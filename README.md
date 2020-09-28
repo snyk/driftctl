@@ -1,5 +1,5 @@
-# Cloudskiff
-Cloudskiff measures infrastucture as code coverage, and tracks cloud configuration drift.
+# About driftctl
+`driftctl` measures infrastucture as code coverage, and tracks cloud configuration drift.
 
 ## Why ?
 
@@ -9,7 +9,7 @@ Drift can have multiple causes: from developers creating or updating infrastruct
 
 You can't efficiently improve what you don't track. **We track coverage for unit tests, why not infrastructure as code coverage?**
 
-Cloudskiff tracks how well your IaC codebase covers your cloud configuration. Cloudskiff warns you about drift.
+`driftctl` tracks how well your IaC codebase covers your cloud configuration. `driftctl` warns you about drift.
 
 
 ## What does it do?
