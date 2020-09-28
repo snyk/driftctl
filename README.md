@@ -1,9 +1,9 @@
 # About driftctl
-`driftctl` measures infrastucture as code coverage, and tracks cloud configuration drift.
+`driftctl` measures infrastucture as code coverage, and tracks infrastructure drift.
 
 ## Why ?
 
-Infrastructure as code is awesome, but there are too many moving parts: codebase, state file, actual cloud configuration. Things tend to drift.
+Infrastructure as code is awesome, but there are too many moving parts: codebase, state file, actual cloud state. Things tend to drift.
 
 Drift can have multiple causes: from developers creating or updating infrastructure through the web console without telling anyone, to uncontrolled updates on the cloud provider side. Handling infrastructure drift vs the codebase can be challenging.
 
