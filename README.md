@@ -9,7 +9,7 @@
   <a href="https://codecov.io/gh/cloudskiff/driftctl">
     <img src="https://codecov.io/gh/cloudskiff/driftctl/branch/main/graph/badge.svg?token=8C5R02G5S7"/>
   </a><br>
-  Measures infrastucture as code coverage, and tracks infrastructure drift.<br>
+  Measures infrastructure as code coverage, and tracks infrastructure drift.<br>
   :warning: <strong>This tool is still in beta state and will evolve in the future with potential breaking changes</strong> :warning:
 </p>
 
@@ -28,7 +28,7 @@ driftctl tracks how well your IaC codebase covers your cloud configuration. drif
 - **Scan** cloud provider and map resources with IaC code
 - Analyze diff, and warn about drift and unwanted unmanaged resources
 - Allow users to **ignore** resources
-- Multiples output format
+- Multiple output formats
 
 ## Getting started
 
