@@ -1,5 +1,14 @@
 <p align="center">
   <img width="201" src="assets/icon.svg" alt="Driftctl"><br>
+  <img src="https://circleci.com/gh/cloudskiff/driftctl.svg?style=shield"/>
+  <img src="https://goreportcard.com/badge/github.com/cloudskiff/driftctl"/>
+  <img src="https://img.shields.io/github/license/cloudskiff/driftctl">
+  <img src="https://img.shields.io/github/v/release/cloudskiff/driftctl">
+  <img src="https://img.shields.io/github/go-mod/go-version/cloudskiff/driftctl">
+  <img src="https://img.shields.io/github/downloads/cloudskiff/driftctl/total.svg"/>
+  <a href="https://codecov.io/gh/cloudskiff/driftctl">
+    <img src="https://codecov.io/gh/cloudskiff/driftctl/branch/main/graph/badge.svg?token=8C5R02G5S7"/>
+  </a><br>
   Measures infrastucture as code coverage, and tracks infrastructure drift.<br>
   :warning: <strong>This tool is still in beta state and will evolve in the future with potential breaking changes</strong> :warning:
 </p>
