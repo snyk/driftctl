@@ -76,7 +76,6 @@ $ driftctl scan --from tfstate+s3://my-bucket/path/to/state.tfstate
 
 - [User guide](doc/README.md)
 - [Discord](https://discord.gg/eYGHUa75Q2)
-- Forum
 
 ## Contribute
 
