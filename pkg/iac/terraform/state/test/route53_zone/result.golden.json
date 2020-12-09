@@ -1,0 +1,18 @@
+[
+ {
+  "Comment": "Managed by Terraform",
+  "DelegationSetId": "",
+  "ForceDestroy": false,
+  "Id": "Z09368953G729AFEX5048",
+  "Name": "elie.ski",
+  "NameServers": [
+   "ns-1504.awsdns-60.org",
+   "ns-180.awsdns-22.com",
+   "ns-1890.awsdns-44.co.uk",
+   "ns-759.awsdns-30.net"
+  ],
+  "Tags": null,
+  "ZoneId": "Z09368953G729AFEX5048",
+  "Vpc": []
+ }
+]

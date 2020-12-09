@@ -1,0 +1,99 @@
+version: 2.1
+orbs:
+  aws-cli: circleci/aws-cli@1.3.0
+jobs:
+  build:
+    docker:
+      - image: golang:1.15
+    steps:
+      - checkout
+      - run: make release
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - bin/
+  test:
+    docker:
+      - image: golang:1.15
+    steps:
+      - checkout
+      - run: make install-tools
+      - run: make test
+      - run:
+          name: Codecov upload
+          command: |
+            bash <(curl -s https://codecov.io/bash)
+      - store_test_results:
+          path: ./
+  release:
+    environment:
+        CIRCLE_PROJECT_USERNAME: cloudskiff
+        CIRCLE_PROJECT_REPONAME: driftctl
+    docker:
+      - image: cibuilds/github:0.13
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            VERSION=$(./bin/driftctl_linux_amd64 version)
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -n ${VERSION} ${VERSION} ./bin/
+  update-lambda:
+    executor: aws-cli/default
+    environment:
+        FUNCTION_NAME: driftctl-version
+    steps:
+      - aws-cli/install
+      - run:
+          name: "Update Lambda version"
+          command: |
+            aws lambda update-function-configuration --function-name $FUNCTION_NAME --environment "{\"Variables\":{\"LATEST_VERSION\":\"$CIRCLE_TAG\"}}"
+workflows:
+  pullrequest:
+    jobs:
+      - test:
+          filters:
+            branches:
+              ignore:
+                - master
+  push:
+    jobs:
+      - test:
+          filters:
+            branches:
+              only:
+                - master
+  release:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - test:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - release:
+          context: driftctl
+          requires:
+            - test
+            - build
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - update-lambda:
+          context: driftctl-version-lambda
+          requires:
+            - release
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/

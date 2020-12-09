@@ -1,0 +1,26 @@
+[
+  {
+    "Arn": "arn:aws:rds:eu-west-3:929327065333:subgrp:bar",
+    "Description": "Managed by Terraform",
+    "Id": "bar",
+    "Name": "bar",
+    "NamePrefix": null,
+    "SubnetIds": [
+      "subnet-63c5f90a",
+      "subnet-d81e8695"
+    ],
+    "Tags": null
+  },
+  {
+    "Arn": "arn:aws:rds:eu-west-3:929327065333:subgrp:foo",
+    "Description": "Managed by Terraform",
+    "Id": "foo",
+    "Name": "foo",
+    "NamePrefix": null,
+    "SubnetIds": [
+      "subnet-49f9ae32",
+      "subnet-63c5f90a"
+    ],
+    "Tags": null
+  }
+]

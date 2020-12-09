@@ -1,0 +1,50 @@
+[
+ {
+  "comment": "Managed by Terraform",
+  "delegation_set_id": "",
+  "force_destroy": null,
+  "id": "Z01804312AV8PHE3C43AD",
+  "name": "foo-1.com",
+  "name_servers": [
+   "ns-1243.awsdns-27.org",
+   "ns-2046.awsdns-63.co.uk",
+   "ns-395.awsdns-49.com",
+   "ns-961.awsdns-56.net"
+  ],
+  "tags": {},
+  "vpc": [],
+  "zone_id": "Z01804312AV8PHE3C43AD"
+ },
+ {
+  "comment": "Managed by Terraform",
+  "delegation_set_id": "",
+  "force_destroy": null,
+  "id": "Z01874941AR1TCGV5K65C",
+  "name": "foo-2.com",
+  "name_servers": [
+   "ns-1119.awsdns-11.org",
+   "ns-1538.awsdns-00.co.uk",
+   "ns-325.awsdns-40.com",
+   "ns-649.awsdns-17.net"
+  ],
+  "tags": {},
+  "vpc": [],
+  "zone_id": "Z01874941AR1TCGV5K65C"
+ },
+ {
+  "comment": "Managed by Terraform",
+  "delegation_set_id": "",
+  "force_destroy": null,
+  "id": "Z01809283VH9BBALZHO7B",
+  "name": "foo-0.com",
+  "name_servers": [
+   "ns-1039.awsdns-01.org",
+   "ns-1802.awsdns-33.co.uk",
+   "ns-503.awsdns-62.com",
+   "ns-813.awsdns-37.net"
+  ],
+  "tags": {},
+  "vpc": [],
+  "zone_id": "Z01809283VH9BBALZHO7B"
+ }
+]

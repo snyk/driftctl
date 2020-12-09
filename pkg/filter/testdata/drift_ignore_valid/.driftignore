@@ -1,0 +1,3 @@
+ignored_resource.id2
+wildcard_resource.*
+resource_type.id.with.dots

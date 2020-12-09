@@ -1,0 +1,217 @@
+[
+ {
+  "Comment": "Managed by Terraform",
+  "DelegationSetId": "",
+  "ForceDestroy": false,
+  "Id": "Z1035360GLIB82T1EH2G",
+  "Name": "foo-0.com",
+  "NameServers": [
+   "ns-1441.awsdns-52.org",
+   "ns-1595.awsdns-07.co.uk",
+   "ns-332.awsdns-41.com",
+   "ns-885.awsdns-46.net"
+  ],
+  "Tags": {},
+  "ZoneId": "Z1035360GLIB82T1EH2G",
+  "Vpc": []
+ },
+ {
+  "Comment": "Managed by Terraform",
+  "DelegationSetId": "",
+  "ForceDestroy": false,
+  "Id": "Z10347383HV75H96J919W",
+  "Name": "foo-1.com",
+  "NameServers": [
+   "ns-1065.awsdns-05.org",
+   "ns-1882.awsdns-43.co.uk",
+   "ns-449.awsdns-56.com",
+   "ns-921.awsdns-51.net"
+  ],
+  "Tags": {},
+  "ZoneId": "Z10347383HV75H96J919W",
+  "Vpc": []
+ },
+ {
+  "AllowOverwrite": true,
+  "Fqdn": "foo-0.com",
+  "HealthCheckId": "",
+  "Id": "Z1035360GLIB82T1EH2G_foo-0.com_NS",
+  "MultivalueAnswerRoutingPolicy": null,
+  "Name": "foo-0.com",
+  "Records": [
+   "ns-1295.awsdns-33.org.",
+   "ns-1843.awsdns-38.co.uk.",
+   "ns-228.awsdns-28.demo.",
+   "ns-873.awsdns-45.net."
+  ],
+  "SetIdentifier": "",
+  "Ttl": 172800,
+  "Type": "NS",
+  "ZoneId": "Z1035360GLIB82T1EH2G",
+  "Alias": null,
+  "FailoverRoutingPolicy": [],
+  "GeolocationRoutingPolicy": [],
+  "LatencyRoutingPolicy": [],
+  "WeightedRoutingPolicy": []
+ },
+ {
+  "AllowOverwrite": null,
+  "Fqdn": "test2.foo-0.com",
+  "HealthCheckId": "",
+  "Id": "Z1035360GLIB82T1EH2G_test2_A",
+  "MultivalueAnswerRoutingPolicy": null,
+  "Name": "test2",
+  "Records": [
+   "1.2.3.4"
+  ],
+  "SetIdentifier": "",
+  "Ttl": 300,
+  "Type": "A",
+  "ZoneId": "Z1035360GLIB82T1EH2G",
+  "Alias": null,
+  "FailoverRoutingPolicy": [],
+  "GeolocationRoutingPolicy": [],
+  "LatencyRoutingPolicy": [],
+  "WeightedRoutingPolicy": []
+ },
+ {
+  "AllowOverwrite": null,
+  "Fqdn": "test3.foo-0.com",
+  "HealthCheckId": "",
+  "Id": "Z1035360GLIB82T1EH2G_test3_A",
+  "MultivalueAnswerRoutingPolicy": null,
+  "Name": "test3",
+  "Records": [
+   "1.2.3.4"
+  ],
+  "SetIdentifier": "",
+  "Ttl": 300,
+  "Type": "A",
+  "ZoneId": "Z1035360GLIB82T1EH2G",
+  "Alias": null,
+  "FailoverRoutingPolicy": [],
+  "GeolocationRoutingPolicy": [],
+  "LatencyRoutingPolicy": [],
+  "WeightedRoutingPolicy": []
+ },
+ {
+  "AllowOverwrite": null,
+  "Fqdn": "test0.foo-0.com",
+  "HealthCheckId": "",
+  "Id": "Z1035360GLIB82T1EH2G_test0_A",
+  "MultivalueAnswerRoutingPolicy": null,
+  "Name": "test0",
+  "Records": [
+   "1.2.3.4"
+  ],
+  "SetIdentifier": "",
+  "Ttl": 300,
+  "Type": "A",
+  "ZoneId": "Z1035360GLIB82T1EH2G",
+  "Alias": null,
+  "FailoverRoutingPolicy": [],
+  "GeolocationRoutingPolicy": [],
+  "LatencyRoutingPolicy": [],
+  "WeightedRoutingPolicy": []
+ },
+ {
+  "AllowOverwrite": null,
+  "Fqdn": "test1.foo-0.com",
+  "HealthCheckId": "",
+  "Id": "Z1035360GLIB82T1EH2G_test1_A",
+  "MultivalueAnswerRoutingPolicy": null,
+  "Name": "test1",
+  "Records": [
+   "1.2.3.4"
+  ],
+  "SetIdentifier": "",
+  "Ttl": 300,
+  "Type": "A",
+  "ZoneId": "Z1035360GLIB82T1EH2G",
+  "Alias": null,
+  "FailoverRoutingPolicy": [],
+  "GeolocationRoutingPolicy": [],
+  "LatencyRoutingPolicy": [],
+  "WeightedRoutingPolicy": []
+ },
+ {
+  "AllowOverwrite": null,
+  "Fqdn": "test3.foo-1.com",
+  "HealthCheckId": "",
+  "Id": "Z10347383HV75H96J919W_test3_A",
+  "MultivalueAnswerRoutingPolicy": null,
+  "Name": "test3",
+  "Records": [
+   "1.2.3.4"
+  ],
+  "SetIdentifier": "",
+  "Ttl": 300,
+  "Type": "A",
+  "ZoneId": "Z10347383HV75H96J919W",
+  "Alias": null,
+  "FailoverRoutingPolicy": [],
+  "GeolocationRoutingPolicy": [],
+  "LatencyRoutingPolicy": [],
+  "WeightedRoutingPolicy": []
+ },
+ {
+  "AllowOverwrite": null,
+  "Fqdn": "test0.foo-1.com",
+  "HealthCheckId": "",
+  "Id": "Z10347383HV75H96J919W_test0_A",
+  "MultivalueAnswerRoutingPolicy": null,
+  "Name": "test0",
+  "Records": [
+   "1.2.3.4"
+  ],
+  "SetIdentifier": "",
+  "Ttl": 300,
+  "Type": "A",
+  "ZoneId": "Z10347383HV75H96J919W",
+  "Alias": null,
+  "FailoverRoutingPolicy": [],
+  "GeolocationRoutingPolicy": [],
+  "LatencyRoutingPolicy": [],
+  "WeightedRoutingPolicy": []
+ },
+ {
+  "AllowOverwrite": null,
+  "Fqdn": "test1.foo-1.com",
+  "HealthCheckId": "",
+  "Id": "Z10347383HV75H96J919W_test1_A",
+  "MultivalueAnswerRoutingPolicy": null,
+  "Name": "test1",
+  "Records": [
+   "1.2.3.4"
+  ],
+  "SetIdentifier": "",
+  "Ttl": 300,
+  "Type": "A",
+  "ZoneId": "Z10347383HV75H96J919W",
+  "Alias": null,
+  "FailoverRoutingPolicy": [],
+  "GeolocationRoutingPolicy": [],
+  "LatencyRoutingPolicy": [],
+  "WeightedRoutingPolicy": []
+ },
+ {
+  "AllowOverwrite": null,
+  "Fqdn": "test2.foo-1.com",
+  "HealthCheckId": "",
+  "Id": "Z10347383HV75H96J919W_test2_A",
+  "MultivalueAnswerRoutingPolicy": null,
+  "Name": "test2",
+  "Records": [
+   "1.2.3.4"
+  ],
+  "SetIdentifier": "",
+  "Ttl": 300,
+  "Type": "A",
+  "ZoneId": "Z10347383HV75H96J919W",
+  "Alias": null,
+  "FailoverRoutingPolicy": [],
+  "GeolocationRoutingPolicy": [],
+  "LatencyRoutingPolicy": [],
+  "WeightedRoutingPolicy": []
+ }
+]

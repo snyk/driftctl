@@ -1,0 +1,31 @@
+[
+ {
+  "AllocationId": null,
+  "AssociateWithPrivateIp": "10.0.0.11",
+  "AssociationId": "eipassoc-05d9c19732254e578",
+  "CustomerOwnedIp": "",
+  "CustomerOwnedIpv4Pool": "",
+  "Domain": "vpc",
+  "Id": "eipalloc-017d5267e4dda73f1",
+  "Instance": "i-0d3650a23f4e45dc0",
+  "NetworkBorderGroup": null,
+  "NetworkInterface": "eni-0f35ce5577bbab251",
+  "PrivateDns": "ip-172-31-22-12.eu-west-3.compute.internal",
+  "PrivateIp": "172.31.22.12",
+  "PublicDns": "ec2-35-180-239-105.eu-west-3.compute.amazonaws.com",
+  "PublicIp": "35.180.239.105",
+  "PublicIpv4Pool": "amazon",
+  "Tags": {},
+  "Vpc": true,
+  "Timeouts": null
+ },
+ {
+  "AllocationId": "eipalloc-017d5267e4dda73f1",
+  "AllowReassociation": null,
+  "Id": "eipassoc-05d9c19732254e578",
+  "InstanceId": "i-0d3650a23f4e45dc0",
+  "NetworkInterfaceId": "eni-0f35ce5577bbab251",
+  "PrivateIpAddress": "172.31.22.12",
+  "PublicIp": "35.180.239.105"
+ }
+]

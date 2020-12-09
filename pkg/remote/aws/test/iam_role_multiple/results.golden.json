@@ -1,0 +1,53 @@
+[
+ {
+  "arn": "arn:aws:iam::929327065333:role/test/test_role_0",
+  "assume_role_policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+  "create_date": "2020-11-04T10:09:37Z",
+  "description": "test",
+  "force_detach_policies": null,
+  "id": "test_role_0",
+  "max_session_duration": 3600,
+  "name": "test_role_0",
+  "name_prefix": null,
+  "path": "/test/",
+  "permissions_boundary": null,
+  "tags": {
+   "foo": "bar0"
+  },
+  "unique_id": "AROA5QYBVVD24YSTJXHHO"
+ },
+ {
+  "arn": "arn:aws:iam::929327065333:role/test/test_role_1",
+  "assume_role_policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+  "create_date": "2020-11-04T10:09:37Z",
+  "description": "",
+  "force_detach_policies": null,
+  "id": "test_role_1",
+  "max_session_duration": 3600,
+  "name": "test_role_1",
+  "name_prefix": null,
+  "path": "/test/",
+  "permissions_boundary": null,
+  "tags": {
+   "foo": "bar1"
+  },
+  "unique_id": "AROA5QYBVVD2UGXJCEDXF"
+ },
+ {
+  "arn": "arn:aws:iam::929327065333:role/test/test_role_2",
+  "assume_role_policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+  "create_date": "2020-11-04T10:09:37Z",
+  "description": "",
+  "force_detach_policies": null,
+  "id": "test_role_2",
+  "max_session_duration": 3600,
+  "name": "test_role_2",
+  "name_prefix": null,
+  "path": "/test/",
+  "permissions_boundary": null,
+  "tags": {
+   "foo": "bar2"
+  },
+  "unique_id": "AROA5QYBVVD2WGP2ZEG73"
+ }
+]

@@ -1,0 +1,17 @@
+@startuml
+Driftctl -> Scanner: Resource()
+Scanner -> Scanner: List Suppliers
+loop
+Scanner -> Supplier: Resources()
+Supplier -> RemoteSDK: List resource
+RemoteSDK --> Supplier: []ResourcesIds
+loop
+Supplier -> TerraformProvider: ReadResource()
+TerraformProvider --> Supplier: CTYRessource
+Supplier -> CTYDeserializer: Deserialize()
+CTYDeserializer --> Supplier: Resource
+end
+Supplier --> Scanner: []Resource
+end
+Scanner --> Driftctl: []Resource
+@enduml

@@ -1,0 +1,76 @@
+{
+	"summary": {
+		"total_resources": 6,
+		"total_drifted": 1,
+		"total_unmanaged": 2,
+		"total_deleted": 2,
+		"total_managed": 2
+	},
+	"managed": [
+		{
+			"id": "diff-id-1",
+			"type": "aws_diff_resource"
+		},
+		{
+			"id": "no-diff-id-1",
+			"type": "aws_no_diff_resource"
+		}
+	],
+	"unmanaged": [
+		{
+			"id": "unmanaged-id-1",
+			"type": "aws_unmanaged_resource"
+		},
+		{
+			"id": "unmanaged-id-2",
+			"type": "aws_unmanaged_resource"
+		}
+	],
+	"deleted": [
+		{
+			"id": "deleted-id-1",
+			"type": "aws_deleted_resource"
+		},
+		{
+			"id": "deleted-id-2",
+			"type": "aws_deleted_resource"
+		}
+	],
+	"differences": [
+		{
+			"res": {
+				"id": "diff-id-1",
+				"type": "aws_diff_resource"
+			},
+			"changelog": [
+				{
+					"type": "update",
+					"path": [
+						"updated",
+						"field"
+					],
+					"from": "foobar",
+					"to": "barfoo"
+				},
+				{
+					"type": "create",
+					"path": [
+						"new",
+						"field"
+					],
+					"from": null,
+					"to": "newValue"
+				},
+				{
+					"type": "delete",
+					"path": [
+						"a"
+					],
+					"from": "oldValue",
+					"to": null
+				}
+			]
+		}
+	],
+	"coverage": 33
+}

@@ -1,0 +1,31 @@
+Found drifted resources:
+  - diff-id-1 (aws_diff_resource):
+    ~ Json:
+        {
+          "Statement": [
+            {
+              "Changed": [
+                ~ "ec2:DescribeInstances" => "ec2:*"
+              ],
+              "Effect": "Allow",
+              + "NewField": [
+                + "foobar"
+              + ],
+              - "Removed": "Added",
+              "Resource": "*"
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+  - diff-id-2 (aws_diff_resource):
+    ~ Json:
+        {
+          + "bar": "foo",
+          - "foo": "bar"
+        }
+Found 2 resource(s)
+ - 100% coverage
+ - 2 covered by IaC
+ - 0 not covered by IaC
+ - 0 deleted on cloud provider
+ - 2/2 drifted from IaC

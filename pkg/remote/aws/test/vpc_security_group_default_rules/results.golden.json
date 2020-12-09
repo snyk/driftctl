@@ -1,0 +1,34 @@
+[
+ {
+  "cidr_blocks": [
+   "1.2.3.4/32"
+  ],
+  "description": "",
+  "from_port": 0,
+  "id": "sgrule-529352477",
+  "ipv6_cidr_blocks": [],
+  "prefix_list_ids": [],
+  "protocol": "-1",
+  "security_group_id": "sg-a74815c8",
+  "self": false,
+  "source_security_group_id": "",
+  "to_port": 0,
+  "type": "egress"
+ },
+ {
+  "cidr_blocks": [
+   "1.2.0.0/16"
+  ],
+  "description": "",
+  "from_port": 0,
+  "id": "sgrule-3820791514",
+  "ipv6_cidr_blocks": [],
+  "prefix_list_ids": [],
+  "protocol": "-1",
+  "security_group_id": "sg-a74815c8",
+  "self": false,
+  "source_security_group_id": "",
+  "to_port": 0,
+  "type": "ingress"
+ }
+]

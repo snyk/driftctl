@@ -1,0 +1,20 @@
+[
+ {
+  "comment": "test comment",
+  "delegation_set_id": "",
+  "force_destroy": null,
+  "id": "Z08068311RGDXPHF8KE62",
+  "name": "foo.bar",
+  "name_servers": [
+   "ns-1011.awsdns-62.net",
+   "ns-117.awsdns-14.com",
+   "ns-1423.awsdns-49.org",
+   "ns-1998.awsdns-57.co.uk"
+  ],
+  "tags": {
+   "test": "example"
+  },
+  "vpc": [],
+  "zone_id": "Z08068311RGDXPHF8KE62"
+ }
+]

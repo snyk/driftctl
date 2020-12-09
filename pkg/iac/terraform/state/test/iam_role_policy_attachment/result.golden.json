@@ -1,0 +1,110 @@
+[
+ {
+  "Arn": "arn:aws:iam::526954929923:role/test-role2",
+  "AssumeRolePolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+  "CreateDate": "2020-11-18T16:29:08Z",
+  "Description": "",
+  "ForceDetachPolicies": false,
+  "Id": "test-role2",
+  "MaxSessionDuration": 3600,
+  "Name": "test-role2",
+  "NamePrefix": null,
+  "Path": "/",
+  "PermissionsBoundary": null,
+  "Tags": {},
+  "UniqueId": "AROAXVMHWD4BXFUYMSDRB"
+ },
+ {
+  "Arn": "arn:aws:iam::526954929923:role/test-role",
+  "AssumeRolePolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+  "CreateDate": "2020-11-18T16:28:49Z",
+  "Description": "",
+  "ForceDetachPolicies": false,
+  "Id": "test-role",
+  "MaxSessionDuration": 3600,
+  "Name": "test-role",
+  "NamePrefix": null,
+  "Path": "/",
+  "PermissionsBoundary": null,
+  "Tags": {},
+  "UniqueId": "AROAXVMHWD4BRFKSROAS3"
+ },
+ {
+  "Arn": "arn:aws:iam::526954929923:policy/test-policy",
+  "Description": "A test policy",
+  "Id": "arn:aws:iam::526954929923:policy/test-policy",
+  "Name": "test-policy",
+  "NamePrefix": null,
+  "Path": "/",
+  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}"
+ },
+ {
+  "Arn": "arn:aws:iam::526954929923:policy/test-policy3",
+  "Description": "A test policy 3",
+  "Id": "arn:aws:iam::526954929923:policy/test-policy3",
+  "Name": "test-policy3",
+  "NamePrefix": null,
+  "Path": "/",
+  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}"
+ },
+ {
+  "Arn": "arn:aws:iam::526954929923:policy/test-policy2",
+  "Description": "A test policy 2",
+  "Id": "arn:aws:iam::526954929923:policy/test-policy2",
+  "Name": "test-policy2",
+  "NamePrefix": null,
+  "Path": "/",
+  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}"
+ },
+ {
+  "Groups": [],
+  "Id": "test-attachment5",
+  "Name": "test-attachment5",
+  "PolicyArn": "arn:aws:iam::526954929923:policy/test-policy3",
+  "Roles": [
+   "test-role",
+   "test-role2"
+  ],
+  "Users": []
+ },
+ {
+  "Groups": [],
+  "Id": "test-role-arn:aws:iam::526954929923:policy/test-policy",
+  "Name": "test-role-20201118162849968800000001",
+  "PolicyArn": "arn:aws:iam::526954929923:policy/test-policy",
+  "Roles": [
+   "test-role"
+  ],
+  "Users": []
+ },
+ {
+  "Groups": [],
+  "Id": "test-role-arn:aws:iam::526954929923:policy/test-policy2",
+  "Name": "test-role-20201118162849994600000002",
+  "PolicyArn": "arn:aws:iam::526954929923:policy/test-policy2",
+  "Roles": [
+   "test-role"
+  ],
+  "Users": []
+ },
+ {
+  "Groups": [],
+  "Id": "test-role2-arn:aws:iam::526954929923:policy/test-policy",
+  "Name": "test-role2-20201118162908999800000001",
+  "PolicyArn": "arn:aws:iam::526954929923:policy/test-policy",
+  "Roles": [
+   "test-role2"
+  ],
+  "Users": []
+ },
+ {
+  "Groups": [],
+  "Id": "test-role2-arn:aws:iam::526954929923:policy/test-policy2",
+  "Name": "test-role2-20201118162909011200000002",
+  "PolicyArn": "arn:aws:iam::526954929923:policy/test-policy2",
+  "Roles": [
+   "test-role2"
+  ],
+  "Users": []
+ }
+]

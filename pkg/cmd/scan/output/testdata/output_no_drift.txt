@@ -1,0 +1,3 @@
+Found 5 resource(s)
+ - 100% coverage
+Congrats! Your infrastructure is fully in sync.

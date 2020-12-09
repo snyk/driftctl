@@ -1,0 +1,62 @@
+[
+ {
+  "Arn": "arn:aws:iam::929327065333:user/test-driftctl",
+  "ForceDestroy": false,
+  "Id": "test-driftctl",
+  "Name": "test-driftctl",
+  "Path": "/",
+  "PermissionsBoundary": null,
+  "Tags": {},
+  "UniqueId": "AIDA5QYBVVD27TBHIJVSL"
+ },
+ {
+  "Arn": "arn:aws:iam::929327065333:user/test-driftctl2",
+  "ForceDestroy": false,
+  "Id": "test-driftctl2",
+  "Name": "test-driftctl2",
+  "Path": "/",
+  "PermissionsBoundary": null,
+  "Tags": {},
+  "UniqueId": "AIDA5QYBVVD2RVTK3ODPO"
+ },
+ {
+  "EncryptedSecret": null,
+  "Id": "AKIA5QYBVVD223VWU32A",
+  "KeyFingerprint": null,
+  "PgpKey": null,
+  "Secret": null,
+  "SesSmtpPasswordV4": null,
+  "Status": "Active",
+  "User": "test-driftctl"
+ },
+ {
+  "EncryptedSecret": null,
+  "Id": "AKIA5QYBVVD2QYI36UZP",
+  "KeyFingerprint": null,
+  "PgpKey": null,
+  "Secret": null,
+  "SesSmtpPasswordV4": null,
+  "Status": "Active",
+  "User": "test-driftctl"
+ },
+ {
+  "EncryptedSecret": null,
+  "Id": "AKIA5QYBVVD26EJME25D",
+  "KeyFingerprint": null,
+  "PgpKey": null,
+  "Secret": null,
+  "SesSmtpPasswordV4": null,
+  "Status": "Active",
+  "User": "test-driftctl2"
+ },
+ {
+  "EncryptedSecret": null,
+  "Id": "AKIA5QYBVVD2SWDFVVMG",
+  "KeyFingerprint": null,
+  "PgpKey": null,
+  "Secret": null,
+  "SesSmtpPasswordV4": null,
+  "Status": "Active",
+  "User": "test-driftctl2"
+ }
+]

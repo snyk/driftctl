@@ -1,0 +1,34 @@
+[
+  {
+    "AccelerationStatus": "",
+    "Acl": "private",
+    "Arn": "arn:aws:s3:::69vgd6-qa-bucket-001",
+    "Bucket": "69vgd6-qa-bucket-001",
+    "BucketDomainName": "69vgd6-qa-bucket-001.s3.amazonaws.com",
+    "BucketPrefix": null,
+    "BucketRegionalDomainName": "69vgd6-qa-bucket-001.s3.ca-central-1.amazonaws.com",
+    "ForceDestroy": false,
+    "HostedZoneId": "Z1QDHH18159H29",
+    "Id": "69vgd6-qa-bucket-001",
+    "Policy": null,
+    "Region": "ca-central-1",
+    "RequestPayer": "BucketOwner",
+    "Tags": null,
+    "WebsiteDomain": null,
+    "WebsiteEndpoint": null,
+    "CorsRule": [],
+    "Grant": [],
+    "LifecycleRule": [],
+    "Logging": [],
+    "ObjectLockConfiguration": [],
+    "ReplicationConfiguration": [],
+    "ServerSideEncryptionConfiguration": [],
+    "Versioning": [
+      {
+        "Enabled": false,
+        "MfaDelete": false
+      }
+    ],
+    "Website": []
+  }
+]

@@ -1,0 +1,38 @@
+[
+ {
+  "Arn": "arn:aws:iam::929327065333:user/test/test-driftctl-0",
+  "ForceDestroy": true,
+  "Id": "test-driftctl-0",
+  "Name": "test-driftctl-0",
+  "Path": "/test/",
+  "PermissionsBoundary": null,
+  "Tags": {
+   "foo": "bar"
+  },
+  "UniqueId": "AIDA5QYBVVD2ZWIW56NWS"
+ },
+ {
+  "Arn": "arn:aws:iam::929327065333:user/test/test-driftctl-1",
+  "ForceDestroy": true,
+  "Id": "test-driftctl-1",
+  "Name": "test-driftctl-1",
+  "Path": "/test/",
+  "PermissionsBoundary": null,
+  "Tags": {
+   "foo": "bar"
+  },
+  "UniqueId": "AIDA5QYBVVD2UMP6CZEGZ"
+ },
+ {
+  "Arn": "arn:aws:iam::929327065333:user/test/test-driftctl-2",
+  "ForceDestroy": true,
+  "Id": "test-driftctl-2",
+  "Name": "test-driftctl-2",
+  "Path": "/test/",
+  "PermissionsBoundary": null,
+  "Tags": {
+   "foo": "bar"
+  },
+  "UniqueId": "AIDA5QYBVVD23ZWIILRUW"
+ }
+]

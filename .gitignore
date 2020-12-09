@@ -1,0 +1,33 @@
+/bin/*
+!/bin/.gitkeep
+
+### Go ###
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+### Go Patch ###
+/vendor/
+
+### test report ###
+/unit-tests.xml
+/unit-tests-acc.xml
+/cover.out
+/cover-acc.out
+
+### coverage folder inside pkg ###
+!pkg/coverage
+
+### vscode settings ###
+.vscode
+
+### terraform provider/tfstate ###
+.terraform
+*.tfstate*
+!pkg/iac/**/*.tfstate*
+
+### driftctl
+/.driftignore

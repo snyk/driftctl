@@ -1,0 +1,181 @@
+[
+ {
+  "CidrBlocks": [
+   "0.0.0.0/0"
+  ],
+  "Description": "Bar Full Open",
+  "FromPort": 0,
+  "Id": "sgrule-845917806",
+  "Ipv6CidrBlocks": [
+   "::/0"
+  ],
+  "PrefixListIds": [],
+  "Protocol": "-1",
+  "SecurityGroupId": "sg-0cc8b3c3c2851705a",
+  "Self": false,
+  "SourceSecurityGroupId": null,
+  "ToPort": 0,
+  "Type": "egress"
+ },
+ {
+  "CidrBlocks": [
+   "0.0.0.0/0"
+  ],
+  "Description": "Bar Full Open",
+  "FromPort": 0,
+  "Id": "sgrule-2990167998",
+  "Ipv6CidrBlocks": [
+   "::/0"
+  ],
+  "PrefixListIds": [],
+  "Protocol": "-1",
+  "SecurityGroupId": "sg-06910b842af0d3a8f",
+  "Self": false,
+  "SourceSecurityGroupId": null,
+  "ToPort": 0,
+  "Type": "egress"
+ },
+ {
+  "CidrBlocks": [],
+  "Description": "Baz 2",
+  "FromPort": 0,
+  "Id": "sgrule-2471889226",
+  "Ipv6CidrBlocks": [],
+  "PrefixListIds": [
+   "pl-abb451c2"
+  ],
+  "Protocol": "tcp",
+  "SecurityGroupId": "sg-0254c038e32f25530",
+  "Self": false,
+  "SourceSecurityGroupId": null,
+  "ToPort": 0,
+  "Type": "ingress"
+ },
+ {
+  "CidrBlocks": [],
+  "Description": "Bla 1",
+  "FromPort": 0,
+  "Id": "sgrule-3266388606",
+  "Ipv6CidrBlocks": [
+   "::/0"
+  ],
+  "PrefixListIds": [],
+  "Protocol": "-1",
+  "SecurityGroupId": "sg-0d290f68e48de546b",
+  "Self": false,
+  "SourceSecurityGroupId": null,
+  "ToPort": 0,
+  "Type": "ingress"
+ },
+ {
+  "CidrBlocks": [
+   "0.0.0.0/0"
+  ],
+  "Description": "Bar Full Open",
+  "FromPort": 0,
+  "Id": "sgrule-752281532",
+  "Ipv6CidrBlocks": [],
+  "PrefixListIds": [],
+  "Protocol": "tcp",
+  "SecurityGroupId": "sg-0d290f68e48de546b",
+  "Self": false,
+  "SourceSecurityGroupId": null,
+  "ToPort": 0,
+  "Type": "egress"
+ },
+ {
+  "CidrBlocks": [],
+  "Description": "Test 1",
+  "FromPort": 0,
+  "Id": "sgrule-3970541193",
+  "Ipv6CidrBlocks": [],
+  "PrefixListIds": [],
+  "Protocol": "tcp",
+  "SecurityGroupId": "sg-0254c038e32f25530",
+  "Self": true,
+  "SourceSecurityGroupId": "sg-0254c038e32f25530",
+  "ToPort": 65535,
+  "Type": "ingress"
+ },
+ {
+  "CidrBlocks": [],
+  "Description": "",
+  "FromPort": 0,
+  "Id": "sgrule-1872529830",
+  "Ipv6CidrBlocks": [],
+  "PrefixListIds": [],
+  "Protocol": "icmp",
+  "SecurityGroupId": "sg-0254c038e32f25530",
+  "Self": true,
+  "SourceSecurityGroupId": "sg-0254c038e32f25530",
+  "ToPort": 0,
+  "Type": "ingress"
+ },
+ {
+  "CidrBlocks": [
+   "0.0.0.0/0"
+  ],
+  "Description": "Bar 1",
+  "FromPort": 0,
+  "Id": "sgrule-929398029",
+  "Ipv6CidrBlocks": [
+   "::/0"
+  ],
+  "PrefixListIds": [],
+  "Protocol": "-1",
+  "SecurityGroupId": "sg-0254c038e32f25530",
+  "Self": false,
+  "SourceSecurityGroupId": null,
+  "ToPort": 0,
+  "Type": "egress"
+ },
+ {
+  "CidrBlocks": [
+   "1.2.0.0/16",
+   "5.6.7.0/24"
+  ],
+  "Description": "Foo 5",
+  "FromPort": 0,
+  "Id": "sgrule-294318973",
+  "Ipv6CidrBlocks": [],
+  "PrefixListIds": [],
+  "Protocol": "-1",
+  "SecurityGroupId": "sg-0254c038e32f25530",
+  "Self": false,
+  "SourceSecurityGroupId": null,
+  "ToPort": 0,
+  "Type": "ingress"
+ },
+ {
+  "CidrBlocks": [
+   "0.0.0.0/0"
+  ],
+  "Description": "Foo 1",
+  "FromPort": 0,
+  "Id": "sgrule-3602495974",
+  "Ipv6CidrBlocks": [],
+  "PrefixListIds": [],
+  "Protocol": "-1",
+  "SecurityGroupId": "sg-0254c038e32f25530",
+  "Self": false,
+  "SourceSecurityGroupId": null,
+  "ToPort": 0,
+  "Type": "ingress"
+ },
+ {
+  "CidrBlocks": [
+   "0.0.0.0/0"
+  ],
+  "Description": "Stream",
+  "FromPort": 0,
+  "Id": "sgrule-850043874",
+  "Ipv6CidrBlocks": null,
+  "PrefixListIds": null,
+  "Protocol": "5",
+  "SecurityGroupId": "sg-0cc8b3c3c2851705a",
+  "Self": false,
+  "SourceSecurityGroupId": null,
+  "ToPort": 0,
+  "Type": "egress"
+ }
+]

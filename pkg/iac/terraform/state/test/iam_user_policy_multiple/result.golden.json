@@ -1,0 +1,146 @@
+[
+ {
+  "Arn": "arn:aws:iam::526954929923:user/system/loadbalancer3",
+  "ForceDestroy": false,
+  "Id": "loadbalancer3",
+  "Name": "loadbalancer3",
+  "Path": "/system/",
+  "PermissionsBoundary": null,
+  "Tags": null,
+  "UniqueId": "AIDAXVMHWD4BUICVKAIIT"
+ },
+ {
+  "Arn": "arn:aws:iam::526954929923:user/system/loadbalancer2",
+  "ForceDestroy": false,
+  "Id": "loadbalancer2",
+  "Name": "loadbalancer2",
+  "Path": "/system/",
+  "PermissionsBoundary": null,
+  "Tags": null,
+  "UniqueId": "AIDAXVMHWD4BTVLVQM236"
+ },
+ {
+  "Arn": "arn:aws:iam::526954929923:user/system/loadbalancer",
+  "ForceDestroy": false,
+  "Id": "loadbalancer",
+  "Name": "loadbalancer",
+  "Path": "/system/",
+  "PermissionsBoundary": null,
+  "Tags": null,
+  "UniqueId": "AIDAXVMHWD4B7BHWL7YKF"
+ },
+ {
+  "Id": "loadbalancer3:test34",
+  "Name": "test34",
+  "NamePrefix": null,
+  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "User": "loadbalancer3"
+ },
+ {
+  "Id": "loadbalancer:test4",
+  "Name": "test4",
+  "NamePrefix": null,
+  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "User": "loadbalancer"
+ },
+ {
+  "Id": "loadbalancer2:test23",
+  "Name": "test23",
+  "NamePrefix": null,
+  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "User": "loadbalancer2"
+ },
+ {
+  "Id": "loadbalancer:test2",
+  "Name": "test2",
+  "NamePrefix": null,
+  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "User": "loadbalancer"
+ },
+ {
+  "Id": "loadbalancer2:test22",
+  "Name": "test22",
+  "NamePrefix": null,
+  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "User": "loadbalancer2"
+ },
+ {
+  "Id": "loadbalancer3:test32",
+  "Name": "test32",
+  "NamePrefix": null,
+  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "User": "loadbalancer3"
+ },
+ {
+  "Id": "loadbalancer:test3",
+  "Name": "test3",
+  "NamePrefix": null,
+  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "User": "loadbalancer"
+ },
+ {
+  "Id": "loadbalancer2:test24",
+  "Name": "test24",
+  "NamePrefix": null,
+  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "User": "loadbalancer2"
+ },
+ {
+  "Id": "loadbalancer3:test3",
+  "Name": "test3",
+  "NamePrefix": null,
+  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "User": "loadbalancer3"
+ },
+ {
+  "Id": "loadbalancer3:test33",
+  "Name": "test33",
+  "NamePrefix": null,
+  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "User": "loadbalancer3"
+ },
+ {
+  "Id": "loadbalancer:test",
+  "Name": "test",
+  "NamePrefix": null,
+  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "User": "loadbalancer"
+ },
+ {
+  "Id": "loadbalancer2:test2",
+  "Name": "test2",
+  "NamePrefix": null,
+  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "User": "loadbalancer2"
+ },
+ {
+  "EncryptedSecret": null,
+  "Id": "AKIAXVMHWD4BZZ46XCIU",
+  "KeyFingerprint": null,
+  "PgpKey": null,
+  "Secret": null,
+  "SesSmtpPasswordV4": null,
+  "Status": "Active",
+  "User": "loadbalancer2"
+ },
+ {
+  "EncryptedSecret": null,
+  "Id": "AKIAXVMHWD4BYCOUMTPB",
+  "KeyFingerprint": null,
+  "PgpKey": null,
+  "Secret": null,
+  "SesSmtpPasswordV4": null,
+  "Status": "Active",
+  "User": "loadbalancer"
+ },
+ {
+  "EncryptedSecret": null,
+  "Id": "AKIAXVMHWD4BQM7NGPEU",
+  "KeyFingerprint": null,
+  "PgpKey": null,
+  "Secret": null,
+  "SesSmtpPasswordV4": null,
+  "Status": "Active",
+  "User": "loadbalancer3"
+ }
+]

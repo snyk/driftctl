@@ -1,0 +1,58 @@
+{
+	"summary": {
+		"total_resources": 6,
+		"total_drifted": 1,
+		"total_unmanaged": 2,
+		"total_deleted": 2,
+		"total_managed": 2
+	},
+	"managed": [
+		{
+			"id": "AKIA5QYBVVD25KFXJHYJ",
+			"type": "aws_iam_access_key"
+		},
+		{
+			"id": "driftctl2",
+			"type": "aws_managed_resource"
+		}
+	],
+	"unmanaged": [
+		{
+			"id": "driftctl",
+			"type": "aws_s3_bucket_policy"
+		},
+		{
+			"id": "driftctl",
+			"type": "aws_s3_bucket_notification"
+		}
+	],
+	"deleted": [
+		{
+			"id": "test-driftctl2",
+			"type": "aws_iam_user"
+		},
+		{
+			"id": "AKIA5QYBVVD2Y6PBAAPY",
+			"type": "aws_iam_access_key"
+		}
+	],
+	"differences": [
+		{
+			"res": {
+				"id": "AKIA5QYBVVD25KFXJHYJ",
+				"type": "aws_iam_access_key"
+			},
+			"changelog": [
+				{
+					"type": "update",
+					"path": [
+						"Status"
+					],
+					"from": "Active",
+					"to": "Inactive"
+				}
+			]
+		}
+	],
+	"coverage": 33
+}

@@ -1,0 +1,112 @@
+[
+ {
+  "groups": [],
+  "id": "loadbalancer-arn:aws:iam::526954929923:policy/test3",
+  "name": "test-attach3",
+  "policy_arn": "arn:aws:iam::526954929923:policy/test3",
+  "roles": [],
+  "users": [
+   "loadbalancer"
+  ]
+ },
+ {
+  "groups": [],
+  "id": "loadbalancer-arn:aws:iam::526954929923:policy/test",
+  "name": "test-attach",
+  "policy_arn": "arn:aws:iam::526954929923:policy/test",
+  "roles": [],
+  "users": [
+   "loadbalancer"
+  ]
+ },
+ {
+  "groups": [],
+  "id": "loadbalancer3-arn:aws:iam::526954929923:policy/test3",
+  "name": "test-attach3",
+  "policy_arn": "arn:aws:iam::526954929923:policy/test3",
+  "roles": [],
+  "users": [
+   "loadbalancer3"
+  ]
+ },
+ {
+  "groups": [],
+  "id": "loadbalancer-arn:aws:iam::526954929923:policy/test4",
+  "name": "test-attach4",
+  "policy_arn": "arn:aws:iam::526954929923:policy/test4",
+  "roles": [],
+  "users": [
+   "loadbalancer"
+  ]
+ },
+ {
+  "groups": [],
+  "id": "loadbalancer-arn:aws:iam::526954929923:policy/test2",
+  "name": "test-attach2",
+  "policy_arn": "arn:aws:iam::526954929923:policy/test2",
+  "roles": [],
+  "users": [
+   "loadbalancer"
+  ]
+ },
+ {
+  "groups": [],
+  "id": "loadbalancer2-arn:aws:iam::526954929923:policy/test",
+  "name": "test-attach",
+  "policy_arn": "arn:aws:iam::526954929923:policy/test",
+  "roles": [],
+  "users": [
+   "loadbalancer2"
+  ]
+ },
+ {
+  "groups": [],
+  "id": "loadbalancer2-arn:aws:iam::526954929923:policy/test2",
+  "name": "test-attach2",
+  "policy_arn": "arn:aws:iam::526954929923:policy/test2",
+  "roles": [],
+  "users": [
+   "loadbalancer2"
+  ]
+ },
+ {
+  "groups": [],
+  "id": "loadbalancer2-arn:aws:iam::526954929923:policy/test3",
+  "name": "test-attach3",
+  "policy_arn": "arn:aws:iam::526954929923:policy/test3",
+  "roles": [],
+  "users": [
+   "loadbalancer2"
+  ]
+ },
+ {
+  "groups": [],
+  "id": "loadbalancer2-arn:aws:iam::526954929923:policy/test4",
+  "name": "test-attach4",
+  "policy_arn": "arn:aws:iam::526954929923:policy/test4",
+  "roles": [],
+  "users": [
+   "loadbalancer2"
+  ]
+ },
+ {
+  "groups": [],
+  "id": "loadbalancer3-arn:aws:iam::526954929923:policy/test",
+  "name": "test-attach",
+  "policy_arn": "arn:aws:iam::526954929923:policy/test",
+  "roles": [],
+  "users": [
+   "loadbalancer3"
+  ]
+ },
+ {
+  "groups": [],
+  "id": "loadbalancer3-arn:aws:iam::526954929923:policy/test2",
+  "name": "test-attach2",
+  "policy_arn": "arn:aws:iam::526954929923:policy/test2",
+  "roles": [],
+  "users": [
+   "loadbalancer3"
+  ]
+ }
+]

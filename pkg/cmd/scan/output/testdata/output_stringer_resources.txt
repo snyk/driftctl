@@ -1,0 +1,15 @@
+Found deleted resources:
+  FakeResourceStringer:
+    - dfjkgnbsgj (Name: 'deleted resource')
+Found unmanaged resources:
+  FakeResourceStringer:
+    - duysgkfdjfdgfhd (Name: 'unmanaged resource')
+Found drifted resources:
+  - gdsfhgkbn (Name: 'resource with diff'):
+    ~ Name: "" => "resource with diff"
+Found 3 resource(s)
+ - 33% coverage
+ - 1 covered by IaC
+ - 1 not covered by IaC
+ - 1 deleted on cloud provider
+ - 1/1 drifted from IaC
