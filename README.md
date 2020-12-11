@@ -8,7 +8,12 @@
   <img src="https://img.shields.io/github/downloads/cloudskiff/driftctl/total.svg"/>
   <a href="https://codecov.io/gh/cloudskiff/driftctl">
     <img src="https://codecov.io/gh/cloudskiff/driftctl/branch/main/graph/badge.svg?token=8C5R02G5S7"/>
-  </a><br>
+  </a>
+  <img src="https://img.shields.io/docker/pulls/cloudskiff/driftctl"/>
+  <img src="https://img.shields.io/microbadger/layers/cloudskiff/driftctl"/>
+  <img src="https://img.shields.io/docker/image-size/cloudskiff/driftctl"/>
+
+<br>
   Measures infrastructure as code coverage, and tracks infrastructure drift.<br>
   :warning: <strong>This tool is still in beta state and will evolve in the future with potential breaking changes</strong> :warning:
 </p>
