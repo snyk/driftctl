@@ -1,0 +1,15 @@
+name-template: 'v$NEXT_PATCH_VERSION'
+tag-template: 'v$NEXT_PATCH_VERSION'
+categories:
+  - title: '🚀 Features'
+    labels:
+      - 'kind/enhancement'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'kind/bug'
+  - title: '📝 Documentation'
+    labels:
+      - 'kind/documentation'
+  - title: '🔨 Maintenance'
+    labels:
+      - 'kind/maintenance'
