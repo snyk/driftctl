@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
+	"github.com/pkg/errors"
 
 	"github.com/sirupsen/logrus"
 
@@ -92,18 +93,18 @@ func terraformApply() error {
 	defer os.Setenv("CHECKPOINT_DISABLE", checkpoint)
 
 	logrus.Debug("Running terraform init ...")
-	cmd := exec.Command("terraform", "init")
-	err := cmd.Run()
+	cmd := exec.Command("terraform", "init", "-upgrade")
+	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return err
+		return errors.Wrap(err, string(out))
 	}
 	logrus.Debug("Terraform init done")
 
 	logrus.Debug("Running terraform apply ...")
 	cmd = exec.Command("terraform", "apply", "-auto-approve")
-	err = cmd.Run()
+	out, err = cmd.CombinedOutput()
 	if err != nil {
-		return err
+		return errors.Wrap(err, string(out))
 	}
 	logrus.Debug("Terraform apply done")
 
