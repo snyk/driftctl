@@ -4,7 +4,7 @@
 
 #### Version check
 
-By default, driftctl check for a new version remotely, to disable this behavior, use flag `--no-version-check` 
+By default, driftctl checks for a new version remotely, to disable this behavior, use flag `--no-version-check` 
 
 ### Usage
 
