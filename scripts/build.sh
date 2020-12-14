@@ -3,7 +3,7 @@
 #
 # This script builds the application from source for multiple platforms.
 # Inspired from hashicorp/terraform build script
-set -euo pipefail
+set -eo pipefail
 
 echo "Bash: ${BASH_VERSION}"
 
