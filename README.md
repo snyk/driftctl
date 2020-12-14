@@ -8,7 +8,12 @@
   <img src="https://img.shields.io/github/downloads/cloudskiff/driftctl/total.svg"/>
   <a href="https://codecov.io/gh/cloudskiff/driftctl">
     <img src="https://codecov.io/gh/cloudskiff/driftctl/branch/main/graph/badge.svg?token=8C5R02G5S7"/>
-  </a><br>
+  </a>
+  <img src="https://img.shields.io/docker/pulls/cloudskiff/driftctl"/>
+  <img src="https://img.shields.io/microbadger/layers/cloudskiff/driftctl"/>
+  <img src="https://img.shields.io/docker/image-size/cloudskiff/driftctl"/>
+
+<br>
   Measures infrastructure as code coverage, and tracks infrastructure drift.<br>
   :warning: <strong>This tool is still in beta state and will evolve in the future with potential breaking changes</strong> :warning:
 </p>
@@ -37,6 +42,24 @@ driftctl tracks how well your IaC codebase covers your cloud configuration. drif
 driftctl is available on Linux, macOS and Windows.
 
 Binaries are available in the [release page](https://github.com/cloudskiff/driftctl/releases).
+
+#### Docker
+```bash
+docker run \
+  -v ~/.aws:/app/.aws:ro \
+  -v $(pwd)/terraform.tfstate:/app/terraform.tfstate:ro \
+  -v ~/.driftctl:/app/.driftctl \
+  -e AWS_PROFILE=cloudskiff \
+  cloudskiff/driftctl scan ## with the same option as the binary version
+```
+`-v ~/.aws:/app/.aws:ro` mount your .aws containing credentials and profile
+
+`-v $(pwd)/terraform.tfstate:/app/terraform.tfstate:ro` mount your terraform state
+
+`-v ~/.driftctl:/app/.driftctl` to prevent driftctl downloading the provider at each run, mount a directory to persist it
+
+`-e AWS_PROFILE=cloudskiff` export the profile to use in you aws config
+
 
 #### Manual
 
@@ -80,7 +103,6 @@ $ driftctl scan --from tfstate://terraform.tfstate
 # With state stored on a s3 backend
 $ driftctl scan --from tfstate+s3://my-bucket/path/to/state.tfstate
 ```
-
 ## Documentation & support
 
 - [User guide](doc/README.md)

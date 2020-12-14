@@ -1,0 +1,4 @@
+bin/
+Dockerfile
+.cache
+**/*.golden.json
