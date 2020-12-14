@@ -93,7 +93,7 @@ func terraformApply() error {
 	defer os.Setenv("CHECKPOINT_DISABLE", checkpoint)
 
 	logrus.Debug("Running terraform init ...")
-	cmd := exec.Command("terraform", "init")
+	cmd := exec.Command("terraform", "init", "-upgrade")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.Wrap(err, string(out))
