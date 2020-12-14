@@ -43,6 +43,24 @@ driftctl is available on Linux, macOS and Windows.
 
 Binaries are available in the [release page](https://github.com/cloudskiff/driftctl/releases).
 
+#### Docker
+```bash
+docker run \
+  -v ~/.aws:/app/.aws:ro \
+  -v $(pwd)/terraform.tfstate:/app/terraform.tfstate:ro \
+  -v ~/.driftctl:/app/.driftctl \
+  -e AWS_PROFILE=cloudskiff \
+  cloudskiff/driftctl scan ## with the same option as the binary version
+```
+`-v ~/.aws:/app/.aws:ro` mount your .aws containing credentials and profile
+
+`-v $(pwd)/terraform.tfstate:/app/terraform.tfstate:ro` mount your terraform state
+
+`-v ~/.driftctl:/app/.driftctl` to prevent driftctl downloading the provider at each run, mount a directory to persist it
+
+`-e AWS_PROFILE=cloudskiff` export the profile to use in you aws config
+
+
 #### Manual
 
 ##### Linux
@@ -85,7 +103,6 @@ $ driftctl scan --from tfstate://terraform.tfstate
 # With state stored on a s3 backend
 $ driftctl scan --from tfstate+s3://my-bucket/path/to/state.tfstate
 ```
-
 ## Documentation & support
 
 - [User guide](doc/README.md)
