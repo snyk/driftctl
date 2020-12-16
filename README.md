@@ -100,6 +100,11 @@ $ driftctl scan
 # Same as
 $ driftctl scan --from tfstate://terraform.tfstate
 
+# To specify AWS credentials
+$ AWS_ACCESS_KEY_ID=XXX AWS_SECRET_ACCESS_KEY=XXX driftctl scan
+# or using a profile
+$ AWS_PROFILE=profile_name driftctl scan
+
 # With state stored on a s3 backend
 $ driftctl scan --from tfstate+s3://my-bucket/path/to/state.tfstate
 ```
