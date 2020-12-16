@@ -1,0 +1,91 @@
+{
+	"summary": {
+		"total_resources": 1,
+		"total_drifted": 1,
+		"total_unmanaged": 0,
+		"total_deleted": 0,
+		"total_managed": 1
+	},
+	"managed": [
+		{
+			"id": "diff-id-1",
+			"type": "aws_diff_resource"
+		}
+	],
+	"unmanaged": null,
+	"deleted": null,
+	"differences": [
+		{
+			"res": {
+				"id": "diff-id-1",
+				"type": "aws_diff_resource"
+			},
+			"changelog": [
+				{
+					"type": "update",
+					"path": [
+						"updated",
+						"field"
+					],
+					"from": "foobar",
+					"to": "barfoo"
+				},
+				{
+					"type": "create",
+					"path": [
+						"new",
+						"field"
+					],
+					"from": null,
+					"to": "newValue"
+				},
+				{
+					"type": "delete",
+					"path": [
+						"a"
+					],
+					"from": "oldValue",
+					"to": null
+				},
+				{
+					"type": "update",
+					"path": [
+						"struct",
+						"0",
+						"array",
+						"0"
+					],
+					"from": "foo",
+					"to": "oof"
+				},
+				{
+					"type": "update",
+					"path": [
+						"struct",
+						"0",
+						"string"
+					],
+					"from": "one",
+					"to": "two"
+				}
+			]
+		}
+	],
+	"coverage": 100,
+	"alerts": {
+		"aws_diff_resource.diff-id-1": [
+			{
+				"message": "updated.field is a computed field"
+			},
+			{
+				"message": "a is a computed field"
+			},
+			{
+				"message": "struct.0.array.0 is a computed field"
+			},
+			{
+				"message": "struct.0.string is a computed field"
+			}
+		]
+	}
+}

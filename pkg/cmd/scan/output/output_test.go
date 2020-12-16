@@ -3,6 +3,7 @@ package output
 import (
 	"fmt"
 
+	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/r3labs/diff/v2"
@@ -146,5 +147,76 @@ func fakeAnalysisWithStringerResources() *analyser.Analysis {
 			To:   "resource with diff",
 		},
 	}})
+	return &a
+}
+
+func fakeAnalysisWithComputedFields() *analyser.Analysis {
+	a := analyser.Analysis{}
+	a.AddManaged(
+		&testresource.FakeResource{
+			Id:   "diff-id-1",
+			Type: "aws_diff_resource",
+		},
+	)
+	a.AddDifference(analyser.Difference{Res: testresource.FakeResource{
+		Id:   "diff-id-1",
+		Type: "aws_diff_resource",
+	}, Changelog: []diff.Change{
+		{
+			Type: diff.UPDATE,
+			Path: []string{"updated", "field"},
+			From: "foobar",
+			To:   "barfoo",
+		},
+		{
+			Type: diff.CREATE,
+			Path: []string{"new", "field"},
+			From: nil,
+			To:   "newValue",
+		},
+		{
+			Type: diff.DELETE,
+			Path: []string{"a"},
+			From: "oldValue",
+			To:   nil,
+		},
+		{
+			Type: diff.UPDATE,
+			From: "foo",
+			To:   "oof",
+			Path: []string{
+				"struct",
+				"0",
+				"array",
+				"0",
+			},
+		},
+		{
+			Type: diff.UPDATE,
+			From: "one",
+			To:   "two",
+			Path: []string{
+				"struct",
+				"0",
+				"string",
+			},
+		},
+	}})
+	a.AddAlerts(alerter.Alerts{
+		"aws_diff_resource.diff-id-1": []alerter.Alert{
+			{
+				Message: "updated.field is a computed field",
+			},
+			{
+				Message: "a is a computed field",
+			},
+			{
+				Message: "struct.0.array.0 is a computed field",
+			},
+			{
+				Message: "struct.0.string is a computed field",
+			},
+		},
+	})
 	return &a
 }

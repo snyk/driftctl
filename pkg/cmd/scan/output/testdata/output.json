@@ -72,5 +72,6 @@
 			]
 		}
 	],
-	"coverage": 33
+	"coverage": 33,
+	"alerts": null
 }

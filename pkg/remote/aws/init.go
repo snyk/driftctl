@@ -2,6 +2,7 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go/service/iam"
+	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
@@ -17,7 +18,7 @@ const RemoteAWSTerraform = "aws+tf"
  * Initialize remote (configure credentials, launch tf providers and start gRPC clients)
  * Required to use Scanner
  */
-func Init() error {
+func Init(alerter *alerter.Alerter) error {
 	provider, err := NewTerraFormProvider()
 	if err != nil {
 		return err

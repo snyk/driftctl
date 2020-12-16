@@ -30,6 +30,14 @@ func TestJSON_Write(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name:       "test json output with drift on computed fields",
+			goldenfile: "output_computed_fields.json",
+			args: args{
+				analysis: fakeAnalysisWithComputedFields(),
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

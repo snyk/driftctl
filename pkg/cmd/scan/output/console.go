@@ -28,6 +28,7 @@ func NewConsole() *Console {
 }
 
 func (c *Console) Write(analysis *analyser.Analysis) error {
+	var shouldWarnOnComputedFields bool
 
 	if analysis.Summary().TotalDeleted > 0 {
 		fmt.Printf("Found deleted resources:\n")
@@ -86,12 +87,27 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 						continue
 					}
 				}
-				fmt.Printf("    %s %s => %s\n", pref, prettify(change.From), prettify(change.To))
+				fmt.Printf("    %s %s => %s", pref, prettify(change.From), prettify(change.To))
+				for key, val := range analysis.Alerts() {
+					if fmt.Sprintf("%s.%s", humanString, difference.Res.TerraformId()) == key {
+						for _, a := range val {
+							if fmt.Sprintf("%s is a computed field", path) == a.Message {
+								shouldWarnOnComputedFields = true
+								fmt.Printf(" %s", color.YellowString("(computed)"))
+							}
+						}
+					}
+				}
+				fmt.Printf("\n")
 			}
 		}
 	}
 
 	c.writeSummary(analysis)
+
+	if shouldWarnOnComputedFields {
+		fmt.Printf("%s\n", color.YellowString("You have diffs on computed field, check the documentation for potential false positive drifts"))
+	}
 
 	return nil
 }

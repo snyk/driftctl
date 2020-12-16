@@ -54,5 +54,12 @@
       ]
     }
   ],
-  "coverage": 33
+  "coverage": 33,
+  "alerts": {
+    "aws_iam_access_key": [
+      {
+        "message": "This is an alert"
+      }
+    ]
+  }
 }
