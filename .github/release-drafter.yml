@@ -14,5 +14,4 @@ categories:
     labels:
       - 'kind/maintenance'
 template: |
-  # v$NEXT_PATCH_VERSION
   $CHANGES
