@@ -70,10 +70,11 @@ func contains(args []string, cmd string) bool {
 }
 
 func (driftctlCmd DriftctlCmd) ShouldCheckVersion() bool {
+	noVersionCheckEnv := os.Getenv("DCTL_NO_VERSION_CHECK") == "true"
 	noVersionCheckVal := contains(os.Args[1:], "--no-version-check")
 	hasVersionCmd := contains(os.Args[1:], "version")
 	isHelp := contains(os.Args[1:], "help") || contains(os.Args[1:], "--help") || contains(os.Args[1:], "-h")
-	return driftctlCmd.build.IsRelease() && !hasVersionCmd && !noVersionCheckVal && !isHelp
+	return driftctlCmd.build.IsRelease() && !hasVersionCmd && !noVersionCheckVal && !isHelp && !noVersionCheckEnv
 }
 
 // Iterate over command flags
@@ -85,12 +86,18 @@ func bindEnvToFlags(cmd *cobra.Command) error {
 		if err != nil {
 			return
 		}
+		// Ignore some global flags
+		// no-version-check is ignored because we don't use cmd flags to retrieve flag in version check function
+		// as we check version before cmd, we use os.Args
+		if f.Name == "help" || f.Name == "no-version-check" {
+			return
+		}
 		envKey := strings.ReplaceAll(f.Name, "-", "_")
 		// Apply the viper config value to the flag when the flag is not set and viper has a value
 		// Allow flags precedence over env variables
 		if !f.Changed && viper.IsSet(envKey) {
 			envVal := viper.GetString(envKey)
-			err = cmd.Flags().Set(envKey, envVal)
+			err = cmd.Flags().Set(f.Name, envVal)
 			if err != nil {
 				return
 			}
