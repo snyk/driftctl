@@ -36,5 +36,7 @@ func Deserializers() []deserializer.CTYDeserializer {
 		awsdeserializer.NewIamRolePolicyDeserializer(),
 		awsdeserializer.NewIamRolePolicyAttachmentDeserializer(),
 		awsdeserializer.NewVPCSecurityGroupRuleDeserializer(),
+		awsdeserializer.NewDefaultVPCDeserializer(),
+		awsdeserializer.NewVPCDeserializer(),
 	}
 }
