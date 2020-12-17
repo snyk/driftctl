@@ -168,6 +168,7 @@ func TestDriftctlCmd_ShouldCheckVersion(t *testing.T) {
 		Name      string
 		IsRelease bool
 		args      []string
+		env       map[string]string
 		expected  bool
 	}{
 		{
@@ -213,6 +214,14 @@ func TestDriftctlCmd_ShouldCheckVersion(t *testing.T) {
 			expected:  false,
 		},
 		{
+			Name:      "Don't check for update when env var set",
+			IsRelease: true,
+			env: map[string]string{
+				"DCTL_NO_VERSION_CHECK": "true",
+			},
+			expected: false,
+		},
+		{
 			Name:      "Should not return error when launching sub command",
 			IsRelease: false,
 			args:      []string{"scan", "--from", "tfstate://terraform.tfstate"},
@@ -224,11 +233,16 @@ func TestDriftctlCmd_ShouldCheckVersion(t *testing.T) {
 		t.Run(c.Name, func(tt *testing.T) {
 			assert := assert.New(tt)
 
+			os.Clearenv()
+			for key, val := range c.env {
+				os.Setenv(key, val)
+			}
+
 			cmd := NewDriftctlCmd(mocks.MockBuild{Release: c.IsRelease})
 			os.Args = append([]string{"driftctl"}, c.args...)
 			result := cmd.ShouldCheckVersion()
 
-			assert.Equal(result, c.expected)
+			assert.Equal(c.expected, result)
 		})
 	}
 }
