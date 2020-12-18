@@ -9,11 +9,15 @@ import (
 
 type Analyzer struct{}
 
+type DriftFilter interface {
+	FilterDrift(diffs []Difference) []Difference
+}
+
 func NewAnalyzer() Analyzer {
 	return Analyzer{}
 }
 
-func (a Analyzer) Analyze(remoteResources []resource.Resource, resourcesFromState []resource.Resource) (Analysis, error) {
+func (a Analyzer) Analyze(remoteResources []resource.Resource, resourcesFromState []resource.Resource, filter DriftFilter) (Analysis, error) {
 	analysis := Analysis{}
 
 	for _, stateRes := range resourcesFromState {
@@ -36,7 +40,9 @@ func (a Analyzer) Analyze(remoteResources []resource.Resource, resourcesFromStat
 			})
 		}
 	}
-
+	if filter != nil {
+		analysis.differences = filter.FilterDrift(analysis.differences)
+	}
 	analysis.AddUnmanaged(remoteResources...)
 	return analysis, nil
 }

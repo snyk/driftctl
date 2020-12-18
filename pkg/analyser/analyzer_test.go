@@ -168,7 +168,7 @@ func TestAnalyze(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 
-			result, err := analyzer.Analyze(c.cloud, c.iac)
+			result, err := analyzer.Analyze(c.cloud, c.iac, nil)
 
 			if err != nil {
 				t.Error(err)
