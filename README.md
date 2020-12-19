@@ -50,7 +50,7 @@ docker run \
   -v $(pwd)/terraform.tfstate:/app/terraform.tfstate:ro \
   -v ~/.driftctl:/app/.driftctl \
   -e AWS_PROFILE=cloudskiff \
-  cloudskiff/driftctl scan ## with the same option as the binary version
+  cloudskiff/driftctl:v0.1.1 scan ## with the same option as the binary version
 ```
 `-v ~/.aws:/app/.aws:ro` mount your .aws containing credentials and profile
 
