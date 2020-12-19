@@ -157,7 +157,7 @@ func scanRun(opts *ScanOptions) error {
 	analysis := ctl.Run()
 
 	if analysis == nil {
-		return errors.New("unable to run driftcl")
+		return errors.New("unable to run driftctl")
 	}
 	out := output.GetOutput(opts.Output)
 	return out.Write(analysis)
