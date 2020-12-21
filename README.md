@@ -75,29 +75,43 @@ This is an example using `curl`. If you don't have `curl`, install it, or use `w
 
 ```bash
 # x64
-sudo curl -L https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_linux_amd64 -o /usr/local/bin/driftctl
+curl -L https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_linux_amd64 -o driftctl
 
 # x86
-sudo curl -L https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_linux_386 -o /usr/local/bin/driftctl
+curl -L https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_linux_386 -o driftctl
 ```
 
 Make the binary executable:
 
 ```bash
-sudo chmod +x /usr/local/bin/driftctl
+chmod +x driftctl
+```
+
+Optionally install driftctl to a central location in your `PATH`:
+
+```bash
+# use any path that suits you, this is just a standard example. Install sudo if needed. 
+sudo mv driftctl /usr/local/bin/
 ```
 
 ##### macOS
 
 ```bash
 # x64
-sudo curl -L https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_darwin_amd64 -o /usr/local/bin/driftctl
+curl -L https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_darwin_amd64 -o driftctl
 ```
 
 Make the binary executable:
 
 ```bash
-sudo chmod +x /usr/local/bin/driftctl
+chmod +x driftctl
+```
+
+Optionally install driftctl to a central location in your `PATH`:
+
+```bash
+# use any path that suits you, this is just a standard example. Install sudo if needed. 
+sudo mv driftctl /usr/local/bin/
 ```
 
 ##### Windows
