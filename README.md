@@ -71,7 +71,7 @@ docker run \
 
 ##### Linux
 
-This is an example using `curl`, if you don't have `curl`, install it, or use `wget`.
+This is an example using `curl`. If you don't have `curl`, install it, or use `wget`.
 
 ```bash
 # x64
