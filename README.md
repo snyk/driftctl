@@ -126,7 +126,7 @@ curl https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_wi
 
 ### Run
 
-Be sure to have [configured](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) your AWS credentials.
+Be sure to have [configured](doc/cmd/scan/supported_resources/aws.md#authentication) your AWS credentials.
 
 You will need to assign [proper permissions](doc/cmd/scan/supported_resources/aws.md#least-privileged-policy) to allow driftctl to scan your account.
 
