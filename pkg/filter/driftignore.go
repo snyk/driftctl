@@ -8,9 +8,6 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/stringutils"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/r3labs/diff/v2"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/sirupsen/logrus"
 )
@@ -42,7 +39,7 @@ func (r *DriftIgnore) readIgnoreFile() error {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
-		typeVal := stringutils.EscapableSplit(line)
+		typeVal := escapableSplit(line)
 		nbArgs := len(typeVal)
 		if nbArgs < 2 {
 			logrus.WithFields(logrus.Fields{
@@ -83,71 +80,61 @@ func (r *DriftIgnore) readIgnoreFile() error {
 	return nil
 }
 
-func (r *DriftIgnore) FilterResources(resources []resource.Resource) []resource.Resource {
-
-	results := make([]resource.Resource, 0, len(resources))
-
-	for _, res := range resources {
-		_, isExclusionRule := r.resExclusionList[fmt.Sprintf("%s.%s", res.TerraformType(), res.TerraformId())]
-		_, isExclusionWildcardRule := r.resExclusionList[fmt.Sprintf("%s.*", res.TerraformType())]
-		if !isExclusionRule && !isExclusionWildcardRule {
-			results = append(results, res)
-		}
-	}
-
-	return results
+func (r *DriftIgnore) IsResourceIgnored(res resource.Resource) bool {
+	_, isExclusionRule := r.resExclusionList[fmt.Sprintf("%s.%s", res.TerraformType(), res.TerraformId())]
+	_, isExclusionWildcardRule := r.resExclusionList[fmt.Sprintf("%s.*", res.TerraformType())]
+	return isExclusionRule || isExclusionWildcardRule
 }
 
-func (r *DriftIgnore) FilterDrift(diffs []analyser.Difference) []analyser.Difference {
+func (r *DriftIgnore) IsFieldIgnored(res resource.Resource, path []string) bool {
+	exclusionRules, isExclusionRule := r.driftExclusionList[fmt.Sprintf("%s.%s", res.TerraformType(), res.TerraformId())]
+	exclusionWildcardRules, isExclusionWildcardRule := r.driftExclusionList[fmt.Sprintf("%s.*", res.TerraformType())]
 
-	results := make([]analyser.Difference, 0, len(diffs))
-
-	for _, dif := range diffs {
-		exclusionRules, isExclusionRule := r.driftExclusionList[fmt.Sprintf("%s.%s", dif.Res.TerraformType(), dif.Res.TerraformId())]
-		exclusionWildcardRules, isExclusionWildcardRule := r.driftExclusionList[fmt.Sprintf("%s.*", dif.Res.TerraformType())]
-
-		if !isExclusionRule && !isExclusionWildcardRule {
-			results = append(results, dif) // we don't have rules to ignore drift on this resource
-			continue
-		}
-
-		if !isExclusionRule {
-			exclusionRules = exclusionWildcardRules
-		}
-
-		changelog := make([]diff.Change, 0, len(dif.Changelog))
-		for _, change := range dif.Changelog {
-			if r.isExcluded(exclusionRules, change) {
-				continue // Change is excluded we don't append it to the changelog
-			}
-			changelog = append(changelog, change)
-		}
-
-		if len(changelog) <= 0 {
-			continue // All changes where ignored we don't keep this difference
-		}
-
-		dif.Changelog = changelog      // Update changelog
-		results = append(results, dif) // Keep this diff
+	if !isExclusionRule && !isExclusionWildcardRule {
+		return false
 	}
 
-	return results
+	if !isExclusionRule {
+		exclusionRules = exclusionWildcardRules
+	}
+
+	if r.isExcluded(exclusionRules, path) {
+		return true
+	}
+
+	return false
 }
 
-func (r *DriftIgnore) isExcluded(rules []string, change diff.Change) bool {
+func (r *DriftIgnore) isExcluded(rules []string, changePath []string) bool {
 RuleCheck:
 	for _, rule := range rules {
-		path := stringutils.EscapableSplit(rule)
-		if len(path) > len(change.Path) {
+		path := escapableSplit(rule)
+		if len(path) > len(changePath) {
 			continue // path size does not match
 		}
 
 		for i := range path {
-			if path[i] != strings.ToLower(change.Path[i]) && path[i] != "*" {
+			if path[i] != strings.ToLower(changePath[i]) && path[i] != "*" {
 				continue RuleCheck // found a diff in path that was not a wildcard
 			}
 		}
 		return true
 	}
 	return false
+}
+
+func escapableSplit(line string) []string {
+	var splitted []string
+	lastWordEnd := 0
+	for i := range line {
+		if line[i] == '.' && ((i >= 1 && line[i-1] != '\\') || (i >= 2 && line[i-1] == '\\' && line[i-2] == '\\')) {
+			splitted = append(splitted, stringutils.Unescape(line[lastWordEnd:i]))
+			lastWordEnd = i + 1
+			continue
+		}
+		if i == len(line)-1 {
+			splitted = append(splitted, stringutils.Unescape(line[lastWordEnd:]))
+		}
+	}
+	return splitted
 }

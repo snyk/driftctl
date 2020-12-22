@@ -1,21 +1,5 @@
 package stringutils
 
-func EscapableSplit(line string) []string {
-	var splitted []string
-	lastWordEnd := 0
-	for i := range line {
-		if line[i] == '.' && ((i >= 1 && line[i-1] != '\\') || (i >= 2 && line[i-1] == '\\' && line[i-2] == '\\')) {
-			splitted = append(splitted, Unescape(line[lastWordEnd:i]))
-			lastWordEnd = i + 1
-			continue
-		}
-		if i == len(line)-1 {
-			splitted = append(splitted, Unescape(line[lastWordEnd:]))
-		}
-	}
-	return splitted
-}
-
 // Remove \ that are not escaped
 func Unescape(line string) string {
 	var res string
