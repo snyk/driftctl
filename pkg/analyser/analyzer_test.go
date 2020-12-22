@@ -39,7 +39,7 @@ func TestAnalyze(t *testing.T) {
 		{
 			name: "TestIgnoreFromCoverageIacNotInCloud",
 			iac: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id: "foobar",
 				},
 			},
@@ -50,7 +50,7 @@ func TestAnalyze(t *testing.T) {
 					TotalDeleted:   1,
 				},
 				deleted: []resource.Resource{
-					testresource.FakeResource{
+					&testresource.FakeResource{
 						Id: "foobar",
 					},
 				},
@@ -60,18 +60,18 @@ func TestAnalyze(t *testing.T) {
 		{
 			name: "Test100PercentCoverage",
 			iac: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id: "foobar",
 				},
 			},
 			cloud: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id: "foobar",
 				},
 			},
 			expected: Analysis{
 				managed: []resource.Resource{
-					testresource.FakeResource{
+					&testresource.FakeResource{
 						Id: "foobar",
 					},
 				},
@@ -85,7 +85,7 @@ func TestAnalyze(t *testing.T) {
 			name: "TestUnmanagedResource",
 			iac:  []resource.Resource{},
 			cloud: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id: "foobar",
 				},
 			},
@@ -95,7 +95,7 @@ func TestAnalyze(t *testing.T) {
 					TotalUnmanaged: 1,
 				},
 				unmanaged: []resource.Resource{
-					testresource.FakeResource{
+					&testresource.FakeResource{
 						Id: "foobar",
 					},
 				},
@@ -105,14 +105,14 @@ func TestAnalyze(t *testing.T) {
 		{
 			name: "TestDiff",
 			iac: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id:     "foobar",
 					FooBar: "foobar",
 					BarFoo: "barfoo",
 				},
 			},
 			cloud: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id:     "foobar",
 					FooBar: "barfoo",
 					BarFoo: "foobar",
@@ -120,7 +120,7 @@ func TestAnalyze(t *testing.T) {
 			},
 			expected: Analysis{
 				managed: []resource.Resource{
-					testresource.FakeResource{
+					&testresource.FakeResource{
 						Id:     "foobar",
 						FooBar: "foobar",
 						BarFoo: "barfoo",
@@ -133,7 +133,7 @@ func TestAnalyze(t *testing.T) {
 				},
 				differences: []Difference{
 					{
-						Res: testresource.FakeResource{
+						Res: &testresource.FakeResource{
 							Id:     "foobar",
 							FooBar: "foobar",
 							BarFoo: "barfoo",
@@ -237,36 +237,36 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 	goldenFile := "./testdata/output.json"
 	analysis := Analysis{}
 	analysis.AddManaged(
-		testresource.FakeResource{
+		&testresource.FakeResource{
 			Id:   "AKIA5QYBVVD25KFXJHYJ",
 			Type: "aws_iam_access_key",
-		}, testresource.FakeResource{
+		}, &testresource.FakeResource{
 			Id:   "driftctl2",
 			Type: "aws_managed_resource",
 		},
 	)
 	analysis.AddUnmanaged(
-		testresource.FakeResource{
+		&testresource.FakeResource{
 			Id:   "driftctl",
 			Type: "aws_s3_bucket_policy",
-		}, testresource.FakeResource{
+		}, &testresource.FakeResource{
 			Id:   "driftctl",
 			Type: "aws_s3_bucket_notification",
 		},
 	)
 	analysis.AddDeleted(
-		testresource.FakeResource{
+		&testresource.FakeResource{
 			Id:     "test-driftctl2",
 			Type:   "aws_iam_user",
 			FooBar: "test",
 		},
-		testresource.FakeResource{
+		&testresource.FakeResource{
 			Id:   "AKIA5QYBVVD2Y6PBAAPY",
 			Type: "aws_iam_access_key",
 		},
 	)
 	analysis.AddDifference(Difference{
-		Res: testresource.FakeResource{
+		Res: &testresource.FakeResource{
 			Id:   "AKIA5QYBVVD25KFXJHYJ",
 			Type: "aws_iam_access_key",
 		},
