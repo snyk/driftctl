@@ -11,35 +11,35 @@ import (
 func fakeAnalysis() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddUnmanaged(
-		testresource.FakeResource{
+		&testresource.FakeResource{
 			Id:   "unmanaged-id-1",
 			Type: "aws_unmanaged_resource",
 		},
-		testresource.FakeResource{
+		&testresource.FakeResource{
 			Id:   "unmanaged-id-2",
 			Type: "aws_unmanaged_resource",
 		},
 	)
 	a.AddDeleted(
-		testresource.FakeResource{
+		&testresource.FakeResource{
 			Id:   "deleted-id-1",
 			Type: "aws_deleted_resource",
-		}, testresource.FakeResource{
+		}, &testresource.FakeResource{
 			Id:   "deleted-id-2",
 			Type: "aws_deleted_resource",
 		},
 	)
 	a.AddManaged(
-		testresource.FakeResource{
+		&testresource.FakeResource{
 			Id:   "diff-id-1",
 			Type: "aws_diff_resource",
 		},
-		testresource.FakeResource{
+		&testresource.FakeResource{
 			Id:   "no-diff-id-1",
 			Type: "aws_no_diff_resource",
 		},
 	)
-	a.AddDifference(analyser.Difference{Res: testresource.FakeResource{
+	a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
 		Id:   "diff-id-1",
 		Type: "aws_diff_resource",
 	}, Changelog: []diff.Change{
@@ -68,7 +68,7 @@ func fakeAnalysis() *analyser.Analysis {
 func fakeAnalysisNoDrift() *analyser.Analysis {
 	a := analyser.Analysis{}
 	for i := 0; i < 5; i++ {
-		a.AddManaged(testresource.FakeResource{
+		a.AddManaged(&testresource.FakeResource{
 			Id:   "managed-id-" + fmt.Sprintf("%d", i),
 			Type: "aws_managed_resource",
 		})
@@ -79,18 +79,18 @@ func fakeAnalysisNoDrift() *analyser.Analysis {
 func fakeAnalysisWithJsonFields() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddManaged(
-		testresource.FakeResource{
+		&testresource.FakeResource{
 			Id:   "diff-id-1",
 			Type: "aws_diff_resource",
 		},
 	)
 	a.AddManaged(
-		testresource.FakeResource{
+		&testresource.FakeResource{
 			Id:   "diff-id-2",
 			Type: "aws_diff_resource",
 		},
 	)
-	a.AddDifference(analyser.Difference{Res: testresource.FakeResource{
+	a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
 		Id:   "diff-id-1",
 		Type: "aws_diff_resource",
 	}, Changelog: []diff.Change{
