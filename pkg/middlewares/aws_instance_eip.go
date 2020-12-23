@@ -47,7 +47,7 @@ func (a AwsInstanceEIP) hasEIP(instance *aws.AwsInstance, resources *[]resource.
 	return false
 }
 
-func (a AwsInstanceEIP) ignorePublicIpAndDns(instance *aws.AwsInstance, resourcesSet ...*[]resource.Resource)  {
+func (a AwsInstanceEIP) ignorePublicIpAndDns(instance *aws.AwsInstance, resourcesSet ...*[]resource.Resource) {
 	for _, resources := range resourcesSet {
 		for _, res := range *resources {
 			if res.TerraformType() == instance.TerraformType() &&
