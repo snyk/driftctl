@@ -20,13 +20,13 @@ func TestDriftIgnore_Run(t *testing.T) {
 		{
 			name: "drift_ignore_no_file",
 			resources: []resource.Resource{
-				resource2.FakeResource{
+				&resource2.FakeResource{
 					Type: "type1",
 					Id:   "id1",
 				},
 			},
 			want: []resource.Resource{
-				resource2.FakeResource{
+				&resource2.FakeResource{
 					Type: "type1",
 					Id:   "id1",
 				},
@@ -35,13 +35,13 @@ func TestDriftIgnore_Run(t *testing.T) {
 		{
 			name: "drift_ignore_empty",
 			resources: []resource.Resource{
-				resource2.FakeResource{
+				&resource2.FakeResource{
 					Type: "type1",
 					Id:   "id1",
 				},
 			},
 			want: []resource.Resource{
-				resource2.FakeResource{
+				&resource2.FakeResource{
 					Type: "type1",
 					Id:   "id1",
 				},
@@ -50,17 +50,17 @@ func TestDriftIgnore_Run(t *testing.T) {
 		{
 			name: "drift_ignore_invalid_lines",
 			resources: []resource.Resource{
-				resource2.FakeResource{
+				&resource2.FakeResource{
 					Type: "type1",
 					Id:   "id1",
 				},
-				resource2.FakeResource{
+				&resource2.FakeResource{
 					Type: "ignored_resource",
 					Id:   "id2",
 				},
 			},
 			want: []resource.Resource{
-				resource2.FakeResource{
+				&resource2.FakeResource{
 					Type: "type1",
 					Id:   "id1",
 				},
@@ -69,33 +69,33 @@ func TestDriftIgnore_Run(t *testing.T) {
 		{
 			name: "drift_ignore_valid",
 			resources: []resource.Resource{
-				resource2.FakeResource{
+				&resource2.FakeResource{
 					Type: "type1",
 					Id:   "id1",
 				},
-				resource2.FakeResource{
+				&resource2.FakeResource{
 					Type: "wildcard_resource",
 					Id:   "id1",
 				},
-				resource2.FakeResource{
+				&resource2.FakeResource{
 					Type: "wildcard_resource",
 					Id:   "id2",
 				},
-				resource2.FakeResource{
+				&resource2.FakeResource{
 					Type: "wildcard_resource",
 					Id:   "id3",
 				},
-				resource2.FakeResource{
+				&resource2.FakeResource{
 					Type: "ignored_resource",
 					Id:   "id2",
 				},
-				resource2.FakeResource{
+				&resource2.FakeResource{
 					Type: "resource_type",
 					Id:   "id.with.dots",
 				},
 			},
 			want: []resource.Resource{
-				resource2.FakeResource{
+				&resource2.FakeResource{
 					Type: "type1",
 					Id:   "id1",
 				},
