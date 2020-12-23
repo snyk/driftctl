@@ -1,5 +1,26 @@
 # AWS Supported resources
 
+## Authentication
+
+To use driftctl, we need credentials to make authenticated requests to AWS. Just like the AWS CLI, we use [credentials and configuration](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) settings declared as user environment variables, or in local AWS configuration files.
+
+Driftctl supports [named profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html). By default, the CLI uses the settings found in the profile named `default`. You can override an individual setting by declaring the supported environment variables such as `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_PROFILE` ...
+
+If you are using an [IAM role](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-role.html) as an authorization tool, which is considered a good practice, please be aware that you can still use driftctl by defining a profile for the role in your `~/.aws/config` file.
+
+```bash
+[profile driftctlrole]
+role_arn = arn:aws:iam::123456789012:role/<NAMEOFTHEROLE>
+source_profile = user # profile to assume the role
+region = eu-west-3
+```
+
+You can now use driftctl by overriding the profile setting.
+
+```bash
+$ AWS_PROFILE=driftctlrole driftctl scan
+```
+
 ## Least privileged policy
 
 Driftctl needs access to your cloud provider account so that it can list resources on your behalf.
