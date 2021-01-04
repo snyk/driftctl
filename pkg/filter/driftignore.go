@@ -6,8 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cloudskiff/driftctl/pkg/stringutils"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/sirupsen/logrus"
 )
@@ -39,7 +37,7 @@ func (r *DriftIgnore) readIgnoreFile() error {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
-		typeVal := escapableSplit(line)
+		typeVal := readDriftIgnoreLine(line)
 		nbArgs := len(typeVal)
 		if nbArgs < 2 {
 			logrus.WithFields(logrus.Fields{
@@ -108,7 +106,7 @@ func (r *DriftIgnore) IsFieldIgnored(res resource.Resource, path []string) bool 
 func (r *DriftIgnore) isExcluded(rules []string, changePath []string) bool {
 RuleCheck:
 	for _, rule := range rules {
-		path := escapableSplit(rule)
+		path := readDriftIgnoreLine(rule)
 		if len(path) > len(changePath) {
 			continue // path size does not match
 		}
@@ -123,18 +121,47 @@ RuleCheck:
 	return false
 }
 
-func escapableSplit(line string) []string {
+/**
+ * Read a line of ignore
+ * Handle split on dots and escaping
+ */
+func readDriftIgnoreLine(line string) []string {
 	var splitted []string
 	lastWordEnd := 0
 	for i := range line {
 		if line[i] == '.' && ((i >= 1 && line[i-1] != '\\') || (i >= 2 && line[i-1] == '\\' && line[i-2] == '\\')) {
-			splitted = append(splitted, stringutils.Unescape(line[lastWordEnd:i]))
+			splitted = append(splitted, unescapeDriftIgnoreLine(line[lastWordEnd:i]))
 			lastWordEnd = i + 1
 			continue
 		}
 		if i == len(line)-1 {
-			splitted = append(splitted, stringutils.Unescape(line[lastWordEnd:]))
+			splitted = append(splitted, unescapeDriftIgnoreLine(line[lastWordEnd:]))
 		}
 	}
 	return splitted
+}
+
+func unescapeDriftIgnoreLine(line string) string {
+	var res string
+	lastEscapeEnd := 0
+	for i := range line {
+		if line[i] == '\\' {
+			if i+1 < len(line) && line[i+1] == '\\' {
+				continue
+			}
+			if i > 1 && line[i-1] == '\\' {
+				res += line[lastEscapeEnd:i]
+				lastEscapeEnd = i + 1
+				continue
+			}
+			res += line[lastEscapeEnd:i]
+			lastEscapeEnd = i + 1
+			continue
+		}
+		if i == len(line)-1 {
+			res += line[lastEscapeEnd:]
+		}
+	}
+
+	return res
 }
