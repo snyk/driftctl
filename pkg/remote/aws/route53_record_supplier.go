@@ -80,11 +80,7 @@ func (s Route53RecordSupplier) listRecordsForZone(zoneId string, zoneName string
 		s.runner.Run(func() (cty.Value, error) {
 			vars := []string{
 				zoneId,
-				// aws api is appending zone name in record names
-				// we need to remove zone name and avoid fqdn to match terraform id's
-				// e.g. : aws api response Name: foobar.example.com. should be converted to `foobar`
-				// Also remove trailing dot ID_example.com._NS should be ID_example.com_NS
-				strings.ToLower(strings.TrimSuffix(strings.TrimSuffix(rawName, "."+zoneName), ".")),
+				strings.ToLower(strings.TrimSuffix(rawName, ".")),
 				rawType,
 			}
 			if rawSetIdentifier != nil {
