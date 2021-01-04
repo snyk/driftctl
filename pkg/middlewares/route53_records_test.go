@@ -16,19 +16,21 @@ func TestDefaultRoute53RecordShouldBeIgnored(t *testing.T) {
 		&aws.AwsRoute53Zone{},
 		&aws.AwsRoute53Record{
 			Type: awssdk.String("NS"),
-			Id:   "foobar",
+			Fqdn: awssdk.String("foobar"),
 		},
 		&aws.AwsRoute53Record{
 			Type: awssdk.String("SOA"),
+			Fqdn: awssdk.String(""),
 		},
 		&aws.AwsRoute53Record{
 			Type: awssdk.String("A"),
+			Fqdn: awssdk.String(""),
 		},
 	}
 	stateResources := []resource.Resource{
 		&aws.AwsRoute53Record{
 			Type: awssdk.String("NS"),
-			Id:   "barfoo",
+			Fqdn: awssdk.String("barfoo"),
 		},
 	}
 	err := middleware.Execute(&remoteResources, &stateResources)
@@ -52,19 +54,21 @@ func TestDefaultRoute53RecordShouldNotBeIgnoredWhenManaged(t *testing.T) {
 		&aws.AwsRoute53Zone{},
 		&aws.AwsRoute53Record{
 			Type: awssdk.String("NS"),
-			Id:   "foobar",
+			Fqdn: awssdk.String("foobar"),
 		},
 		&aws.AwsRoute53Record{
 			Type: awssdk.String("SOA"),
+			Fqdn: awssdk.String(""),
 		},
 		&aws.AwsRoute53Record{
 			Type: awssdk.String("A"),
+			Fqdn: awssdk.String(""),
 		},
 	}
 	stateResources := []resource.Resource{
 		&aws.AwsRoute53Record{
 			Type: awssdk.String("NS"),
-			Id:   "foobar",
+			Fqdn: awssdk.String("foobar"),
 		},
 	}
 	err := middleware.Execute(&remoteResources, &stateResources)

@@ -125,6 +125,46 @@ func TestRoute53RecordSupplier_Resources(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			test:    "explicit subdomain records",
+			dirName: "route53_record_explicit_subdomain",
+			zonesPages: mocks.ListHostedZonesPagesOutput{
+				{
+					true,
+					&route53.ListHostedZonesOutput{
+						HostedZones: []*route53.HostedZone{
+							{
+								Id:   awssdk.String("Z06486383UC8WYSBZTWFM"),
+								Name: awssdk.String("foo-2.com"),
+							},
+						},
+					},
+				},
+			},
+			recordsPages: mocks.ListResourceRecordSetsPagesOutput{
+				{
+					true,
+					&route53.ListResourceRecordSetsOutput{
+						ResourceRecordSets: []*route53.ResourceRecordSet{
+							{
+								Name: awssdk.String("test0"),
+								Type: awssdk.String("TXT"),
+							},
+							{
+								Name: awssdk.String("test1.foo-2.com"),
+								Type: awssdk.String("TXT"),
+							},
+							{
+								Name: awssdk.String("_test2.foo-2.com"),
+								Type: awssdk.String("TXT"),
+							},
+						},
+					},
+					"Z06486383UC8WYSBZTWFM",
+				},
+			},
+			err: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.test, func(t *testing.T) {
