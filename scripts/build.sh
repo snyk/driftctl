@@ -36,8 +36,6 @@ if [ -n "$OS_ARCH" ]; then
   os_archs=("$OS_ARCH")
 fi
 
-echo "ARCH: $os_archs"
-
 if [ $ENV != "release" ]; then
     echo "+ Building env: dev"
     # If its dev mode, only build for ourself
@@ -45,6 +43,8 @@ if [ $ENV != "release" ]; then
     # And set version to git commit
     VERSION="${GIT_COMMIT}${GIT_DIRTY}"
 fi
+
+echo "ARCH: $os_archs"
 
 # In release mode we don't want debug information in the binary
 # We also set the build env to release
