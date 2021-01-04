@@ -299,11 +299,19 @@ func TestAnalyze(t *testing.T) {
 					BarFoo: "barfoo",
 				},
 			},
+			ignoredRes: []resource.Resource{
+				&testresource.FakeResource{
+					Id: "should_be_ignored",
+				},
+			},
 			cloud: []resource.Resource{
 				&testresource.FakeResource{
 					Id:     "foobar",
 					FooBar: "barfoo",
 					BarFoo: "foobar",
+				},
+				&testresource.FakeResource{
+					Id: "should_be_ignored",
 				},
 			},
 			ignoredDrift: []struct {
@@ -411,7 +419,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			summaryChanges, err := diff.Diff(result.Summary(), c.expected.Summary())
+			summaryChanges, err := diff.Diff(c.expected.Summary(), result.Summary())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
