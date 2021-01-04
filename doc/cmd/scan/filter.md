@@ -7,8 +7,8 @@ Driftctl offers two ways to filter resources
 
 **Driftignore** Is a simple way to ignore resources, you put resources in a `.driftignore` file like a `.gitignore`.
 
-**Filter rules** Allow you to build complex expression to include and exclude a set of resources in your workflow. 
-Powered by expression language JMESPath you could build a complex include and exclude expression. 
+**Filter rules** Allow you to build complex expression to include and exclude a set of resources in your workflow.
+Powered by expression language JMESPath you could build a complex include and exclude expression.
 
 If you need only to exclude a set of resources you should use .driftignore, if you need something more advanced, check filter rules.
 
@@ -16,15 +16,27 @@ If you need only to exclude a set of resources you should use .driftignore, if y
 
 Create the .driftignore file where you launch driftctl (usually the root of your IaC repo).
 
-Each line must be of kind `resource_type.resource_id`, resource_id could be a wildcard to exclude all resources of a given type.
+Each line must be of kind
+- `resource_type.resource_id`, resource_id could be a wildcard to exclude all resources of a given type.
+- `resource_type.resource_id.path.to.field`, resource_id can be wildcard to ignore a drift on given field for a given type, path could also contain wildcards.
+
+If your resource id or the path of a field contains dot or backslash you can escape them with backslashes:
+```ignore
+resource_type.resource\.id\.containing\.dots.path.to.dotted\.fieldname
+resource_type.resource_id_containing\\backslash.path.to.backslash\\fieldname
+```
 
 ### Example
 
-```gitignore
-# Will ignore S3 bucket called my-bucket 
+```ignore
+# Will ignore S3 bucket called my-bucket
 aws_s3_bucket.my-buckey
 # Will ignore every aws_instance resource
 aws_instance.*
+# Will ignore environement for all lambda functions
+aws_lambda_function.*.environment
+# Will ignore lastModified for my-lambda-name lambda function
+aws_lambda_function.my-lambda-name.lastmodified
 ```
 
 ## Filter rules
