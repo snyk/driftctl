@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/cloudskiff/driftctl/build"
 	"github.com/cloudskiff/driftctl/logger"
@@ -10,7 +11,9 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/config"
 	"github.com/cloudskiff/driftctl/pkg/version"
 	"github.com/fatih/color"
+	"github.com/getsentry/sentry-go"
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 )
 
 func init() {
@@ -19,6 +22,10 @@ func init() {
 }
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 
 	config.Init()
 	logger.Init(logger.GetConfig())
@@ -34,9 +41,26 @@ func main() {
 		}()
 	}
 
+	// Handle panic and log them to sentry if error reporting is enabled
+	defer func() {
+		if cmd.IsReportingEnabled(&driftctlCmd.Command) {
+			err := recover()
+			if err != nil {
+				sentry.CurrentHub().Recover(err)
+				flushSentry()
+				logrus.Fatalf("Captured panic: %s", err)
+				os.Exit(2)
+			}
+			flushSentry()
+		}
+	}()
+
 	if _, err := driftctlCmd.ExecuteC(); err != nil {
+		if cmd.IsReportingEnabled(&driftctlCmd.Command) {
+			sentry.CaptureException(err)
+		}
 		fmt.Fprintln(os.Stderr, color.RedString("%s", err))
-		os.Exit(1)
+		return 1
 	}
 
 	if checkVersion {
@@ -46,4 +70,12 @@ func main() {
 			fmt.Printf("Current: %s; Latest: %s", version.Current(), newVersion)
 		}
 	}
+
+	return 0
+}
+
+func flushSentry() {
+	fmt.Print("Sending error report ...")
+	sentry.Flush(60 * time.Second)
+	fmt.Printf(" done, thank you %s\n", color.RedString("❤️"))
 }

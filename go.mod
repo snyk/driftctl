@@ -6,6 +6,7 @@ require (
 	github.com/aws/aws-sdk-go v1.34.2
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/fatih/color v1.9.0
+	github.com/getsentry/sentry-go v0.9.0
 	github.com/google/go-cmp v0.5.2 // indirect
 	github.com/hashicorp/go-getter v1.5.1
 	github.com/hashicorp/go-hclog v0.9.2

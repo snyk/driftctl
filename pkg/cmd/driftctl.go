@@ -1,10 +1,13 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
 	"github.com/cloudskiff/driftctl/build"
+	"github.com/cloudskiff/driftctl/pkg/version"
+	"github.com/getsentry/sentry-go"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -39,7 +42,11 @@ func NewDriftctlCmd(build build.BuildInterface) *DriftctlCmd {
 			Use:   "driftctl <command> [flags]",
 			Short: "Driftctl CLI",
 			PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-				return bindEnvToFlags(cmd)
+				err := bindEnvToFlags(cmd)
+				if err != nil {
+					return err
+				}
+				return handleReporting(cmd)
 			},
 			Long:          "Detect, track and alert on infrastructure drift.",
 			SilenceErrors: true,
@@ -54,6 +61,7 @@ func NewDriftctlCmd(build build.BuildInterface) *DriftctlCmd {
 
 	cmd.PersistentFlags().BoolP("help", "h", false, "Display help for command")
 	cmd.PersistentFlags().BoolP("no-version-check", "", false, "Disable the version check")
+	cmd.PersistentFlags().BoolP("error-reporting", "", false, "Enable error reporting.\nWARNING: may leak sensitive data")
 
 	cmd.AddCommand(NewScanCmd())
 
@@ -75,6 +83,25 @@ func (driftctlCmd DriftctlCmd) ShouldCheckVersion() bool {
 	hasVersionCmd := contains(os.Args[1:], "version")
 	isHelp := contains(os.Args[1:], "help") || contains(os.Args[1:], "--help") || contains(os.Args[1:], "-h")
 	return driftctlCmd.build.IsRelease() && !hasVersionCmd && !noVersionCheckVal && !isHelp && !noVersionCheckEnv
+}
+
+func IsReportingEnabled(cmd *cobra.Command) bool {
+	enableReporting, err := cmd.Flags().GetBool("error-reporting")
+	if err != nil {
+		return false
+	}
+	return enableReporting
+}
+
+func handleReporting(cmd *cobra.Command) error {
+	if IsReportingEnabled(cmd) {
+		logrus.Debug("Enabled error reporting")
+		return sentry.Init(sentry.ClientOptions{
+			Dsn:     "https://9f2b735e20bc452387f7fa093f786173@o495597.ingest.sentry.io/5568568",
+			Release: fmt.Sprintf("driftctl@%s", version.Current()),
+		})
+	}
+	return nil
 }
 
 // Iterate over command flags
