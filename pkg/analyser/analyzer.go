@@ -21,13 +21,19 @@ func NewAnalyzer() Analyzer {
 func (a Analyzer) Analyze(remoteResources []resource.Resource, resourcesFromState []resource.Resource, filter Filter) (Analysis, error) {
 	analysis := Analysis{}
 
+	// Iterate on remote resources and filter ignored resources
+	filteredRemoteResource := make([]resource.Resource, 0, len(remoteResources))
+	for _, remoteRes := range remoteResources {
+		if filter.IsResourceIgnored(remoteRes) {
+			continue
+		}
+		filteredRemoteResource = append(filteredRemoteResource, remoteRes)
+	}
+
 	for _, stateRes := range resourcesFromState {
-		i, remoteRes, found := findCorrespondingRes(remoteResources, stateRes)
+		i, remoteRes, found := findCorrespondingRes(filteredRemoteResource, stateRes)
 
 		if filter.IsResourceIgnored(stateRes) {
-			if found {
-				remoteResources = append(remoteResources[:i], remoteResources[i+1:]...)
-			}
 			continue
 		}
 
@@ -35,7 +41,9 @@ func (a Analyzer) Analyze(remoteResources []resource.Resource, resourcesFromStat
 			analysis.AddDeleted(stateRes)
 			continue
 		}
-		remoteResources = append(remoteResources[:i], remoteResources[i+1:]...)
+
+		// Remove managed resources, so it will remain only unmanaged ones
+		filteredRemoteResource = removeResourceByIndex(i, filteredRemoteResource)
 		analysis.AddManaged(stateRes)
 
 		delta, _ := diff.Diff(stateRes, remoteRes)
@@ -58,7 +66,10 @@ func (a Analyzer) Analyze(remoteResources []resource.Resource, resourcesFromStat
 			}
 		}
 	}
-	analysis.AddUnmanaged(remoteResources...)
+
+	// Add remaining unmanaged resources
+	analysis.AddUnmanaged(filteredRemoteResource...)
+
 	return analysis, nil
 }
 
@@ -69,4 +80,11 @@ func findCorrespondingRes(resources []resource.Resource, res resource.Resource) 
 		}
 	}
 	return -1, nil, false
+}
+
+func removeResourceByIndex(i int, resources []resource.Resource) []resource.Resource {
+	if i == len(resources)-1 {
+		return resources[:len(resources)-1]
+	}
+	return append(resources[:i], resources[i+1:]...)
 }
