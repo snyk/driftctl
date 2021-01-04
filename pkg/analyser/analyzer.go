@@ -9,15 +9,28 @@ import (
 
 type Analyzer struct{}
 
+type Filter interface {
+	IsResourceIgnored(res resource.Resource) bool
+	IsFieldIgnored(res resource.Resource, path []string) bool
+}
+
 func NewAnalyzer() Analyzer {
 	return Analyzer{}
 }
 
-func (a Analyzer) Analyze(remoteResources []resource.Resource, resourcesFromState []resource.Resource) (Analysis, error) {
+func (a Analyzer) Analyze(remoteResources []resource.Resource, resourcesFromState []resource.Resource, filter Filter) (Analysis, error) {
 	analysis := Analysis{}
 
 	for _, stateRes := range resourcesFromState {
 		i, remoteRes, found := findCorrespondingRes(remoteResources, stateRes)
+
+		if filter.IsResourceIgnored(stateRes) {
+			if found {
+				remoteResources = append(remoteResources[:i], remoteResources[i+1:]...)
+			}
+			continue
+		}
+
 		if !found {
 			analysis.AddDeleted(stateRes)
 			continue
@@ -30,13 +43,21 @@ func (a Analyzer) Analyze(remoteResources []resource.Resource, resourcesFromStat
 			sort.Slice(delta, func(i, j int) bool {
 				return delta[i].Type < delta[j].Type
 			})
-			analysis.AddDifference(Difference{
-				Res:       stateRes,
-				Changelog: delta,
-			})
+			changelog := make([]diff.Change, 0, len(delta))
+			for _, change := range delta {
+				if filter.IsFieldIgnored(stateRes, change.Path) {
+					continue
+				}
+				changelog = append(changelog, change)
+			}
+			if len(changelog) > 0 {
+				analysis.AddDifference(Difference{
+					Res:       stateRes,
+					Changelog: changelog,
+				})
+			}
 		}
 	}
-
 	analysis.AddUnmanaged(remoteResources...)
 	return analysis, nil
 }

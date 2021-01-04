@@ -63,10 +63,8 @@ func (d DriftCTL) Run() *analyser.Analysis {
 
 	logrus.Debug("Checking for driftignore")
 	driftIgnore := filter.NewDriftIgnore()
-	remoteResources = driftIgnore.Run(remoteResources)
-	resourcesFromState = driftIgnore.Run(resourcesFromState)
 
-	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState)
+	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState, driftIgnore)
 	if err != nil {
 		logrus.Errorf("Unable to analyse resources: %+v", err)
 		return nil

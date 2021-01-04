@@ -4,6 +4,10 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
+	"github.com/stretchr/testify/mock"
+
+	"github.com/cloudskiff/driftctl/mocks"
+
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/stretchr/testify/assert"
 
@@ -18,9 +22,14 @@ import (
 
 func TestAnalyze(t *testing.T) {
 	cases := []struct {
-		name       string
-		iac        []resource.Resource
-		cloud      []resource.Resource
+		name         string
+		iac          []resource.Resource
+		ignoredRes   []resource.Resource
+		cloud        []resource.Resource
+		ignoredDrift []struct {
+			res  resource.Resource
+			path []string
+		}
 		expected   Analysis
 		hasDrifted bool
 	}{
@@ -56,6 +65,62 @@ func TestAnalyze(t *testing.T) {
 				},
 			},
 			hasDrifted: true,
+		},
+		{
+			name: "TestResourceIgnoredDeleted",
+			iac: []resource.Resource{
+				&testresource.FakeResource{
+					Id: "foobar",
+				},
+			},
+			ignoredRes: []resource.Resource{
+				&testresource.FakeResource{
+					Id: "foobar",
+				},
+			},
+			cloud: []resource.Resource{},
+			expected: Analysis{
+				summary: Summary{
+					TotalResources: 0,
+					TotalDeleted:   0,
+				},
+			},
+			hasDrifted: false,
+		},
+		{
+			name: "Test100PercentCoverage with ignore",
+			iac: []resource.Resource{
+				&testresource.FakeResource{
+					Id: "foobar",
+				},
+				&testresource.FakeResource{
+					Id: "foobar2",
+				},
+			},
+			ignoredRes: []resource.Resource{
+				&testresource.FakeResource{
+					Id: "foobar2",
+				},
+			},
+			cloud: []resource.Resource{
+				&testresource.FakeResource{
+					Id: "foobar",
+				},
+				&testresource.FakeResource{
+					Id: "foobar2",
+				},
+			},
+			expected: Analysis{
+				managed: []resource.Resource{
+					&testresource.FakeResource{
+						Id: "foobar",
+					},
+				},
+				summary: Summary{
+					TotalManaged:   1,
+					TotalResources: 1,
+				},
+			},
 		},
 		{
 			name: "Test100PercentCoverage",
@@ -161,14 +226,141 @@ func TestAnalyze(t *testing.T) {
 			},
 			hasDrifted: true,
 		},
+		{
+			name: "TestDiff with partial ignore",
+			iac: []resource.Resource{
+				&testresource.FakeResource{
+					Id:     "foobar",
+					FooBar: "foobar",
+					BarFoo: "barfoo",
+				},
+			},
+			cloud: []resource.Resource{
+				&testresource.FakeResource{
+					Id:     "foobar",
+					FooBar: "barfoo",
+					BarFoo: "foobar",
+				},
+			},
+			ignoredDrift: []struct {
+				res  resource.Resource
+				path []string
+			}{
+				{
+					res: &testresource.FakeResource{
+						Id:     "foobar",
+						FooBar: "foobar",
+						BarFoo: "barfoo",
+					},
+					path: []string{"FooBar"},
+				},
+			},
+			expected: Analysis{
+				managed: []resource.Resource{
+					&testresource.FakeResource{
+						Id:     "foobar",
+						FooBar: "foobar",
+						BarFoo: "barfoo",
+					},
+				},
+				summary: Summary{
+					TotalResources: 1,
+					TotalDrifted:   1,
+					TotalManaged:   1,
+				},
+				differences: []Difference{
+					{
+						Res: &testresource.FakeResource{
+							Id:     "foobar",
+							FooBar: "foobar",
+							BarFoo: "barfoo",
+						},
+						Changelog: diff.Changelog{
+							diff.Change{
+								Type: "update",
+								From: "barfoo",
+								To:   "foobar",
+								Path: []string{
+									"BarFoo",
+								},
+							},
+						},
+					},
+				},
+			},
+			hasDrifted: true,
+		},
+		{
+			name: "TestDiff with full ignore",
+			iac: []resource.Resource{
+				&testresource.FakeResource{
+					Id:     "foobar",
+					FooBar: "foobar",
+					BarFoo: "barfoo",
+				},
+			},
+			cloud: []resource.Resource{
+				&testresource.FakeResource{
+					Id:     "foobar",
+					FooBar: "barfoo",
+					BarFoo: "foobar",
+				},
+			},
+			ignoredDrift: []struct {
+				res  resource.Resource
+				path []string
+			}{
+				{
+					res: &testresource.FakeResource{
+						Id:     "foobar",
+						FooBar: "foobar",
+						BarFoo: "barfoo",
+					},
+					path: []string{"FooBar"},
+				},
+				{
+					res: &testresource.FakeResource{
+						Id:     "foobar",
+						FooBar: "foobar",
+						BarFoo: "barfoo",
+					},
+					path: []string{"BarFoo"},
+				},
+			},
+			expected: Analysis{
+				managed: []resource.Resource{
+					&testresource.FakeResource{
+						Id:     "foobar",
+						FooBar: "foobar",
+						BarFoo: "barfoo",
+					},
+				},
+				summary: Summary{
+					TotalResources: 1,
+					TotalDrifted:   0,
+					TotalManaged:   1,
+				},
+			},
+			hasDrifted: false,
+		},
 	}
 
 	analyzer := NewAnalyzer()
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
+			filter := &mocks.Filter{}
+			for _, ignored := range c.ignoredRes {
+				filter.On("IsResourceIgnored", ignored).Return(true)
+			}
+			filter.On("IsResourceIgnored", mock.Anything).Return(false)
 
-			result, err := analyzer.Analyze(c.cloud, c.iac)
+			for _, s := range c.ignoredDrift {
+				filter.On("IsFieldIgnored", s.res, s.path).Return(true)
+			}
+			filter.On("IsFieldIgnored", mock.Anything, mock.Anything).Return(false)
+
+			result, err := analyzer.Analyze(c.cloud, c.iac, filter)
 
 			if err != nil {
 				t.Error(err)

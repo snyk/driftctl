@@ -12,7 +12,11 @@ type FakeResource struct {
 	CustomMap map[string]struct {
 		Tag string
 	}
-	Slice []string
+	Slice  []string
+	Struct struct {
+		Baz string `computed:"true"`
+		Bar string
+	}
 }
 
 func (d FakeResource) TerraformId() string {

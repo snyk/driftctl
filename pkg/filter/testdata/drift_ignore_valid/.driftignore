@@ -1,3 +1,6 @@
 ignored_resource.id2
 wildcard_resource.*
-resource_type.id.with.dots
+resource_type.id\.with\.dots
+resource_type.idwith\\
+resource_type.idwith\\backslashes
+

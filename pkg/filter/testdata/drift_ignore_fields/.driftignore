@@ -1,0 +1,8 @@
+res_type.full_drift_ignored.json
+res_type.full_drift_ignored.foobar
+res_type.partial_drift_ignored.foobar
+res_type.wildcard_drift_ignored.*.baz
+res_type.endofpath_drift_ignored.struct
+resource_type.id\.with\.dots.json
+resource_type.idwith\\.json
+resource_type.idwith\\backslashes.foobar
