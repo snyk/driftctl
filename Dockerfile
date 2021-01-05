@@ -13,7 +13,7 @@ FROM gcr.io/distroless/base-debian10
 
 ARG OS="linux"
 ARG ARCH="amd64"
-ENV HOME=/app
+ENV HOME=/home
 
 WORKDIR /app
 COPY --from=builder /go/src/app/bin/driftctl_${OS}_${ARCH} /bin/driftctl
