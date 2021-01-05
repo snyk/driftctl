@@ -49,7 +49,19 @@ func WriteFile(p string, content []byte, name string) {
 
 // Remove forbidden characters like / in file name
 func sanitizeName(name string) string {
-	return strings.ReplaceAll(name, "/", "_")
+	substitution := "_"
+	replacer := strings.NewReplacer(
+		"/", substitution,
+		"\\", substitution,
+		"<", substitution,
+		">", substitution,
+		":", substitution,
+		"\"", substitution,
+		"|", substitution,
+		"?", substitution,
+		"*", substitution,
+	)
+	return replacer.Replace(name)
 }
 
 func FileExists(dirname, f string) bool {
