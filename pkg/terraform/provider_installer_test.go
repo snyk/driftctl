@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"runtime"
 	"testing"
 
 	"github.com/cloudskiff/driftctl/mocks"
@@ -16,7 +17,7 @@ func TestProviderInstallerGetAwsDoesNotExist(t *testing.T) {
 	assert := assert.New(t)
 	fakeTmpHome := t.TempDir()
 
-	expectedSubFolder := "/.driftctl/plugins/linux_amd64"
+	expectedSubFolder := fmt.Sprintf("/.driftctl/plugins/%s_%s", runtime.GOOS, runtime.GOARCH)
 	fakeUrl := "https://example.com"
 	mockDownloader := mocks.ProviderDownloaderInterface{}
 	mockDownloader.On("GetProviderUrl", "aws", "3.19.0").Return(fakeUrl)
@@ -40,7 +41,7 @@ func TestProviderInstallerGetAwsWithoutHomeDir(t *testing.T) {
 	assert := assert.New(t)
 
 	expectedHomeDir := os.TempDir()
-	expectedSubFolder := "/.driftctl/plugins/linux_amd64"
+	expectedSubFolder := fmt.Sprintf("/.driftctl/plugins/%s_%s", runtime.GOOS, runtime.GOARCH)
 	fakeUrl := "https://example.com"
 	mockDownloader := mocks.ProviderDownloaderInterface{}
 	mockDownloader.On("GetProviderUrl", "aws", "3.19.0").Return(fakeUrl)
@@ -62,7 +63,7 @@ func TestProviderInstallerGetAwsAlreadyExist(t *testing.T) {
 
 	assert := assert.New(t)
 	fakeTmpHome := t.TempDir()
-	expectedSubFolder := "/.driftctl/plugins/linux_amd64"
+	expectedSubFolder := fmt.Sprintf("/.driftctl/plugins/%s_%s", runtime.GOOS, runtime.GOARCH)
 	err := os.MkdirAll(path.Join(fakeTmpHome, expectedSubFolder), 0755)
 	if err != nil {
 		t.Error(err)
@@ -91,7 +92,7 @@ func TestProviderInstallerGetAwsAlreadyExistButIsDirectory(t *testing.T) {
 
 	assert := assert.New(t)
 	fakeTmpHome := t.TempDir()
-	expectedSubFolder := "/.driftctl/plugins/linux_amd64"
+	expectedSubFolder := fmt.Sprintf("/.driftctl/plugins/%s_%s", runtime.GOOS, runtime.GOARCH)
 	invalidDirPath := path.Join(fakeTmpHome, expectedSubFolder, awsProviderName)
 	err := os.MkdirAll(invalidDirPath, 0755)
 	if err != nil {

@@ -47,24 +47,21 @@ Binaries are available in the [release page](https://github.com/cloudskiff/drift
 #### Docker
 
 ```bash
-docker run \
-  -v ~/.aws:/app/.aws:ro \
-  -v $(pwd)/terraform.tfstate:/app/terraform.tfstate:ro \
-  -v ~/.driftctl:/app/.driftctl \
-  -e AWS_REGION=us-east-1 \
-  -e AWS_PROFILE=cloudskiff \
-  cloudskiff/driftctl:v0.1.1 scan ## with the same option as the binary version
+docker run -t --rm \
+  -v ~/.aws:/home/.aws:ro \
+  -v $(pwd):/app:ro \
+  -v ~/.driftctl:/home/.driftctl \
+  -e AWS_PROFILE=non-default-profile \
+  cloudskiff/driftctl scan
 ```
 
-`-v ~/.aws:/app/.aws:ro` mount your .aws containing credentials and profile
+`-v ~/.aws:/home/.aws:ro` (optionally) mounts your `~/.aws` containing AWS credentials and profile
 
-`-v $(pwd)/terraform.tfstate:/app/terraform.tfstate:ro` mount your terraform state
+`-v $(pwd):/app:ro` (optionally) mounts your working dir containing the terraform state
 
-`-v ~/.driftctl:/app/.driftctl` to prevent driftctl downloading the provider at each run, mount a directory to persist it
+`-v ~/.driftctl:/home/.driftctl` (optionally) prevents driftctl to download the provider at each run
 
-`-e AWS_PROFILE=cloudskiff` export the profile to use in your AWS config
-
-`-e AWS_REGION=us-east-1` export the specific AWS region you want to use
+`-e AWS_PROFILE=cloudskiff` (optionally) exports the non-default AWS profile name to use
 
 `cloudskiff/driftctl:<VERSION_TAG>` run a specific driftctl tagged release
 
