@@ -43,7 +43,7 @@ func main() {
 		newVersion := <-latestVersionChan
 		if newVersion != "" {
 			fmt.Println("\n\nYour version of driftctl is outdated, please upgrade !")
-			fmt.Printf("Current: %s; Latest: %s", version.Current(), newVersion)
+			fmt.Printf("Current: %s; Latest: %s\n", version.Current(), newVersion)
 		}
 	}
 }
