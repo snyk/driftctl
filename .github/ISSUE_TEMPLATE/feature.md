@@ -1,7 +1,7 @@
 ---
 name: 🚀 Feature
 about: RFC and ideas for new features and improvements
-label: kind/feature
+labels: kind/feature
 
 ---
 
