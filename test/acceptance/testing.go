@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
@@ -85,24 +86,27 @@ func (c *AccTestCase) getResult(t *testing.T) *ScanResult {
 	return NewScanResult(t, analysis)
 }
 
-func terraformApply() error {
-	// Disable terraform version checks
-	// @link https://www.terraform.io/docs/commands/index.html#upgrade-and-security-bulletin-checks
-	checkpoint := os.Getenv("CHECKPOINT_DISABLE")
-	os.Setenv("CHECKPOINT_DISABLE", "true")
-	defer os.Setenv("CHECKPOINT_DISABLE", checkpoint)
-
-	logrus.Debug("Running terraform init ...")
-	cmd := exec.Command("terraform", "init", "-upgrade")
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return errors.Wrap(err, string(out))
+func (c *AccTestCase) terraformInit() error {
+	_, err := os.Stat(path.Join(c.Path, ".terraform"))
+	if os.IsNotExist(err) {
+		logrus.Debug("Running terraform init ...")
+		cmd := exec.Command("terraform", "init", "-input=false")
+		cmd.Dir = c.Path
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			return errors.Wrap(err, string(out))
+		}
+		logrus.Debug("Terraform init done")
 	}
-	logrus.Debug("Terraform init done")
 
+	return nil
+}
+
+func (c *AccTestCase) terraformApply() error {
 	logrus.Debug("Running terraform apply ...")
-	cmd = exec.Command("terraform", "apply", "-auto-approve")
-	out, err = cmd.CombinedOutput()
+	cmd := exec.Command("terraform", "apply", "-auto-approve")
+	cmd.Dir = c.Path
+	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.Wrap(err, string(out))
 	}
@@ -111,10 +115,17 @@ func terraformApply() error {
 	return nil
 }
 
-func terraformDestroy() {
+func (c *AccTestCase) terraformDestroy() error {
 	logrus.Debug("Running terraform destroy ...")
-	_ = exec.Command("terraform", "destroy", "-auto-approve").Run()
+	cmd := exec.Command("terraform", "destroy", "-auto-approve")
+	cmd.Dir = c.Path
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return errors.Wrap(err, string(out))
+	}
 	logrus.Debug("Terraform destroy done")
+
+	return nil
 }
 
 func runDriftCtlCmd(driftctlCmd *cmd.DriftctlCmd) (*cobra.Command, string, error) {
@@ -147,18 +158,33 @@ func Run(t *testing.T, c AccTestCase) {
 		t.Fatal(err)
 	}
 
-	err := os.Chdir(c.Path)
-	if err != nil {
-		t.Fatal(err)
-	}
 	if c.OnStart != nil {
 		c.OnStart()
 	}
-	err = terraformApply()
+
+	// Disable terraform version checks
+	// @link https://www.terraform.io/docs/commands/index.html#upgrade-and-security-bulletin-checks
+	checkpoint := os.Getenv("CHECKPOINT_DISABLE")
+	os.Setenv("CHECKPOINT_DISABLE", "true")
+
+	// Execute terraform init if .terraform folder is not found in test folder
+	err := c.terraformInit()
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer terraformDestroy()
+
+	err = c.terraformApply()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		err := c.terraformDestroy()
+		os.Setenv("CHECKPOINT_DISABLE", checkpoint)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
 
 	logger.Init(logger.GetConfig())
 
@@ -170,7 +196,10 @@ func Run(t *testing.T, c AccTestCase) {
 	}
 	if c.Args != nil {
 		c.Args = append([]string{""}, c.Args...)
-		c.Args = append(c.Args, "--output", fmt.Sprintf("json://%s", c.getResultFilePath()))
+		c.Args = append(c.Args,
+			"--from", fmt.Sprintf("tfstate://%s", path.Join(c.Path, "terraform.tfstate")),
+			"--output", fmt.Sprintf("json://%s", c.getResultFilePath()),
+		)
 	}
 	os.Args = c.Args
 

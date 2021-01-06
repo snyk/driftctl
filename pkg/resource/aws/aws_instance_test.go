@@ -15,7 +15,7 @@ func TestAcc_AwsInstance_WithBlockDevices(t *testing.T) {
 	var mutatedInstanceId string
 	acceptance.Run(t, acceptance.AccTestCase{
 		Path: "./testdata/acc/aws_instance",
-		Args: []string{"scan"}, // TODO add filter to limit scan scope to aws_instances
+		Args: []string{"scan", "--filter", "Type=='aws_instance'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Check: func(result *acceptance.ScanResult, stdout string, err error) {
