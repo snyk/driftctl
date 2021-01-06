@@ -1,20 +1,19 @@
 package state
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
-	"github.com/hashicorp/terraform/addrs"
-
 	"github.com/cloudskiff/driftctl/pkg/iac"
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
+	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
-
-	"github.com/hashicorp/terraform/states/statefile"
-
+	"github.com/hashicorp/terraform/addrs"
 	"github.com/hashicorp/terraform/states"
+	"github.com/hashicorp/terraform/states/statefile"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
+	ctyconvert "github.com/zclconf/go-cty/cty/convert"
+	ctyjson "github.com/zclconf/go-cty/cty/json"
 )
 
 const TerraformStateReaderSupplier = "tfstate"
@@ -54,11 +53,13 @@ func (r *TerraformStateReader) retrieve() (map[string][]cty.Value, error) {
 	stateResources := state.RootModule().Resources
 	resMap := make(map[string][]cty.Value)
 	for _, stateRes := range stateResources {
+		resName := stateRes.Addr.Resource.Name
+		resType := stateRes.Addr.Resource.Type
 		if stateRes.Addr.Resource.Mode != addrs.ManagedResourceMode {
 			logrus.WithFields(logrus.Fields{
 				"mode": stateRes.Addr.Resource.Mode,
-				"name": stateRes.Addr.Resource.Name,
-				"type": stateRes.Addr.Resource.Type,
+				"name": resName,
+				"type": resType,
 			}).Debug("Skipping state entry as it is not a managed resource")
 			continue
 		}
@@ -74,8 +75,28 @@ func (r *TerraformStateReader) retrieve() (map[string][]cty.Value, error) {
 		for _, instance := range stateRes.Instances {
 			decodedVal, err := instance.Current.Decode(schema.Block.ImpliedType())
 			if err != nil {
-				logrus.Error(err)
-				continue
+				// Try to do a manual type conversion if we got a path error
+				// It will allow driftctl to read state generated with a superior version of provider
+				// than the actually supported one
+				// by ignoring new fields
+				_, isPathError := err.(cty.PathError)
+				if isPathError {
+					logrus.WithFields(logrus.Fields{
+						"name": resName,
+						"type": resType,
+						"err":  err.Error(),
+					}).Debug("Got a cty path error when deserializing state")
+
+					decodedVal, err = r.convertInstance(instance.Current, schema.Block.ImpliedType())
+				}
+
+				if err != nil {
+					logrus.WithFields(logrus.Fields{
+						"name": resName,
+						"type": resType,
+					}).Error("Unable to decode resource from state")
+					return nil, err
+				}
 			}
 			_, exists := resMap[stateRes.Addr.Resource.Type]
 			if !exists {
@@ -89,6 +110,34 @@ func (r *TerraformStateReader) retrieve() (map[string][]cty.Value, error) {
 	}
 
 	return resMap, nil
+}
+
+func (r *TerraformStateReader) convertInstance(instance *states.ResourceInstanceObjectSrc, ty cty.Type) (*states.ResourceInstanceObject, error) {
+	inputType, err := ctyjson.ImpliedType(instance.AttrsJSON)
+	if err != nil {
+		return nil, err
+	}
+	input, err := ctyjson.Unmarshal(instance.AttrsJSON, inputType)
+	if err != nil {
+		return nil, err
+	}
+
+	convertedVal, err := ctyconvert.Convert(input, ty)
+	if err != nil {
+		return nil, err
+	}
+
+	instanceObj := &states.ResourceInstanceObject{
+		Value:               convertedVal,
+		Status:              instance.Status,
+		Dependencies:        instance.Dependencies,
+		Private:             instance.Private,
+		CreateBeforeDestroy: instance.CreateBeforeDestroy,
+	}
+
+	logrus.Debug("Successfully converted resource")
+
+	return instanceObj, nil
 }
 
 func (r *TerraformStateReader) decode(values map[string][]cty.Value) ([]resource.Resource, error) {

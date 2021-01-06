@@ -7,13 +7,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/test/goldenfile"
-
 	"github.com/cloudskiff/driftctl/pkg/iac"
 	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/cloudskiff/driftctl/test/goldenfile"
 	"github.com/cloudskiff/driftctl/test/mocks"
 
 	"github.com/r3labs/diff/v2"
@@ -50,6 +49,7 @@ func TestTerraformStateReader_Resources(t *testing.T) {
 		{name: "RDS DB instance", dirName: "db_instance", wantErr: false},
 		{name: "RDS DB Subnet group", dirName: "db_subnet_group", wantErr: false},
 		{name: "Lambda function", dirName: "lambda_function", wantErr: false},
+		{name: "unsupported attribute", dirName: "unsupported_attribute", wantErr: false},
 		{name: "Unsupported provider", dirName: "unsupported_provider", wantErr: false},
 		{name: "EC2 instance", dirName: "ec2_instance", wantErr: false},
 		{name: "EC2 key pair", dirName: "ec2_key_pair", wantErr: false},
