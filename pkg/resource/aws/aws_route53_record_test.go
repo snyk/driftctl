@@ -18,7 +18,7 @@ func TestAcc_AwsRoute53Record_WithFQDNAsId(t *testing.T) {
 					}
 					result.AssertDriftCountTotal(0)
 					result.Equal(0, result.Summary().TotalDeleted)
-					result.Equal(4, result.Summary().TotalManaged)
+					result.Equal(8, result.Summary().TotalManaged)
 				},
 			},
 		},

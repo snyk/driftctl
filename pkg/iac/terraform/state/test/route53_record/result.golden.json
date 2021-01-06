@@ -42,7 +42,7 @@
   "AllowOverwrite": null,
   "Fqdn": "test.elie.ski",
   "HealthCheckId": "",
-  "Id": "Z09368953G729AFEX5048_test_A",
+  "Id": "Z09368953G729AFEX5048_test.elie.ski_A",
   "MultivalueAnswerRoutingPolicy": null,
   "Name": "test",
   "Records": [

@@ -151,12 +151,24 @@ func TestRoute53RecordSupplier_Resources(t *testing.T) {
 								Type: awssdk.String("TXT"),
 							},
 							{
+								Name: awssdk.String("test0"),
+								Type: awssdk.String("A"),
+							},
+							{
 								Name: awssdk.String("test1.foo-2.com"),
 								Type: awssdk.String("TXT"),
 							},
 							{
+								Name: awssdk.String("test1.foo-2.com"),
+								Type: awssdk.String("A"),
+							},
+							{
 								Name: awssdk.String("_test2.foo-2.com"),
 								Type: awssdk.String("TXT"),
+							},
+							{
+								Name: awssdk.String("_test2.foo-2.com"),
+								Type: awssdk.String("A"),
 							},
 						},
 					},
