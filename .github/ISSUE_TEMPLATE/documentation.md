@@ -1,7 +1,7 @@
 ---
 name: 📝 Documentation
 about: documentation lacks and improvements
-label: kind/documentation
+labels: kind/documentation
 
 ---
 
