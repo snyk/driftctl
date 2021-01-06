@@ -7,7 +7,7 @@ type AwsRoute53Record struct {
 	AllowOverwrite                *bool    `cty:"allow_overwrite" diff:"-" computed:"true"`
 	Fqdn                          *string  `cty:"fqdn" computed:"true"`
 	HealthCheckId                 *string  `cty:"health_check_id"`
-	Id                            string   `cty:"id" diff:"-" computed:"true"`
+	Id                            string   `cty:"id" computed:"true"`
 	MultivalueAnswerRoutingPolicy *bool    `cty:"multivalue_answer_routing_policy"`
 	Name                          *string  `cty:"name" diff:"-"`
 	Records                       []string `cty:"records"`
@@ -37,7 +37,7 @@ type AwsRoute53Record struct {
 }
 
 func (r *AwsRoute53Record) TerraformId() string {
-	return *r.Fqdn
+	return r.Id
 }
 
 func (r *AwsRoute53Record) TerraformType() string {
