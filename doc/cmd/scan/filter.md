@@ -18,12 +18,14 @@ Create the .driftignore file where you launch driftctl (usually the root of your
 
 Each line must be of kind
 - `resource_type.resource_id`, resource_id could be a wildcard to exclude all resources of a given type.
-- `resource_type.resource_id.path.to.field`, resource_id can be wildcard to ignore a drift on given field for a given type, path could also contain wildcards.
+- `resource_type.resource_id.path.to.FieldName`, resource_id can be wildcard to ignore a drift on given field for a given type, path could also contain wildcards.
+
+**N.B.** Fields are not case-sensitive.
 
 If your resource id or the path of a field contains dot or backslash you can escape them with backslashes:
 ```ignore
-resource_type.resource\.id\.containing\.dots.path.to.dotted\.fieldname
-resource_type.resource_id_containing\\backslash.path.to.backslash\\fieldname
+resource_type.resource\.id\.containing\.dots.path.to.dotted\.FieldName
+resource_type.resource_id_containing\\backslash.path.to.backslash\\FieldName
 ```
 
 ### Example
@@ -34,9 +36,9 @@ aws_s3_bucket.my-buckey
 # Will ignore every aws_instance resource
 aws_instance.*
 # Will ignore environement for all lambda functions
-aws_lambda_function.*.environment
+aws_lambda_function.*.Environment
 # Will ignore lastModified for my-lambda-name lambda function
-aws_lambda_function.my-lambda-name.lastmodified
+aws_lambda_function.my-lambda-name.LastModified
 ```
 
 ## Filter rules
