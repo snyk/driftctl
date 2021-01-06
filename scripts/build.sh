@@ -74,6 +74,7 @@ echo "+ Building with flags: ${LD_FLAGS}"
 osarch="${os_archs[@]}"
 gox \
     -osarch="$osarch" \
+    -parallel=2 \
     -ldflags "${LD_FLAGS}" \
     -output "bin/driftctl_{{.OS}}_{{.Arch}}" \
     ./
