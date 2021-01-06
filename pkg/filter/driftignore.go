@@ -112,7 +112,7 @@ RuleCheck:
 		}
 
 		for i := range path {
-			if path[i] != strings.ToLower(changePath[i]) && path[i] != "*" {
+			if !strings.EqualFold(path[i], changePath[i]) && path[i] != "*" {
 				continue RuleCheck // found a diff in path that was not a wildcard
 			}
 		}
