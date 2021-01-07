@@ -68,6 +68,13 @@ func readBucketRegion(client *s3iface.S3API, name string) (string, error) {
 		}
 		return "", err
 	}
+
+	// Buckets in Region us-east-1 have a LocationConstraint of null.
+	// https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketLocation.html#API_GetBucketLocation_ResponseSyntax
+	if bucketLocationResponse.LocationConstraint == nil {
+		return "us-east-1", err
+	}
+
 	return *bucketLocationResponse.LocationConstraint, nil
 }
 
