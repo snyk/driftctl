@@ -84,3 +84,7 @@ func (r *ScanResult) AssertDriftCountTotal(count int) {
 	}
 	r.Equal(count, driftCount)
 }
+
+func (r ScanResult) AssertInfrastructureIsInSync() {
+	r.Equal(true, r.Analysis.IsSync(), "Infrastructure is not in sync")
+}

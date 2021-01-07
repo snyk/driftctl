@@ -38,5 +38,7 @@ func Deserializers() []deserializer.CTYDeserializer {
 		awsdeserializer.NewVPCSecurityGroupRuleDeserializer(),
 		awsdeserializer.NewDefaultVPCDeserializer(),
 		awsdeserializer.NewVPCDeserializer(),
+		awsdeserializer.NewDefaultSubnetDeserializer(),
+		awsdeserializer.NewSubnetDeserializer(),
 	}
 }
