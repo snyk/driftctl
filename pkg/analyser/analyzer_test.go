@@ -221,39 +221,49 @@ func TestAnalyze(t *testing.T) {
 								Bar string
 							}{"baz", "bar"},
 						},
-						Changelog: diff.Changelog{
-							diff.Change{
-								Type: "update",
-								From: "foobar",
-								To:   "barfoo",
-								Path: []string{
-									"FooBar",
+						Changelog: Changelog{
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "foobar",
+									To:   "barfoo",
+									Path: []string{
+										"FooBar",
+									},
 								},
 							},
-							diff.Change{
-								Type: "update",
-								From: "barfoo",
-								To:   "foobar",
-								Path: []string{
-									"BarFoo",
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "barfoo",
+									To:   "foobar",
+									Path: []string{
+										"BarFoo",
+									},
 								},
+								Computed: true,
 							},
-							diff.Change{
-								Type: "update",
-								From: "baz",
-								To:   "bar",
-								Path: []string{
-									"Struct",
-									"Baz",
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "baz",
+									To:   "bar",
+									Path: []string{
+										"Struct",
+										"Baz",
+									},
 								},
+								Computed: true,
 							},
-							diff.Change{
-								Type: "update",
-								From: "bar",
-								To:   "baz",
-								Path: []string{
-									"Struct",
-									"Bar",
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "bar",
+									To:   "baz",
+									Path: []string{
+										"Struct",
+										"Bar",
+									},
 								},
 							},
 						},
@@ -326,14 +336,17 @@ func TestAnalyze(t *testing.T) {
 							FooBar: "foobar",
 							BarFoo: "barfoo",
 						},
-						Changelog: diff.Changelog{
-							diff.Change{
-								Type: "update",
-								From: "barfoo",
-								To:   "foobar",
-								Path: []string{
-									"BarFoo",
+						Changelog: Changelog{
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "barfoo",
+									To:   "foobar",
+									Path: []string{
+										"BarFoo",
+									},
 								},
+								Computed: true,
 							},
 						},
 					},
@@ -568,61 +581,77 @@ func TestAnalyze(t *testing.T) {
 								{"one", []string{"foo"}},
 							},
 						},
-						Changelog: diff.Changelog{
-							diff.Change{
-								Type: "update",
-								From: "foobar",
-								To:   "barfoo",
-								Path: []string{
-									"FooBar",
+						Changelog: Changelog{
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "foobar",
+									To:   "barfoo",
+									Path: []string{
+										"FooBar",
+									},
 								},
 							},
-							diff.Change{
-								Type: "update",
-								From: "barfoo",
-								To:   "foobar",
-								Path: []string{
-									"BarFoo",
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "barfoo",
+									To:   "foobar",
+									Path: []string{
+										"BarFoo",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "baz",
+									To:   "bar",
+									Path: []string{
+										"Struct",
+										"Baz",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "bar",
+									To:   "baz",
+									Path: []string{
+										"Struct",
+										"Bar",
+									},
 								},
 							},
-							diff.Change{
-								Type: "update",
-								From: "baz",
-								To:   "bar",
-								Path: []string{
-									"Struct",
-									"Baz",
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "foo",
+									To:   "oof",
+									Path: []string{
+										"StructSlice",
+										"0",
+										"Array",
+										"0",
+									},
 								},
+								Computed: true,
 							},
-							diff.Change{
-								Type: "update",
-								From: "bar",
-								To:   "baz",
-								Path: []string{
-									"Struct",
-									"Bar",
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "one",
+									To:   "two",
+									Path: []string{
+										"StructSlice",
+										"0",
+										"String",
+									},
 								},
-							},
-							diff.Change{
-								Type: "update",
-								From: "foo",
-								To:   "oof",
-								Path: []string{
-									"StructSlice",
-									"0",
-									"Array",
-									"0",
-								},
-							},
-							diff.Change{
-								Type: "update",
-								From: "one",
-								To:   "two",
-								Path: []string{
-									"StructSlice",
-									"0",
-									"String",
-								},
+								Computed: true,
 							},
 						},
 					},
@@ -654,7 +683,7 @@ func TestAnalyze(t *testing.T) {
 							Message: "StructSlice.0.String is a computed field",
 						},
 						{
-							Message: "StructSlice.0.Array.0 is a computed field",
+							Message: "StructSlice.0.Array is a computed field",
 						},
 					},
 				},
@@ -676,12 +705,12 @@ func TestAnalyze(t *testing.T) {
 			}
 			filter.On("IsFieldIgnored", mock.Anything, mock.Anything).Return(false)
 
-			alerter := alerter.NewAlerter()
+			al := alerter.NewAlerter()
 			if c.alerts != nil {
-				alerter.SetAlerts(c.alerts)
+				al.SetAlerts(c.alerts)
 			}
 
-			analyzer := NewAnalyzer(alerter)
+			analyzer := NewAnalyzer(al)
 			result, err := analyzer.Analyze(c.cloud, c.iac, filter)
 
 			if err != nil {
@@ -793,12 +822,14 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 			Id:   "AKIA5QYBVVD25KFXJHYJ",
 			Type: "aws_iam_access_key",
 		},
-		Changelog: []diff.Change{
+		Changelog: []Change{
 			{
-				Type: "update",
-				Path: []string{"Status"},
-				From: "Active",
-				To:   "Inactive",
+				Change: diff.Change{
+					Type: "update",
+					Path: []string{"Status"},
+					From: "Active",
+					To:   "Inactive",
+				},
 			},
 		},
 	})
@@ -872,12 +903,14 @@ func TestAnalysis_UnmarshalJSON(t *testing.T) {
 					Id:   "AKIA5QYBVVD25KFXJHYJ",
 					Type: "aws_iam_access_key",
 				},
-				Changelog: []diff.Change{
+				Changelog: []Change{
 					{
-						Type: "update",
-						Path: []string{"Status"},
-						From: "Active",
-						To:   "Inactive",
+						Change: diff.Change{
+							Type: "update",
+							Path: []string{"Status"},
+							From: "Active",
+							To:   "Inactive",
+						},
 					},
 				},
 			},

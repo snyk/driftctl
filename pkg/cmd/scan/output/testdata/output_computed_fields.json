@@ -28,7 +28,8 @@
 						"field"
 					],
 					"from": "foobar",
-					"to": "barfoo"
+					"to": "barfoo",
+					"computed": true
 				},
 				{
 					"type": "create",
@@ -37,7 +38,8 @@
 						"field"
 					],
 					"from": null,
-					"to": "newValue"
+					"to": "newValue",
+					"computed": false
 				},
 				{
 					"type": "delete",
@@ -45,7 +47,8 @@
 						"a"
 					],
 					"from": "oldValue",
-					"to": null
+					"to": null,
+					"computed": true
 				},
 				{
 					"type": "update",
@@ -56,7 +59,8 @@
 						"0"
 					],
 					"from": "foo",
-					"to": "oof"
+					"to": "oof",
+					"computed": true
 				},
 				{
 					"type": "update",
@@ -66,7 +70,8 @@
 						"string"
 					],
 					"from": "one",
-					"to": "two"
+					"to": "two",
+					"computed": true
 				}
 			]
 		}
@@ -81,7 +86,7 @@
 				"message": "a is a computed field"
 			},
 			{
-				"message": "struct.0.array.0 is a computed field"
+				"message": "struct.0.array is a computed field"
 			},
 			{
 				"message": "struct.0.string is a computed field"

@@ -7,7 +7,6 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 
-	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/require"
 )
 
@@ -50,7 +49,7 @@ func (r *ScanResult) AssertResourceDriftCount(id, ty string, count int) {
 	r.Failf("no differences found", "%s(%s)", id, ty)
 }
 
-func (r *ScanResult) AssertResourceHasDrift(id, ty string, change diff.Change) {
+func (r *ScanResult) AssertResourceHasDrift(id, ty string, change analyser.Change) {
 	found := false
 	for _, u := range r.Differences() {
 		if u.Res.TerraformType() == ty && u.Res.TerraformId() == id {

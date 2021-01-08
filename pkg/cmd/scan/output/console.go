@@ -88,15 +88,9 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 					}
 				}
 				fmt.Printf("    %s %s => %s", pref, prettify(change.From), prettify(change.To))
-				for key, val := range analysis.Alerts() {
-					if fmt.Sprintf("%s.%s", humanString, difference.Res.TerraformId()) == key {
-						for _, a := range val {
-							if fmt.Sprintf("%s is a computed field", path) == a.Message {
-								shouldWarnOnComputedFields = true
-								fmt.Printf(" %s", color.YellowString("(computed)"))
-							}
-						}
-					}
+				if change.Computed {
+					shouldWarnOnComputedFields = true
+					fmt.Printf(" %s", color.YellowString("(computed)"))
 				}
 				fmt.Printf("\n")
 			}

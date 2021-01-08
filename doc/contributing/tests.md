@@ -220,12 +220,14 @@ func TestAcc_AwsInstance_WithBlockDevices(t *testing.T) {
 					result.AssertResourceHasDrift(
 						mutatedInstanceId,
 						awsresources.AwsInstanceResourceType,
-						diff.Change{
-							Type: diff.CREATE,
-							Path: []string{"Tags", "Env"},
-							From: nil,
-							To:   "Production",
-						},
+                        analyser.Change{
+                            Change: diff.Change{
+                                Type: diff.CREATE,
+                                Path: []string{"Tags", "Env"},
+                                From: nil,
+                                To:   "Production",
+                            },
+                        },
 					)
 				},
 			},

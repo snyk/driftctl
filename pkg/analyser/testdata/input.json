@@ -49,7 +49,8 @@
             "Status"
           ],
           "from": "Active",
-          "to": "Inactive"
+          "to": "Inactive",
+          "computed": false
         }
       ]
     }

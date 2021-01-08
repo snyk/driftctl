@@ -43,24 +43,30 @@ func fakeAnalysis() *analyser.Analysis {
 	a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
 		Id:   "diff-id-1",
 		Type: "aws_diff_resource",
-	}, Changelog: []diff.Change{
+	}, Changelog: []analyser.Change{
 		{
-			Type: diff.UPDATE,
-			Path: []string{"updated", "field"},
-			From: "foobar",
-			To:   "barfoo",
+			Change: diff.Change{
+				Type: diff.UPDATE,
+				Path: []string{"updated", "field"},
+				From: "foobar",
+				To:   "barfoo",
+			},
 		},
 		{
-			Type: diff.CREATE,
-			Path: []string{"new", "field"},
-			From: nil,
-			To:   "newValue",
+			Change: diff.Change{
+				Type: diff.CREATE,
+				Path: []string{"new", "field"},
+				From: nil,
+				To:   "newValue",
+			},
 		},
 		{
-			Type: diff.DELETE,
-			Path: []string{"a"},
-			From: "oldValue",
-			To:   nil,
+			Change: diff.Change{
+				Type: diff.DELETE,
+				Path: []string{"a"},
+				From: "oldValue",
+				To:   nil,
+			},
 		},
 	}})
 	return &a
@@ -94,23 +100,27 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 	a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
 		Id:   "diff-id-1",
 		Type: "aws_diff_resource",
-	}, Changelog: []diff.Change{
+	}, Changelog: []analyser.Change{
 		{
-			Type: diff.UPDATE,
-			Path: []string{"Json"},
-			From: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Removed\":\"Added\",\"Changed\":[\"ec2:DescribeInstances\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
-			To:   "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Changed\":[\"ec2:*\"],\"NewField\":[\"foobar\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
+			Change: diff.Change{
+				Type: diff.UPDATE,
+				Path: []string{"Json"},
+				From: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Removed\":\"Added\",\"Changed\":[\"ec2:DescribeInstances\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
+				To:   "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Changed\":[\"ec2:*\"],\"NewField\":[\"foobar\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
+			},
 		},
 	}})
 	a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
 		Id:   "diff-id-2",
 		Type: "aws_diff_resource",
-	}, Changelog: []diff.Change{
+	}, Changelog: []analyser.Change{
 		{
-			Type: diff.UPDATE,
-			Path: []string{"Json"},
-			From: "{\"foo\":\"bar\"}",
-			To:   "{\"bar\":\"foo\"}",
+			Change: diff.Change{
+				Type: diff.UPDATE,
+				Path: []string{"Json"},
+				From: "{\"foo\":\"bar\"}",
+				To:   "{\"bar\":\"foo\"}",
+			},
 		},
 	}})
 	return &a
@@ -139,12 +149,14 @@ func fakeAnalysisWithStringerResources() *analyser.Analysis {
 	a.AddDifference(analyser.Difference{Res: &testresource.FakeResourceStringer{
 		Id:   "gdsfhgkbn",
 		Name: "resource with diff",
-	}, Changelog: []diff.Change{
+	}, Changelog: []analyser.Change{
 		{
-			Type: diff.UPDATE,
-			Path: []string{"Name"},
-			From: "",
-			To:   "resource with diff",
+			Change: diff.Change{
+				Type: diff.UPDATE,
+				Path: []string{"Name"},
+				From: "",
+				To:   "resource with diff",
+			},
 		},
 	}})
 	return &a
@@ -161,45 +173,59 @@ func fakeAnalysisWithComputedFields() *analyser.Analysis {
 	a.AddDifference(analyser.Difference{Res: testresource.FakeResource{
 		Id:   "diff-id-1",
 		Type: "aws_diff_resource",
-	}, Changelog: []diff.Change{
+	}, Changelog: []analyser.Change{
 		{
-			Type: diff.UPDATE,
-			Path: []string{"updated", "field"},
-			From: "foobar",
-			To:   "barfoo",
+			Change: diff.Change{
+				Type: diff.UPDATE,
+				Path: []string{"updated", "field"},
+				From: "foobar",
+				To:   "barfoo",
+			},
+			Computed: true,
 		},
 		{
-			Type: diff.CREATE,
-			Path: []string{"new", "field"},
-			From: nil,
-			To:   "newValue",
-		},
-		{
-			Type: diff.DELETE,
-			Path: []string{"a"},
-			From: "oldValue",
-			To:   nil,
-		},
-		{
-			Type: diff.UPDATE,
-			From: "foo",
-			To:   "oof",
-			Path: []string{
-				"struct",
-				"0",
-				"array",
-				"0",
+			Change: diff.Change{
+				Type: diff.CREATE,
+				Path: []string{"new", "field"},
+				From: nil,
+				To:   "newValue",
 			},
 		},
 		{
-			Type: diff.UPDATE,
-			From: "one",
-			To:   "two",
-			Path: []string{
-				"struct",
-				"0",
-				"string",
+			Change: diff.Change{
+				Type: diff.DELETE,
+				Path: []string{"a"},
+				From: "oldValue",
+				To:   nil,
 			},
+			Computed: true,
+		},
+		{
+			Change: diff.Change{
+				Type: diff.UPDATE,
+				From: "foo",
+				To:   "oof",
+				Path: []string{
+					"struct",
+					"0",
+					"array",
+					"0",
+				},
+			},
+			Computed: true,
+		},
+		{
+			Change: diff.Change{
+				Type: diff.UPDATE,
+				From: "one",
+				To:   "two",
+				Path: []string{
+					"struct",
+					"0",
+					"string",
+				},
+			},
+			Computed: true,
 		},
 	}})
 	a.AddAlerts(alerter.Alerts{
@@ -211,7 +237,7 @@ func fakeAnalysisWithComputedFields() *analyser.Analysis {
 				Message: "a is a computed field",
 			},
 			{
-				Message: "struct.0.array.0 is a computed field",
+				Message: "struct.0.array is a computed field",
 			},
 			{
 				Message: "struct.0.string is a computed field",

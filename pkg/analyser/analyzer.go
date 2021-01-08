@@ -57,19 +57,23 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 			sort.Slice(delta, func(i, j int) bool {
 				return delta[i].Type < delta[j].Type
 			})
-			changelog := make([]diff.Change, 0, len(delta))
+			changelog := make([]Change, 0, len(delta))
 			for _, change := range delta {
 				if filter.IsFieldIgnored(stateRes, change.Path) {
 					continue
 				}
-				changelog = append(changelog, change)
+				c := Change{Change: change}
+				if a.isComputedField(stateRes, c) {
+					c.Computed = true
+				}
+				changelog = append(changelog, c)
 			}
 			if len(changelog) > 0 {
 				analysis.AddDifference(Difference{
 					Res:       stateRes,
 					Changelog: changelog,
 				})
-				a.sendAlertOnComputedField(stateRes, delta)
+				a.sendAlertOnComputedField(stateRes, changelog)
 			}
 		}
 	}
@@ -98,18 +102,34 @@ func removeResourceByIndex(i int, resources []resource.Resource) []resource.Reso
 	return append(resources[:i], resources[i+1:]...)
 }
 
-// sendAlertOnComputedField will send an alert to a channel if the field of a delta (e.g. diff)
+// isComputedField returns true if the field that generated the diff of a resource
 // has a computed tag
-func (a Analyzer) sendAlertOnComputedField(stateRes resource.Resource, delta diff.Changelog) {
+func (a Analyzer) isComputedField(stateRes resource.Resource, change Change) bool {
+	if field, ok := a.getField(reflect.TypeOf(stateRes), change.Path); ok {
+		return field.Tag.Get("computed") == "true"
+	}
+	return false
+}
+
+// sendAlertOnComputedField will send an alert to a channel for diffs on computed field
+func (a Analyzer) sendAlertOnComputedField(stateRes resource.Resource, delta Changelog) {
 	for _, d := range delta {
-		if field, ok := a.getField(reflect.TypeOf(stateRes), d.Path); ok {
-			if computed := field.Tag.Get("computed") == "true"; computed {
-				path := strings.Join(d.Path, ".")
-				a.alerter.SendAlert(fmt.Sprintf("%s.%s", stateRes.TerraformType(), stateRes.TerraformId()),
-					alerter.Alert{
-						Message: fmt.Sprintf("%s is a computed field", path),
-					})
+		if d.Computed {
+			// We need to copy the path (for console output compatibility) and remove the
+			// last index if it's a slice.
+			// We want a console output of format: struct.0.array.0: "foo" => "bar" (computed)
+			// We want a json output of format: "message": "struct.0.array is a computed field"
+			tmp := make([]string, len(d.Path))
+			copy(tmp, d.Path)
+			field, _ := a.getField(reflect.TypeOf(stateRes), tmp)
+			if field.Type.Kind() == reflect.Slice {
+				tmp = tmp[:len(tmp)-1]
 			}
+			path := strings.Join(tmp, ".")
+			a.alerter.SendAlert(fmt.Sprintf("%s.%s", stateRes.TerraformType(), stateRes.TerraformId()),
+				alerter.Alert{
+					Message: fmt.Sprintf("%s is a computed field", path),
+				})
 		}
 	}
 }

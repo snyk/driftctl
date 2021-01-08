@@ -8,9 +8,16 @@ import (
 	"github.com/r3labs/diff/v2"
 )
 
+type Change struct {
+	diff.Change
+	Computed bool `json:"computed"`
+}
+
+type Changelog []Change
+
 type Difference struct {
 	Res       resource.Resource
-	Changelog diff.Changelog
+	Changelog Changelog
 }
 
 type Summary struct {
@@ -32,7 +39,7 @@ type Analysis struct {
 
 type serializableDifference struct {
 	Res       resource.SerializableResource `json:"res"`
-	Changelog diff.Changelog                `json:"changelog"`
+	Changelog Changelog                     `json:"changelog"`
 }
 
 type serializableAnalysis struct {
