@@ -89,14 +89,14 @@ func (d DriftCTL) Stop() {
 }
 
 func (d DriftCTL) scan() (remoteResources []resource.Resource, resourcesFromState []resource.Resource, err error) {
-	logrus.Info("Start scanning cloud provider")
-	remoteResources, err = d.remoteSupplier.Resources()
+	logrus.Info("Start reading terraform state")
+	resourcesFromState, err = d.iacSupplier.Resources()
 	if err != nil {
 		return nil, nil, err
 	}
 
-	logrus.Info("Start reading terraform state")
-	resourcesFromState, err = d.iacSupplier.Resources()
+	logrus.Info("Start scanning cloud provider")
+	remoteResources, err = d.remoteSupplier.Resources()
 	if err != nil {
 		return nil, nil, err
 	}
