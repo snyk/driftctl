@@ -6,6 +6,12 @@
 
 By default, driftctl checks for a new version remotely. To disable this behavior, use either the flag `--no-version-check` or the environment variable `DCTL_NO_VERSION_CHECK=true`.
 
+#### Error reporting
+
+When a crash occurs in driftctl, we do not send any crash reports.
+For debugging purposes, you can add `--error-reporting` when running driftctl and crash data will be sent to us via [Sentry](https://sentry.io)
+Details of reported data can be found [here](./cmd/flags/error-reporting.md)
+
 ### Usage
 
 - Commands
