@@ -1,19 +1,24 @@
 <p align="center">
-  <img width="201" src="assets/icon.svg" alt="Driftctl"><br>
+  <img width="201" src="assets/icon.svg" alt="Driftctl">
+</p>
+
+<p align="center">
   <img src="https://circleci.com/gh/cloudskiff/driftctl.svg?style=shield"/>
   <img src="https://goreportcard.com/badge/github.com/cloudskiff/driftctl"/>
   <img src="https://img.shields.io/github/license/cloudskiff/driftctl">
   <img src="https://img.shields.io/github/v/release/cloudskiff/driftctl">
   <img src="https://img.shields.io/github/go-mod/go-version/cloudskiff/driftctl">
   <img src="https://img.shields.io/github/downloads/cloudskiff/driftctl/total.svg"/>
+  <img src="https://img.shields.io/bintray/dt/homebrew/bottles/driftctl?label=homebrew"/>
   <a href="https://codecov.io/gh/cloudskiff/driftctl">
     <img src="https://codecov.io/gh/cloudskiff/driftctl/branch/main/graph/badge.svg?token=8C5R02G5S7"/>
   </a>
   <img src="https://img.shields.io/docker/pulls/cloudskiff/driftctl"/>
   <img src="https://img.shields.io/microbadger/layers/cloudskiff/driftctl"/>
   <img src="https://img.shields.io/docker/image-size/cloudskiff/driftctl"/>
+</p>
 
-<br>
+<p align="center">
   Measures infrastructure as code coverage, and tracks infrastructure drift.<br>
   <strong>IaC:</strong> Terraform, <strong>Cloud platform:</strong> AWS (Azure and GCP on the roadmap for 2021).<br>
   :warning: <strong>This tool is still in beta state and will evolve in the future with potential breaking changes</strong> :warning:
@@ -44,6 +49,12 @@ driftctl is available on Linux, macOS and Windows.
 
 Binaries are available in the [release page](https://github.com/cloudskiff/driftctl/releases).
 
+#### Homebrew for macOS
+
+```bash
+brew install driftctl
+```
+
 #### Docker
 
 ```bash
@@ -67,7 +78,7 @@ docker run -t --rm \
 
 #### Manual
 
-##### Linux
+- **Linux**
 
 This is an example using `curl`. If you don't have `curl`, install it, or use `wget`.
 
@@ -88,11 +99,11 @@ chmod +x driftctl
 Optionally install driftctl to a central location in your `PATH`:
 
 ```bash
-# use any path that suits you, this is just a standard example. Install sudo if needed. 
+# use any path that suits you, this is just a standard example. Install sudo if needed.
 sudo mv driftctl /usr/local/bin/
 ```
 
-##### macOS
+- **macOS**
 
 ```bash
 # x64
@@ -108,11 +119,11 @@ chmod +x driftctl
 Optionally install driftctl to a central location in your `PATH`:
 
 ```bash
-# use any path that suits you, this is just a standard example. Install sudo if needed. 
+# use any path that suits you, this is just a standard example. Install sudo if needed.
 sudo mv driftctl /usr/local/bin/
 ```
 
-##### Windows
+- **Windows**
 
 ```bash
 # x64
