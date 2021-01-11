@@ -833,7 +833,7 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 			},
 		},
 	})
-	analysis.AddAlerts(alerter.Alerts{
+	analysis.SetAlerts(alerter.Alerts{
 		"aws_iam_access_key": {
 			{
 				Message: "This is an alert",

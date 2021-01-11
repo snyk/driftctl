@@ -108,7 +108,7 @@ func (a *Analysis) UnmarshalJSON(bytes []byte) error {
 			Changelog: di.Changelog,
 		})
 	}
-	a.AddAlerts(bla.Alerts)
+	a.SetAlerts(bla.Alerts)
 	return nil
 }
 
@@ -139,7 +139,7 @@ func (a *Analysis) AddDifference(diffs ...Difference) {
 	a.summary.TotalDrifted += len(diffs)
 }
 
-func (a *Analysis) AddAlerts(alerts alerter.Alerts) {
+func (a *Analysis) SetAlerts(alerts alerter.Alerts) {
 	a.alerts = alerts
 }
 

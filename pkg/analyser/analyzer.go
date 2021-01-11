@@ -63,9 +63,7 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 					continue
 				}
 				c := Change{Change: change}
-				if a.isComputedField(stateRes, c) {
-					c.Computed = true
-				}
+				c.Computed = a.isComputedField(stateRes, c)
 				changelog = append(changelog, c)
 			}
 			if len(changelog) > 0 {
@@ -81,7 +79,7 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 	// Add remaining unmanaged resources
 	analysis.AddUnmanaged(filteredRemoteResource...)
 
-	analysis.AddAlerts(a.alerter.GetAlerts())
+	analysis.SetAlerts(a.alerter.Retrieve())
 
 	return analysis, nil
 }

@@ -89,8 +89,8 @@ func TestAlerter_Alert(t *testing.T) {
 				}
 			}
 
-			if eq := reflect.DeepEqual(alerter.GetAlerts(), c.expected); !eq {
-				t.Errorf("Got %+v, expected %+v", alerter.GetAlerts(), c.expected)
+			if eq := reflect.DeepEqual(alerter.Retrieve(), c.expected); !eq {
+				t.Errorf("Got %+v, expected %+v", alerter.Retrieve(), c.expected)
 			}
 		})
 	}

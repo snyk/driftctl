@@ -41,7 +41,7 @@ func (a *Alerter) SetAlerts(alerts Alerts) {
 	a.alerts = alerts
 }
 
-func (a *Alerter) GetAlerts() Alerts {
+func (a *Alerter) Retrieve() Alerts {
 	close(a.alertsCh)
 	<-a.doneCh
 	return a.alerts
