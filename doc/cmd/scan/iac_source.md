@@ -11,7 +11,7 @@ We are investigating to support the Terraform code as well, as a state does not 
 
 ### S3
 
-driftctl needs to read your state, you could use the policy below to ensure minimal access to your state file
+driftctl needs read-only access so you could use the policy below to ensure minimal access to your state file
 
 ```json
 {
@@ -24,7 +24,7 @@ driftctl needs to read your state, you could use the policy below to ensure mini
     },
     {
       "Effect": "Allow",
-      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Action": "s3:GetObject",
       "Resource": "arn:aws:s3:::mybucket/path/to/my/key"
     }
   ]
