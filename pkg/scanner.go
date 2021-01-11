@@ -6,18 +6,21 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
 type Scanner struct {
 	resourceSuppliers []resource.Supplier
 	runner            *ParallelRunner
+	alerter           *alerter.Alerter
 }
 
-func NewScanner(resourceSuppliers []resource.Supplier) *Scanner {
+func NewScanner(resourceSuppliers []resource.Supplier, alerter *alerter.Alerter) *Scanner {
 	return &Scanner{
 		resourceSuppliers: resourceSuppliers,
 		runner:            NewParallelRunner(context.TODO(), 10),
+		alerter:           alerter,
 	}
 }
 

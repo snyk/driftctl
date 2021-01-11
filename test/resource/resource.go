@@ -5,7 +5,7 @@ import "fmt"
 type FakeResource struct {
 	Id        string
 	FooBar    string
-	BarFoo    string
+	BarFoo    string `computed:"true"`
 	Json      string `jsonstring:"true"`
 	Type      string
 	Tags      map[string]string
@@ -16,6 +16,10 @@ type FakeResource struct {
 	Struct struct {
 		Baz string `computed:"true"`
 		Bar string
+	}
+	StructSlice []struct {
+		String string   `computed:"true"`
+		Array  []string `computed:"true"`
 	}
 }
 

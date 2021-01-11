@@ -3,6 +3,8 @@ package aws_test
 import (
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/analyser"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	awsresources "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -68,11 +70,13 @@ func TestAcc_AwsInstance_WithBlockDevices(t *testing.T) {
 					result.AssertResourceHasDrift(
 						mutatedInstanceId,
 						awsresources.AwsInstanceResourceType,
-						diff.Change{
-							Type: diff.CREATE,
-							Path: []string{"Tags", "Env"},
-							From: nil,
-							To:   "Production",
+						analyser.Change{
+							Change: diff.Change{
+								Type: diff.CREATE,
+								Path: []string{"Tags", "Env"},
+								From: nil,
+								To:   "Production",
+							},
 						},
 					)
 				},

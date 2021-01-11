@@ -50,7 +50,8 @@
 						"field"
 					],
 					"from": "foobar",
-					"to": "barfoo"
+					"to": "barfoo",
+					"computed": false
 				},
 				{
 					"type": "create",
@@ -59,7 +60,8 @@
 						"field"
 					],
 					"from": null,
-					"to": "newValue"
+					"to": "newValue",
+					"computed": false
 				},
 				{
 					"type": "delete",
@@ -67,10 +69,12 @@
 						"a"
 					],
 					"from": "oldValue",
-					"to": null
+					"to": null,
+					"computed": false
 				}
 			]
 		}
 	],
-	"coverage": 33
+	"coverage": 33,
+	"alerts": null
 }

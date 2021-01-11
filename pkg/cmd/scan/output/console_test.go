@@ -49,6 +49,12 @@ func TestConsole_Write(t *testing.T) {
 			args:       args{analysis: fakeAnalysisWithStringerResources()},
 			wantErr:    false,
 		},
+		{
+			name:       "test console output with drift on computed fields",
+			goldenfile: "output_computed_fields.txt",
+			args:       args{analysis: fakeAnalysisWithComputedFields()},
+			wantErr:    false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

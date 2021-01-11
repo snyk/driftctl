@@ -3,6 +3,7 @@ package remote
 import (
 	"fmt"
 
+	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 )
 
@@ -19,10 +20,10 @@ func IsSupported(remote string) bool {
 	return false
 }
 
-func Activate(remote string) error {
+func Activate(remote string, alerter *alerter.Alerter) error {
 	switch remote {
 	case aws.RemoteAWSTerraform:
-		return aws.Init()
+		return aws.Init(alerter)
 	default:
 		return fmt.Errorf("unsupported remote '%s'", remote)
 	}

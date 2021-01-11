@@ -3,13 +3,21 @@ package analyser
 import (
 	"encoding/json"
 
+	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/r3labs/diff/v2"
 )
 
+type Change struct {
+	diff.Change
+	Computed bool `json:"computed"`
+}
+
+type Changelog []Change
+
 type Difference struct {
 	Res       resource.Resource
-	Changelog diff.Changelog
+	Changelog Changelog
 }
 
 type Summary struct {
@@ -26,11 +34,12 @@ type Analysis struct {
 	deleted     []resource.Resource
 	differences []Difference
 	summary     Summary
+	alerts      alerter.Alerts
 }
 
 type serializableDifference struct {
 	Res       resource.SerializableResource `json:"res"`
-	Changelog diff.Changelog                `json:"changelog"`
+	Changelog Changelog                     `json:"changelog"`
 }
 
 type serializableAnalysis struct {
@@ -40,6 +49,7 @@ type serializableAnalysis struct {
 	Deleted     []resource.SerializableResource `json:"deleted"`
 	Differences []serializableDifference        `json:"differences"`
 	Coverage    int                             `json:"coverage"`
+	Alerts      alerter.Alerts                  `json:"alerts"`
 }
 
 func (a Analysis) MarshalJSON() ([]byte, error) {
@@ -61,6 +71,7 @@ func (a Analysis) MarshalJSON() ([]byte, error) {
 	}
 	bla.Summary = a.summary
 	bla.Coverage = a.Coverage()
+	bla.Alerts = a.alerts
 
 	return json.Marshal(bla)
 }
@@ -97,6 +108,7 @@ func (a *Analysis) UnmarshalJSON(bytes []byte) error {
 			Changelog: di.Changelog,
 		})
 	}
+	a.SetAlerts(bla.Alerts)
 	return nil
 }
 
@@ -127,6 +139,10 @@ func (a *Analysis) AddDifference(diffs ...Difference) {
 	a.summary.TotalDrifted += len(diffs)
 }
 
+func (a *Analysis) SetAlerts(alerts alerter.Alerts) {
+	a.alerts = alerts
+}
+
 func (a *Analysis) Coverage() int {
 	if a.summary.TotalResources > 0 {
 		return int((float32(a.summary.TotalManaged) / float32(a.summary.TotalResources)) * 100.0)
@@ -152,4 +168,8 @@ func (a *Analysis) Differences() []Difference {
 
 func (a *Analysis) Summary() Summary {
 	return a.summary
+}
+
+func (a *Analysis) Alerts() alerter.Alerts {
+	return a.alerts
 }

@@ -13,6 +13,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 
+	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 
 	"github.com/r3labs/diff/v2"
@@ -30,6 +31,7 @@ func TestAnalyze(t *testing.T) {
 			res  resource.Resource
 			path []string
 		}
+		alerts     alerter.Alerts
 		expected   Analysis
 		hasDrifted bool
 	}{
@@ -174,6 +176,10 @@ func TestAnalyze(t *testing.T) {
 					Id:     "foobar",
 					FooBar: "foobar",
 					BarFoo: "barfoo",
+					Struct: struct {
+						Baz string `computed:"true"`
+						Bar string
+					}{"baz", "bar"},
 				},
 			},
 			cloud: []resource.Resource{
@@ -181,6 +187,10 @@ func TestAnalyze(t *testing.T) {
 					Id:     "foobar",
 					FooBar: "barfoo",
 					BarFoo: "foobar",
+					Struct: struct {
+						Baz string `computed:"true"`
+						Bar string
+					}{"bar", "baz"},
 				},
 			},
 			expected: Analysis{
@@ -189,6 +199,10 @@ func TestAnalyze(t *testing.T) {
 						Id:     "foobar",
 						FooBar: "foobar",
 						BarFoo: "barfoo",
+						Struct: struct {
+							Baz string `computed:"true"`
+							Bar string
+						}{"baz", "bar"},
 					},
 				},
 				summary: Summary{
@@ -202,24 +216,66 @@ func TestAnalyze(t *testing.T) {
 							Id:     "foobar",
 							FooBar: "foobar",
 							BarFoo: "barfoo",
+							Struct: struct {
+								Baz string `computed:"true"`
+								Bar string
+							}{"baz", "bar"},
 						},
-						Changelog: diff.Changelog{
-							diff.Change{
-								Type: "update",
-								From: "foobar",
-								To:   "barfoo",
-								Path: []string{
-									"FooBar",
+						Changelog: Changelog{
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "foobar",
+									To:   "barfoo",
+									Path: []string{
+										"FooBar",
+									},
 								},
 							},
-							diff.Change{
-								Type: "update",
-								From: "barfoo",
-								To:   "foobar",
-								Path: []string{
-									"BarFoo",
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "barfoo",
+									To:   "foobar",
+									Path: []string{
+										"BarFoo",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "baz",
+									To:   "bar",
+									Path: []string{
+										"Struct",
+										"Baz",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "bar",
+									To:   "baz",
+									Path: []string{
+										"Struct",
+										"Bar",
+									},
 								},
 							},
+						},
+					},
+				},
+				alerts: alerter.Alerts{
+					"FakeResource.foobar": {
+						{
+							Message: "BarFoo is a computed field",
+						},
+						{
+							Message: "Struct.Baz is a computed field",
 						},
 					},
 				},
@@ -231,6 +287,7 @@ func TestAnalyze(t *testing.T) {
 			iac: []resource.Resource{
 				&testresource.FakeResource{
 					Id:     "foobar",
+					Type:   "fakeres",
 					FooBar: "foobar",
 					BarFoo: "barfoo",
 				},
@@ -238,6 +295,7 @@ func TestAnalyze(t *testing.T) {
 			cloud: []resource.Resource{
 				&testresource.FakeResource{
 					Id:     "foobar",
+					Type:   "fakeres",
 					FooBar: "barfoo",
 					BarFoo: "foobar",
 				},
@@ -249,6 +307,7 @@ func TestAnalyze(t *testing.T) {
 				{
 					res: &testresource.FakeResource{
 						Id:     "foobar",
+						Type:   "fakeres",
 						FooBar: "foobar",
 						BarFoo: "barfoo",
 					},
@@ -259,6 +318,7 @@ func TestAnalyze(t *testing.T) {
 				managed: []resource.Resource{
 					&testresource.FakeResource{
 						Id:     "foobar",
+						Type:   "fakeres",
 						FooBar: "foobar",
 						BarFoo: "barfoo",
 					},
@@ -272,18 +332,29 @@ func TestAnalyze(t *testing.T) {
 					{
 						Res: &testresource.FakeResource{
 							Id:     "foobar",
+							Type:   "fakeres",
 							FooBar: "foobar",
 							BarFoo: "barfoo",
 						},
-						Changelog: diff.Changelog{
-							diff.Change{
-								Type: "update",
-								From: "barfoo",
-								To:   "foobar",
-								Path: []string{
-									"BarFoo",
+						Changelog: Changelog{
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "barfoo",
+									To:   "foobar",
+									Path: []string{
+										"BarFoo",
+									},
 								},
+								Computed: true,
 							},
+						},
+					},
+				},
+				alerts: alerter.Alerts{
+					"fakeres.foobar": {
+						{
+							Message: "BarFoo is a computed field",
 						},
 					},
 				},
@@ -351,9 +422,275 @@ func TestAnalyze(t *testing.T) {
 			},
 			hasDrifted: false,
 		},
+		{
+			name: "TestDiffWithAlertFiltering",
+			iac: []resource.Resource{
+				&testresource.FakeResource{
+					Id:     "foobar",
+					Type:   "fakeres",
+					FooBar: "foobar",
+					BarFoo: "barfoo",
+					Struct: struct {
+						Baz string `computed:"true"`
+						Bar string
+					}{"baz", "bar"},
+				},
+				&testresource.FakeResource{
+					Id:     "barfoo",
+					Type:   "fakeres",
+					FooBar: "foobar",
+					BarFoo: "barfoo",
+					Struct: struct {
+						Baz string `computed:"true"`
+						Bar string
+					}{"baz", "bar"},
+				},
+				&testresource.FakeResource{
+					Id:     "foobaz",
+					Type:   "other",
+					FooBar: "foobar",
+					BarFoo: "barfoo",
+					Struct: struct {
+						Baz string `computed:"true"`
+						Bar string
+					}{"baz", "bar"},
+				},
+				&testresource.FakeResource{
+					Id:     "resource",
+					Type:   "other",
+					FooBar: "foobar",
+					BarFoo: "barfoo",
+					Struct: struct {
+						Baz string `computed:"true"`
+						Bar string
+					}{"baz", "bar"},
+					StructSlice: []struct {
+						String string   `computed:"true"`
+						Array  []string `computed:"true"`
+					}{
+						{"one", []string{"foo"}},
+					},
+				},
+			},
+			cloud: []resource.Resource{
+				&testresource.FakeResource{
+					Id:     "foobar",
+					Type:   "fakeres",
+					FooBar: "barfoo",
+					BarFoo: "foobar",
+					Struct: struct {
+						Baz string `computed:"true"`
+						Bar string
+					}{"bar", "baz"},
+				},
+				&testresource.FakeResource{
+					Id:     "barfoo",
+					Type:   "fakeres",
+					FooBar: "barfoo",
+					BarFoo: "foobar",
+					Struct: struct {
+						Baz string `computed:"true"`
+						Bar string
+					}{"bar", "baz"},
+				},
+				&testresource.FakeResource{
+					Id:     "foobaz",
+					Type:   "other",
+					FooBar: "barfoo",
+					BarFoo: "foobar",
+					Struct: struct {
+						Baz string `computed:"true"`
+						Bar string
+					}{"bar", "baz"},
+				},
+				&testresource.FakeResource{
+					Id:     "resource",
+					Type:   "other",
+					FooBar: "barfoo",
+					BarFoo: "foobar",
+					Struct: struct {
+						Baz string `computed:"true"`
+						Bar string
+					}{"bar", "baz"},
+					StructSlice: []struct {
+						String string   `computed:"true"`
+						Array  []string `computed:"true"`
+					}{
+						{"two", []string{"oof"}},
+					},
+				},
+			},
+			alerts: alerter.Alerts{
+				"fakeres": {
+					{
+						Message:              "Should be ignored",
+						ShouldIgnoreResource: true,
+					},
+				},
+				"other.foobaz": {
+					{
+						Message:              "Should be ignored",
+						ShouldIgnoreResource: true,
+					},
+				},
+				"other.resource": {
+					{
+						Message: "Should not be ignored",
+					},
+				},
+			},
+			expected: Analysis{
+				managed: []resource.Resource{
+					&testresource.FakeResource{
+						Id:     "resource",
+						Type:   "other",
+						FooBar: "foobar",
+						BarFoo: "barfoo",
+						Struct: struct {
+							Baz string `computed:"true"`
+							Bar string
+						}{"baz", "bar"},
+						StructSlice: []struct {
+							String string   `computed:"true"`
+							Array  []string `computed:"true"`
+						}{
+							{"one", []string{"foo"}},
+						},
+					},
+				},
+				summary: Summary{
+					TotalResources: 1,
+					TotalDrifted:   1,
+					TotalManaged:   1,
+				},
+				differences: []Difference{
+					{
+						Res: &testresource.FakeResource{
+							Id:     "resource",
+							Type:   "other",
+							FooBar: "foobar",
+							BarFoo: "barfoo",
+							Struct: struct {
+								Baz string `computed:"true"`
+								Bar string
+							}{"baz", "bar"},
+							StructSlice: []struct {
+								String string   `computed:"true"`
+								Array  []string `computed:"true"`
+							}{
+								{"one", []string{"foo"}},
+							},
+						},
+						Changelog: Changelog{
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "foobar",
+									To:   "barfoo",
+									Path: []string{
+										"FooBar",
+									},
+								},
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "barfoo",
+									To:   "foobar",
+									Path: []string{
+										"BarFoo",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "baz",
+									To:   "bar",
+									Path: []string{
+										"Struct",
+										"Baz",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "bar",
+									To:   "baz",
+									Path: []string{
+										"Struct",
+										"Bar",
+									},
+								},
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "foo",
+									To:   "oof",
+									Path: []string{
+										"StructSlice",
+										"0",
+										"Array",
+										"0",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "one",
+									To:   "two",
+									Path: []string{
+										"StructSlice",
+										"0",
+										"String",
+									},
+								},
+								Computed: true,
+							},
+						},
+					},
+				},
+				alerts: alerter.Alerts{
+					"fakeres": {
+						{
+							Message:              "Should be ignored",
+							ShouldIgnoreResource: true,
+						},
+					},
+					"other.foobaz": {
+						{
+							Message:              "Should be ignored",
+							ShouldIgnoreResource: true,
+						},
+					},
+					"other.resource": {
+						{
+							Message: "Should not be ignored",
+						},
+						{
+							Message: "BarFoo is a computed field",
+						},
+						{
+							Message: "Struct.Baz is a computed field",
+						},
+						{
+							Message: "StructSlice.0.String is a computed field",
+						},
+						{
+							Message: "StructSlice.0.Array is a computed field",
+						},
+					},
+				},
+			},
+			hasDrifted: true,
+		},
 	}
-
-	analyzer := NewAnalyzer()
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -368,6 +705,12 @@ func TestAnalyze(t *testing.T) {
 			}
 			filter.On("IsFieldIgnored", mock.Anything, mock.Anything).Return(false)
 
+			al := alerter.NewAlerter()
+			if c.alerts != nil {
+				al.SetAlerts(c.alerts)
+			}
+
+			analyzer := NewAnalyzer(al)
 			result, err := analyzer.Analyze(c.cloud, c.iac, filter)
 
 			if err != nil {
@@ -429,6 +772,15 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
+			alertsChanges, err := diff.Diff(result.Alerts(), c.expected.Alerts())
+			if err != nil {
+				t.Fatalf("Unable to compare %+v", err)
+			}
+			if len(alertsChanges) > 0 {
+				for _, change := range alertsChanges {
+					t.Errorf("%+v", change)
+				}
+			}
 		})
 	}
 }
@@ -470,12 +822,21 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 			Id:   "AKIA5QYBVVD25KFXJHYJ",
 			Type: "aws_iam_access_key",
 		},
-		Changelog: []diff.Change{
+		Changelog: []Change{
 			{
-				Type: "update",
-				Path: []string{"Status"},
-				From: "Active",
-				To:   "Inactive",
+				Change: diff.Change{
+					Type: "update",
+					Path: []string{"Status"},
+					From: "Active",
+					To:   "Inactive",
+				},
+			},
+		},
+	})
+	analysis.SetAlerts(alerter.Alerts{
+		"aws_iam_access_key": {
+			{
+				Message: "This is an alert",
 			},
 		},
 	})
@@ -542,13 +903,22 @@ func TestAnalysis_UnmarshalJSON(t *testing.T) {
 					Id:   "AKIA5QYBVVD25KFXJHYJ",
 					Type: "aws_iam_access_key",
 				},
-				Changelog: []diff.Change{
+				Changelog: []Change{
 					{
-						Type: "update",
-						Path: []string{"Status"},
-						From: "Active",
-						To:   "Inactive",
+						Change: diff.Change{
+							Type: "update",
+							Path: []string{"Status"},
+							From: "Active",
+							To:   "Inactive",
+						},
 					},
+				},
+			},
+		},
+		alerts: alerter.Alerts{
+			"aws_iam_access_key": {
+				{
+					Message: "This is an alert",
 				},
 			},
 		},

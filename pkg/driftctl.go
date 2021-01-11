@@ -3,6 +3,7 @@ package pkg
 import (
 	"fmt"
 
+	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/middlewares"
@@ -18,8 +19,8 @@ type DriftCTL struct {
 	filter         *jmespath.JMESPath
 }
 
-func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, filter *jmespath.JMESPath) *DriftCTL {
-	return &DriftCTL{remoteSupplier, iacSupplier, analyser.NewAnalyzer(), filter}
+func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, filter *jmespath.JMESPath, alerter *alerter.Alerter) *DriftCTL {
+	return &DriftCTL{remoteSupplier, iacSupplier, analyser.NewAnalyzer(alerter), filter}
 }
 
 func (d DriftCTL) Run() *analyser.Analysis {
@@ -65,6 +66,7 @@ func (d DriftCTL) Run() *analyser.Analysis {
 	driftIgnore := filter.NewDriftIgnore()
 
 	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState, driftIgnore)
+
 	if err != nil {
 		logrus.Errorf("Unable to analyse resources: %+v", err)
 		return nil

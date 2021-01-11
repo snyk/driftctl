@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/cmd/scan/output"
 	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
@@ -123,7 +124,9 @@ func scanRun(opts *ScanOptions) error {
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
-	err := remote.Activate(opts.To)
+	alerter := alerter.NewAlerter()
+
+	err := remote.Activate(opts.To, alerter)
 	if err != nil {
 		return err
 	}
@@ -135,7 +138,7 @@ func scanRun(opts *ScanOptions) error {
 		logrus.Trace("Exited")
 	}()
 
-	scanner := pkg.NewScanner(resource.Suppliers())
+	scanner := pkg.NewScanner(resource.Suppliers(), alerter)
 
 	iacSupplier, err := supplier.GetIACSupplier(opts.From)
 	if err != nil {
@@ -146,7 +149,7 @@ func scanRun(opts *ScanOptions) error {
 		"backend":  opts.From.Backend,
 		"path":     opts.From.Path,
 	}).Debug("Found IAC provider")
-	ctl := pkg.NewDriftCTL(scanner, iacSupplier, opts.Filter)
+	ctl := pkg.NewDriftCTL(scanner, iacSupplier, opts.Filter, alerter)
 
 	go func() {
 		<-c
