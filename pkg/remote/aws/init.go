@@ -57,6 +57,7 @@ func Init(alerter *alerter.Alerter) error {
 	resource.AddSupplier(NewIamRolePolicyAttachmentSupplier(provider.Runner().SubRunner(), iam.New(provider.session)))
 	resource.AddSupplier(NewVPCSecurityGroupRuleSupplier(provider.Runner().SubRunner(), ec2.New(provider.session)))
 	resource.AddSupplier(NewVPCSupplier(provider.Runner(), ec2.New(provider.session)))
+	resource.AddSupplier(NewSubnetSupplier(provider.Runner(), ec2.New(provider.session)))
 
 	return nil
 }

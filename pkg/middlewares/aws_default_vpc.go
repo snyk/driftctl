@@ -7,7 +7,7 @@ import (
 )
 
 // Default VPC should not be shown as unmanaged as they are present by default
-// This middleware ignores default VPC from unmanaged resources of they are not managed  IaC
+// This middleware ignores default VPC from unmanaged resources if they are not managed by IaC
 type AwsDefaultVPC struct{}
 
 func NewAwsDefaultVPC() AwsDefaultVPC {

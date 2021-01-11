@@ -27,6 +27,7 @@ import (
 type AccCheck struct {
 	PreExec  func()
 	PostExec func()
+	Env      map[string]string
 	Check    func(result *ScanResult, stdout string, err error)
 }
 
@@ -210,7 +211,17 @@ func Run(t *testing.T, c AccTestCase) {
 		if check.PreExec != nil {
 			check.PreExec()
 		}
+		if len(check.Env) > 0 {
+			for key, value := range check.Env {
+				os.Setenv(key, value)
+			}
+		}
 		_, out, cmdErr := runDriftCtlCmd(driftctlCmd)
+		if len(check.Env) > 0 {
+			for key := range check.Env {
+				_ = os.Unsetenv(key)
+			}
+		}
 		check.Check(c.getResult(t), out, cmdErr)
 		if check.PostExec != nil {
 			check.PostExec()
