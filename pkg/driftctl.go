@@ -39,6 +39,7 @@ func (d DriftCTL) Run() *analyser.Analysis {
 		middlewares.NewIamPolicyAttachmentSanitizer(),
 		middlewares.AwsInstanceEIP{},
 		middlewares.NewAwsDefaultVPC(),
+		middlewares.NewAwsDefaultSubnet(),
 	)
 
 	logrus.Debug("Ready to run middlewares")

@@ -51,6 +51,7 @@ As AWS documentation recommends, the below policy is granting only the permissio
                 "ec2:DescribeVpcAttribute",
                 "ec2:DescribeVpcClassicLink",
                 "ec2:DescribeVpcClassicLinkDnsSupport",
+                "ec2:DescribeSubnets",
                 "iam:GetPolicy",
                 "iam:GetPolicyVersion",
                 "iam:GetRole",
@@ -194,6 +195,8 @@ As AWS documentation recommends, the below policy is granting only the permissio
 
 ## VPC
 
+- [x]  aws_default_subnet
+- [x]  aws_subnet
 - [x]  aws_default_vpc
 - [x]  aws_vpc
 - [x]  aws_security_group
