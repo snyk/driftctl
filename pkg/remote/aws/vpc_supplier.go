@@ -18,10 +18,10 @@ import (
 type VPCSupplier struct {
 	reader                 terraform.ResourceReader
 	defaultVPCDeserializer deserializer.CTYDeserializer
-	VPCDeserializer        deserializer.CTYDeserializer
+	vpcDeserializer        deserializer.CTYDeserializer
 	client                 ec2iface.EC2API
 	defaultVPCRunner       *terraform.ParallelResourceReader
-	VPCRunner              *terraform.ParallelResourceReader
+	vpcRunner              *terraform.ParallelResourceReader
 }
 
 func NewVPCSupplier(runner *pkg.ParallelRunner, client ec2iface.EC2API) *VPCSupplier {
@@ -59,7 +59,7 @@ func (s VPCSupplier) Resources() ([]resource.Resource, error) {
 
 	for _, item := range VPCs {
 		res := *item
-		s.VPCRunner.Run(func() (cty.Value, error) {
+		s.vpcRunner.Run(func() (cty.Value, error) {
 			return s.readVPC(res)
 		})
 	}
@@ -76,7 +76,7 @@ func (s VPCSupplier) Resources() ([]resource.Resource, error) {
 	if err != nil {
 		return nil, err
 	}
-	VPCResources, err := s.VPCRunner.Wait()
+	VPCResources, err := s.vpcRunner.Wait()
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (s VPCSupplier) Resources() ([]resource.Resource, error) {
 	if err != nil {
 		return nil, err
 	}
-	deserializedVPCs, err := s.VPCDeserializer.Deserialize(VPCResources)
+	deserializedVPCs, err := s.vpcDeserializer.Deserialize(VPCResources)
 	if err != nil {
 		return nil, err
 	}
