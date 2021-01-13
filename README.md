@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="201" src="assets/icon.svg" alt="Driftctl">
+  <img width="201" src="assets/new_icon.svg" alt="Driftctl">
 </p>
 
 <p align="center">
