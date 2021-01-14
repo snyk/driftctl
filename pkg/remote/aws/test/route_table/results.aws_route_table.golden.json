@@ -1,0 +1,32 @@
+[
+ {
+  "id": "rtb-08b7b71af15e183ce",
+  "owner_id": "929327065333",
+  "propagating_vgws": [],
+  "route": [],
+  "tags": {
+   "Name": "table1"
+  },
+  "vpc_id": "vpc-0b4a6b3536da20ecd"
+ },
+ {
+  "id": "rtb-0002ac731f6fdea55",
+  "owner_id": "929327065333",
+  "propagating_vgws": [],
+  "route": [],
+  "tags": {
+   "Name": "table2"
+  },
+  "vpc_id": "vpc-0b4a6b3536da20ecd"
+ },
+ {
+  "id": "rtb-0c55d55593f33fbac",
+  "owner_id": "929327065333",
+  "propagating_vgws": [],
+  "route": [],
+  "tags": {
+   "Name": "table3"
+  },
+  "vpc_id": "vpc-0b4a6b3536da20ecd"
+ }
+]

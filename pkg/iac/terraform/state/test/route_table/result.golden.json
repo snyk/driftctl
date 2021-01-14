@@ -1,0 +1,88 @@
+[
+ {
+  "Arn": "arn:aws:ec2:us-east-1:929327065333:vpc/vpc-41d1d13b",
+  "AssignGeneratedIpv6CidrBlock": false,
+  "CidrBlock": "172.31.0.0/16",
+  "DefaultNetworkAclId": "acl-e88ee595",
+  "DefaultRouteTableId": "rtb-9642cde8",
+  "DefaultSecurityGroupId": "sg-e633c1c8",
+  "DhcpOptionsId": "dopt-d29e33a8",
+  "EnableClassiclink": false,
+  "EnableClassiclinkDnsSupport": false,
+  "EnableDnsHostnames": true,
+  "EnableDnsSupport": true,
+  "Id": "vpc-41d1d13b",
+  "InstanceTenancy": "default",
+  "Ipv6AssociationId": "",
+  "Ipv6CidrBlock": "",
+  "MainRouteTableId": "rtb-9642cde8",
+  "OwnerId": "929327065333",
+  "Tags": null
+ },
+ {
+  "Arn": "arn:aws:ec2:us-east-1:929327065333:vpc/vpc-0a5666c0cfc366714",
+  "AssignGeneratedIpv6CidrBlock": false,
+  "CidrBlock": "10.0.0.0/16",
+  "DefaultNetworkAclId": "acl-081a06acb9d092caf",
+  "DefaultRouteTableId": "rtb-0aa0a93a2960854a1",
+  "DefaultSecurityGroupId": "sg-0b1ad864ecd584998",
+  "DhcpOptionsId": "dopt-d29e33a8",
+  "EnableClassiclink": false,
+  "EnableClassiclinkDnsSupport": false,
+  "EnableDnsHostnames": false,
+  "EnableDnsSupport": true,
+  "Id": "vpc-0a5666c0cfc366714",
+  "InstanceTenancy": "default",
+  "Ipv6AssociationId": "",
+  "Ipv6CidrBlock": "",
+  "MainRouteTableId": "rtb-0aa0a93a2960854a1",
+  "OwnerId": "929327065333",
+  "Tags": {}
+ },
+ {
+  "DefaultRouteTableId": "rtb-9642cde8",
+  "Id": "rtb-9642cde8",
+  "OwnerId": "929327065333",
+  "PropagatingVgws": null,
+  "Route": null,
+  "Tags": null,
+  "VpcId": "vpc-41d1d13b"
+ },
+ {
+  "Id": "rtb-0232602f0f07748fc",
+  "OwnerId": "929327065333",
+  "PropagatingVgws": null,
+  "Route": [
+   {
+    "CidrBlock": "",
+    "EgressOnlyGatewayId": "",
+    "GatewayId": "igw-07b7844a8fd17a638",
+    "InstanceId": "",
+    "Ipv6CidrBlock": "::/0",
+    "LocalGatewayId": "",
+    "NatGatewayId": "",
+    "NetworkInterfaceId": "",
+    "TransitGatewayId": "",
+    "VpcEndpointId": "",
+    "VpcPeeringConnectionId": ""
+   },
+   {
+    "CidrBlock": "1.1.1.1/32",
+    "EgressOnlyGatewayId": "",
+    "GatewayId": "igw-07b7844a8fd17a638",
+    "InstanceId": "",
+    "Ipv6CidrBlock": "",
+    "LocalGatewayId": "",
+    "NatGatewayId": "",
+    "NetworkInterfaceId": "",
+    "TransitGatewayId": "",
+    "VpcEndpointId": "",
+    "VpcPeeringConnectionId": ""
+   }
+  ],
+  "Tags": {
+   "Name": "rr"
+  },
+  "VpcId": "vpc-0a5666c0cfc366714"
+ }
+]

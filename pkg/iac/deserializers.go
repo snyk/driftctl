@@ -40,5 +40,8 @@ func Deserializers() []deserializer.CTYDeserializer {
 		awsdeserializer.NewVPCDeserializer(),
 		awsdeserializer.NewDefaultSubnetDeserializer(),
 		awsdeserializer.NewSubnetDeserializer(),
+		awsdeserializer.NewDefaultRouteTableDeserializer(),
+		awsdeserializer.NewRouteTableDeserializer(),
+		awsdeserializer.NewRouteDeserializer(),
 	}
 }
