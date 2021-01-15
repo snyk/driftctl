@@ -142,7 +142,7 @@ func (a Analyzer) getField(t reflect.Type, path []string) (reflect.StructField, 
 		return a.getField(t.Elem(), path[1:])
 	default:
 		{
-			if field, ok := t.FieldByName(path[0]); ok && a.hasNestedFields(field.Type) {
+			if field, ok := t.FieldByName(path[0]); ok && a.hasNestedFields(field.Type) && len(path) > 1 {
 				return a.getField(field.Type, path[1:])
 			} else {
 				return field, ok
