@@ -207,3 +207,6 @@ As AWS documentation recommends, the below policy is granting only the permissio
 - [x]  aws_vpc
 - [x]  aws_security_group
 - [x]  aws_security_group_rule
+- [x]  aws_route_table
+- [x]  aws_default_route_table
+- [x]  aws_route

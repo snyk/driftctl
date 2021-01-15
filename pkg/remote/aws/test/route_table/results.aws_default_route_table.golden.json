@@ -1,0 +1,13 @@
+[
+ {
+  "default_route_table_id": "rtb-0eabf071c709c0976",
+  "id": "rtb-0eabf071c709c0976",
+  "owner_id": "929327065333",
+  "propagating_vgws": [],
+  "route": [],
+  "tags": {
+   "Name": "default_table"
+  },
+  "vpc_id": "vpc-0b4a6b3536da20ecd"
+ }
+]
