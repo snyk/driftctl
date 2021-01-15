@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/route53"
-	"github.com/cloudskiff/driftctl/pkg"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
@@ -197,7 +197,7 @@ func TestRoute53RecordSupplier_Resources(t *testing.T) {
 				provider,
 				deserializer,
 				mocks.NewMockAWSRoute53RecordClient(tt.zonesPages, tt.recordsPages),
-				terraform.NewParallelResourceReader(pkg.NewParallelRunner(context.TODO(), 10)),
+				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
 			if tt.err != err {

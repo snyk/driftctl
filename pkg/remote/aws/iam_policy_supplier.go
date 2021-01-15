@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -22,7 +22,7 @@ type IamPolicySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamPolicySupplier(runner *pkg.ParallelRunner, client iamiface.IAMAPI) *IamPolicySupplier {
+func NewIamPolicySupplier(runner *parallel.ParallelRunner, client iamiface.IAMAPI) *IamPolicySupplier {
 	return &IamPolicySupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewIamPolicyDeserializer(), client, terraform.NewParallelResourceReader(runner)}
 }
 

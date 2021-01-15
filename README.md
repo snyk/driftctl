@@ -156,6 +156,9 @@ $ AWS_PROFILE=profile_name driftctl scan
 
 # With state stored on a s3 backend
 $ driftctl scan --from tfstate+s3://my-bucket/path/to/state.tfstate
+
+# With multiples states
+$ driftctl scan --from tfstate://terraform_S3.tfstate --from tfstate://terraform_VPC.tfstate
 ```
 
 ## Contribute

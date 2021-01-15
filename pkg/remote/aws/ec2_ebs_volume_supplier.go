@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -22,7 +22,7 @@ type EC2EbsVolumeSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2EbsVolumeSupplier(runner *pkg.ParallelRunner, client ec2iface.EC2API) *EC2EbsVolumeSupplier {
+func NewEC2EbsVolumeSupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *EC2EbsVolumeSupplier {
 	return &EC2EbsVolumeSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewEC2EbsVolumeDeserializer(), client, terraform.NewParallelResourceReader(runner)}
 }
 

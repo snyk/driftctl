@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
@@ -24,7 +24,7 @@ type DBSubnetGroupSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewDBSubnetGroupSupplier(runner *pkg.ParallelRunner, client rdsiface.RDSAPI) *DBSubnetGroupSupplier {
+func NewDBSubnetGroupSupplier(runner *parallel.ParallelRunner, client rdsiface.RDSAPI) *DBSubnetGroupSupplier {
 	return &DBSubnetGroupSupplier{
 		terraform.Provider(terraform.AWS),
 		awsdeserializer.NewDBSubnetGroupDeserializer(),

@@ -26,7 +26,7 @@ import (
 type ScanOptions struct {
 	Coverage bool
 	Detect   bool
-	From     config.SupplierConfig
+	From     []config.SupplierConfig
 	To       string
 	Output   output.OutputConfig
 	Filter   *jmespath.JMESPath
@@ -41,14 +41,14 @@ func NewScanCmd() *cobra.Command {
 		Long:  "Scan",
 		Args:  cobra.NoArgs,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			from, _ := cmd.Flags().GetString("from")
+			from, _ := cmd.Flags().GetStringSlice("from")
 
 			iacSource, err := parseFromFlag(from)
 			if err != nil {
 				return err
 			}
 
-			opts.From = *iacSource
+			opts.From = iacSource
 
 			to, _ := cmd.Flags().GetString("to")
 			if !remote.IsSupported(to) {
@@ -100,11 +100,11 @@ func NewScanCmd() *cobra.Command {
 		"Output format, by default it will write to the console\n"+
 			"Accepted formats are: "+strings.Join(output.SupportedOutputsExample(), ",")+"\n",
 	)
-	fl.StringP(
+	fl.StringSliceP(
 		"from",
 		"f",
-		"tfstate://terraform.tfstate",
-		"IaC source, by default try to find local terraform.tfstate file\n"+
+		[]string{"tfstate://terraform.tfstate"},
+		"IaC sources, by default try to find local terraform.tfstate file\n"+
 			"Accepted schemes are: "+strings.Join(supplier.GetSupportedSchemes(), ",")+"\n",
 	)
 	supportedRemotes := remote.GetSupportedRemotes()
@@ -144,11 +144,6 @@ func scanRun(opts *ScanOptions) error {
 	if err != nil {
 		return err
 	}
-	logrus.WithFields(logrus.Fields{
-		"supplier": opts.From.Key,
-		"backend":  opts.From.Backend,
-		"path":     opts.From.Path,
-	}).Debug("Found IAC provider")
 	ctl := pkg.NewDriftCTL(scanner, iacSupplier, opts.Filter, alerter)
 
 	go func() {
@@ -166,54 +161,60 @@ func scanRun(opts *ScanOptions) error {
 	return out.Write(analysis)
 }
 
-func parseFromFlag(from string) (*config.SupplierConfig, error) {
+func parseFromFlag(from []string) ([]config.SupplierConfig, error) {
 
-	schemePath := strings.Split(from, "://")
-	if len(schemePath) != 2 || schemePath[1] == "" || schemePath[0] == "" {
-		return nil, fmt.Errorf(
-			"Unable to parse from flag: %s\nAccepted schemes are: %s",
-			from,
-			strings.Join(supplier.GetSupportedSchemes(), ","),
-		)
-	}
+	configs := make([]config.SupplierConfig, 0, len(from))
 
-	scheme := schemePath[0]
-	path := schemePath[1]
-	supplierBackend := strings.Split(scheme, "+")
-	if len(supplierBackend) > 2 {
-		return nil, fmt.Errorf(
-			"Unable to parse from scheme: %s\nAccepted schemes are: %s",
-			scheme,
-			strings.Join(supplier.GetSupportedSchemes(), ","),
-		)
-	}
-
-	supplierKey := supplierBackend[0]
-	if !supplier.IsSupplierSupported(supplierKey) {
-		return nil, fmt.Errorf(
-			"Unsupported IaC source: %s\nAccepted values are: %s",
-			supplierKey,
-			strings.Join(supplier.GetSupportedSuppliers(), ","),
-		)
-	}
-
-	backendString := ""
-	if len(supplierBackend) == 2 {
-		backendString = supplierBackend[1]
-		if !backend.IsSupported(backendString) {
+	for _, flag := range from {
+		schemePath := strings.Split(flag, "://")
+		if len(schemePath) != 2 || schemePath[1] == "" || schemePath[0] == "" {
 			return nil, fmt.Errorf(
-				"Unsupported IaC backend: %s\nAccepted values are: %s",
-				backendString,
-				strings.Join(backend.GetSupportedBackends(), ","),
+				"Unable to parse from flag: %s\nAccepted schemes are: %s",
+				flag,
+				strings.Join(supplier.GetSupportedSchemes(), ","),
 			)
 		}
+
+		scheme := schemePath[0]
+		path := schemePath[1]
+		supplierBackend := strings.Split(scheme, "+")
+		if len(supplierBackend) > 2 {
+			return nil, fmt.Errorf(
+				"Unable to parse from scheme: %s\nAccepted schemes are: %s",
+				scheme,
+				strings.Join(supplier.GetSupportedSchemes(), ","),
+			)
+		}
+
+		supplierKey := supplierBackend[0]
+		if !supplier.IsSupplierSupported(supplierKey) {
+			return nil, fmt.Errorf(
+				"Unsupported IaC source: %s\nAccepted values are: %s",
+				supplierKey,
+				strings.Join(supplier.GetSupportedSuppliers(), ","),
+			)
+		}
+
+		backendString := ""
+		if len(supplierBackend) == 2 {
+			backendString = supplierBackend[1]
+			if !backend.IsSupported(backendString) {
+				return nil, fmt.Errorf(
+					"Unsupported IaC backend: %s\nAccepted values are: %s",
+					backendString,
+					strings.Join(backend.GetSupportedBackends(), ","),
+				)
+			}
+		}
+
+		configs = append(configs, config.SupplierConfig{
+			Key:     supplierKey,
+			Backend: backendString,
+			Path:    path,
+		})
 	}
 
-	return &config.SupplierConfig{
-		Key:     supplierKey,
-		Backend: backendString,
-		Path:    path,
-	}, nil
+	return configs, nil
 }
 
 func parseOutputFlag(out string) (*output.OutputConfig, error) {

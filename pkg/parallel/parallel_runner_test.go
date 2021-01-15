@@ -1,4 +1,4 @@
-package pkg
+package parallel
 
 import (
 	"context"

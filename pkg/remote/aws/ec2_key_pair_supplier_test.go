@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
@@ -12,7 +13,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
 
-	"github.com/cloudskiff/driftctl/pkg"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -61,7 +61,7 @@ func TestEC2KeyPairSupplier_Resources(t *testing.T) {
 				provider,
 				deserializer,
 				mocks.NewMockAWSEC2KeyPairClient(tt.kpNames),
-				terraform.NewParallelResourceReader(pkg.NewParallelRunner(context.TODO(), 10)),
+				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
 			if tt.err != err {

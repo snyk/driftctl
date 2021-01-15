@@ -95,7 +95,7 @@ func (d DriftCTL) Stop() {
 }
 
 func (d DriftCTL) scan() (remoteResources []resource.Resource, resourcesFromState []resource.Resource, err error) {
-	logrus.Info("Start reading terraform state")
+	logrus.Info("Start reading IaC")
 	resourcesFromState, err = d.iacSupplier.Resources()
 	if err != nil {
 		return nil, nil, err

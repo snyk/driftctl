@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/r3labs/diff/v2"
 
 	"github.com/stretchr/testify/assert"
@@ -55,7 +55,7 @@ func TestParallelResourceReader_Wait(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := NewParallelResourceReader(pkg.NewParallelRunner(context.TODO(), 10))
+			p := NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10))
 
 			for _, fun := range tt.execs {
 				p.Run(fun)

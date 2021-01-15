@@ -8,7 +8,7 @@ import (
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/cloudskiff/driftctl/mocks"
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
@@ -101,8 +101,8 @@ func TestRouteTableSupplier_Resources(t *testing.T) {
 				defaultRouteTableDeserializer,
 				routeTableDeserializer,
 				&fakeEC2,
-				terraform.NewParallelResourceReader(pkg.NewParallelRunner(context.TODO(), 10)),
-				terraform.NewParallelResourceReader(pkg.NewParallelRunner(context.TODO(), 10)),
+				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
+				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
 			if c.err != err {

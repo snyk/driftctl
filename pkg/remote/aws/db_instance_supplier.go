@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -21,7 +21,7 @@ type DBInstanceSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewDBInstanceSupplier(runner *pkg.ParallelRunner, client rdsiface.RDSAPI) *DBInstanceSupplier {
+func NewDBInstanceSupplier(runner *parallel.ParallelRunner, client rdsiface.RDSAPI) *DBInstanceSupplier {
 	return &DBInstanceSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewDBInstanceDeserializer(), client, terraform.NewParallelResourceReader(runner)}
 }
 

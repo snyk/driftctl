@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -28,7 +28,7 @@ type VPCSecurityGroupRuleSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewVPCSecurityGroupRuleSupplier(runner *pkg.ParallelRunner, client ec2iface.EC2API) *VPCSecurityGroupRuleSupplier {
+func NewVPCSecurityGroupRuleSupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *VPCSecurityGroupRuleSupplier {
 	return &VPCSecurityGroupRuleSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewVPCSecurityGroupRuleDeserializer(), client, terraform.NewParallelResourceReader(runner)}
 }
 

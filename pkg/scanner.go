@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/sirupsen/logrus"
 
 	"github.com/cloudskiff/driftctl/pkg/alerter"
@@ -12,14 +13,14 @@ import (
 
 type Scanner struct {
 	resourceSuppliers []resource.Supplier
-	runner            *ParallelRunner
+	runner            *parallel.ParallelRunner
 	alerter           *alerter.Alerter
 }
 
 func NewScanner(resourceSuppliers []resource.Supplier, alerter *alerter.Alerter) *Scanner {
 	return &Scanner{
 		resourceSuppliers: resourceSuppliers,
-		runner:            NewParallelRunner(context.TODO(), 10),
+		runner:            parallel.NewParallelRunner(context.TODO(), 10),
 		alerter:           alerter,
 	}
 }

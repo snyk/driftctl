@@ -3,7 +3,7 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -30,7 +30,7 @@ type IamRoleSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamRoleSupplier(runner *pkg.ParallelRunner, client iamiface.IAMAPI) *IamRoleSupplier {
+func NewIamRoleSupplier(runner *parallel.ParallelRunner, client iamiface.IAMAPI) *IamRoleSupplier {
 	return &IamRoleSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewIamRoleDeserializer(), client, terraform.NewParallelResourceReader(runner)}
 }
 

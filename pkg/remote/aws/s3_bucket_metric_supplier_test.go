@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 
-	"github.com/cloudskiff/driftctl/pkg"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
@@ -79,7 +79,7 @@ func TestS3BucketMetricSupplier_Resources(t *testing.T) {
 				provider,
 				deserializer,
 				factory,
-				terraform.NewParallelResourceReader(pkg.NewParallelRunner(context.TODO(), 10)),
+				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
 			if (err != nil) != tt.wantErr {

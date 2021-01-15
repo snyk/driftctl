@@ -10,7 +10,7 @@ import (
 
 func TestGetIACSupplier(t *testing.T) {
 	type args struct {
-		config config.SupplierConfig
+		config []config.SupplierConfig
 	}
 	tests := []struct {
 		name    string
@@ -20,33 +20,56 @@ func TestGetIACSupplier(t *testing.T) {
 		{
 			name: "test unknown supplier",
 			args: args{
-				config: struct {
-					Key     string
-					Backend string
-					Path    string
-				}{Key: "foobar"},
+				config: []config.SupplierConfig{
+					{
+						Key: "foobar",
+					},
+				},
+			},
+			wantErr: fmt.Errorf("Unsupported supplier 'foobar'"),
+		},
+		{
+			name: "test unknown supplier in multiples states",
+			args: args{
+				config: []config.SupplierConfig{
+					{
+						Key: "foobar",
+					},
+					{
+						Key:     "tfstate",
+						Backend: "",
+						Path:    "terraform.tfstate",
+					},
+				},
 			},
 			wantErr: fmt.Errorf("Unsupported supplier 'foobar'"),
 		},
 		{
 			name: "test unknown backend",
 			args: args{
-				config: struct {
-					Key     string
-					Backend string
-					Path    string
-				}{Key: "tfstate", Backend: "foobar"},
+				config: []config.SupplierConfig{
+					{Key: "tfstate", Backend: "foobar"},
+				},
 			},
 			wantErr: fmt.Errorf("Unsupported backend 'foobar'"),
 		},
 		{
 			name: "test valid tfstate://terraform.tfstate",
 			args: args{
-				config: struct {
-					Key     string
-					Backend string
-					Path    string
-				}{Key: "tfstate", Backend: "", Path: "terraform.tfstate"},
+				config: []config.SupplierConfig{
+					{Key: "tfstate", Backend: "", Path: "terraform.tfstate"},
+				},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "test valid multiples states",
+			args: args{
+				config: []config.SupplierConfig{
+					{Key: "tfstate", Backend: "", Path: "terraform.tfstate"},
+					{Key: "tfstate", Backend: "s3", Path: "terraform.tfstate"},
+					{Key: "tfstate", Backend: "", Path: "terraform2.tfstate"},
+				},
 			},
 			wantErr: nil,
 		},

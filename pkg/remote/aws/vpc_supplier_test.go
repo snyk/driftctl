@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
@@ -17,7 +18,6 @@ import (
 
 	"github.com/cloudskiff/driftctl/mocks"
 
-	"github.com/cloudskiff/driftctl/pkg"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
@@ -102,8 +102,8 @@ func TestVPCSupplier_Resources(t *testing.T) {
 				defaultVPCDeserializer,
 				VPCDeserializer,
 				&fakeEC2,
-				terraform.NewParallelResourceReader(pkg.NewParallelRunner(context.TODO(), 10)),
-				terraform.NewParallelResourceReader(pkg.NewParallelRunner(context.TODO(), 10)),
+				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
+				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
 			if c.err != err {

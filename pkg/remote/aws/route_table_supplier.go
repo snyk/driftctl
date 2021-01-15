@@ -5,7 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -25,7 +25,7 @@ type RouteTableSupplier struct {
 	routeTableRunner              *terraform.ParallelResourceReader
 }
 
-func NewRouteTableSupplier(runner *pkg.ParallelRunner, client ec2iface.EC2API) *RouteTableSupplier {
+func NewRouteTableSupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *RouteTableSupplier {
 	return &RouteTableSupplier{
 		terraform.Provider(terraform.AWS),
 		awsdeserializer.NewDefaultRouteTableDeserializer(),

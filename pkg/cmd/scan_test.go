@@ -35,6 +35,7 @@ func TestScanCmd_Valid(t *testing.T) {
 		{args: []string{"scan", "--to", "aws+tf"}},
 		{args: []string{"scan", "-f", "tfstate://test"}},
 		{args: []string{"scan", "--from", "tfstate://test"}},
+		{args: []string{"scan", "--from", "tfstate://test", "--from", "tfstate://test2"}},
 		{args: []string{"scan", "-t", "aws+tf", "-f", "tfstate://test"}},
 		{args: []string{"scan", "--to", "aws+tf", "--from", "tfstate://test"}},
 		{args: []string{"scan", "--filter", "Type=='aws_s3_bucket'"}},
@@ -73,6 +74,7 @@ func TestScanCmd_Invalid(t *testing.T) {
 		{args: []string{"scan", "--from", "terraform+foo+bar://test"}, expected: "Unable to parse from scheme: terraform+foo+bar\nAccepted schemes are: tfstate://,tfstate+s3://"},
 		{args: []string{"scan", "--from", "unsupported://test"}, expected: "Unsupported IaC source: unsupported\nAccepted values are: tfstate"},
 		{args: []string{"scan", "--from", "tfstate+foobar://test"}, expected: "Unsupported IaC backend: foobar\nAccepted values are: s3"},
+		{args: []string{"scan", "--from", "tfstate:///tmp/test", "--from", "tfstate+toto://test"}, expected: "Unsupported IaC backend: toto\nAccepted values are: s3"},
 		{args: []string{"scan", "--filter", "Type='test'"}, expected: "unable to parse filter expression: SyntaxError: Expected tRbracket, received: tUnknown"},
 	}
 
@@ -91,23 +93,44 @@ func TestScanCmd_Invalid(t *testing.T) {
 
 func Test_parseFromFlag(t *testing.T) {
 	type args struct {
-		from string
+		from []string
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *config.SupplierConfig
+		want    []config.SupplierConfig
 		wantErr bool
 	}{
 		{
 			name: "test complete from parsing",
 			args: args{
-				from: "tfstate+s3://bucket/path/to/state.tfstate",
+				from: []string{"tfstate+s3://bucket/path/to/state.tfstate"},
 			},
-			want: &config.SupplierConfig{
-				Key:     "tfstate",
-				Backend: "s3",
-				Path:    "bucket/path/to/state.tfstate",
+			want: []config.SupplierConfig{
+				{
+					Key:     "tfstate",
+					Backend: "s3",
+					Path:    "bucket/path/to/state.tfstate",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "test complete from parsing with multiples flags",
+			args: args{
+				from: []string{"tfstate+s3://bucket/path/to/state.tfstate", "tfstate:///tmp/my-state.tfstate"},
+			},
+			want: []config.SupplierConfig{
+				{
+					Key:     "tfstate",
+					Backend: "s3",
+					Path:    "bucket/path/to/state.tfstate",
+				},
+				{
+					Key:     "tfstate",
+					Backend: "",
+					Path:    "/tmp/my-state.tfstate",
+				},
 			},
 			wantErr: false,
 		},
