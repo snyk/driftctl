@@ -82,7 +82,7 @@ func (s VPCSecurityGroupSupplier) Resources() ([]resource.Resource, error) {
 
 func (s VPCSecurityGroupSupplier) readSecurityGroup(securityGroup ec2.SecurityGroup) (cty.Value, error) {
 	var Ty resource.ResourceType = resourceaws.AwsSecurityGroupResourceType
-	if securityGroup.GroupName != nil && *securityGroup.GroupName == "default" {
+	if isDefaultSecurityGroup(securityGroup) {
 		Ty = resourceaws.AwsDefaultSecurityGroupResourceType
 	}
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
@@ -102,7 +102,7 @@ func listSecurityGroups(client ec2iface.EC2API) ([]*ec2.SecurityGroup, []*ec2.Se
 	input := &ec2.DescribeSecurityGroupsInput{}
 	err := client.DescribeSecurityGroupsPages(input, func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool {
 		for _, securityGroup := range res.SecurityGroups {
-			if securityGroup.GroupName != nil && *securityGroup.GroupName == "default" {
+			if isDefaultSecurityGroup(*securityGroup) {
 				defaultSecurityGroups = append(defaultSecurityGroups, securityGroup)
 				continue
 			}
@@ -114,4 +114,9 @@ func listSecurityGroups(client ec2iface.EC2API) ([]*ec2.SecurityGroup, []*ec2.Se
 		return nil, nil, err
 	}
 	return securityGroups, defaultSecurityGroups, nil
+}
+
+// Return true if the security group is considered as a default one
+func isDefaultSecurityGroup(securityGroup ec2.SecurityGroup) bool {
+	return securityGroup.GroupName != nil && *securityGroup.GroupName == "default"
 }
