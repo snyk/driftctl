@@ -18,6 +18,6 @@ Details of reported data can be found [here](./cmd/flags/error-reporting.md)
   - Scan
     - [Output format](cmd/scan/output.md)
     - [Filtering resources](cmd/scan/filter.md)
-    - [Supported remotes](cmd/scan/supported_resources/README.md)
+    - [Supported resources](cmd/scan/supported_resources/README.md)
     - [Iac sources](cmd/scan/iac_source.md)
 
