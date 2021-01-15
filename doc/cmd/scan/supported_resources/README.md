@@ -1,3 +1,3 @@
-# Supported remotes
+# Supported IaaS Providers
 
 - [AWS](aws.md)
