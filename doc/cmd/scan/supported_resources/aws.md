@@ -21,6 +21,12 @@ You can now use driftctl by overriding the profile setting.
 $ AWS_PROFILE=driftctlrole driftctl scan
 ```
 
+## CloudFormation template
+
+Deploy this CloudFormation template to create our limited permission role that you can use as per our above authentication guide.
+
+[![Launch Stack](https://cdn.rawgit.com/buildkite/cloudformation-launch-stack-button-svg/master/launch-stack.svg)](https://console.aws.amazon.com/cloudformation/home?#/stacks/new?stackName=driftctl-stack&templateURL=https://driftctl-cfn-templates.s3.eu-west-3.amazonaws.com/driftctl-role.yml)
+
 ## Least privileged policy
 
 Driftctl needs access to your cloud provider account so that it can list resources on your behalf.
