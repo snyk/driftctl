@@ -4,15 +4,20 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
+
+	"github.com/stretchr/testify/mock"
+
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
+	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 
 	"github.com/cloudskiff/driftctl/pkg"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
-	"github.com/cloudskiff/driftctl/test/mocks"
+	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -20,46 +25,45 @@ import (
 
 func TestVPCSecurityGroupSupplier_Resources(t *testing.T) {
 	tests := []struct {
-		test                string
-		dirName             string
-		securityGroupsPages mocks.DescribeSecurityGroupsPagesOutput
-		err                 error
+		test    string
+		dirName string
+		mocks   func(client *mocks.FakeEC2)
+		err     error
 	}{
 		{
 			test:    "no security groups",
 			dirName: "vpc_security_group_empty",
-			securityGroupsPages: mocks.DescribeSecurityGroupsPagesOutput{
-				{
-					true,
-					&ec2.DescribeSecurityGroupsOutput{},
-				},
+			mocks: func(client *mocks.FakeEC2) {
+				client.On("DescribeSecurityGroupsPages",
+					&ec2.DescribeSecurityGroupsInput{},
+					mock.MatchedBy(func(callback func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool) bool {
+						callback(&ec2.DescribeSecurityGroupsOutput{}, true)
+						return true
+					})).Return(nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "with security groups",
 			dirName: "vpc_security_group_multiple",
-			securityGroupsPages: mocks.DescribeSecurityGroupsPagesOutput{
-				{
-					false,
-					&ec2.DescribeSecurityGroupsOutput{
-						SecurityGroups: []*ec2.SecurityGroup{
-							{
-								GroupId: aws.String("sg-0254c038e32f25530"),
+			mocks: func(client *mocks.FakeEC2) {
+				client.On("DescribeSecurityGroupsPages",
+					&ec2.DescribeSecurityGroupsInput{},
+					mock.MatchedBy(func(callback func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool) bool {
+						callback(&ec2.DescribeSecurityGroupsOutput{
+							SecurityGroups: []*ec2.SecurityGroup{
+								{
+									GroupId:   aws.String("sg-0254c038e32f25530"),
+									GroupName: aws.String("foo"),
+								},
+								{
+									GroupId:   aws.String("sg-9e0204ff"),
+									GroupName: aws.String("default"),
+								},
 							},
-						},
-					},
-				},
-				{
-					true,
-					&ec2.DescribeSecurityGroupsOutput{
-						SecurityGroups: []*ec2.SecurityGroup{
-							{
-								GroupId: aws.String("sg-9e0204ff"),
-							},
-						},
-					},
-				},
+						}, true)
+						return true
+					})).Return(nil)
 			},
 			err: nil,
 		},
@@ -77,12 +81,17 @@ func TestVPCSecurityGroupSupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
-			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
-			deserializer := awsdeserializer.NewVPCSecurityGroupDeserializer()
+			fakeEC2 := mocks.FakeEC2{}
+			tt.mocks(&fakeEC2)
+			provider := mocks2.NewMockedGoldenTFProvider(tt.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			securityGroupDeserializer := awsdeserializer.NewVPCSecurityGroupDeserializer()
+			defaultSecurityGroupDeserializer := awsdeserializer.NewDefaultSecurityGroupDeserializer()
 			s := &VPCSecurityGroupSupplier{
 				provider,
-				deserializer,
-				mocks.NewMockAWSVPCSecurityGroupClient(tt.securityGroupsPages),
+				defaultSecurityGroupDeserializer,
+				securityGroupDeserializer,
+				&fakeEC2,
+				terraform.NewParallelResourceReader(pkg.NewParallelRunner(context.TODO(), 10)),
 				terraform.NewParallelResourceReader(pkg.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
@@ -90,7 +99,9 @@ func TestVPCSecurityGroupSupplier_Resources(t *testing.T) {
 				t.Errorf("Expected error %+v got %+v", tt.err, err)
 			}
 
-			test.CtyTestDiff(got, tt.dirName, provider, deserializer, shouldUpdate, t)
+			mock.AssertExpectationsForObjects(t)
+			deserializers := []deserializer.CTYDeserializer{securityGroupDeserializer, defaultSecurityGroupDeserializer}
+			test.CtyTestDiffMixed(got, tt.dirName, provider, deserializers, shouldUpdate, t)
 		})
 	}
 }

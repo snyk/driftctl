@@ -19,15 +19,8 @@ func (m VPCDefaultSecurityGroupSanitizer) Execute(remoteResources, resourcesFrom
 	for _, remoteResource := range *remoteResources {
 		existInState := false
 
-		// Ignore all resources other than security group
-		if remoteResource.TerraformType() != aws.AwsSecurityGroupResourceType {
-			newRemoteResources = append(newRemoteResources, remoteResource)
-			continue
-		}
-
-		securityGroup, _ := remoteResource.(*aws.AwsSecurityGroup)
-
-		if !isDefaultSecurityGroup(securityGroup) {
+		// Ignore all resources other than default security group
+		if remoteResource.TerraformType() != aws.AwsDefaultSecurityGroupResourceType {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
@@ -54,9 +47,4 @@ func (m VPCDefaultSecurityGroupSanitizer) Execute(remoteResources, resourcesFrom
 	*remoteResources = newRemoteResources
 
 	return nil
-}
-
-// Return true if the security group is the default one
-func isDefaultSecurityGroup(securityGroup *aws.AwsSecurityGroup) bool {
-	return *securityGroup.Name == "default"
 }

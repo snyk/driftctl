@@ -19,7 +19,7 @@ func TestDefaultVPCSecurityGroupShouldBeIgnored(t *testing.T) {
 			Id:   "sg-foo",
 			Name: awssdk.String("foo"),
 		},
-		&aws.AwsSecurityGroup{
+		&aws.AwsDefaultSecurityGroup{
 			Id:   "sg-default",
 			Name: awssdk.String("default"),
 		},
@@ -50,13 +50,13 @@ func TestDefaultVPCSecurityGroupShouldNotBeIgnoredWhenManaged(t *testing.T) {
 			Id:   "sg-foo",
 			Name: awssdk.String("foo"),
 		},
-		&aws.AwsSecurityGroup{
+		&aws.AwsDefaultSecurityGroup{
 			Id:   "sg-default",
 			Name: awssdk.String("default"),
 		},
 	}
 	stateResources := []resource.Resource{
-		&aws.AwsSecurityGroup{
+		&aws.AwsDefaultSecurityGroup{
 			Id:   "sg-default",
 			Name: awssdk.String("default"),
 		},
@@ -68,7 +68,7 @@ func TestDefaultVPCSecurityGroupShouldNotBeIgnoredWhenManaged(t *testing.T) {
 	if len(remoteResources) != 3 {
 		t.Error("Default security group was ignored")
 	}
-	managedDefaultSecurityGroup := remoteResources[2].(*aws.AwsSecurityGroup)
+	managedDefaultSecurityGroup := remoteResources[2].(*aws.AwsDefaultSecurityGroup)
 	if *managedDefaultSecurityGroup.Name != "default" {
 		t.Error("Default security group is ignored when it should not be")
 	}
