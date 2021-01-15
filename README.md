@@ -41,6 +41,11 @@ driftctl tracks how well your IaC codebase covers your cloud configuration. drif
 - Allow users to **ignore** resources
 - Multiple output formats
 
+## Documentation & support
+
+- [User guide](doc/README.md)
+- [Discord](https://discord.gg/eYGHUa75Q2)
+
 ## Getting started
 
 ### Installation
@@ -152,10 +157,6 @@ $ AWS_PROFILE=profile_name driftctl scan
 # With state stored on a s3 backend
 $ driftctl scan --from tfstate+s3://my-bucket/path/to/state.tfstate
 ```
-## Documentation & support
-
-- [User guide](doc/README.md)
-- [Discord](https://discord.gg/eYGHUa75Q2)
 
 ## Contribute
 
