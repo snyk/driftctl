@@ -3,7 +3,7 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -21,7 +21,7 @@ type IamRolePolicyAttachmentSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamRolePolicyAttachmentSupplier(runner *pkg.ParallelRunner, client iamiface.IAMAPI) *IamRolePolicyAttachmentSupplier {
+func NewIamRolePolicyAttachmentSupplier(runner *parallel.ParallelRunner, client iamiface.IAMAPI) *IamRolePolicyAttachmentSupplier {
 	return &IamRolePolicyAttachmentSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewIamRolePolicyAttachmentDeserializer(), client, terraform.NewParallelResourceReader(runner)}
 }
 

@@ -3,7 +3,7 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
@@ -24,7 +24,7 @@ type SubnetSupplier struct {
 	subnetRunner              *terraform.ParallelResourceReader
 }
 
-func NewSubnetSupplier(runner *pkg.ParallelRunner, client ec2iface.EC2API) *SubnetSupplier {
+func NewSubnetSupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *SubnetSupplier {
 	return &SubnetSupplier{
 		terraform.Provider(terraform.AWS),
 		awsdeserializer.NewDefaultSubnetDeserializer(),

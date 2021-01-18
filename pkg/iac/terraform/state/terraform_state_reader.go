@@ -147,7 +147,10 @@ func (r *TerraformStateReader) decode(values map[string][]cty.Value) ([]resource
 		typ := deserializer.HandledType().String()
 		vals, exists := values[typ]
 		if !exists {
-			logrus.Debugf("No resource of type %s found in state", typ)
+			logrus.WithFields(logrus.Fields{
+				"path":    r.config.Path,
+				"backend": r.config.Backend,
+			}).Debugf("No resource of type %s found in state", typ)
 			continue
 		}
 		decodedResources, err := deserializer.Deserialize(vals)
@@ -157,8 +160,10 @@ func (r *TerraformStateReader) decode(values map[string][]cty.Value) ([]resource
 		}
 		for _, res := range decodedResources {
 			logrus.WithFields(logrus.Fields{
-				"id":   res.TerraformId(),
-				"type": res.TerraformType(),
+				"path":    r.config.Path,
+				"backend": r.config.Backend,
+				"id":      res.TerraformId(),
+				"type":    res.TerraformType(),
 			}).Debug("Found IAC resource")
 			normalisable, ok := res.(resource.NormalizedResource)
 			if ok {
@@ -182,6 +187,10 @@ func (r *TerraformStateReader) decode(values map[string][]cty.Value) ([]resource
 }
 
 func (r *TerraformStateReader) Resources() ([]resource.Resource, error) {
+	logrus.WithFields(logrus.Fields{
+		"path":    r.config.Path,
+		"backend": r.config.Backend,
+	}).Debug("Starting state reader supplier")
 	values, err := r.retrieve()
 	if err != nil {
 		return nil, err

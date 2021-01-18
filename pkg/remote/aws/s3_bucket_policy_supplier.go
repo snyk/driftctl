@@ -2,7 +2,7 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -18,7 +18,7 @@ type S3BucketPolicySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewS3BucketPolicySupplier(runner *pkg.ParallelRunner, factory AwsClientFactoryInterface) *S3BucketPolicySupplier {
+func NewS3BucketPolicySupplier(runner *parallel.ParallelRunner, factory AwsClientFactoryInterface) *S3BucketPolicySupplier {
 	return &S3BucketPolicySupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewS3BucketPolicyDeserializer(), factory, terraform.NewParallelResourceReader(runner)}
 }
 

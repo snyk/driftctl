@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
+	"github.com/sirupsen/logrus"
 
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 
@@ -25,17 +26,35 @@ func IsSupplierSupported(supplierKey string) bool {
 	return false
 }
 
-func GetIACSupplier(config config.SupplierConfig) (resource.Supplier, error) {
-	if !IsSupplierSupported(config.Key) {
-		return nil, fmt.Errorf("Unsupported supplier '%s'", config.Key)
-	}
+func GetIACSupplier(configs []config.SupplierConfig) (resource.Supplier, error) {
+	chainSupplier := resource.NewChainSupplier()
+	for _, config := range configs {
+		if !IsSupplierSupported(config.Key) {
+			return nil, fmt.Errorf("Unsupported supplier '%s'", config.Key)
+		}
 
-	switch config.Key {
-	case state.TerraformStateReaderSupplier:
-		return state.NewReader(config)
-	default:
-		return nil, fmt.Errorf("Unsupported supplier '%s'", config.Key)
+		var supplier resource.Supplier
+		var err error
+		switch config.Key {
+		case state.TerraformStateReaderSupplier:
+			supplier, err = state.NewReader(config)
+		default:
+			return nil, fmt.Errorf("Unsupported supplier '%s'", config.Key)
+		}
+
+		if err != nil {
+			return nil, err
+		}
+
+		logrus.WithFields(logrus.Fields{
+			"supplier": config.Key,
+			"backend":  config.Backend,
+			"path":     config.Path,
+		}).Debug("Found IAC supplier")
+
+		chainSupplier.AddSupplier(supplier)
 	}
+	return chainSupplier, nil
 }
 
 func GetSupportedSuppliers() []string {

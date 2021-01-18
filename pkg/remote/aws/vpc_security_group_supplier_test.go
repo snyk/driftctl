@@ -4,23 +4,18 @@ import (
 	"context"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
-
-	"github.com/stretchr/testify/mock"
-
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
-
-	"github.com/cloudskiff/driftctl/mocks"
-	"github.com/cloudskiff/driftctl/test/goldenfile"
-
-	"github.com/cloudskiff/driftctl/pkg"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/terraform"
-	"github.com/cloudskiff/driftctl/test"
-	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/cloudskiff/driftctl/mocks"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
+	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
+	"github.com/cloudskiff/driftctl/pkg/resource"
+	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/cloudskiff/driftctl/test"
+	"github.com/cloudskiff/driftctl/test/goldenfile"
+	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestVPCSecurityGroupSupplier_Resources(t *testing.T) {
@@ -91,8 +86,8 @@ func TestVPCSecurityGroupSupplier_Resources(t *testing.T) {
 				defaultSecurityGroupDeserializer,
 				securityGroupDeserializer,
 				&fakeEC2,
-				terraform.NewParallelResourceReader(pkg.NewParallelRunner(context.TODO(), 10)),
-				terraform.NewParallelResourceReader(pkg.NewParallelRunner(context.TODO(), 10)),
+				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
+				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
 			if tt.err != err {

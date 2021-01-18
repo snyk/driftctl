@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/sirupsen/logrus"
 
 	tf "github.com/cloudskiff/driftctl/pkg/terraform"
@@ -61,7 +61,7 @@ type TerraformProvider struct {
 	grpcProviders    map[string]*plugin.GRPCProvider
 	schemas          map[string]providers.Schema
 	defaultRegion    string
-	runner           *pkg.ParallelRunner
+	runner           *parallel.ParallelRunner
 }
 
 func NewTerraFormProvider() (*TerraformProvider, error) {
@@ -71,7 +71,7 @@ func NewTerraFormProvider() (*TerraformProvider, error) {
 	}
 	p := TerraformProvider{
 		providerSupplier: provider,
-		runner:           pkg.NewParallelRunner(context.TODO(), 10),
+		runner:           parallel.NewParallelRunner(context.TODO(), 10),
 		grpcProviders:    make(map[string]*plugin.GRPCProvider),
 	}
 	p.initSession()
@@ -104,7 +104,7 @@ func (p *TerraformProvider) Schema() map[string]providers.Schema {
 	return p.schemas
 }
 
-func (p *TerraformProvider) Runner() *pkg.ParallelRunner {
+func (p *TerraformProvider) Runner() *parallel.ParallelRunner {
 	return p.runner
 }
 

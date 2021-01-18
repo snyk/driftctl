@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -22,7 +22,7 @@ type EC2EbsSnapshotSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2EbsSnapshotSupplier(runner *pkg.ParallelRunner, client ec2iface.EC2API) *EC2EbsSnapshotSupplier {
+func NewEC2EbsSnapshotSupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *EC2EbsSnapshotSupplier {
 	return &EC2EbsSnapshotSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewEC2EbsSnapshotDeserializer(), client, terraform.NewParallelResourceReader(runner)}
 }
 

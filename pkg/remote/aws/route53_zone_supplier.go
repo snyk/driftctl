@@ -3,7 +3,7 @@ package aws
 import (
 	"strings"
 
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -23,7 +23,7 @@ type Route53ZoneSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewRoute53ZoneSupplier(runner *pkg.ParallelRunner, client route53iface.Route53API) *Route53ZoneSupplier {
+func NewRoute53ZoneSupplier(runner *parallel.ParallelRunner, client route53iface.Route53API) *Route53ZoneSupplier {
 	return &Route53ZoneSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewRoute53ZoneDeserializer(), client, terraform.NewParallelResourceReader(runner)}
 }
 

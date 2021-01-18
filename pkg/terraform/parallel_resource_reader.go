@@ -1,16 +1,16 @@
 package terraform
 
 import (
-	"github.com/cloudskiff/driftctl/pkg"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
 
 	"github.com/zclconf/go-cty/cty"
 )
 
 type ParallelResourceReader struct {
-	runner *pkg.ParallelRunner
+	runner *parallel.ParallelRunner
 }
 
-func NewParallelResourceReader(runner *pkg.ParallelRunner) *ParallelResourceReader {
+func NewParallelResourceReader(runner *parallel.ParallelRunner) *ParallelResourceReader {
 	return &ParallelResourceReader{
 		runner: runner,
 	}
