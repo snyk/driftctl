@@ -1,0 +1,26 @@
+[
+ {
+  "GatewayId": null,
+  "Id": "rtbassoc-01957791b2cfe6ea4",
+  "RouteTableId": "rtb-05aa6c5673311a17b",
+  "SubnetId": "subnet-0e93dbfa2e5dd8282"
+ },
+ {
+  "GatewayId": null,
+  "Id": "rtbassoc-0809598f92dbec03b",
+  "RouteTableId": "rtb-05aa6c5673311a17b",
+  "SubnetId": "subnet-05185af647b2eeda3"
+ },
+ {
+  "GatewayId": null,
+  "Id": "rtbassoc-0b4f97ea57490e213",
+  "RouteTableId": "rtb-05aa6c5673311a17b",
+  "SubnetId": "subnet-0fd966efd884d0362"
+ },
+ {
+  "GatewayId": "igw-0238f6e09185ac954",
+  "Id": "rtbassoc-0a79ccacfceb4944b",
+  "RouteTableId": "rtb-09df7cc9d16de9f8f",
+  "SubnetId": null
+ }
+]

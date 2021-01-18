@@ -211,3 +211,4 @@ As AWS documentation recommends, the below policy is granting only the permissio
 - [x]  aws_route_table
 - [x]  aws_default_route_table
 - [x]  aws_route
+- [x]  aws_route_table_association

@@ -60,6 +60,7 @@ func Init(alerter *alerter.Alerter) error {
 	resource.AddSupplier(NewSubnetSupplier(provider.Runner(), ec2.New(provider.session)))
 	resource.AddSupplier(NewRouteTableSupplier(provider.Runner(), ec2.New(provider.session)))
 	resource.AddSupplier(NewRouteSupplier(provider.Runner(), ec2.New(provider.session)))
+	resource.AddSupplier(NewRouteTableAssociationSupplier(provider.Runner(), ec2.New(provider.session)))
 
 	return nil
 }
