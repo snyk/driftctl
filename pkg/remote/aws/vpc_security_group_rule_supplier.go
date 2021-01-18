@@ -33,11 +33,14 @@ func NewVPCSecurityGroupRuleSupplier(runner *pkg.ParallelRunner, client ec2iface
 }
 
 func (s VPCSecurityGroupRuleSupplier) Resources() ([]resource.Resource, error) {
-	securityGroups, err := listSecurityGroups(s.client)
+	securityGroups, defaultSecurityGroups, err := listSecurityGroups(s.client)
 	if err != nil {
 		return nil, err
 	}
-	securityGroupsRules := s.listSecurityGroupsRules(securityGroups)
+	secGroups := make([]*ec2.SecurityGroup, 0, len(securityGroups)+len(defaultSecurityGroups))
+	secGroups = append(secGroups, securityGroups...)
+	secGroups = append(secGroups, defaultSecurityGroups...)
+	securityGroupsRules := s.listSecurityGroupsRules(secGroups)
 	results := make([]cty.Value, 0)
 	if len(securityGroupsRules) > 0 {
 		for _, securityGroupsRule := range securityGroupsRules {

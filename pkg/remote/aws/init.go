@@ -46,7 +46,7 @@ func Init(alerter *alerter.Alerter) error {
 	resource.AddSupplier(NewLambdaFunctionSupplier(provider.Runner().SubRunner(), lambda.New(provider.session)))
 	resource.AddSupplier(NewDBSubnetGroupSupplier(provider.Runner().SubRunner(), rds.New(provider.session)))
 	resource.AddSupplier(NewDBInstanceSupplier(provider.Runner().SubRunner(), rds.New(provider.session)))
-	resource.AddSupplier(NewVPCSecurityGroupSupplier(provider.Runner().SubRunner(), ec2.New(provider.session)))
+	resource.AddSupplier(NewVPCSecurityGroupSupplier(provider.Runner(), ec2.New(provider.session)))
 	resource.AddSupplier(NewIamUserSupplier(provider.Runner().SubRunner(), iam.New(provider.session)))
 	resource.AddSupplier(NewIamUserPolicySupplier(provider.Runner().SubRunner(), iam.New(provider.session)))
 	resource.AddSupplier(NewIamUserPolicyAttachmentSupplier(provider.Runner().SubRunner(), iam.New(provider.session)))
