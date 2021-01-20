@@ -38,6 +38,7 @@ func (d DriftCTL) Run() *analyser.Analysis {
 		middlewares.NewVPCSecurityGroupRuleSanitizer(),
 		middlewares.NewIamPolicyAttachmentSanitizer(),
 		middlewares.AwsInstanceEIP{},
+		middlewares.NewAwsDefaultInternetGateway(),
 		middlewares.NewAwsDefaultVPC(),
 		middlewares.NewAwsDefaultSubnet(),
 		middlewares.NewAwsRouteTableExpander(),
