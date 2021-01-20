@@ -57,6 +57,8 @@ func NewDriftctlCmd(build build.BuildInterface) *DriftctlCmd {
 	cmd.SetVersionTemplate(versionTemplate)
 	cmd.AddCommand(NewVersionCmd())
 
+	cmd.AddCommand(NewCompletionCmd())
+
 	cmd.SetUsageTemplate(usageTemplate)
 
 	cmd.PersistentFlags().BoolP("help", "h", false, "Display help for command")
@@ -81,8 +83,9 @@ func (driftctlCmd DriftctlCmd) ShouldCheckVersion() bool {
 	noVersionCheckEnv := os.Getenv("DCTL_NO_VERSION_CHECK") == "true"
 	noVersionCheckVal := contains(os.Args[1:], "--no-version-check")
 	hasVersionCmd := contains(os.Args[1:], "version")
+	hasCompletionCmd := contains(os.Args[1:], "completion")
 	isHelp := contains(os.Args[1:], "help") || contains(os.Args[1:], "--help") || contains(os.Args[1:], "-h")
-	return driftctlCmd.build.IsRelease() && !hasVersionCmd && !noVersionCheckVal && !isHelp && !noVersionCheckEnv
+	return driftctlCmd.build.IsRelease() && !hasVersionCmd && !hasCompletionCmd && !noVersionCheckVal && !isHelp && !noVersionCheckEnv
 }
 
 func IsReportingEnabled(cmd *cobra.Command) bool {
