@@ -32,18 +32,13 @@ func NewRouteSupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *
 
 func (s RouteSupplier) Resources() ([]resource.Resource, error) {
 
-	routeTables, err := listRouteTables(s.client)
+	routeTables, err := listRouteTables(s.client, aws.AwsRouteResourceType)
 	if err != nil {
-		logrus.Error(err)
 		return nil, err
 	}
 
 	for _, routeTable := range routeTables {
 		table := *routeTable
-		if err != nil {
-			logrus.Error(err)
-			return nil, err
-		}
 		for _, route := range table.Routes {
 			res := *route
 			s.routeRunner.Run(func() (cty.Value, error) {

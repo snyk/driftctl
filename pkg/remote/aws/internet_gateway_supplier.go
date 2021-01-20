@@ -5,6 +5,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
@@ -32,7 +33,7 @@ func NewInternetGatewaySupplier(runner *parallel.ParallelRunner, client ec2iface
 func (s InternetGatewaySupplier) Resources() ([]resource.Resource, error) {
 	internetGateways, err := listInternetGateways(s.client)
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsInternetGatewayResourceType)
 	}
 
 	for _, internetGateway := range internetGateways {

@@ -2,6 +2,8 @@ package aws
 
 import (
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -23,13 +25,18 @@ type EC2EbsSnapshotSupplier struct {
 }
 
 func NewEC2EbsSnapshotSupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *EC2EbsSnapshotSupplier {
-	return &EC2EbsSnapshotSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewEC2EbsSnapshotDeserializer(), client, terraform.NewParallelResourceReader(runner)}
+	return &EC2EbsSnapshotSupplier{
+		terraform.Provider(terraform.AWS),
+		awsdeserializer.NewEC2EbsSnapshotDeserializer(),
+		client,
+		terraform.NewParallelResourceReader(runner),
+	}
 }
 
 func (s EC2EbsSnapshotSupplier) Resources() ([]resource.Resource, error) {
 	snapshots, err := listSnapshots(s.client)
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEbsSnapshotResourceType)
 	}
 	results := make([]cty.Value, 0)
 	if len(snapshots) > 0 {

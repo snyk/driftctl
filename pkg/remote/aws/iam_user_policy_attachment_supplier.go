@@ -4,6 +4,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -22,11 +24,16 @@ type IamUserPolicyAttachmentSupplier struct {
 }
 
 func NewIamUserPolicyAttachmentSupplier(runner *parallel.ParallelRunner, client iamiface.IAMAPI) *IamUserPolicyAttachmentSupplier {
-	return &IamUserPolicyAttachmentSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewIamUserPolicyAttachmentDeserializer(), client, terraform.NewParallelResourceReader(runner)}
+	return &IamUserPolicyAttachmentSupplier{
+		terraform.Provider(terraform.AWS),
+		awsdeserializer.NewIamUserPolicyAttachmentDeserializer(),
+		client,
+		terraform.NewParallelResourceReader(runner),
+	}
 }
 
 func (s IamUserPolicyAttachmentSupplier) Resources() ([]resource.Resource, error) {
-	users, err := listIamUsers(s.client)
+	users, err := listIamUsers(s.client, resourceaws.AwsIamUserPolicyAttachmentResourceType)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +44,7 @@ func (s IamUserPolicyAttachmentSupplier) Resources() ([]resource.Resource, error
 			userName := *user.UserName
 			policyAttachmentList, err := listIamUserPoliciesAttachment(userName, s.client)
 			if err != nil {
-				return nil, err
+				return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamUserPolicyAttachmentResourceType)
 			}
 			attachedPolicies = append(attachedPolicies, policyAttachmentList...)
 		}
