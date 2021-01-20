@@ -70,6 +70,7 @@ func TestTerraformStateReader_Resources(t *testing.T) {
 		{name: "VPC security group rule", dirName: "vpc_security_group_rule", wantErr: false},
 		{name: "route table", dirName: "route_table", wantErr: false},
 		{name: "route", dirName: "route", wantErr: false},
+		{name: "route table associations", dirName: "route_assoc", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

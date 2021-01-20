@@ -44,5 +44,6 @@ func Deserializers() []deserializer.CTYDeserializer {
 		awsdeserializer.NewDefaultRouteTableDeserializer(),
 		awsdeserializer.NewRouteTableDeserializer(),
 		awsdeserializer.NewRouteDeserializer(),
+		awsdeserializer.NewRouteTableAssociationDeserializer(),
 	}
 }
