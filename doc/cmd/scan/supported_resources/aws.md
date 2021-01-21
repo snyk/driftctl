@@ -58,6 +58,7 @@ As AWS documentation recommends, the below policy is granting only the permissio
                 "ec2:DescribeVpcClassicLink",
                 "ec2:DescribeVpcClassicLinkDnsSupport",
                 "ec2:DescribeSubnets",
+                "ec2:DescribeNatGateways",
                 "iam:GetPolicy",
                 "iam:GetPolicyVersion",
                 "iam:GetRole",
@@ -212,3 +213,4 @@ As AWS documentation recommends, the below policy is granting only the permissio
 - [x]  aws_default_route_table
 - [x]  aws_route
 - [x]  aws_route_table_association
+- [x]  aws_nat_gateway
