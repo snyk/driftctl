@@ -1,0 +1,11 @@
+[
+ {
+  "Arn": "arn:aws:ec2:eu-west-3:047081014315:internet-gateway/igw-0184eb41aadc62d1c",
+  "Id": "igw-0184eb41aadc62d1c",
+  "OwnerId": "047081014315",
+  "Tags": {
+   "Name": "main"
+  },
+  "VpcId": "vpc-0f3ac2b7909b6bedd"
+ }
+]
