@@ -270,9 +270,9 @@ func TestAnalyze(t *testing.T) {
 					},
 				},
 				alerts: alerter.Alerts{
-					"*": {
+					"": {
 						{
-							Message: "You have diffs on 2 computed fields, check the documentation for potential false positive drifts",
+							Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
 						},
 					},
 				},
@@ -349,9 +349,9 @@ func TestAnalyze(t *testing.T) {
 					},
 				},
 				alerts: alerter.Alerts{
-					"*": {
+					"": {
 						{
-							Message: "You have diffs on 1 computed field, check the documentation for potential false positive drifts",
+							Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
 						},
 					},
 				},
@@ -671,9 +671,9 @@ func TestAnalyze(t *testing.T) {
 							Message: "Should not be ignored",
 						},
 					},
-					"*": {
+					"": {
 						{
-							Message: "You have diffs on 4 computed fields, check the documentation for potential false positive drifts",
+							Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
 						},
 					},
 				},

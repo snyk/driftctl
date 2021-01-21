@@ -1,7 +1,6 @@
 package analyser
 
 import (
-	"fmt"
 	"reflect"
 	"sort"
 
@@ -35,7 +34,7 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 		filteredRemoteResource = append(filteredRemoteResource, remoteRes)
 	}
 
-	nbComputed := 0
+	haveComputedDiff := false
 	for _, stateRes := range resourcesFromState {
 		i, remoteRes, found := findCorrespondingRes(filteredRemoteResource, stateRes)
 
@@ -65,7 +64,7 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 				c := Change{Change: change}
 				c.Computed = a.isComputedField(stateRes, c)
 				if c.Computed {
-					nbComputed++
+					haveComputedDiff = true
 				}
 				changelog = append(changelog, c)
 			}
@@ -75,8 +74,12 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 					Changelog: changelog,
 				})
 			}
-
-			a.sendAlertOnComputedField(nbComputed)
+		}
+		if haveComputedDiff {
+			a.alerter.SendAlert("",
+				alerter.Alert{
+					Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
+				})
 		}
 	}
 
@@ -111,23 +114,6 @@ func (a Analyzer) isComputedField(stateRes resource.Resource, change Change) boo
 		return field.Tag.Get("computed") == "true"
 	}
 	return false
-}
-
-// sendAlertOnComputedField will send an alert if we found computed fields
-func (a Analyzer) sendAlertOnComputedField(nbComputed int) {
-	if nbComputed <= 0 {
-		return // no computed field
-	}
-
-	computedFields := "1 computed field"
-	if nbComputed > 1 {
-		computedFields = fmt.Sprintf("%d computed fields", nbComputed)
-	}
-
-	a.alerter.SendAlert("*",
-		alerter.Alert{
-			Message: fmt.Sprintf("You have diffs on %s, check the documentation for potential false positive drifts", computedFields),
-		})
 }
 
 // getField recursively finds the deepest field inside a resource depending on

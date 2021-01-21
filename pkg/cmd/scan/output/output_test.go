@@ -229,18 +229,9 @@ func fakeAnalysisWithComputedFields() *analyser.Analysis {
 		},
 	}})
 	a.SetAlerts(alerter.Alerts{
-		"aws_diff_resource.diff-id-1": []alerter.Alert{
+		"": []alerter.Alert{
 			{
-				Message: "updated.field is a computed field",
-			},
-			{
-				Message: "a is a computed field",
-			},
-			{
-				Message: "struct.0.array is a computed field",
-			},
-			{
-				Message: "struct.0.string is a computed field",
+				Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
 			},
 		},
 	})
