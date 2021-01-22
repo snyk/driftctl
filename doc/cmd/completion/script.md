@@ -38,6 +38,12 @@ At this point you can generate and place the completion script in your completio
 $ driftctl completion zsh > fpath/completion_folder/_driftctl
 ```
 
+#### Oh-My-Zsh
+```shell
+$ mkdir -p ~/.oh-my-zsh/completions
+$ driftctl completion zsh > ~/.oh-my-zsh/completions/_driftctl
+```
+
 You will need to start a new shell for this setup to take effect.
 
 ### Fish

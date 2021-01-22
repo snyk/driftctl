@@ -31,6 +31,11 @@ func TestCompletionCmd(t *testing.T) {
 			err:  fmt.Errorf("invalid argument \"test\" for \"root completion\""),
 		},
 		{
+			name: "With multiple args",
+			args: []string{"completion", "bash", "zsh"},
+			err:  fmt.Errorf("accepts 1 arg(s), received 2"),
+		},
+		{
 			name:     "With bash arg",
 			args:     []string{"completion", "bash"},
 			expected: "# bash completion for root",
