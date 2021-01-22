@@ -20,4 +20,5 @@ Details of reported data can be found [here](./cmd/flags/error-reporting.md)
     - [Filtering resources](cmd/scan/filter.md)
     - [Supported remotes](cmd/scan/supported_resources/README.md)
     - [Iac sources](cmd/scan/iac_source.md)
+  - [Completion](cmd/completion/script.md)
 
