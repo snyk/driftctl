@@ -4,4 +4,5 @@ package terraform
 type TerraformProvider interface {
 	SchemaSupplier
 	ResourceReader
+	Cleanup()
 }

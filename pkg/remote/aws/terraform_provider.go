@@ -83,7 +83,7 @@ func NewTerraFormProvider() (*TerraformProvider, error) {
 		select {
 		case <-c:
 			logrus.Warn("Detected interrupt during terraform provider configuration, cleanup ...")
-			tf.Cleanup()
+			p.Cleanup()
 			os.Exit(1)
 		case <-stopCh:
 			return
@@ -234,4 +234,13 @@ func (p *TerraformProvider) ReadResource(args tf.ReadResourceArgs) (*cty.Value, 
 		return nil, err
 	}
 	return &newState, nil
+}
+
+func (p *TerraformProvider) Cleanup() {
+	for region, client := range p.grpcProviders {
+		logrus.WithFields(logrus.Fields{
+			"region": region,
+		}).Debug("Closing gRPC client")
+		client.Close()
+	}
 }

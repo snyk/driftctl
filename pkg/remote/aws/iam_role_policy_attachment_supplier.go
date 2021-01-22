@@ -3,7 +3,6 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
-	"github.com/cloudskiff/driftctl/pkg/parallel"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
@@ -23,12 +22,12 @@ type IamRolePolicyAttachmentSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamRolePolicyAttachmentSupplier(runner *parallel.ParallelRunner, client iamiface.IAMAPI) *IamRolePolicyAttachmentSupplier {
+func NewIamRolePolicyAttachmentSupplier(provider *TerraformProvider) *IamRolePolicyAttachmentSupplier {
 	return &IamRolePolicyAttachmentSupplier{
-		terraform.Provider(terraform.AWS),
+		provider,
 		awsdeserializer.NewIamRolePolicyAttachmentDeserializer(),
-		client,
-		terraform.NewParallelResourceReader(runner),
+		iam.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 

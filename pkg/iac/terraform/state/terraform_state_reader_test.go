@@ -90,12 +90,13 @@ func TestTerraformStateReader_Resources(t *testing.T) {
 			}
 
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, realProvider, shouldUpdate)
-
-			terraform.AddProvider(terraform.AWS, provider)
+			library := terraform.NewProviderLibrary()
+			library.AddProvider(terraform.AWS, provider)
 
 			b, _ := backend.NewFileReader(path.Join(goldenfile.GoldenFilePath, tt.dirName, "terraform.tfstate"))
 			r := &TerraformStateReader{
 				backend:       b,
+				library:       library,
 				deserializers: iac.Deserializers(),
 			}
 

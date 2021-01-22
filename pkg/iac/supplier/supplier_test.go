@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
+	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
 func TestGetIACSupplier(t *testing.T) {
@@ -76,7 +77,7 @@ func TestGetIACSupplier(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := GetIACSupplier(tt.args.config)
+			_, err := GetIACSupplier(tt.args.config, terraform.NewProviderLibrary())
 			if tt.wantErr != nil && err.Error() != tt.wantErr.Error() {
 				t.Errorf("GetIACSupplier() error = %v, wantErr %v", err, tt.wantErr)
 				return

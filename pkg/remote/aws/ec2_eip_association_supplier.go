@@ -1,9 +1,9 @@
 package aws
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/parallel"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
+	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -23,13 +23,12 @@ type EC2EipAssociationSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2EipAssociationSupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *EC2EipAssociationSupplier {
+func NewEC2EipAssociationSupplier(provider *TerraformProvider) *EC2EipAssociationSupplier {
 	return &EC2EipAssociationSupplier{
-		terraform.Provider(terraform.AWS),
+		provider,
 		awsdeserializer.NewEC2EipAssociationDeserializer(),
-		client,
-		terraform.NewParallelResourceReader(runner),
-	}
+		ec2.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner())}
 }
 
 func (s EC2EipAssociationSupplier) Resources() ([]resource.Resource, error) {
