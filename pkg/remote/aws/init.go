@@ -61,6 +61,8 @@ func Init(alerter *alerter.Alerter) error {
 	resource.AddSupplier(NewRouteTableSupplier(provider.Runner(), ec2.New(provider.session)))
 	resource.AddSupplier(NewRouteSupplier(provider.Runner(), ec2.New(provider.session)))
 	resource.AddSupplier(NewRouteTableAssociationSupplier(provider.Runner(), ec2.New(provider.session)))
+	resource.AddSupplier(NewNatGatewaySupplier(provider.Runner(), ec2.New(provider.session)))
+	resource.AddSupplier(NewInternetGatewaySupplier(provider.Runner().SubRunner(), ec2.New(provider.session)))
 
 	return nil
 }

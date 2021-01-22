@@ -58,6 +58,23 @@ func TestDriftctlCmd_Version(t *testing.T) {
 	}
 }
 
+func TestDriftctlCmd_Completion(t *testing.T) {
+	cmd := NewDriftctlCmd(mocks.MockBuild{})
+
+	output, err := test.Execute(&cmd.Command, "completion", "bash")
+	if output == "" {
+		t.Errorf("Unexpected output: %v", output)
+	}
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	expected := "# bash completion for driftctl"
+	if !strings.Contains(output, expected) {
+		t.Errorf("Expected to contain: \n %v\nGot:\n %v", expected, output)
+	}
+}
+
 func TestDriftctlCmd_Scan(t *testing.T) {
 
 	cases := []struct {
@@ -225,6 +242,12 @@ func TestDriftctlCmd_ShouldCheckVersion(t *testing.T) {
 			Name:      "Should not return error when launching sub command",
 			IsRelease: false,
 			args:      []string{"scan", "--from", "tfstate://terraform.tfstate"},
+			expected:  false,
+		},
+		{
+			Name:      "Don't check for update for completion cmd",
+			IsRelease: true,
+			args:      []string{"completion", "bash"},
 			expected:  false,
 		},
 	}

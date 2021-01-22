@@ -71,6 +71,8 @@ func TestTerraformStateReader_Resources(t *testing.T) {
 		{name: "route table", dirName: "route_table", wantErr: false},
 		{name: "route", dirName: "route", wantErr: false},
 		{name: "route table associations", dirName: "route_assoc", wantErr: false},
+		{name: "NAT gateway", dirName: "aws_nat_gateway", wantErr: false},
+		{name: "Internet Gateway", dirName: "internet_gateway", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
