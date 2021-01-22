@@ -28,8 +28,6 @@ func NewConsole() *Console {
 }
 
 func (c *Console) Write(analysis *analyser.Analysis) error {
-	var shouldWarnOnComputedFields bool
-
 	if analysis.Summary().TotalDeleted > 0 {
 		fmt.Printf("Found deleted resources:\n")
 		deletedByType := groupByType(analysis.Deleted())
@@ -89,7 +87,6 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 				}
 				fmt.Printf("    %s %s => %s", pref, prettify(change.From), prettify(change.To))
 				if change.Computed {
-					shouldWarnOnComputedFields = true
 					fmt.Printf(" %s", color.YellowString("(computed)"))
 				}
 				fmt.Printf("\n")
@@ -99,8 +96,10 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 
 	c.writeSummary(analysis)
 
-	if shouldWarnOnComputedFields {
-		fmt.Printf("%s\n", color.YellowString("You have diffs on computed field, check the documentation for potential false positive drifts"))
+	for _, alerts := range analysis.Alerts() {
+		for _, alert := range alerts {
+			fmt.Printf("%s\n", color.YellowString(alert.Message))
+		}
 	}
 
 	return nil

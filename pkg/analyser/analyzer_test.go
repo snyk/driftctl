@@ -270,12 +270,9 @@ func TestAnalyze(t *testing.T) {
 					},
 				},
 				alerts: alerter.Alerts{
-					"FakeResource.foobar": {
+					"": {
 						{
-							Message: "BarFoo is a computed field",
-						},
-						{
-							Message: "Struct.Baz is a computed field",
+							Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
 						},
 					},
 				},
@@ -352,9 +349,9 @@ func TestAnalyze(t *testing.T) {
 					},
 				},
 				alerts: alerter.Alerts{
-					"fakeres.foobar": {
+					"": {
 						{
-							Message: "BarFoo is a computed field",
+							Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
 						},
 					},
 				},
@@ -673,17 +670,10 @@ func TestAnalyze(t *testing.T) {
 						{
 							Message: "Should not be ignored",
 						},
+					},
+					"": {
 						{
-							Message: "BarFoo is a computed field",
-						},
-						{
-							Message: "Struct.Baz is a computed field",
-						},
-						{
-							Message: "StructSlice.0.String is a computed field",
-						},
-						{
-							Message: "StructSlice.0.Array is a computed field",
+							Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
 						},
 					},
 				},
