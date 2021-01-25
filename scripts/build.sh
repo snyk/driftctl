@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 #
 # This script builds the application from source for multiple platforms.
