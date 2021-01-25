@@ -124,6 +124,34 @@ Each acceptance test should be prefixed by `TestAcc_` and should be run using en
 DRIFTCTL_ACC=true go test -run=TestAcc_ ./pkg/resource/aws/aws_instance_test.go
 ```
 
+### Credentials
+
+Acceptance tests need credentials to perform real world action on cloud providers:
+- Read/write access are required to perform terraform action
+- Read only access is required for driftctl execution
+
+Recommended way to run acc tests is to use two distinct credentials:
+one for terraform related actions, and one for driftctl scan.
+
+You can override environment variables passed to terraform operations by adding `ACC_` prefix on env variables.
+
+#### AWS
+
+You can use `ACC_AWS_PROFILE` to override AWS named profile used for terraform operations.
+
+```shell script
+ACC_AWS_PROFILE=read-write-profile AWS_PROFILE=read-only-profile DRIFTCTL_ACC=true go test -run=TestAcc_ ./pkg/resource/aws/aws_instance_test.go
+```
+
+In the example below, the `driftctl` AWS profile must have read/write permissions and will be used
+for both terraform operations and driftctl run.
+
+This is **not** the recommended way to run tests as it may hide permissions issues.
+
+```shell script
+AWS_PROFILE=driftctl DRIFTCTL_ACC=true go test -run=TestAcc_ ./pkg/resource/aws/aws_instance_test.go
+```
+
 ### Workflow
 
 - **`OnStart`** You may run some code before everything
