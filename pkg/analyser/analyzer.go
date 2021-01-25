@@ -1,10 +1,8 @@
 package analyser
 
 import (
-	"fmt"
 	"reflect"
 	"sort"
-	"strings"
 
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -36,6 +34,7 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 		filteredRemoteResource = append(filteredRemoteResource, remoteRes)
 	}
 
+	haveComputedDiff := false
 	for _, stateRes := range resourcesFromState {
 		i, remoteRes, found := findCorrespondingRes(filteredRemoteResource, stateRes)
 
@@ -64,6 +63,9 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 				}
 				c := Change{Change: change}
 				c.Computed = a.isComputedField(stateRes, c)
+				if c.Computed {
+					haveComputedDiff = true
+				}
 				changelog = append(changelog, c)
 			}
 			if len(changelog) > 0 {
@@ -71,8 +73,13 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 					Res:       stateRes,
 					Changelog: changelog,
 				})
-				a.sendAlertOnComputedField(stateRes, changelog)
 			}
+		}
+		if haveComputedDiff {
+			a.alerter.SendAlert("",
+				alerter.Alert{
+					Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
+				})
 		}
 	}
 
@@ -107,29 +114,6 @@ func (a Analyzer) isComputedField(stateRes resource.Resource, change Change) boo
 		return field.Tag.Get("computed") == "true"
 	}
 	return false
-}
-
-// sendAlertOnComputedField will send an alert to a channel for diffs on computed field
-func (a Analyzer) sendAlertOnComputedField(stateRes resource.Resource, delta Changelog) {
-	for _, d := range delta {
-		if d.Computed {
-			// We need to copy the path (for console output compatibility) and remove the
-			// last index if it's a slice.
-			// We want a console output of format: struct.0.array.0: "foo" => "bar" (computed)
-			// We want a json output of format: "message": "struct.0.array is a computed field"
-			tmp := make([]string, len(d.Path))
-			copy(tmp, d.Path)
-			field, _ := a.getField(reflect.TypeOf(stateRes), tmp)
-			if field.Type.Kind() == reflect.Slice {
-				tmp = tmp[:len(tmp)-1]
-			}
-			path := strings.Join(tmp, ".")
-			a.alerter.SendAlert(fmt.Sprintf("%s.%s", stateRes.TerraformType(), stateRes.TerraformId()),
-				alerter.Alert{
-					Message: fmt.Sprintf("%s is a computed field", path),
-				})
-		}
-	}
 }
 
 // getField recursively finds the deepest field inside a resource depending on

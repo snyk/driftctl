@@ -78,18 +78,9 @@
 	],
 	"coverage": 100,
 	"alerts": {
-		"aws_diff_resource.diff-id-1": [
+		"": [
 			{
-				"message": "updated.field is a computed field"
-			},
-			{
-				"message": "a is a computed field"
-			},
-			{
-				"message": "struct.0.array is a computed field"
-			},
-			{
-				"message": "struct.0.string is a computed field"
+				"message": "You have diffs on computed fields, check the documentation for potential false positive drifts"
 			}
 		]
 	}
