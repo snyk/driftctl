@@ -41,6 +41,7 @@ func TestTerraformStateReader_Resources(t *testing.T) {
 		dirName string
 		wantErr bool
 	}{
+		{name: "IAM user module", dirName: "module.iam_iam-user", wantErr: false},
 		{name: "Data source", dirName: "data_source", wantErr: false},
 		{name: "Route 53 zone", dirName: "route53_zone", wantErr: false},
 		{name: "Route 53 record - single record", dirName: "route53_record", wantErr: false},
