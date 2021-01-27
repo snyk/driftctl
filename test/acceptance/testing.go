@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
+	cmderrors "github.com/cloudskiff/driftctl/pkg/cmd/errors"
 	"github.com/pkg/errors"
 
 	"github.com/sirupsen/logrus"
@@ -168,6 +169,10 @@ func runDriftCtlCmd(driftctlCmd *cmd.DriftctlCmd) (*cobra.Command, string, error
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 	cmd, cmdErr := driftctlCmd.ExecuteC()
+	// Ignore not in sync errors in acceptance test context
+	if _, isNotInSyncErr := cmdErr.(cmderrors.InfrastructureNotInSync); isNotInSyncErr {
+		cmdErr = nil
+	}
 	outC := make(chan string)
 	// copy the output in a separate goroutine so printing can't block indefinitely
 	go func() {
