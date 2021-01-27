@@ -3,6 +3,7 @@ package acceptance
 import (
 	"os"
 	"reflect"
+	"sort"
 	"testing"
 )
 
@@ -20,6 +21,8 @@ func TestAccTestCase_resolveTerraformEnv(t *testing.T) {
 	testCase := AccTestCase{}
 	env := testCase.resolveTerraformEnv()
 	expected := []string{"TEST_VAR=foobar", "TEST_VAR_2=barfoo", "TEST_VAR_3=", "TEST_VAR_4="}
+	sort.Strings(env)
+	sort.Strings(expected)
 
 	if !reflect.DeepEqual(expected, env) {
 		t.Fatalf("Variable env override not working, got: %+v, expected %+v", env, expected)
