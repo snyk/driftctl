@@ -1,6 +1,8 @@
 package state
 
 import (
+	"fmt"
+
 	"github.com/cloudskiff/driftctl/pkg/iac"
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
@@ -50,61 +52,66 @@ func (r *TerraformStateReader) retrieve() (map[string][]cty.Value, error) {
 		return nil, err
 	}
 
-	stateResources := state.RootModule().Resources
 	resMap := make(map[string][]cty.Value)
-	for _, stateRes := range stateResources {
-		resName := stateRes.Addr.Resource.Name
-		resType := stateRes.Addr.Resource.Type
-		if stateRes.Addr.Resource.Mode != addrs.ManagedResourceMode {
-			logrus.WithFields(logrus.Fields{
-				"mode": stateRes.Addr.Resource.Mode,
-				"name": resName,
-				"type": resType,
-			}).Debug("Skipping state entry as it is not a managed resource")
-			continue
-		}
-		providerType := stateRes.ProviderConfig.Provider.Type
-		provider := terraform.Provider(providerType)
-		if provider == nil {
-			logrus.WithFields(logrus.Fields{
-				"providerKey": providerType,
-			}).Debug("Unsupported provider found in state")
-			continue
-		}
-		schema := provider.Schema()[stateRes.Addr.Resource.Type]
-		for _, instance := range stateRes.Instances {
-			decodedVal, err := instance.Current.Decode(schema.Block.ImpliedType())
-			if err != nil {
-				// Try to do a manual type conversion if we got a path error
-				// It will allow driftctl to read state generated with a superior version of provider
-				// than the actually supported one
-				// by ignoring new fields
-				_, isPathError := err.(cty.PathError)
-				if isPathError {
-					logrus.WithFields(logrus.Fields{
-						"name": resName,
-						"type": resType,
-						"err":  err.Error(),
-					}).Debug("Got a cty path error when deserializing state")
-
-					decodedVal, err = r.convertInstance(instance.Current, schema.Block.ImpliedType())
-				}
-
-				if err != nil {
-					logrus.WithFields(logrus.Fields{
-						"name": resName,
-						"type": resType,
-					}).Error("Unable to decode resource from state")
-					return nil, err
-				}
+	for moduleName, module := range state.Modules {
+		logrus.WithFields(logrus.Fields{
+			"module":        moduleName,
+			"resourceCount": fmt.Sprintf("%d", len(module.Resources)),
+		}).Debug("Found module in state")
+		for _, stateRes := range module.Resources {
+			resName := stateRes.Addr.Resource.Name
+			resType := stateRes.Addr.Resource.Type
+			if stateRes.Addr.Resource.Mode != addrs.ManagedResourceMode {
+				logrus.WithFields(logrus.Fields{
+					"mode": stateRes.Addr.Resource.Mode,
+					"name": resName,
+					"type": resType,
+				}).Debug("Skipping state entry as it is not a managed resource")
+				continue
 			}
-			_, exists := resMap[stateRes.Addr.Resource.Type]
-			if !exists {
-				resMap[stateRes.Addr.Resource.Type] = []cty.Value{
-					decodedVal.Value,
+			providerType := stateRes.ProviderConfig.Provider.Type
+			provider := terraform.Provider(providerType)
+			if provider == nil {
+				logrus.WithFields(logrus.Fields{
+					"providerKey": providerType,
+				}).Debug("Unsupported provider found in state")
+				continue
+			}
+			schema := provider.Schema()[stateRes.Addr.Resource.Type]
+			for _, instance := range stateRes.Instances {
+				decodedVal, err := instance.Current.Decode(schema.Block.ImpliedType())
+				if err != nil {
+					// Try to do a manual type conversion if we got a path error
+					// It will allow driftctl to read state generated with a superior version of provider
+					// than the actually supported one
+					// by ignoring new fields
+					_, isPathError := err.(cty.PathError)
+					if isPathError {
+						logrus.WithFields(logrus.Fields{
+							"name": resName,
+							"type": resType,
+							"err":  err.Error(),
+						}).Debug("Got a cty path error when deserializing state")
+
+						decodedVal, err = r.convertInstance(instance.Current, schema.Block.ImpliedType())
+					}
+
+					if err != nil {
+						logrus.WithFields(logrus.Fields{
+							"name": resName,
+							"type": resType,
+						}).Error("Unable to decode resource from state")
+						return nil, err
+					}
 				}
-			} else {
-				resMap[stateRes.Addr.Resource.Type] = append(resMap[stateRes.Addr.Resource.Type], decodedVal.Value)
+				_, exists := resMap[stateRes.Addr.Resource.Type]
+				if !exists {
+					resMap[stateRes.Addr.Resource.Type] = []cty.Value{
+						decodedVal.Value,
+					}
+				} else {
+					resMap[stateRes.Addr.Resource.Type] = append(resMap[stateRes.Addr.Resource.Type], decodedVal.Value)
+				}
 			}
 		}
 	}

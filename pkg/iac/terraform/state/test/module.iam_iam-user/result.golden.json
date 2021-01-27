@@ -1,0 +1,22 @@
+[
+ {
+  "Arn": "arn:aws:iam::929327065333:user/MODULE-USER",
+  "ForceDestroy": false,
+  "Id": "MODULE-USER",
+  "Name": "MODULE-USER",
+  "Path": "/",
+  "PermissionsBoundary": null,
+  "Tags": null,
+  "UniqueId": "AIDA5QYBVVD22N3IK6SAR"
+ },
+ {
+  "EncryptedSecret": null,
+  "Id": "AKIA5QYBVVD2VIEMMUIQ",
+  "KeyFingerprint": null,
+  "PgpKey": null,
+  "Secret": null,
+  "SesSmtpPasswordV4": null,
+  "Status": "Active",
+  "User": "MODULE-USER"
+ }
+]
