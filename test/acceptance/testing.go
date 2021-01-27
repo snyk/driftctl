@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
@@ -87,12 +88,43 @@ func (c *AccTestCase) getResult(t *testing.T) *ScanResult {
 	return NewScanResult(t, analysis)
 }
 
+/**
+ * Retrieve env from os.Environ() but override every variable prefixed with ACC_
+ * e.g. ACC_AWS_PROFILE will override AWS_PROFILE
+ */
+func (c *AccTestCase) resolveTerraformEnv() []string {
+
+	environMap := make(map[string]string, len(os.Environ()))
+
+	const PREFIX string = "ACC_"
+
+	for _, e := range os.Environ() {
+		envKeyValue := strings.SplitN(e, "=", 2)
+		if strings.HasPrefix(envKeyValue[0], PREFIX) {
+			varName := strings.TrimPrefix(envKeyValue[0], PREFIX)
+			environMap[varName] = envKeyValue[1]
+			continue
+		}
+		if _, exist := environMap[envKeyValue[0]]; !exist {
+			environMap[envKeyValue[0]] = envKeyValue[1]
+		}
+	}
+
+	results := make([]string, 0, len(environMap))
+	for k, v := range environMap {
+		results = append(results, fmt.Sprintf("%s=%s", k, v))
+	}
+
+	return results
+}
+
 func (c *AccTestCase) terraformInit() error {
 	_, err := os.Stat(path.Join(c.Path, ".terraform"))
 	if os.IsNotExist(err) {
 		logrus.Debug("Running terraform init ...")
 		cmd := exec.Command("terraform", "init", "-input=false")
 		cmd.Dir = c.Path
+		cmd.Env = c.resolveTerraformEnv()
 		out, err := cmd.CombinedOutput()
 		if err != nil {
 			return errors.Wrap(err, string(out))
@@ -107,6 +139,7 @@ func (c *AccTestCase) terraformApply() error {
 	logrus.Debug("Running terraform apply ...")
 	cmd := exec.Command("terraform", "apply", "-auto-approve")
 	cmd.Dir = c.Path
+	cmd.Env = c.resolveTerraformEnv()
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.Wrap(err, string(out))
@@ -120,6 +153,7 @@ func (c *AccTestCase) terraformDestroy() error {
 	logrus.Debug("Running terraform destroy ...")
 	cmd := exec.Command("terraform", "destroy", "-auto-approve")
 	cmd.Dir = c.Path
+	cmd.Env = c.resolveTerraformEnv()
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.Wrap(err, string(out))
