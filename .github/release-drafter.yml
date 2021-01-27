@@ -14,6 +14,15 @@ categories:
     labels:
       - 'kind/maintenance'
 version-resolver:
+  major:
+    labels:
+      - 'next-version/major'
+  minor:
+    labels:
+      - 'next-version/minor'
+  patch:
+    labels:
+      - 'next-version/patch'
   default: minor
 template: |
   $CHANGES
