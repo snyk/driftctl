@@ -9,7 +9,7 @@ To record a bug report, enhancement proposal, or give any other product feedback
 
 For new contributors we've labeled a few issues with Good First Issue as a nod to issues which will help get you familiar with driftctl development, while also providing an onramp to the codebase itself.
 
-Read the documentation, and don't be afraid to [ask questions](https://discord.gg/eYGHUa75Q2).
+Read the documentation, and don't be afraid to [ask questions](https://discord.gg/NMCBxtD7Nd).
 
 ## Proposing a Change
 

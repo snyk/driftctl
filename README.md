@@ -16,6 +16,9 @@
   <img src="https://img.shields.io/docker/pulls/cloudskiff/driftctl"/>
   <img src="https://img.shields.io/microbadger/layers/cloudskiff/driftctl"/>
   <img src="https://img.shields.io/docker/image-size/cloudskiff/driftctl"/>
+  <a href="https://discord.gg/NMCBxtD7Nd">
+    <img src="https://img.shields.io/discord/783720783469871124?color=%237289da&label=discord&logo=discord"/>
+  </a>
 </p>
 
 <p align="center">
@@ -44,7 +47,7 @@ driftctl tracks how well your IaC codebase covers your cloud configuration. drif
 ## Documentation & support
 
 - [User guide](doc/README.md)
-- [Discord](https://discord.gg/eYGHUa75Q2)
+- [Discord](https://discord.gg/NMCBxtD7Nd)
 
 ## Getting started
 

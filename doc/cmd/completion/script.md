@@ -17,7 +17,7 @@ By default, this command will print on the standard output the content of the co
 ### Bash
 ```shell
 # Linux:
-$ driftctl completion bash > /etc/bash_completion.d/driftctl
+$ driftctl completion bash | sudo tee /etc/bash_completion.d/driftctl
 
 # MacOS:
 $ driftctl completion bash > /usr/local/etc/bash_completion.d/driftctl
