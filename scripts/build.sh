@@ -14,7 +14,7 @@ GIT_COMMIT=$(git rev-parse HEAD)
 GIT_DIRTY=$(test -n "`git status --porcelain`" && echo "-dev" || true)
 
 # Retrieve
-VERSION=$(git name-rev --name-only --tags --no-undefined HEAD 2>/dev/null || git rev-parse --short HEAD)
+VERSION=$(git describe --exact-match 2>/dev/null || git rev-parse --short HEAD)
 
 # Inject version number
 LD_FLAGS="-X github.com/cloudskiff/driftctl/pkg/version.version=${VERSION}"
