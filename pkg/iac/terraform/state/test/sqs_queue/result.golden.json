@@ -1,0 +1,38 @@
+[
+ {
+  "Arn": "arn:aws:sqs:eu-west-3:047081014315:bar.fifo",
+  "ContentBasedDeduplication": true,
+  "DelaySeconds": 0,
+  "FifoQueue": true,
+  "Id": "https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo",
+  "KmsDataKeyReusePeriodSeconds": 300,
+  "KmsMasterKeyId": "",
+  "MaxMessageSize": 262144,
+  "MessageRetentionSeconds": 345600,
+  "Name": "bar.fifo",
+  "NamePrefix": null,
+  "Policy": "",
+  "ReceiveWaitTimeSeconds": 0,
+  "RedrivePolicy": "",
+  "Tags": {},
+  "VisibilityTimeoutSeconds": 30
+ },
+ {
+  "Arn": "arn:aws:sqs:eu-west-3:047081014315:foo",
+  "ContentBasedDeduplication": false,
+  "DelaySeconds": 0,
+  "FifoQueue": false,
+  "Id": "https://sqs.eu-west-3.amazonaws.com/047081014315/foo",
+  "KmsDataKeyReusePeriodSeconds": 300,
+  "KmsMasterKeyId": "",
+  "MaxMessageSize": 262144,
+  "MessageRetentionSeconds": 345600,
+  "Name": "foo",
+  "NamePrefix": null,
+  "Policy": "",
+  "ReceiveWaitTimeSeconds": 0,
+  "RedrivePolicy": "",
+  "Tags": {},
+  "VisibilityTimeoutSeconds": 30
+ }
+]

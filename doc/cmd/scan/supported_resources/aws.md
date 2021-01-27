@@ -126,7 +126,10 @@ As AWS documentation recommends, the below policy is granting only the permissio
                 "s3:GetMetricsConfiguration",
                 "s3:GetReplicationConfiguration",
                 "s3:ListAllMyBuckets",
-                "s3:ListBucket"
+                "s3:ListBucket",
+                "sqs:GetQueueAttributes",
+                "sqs:ListQueueTags",
+                "sqs:ListQueues"
             ]
         }
     ]
@@ -237,3 +240,8 @@ As AWS documentation recommends, the below policy is granting only the permissio
 - [x] aws_route_table_association
 - [x] aws_nat_gateway
 - [x] aws_internet_gateway
+
+## SQS
+
+- [x] aws_sqs_queue
+- [ ] aws_sqs_queue_policy
