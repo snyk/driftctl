@@ -60,7 +60,7 @@ func (r *ScanResult) AssertResourceHasDrift(id, ty string, change analyser.Chang
 		}
 	}
 	if !found {
-		r.Failf("no differences found", "%s(%s)", id, ty)
+		r.Failf("no differences found", "%s (%s)", id, ty)
 	}
 }
 

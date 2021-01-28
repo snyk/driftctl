@@ -12,6 +12,9 @@ func TestAcc_AwsRoute53Record_WithFQDNAsId(t *testing.T) {
 		Args: []string{"scan", "--filter", "Type=='aws_route53_record'"},
 		Checks: []acceptance.AccCheck{
 			{
+				Env: map[string]string{
+					"AWS_REGION": "us-east-1",
+				},
 				Check: func(result *acceptance.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
