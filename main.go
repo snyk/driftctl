@@ -8,6 +8,7 @@ import (
 	"github.com/cloudskiff/driftctl/build"
 	"github.com/cloudskiff/driftctl/logger"
 	"github.com/cloudskiff/driftctl/pkg/cmd"
+	cmderrors "github.com/cloudskiff/driftctl/pkg/cmd/errors"
 	"github.com/cloudskiff/driftctl/pkg/config"
 	"github.com/cloudskiff/driftctl/pkg/version"
 	"github.com/fatih/color"
@@ -56,6 +57,9 @@ func run() int {
 	}()
 
 	if _, err := driftctlCmd.ExecuteC(); err != nil {
+		if _, isNotInSync := err.(cmderrors.InfrastructureNotInSync); isNotInSync {
+			return 1
+		}
 		if cmd.IsReportingEnabled(&driftctlCmd.Command) {
 			sentry.CaptureException(err)
 		}
