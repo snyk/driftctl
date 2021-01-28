@@ -50,6 +50,7 @@ func NewDriftctlCmd(build build.BuildInterface) *DriftctlCmd {
 			},
 			Long:          "Detect, track and alert on infrastructure drift.",
 			SilenceErrors: true,
+			SilenceUsage:  true,
 		},
 		build,
 	}
