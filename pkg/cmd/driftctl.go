@@ -81,7 +81,7 @@ func contains(args []string, cmd string) bool {
 }
 
 func (driftctlCmd DriftctlCmd) ShouldCheckVersion() bool {
-	noVersionCheckEnv := os.Getenv("DCTL_NO_VERSION_CHECK") == "true"
+	_, noVersionCheckEnv := os.LookupEnv("DCTL_NO_VERSION_CHECK")
 	noVersionCheckVal := contains(os.Args[1:], "--no-version-check")
 	hasVersionCmd := contains(os.Args[1:], "version")
 	hasCompletionCmd := contains(os.Args[1:], "completion")

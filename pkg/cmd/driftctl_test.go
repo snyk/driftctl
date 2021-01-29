@@ -231,10 +231,10 @@ func TestDriftctlCmd_ShouldCheckVersion(t *testing.T) {
 			expected:  false,
 		},
 		{
-			Name:      "Don't check for update when env var set",
+			Name:      "Don't check for update when env DCTL_NO_VERSION_CHECK set",
 			IsRelease: true,
 			env: map[string]string{
-				"DCTL_NO_VERSION_CHECK": "true",
+				"DCTL_NO_VERSION_CHECK": "foo",
 			},
 			expected: false,
 		},
