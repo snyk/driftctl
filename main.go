@@ -1,3 +1,5 @@
+// a test commit to trigger the CI as external contributor
+
 package main
 
 import (
