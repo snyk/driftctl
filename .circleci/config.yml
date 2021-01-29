@@ -75,14 +75,14 @@ workflows:
           filters:
             branches:
               ignore:
-                - master
+                - main
   push:
     jobs:
       - test:
           filters:
             branches:
               only:
-                - master
+                - main
   release:
     jobs:
       - build:

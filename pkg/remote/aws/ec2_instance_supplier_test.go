@@ -4,7 +4,15 @@ import (
 	"context"
 	"testing"
 
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
@@ -23,6 +31,7 @@ func TestEC2InstanceSupplier_Resources(t *testing.T) {
 		test           string
 		dirName        string
 		instancesPages mocks.DescribeInstancesPagesOutput
+		listError      error
 		err            error
 	}{
 		{
@@ -95,6 +104,12 @@ func TestEC2InstanceSupplier_Resources(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			test:      "Cannot list instances",
+			dirName:   "ec2_instance_empty",
+			listError: awserr.NewRequestFailure(nil, 403, ""),
+			err:       remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsInstanceResourceType),
+		},
 	}
 	for _, tt := range tests {
 		shouldUpdate := tt.dirName == *goldenfile.Update
@@ -111,16 +126,18 @@ func TestEC2InstanceSupplier_Resources(t *testing.T) {
 		t.Run(tt.test, func(t *testing.T) {
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewEC2InstanceDeserializer()
+			client := mocks.NewMockAWSEC2InstanceClient(tt.instancesPages)
+			if tt.listError != nil {
+				client = mocks.NewMockAWSEC2ErrorClient(tt.listError)
+			}
 			s := &EC2InstanceSupplier{
 				provider,
 				deserializer,
-				mocks.NewMockAWSEC2InstanceClient(tt.instancesPages),
+				client,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
-			if tt.err != err {
-				t.Errorf("Expected error %+v got %+v", tt.err, err)
-			}
+			assert.Equal(t, tt.err, err)
 
 			test.CtyTestDiff(got, tt.dirName, provider, deserializer, shouldUpdate, t)
 		})

@@ -32,7 +32,7 @@ func NewRouteTableAssociationSupplier(runner *parallel.ParallelRunner, client ec
 
 func (s RouteTableAssociationSupplier) Resources() ([]resource.Resource, error) {
 
-	tables, err := listRouteTables(s.client)
+	tables, err := listRouteTables(s.client, aws.AwsRouteTableAssociationResourceType)
 	if err != nil {
 		return nil, err
 	}

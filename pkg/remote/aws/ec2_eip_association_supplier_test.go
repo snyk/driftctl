@@ -4,7 +4,15 @@ import (
 	"context"
 	"testing"
 
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
@@ -23,6 +31,7 @@ func TestEC2EipAssociationSupplier_Resources(t *testing.T) {
 		test      string
 		dirName   string
 		addresses []*ec2.Address
+		listError error
 		err       error
 	}{
 		{
@@ -41,6 +50,12 @@ func TestEC2EipAssociationSupplier_Resources(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			test:      "Cannot list eip associations",
+			dirName:   "ec2_eip_association_empty",
+			listError: awserr.NewRequestFailure(nil, 403, ""),
+			err:       remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsEipAssociationResourceType),
+		},
 	}
 	for _, tt := range tests {
 		shouldUpdate := tt.dirName == *goldenfile.Update
@@ -57,16 +72,18 @@ func TestEC2EipAssociationSupplier_Resources(t *testing.T) {
 		t.Run(tt.test, func(t *testing.T) {
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewEC2EipAssociationDeserializer()
+			client := mocks.NewMockAWSEC2EipClient(tt.addresses)
+			if tt.listError != nil {
+				client = mocks.NewMockAWSEC2ErrorClient(tt.listError)
+			}
 			s := &EC2EipAssociationSupplier{
 				provider,
 				deserializer,
-				mocks.NewMockAWSEC2EipClient(tt.addresses),
+				client,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
-			if tt.err != err {
-				t.Errorf("Expected error %+v got %+v", tt.err, err)
-			}
+			assert.Equal(t, tt.err, err)
 
 			test.CtyTestDiff(got, tt.dirName, provider, deserializer, shouldUpdate, t)
 		})

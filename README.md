@@ -46,6 +46,7 @@ driftctl tracks how well your IaC codebase covers your cloud configuration. drif
 
 ## Documentation & support
 
+- [Get started](https://driftctl.com/product/quick-tutorial/)
 - [User guide](doc/README.md)
 - [Discord](https://discord.gg/NMCBxtD7Nd)
 

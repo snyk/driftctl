@@ -2,6 +2,8 @@ package aws
 
 import (
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -23,13 +25,18 @@ type EC2EbsVolumeSupplier struct {
 }
 
 func NewEC2EbsVolumeSupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *EC2EbsVolumeSupplier {
-	return &EC2EbsVolumeSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewEC2EbsVolumeDeserializer(), client, terraform.NewParallelResourceReader(runner)}
+	return &EC2EbsVolumeSupplier{
+		terraform.Provider(terraform.AWS),
+		awsdeserializer.NewEC2EbsVolumeDeserializer(),
+		client,
+		terraform.NewParallelResourceReader(runner),
+	}
 }
 
 func (s EC2EbsVolumeSupplier) Resources() ([]resource.Resource, error) {
 	volumes, err := listVolumes(s.client)
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEbsVolumeResourceType)
 	}
 	results := make([]cty.Value, 0)
 	if len(volumes) > 0 {
