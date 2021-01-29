@@ -4,7 +4,14 @@ import (
 	"context"
 	"testing"
 
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+
+	"github.com/aws/aws-sdk-go/aws/awserr"
+
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
@@ -14,6 +21,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam"
 
 	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/mocks"
@@ -107,6 +115,37 @@ func TestIamAccessKeySupplier_Resources(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			test:    "Cannot list iam user",
+			dirName: "iam_access_key_empty",
+			mocks: func(client *mocks.FakeIAM) {
+				client.On("ListUsersPages",
+					&iam.ListUsersInput{},
+					mock.MatchedBy(func(callback func(res *iam.ListUsersOutput, lastPage bool) bool) bool {
+						return true
+					})).Return(awserr.NewRequestFailure(nil, 403, ""))
+				client.On("ListAccessKeysPages", mock.Anything, mock.Anything).Return(awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsIamAccessKeyResourceType, resourceaws.AwsIamUserResourceType),
+		},
+		{
+			test:    "Cannot list iam access_key",
+			dirName: "iam_access_key_empty",
+			mocks: func(client *mocks.FakeIAM) {
+				client.On("ListUsersPages",
+					&iam.ListUsersInput{},
+					mock.MatchedBy(func(callback func(res *iam.ListUsersOutput, lastPage bool) bool) bool {
+						callback(&iam.ListUsersOutput{Users: []*iam.User{
+							{
+								UserName: aws.String("test-driftctl"),
+							},
+						}}, true)
+						return true
+					})).Return(nil)
+				client.On("ListAccessKeysPages", mock.Anything, mock.Anything).Return(awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsIamAccessKeyResourceType),
+		},
 	}
 	for _, c := range cases {
 		shouldUpdate := c.dirName == *goldenfile.Update
@@ -133,9 +172,7 @@ func TestIamAccessKeySupplier_Resources(t *testing.T) {
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
-			if c.err != err {
-				t.Errorf("Expected error %+v got %+v", c.err, err)
-			}
+			assert.Equal(tt, c.err, err)
 
 			mock.AssertExpectationsForObjects(tt)
 			test.CtyTestDiff(got, c.dirName, provider, deserializer, shouldUpdate, t)

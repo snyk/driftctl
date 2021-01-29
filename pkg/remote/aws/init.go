@@ -27,7 +27,6 @@ func Init(alerter *alerter.Alerter) error {
 	factory := AwsClientFactory{config: provider.session}
 
 	terraform.AddProvider(terraform.AWS, provider)
-
 	resource.AddSupplier(NewS3BucketSupplier(provider.Runner().SubRunner(), factory))
 	resource.AddSupplier(NewS3BucketAnalyticSupplier(provider.Runner().SubRunner(), factory))
 	resource.AddSupplier(NewS3BucketInventorySupplier(provider.Runner().SubRunner(), factory))

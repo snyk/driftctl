@@ -4,7 +4,14 @@ import (
 	"context"
 	"testing"
 
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+	"github.com/stretchr/testify/assert"
+
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
@@ -24,6 +31,7 @@ func TestRoute53ZoneSupplier_Resources(t *testing.T) {
 		test       string
 		dirName    string
 		zonesPages mocks.ListHostedZonesPagesOutput
+		listError  error
 		err        error
 	}{
 		{
@@ -88,6 +96,12 @@ func TestRoute53ZoneSupplier_Resources(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			test:      "cannot list zones",
+			dirName:   "route53_zone_empty",
+			listError: awserr.NewRequestFailure(nil, 403, ""),
+			err:       remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRoute53ZoneResourceType),
+		},
 	}
 	for _, tt := range tests {
 		shouldUpdate := tt.dirName == *goldenfile.Update
@@ -104,16 +118,15 @@ func TestRoute53ZoneSupplier_Resources(t *testing.T) {
 		t.Run(tt.test, func(t *testing.T) {
 			deserializer := awsdeserializer.NewRoute53ZoneDeserializer()
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			client := mocks.NewMockAWSRoute53ZoneClient(tt.zonesPages, tt.listError)
 			s := &Route53ZoneSupplier{
 				provider,
 				deserializer,
-				mocks.NewMockAWSRoute53ZoneClient(tt.zonesPages),
+				client,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
-			if tt.err != err {
-				t.Errorf("Expected error %+v got %+v", tt.err, err)
-			}
+			assert.Equal(t, tt.err, err)
 
 			test.CtyTestDiff(got, tt.dirName, provider, deserializer, shouldUpdate, t)
 		})

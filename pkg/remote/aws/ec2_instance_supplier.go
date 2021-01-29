@@ -2,6 +2,8 @@ package aws
 
 import (
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -23,13 +25,18 @@ type EC2InstanceSupplier struct {
 }
 
 func NewEC2InstanceSupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *EC2InstanceSupplier {
-	return &EC2InstanceSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewEC2InstanceDeserializer(), client, terraform.NewParallelResourceReader(runner)}
+	return &EC2InstanceSupplier{
+		terraform.Provider(terraform.AWS),
+		awsdeserializer.NewEC2InstanceDeserializer(),
+		client,
+		terraform.NewParallelResourceReader(runner),
+	}
 }
 
 func (s EC2InstanceSupplier) Resources() ([]resource.Resource, error) {
 	instances, err := listInstances(s.client)
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsInstanceResourceType)
 	}
 
 	results := make([]cty.Value, 0)
