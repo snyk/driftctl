@@ -75,12 +75,13 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 				})
 			}
 		}
-		if haveComputedDiff {
-			a.alerter.SendAlert("",
-				alerter.Alert{
-					Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
-				})
-		}
+	}
+
+	if haveComputedDiff {
+		a.alerter.SendAlert("",
+			alerter.Alert{
+				Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
+			})
 	}
 
 	// Add remaining unmanaged resources

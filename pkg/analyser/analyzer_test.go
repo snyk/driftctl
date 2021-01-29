@@ -680,6 +680,208 @@ func TestAnalyze(t *testing.T) {
 			},
 			hasDrifted: true,
 		},
+		{
+			name: "TestDiff with computed field send 1 alert",
+			iac: []resource.Resource{
+				&testresource.FakeResource{
+					Id:     "foobar",
+					Type:   "fakeres",
+					FooBar: "foobar",
+					BarFoo: "barfoo",
+					Struct: struct {
+						Baz string `computed:"true"`
+						Bar string
+					}{"baz", "bar"},
+				},
+				&testresource.FakeResource{
+					Id:     "resource",
+					Type:   "other",
+					FooBar: "foobar",
+					BarFoo: "barfoo",
+					Struct: struct {
+						Baz string `computed:"true"`
+						Bar string
+					}{"baz", "bar"},
+					StructSlice: []struct {
+						String string   `computed:"true"`
+						Array  []string `computed:"true"`
+					}{
+						{"one", []string{"foo"}},
+					},
+				},
+			},
+			cloud: []resource.Resource{
+				&testresource.FakeResource{
+					Id:     "foobar",
+					Type:   "fakeres",
+					FooBar: "foobar",
+					BarFoo: "barfoo",
+					Struct: struct {
+						Baz string `computed:"true"`
+						Bar string
+					}{"bazdiff", "bardiff"},
+				},
+				&testresource.FakeResource{
+					Id:     "resource",
+					Type:   "other",
+					FooBar: "foobar",
+					BarFoo: "barfoo",
+					Struct: struct {
+						Baz string `computed:"true"`
+						Bar string
+					}{"bazdiff", "bar"},
+					StructSlice: []struct {
+						String string   `computed:"true"`
+						Array  []string `computed:"true"`
+					}{
+						{"onediff", []string{"foo", "diff"}},
+					},
+				},
+			},
+			alerts: alerter.Alerts{},
+			expected: Analysis{
+				managed: []resource.Resource{
+					&testresource.FakeResource{
+						Id:     "foobar",
+						Type:   "fakeres",
+						FooBar: "foobar",
+						BarFoo: "barfoo",
+						Struct: struct {
+							Baz string `computed:"true"`
+							Bar string
+						}{"baz", "bar"},
+					},
+					&testresource.FakeResource{
+						Id:     "resource",
+						Type:   "other",
+						FooBar: "foobar",
+						BarFoo: "barfoo",
+						Struct: struct {
+							Baz string `computed:"true"`
+							Bar string
+						}{"baz", "bar"},
+						StructSlice: []struct {
+							String string   `computed:"true"`
+							Array  []string `computed:"true"`
+						}{
+							{"one", []string{"foo"}},
+						},
+					},
+				},
+				summary: Summary{
+					TotalResources: 2,
+					TotalDrifted:   2,
+					TotalManaged:   2,
+				},
+				differences: []Difference{
+					{
+						Res: &testresource.FakeResource{
+							Id:     "foobar",
+							Type:   "fakeres",
+							FooBar: "foobar",
+							BarFoo: "barfoo",
+							Struct: struct {
+								Baz string `computed:"true"`
+								Bar string
+							}{"baz", "bar"},
+						},
+						Changelog: Changelog{
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "baz",
+									To:   "bazdiff",
+									Path: []string{
+										"Struct",
+										"Baz",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "bar",
+									To:   "bardiff",
+									Path: []string{
+										"Struct",
+										"Bar",
+									},
+								},
+								Computed: false,
+							},
+						},
+					},
+					{
+						Res: &testresource.FakeResource{
+							Id:     "resource",
+							Type:   "other",
+							FooBar: "foobar",
+							BarFoo: "barfoo",
+							Struct: struct {
+								Baz string `computed:"true"`
+								Bar string
+							}{"baz", "bar"},
+							StructSlice: []struct {
+								String string   `computed:"true"`
+								Array  []string `computed:"true"`
+							}{
+								{"one", []string{"foo"}},
+							},
+						},
+						Changelog: Changelog{
+							{
+								Change: diff.Change{
+									Type: "create",
+									From: nil,
+									To:   "diff",
+									Path: []string{
+										"StructSlice",
+										"0",
+										"Array",
+										"1",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "baz",
+									To:   "bazdiff",
+									Path: []string{
+										"Struct",
+										"Baz",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "one",
+									To:   "onediff",
+									Path: []string{
+										"StructSlice",
+										"0",
+										"String",
+									},
+								},
+								Computed: true,
+							},
+						},
+					},
+				},
+				alerts: alerter.Alerts{
+					"": {
+						{
+							Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
+						},
+					},
+				},
+			},
+			hasDrifted: true,
+		},
 	}
 
 	for _, c := range cases {
