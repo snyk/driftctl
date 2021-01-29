@@ -1,5 +1,5 @@
 provider "aws" {
-  region  = "eu-west-3"
+  region = "us-east-1"
 }
 terraform {
   required_providers {

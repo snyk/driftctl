@@ -20,6 +20,9 @@ func TestAcc_AwsInstance_WithBlockDevices(t *testing.T) {
 		Args: []string{"scan", "--filter", "Type=='aws_instance'"},
 		Checks: []acceptance.AccCheck{
 			{
+				Env: map[string]string{
+					"AWS_REGION": "us-east-1",
+				},
 				Check: func(result *acceptance.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
@@ -28,6 +31,9 @@ func TestAcc_AwsInstance_WithBlockDevices(t *testing.T) {
 				},
 			},
 			{
+				Env: map[string]string{
+					"AWS_REGION": "us-east-1",
+				},
 				PreExec: func() {
 					client := ec2.New(awsutils.Session())
 					response, err := client.DescribeInstances(&ec2.DescribeInstancesInput{
@@ -49,11 +55,11 @@ func TestAcc_AwsInstance_WithBlockDevices(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					if len(response.Reservations[0].Instances) != 1 {
+					if len(response.Reservations) != 1 || len(response.Reservations[0].Instances) != 1 {
 						t.Fatal("Error, unexpected number of instances found, manual check required")
 					}
 					mutatedInstanceId = *response.Reservations[0].Instances[0].InstanceId
-					_, _ = client.CreateTags(&ec2.CreateTagsInput{
+					_, err = client.CreateTags(&ec2.CreateTagsInput{
 						Resources: []*string{&mutatedInstanceId},
 						Tags: []*ec2.Tag{
 							{
@@ -62,6 +68,9 @@ func TestAcc_AwsInstance_WithBlockDevices(t *testing.T) {
 							},
 						},
 					})
+					if err != nil {
+						t.Fatal(err)
+					}
 				},
 				Check: func(result *acceptance.ScanResult, stdout string, err error) {
 					if err != nil {

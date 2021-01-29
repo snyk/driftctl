@@ -133,7 +133,9 @@ Acceptance tests need credentials to perform real world action on cloud provider
 Recommended way to run acc tests is to use two distinct credentials:
 one for terraform related actions, and one for driftctl scan.
 
-You can override environment variables passed to terraform operations by adding `ACC_` prefix on env variables.
+In our acceptance tests, we may need read/write permissions during specific contexts
+(e.g. terraform init, apply, destroy)or lifecycle (PreExec and PostExec).
+If needed, you can override environment variables in those contexts by adding `ACC_` prefix on env variables.
 
 #### AWS
 

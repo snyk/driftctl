@@ -40,6 +40,7 @@ type AccTestCase struct {
 	OnEnd             func()
 	Checks            []AccCheck
 	tmpResultFilePath string
+	originalEnv       []string
 }
 
 func (c *AccTestCase) createResultFile(t *testing.T) error {
@@ -188,6 +189,28 @@ func runDriftCtlCmd(driftctlCmd *cmd.DriftctlCmd) (*cobra.Command, string, error
 	return cmd, out, cmdErr
 }
 
+func (c *AccTestCase) useTerraformEnv() {
+	c.originalEnv = os.Environ()
+	c.setEnv(c.resolveTerraformEnv())
+}
+
+func (c *AccTestCase) restoreEnv() {
+	if c.originalEnv != nil {
+		logrus.Debug("Restoring original environment ...")
+		os.Clearenv()
+		c.setEnv(c.originalEnv)
+		c.originalEnv = nil
+	}
+}
+
+func (c *AccTestCase) setEnv(env []string) {
+	os.Clearenv()
+	for _, e := range env {
+		envKeyValue := strings.SplitN(e, "=", 2)
+		os.Setenv(envKeyValue[0], envKeyValue[1])
+	}
+}
+
 func Run(t *testing.T, c AccTestCase) {
 
 	if os.Getenv("DRIFTCTL_ACC") == "" {
@@ -219,6 +242,7 @@ func Run(t *testing.T, c AccTestCase) {
 	}
 
 	defer func() {
+		c.restoreEnv()
 		err := c.terraformDestroy()
 		os.Setenv("CHECKPOINT_DISABLE", checkpoint)
 		if err != nil {
@@ -248,7 +272,9 @@ func Run(t *testing.T, c AccTestCase) {
 			t.Fatal("Check attribute must be defined")
 		}
 		if check.PreExec != nil {
+			c.useTerraformEnv()
 			check.PreExec()
+			c.restoreEnv()
 		}
 		if len(check.Env) > 0 {
 			for key, value := range check.Env {
