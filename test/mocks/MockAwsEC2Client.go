@@ -35,6 +35,11 @@ type MockAWSEC2Client struct {
 	snapshotsPages      DescribeSnapshotsPagesOutput
 	addresses           []*ec2.Address
 	securityGroupsPages DescribeSecurityGroupsPagesOutput
+	err                 error
+}
+
+func NewMockAWSEC2ErrorClient(err error) *MockAWSEC2Client {
+	return &MockAWSEC2Client{err: err}
 }
 
 func NewMockAWSEC2InstanceClient(instancesPages DescribeInstancesPagesOutput) *MockAWSEC2Client {
@@ -66,6 +71,9 @@ func NewMockAWSVPCSecurityGroupClient(securityGroupsPages DescribeSecurityGroups
 }
 
 func (m *MockAWSEC2Client) DescribeInstancesPages(_ *ec2.DescribeInstancesInput, cb func(*ec2.DescribeInstancesOutput, bool) bool) error {
+	if m.err != nil {
+		return m.err
+	}
 	for _, instancesPage := range m.instancesPages {
 		cb(instancesPage.Response, instancesPage.LastPage)
 	}
@@ -73,6 +81,9 @@ func (m *MockAWSEC2Client) DescribeInstancesPages(_ *ec2.DescribeInstancesInput,
 }
 
 func (m *MockAWSEC2Client) DescribeKeyPairs(*ec2.DescribeKeyPairsInput) (*ec2.DescribeKeyPairsOutput, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
 	var kps []*ec2.KeyPairInfo
 	for _, name := range m.kpNames {
 		kps = append(kps, &ec2.KeyPairInfo{
@@ -85,6 +96,9 @@ func (m *MockAWSEC2Client) DescribeKeyPairs(*ec2.DescribeKeyPairsInput) (*ec2.De
 }
 
 func (m *MockAWSEC2Client) DescribeImages(*ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
 	var images []*ec2.Image
 	for _, id := range m.amiIDs {
 		images = append(images, &ec2.Image{
@@ -97,6 +111,9 @@ func (m *MockAWSEC2Client) DescribeImages(*ec2.DescribeImagesInput) (*ec2.Descri
 }
 
 func (m *MockAWSEC2Client) DescribeVolumesPages(_ *ec2.DescribeVolumesInput, cb func(*ec2.DescribeVolumesOutput, bool) bool) error {
+	if m.err != nil {
+		return m.err
+	}
 	for _, volumesPage := range m.volumesPages {
 		cb(volumesPage.Response, volumesPage.LastPage)
 	}
@@ -104,6 +121,9 @@ func (m *MockAWSEC2Client) DescribeVolumesPages(_ *ec2.DescribeVolumesInput, cb 
 }
 
 func (m *MockAWSEC2Client) DescribeSnapshotsPages(_ *ec2.DescribeSnapshotsInput, cb func(*ec2.DescribeSnapshotsOutput, bool) bool) error {
+	if m.err != nil {
+		return m.err
+	}
 	for _, snapshotsPage := range m.snapshotsPages {
 		cb(snapshotsPage.Response, snapshotsPage.LastPage)
 	}
@@ -111,6 +131,9 @@ func (m *MockAWSEC2Client) DescribeSnapshotsPages(_ *ec2.DescribeSnapshotsInput,
 }
 
 func (m *MockAWSEC2Client) DescribeAddresses(*ec2.DescribeAddressesInput) (*ec2.DescribeAddressesOutput, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
 	addresses := m.addresses
 	return &ec2.DescribeAddressesOutput{
 		Addresses: addresses,
@@ -118,6 +141,9 @@ func (m *MockAWSEC2Client) DescribeAddresses(*ec2.DescribeAddressesInput) (*ec2.
 }
 
 func (m *MockAWSEC2Client) DescribeSecurityGroupsPages(_ *ec2.DescribeSecurityGroupsInput, cb func(*ec2.DescribeSecurityGroupsOutput, bool) bool) error {
+	if m.err != nil {
+		return m.err
+	}
 	for _, securityGroupsPage := range m.securityGroupsPages {
 		cb(securityGroupsPage.Response, securityGroupsPage.LastPage)
 	}

@@ -3,7 +3,10 @@ package aws
 import (
 	"fmt"
 
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/aws/aws-sdk-go/service/iam"
@@ -25,11 +28,16 @@ type IamUserPolicySupplier struct {
 }
 
 func NewIamUserPolicySupplier(runner *parallel.ParallelRunner, client iamiface.IAMAPI) *IamUserPolicySupplier {
-	return &IamUserPolicySupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewIamUserPolicyDeserializer(), client, terraform.NewParallelResourceReader(runner)}
+	return &IamUserPolicySupplier{
+		terraform.Provider(terraform.AWS),
+		awsdeserializer.NewIamUserPolicyDeserializer(),
+		client,
+		terraform.NewParallelResourceReader(runner),
+	}
 }
 
 func (s IamUserPolicySupplier) Resources() ([]resource.Resource, error) {
-	users, err := listIamUsers(s.client)
+	users, err := listIamUsers(s.client, resourceaws.AwsIamUserPolicyResourceType)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +48,7 @@ func (s IamUserPolicySupplier) Resources() ([]resource.Resource, error) {
 			userName := *user.UserName
 			policyList, err := listIamUserPolicies(userName, s.client)
 			if err != nil {
-				return nil, err
+				return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamUserPolicyResourceType)
 			}
 			for _, polName := range policyList {
 				policies = append(policies, fmt.Sprintf("%s:%s", userName, *polName))

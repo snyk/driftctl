@@ -3,6 +3,7 @@ package aws
 import (
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
@@ -22,7 +23,12 @@ type DBInstanceSupplier struct {
 }
 
 func NewDBInstanceSupplier(runner *parallel.ParallelRunner, client rdsiface.RDSAPI) *DBInstanceSupplier {
-	return &DBInstanceSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewDBInstanceDeserializer(), client, terraform.NewParallelResourceReader(runner)}
+	return &DBInstanceSupplier{
+		terraform.Provider(terraform.AWS),
+		awsdeserializer.NewDBInstanceDeserializer(),
+		client,
+		terraform.NewParallelResourceReader(runner),
+	}
 }
 
 func listAwsDBInstances(client rdsiface.RDSAPI) ([]*rds.DBInstance, error) {
@@ -43,8 +49,7 @@ func (s DBInstanceSupplier) Resources() ([]resource.Resource, error) {
 	resourceList, err := listAwsDBInstances(s.client)
 
 	if err != nil {
-		logrus.Error(err)
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsDbInstanceResourceType)
 	}
 
 	for _, res := range resourceList {

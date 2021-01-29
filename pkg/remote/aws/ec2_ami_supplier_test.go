@@ -4,8 +4,14 @@ import (
 	"context"
 	"testing"
 
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 
@@ -19,10 +25,11 @@ import (
 
 func TestEC2AmiSupplier_Resources(t *testing.T) {
 	tests := []struct {
-		test    string
-		dirName string
-		amiIDs  []string
-		err     error
+		test      string
+		dirName   string
+		amiIDs    []string
+		listError error
+		err       error
 	}{
 		{
 			test:    "no amis",
@@ -35,6 +42,12 @@ func TestEC2AmiSupplier_Resources(t *testing.T) {
 			dirName: "ec2_ami_multiple",
 			amiIDs:  []string{"ami-03a578b46f4c3081b", "ami-025962fd8b456731f"},
 			err:     nil,
+		},
+		{
+			test:      "cannot list amis",
+			dirName:   "ec2_ami_empty",
+			listError: awserr.NewRequestFailure(nil, 403, ""),
+			err:       remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsAmiResourceType),
 		},
 	}
 	for _, tt := range tests {
@@ -52,16 +65,18 @@ func TestEC2AmiSupplier_Resources(t *testing.T) {
 		t.Run(tt.test, func(t *testing.T) {
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewEC2AmiDeserializer()
+			client := mocks.NewMockAWSEC2AmiClient(tt.amiIDs)
+			if tt.listError != nil {
+				client = mocks.NewMockAWSEC2ErrorClient(tt.listError)
+			}
 			s := &EC2AmiSupplier{
 				provider,
 				deserializer,
-				mocks.NewMockAWSEC2AmiClient(tt.amiIDs),
+				client,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
-			if tt.err != err {
-				t.Errorf("Expected error %+v got %+v", tt.err, err)
-			}
+			assert.Equal(t, tt.err, err)
 
 			test.CtyTestDiff(got, tt.dirName, provider, deserializer, shouldUpdate, t)
 		})

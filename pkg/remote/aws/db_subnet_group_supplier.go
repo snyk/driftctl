@@ -3,6 +3,7 @@ package aws
 import (
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 	"github.com/zclconf/go-cty/cty"
@@ -45,8 +46,7 @@ func (s DBSubnetGroupSupplier) Resources() ([]resource.Resource, error) {
 	)
 
 	if err != nil {
-		logrus.Error(err)
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsDbSubnetGroupResourceType)
 	}
 
 	for _, subnetGroup := range subnetGroups {
