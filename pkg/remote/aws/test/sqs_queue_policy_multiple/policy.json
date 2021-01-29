@@ -1,0 +1,13 @@
+{
+  "Id": "Policy1611769532425",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1611769527792",
+      "Action": ["sqs:SendMessage"],
+      "Effect": "Allow",
+      "Resource": "arn:aws:sqs:eu-west-3:047081014315:foo",
+      "Principal": "*"
+    }
+  ]
+}

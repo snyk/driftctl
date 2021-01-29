@@ -1,7 +1,6 @@
 package aws
 
 import (
-	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -59,7 +58,7 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	supplierLibrary.AddSupplier(NewNatGatewaySupplier(provider))
 	supplierLibrary.AddSupplier(NewInternetGatewaySupplier(provider))
 	supplierLibrary.AddSupplier(NewSqsQueueSupplier(provider))
-	resource.AddSupplier(NewSqsQueuePolicySupplier(provider.Runner().SubRunner(), sqs.New(provider.session)))
+	supplierLibrary.AddSupplier(NewSqsQueuePolicySupplier(provider))
 
 	return nil
 }

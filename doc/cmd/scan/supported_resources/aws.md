@@ -244,4 +244,4 @@ As AWS documentation recommends, the below policy is granting only the permissio
 ## SQS
 
 - [x] aws_sqs_queue
-- [ ] aws_sqs_queue_policy
+- [x] aws_sqs_queue_policy
