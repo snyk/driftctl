@@ -41,40 +41,40 @@ func (r *DriftIgnore) readIgnoreFile() error {
 			logrus.WithFields(logrus.Fields{
 				"line": line,
 			}).Debug("Skipped comment or empty line")
-		} else {
-			typeVal := readDriftIgnoreLine(line)
-			nbArgs := len(typeVal)
-			if nbArgs < 2 {
-				logrus.WithFields(logrus.Fields{
-					"line": line,
-				}).Warnf("unable to parse line, invalid length, got %d expected >= 2", nbArgs)
-				continue
-			}
-			if nbArgs == 2 { // We want to ignore a resource (type.id)
-				logrus.WithFields(logrus.Fields{
-					"type": typeVal[0],
-					"id":   typeVal[1],
-				}).Debug("Found ignore resource rule in .driftignore")
-				r.resExclusionList[strings.Join(typeVal, ".")] = struct{}{}
-				continue
-			}
-			// Here we want to ignore a drift (type.id.path.to.field)
-			res := strings.Join(typeVal[0:2], ".")
-			ignoreSublist, exists := r.driftExclusionList[res]
-			if !exists {
-				ignoreSublist = make([]string, 0, 1)
-			}
-			path := strings.Join(typeVal[2:], ".")
-
+			continue
+		}
+		typeVal := readDriftIgnoreLine(line)
+		nbArgs := len(typeVal)
+		if nbArgs < 2 {
+			logrus.WithFields(logrus.Fields{
+				"line": line,
+			}).Warnf("unable to parse line, invalid length, got %d expected >= 2", nbArgs)
+			continue
+		}
+		if nbArgs == 2 { // We want to ignore a resource (type.id)
 			logrus.WithFields(logrus.Fields{
 				"type": typeVal[0],
 				"id":   typeVal[1],
-				"path": path,
-			}).Debug("Found ignore resource field rule in .driftignore")
-
-			ignoreSublist = append(ignoreSublist, path)
-			r.driftExclusionList[res] = ignoreSublist
+			}).Debug("Found ignore resource rule in .driftignore")
+			r.resExclusionList[strings.Join(typeVal, ".")] = struct{}{}
+			continue
 		}
+		// Here we want to ignore a drift (type.id.path.to.field)
+		res := strings.Join(typeVal[0:2], ".")
+		ignoreSublist, exists := r.driftExclusionList[res]
+		if !exists {
+			ignoreSublist = make([]string, 0, 1)
+		}
+		path := strings.Join(typeVal[2:], ".")
+
+		logrus.WithFields(logrus.Fields{
+			"type": typeVal[0],
+			"id":   typeVal[1],
+			"path": path,
+		}).Debug("Found ignore resource field rule in .driftignore")
+
+		ignoreSublist = append(ignoreSublist, path)
+		r.driftExclusionList[res] = ignoreSublist
 	}
 
 	if err := scanner.Err(); err != nil {
