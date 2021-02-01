@@ -86,20 +86,24 @@ func TestVPCSecurityGroupSupplier_Resources(t *testing.T) {
 	}
 	for _, tt := range tests {
 		shouldUpdate := tt.dirName == *goldenfile.Update
+
+		providerLibrary := terraform.NewProviderLibrary()
+		supplierLibrary := resource.NewSupplierLibrary()
+
 		if shouldUpdate {
 			provider, err := NewTerraFormProvider()
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			terraform.AddProvider(terraform.AWS, provider)
-			resource.AddSupplier(NewVPCSecurityGroupSupplier(provider.Runner(), ec2.New(provider.session)))
+			providerLibrary.AddProvider(terraform.AWS, provider)
+			supplierLibrary.AddSupplier(NewVPCSecurityGroupSupplier(provider))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
 			fakeEC2 := mocks.FakeEC2{}
 			tt.mocks(&fakeEC2)
-			provider := mocks2.NewMockedGoldenTFProvider(tt.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks2.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			securityGroupDeserializer := awsdeserializer.NewVPCSecurityGroupDeserializer()
 			defaultSecurityGroupDeserializer := awsdeserializer.NewDefaultSecurityGroupDeserializer()
 			s := &VPCSecurityGroupSupplier{

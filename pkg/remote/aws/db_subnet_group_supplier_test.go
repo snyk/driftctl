@@ -83,18 +83,22 @@ func TestDBSubnetGroupSupplier_Resources(t *testing.T) {
 	for _, tt := range tests {
 
 		shouldUpdate := tt.dirName == *goldenfile.Update
+
+		providerLibrary := terraform.NewProviderLibrary()
+		supplierLibrary := resource.NewSupplierLibrary()
+
 		if shouldUpdate {
 			provider, err := NewTerraFormProvider()
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			terraform.AddProvider(terraform.AWS, provider)
-			resource.AddSupplier(NewDBInstanceSupplier(provider.Runner(), rds.New(provider.session)))
+			providerLibrary.AddProvider(terraform.AWS, provider)
+			supplierLibrary.AddSupplier(NewDBInstanceSupplier(provider))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
-			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewDBSubnetGroupDeserializer()
 			client := mocks.NewMockAWSRDSSubnetGroupClient(tt.subnets)
 			if tt.subnetsListError != nil {

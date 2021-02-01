@@ -21,6 +21,7 @@ import (
 const TerraformStateReaderSupplier = "tfstate"
 
 type TerraformStateReader struct {
+	library       *terraform.ProviderLibrary
 	config        config.SupplierConfig
 	backend       backend.Backend
 	deserializers []deserializer.CTYDeserializer
@@ -35,8 +36,8 @@ func (r *TerraformStateReader) initReader() error {
 	return nil
 }
 
-func NewReader(config config.SupplierConfig) (*TerraformStateReader, error) {
-	reader := TerraformStateReader{config: config, deserializers: iac.Deserializers()}
+func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary) (*TerraformStateReader, error) {
+	reader := TerraformStateReader{library: library, config: config, deserializers: iac.Deserializers()}
 	err := reader.initReader()
 	if err != nil {
 		return nil, err
@@ -70,7 +71,7 @@ func (r *TerraformStateReader) retrieve() (map[string][]cty.Value, error) {
 				continue
 			}
 			providerType := stateRes.ProviderConfig.Provider.Type
-			provider := terraform.Provider(providerType)
+			provider := r.library.Provider(providerType)
 			if provider == nil {
 				logrus.WithFields(logrus.Fields{
 					"providerKey": providerType,

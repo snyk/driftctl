@@ -146,21 +146,25 @@ func TestIamRolePolicySupplier_Resources(t *testing.T) {
 	}
 	for _, c := range cases {
 		shouldUpdate := c.dirName == *goldenfile.Update
+
+		providerLibrary := terraform.NewProviderLibrary()
+		supplierLibrary := resource.NewSupplierLibrary()
+
 		if shouldUpdate {
 			provider, err := NewTerraFormProvider()
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			terraform.AddProvider(terraform.AWS, provider)
-			resource.AddSupplier(NewIamRolePolicySupplier(provider.Runner(), iam.New(provider.session)))
+			providerLibrary.AddProvider(terraform.AWS, provider)
+			supplierLibrary.AddSupplier(NewIamRolePolicySupplier(provider))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
 			fakeIam := mocks.FakeIAM{}
 			c.mocks(&fakeIam)
 
-			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewIamRolePolicyDeserializer()
 			s := &IamRolePolicySupplier{
 				provider,

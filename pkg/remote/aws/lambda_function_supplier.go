@@ -1,7 +1,6 @@
 package aws
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/parallel"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
@@ -23,12 +22,12 @@ type LambdaFunctionSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewLambdaFunctionSupplier(runner *parallel.ParallelRunner, client lambdaiface.LambdaAPI) *LambdaFunctionSupplier {
+func NewLambdaFunctionSupplier(provider *TerraformProvider) *LambdaFunctionSupplier {
 	return &LambdaFunctionSupplier{
-		terraform.Provider(terraform.AWS),
+		provider,
 		awsdeserializer.NewLambdaFunctionDeserializer(),
-		client,
-		terraform.NewParallelResourceReader(runner),
+		lambda.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 

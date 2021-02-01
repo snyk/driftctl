@@ -3,7 +3,6 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -21,12 +20,12 @@ type InternetGatewaySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewInternetGatewaySupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *InternetGatewaySupplier {
+func NewInternetGatewaySupplier(provider *TerraformProvider) *InternetGatewaySupplier {
 	return &InternetGatewaySupplier{
-		terraform.Provider(terraform.AWS),
+		provider,
 		awsdeserializer.NewInternetGatewayDeserializer(),
-		client,
-		terraform.NewParallelResourceReader(runner),
+		ec2.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 

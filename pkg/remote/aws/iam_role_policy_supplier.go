@@ -4,9 +4,6 @@ import (
 	"fmt"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-
-	"github.com/cloudskiff/driftctl/pkg/parallel"
-
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/aws/aws-sdk-go/service/iam"
@@ -27,12 +24,12 @@ type IamRolePolicySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamRolePolicySupplier(runner *parallel.ParallelRunner, client iamiface.IAMAPI) *IamRolePolicySupplier {
+func NewIamRolePolicySupplier(provider *TerraformProvider) *IamRolePolicySupplier {
 	return &IamRolePolicySupplier{
-		terraform.Provider(terraform.AWS),
+		provider,
 		awsdeserializer.NewIamRolePolicyDeserializer(),
-		client,
-		terraform.NewParallelResourceReader(runner),
+		iam.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
