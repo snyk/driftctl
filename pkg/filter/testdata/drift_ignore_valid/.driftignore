@@ -4,3 +4,4 @@ resource_type.id\.with\.dots
 resource_type.idwith\\
 resource_type.idwith\\backslashes
 
+# this is a comment
