@@ -271,15 +271,15 @@ func Run(t *testing.T, c AccTestCase) {
 		if check.Check == nil {
 			t.Fatal("Check attribute must be defined")
 		}
-		if check.PreExec != nil {
-			c.useTerraformEnv()
-			check.PreExec()
-			c.restoreEnv()
-		}
 		if len(check.Env) > 0 {
 			for key, value := range check.Env {
 				os.Setenv(key, value)
 			}
+		}
+		if check.PreExec != nil {
+			c.useTerraformEnv()
+			check.PreExec()
+			c.restoreEnv()
 		}
 		_, out, cmdErr := runDriftCtlCmd(driftctlCmd)
 		if len(check.Env) > 0 {
