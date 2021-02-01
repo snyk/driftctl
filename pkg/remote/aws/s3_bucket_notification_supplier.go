@@ -4,7 +4,6 @@ import (
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -20,12 +19,11 @@ type S3BucketNotificationSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewS3BucketNotificationSupplier(runner *parallel.ParallelRunner, factory AwsClientFactoryInterface) *S3BucketNotificationSupplier {
+func NewS3BucketNotificationSupplier(provider *TerraformProvider, factory AwsClientFactoryInterface) *S3BucketNotificationSupplier {
 	return &S3BucketNotificationSupplier{
-		terraform.Provider(terraform.AWS),
+		provider,
 		awsdeserializer.NewS3BucketNotificationDeserializer(),
-		factory,
-		terraform.NewParallelResourceReader(runner),
+		factory, terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 

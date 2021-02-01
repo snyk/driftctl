@@ -1,7 +1,6 @@
 package aws
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/parallel"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
@@ -24,12 +23,12 @@ type EC2InstanceSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2InstanceSupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *EC2InstanceSupplier {
+func NewEC2InstanceSupplier(provider *TerraformProvider) *EC2InstanceSupplier {
 	return &EC2InstanceSupplier{
-		terraform.Provider(terraform.AWS),
+		provider,
 		awsdeserializer.NewEC2InstanceDeserializer(),
-		client,
-		terraform.NewParallelResourceReader(runner),
+		ec2.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 

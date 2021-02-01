@@ -4,9 +4,6 @@ import (
 	"fmt"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-
-	"github.com/cloudskiff/driftctl/pkg/parallel"
-
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
@@ -27,12 +24,12 @@ type S3BucketAnalyticSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewS3BucketAnalyticSupplier(runner *parallel.ParallelRunner, factory AwsClientFactoryInterface) *S3BucketAnalyticSupplier {
+func NewS3BucketAnalyticSupplier(provider *TerraformProvider, factory AwsClientFactoryInterface) *S3BucketAnalyticSupplier {
 	return &S3BucketAnalyticSupplier{
-		terraform.Provider(terraform.AWS),
+		provider,
 		awsdeserializer.NewS3BucketAnalyticDeserializer(),
 		factory,
-		terraform.NewParallelResourceReader(runner),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 

@@ -86,5 +86,15 @@ func (r *ScanResult) AssertDriftCountTotal(count int) {
 }
 
 func (r ScanResult) AssertInfrastructureIsInSync() {
-	r.Equal(true, r.Analysis.IsSync(), fmt.Sprintf("Infrastructure is not in sync: %+v", r.Analysis.Summary()))
+	r.Equal(
+		true,
+		r.Analysis.IsSync(),
+		fmt.Sprintf(
+			"Infrastructure is not in sync: %+v\nUnmanaged:\n%+v\nDeleted:\n%+v\nDifferences:\n%+v\n",
+			r.Analysis.Summary(),
+			r.Analysis.Unmanaged(),
+			r.Analysis.Deleted(),
+			r.Analysis.Differences(),
+		),
+	)
 }

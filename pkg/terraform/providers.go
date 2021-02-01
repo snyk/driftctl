@@ -1,7 +1,6 @@
 package terraform
 
 import (
-	"github.com/hashicorp/go-plugin"
 	"github.com/sirupsen/logrus"
 )
 
@@ -9,25 +8,31 @@ const (
 	AWS string = "aws"
 )
 
-var providers = make(map[string]TerraformProvider)
-
-func AddProvider(name string, provider TerraformProvider) {
-	providers[name] = provider
+type ProviderLibrary struct {
+	providers map[string]TerraformProvider
 }
 
-func Provider(name string) TerraformProvider {
-	return providers[name]
-}
-
-func Providers() []TerraformProvider {
-	m := make([]TerraformProvider, 0, len(providers))
-	for _, val := range providers {
-		m = append(m, val)
+func NewProviderLibrary() *ProviderLibrary {
+	logrus.Debug("New provider library created")
+	return &ProviderLibrary{
+		make(map[string]TerraformProvider),
 	}
-	return m
 }
 
-func Cleanup() {
-	logrus.Trace("Closing providers")
-	plugin.CleanupClients()
+func (p *ProviderLibrary) AddProvider(name string, provider TerraformProvider) {
+	p.providers[name] = provider
+}
+
+func (p *ProviderLibrary) Provider(name string) TerraformProvider {
+	return p.providers[name]
+}
+
+func (p *ProviderLibrary) Cleanup() {
+	logrus.Debug("Closing providers")
+	for providerKey, provider := range p.providers {
+		logrus.WithFields(logrus.Fields{
+			"key": providerKey,
+		}).Debug("Closing provider")
+		provider.Cleanup()
+	}
 }

@@ -34,7 +34,7 @@ coverage: test
 
 .PHONY: acc
 acc:
-	DRIFTCTL_ACC=true $(GOTEST) --format testname --junitfile unit-tests-acc.xml -- -coverprofile=cover-acc.out -coverpkg=./pkg/... -run=TestAcc_ ./pkg/resource/...
+	DRIFTCTL_ACC=true $(GOTEST) --format testname --junitfile unit-tests-acc.xml -- -coverprofile=cover-acc.out -test.timeout 1h -coverpkg=./pkg/... -run=TestAcc_ ./pkg/resource/...
 
 .PHONY: mocks
 mocks: deps

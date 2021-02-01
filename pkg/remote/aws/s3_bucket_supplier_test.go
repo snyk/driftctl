@@ -59,6 +59,10 @@ func TestS3BucketSupplier_Resources(t *testing.T) {
 	}
 	for _, tt := range tests {
 		shouldUpdate := tt.dirName == *goldenfile.Update
+
+		providerLibrary := terraform.NewProviderLibrary()
+		supplierLibrary := resource.NewSupplierLibrary()
+
 		if shouldUpdate {
 			provider, err := NewTerraFormProvider()
 			if err != nil {
@@ -67,15 +71,15 @@ func TestS3BucketSupplier_Resources(t *testing.T) {
 
 			factory := AwsClientFactory{config: provider.session}
 
-			terraform.AddProvider(terraform.AWS, provider)
-			resource.AddSupplier(NewS3BucketSupplier(provider.Runner().SubRunner(), factory))
+			providerLibrary.AddProvider(terraform.AWS, provider)
+			supplierLibrary.AddSupplier(NewS3BucketSupplier(provider, factory))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
 
 			factory := mocks.NewMockAwsClientFactory(mocks.NewMockAWSS3Client(tt.bucketsIDs, nil, nil, nil, tt.bucketLocation, tt.listError))
 
-			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewS3BucketDeserializer()
 			s := &S3BucketSupplier{
 				provider,
