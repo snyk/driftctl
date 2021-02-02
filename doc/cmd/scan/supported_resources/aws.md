@@ -25,7 +25,29 @@ $ AWS_PROFILE=driftctlrole driftctl scan
 
 Deploy this CloudFormation template to create our limited permission role that you can use as per our above authentication guide.
 
-[![Launch Stack](https://cdn.rawgit.com/buildkite/cloudformation-launch-stack-button-svg/master/launch-stack.svg)](https://console.aws.amazon.com/cloudformation/home?#/stacks/new?stackName=driftctl-stack&templateURL=https://driftctl-cfn-templates.s3.eu-west-3.amazonaws.com/driftctl-role.yml)
+[![Launch Stack](https://cdn.rawgit.com/buildkite/cloudformation-launch-stack-button-svg/master/launch-stack.svg)](https://console.aws.amazon.com/cloudformation/home?#/stacks/quickcreate?stackName=driftctl-stack&templateURL=https://driftctl-cfn-templates.s3.eu-west-3.amazonaws.com/driftctl-role.yml)
+
+### Update the CloudFormation template
+
+It does not exist an automatic way to update the CloudFormation template from our side because you launched this template on your AWS account. That's why you must be the one to update the template to be on the most recent driftctl role.
+
+Find below two ways to update the CloudFormation template:
+
+1. With the AWS console
+
+- In the [AWS CloudFormation console](https://console.aws.amazon.com/cloudformation), from the list of stacks, select the driftctl stack
+- In the stack details pane, choose **Update**
+- Select **Replace current template** and specify our **Amazon S3 URL** `https://driftctl-cfn-templates.s3.eu-west-3.amazonaws.com/driftctl-role.yml`, click **Next**
+- On the **Specify stack details** and the **Configure stack options** pages, click **Next**
+- In the **Change set preview** section, check that AWS CloudFormation will indeed make changes
+- Since our template contains one IAM resource, select **I acknowledge that this template may create IAM resources**
+- Finally, click **Update stack**
+
+2. With the AWS CLI
+
+```console
+$ aws cloudformation update-stack --stack-name DRIFTCTL_STACK_NAME --template-url https://driftctl-cfn-templates.s3.eu-west-3.amazonaws.com/driftctl-role.yml --capabilities CAPABILITY_NAMED_IAM
+```
 
 ## Least privileged policy
 
