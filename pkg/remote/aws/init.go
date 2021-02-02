@@ -59,6 +59,7 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	supplierLibrary.AddSupplier(NewInternetGatewaySupplier(provider))
 	supplierLibrary.AddSupplier(NewSqsQueueSupplier(provider))
 	supplierLibrary.AddSupplier(NewSqsQueuePolicySupplier(provider))
+	supplierLibrary.AddSupplier(NewSNSTopicSupplier(provider))
 
 	return nil
 }

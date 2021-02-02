@@ -49,5 +49,6 @@ func Deserializers() []deserializer.CTYDeserializer {
 		awsdeserializer.NewInternetGatewayDeserializer(),
 		awsdeserializer.NewSqsQueueDeserializer(),
 		awsdeserializer.NewSqsQueuePolicyDeserializer(),
+		awsdeserializer.NewSNSTopicDeserializer(),
 	}
 }
