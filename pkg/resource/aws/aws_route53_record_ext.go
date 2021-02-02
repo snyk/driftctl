@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -46,4 +47,11 @@ func (r *AwsRoute53Record) NormalizeForState() (resource.Resource, error) {
 
 func (r *AwsRoute53Record) NormalizeForProvider() (resource.Resource, error) {
 	return r, nil
+}
+
+func (r *AwsRoute53Record) String() string {
+	if r.Name == nil || r.Fqdn == nil || r.Type == nil || r.ZoneId == nil {
+		return r.TerraformId()
+	}
+	return fmt.Sprintf("%s (%s) (Zone: %s)", *r.Fqdn, *r.Type, *r.ZoneId)
 }
