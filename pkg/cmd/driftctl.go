@@ -101,8 +101,9 @@ func handleReporting(cmd *cobra.Command) error {
 	if IsReportingEnabled(cmd) {
 		logrus.Debug("Enabled error reporting")
 		return sentry.Init(sentry.ClientOptions{
-			Dsn:     "https://9f2b735e20bc452387f7fa093f786173@o495597.ingest.sentry.io/5568568",
-			Release: fmt.Sprintf("driftctl@%s", version.Current()),
+			Dsn:              "https://9f2b735e20bc452387f7fa093f786173@o495597.ingest.sentry.io/5568568",
+			Release:          fmt.Sprintf("driftctl@%s", version.Current()),
+			AttachStacktrace: true,
 		})
 	}
 	return nil
