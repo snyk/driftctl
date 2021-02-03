@@ -37,6 +37,20 @@
         "test",
         "infra"
       ]
+    },
+    {
+      "login": "moadibfr",
+      "name": "Martin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4931174?v=4",
+      "profile": "http://moadib.net",
+      "contributions": [
+        "doc",
+        "code",
+        "bug",
+        "review",
+        "maintenance",
+        "test"
+      ]
     }
   ]
 }
