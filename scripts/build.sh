@@ -77,3 +77,9 @@ gox \
     -ldflags "${LD_FLAGS}" \
     -output "bin/driftctl_{{.OS}}_{{.Arch}}" \
     ./
+
+if [ $ENV = "release" ]; then
+  echo "+ Computing checksums"
+  cd bin
+  sha256sum * > driftctl_SHA256SUMS
+fi
