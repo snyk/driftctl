@@ -19,16 +19,16 @@ func (r *AwsRoute) String() string {
 	return output
 }
 
-func CalculateRouteID(tableId, CidrBlock, Ipv6CidrBlock *string) string {
+func CalculateRouteID(tableId, CidrBlock, Ipv6CidrBlock *string) (string, error) {
 	if CidrBlock != nil && *CidrBlock != "" {
-		return fmt.Sprintf("r-%s%d", *tableId, hashcode.String(*CidrBlock))
+		return fmt.Sprintf("r-%s%d", *tableId, hashcode.String(*CidrBlock)), nil
 	}
 
 	if Ipv6CidrBlock != nil && *Ipv6CidrBlock != "" {
-		return fmt.Sprintf("r-%s%d", *tableId, hashcode.String(*Ipv6CidrBlock))
+		return fmt.Sprintf("r-%s%d", *tableId, hashcode.String(*Ipv6CidrBlock)), nil
 	}
 
-	panic("unable to build route ID")
+	return "", fmt.Errorf("invalid route detected for table %s", *tableId)
 }
 
 func (r *AwsRoute) NormalizeForState() (resource.Resource, error) {

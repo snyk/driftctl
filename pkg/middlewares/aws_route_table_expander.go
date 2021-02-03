@@ -1,17 +1,24 @@
 package middlewares
 
 import (
+	"fmt"
+
 	awssdk "github.com/aws/aws-sdk-go/aws"
+	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/sirupsen/logrus"
 )
 
 // Explodes routes found in aws_default_route_table.route and aws_route_table.route to dedicated resources
-type AwsRouteTableExpander struct{}
+type AwsRouteTableExpander struct {
+	alerter alerter.AlerterInterface
+}
 
-func NewAwsRouteTableExpander() AwsRouteTableExpander {
-	return AwsRouteTableExpander{}
+func NewAwsRouteTableExpander(alerter alerter.AlerterInterface) AwsRouteTableExpander {
+	return AwsRouteTableExpander{
+		alerter,
+	}
 }
 
 func (m AwsRouteTableExpander) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
@@ -51,13 +58,20 @@ func (m *AwsRouteTableExpander) handleTable(table *aws.AwsRouteTable, results *[
 		return nil
 	}
 	for _, route := range *table.Route {
+		routeId, err := aws.CalculateRouteID(&table.Id, route.CidrBlock, route.Ipv6CidrBlock)
+		if err != nil {
+			m.alerter.SendAlert(aws.AwsRouteTableResourceType, alerter.Alert{
+				Message: fmt.Sprintf("Skipped invalid route found in state for %s.%s", aws.AwsRouteTableResourceType, table.Id),
+			})
+			continue
+		}
 		newRouteFromTable := &aws.AwsRoute{
 			DestinationCidrBlock:     route.CidrBlock,
 			DestinationIpv6CidrBlock: route.Ipv6CidrBlock,
 			DestinationPrefixListId:  awssdk.String(""),
 			EgressOnlyGatewayId:      route.EgressOnlyGatewayId,
 			GatewayId:                route.GatewayId,
-			Id:                       aws.CalculateRouteID(&table.Id, route.CidrBlock, route.Ipv6CidrBlock),
+			Id:                       routeId,
 			InstanceId:               route.InstanceId,
 			InstanceOwnerId:          awssdk.String(""),
 			LocalGatewayId:           route.LocalGatewayId,
@@ -91,13 +105,20 @@ func (m *AwsRouteTableExpander) handleDefaultTable(table *aws.AwsDefaultRouteTab
 		return nil
 	}
 	for _, route := range *table.Route {
+		routeId, err := aws.CalculateRouteID(&table.Id, route.CidrBlock, route.Ipv6CidrBlock)
+		if err != nil {
+			m.alerter.SendAlert(aws.AwsDefaultRouteTableResourceType, alerter.Alert{
+				Message: fmt.Sprintf("Skipped invalid route found in state for %s.%s", aws.AwsDefaultRouteTableResourceType, table.Id),
+			})
+			continue
+		}
 		newRouteFromTable := &aws.AwsRoute{
 			DestinationCidrBlock:     route.CidrBlock,
 			DestinationIpv6CidrBlock: route.Ipv6CidrBlock,
 			DestinationPrefixListId:  awssdk.String(""),
 			EgressOnlyGatewayId:      route.EgressOnlyGatewayId,
 			GatewayId:                route.GatewayId,
-			Id:                       aws.CalculateRouteID(&table.Id, route.CidrBlock, route.Ipv6CidrBlock),
+			Id:                       routeId,
 			InstanceId:               route.InstanceId,
 			InstanceOwnerId:          awssdk.String(""),
 			NatGatewayId:             route.NatGatewayId,
