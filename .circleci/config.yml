@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@1.3.0
+  go: circleci/go@1.5.0
 jobs:
   build:
     docker:
@@ -12,6 +13,44 @@ jobs:
           root: ~/project
           paths:
             - bin/
+  test_acc:
+    machine:
+      image: ubuntu-2004:202010-01
+    environment:
+      AWS_DEFAULT_REGION: us-east-1
+    steps:
+      - checkout
+      - go/install:
+          version: 1.15.7
+      - run:
+          name: install dependencies
+          command: |
+            sudo apt-get -qq update && sudo apt-get -qq -y install unzip
+            curl "https://releases.hashicorp.com/terraform/0.14.5/terraform_0.14.5_linux_amd64.zip" --output terraform.zip
+            unzip terraform.zip
+            sudo mv terraform /usr/local/bin && sudo chmod +x /usr/local/bin
+            terraform version
+      - run: make install-tools
+      - run:
+          name: Run acceptance tests
+          command: make acc
+      - run:
+          name: Discord notification
+          command: |
+            curl -X POST \
+              -H "Content-Type: application/json" \
+              -d "{\"content\": \"✅ Acceptance tests succeeded 🎉\n<${CIRCLE_BUILD_URL}>\" }"\
+              ${DISCORD_WEBHOOK}
+      - run:
+          name: Discord notification
+          when: on_fail
+          command: |
+            curl -X POST \
+              -H "Content-Type: application/json" \
+              -d "{\"content\": \"❌ Acceptance tests failed\n<${CIRCLE_BUILD_URL}>\" }"\
+              ${DISCORD_WEBHOOK}
+      - store_test_results:
+          path: ./
   test:
     docker:
       - image: golang:1.15
@@ -70,6 +109,17 @@ jobs:
             brew install-bundler-gems -d -v
             brew bump-formula-pr driftctl --url https://github.com/cloudskiff/driftctl/archive/$CIRCLE_TAG.tar.gz -d -v
 workflows:
+  nightly:
+    jobs:
+      - test_acc:
+          context: driftctl-acc
+    triggers:
+      - schedule:
+          cron: "0 3 * * *"
+          filters:
+            branches:
+              only:
+                - main
   pullrequest:
     jobs:
       - test:
