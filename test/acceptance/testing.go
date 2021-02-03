@@ -252,8 +252,6 @@ func Run(t *testing.T, c AccTestCase) {
 
 	logger.Init(logger.GetConfig())
 
-	driftctlCmd := cmd.NewDriftctlCmd(test.Build{})
-
 	err = c.createResultFile(t)
 	if err != nil {
 		t.Fatal(err)
@@ -268,6 +266,7 @@ func Run(t *testing.T, c AccTestCase) {
 	os.Args = c.Args
 
 	for _, check := range c.Checks {
+		driftctlCmd := cmd.NewDriftctlCmd(test.Build{})
 		if check.Check == nil {
 			t.Fatal("Check attribute must be defined")
 		}
