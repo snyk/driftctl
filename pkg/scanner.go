@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/cloudskiff/driftctl/pkg/remote"
+
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/sirupsen/logrus"
 
@@ -31,6 +33,10 @@ func (s *Scanner) Resources() ([]resource.Resource, error) {
 		s.runner.Run(func() (interface{}, error) {
 			res, err := supplier.Resources()
 			if err != nil {
+				err := remote.HandleResourceEnumerationError(err, s.alerter)
+				if err == nil {
+					return []resource.Resource{}, nil
+				}
 				return nil, err
 			}
 			for _, resource := range res {

@@ -3,7 +3,8 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
-	"github.com/cloudskiff/driftctl/pkg/parallel"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -30,8 +31,13 @@ type IamRoleSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamRoleSupplier(runner *parallel.ParallelRunner, client iamiface.IAMAPI) *IamRoleSupplier {
-	return &IamRoleSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewIamRoleDeserializer(), client, terraform.NewParallelResourceReader(runner)}
+func NewIamRoleSupplier(provider *TerraformProvider) *IamRoleSupplier {
+	return &IamRoleSupplier{
+		provider,
+		awsdeserializer.NewIamRoleDeserializer(),
+		iam.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
+	}
 }
 
 func awsIamRoleShouldBeIgnored(roleName string) bool {
@@ -40,7 +46,7 @@ func awsIamRoleShouldBeIgnored(roleName string) bool {
 }
 
 func (s IamRoleSupplier) Resources() ([]resource.Resource, error) {
-	roles, err := listIamRoles(s.client)
+	roles, err := listIamRoles(s.client, resourceaws.AwsIamRoleResourceType)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +84,7 @@ func (s IamRoleSupplier) readRes(resource *iam.Role) (cty.Value, error) {
 	return *res, nil
 }
 
-func listIamRoles(client iamiface.IAMAPI) ([]*iam.Role, error) {
+func listIamRoles(client iamiface.IAMAPI, supplierType string) ([]*iam.Role, error) {
 	var resources []*iam.Role
 	input := &iam.ListRolesInput{}
 	err := client.ListRolesPages(input, func(res *iam.ListRolesOutput, lastPage bool) bool {
@@ -86,7 +92,7 @@ func listIamRoles(client iamiface.IAMAPI) ([]*iam.Role, error) {
 		return !lastPage
 	})
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, supplierType, resourceaws.AwsIamRoleResourceType)
 	}
 	return resources, nil
 }

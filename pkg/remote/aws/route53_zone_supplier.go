@@ -3,7 +3,8 @@ package aws
 import (
 	"strings"
 
-	"github.com/cloudskiff/driftctl/pkg/parallel"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -23,8 +24,13 @@ type Route53ZoneSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewRoute53ZoneSupplier(runner *parallel.ParallelRunner, client route53iface.Route53API) *Route53ZoneSupplier {
-	return &Route53ZoneSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewRoute53ZoneDeserializer(), client, terraform.NewParallelResourceReader(runner)}
+func NewRoute53ZoneSupplier(provider *TerraformProvider) *Route53ZoneSupplier {
+	return &Route53ZoneSupplier{
+		provider,
+		awsdeserializer.NewRoute53ZoneDeserializer(),
+		route53.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
+	}
 }
 
 func listAwsRoute53Zones(client route53iface.Route53API) ([]*route53.HostedZone, error) {
@@ -44,8 +50,7 @@ func (s Route53ZoneSupplier) Resources() ([]resource.Resource, error) {
 
 	zones, err := listAwsRoute53Zones(s.client)
 	if err != nil {
-		logrus.Error(err)
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsRoute53ZoneResourceType)
 	}
 
 	for _, hostedZone := range zones {

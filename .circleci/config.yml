@@ -67,7 +67,8 @@ jobs:
       - run:
           name: "Bump driftctl formula"
           command: |
-            brew bump-formula-pr driftctl --url https://github.com/cloudskiff/driftctl/archive/$CIRCLE_TAG.tar.gz
+            brew install-bundler-gems -d -v
+            brew bump-formula-pr driftctl --url https://github.com/cloudskiff/driftctl/archive/$CIRCLE_TAG.tar.gz -d -v
 workflows:
   pullrequest:
     jobs:

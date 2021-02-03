@@ -4,6 +4,12 @@ import (
 	"context"
 	"testing"
 
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+
+	"github.com/aws/aws-sdk-go/aws/awserr"
+
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/cloudskiff/driftctl/mocks"
@@ -15,6 +21,7 @@ import (
 	"github.com/cloudskiff/driftctl/test"
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -126,23 +133,39 @@ func TestRouteSupplier_Resources(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			test:    "cannot list route table",
+			dirName: "route_empty",
+			mocks: func(client *mocks.FakeEC2) {
+				client.On("DescribeRouteTablesPages",
+					&ec2.DescribeRouteTablesInput{},
+					mock.MatchedBy(func(callback func(res *ec2.DescribeRouteTablesOutput, lastPage bool) bool) bool {
+						return true
+					})).Return(awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRouteResourceType, resourceaws.AwsRouteTableResourceType),
+		},
 	}
 	for _, c := range cases {
 		shouldUpdate := c.dirName == *goldenfile.Update
+
+		providerLibrary := terraform.NewProviderLibrary()
+		supplierLibrary := resource.NewSupplierLibrary()
+
 		if shouldUpdate {
 			provider, err := NewTerraFormProvider()
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			terraform.AddProvider(terraform.AWS, provider)
-			resource.AddSupplier(NewRouteSupplier(provider.Runner(), ec2.New(provider.session)))
+			providerLibrary.AddProvider(terraform.AWS, provider)
+			supplierLibrary.AddSupplier(NewRouteSupplier(provider))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
 			fakeEC2 := mocks.FakeEC2{}
 			c.mocks(&fakeEC2)
-			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			routeDeserializer := awsdeserializer.NewRouteDeserializer()
 			s := &RouteSupplier{
 				provider,
@@ -151,9 +174,7 @@ func TestRouteSupplier_Resources(t *testing.T) {
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
-			if c.err != err {
-				tt.Errorf("Expected error %+v got %+v", c.err, err)
-			}
+			assert.Equal(tt, c.err, err)
 
 			mock.AssertExpectationsForObjects(tt)
 			deserializers := []deserializer.CTYDeserializer{routeDeserializer}

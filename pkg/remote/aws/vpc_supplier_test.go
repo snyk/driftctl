@@ -4,7 +4,13 @@ import (
 	"context"
 	"testing"
 
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
@@ -14,6 +20,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/mocks"
@@ -78,23 +85,39 @@ func TestVPCSupplier_Resources(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			test:    "cannot list VPC",
+			dirName: "vpc_empty",
+			mocks: func(client *mocks.FakeEC2) {
+				client.On("DescribeVpcsPages",
+					&ec2.DescribeVpcsInput{},
+					mock.MatchedBy(func(callback func(res *ec2.DescribeVpcsOutput, lastPage bool) bool) bool {
+						return true
+					})).Return(awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsVpcResourceType),
+		},
 	}
 	for _, c := range cases {
 		shouldUpdate := c.dirName == *goldenfile.Update
+
+		providerLibrary := terraform.NewProviderLibrary()
+		supplierLibrary := resource.NewSupplierLibrary()
+
 		if shouldUpdate {
 			provider, err := NewTerraFormProvider()
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			terraform.AddProvider(terraform.AWS, provider)
-			resource.AddSupplier(NewVPCSupplier(provider.Runner(), ec2.New(provider.session)))
+			providerLibrary.AddProvider(terraform.AWS, provider)
+			supplierLibrary.AddSupplier(NewVPCSupplier(provider))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
 			fakeEC2 := mocks.FakeEC2{}
 			c.mocks(&fakeEC2)
-			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			VPCDeserializer := awsdeserializer.NewVPCDeserializer()
 			defaultVPCDeserializer := awsdeserializer.NewDefaultVPCDeserializer()
 			s := &VPCSupplier{
@@ -106,9 +129,7 @@ func TestVPCSupplier_Resources(t *testing.T) {
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
-			if c.err != err {
-				tt.Errorf("Expected error %+v got %+v", c.err, err)
-			}
+			assert.Equal(tt, c.err, err)
 
 			mock.AssertExpectationsForObjects(tt)
 			deserializers := []deserializer.CTYDeserializer{VPCDeserializer, defaultVPCDeserializer}

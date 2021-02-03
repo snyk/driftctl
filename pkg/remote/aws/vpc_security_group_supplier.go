@@ -1,7 +1,8 @@
 package aws
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/parallel"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -24,21 +25,21 @@ type VPCSecurityGroupSupplier struct {
 	securityGroupRunner              *terraform.ParallelResourceReader
 }
 
-func NewVPCSecurityGroupSupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *VPCSecurityGroupSupplier {
+func NewVPCSecurityGroupSupplier(provider *TerraformProvider) *VPCSecurityGroupSupplier {
 	return &VPCSecurityGroupSupplier{
-		terraform.Provider(terraform.AWS),
+		provider,
 		awsdeserializer.NewDefaultSecurityGroupDeserializer(),
 		awsdeserializer.NewVPCSecurityGroupDeserializer(),
-		client,
-		terraform.NewParallelResourceReader(runner.SubRunner()),
-		terraform.NewParallelResourceReader(runner.SubRunner()),
+		ec2.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s VPCSecurityGroupSupplier) Resources() ([]resource.Resource, error) {
 	securityGroups, defaultSecurityGroups, err := listSecurityGroups(s.client)
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsSecurityGroupResourceType)
 	}
 
 	for _, item := range securityGroups {

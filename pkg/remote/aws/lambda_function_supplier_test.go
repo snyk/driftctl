@@ -4,7 +4,15 @@ import (
 	"context"
 	"testing"
 
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
@@ -23,6 +31,7 @@ func TestLambdaFunctionSupplier_Resources(t *testing.T) {
 		test           string
 		dirName        string
 		functionsPages mocks.ListFunctionsPagesOutput
+		listError      error
 		err            error
 	}{
 		{
@@ -80,32 +89,44 @@ func TestLambdaFunctionSupplier_Resources(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			test:      "cannot list lambda functions",
+			dirName:   "lambda_function_empty",
+			listError: awserr.NewRequestFailure(nil, 403, ""),
+			err:       remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsLambdaFunctionResourceType),
+		},
 	}
 	for _, tt := range tests {
 		shouldUpdate := tt.dirName == *goldenfile.Update
+
+		providerLibrary := terraform.NewProviderLibrary()
+		supplierLibrary := resource.NewSupplierLibrary()
+
 		if shouldUpdate {
 			provider, err := NewTerraFormProvider()
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			terraform.AddProvider(terraform.AWS, provider)
-			resource.AddSupplier(NewLambdaFunctionSupplier(provider.Runner(), lambda.New(provider.session)))
+			providerLibrary.AddProvider(terraform.AWS, provider)
+			supplierLibrary.AddSupplier(NewLambdaFunctionSupplier(provider))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
-			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewLambdaFunctionDeserializer()
+			client := mocks.NewMockAWSLambdaClient(tt.functionsPages)
+			if tt.listError != nil {
+				client = mocks.NewMockAWSLambdaErrorClient(tt.listError)
+			}
 			s := &LambdaFunctionSupplier{
 				provider,
 				deserializer,
-				mocks.NewMockAWSLambdaClient(tt.functionsPages),
+				client,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
-			if tt.err != err {
-				t.Errorf("Expected error %+v got %+v", tt.err, err)
-			}
+			assert.Equal(t, tt.err, err)
 
 			test.CtyTestDiff(got, tt.dirName, provider, deserializer, shouldUpdate, t)
 		})

@@ -3,7 +3,8 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
-	"github.com/cloudskiff/driftctl/pkg/parallel"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -21,12 +22,17 @@ type IamRolePolicyAttachmentSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamRolePolicyAttachmentSupplier(runner *parallel.ParallelRunner, client iamiface.IAMAPI) *IamRolePolicyAttachmentSupplier {
-	return &IamRolePolicyAttachmentSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewIamRolePolicyAttachmentDeserializer(), client, terraform.NewParallelResourceReader(runner)}
+func NewIamRolePolicyAttachmentSupplier(provider *TerraformProvider) *IamRolePolicyAttachmentSupplier {
+	return &IamRolePolicyAttachmentSupplier{
+		provider,
+		awsdeserializer.NewIamRolePolicyAttachmentDeserializer(),
+		iam.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
+	}
 }
 
 func (s IamRolePolicyAttachmentSupplier) Resources() ([]resource.Resource, error) {
-	roles, err := listIamRoles(s.client)
+	roles, err := listIamRoles(s.client, resourceaws.AwsIamRolePolicyAttachmentResourceType)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +100,7 @@ func listIamRolePoliciesAttachment(roleName string, client iamiface.IAMAPI) ([]*
 		return !lastPage
 	})
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, resourceaws.AwsIamRolePolicyAttachmentResourceType, resourceaws.AwsIamRolePolicyResourceType)
 	}
 	return attachedRolePolicies, nil
 }

@@ -4,7 +4,14 @@ import (
 	"context"
 	"testing"
 
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+
+	"github.com/aws/aws-sdk-go/aws/awserr"
+
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
@@ -14,6 +21,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/mocks"
@@ -87,23 +95,39 @@ func TestSubnetSupplier_Resources(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			test:    "cannot list Subnet",
+			dirName: "subnet_empty",
+			mocks: func(client *mocks.FakeEC2) {
+				client.On("DescribeSubnetsPages",
+					&ec2.DescribeSubnetsInput{},
+					mock.MatchedBy(func(callback func(res *ec2.DescribeSubnetsOutput, lastPage bool) bool) bool {
+						return true
+					})).Return(awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSubnetResourceType),
+		},
 	}
 	for _, c := range cases {
 		shouldUpdate := c.dirName == *goldenfile.Update
+
+		providerLibrary := terraform.NewProviderLibrary()
+		supplierLibrary := resource.NewSupplierLibrary()
+
 		if shouldUpdate {
 			provider, err := NewTerraFormProvider()
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			terraform.AddProvider(terraform.AWS, provider)
-			resource.AddSupplier(NewSubnetSupplier(provider.Runner(), ec2.New(provider.session)))
+			providerLibrary.AddProvider(terraform.AWS, provider)
+			supplierLibrary.AddSupplier(NewSubnetSupplier(provider))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
 			fakeEC2 := mocks.FakeEC2{}
 			c.mocks(&fakeEC2)
-			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			SubnetDeserializer := awsdeserializer.NewSubnetDeserializer()
 			defaultSubnetDeserializer := awsdeserializer.NewDefaultSubnetDeserializer()
 			s := &SubnetSupplier{
@@ -115,9 +139,7 @@ func TestSubnetSupplier_Resources(t *testing.T) {
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
-			if c.err != err {
-				tt.Errorf("Expected error %+v got %+v", c.err, err)
-			}
+			assert.Equal(tt, c.err, err)
 
 			mock.AssertExpectationsForObjects(tt)
 			deserializers := []deserializer.CTYDeserializer{SubnetDeserializer, defaultSubnetDeserializer}

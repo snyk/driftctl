@@ -19,6 +19,11 @@ type MockAWSRDSClient struct {
 	rdsiface.RDSAPI
 	dbInstancesPages            DescribeDBInstancesPagesOutput
 	describeSubnetGroupResponse DescribeSubnetGroupResponse
+	err                         error
+}
+
+func NewMockAWSRDSErrorClient(err error) *MockAWSRDSClient {
+	return &MockAWSRDSClient{err: err}
 }
 
 func NewMockAWSRDSClient(dbInstancesPages DescribeDBInstancesPagesOutput) *MockAWSRDSClient {
@@ -30,6 +35,9 @@ func NewMockAWSRDSSubnetGroupClient(describeSubnetGroupResponse DescribeSubnetGr
 }
 
 func (m *MockAWSRDSClient) DescribeDBInstancesPages(_ *rds.DescribeDBInstancesInput, cb func(*rds.DescribeDBInstancesOutput, bool) bool) error {
+	if m.err != nil {
+		return m.err
+	}
 	for _, dbInstancesPage := range m.dbInstancesPages {
 		cb(dbInstancesPage.Response, dbInstancesPage.LastPage)
 	}
@@ -37,6 +45,9 @@ func (m *MockAWSRDSClient) DescribeDBInstancesPages(_ *rds.DescribeDBInstancesIn
 }
 
 func (m *MockAWSRDSClient) DescribeDBSubnetGroupsPages(input *rds.DescribeDBSubnetGroupsInput, callback func(*rds.DescribeDBSubnetGroupsOutput, bool) bool) error {
+	if m.err != nil {
+		return m.err
+	}
 	for _, response := range m.describeSubnetGroupResponse {
 		callback(response.Response, response.LastPage)
 	}

@@ -4,7 +4,14 @@ import (
 	"context"
 	"testing"
 
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+	"github.com/stretchr/testify/assert"
+
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
@@ -24,6 +31,7 @@ func TestRoute53RecordSupplier_Resources(t *testing.T) {
 		dirName      string
 		zonesPages   mocks.ListHostedZonesPagesOutput
 		recordsPages mocks.ListResourceRecordSetsPagesOutput
+		listError    error
 		err          error
 	}{
 		{
@@ -177,32 +185,94 @@ func TestRoute53RecordSupplier_Resources(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			test:      "cannot list zones",
+			dirName:   "route53_zone_with_no_record",
+			listError: awserr.NewRequestFailure(nil, 403, ""),
+			recordsPages: mocks.ListResourceRecordSetsPagesOutput{
+				{
+					true,
+					&route53.ListResourceRecordSetsOutput{
+						ResourceRecordSets: []*route53.ResourceRecordSet{
+							{
+								Name: awssdk.String("test0"),
+								Type: awssdk.String("TXT"),
+							},
+							{
+								Name: awssdk.String("test0"),
+								Type: awssdk.String("A"),
+							},
+							{
+								Name: awssdk.String("test1.foo-2.com"),
+								Type: awssdk.String("TXT"),
+							},
+							{
+								Name: awssdk.String("test1.foo-2.com"),
+								Type: awssdk.String("A"),
+							},
+							{
+								Name: awssdk.String("_test2.foo-2.com"),
+								Type: awssdk.String("TXT"),
+							},
+							{
+								Name: awssdk.String("_test2.foo-2.com"),
+								Type: awssdk.String("A"),
+							},
+						},
+					},
+					"Z06486383UC8WYSBZTWFM",
+				},
+			},
+			err: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRoute53RecordResourceType, resourceaws.AwsRoute53ZoneResourceType),
+		},
+		{
+			test:    "cannot list records",
+			dirName: "route53_zone_with_no_record",
+			zonesPages: mocks.ListHostedZonesPagesOutput{
+				{
+					true,
+					&route53.ListHostedZonesOutput{
+						HostedZones: []*route53.HostedZone{
+							{
+								Id:   awssdk.String("Z06486383UC8WYSBZTWFM"),
+								Name: awssdk.String("foo-2.com"),
+							},
+						},
+					},
+				},
+			},
+			listError: awserr.NewRequestFailure(nil, 403, ""),
+			err:       remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRoute53RecordResourceType),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.test, func(t *testing.T) {
 			shouldUpdate := tt.dirName == *goldenfile.Update
+
+			providerLibrary := terraform.NewProviderLibrary()
+			supplierLibrary := resource.NewSupplierLibrary()
+
 			if shouldUpdate {
 				provider, err := NewTerraFormProvider()
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				terraform.AddProvider(terraform.AWS, provider)
-				resource.AddSupplier(NewRoute53RecordSupplier(provider.Runner(), route53.New(provider.session)))
+				providerLibrary.AddProvider(terraform.AWS, provider)
+				supplierLibrary.AddSupplier(NewRoute53RecordSupplier(provider))
 			}
 
-			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewRoute53RecordDeserializer()
+			client := mocks.NewMockAWSRoute53RecordClient(tt.zonesPages, tt.recordsPages, tt.listError)
 			s := &Route53RecordSupplier{
 				provider,
 				deserializer,
-				mocks.NewMockAWSRoute53RecordClient(tt.zonesPages, tt.recordsPages),
+				client,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
-			if tt.err != err {
-				t.Errorf("Expected error %+v got %+v", tt.err, err)
-			}
+			assert.Equal(t, tt.err, err)
 
 			test.CtyTestDiff(got, tt.dirName, provider, deserializer, shouldUpdate, t)
 		})

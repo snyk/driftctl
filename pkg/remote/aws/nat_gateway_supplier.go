@@ -3,8 +3,8 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
@@ -20,12 +20,12 @@ type NatGatewaySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewNatGatewaySupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *NatGatewaySupplier {
+func NewNatGatewaySupplier(provider *TerraformProvider) *NatGatewaySupplier {
 	return &NatGatewaySupplier{
-		terraform.Provider(terraform.AWS),
+		provider,
 		awsdeserializer.NewNatGatewayDeserializer(),
-		client,
-		terraform.NewParallelResourceReader(runner.SubRunner()),
+		ec2.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
@@ -33,7 +33,7 @@ func (s NatGatewaySupplier) Resources() ([]resource.Resource, error) {
 
 	retrievedNatGateways, err := listNatGateways(s.client)
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsNatGatewayResourceType)
 	}
 
 	for _, gateway := range retrievedNatGateways {

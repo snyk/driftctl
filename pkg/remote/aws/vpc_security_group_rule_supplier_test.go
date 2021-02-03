@@ -4,7 +4,13 @@ import (
 	"context"
 	"testing"
 
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -13,6 +19,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/mocks"
@@ -213,23 +220,39 @@ func TestVPCSecurityGroupRuleSupplier_Resources(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			test:    "cannot list security group rules",
+			dirName: "vpc_security_group_rule_empty",
+			mocks: func(client *mocks.FakeEC2) {
+				client.On("DescribeSecurityGroupsPages",
+					&ec2.DescribeSecurityGroupsInput{},
+					mock.MatchedBy(func(callback func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool) bool {
+						return true
+					})).Return(awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSecurityGroupRuleResourceType),
+		},
 	}
 	for _, c := range cases {
 		shouldUpdate := c.dirName == *goldenfile.Update
+
+		providerLibrary := terraform.NewProviderLibrary()
+		supplierLibrary := resource.NewSupplierLibrary()
+
 		if shouldUpdate {
 			provider, err := NewTerraFormProvider()
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			terraform.AddProvider(terraform.AWS, provider)
-			resource.AddSupplier(NewVPCSecurityGroupRuleSupplier(provider.Runner(), ec2.New(provider.session)))
+			providerLibrary.AddProvider(terraform.AWS, provider)
+			supplierLibrary.AddSupplier(NewVPCSecurityGroupRuleSupplier(provider))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
 			fakeEC2 := mocks.FakeEC2{}
 			c.mocks(&fakeEC2)
-			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewVPCSecurityGroupRuleDeserializer()
 			s := &VPCSecurityGroupRuleSupplier{
 				provider,
@@ -238,9 +261,7 @@ func TestVPCSecurityGroupRuleSupplier_Resources(t *testing.T) {
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
-			if c.err != err {
-				tt.Errorf("Expected error %+v got %+v", c.err, err)
-			}
+			assert.Equal(tt, c.err, err)
 
 			mock.AssertExpectationsForObjects(tt)
 			test.CtyTestDiff(got, c.dirName, provider, deserializer, shouldUpdate, tt)

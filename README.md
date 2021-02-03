@@ -168,3 +168,5 @@ $ driftctl scan --from tfstate://terraform_S3.tfstate --from tfstate://terraform
 ## Contribute
 
 To learn more about compiling driftctl and contributing, please refer to the [contribution guidelines](.github/CONTRIBUTING.md) and [contributing guide](doc/contributing/README.md) for technical details.
+
+Build with ❤️️ from 🇫🇷 🇯🇵 🇬🇷

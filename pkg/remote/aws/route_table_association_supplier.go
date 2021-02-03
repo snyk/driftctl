@@ -3,7 +3,6 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -21,18 +20,18 @@ type RouteTableAssociationSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewRouteTableAssociationSupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *RouteTableAssociationSupplier {
+func NewRouteTableAssociationSupplier(provider *TerraformProvider) *RouteTableAssociationSupplier {
 	return &RouteTableAssociationSupplier{
-		terraform.Provider(terraform.AWS),
+		provider,
 		awsdeserializer.NewRouteTableAssociationDeserializer(),
-		client,
-		terraform.NewParallelResourceReader(runner),
+		ec2.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s RouteTableAssociationSupplier) Resources() ([]resource.Resource, error) {
 
-	tables, err := listRouteTables(s.client)
+	tables, err := listRouteTables(s.client, aws.AwsRouteTableAssociationResourceType)
 	if err != nil {
 		return nil, err
 	}

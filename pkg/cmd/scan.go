@@ -126,8 +126,10 @@ func scanRun(opts *ScanOptions) error {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
 	alerter := alerter.NewAlerter()
+	providerLibrary := terraform.NewProviderLibrary()
+	supplierLibrary := resource.NewSupplierLibrary()
 
-	err := remote.Activate(opts.To, alerter)
+	err := remote.Activate(opts.To, alerter, providerLibrary, supplierLibrary)
 	if err != nil {
 		return err
 	}
@@ -135,13 +137,13 @@ func scanRun(opts *ScanOptions) error {
 	// Teardown
 	defer func() {
 		logrus.Trace("Exiting scan cmd")
-		terraform.Cleanup()
+		providerLibrary.Cleanup()
 		logrus.Trace("Exited")
 	}()
 
-	scanner := pkg.NewScanner(resource.Suppliers(), alerter)
+	scanner := pkg.NewScanner(supplierLibrary.Suppliers(), alerter)
 
-	iacSupplier, err := supplier.GetIACSupplier(opts.From)
+	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary)
 	if err != nil {
 		return err
 	}

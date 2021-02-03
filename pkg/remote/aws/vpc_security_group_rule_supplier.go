@@ -1,7 +1,8 @@
 package aws
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/parallel"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -28,14 +29,19 @@ type VPCSecurityGroupRuleSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewVPCSecurityGroupRuleSupplier(runner *parallel.ParallelRunner, client ec2iface.EC2API) *VPCSecurityGroupRuleSupplier {
-	return &VPCSecurityGroupRuleSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewVPCSecurityGroupRuleDeserializer(), client, terraform.NewParallelResourceReader(runner)}
+func NewVPCSecurityGroupRuleSupplier(provider *TerraformProvider) *VPCSecurityGroupRuleSupplier {
+	return &VPCSecurityGroupRuleSupplier{
+		provider,
+		awsdeserializer.NewVPCSecurityGroupRuleDeserializer(),
+		ec2.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
+	}
 }
 
 func (s VPCSecurityGroupRuleSupplier) Resources() ([]resource.Resource, error) {
 	securityGroups, defaultSecurityGroups, err := listSecurityGroups(s.client)
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsSecurityGroupRuleResourceType)
 	}
 	secGroups := make([]*ec2.SecurityGroup, 0, len(securityGroups)+len(defaultSecurityGroups))
 	secGroups = append(secGroups, securityGroups...)

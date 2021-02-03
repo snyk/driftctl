@@ -1,11 +1,19 @@
 package resource
 
-var resourceSupplier = make([]Supplier, 0)
-
-func AddSupplier(supplier Supplier) {
-	resourceSupplier = append(resourceSupplier, supplier)
+type SupplierLibrary struct {
+	resourceSupplier []Supplier
 }
 
-func Suppliers() []Supplier {
-	return resourceSupplier
+func NewSupplierLibrary() *SupplierLibrary {
+	return &SupplierLibrary{
+		make([]Supplier, 0),
+	}
+}
+
+func (r *SupplierLibrary) AddSupplier(supplier Supplier) {
+	r.resourceSupplier = append(r.resourceSupplier, supplier)
+}
+
+func (r *SupplierLibrary) Suppliers() []Supplier {
+	return r.resourceSupplier
 }

@@ -4,7 +4,14 @@ import (
 	"context"
 	"testing"
 
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+
+	"github.com/aws/aws-sdk-go/aws/awserr"
+
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -13,6 +20,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/mocks"
@@ -129,24 +137,58 @@ func TestIamUserPolicySupplier_Resources(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			test:    "cannot list iam user (no policy)",
+			dirName: "iam_user_policy_empty",
+			mocks: func(client *mocks.FakeIAM) {
+				client.On("ListUsersPages", mock.Anything, mock.Anything).Return(awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsIamUserPolicyResourceType, resourceaws.AwsIamUserResourceType),
+		},
+
+		{
+			test:    "cannot list user policy",
+			dirName: "iam_user_policy_empty",
+			mocks: func(client *mocks.FakeIAM) {
+				client.On("ListUsersPages",
+					&iam.ListUsersInput{},
+					mock.MatchedBy(func(callback func(res *iam.ListUsersOutput, lastPage bool) bool) bool {
+						callback(&iam.ListUsersOutput{Users: []*iam.User{
+							{
+								UserName: aws.String("loadbalancer"),
+							},
+							{
+								UserName: aws.String("loadbalancer2"),
+							},
+						}}, true)
+						return true
+					})).Return(nil).Once()
+				client.On("ListUserPoliciesPages", mock.Anything, mock.Anything).Return(awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsIamUserPolicyResourceType),
+		},
 	}
 	for _, c := range cases {
 		shouldUpdate := c.dirName == *goldenfile.Update
+
+		providerLibrary := terraform.NewProviderLibrary()
+		supplierLibrary := resource.NewSupplierLibrary()
+
 		if shouldUpdate {
 			provider, err := NewTerraFormProvider()
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			terraform.AddProvider(terraform.AWS, provider)
-			resource.AddSupplier(NewIamUserPolicySupplier(provider.Runner(), iam.New(provider.session)))
+			providerLibrary.AddProvider(terraform.AWS, provider)
+			supplierLibrary.AddSupplier(NewIamUserPolicySupplier(provider))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
 			fakeIam := mocks.FakeIAM{}
 			c.mocks(&fakeIam)
 
-			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewIamUserPolicyDeserializer()
 			s := &IamUserPolicySupplier{
 				provider,
@@ -155,9 +197,7 @@ func TestIamUserPolicySupplier_Resources(t *testing.T) {
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
-			if c.err != err {
-				t.Errorf("Expected error %+v got %+v", c.err, err)
-			}
+			assert.Equal(tt, c.err, err)
 
 			mock.AssertExpectationsForObjects(tt)
 			test.CtyTestDiff(got, c.dirName, provider, deserializer, shouldUpdate, t)

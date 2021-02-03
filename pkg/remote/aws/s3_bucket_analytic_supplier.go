@@ -3,7 +3,7 @@ package aws
 import (
 	"fmt"
 
-	"github.com/cloudskiff/driftctl/pkg/parallel"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
@@ -24,8 +24,13 @@ type S3BucketAnalyticSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewS3BucketAnalyticSupplier(runner *parallel.ParallelRunner, factory AwsClientFactoryInterface) *S3BucketAnalyticSupplier {
-	return &S3BucketAnalyticSupplier{terraform.Provider(terraform.AWS), awsdeserializer.NewS3BucketAnalyticDeserializer(), factory, terraform.NewParallelResourceReader(runner)}
+func NewS3BucketAnalyticSupplier(provider *TerraformProvider, factory AwsClientFactoryInterface) *S3BucketAnalyticSupplier {
+	return &S3BucketAnalyticSupplier{
+		provider,
+		awsdeserializer.NewS3BucketAnalyticDeserializer(),
+		factory,
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
+	}
 }
 
 func (s *S3BucketAnalyticSupplier) Resources() ([]resource.Resource, error) {
@@ -34,7 +39,7 @@ func (s *S3BucketAnalyticSupplier) Resources() ([]resource.Resource, error) {
 	client := s.factory.GetS3Client(nil)
 	response, err := client.ListBuckets(input)
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, aws.AwsS3BucketAnalyticsConfigurationResourceType, aws.AwsS3BucketResourceType)
 	}
 
 	for _, bucket := range response.Buckets {
@@ -47,7 +52,7 @@ func (s *S3BucketAnalyticSupplier) Resources() ([]resource.Resource, error) {
 			continue
 		}
 		if err := s.listBucketAnalyticConfiguration(*bucket.Name, region); err != nil {
-			return nil, err
+			return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsS3BucketAnalyticsConfigurationResourceType)
 		}
 	}
 	ctyVals, err := s.runner.Wait()
