@@ -15,7 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/sns"
 )
 
-func Test_snsRepositoryImpl_ListAllTopics(t *testing.T) {
+func Test_snsRepository_ListAllTopics(t *testing.T) {
 
 	tests := []struct {
 		name    string
@@ -60,7 +60,7 @@ func Test_snsRepositoryImpl_ListAllTopics(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			client := &mocks.SNSClient{}
 			tt.mocks(client)
-			r := &snsRepositoryImpl{
+			r := &snsRepository{
 				client: client,
 			}
 			got, err := r.ListAllTopics()

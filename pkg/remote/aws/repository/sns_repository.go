@@ -10,17 +10,17 @@ type SNSRepository interface {
 	ListAllTopics() ([]*sns.Topic, error)
 }
 
-type snsRepositoryImpl struct {
+type snsRepository struct {
 	client snsiface.SNSAPI
 }
 
-func NewSNSClient(session *session.Session) *snsRepositoryImpl {
-	return &snsRepositoryImpl{
+func NewSNSClient(session *session.Session) *snsRepository {
+	return &snsRepository{
 		sns.New(session),
 	}
 }
 
-func (r *snsRepositoryImpl) ListAllTopics() ([]*sns.Topic, error) {
+func (r *snsRepository) ListAllTopics() ([]*sns.Topic, error) {
 	var topics []*sns.Topic
 	input := &sns.ListTopicsInput{}
 	err := r.client.ListTopicsPages(input, func(res *sns.ListTopicsOutput, lastPage bool) bool {
