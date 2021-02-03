@@ -34,7 +34,7 @@ coverage: test
 
 .PHONY: acc
 acc:
-	DRIFTCTL_ACC=true $(GOTEST) --format testname --junitfile unit-tests-acc.xml -- -coverprofile=cover-acc.out -coverpkg=./pkg/... -run=TestAcc_ ./pkg/resource/...
+	DRIFTCTL_ACC=true $(GOTEST) --format testname --junitfile unit-tests-acc.xml -- -coverprofile=cover-acc.out -test.timeout 1h -coverpkg=./pkg/... -run=TestAcc_ ./pkg/resource/...
 
 .PHONY: mocks
 mocks: deps
@@ -54,7 +54,7 @@ clean:
 .PHONY: lint
 lint:
 	@which golangci-lint > /dev/null 2>&1 || (curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | bash -s -- -b $(GOBINPATH) v1.31.0)
-	golangci-lint run
+	golangci-lint run --timeout=2m
 
 .PHONY: deps
 deps:

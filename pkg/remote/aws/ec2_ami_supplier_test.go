@@ -19,8 +19,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
 	"github.com/cloudskiff/driftctl/test/mocks"
-
-	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
 func TestEC2AmiSupplier_Resources(t *testing.T) {
@@ -52,18 +50,22 @@ func TestEC2AmiSupplier_Resources(t *testing.T) {
 	}
 	for _, tt := range tests {
 		shouldUpdate := tt.dirName == *goldenfile.Update
+
+		providerLibrary := terraform.NewProviderLibrary()
+		supplierLibrary := resource.NewSupplierLibrary()
+
 		if shouldUpdate {
 			provider, err := NewTerraFormProvider()
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			terraform.AddProvider(terraform.AWS, provider)
-			resource.AddSupplier(NewEC2AmiSupplier(provider.Runner(), ec2.New(provider.session)))
+			providerLibrary.AddProvider(terraform.AWS, provider)
+			supplierLibrary.AddSupplier(NewEC2AmiSupplier(provider))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
-			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewEC2AmiDeserializer()
 			client := mocks.NewMockAWSEC2AmiClient(tt.amiIDs)
 			if tt.listError != nil {

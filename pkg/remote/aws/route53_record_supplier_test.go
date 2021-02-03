@@ -248,17 +248,21 @@ func TestRoute53RecordSupplier_Resources(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.test, func(t *testing.T) {
 			shouldUpdate := tt.dirName == *goldenfile.Update
+
+			providerLibrary := terraform.NewProviderLibrary()
+			supplierLibrary := resource.NewSupplierLibrary()
+
 			if shouldUpdate {
 				provider, err := NewTerraFormProvider()
 				if err != nil {
 					t.Fatal(err)
 				}
 
-				terraform.AddProvider(terraform.AWS, provider)
-				resource.AddSupplier(NewRoute53RecordSupplier(provider.Runner(), route53.New(provider.session)))
+				providerLibrary.AddProvider(terraform.AWS, provider)
+				supplierLibrary.AddSupplier(NewRoute53RecordSupplier(provider))
 			}
 
-			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewRoute53RecordDeserializer()
 			client := mocks.NewMockAWSRoute53RecordClient(tt.zonesPages, tt.recordsPages, tt.listError)
 			s := &Route53RecordSupplier{

@@ -4,9 +4,6 @@ import (
 	"strings"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-
-	"github.com/cloudskiff/driftctl/pkg/parallel"
-
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
@@ -28,13 +25,12 @@ type Route53RecordSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewRoute53RecordSupplier(runner *parallel.ParallelRunner, client route53iface.Route53API) *Route53RecordSupplier {
+func NewRoute53RecordSupplier(provider *TerraformProvider) *Route53RecordSupplier {
 	return &Route53RecordSupplier{
-		terraform.Provider(terraform.AWS),
+		provider,
 		awsdeserializer.NewRoute53RecordDeserializer(),
-		client,
-		terraform.NewParallelResourceReader(runner),
-	}
+		route53.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner())}
 }
 
 func (s Route53RecordSupplier) Resources() ([]resource.Resource, error) {

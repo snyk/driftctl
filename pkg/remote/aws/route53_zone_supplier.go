@@ -5,8 +5,6 @@ import (
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/cloudskiff/driftctl/pkg/parallel"
-
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -26,12 +24,12 @@ type Route53ZoneSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewRoute53ZoneSupplier(runner *parallel.ParallelRunner, client route53iface.Route53API) *Route53ZoneSupplier {
+func NewRoute53ZoneSupplier(provider *TerraformProvider) *Route53ZoneSupplier {
 	return &Route53ZoneSupplier{
-		terraform.Provider(terraform.AWS),
+		provider,
 		awsdeserializer.NewRoute53ZoneDeserializer(),
-		client,
-		terraform.NewParallelResourceReader(runner),
+		route53.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 

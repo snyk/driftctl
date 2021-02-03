@@ -105,19 +105,23 @@ func TestRoute53ZoneSupplier_Resources(t *testing.T) {
 	}
 	for _, tt := range tests {
 		shouldUpdate := tt.dirName == *goldenfile.Update
+
+		providerLibrary := terraform.NewProviderLibrary()
+		supplierLibrary := resource.NewSupplierLibrary()
+
 		if shouldUpdate {
 			provider, err := NewTerraFormProvider()
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			terraform.AddProvider(terraform.AWS, provider)
-			resource.AddSupplier(NewRoute53ZoneSupplier(provider.Runner(), route53.New(provider.session)))
+			providerLibrary.AddProvider(terraform.AWS, provider)
+			supplierLibrary.AddSupplier(NewRoute53ZoneSupplier(provider))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
 			deserializer := awsdeserializer.NewRoute53ZoneDeserializer()
-			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			client := mocks.NewMockAWSRoute53ZoneClient(tt.zonesPages, tt.listError)
 			s := &Route53ZoneSupplier{
 				provider,

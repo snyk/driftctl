@@ -37,6 +37,12 @@ func (r *DriftIgnore) readIgnoreFile() error {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
+		if line == "" || strings.HasPrefix(line, "#") {
+			logrus.WithFields(logrus.Fields{
+				"line": line,
+			}).Debug("Skipped comment or empty line")
+			continue
+		}
 		typeVal := readDriftIgnoreLine(line)
 		nbArgs := len(typeVal)
 		if nbArgs < 2 {

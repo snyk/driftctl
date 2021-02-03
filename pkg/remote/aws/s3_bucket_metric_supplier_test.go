@@ -104,6 +104,10 @@ func TestS3BucketMetricSupplier_Resources(t *testing.T) {
 	}
 	for _, tt := range tests {
 		shouldUpdate := tt.dirName == *goldenfile.Update
+
+		providerLibrary := terraform.NewProviderLibrary()
+		supplierLibrary := resource.NewSupplierLibrary()
+
 		if shouldUpdate {
 			provider, err := NewTerraFormProvider()
 			if err != nil {
@@ -112,8 +116,8 @@ func TestS3BucketMetricSupplier_Resources(t *testing.T) {
 
 			factory := AwsClientFactory{config: provider.session}
 
-			terraform.AddProvider(terraform.AWS, provider)
-			resource.AddSupplier(NewS3BucketMetricSupplier(provider.Runner().SubRunner(), factory))
+			providerLibrary.AddProvider(terraform.AWS, provider)
+			supplierLibrary.AddSupplier(NewS3BucketMetricSupplier(provider, factory))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
@@ -121,7 +125,7 @@ func TestS3BucketMetricSupplier_Resources(t *testing.T) {
 			mock := mocks.NewMockAWSS3Client(tt.bucketsIDs, nil, nil, tt.metricsIDs, tt.bucketLocation, tt.listError)
 			factory := mocks.NewMockAwsClientFactory(mock)
 
-			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, terraform.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewS3BucketMetricDeserializer()
 			s := &S3BucketMetricSupplier{
 				provider,

@@ -3,7 +3,6 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
-	"github.com/cloudskiff/driftctl/pkg/parallel"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
@@ -23,12 +22,12 @@ type IamAccessKeySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamAccessKeySupplier(runner *parallel.ParallelRunner, client iamiface.IAMAPI) *IamAccessKeySupplier {
+func NewIamAccessKeySupplier(provider *TerraformProvider) *IamAccessKeySupplier {
 	return &IamAccessKeySupplier{
-		terraform.Provider(terraform.AWS),
+		provider,
 		awsdeserializer.NewIamAccessKeyDeserializer(),
-		client,
-		terraform.NewParallelResourceReader(runner),
+		iam.New(provider.session),
+		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
