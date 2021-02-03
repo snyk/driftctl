@@ -4,13 +4,11 @@ import (
 	"context"
 	"testing"
 
+	awssdk "github.com/aws/aws-sdk-go/aws"
+
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-
-	"github.com/aws/aws-sdk-go/service/sqs"
-
-	awssdk "github.com/aws/aws-sdk-go/aws"
 
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
@@ -29,49 +27,33 @@ func TestSqsQueueSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeSQS)
+		mocks   func(client *mocks.SQSRepository)
 		err     error
 	}{
 		{
 			test:    "no sqs queues",
 			dirName: "sqs_queue_empty",
-			mocks: func(client *mocks.FakeSQS) {
-				client.On("ListQueuesPages",
-					&sqs.ListQueuesInput{},
-					mock.MatchedBy(func(callback func(res *sqs.ListQueuesOutput, lastPage bool) bool) bool {
-						callback(&sqs.ListQueuesOutput{}, true)
-						return true
-					})).Return(nil)
+			mocks: func(client *mocks.SQSRepository) {
+				client.On("ListAllQueues").Return([]*string{}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "multiple sqs queues",
 			dirName: "sqs_queue_multiple",
-			mocks: func(client *mocks.FakeSQS) {
-				client.On("ListQueuesPages",
-					&sqs.ListQueuesInput{},
-					mock.MatchedBy(func(callback func(res *sqs.ListQueuesOutput, lastPage bool) bool) bool {
-						callback(&sqs.ListQueuesOutput{
-							QueueUrls: []*string{
-								awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo"),
-								awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/foo"),
-							},
-						}, true)
-						return true
-					})).Return(nil)
+			mocks: func(client *mocks.SQSRepository) {
+				client.On("ListAllQueues").Return([]*string{
+					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo"),
+					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/foo"),
+				}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "cannot list sqs queues",
 			dirName: "sqs_queue_empty",
-			mocks: func(client *mocks.FakeSQS) {
-				client.On(
-					"ListQueuesPages",
-					&sqs.ListQueuesInput{},
-					mock.Anything,
-				).Once().Return(awserr.NewRequestFailure(nil, 403, ""))
+			mocks: func(client *mocks.SQSRepository) {
+				client.On("ListAllQueues").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSqsQueueResourceType),
 		},
@@ -92,7 +74,7 @@ func TestSqsQueueSupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeSQS := mocks.FakeSQS{}
+			fakeSQS := mocks.SQSRepository{}
 			c.mocks(&fakeSQS)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			sqsQueueDeserializer := awsdeserializer.NewSqsQueueDeserializer()

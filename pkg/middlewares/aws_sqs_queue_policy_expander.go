@@ -26,6 +26,10 @@ func (m AwsSqsQueuePolicyExpander) Execute(_, resourcesFromState *[]resource.Res
 		queue, _ := res.(*aws.AwsSqsQueue)
 		newList = append(newList, res)
 
+		if queue.Policy == nil {
+			continue
+		}
+
 		if m.hasPolicyAttached(queue, resourcesFromState) {
 			queue.Policy = nil
 			continue
@@ -41,10 +45,6 @@ func (m AwsSqsQueuePolicyExpander) Execute(_, resourcesFromState *[]resource.Res
 }
 
 func (m *AwsSqsQueuePolicyExpander) handlePolicy(queue *aws.AwsSqsQueue, results *[]resource.Resource) error {
-	if queue.Policy == nil || *queue.Policy == "" {
-		return nil
-	}
-
 	newPolicy := &aws.AwsSqsQueuePolicy{
 		Id:       queue.Id,
 		QueueUrl: awssdk.String(queue.Id),

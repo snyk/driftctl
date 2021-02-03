@@ -1,8 +1,7 @@
 package aws
 
 import (
-	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -16,7 +15,7 @@ import (
 type SqsQueuePolicySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       sqsiface.SQSAPI
+	client       repository.SQSRepository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -24,13 +23,13 @@ func NewSqsQueuePolicySupplier(provider *TerraformProvider) *SqsQueuePolicySuppl
 	return &SqsQueuePolicySupplier{
 		provider,
 		awsdeserializer.NewSqsQueuePolicyDeserializer(),
-		sqs.New(provider.session),
+		repository.NewSQSClient(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s SqsQueuePolicySupplier) Resources() ([]resource.Resource, error) {
-	queues, err := listSqsQueues(s.client)
+	queues, err := s.client.ListAllQueues()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, aws.AwsSqsQueuePolicyResourceType, aws.AwsSqsQueueResourceType)
 	}
@@ -50,11 +49,11 @@ func (s SqsQueuePolicySupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(resources)
 }
 
-func (s SqsQueuePolicySupplier) readSqsQueuePolicy(queue string) (cty.Value, error) {
+func (s SqsQueuePolicySupplier) readSqsQueuePolicy(queueURL string) (cty.Value, error) {
 	var Ty resource.ResourceType = aws.AwsSqsQueuePolicyResourceType
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: Ty,
-		ID: queue,
+		ID: queueURL,
 	})
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
