@@ -85,6 +85,14 @@ func (r *ScanResult) AssertDriftCountTotal(count int) {
 	r.Equal(count, driftCount)
 }
 
+func (r *ScanResult) AssertDeletedCount(count int) {
+	r.Equal(count, len(r.Deleted()))
+}
+
+func (r *ScanResult) AssertManagedCount(count int) {
+	r.Equal(count, len(r.Managed()))
+}
+
 func (r ScanResult) AssertInfrastructureIsInSync() {
 	r.Equal(
 		true,
