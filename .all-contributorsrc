@@ -66,6 +66,18 @@
         "test",
         "tool"
       ]
+    },
+    {
+      "login": "emahe22",
+      "name": "Eric MAHE",
+      "avatar_url": "https://avatars.githubusercontent.com/u/22610513?v=4",
+      "profile": "https://github.com/emahe22",
+      "contributions": [
+        "doc",
+        "ideas",
+        "business",
+        "fundingFinding"
+      ]
     }
   ]
 }
