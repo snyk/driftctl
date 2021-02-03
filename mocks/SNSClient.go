@@ -1108,29 +1108,6 @@ func (_m *SNSClient) GetTopicAttributesWithContext(_a0 context.Context, _a1 *sns
 	return r0, r1
 }
 
-// ListAllTopics provides a mock function with given fields:
-func (_m *SNSClient) ListAllTopics() ([]*sns.Topic, error) {
-	ret := _m.Called()
-
-	var r0 []*sns.Topic
-	if rf, ok := ret.Get(0).(func() []*sns.Topic); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*sns.Topic)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // ListEndpointsByPlatformApplication provides a mock function with given fields: _a0
 func (_m *SNSClient) ListEndpointsByPlatformApplication(_a0 *sns.ListEndpointsByPlatformApplicationInput) (*sns.ListEndpointsByPlatformApplicationOutput, error) {
 	ret := _m.Called(_a0)

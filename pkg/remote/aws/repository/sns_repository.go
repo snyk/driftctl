@@ -1,4 +1,4 @@
-package client
+package repository
 
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -6,25 +6,24 @@ import (
 	"github.com/aws/aws-sdk-go/service/sns/snsiface"
 )
 
-type SNSClient interface {
-	snsiface.SNSAPI
+type SNSRepository interface {
 	ListAllTopics() ([]*sns.Topic, error)
 }
 
-type SNSClientImpl struct {
-	snsiface.SNSAPI
+type snsRepositoryImpl struct {
+	client snsiface.SNSAPI
 }
 
-func NewSNSClient(session *session.Session) *SNSClientImpl {
-	return &SNSClientImpl{
+func NewSNSClient(session *session.Session) *snsRepositoryImpl {
+	return &snsRepositoryImpl{
 		sns.New(session),
 	}
 }
 
-func (c *SNSClientImpl) ListAllTopics() ([]*sns.Topic, error) {
+func (r *snsRepositoryImpl) ListAllTopics() ([]*sns.Topic, error) {
 	var topics []*sns.Topic
 	input := &sns.ListTopicsInput{}
-	err := c.ListTopicsPages(input, func(res *sns.ListTopicsOutput, lastPage bool) bool {
+	err := r.client.ListTopicsPages(input, func(res *sns.ListTopicsOutput, lastPage bool) bool {
 		topics = append(topics, res.Topics...)
 		return !lastPage
 	})

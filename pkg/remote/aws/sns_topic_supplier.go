@@ -2,8 +2,8 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go/service/sns"
-	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
-	error2 "github.com/cloudskiff/driftctl/pkg/remote/error"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 
@@ -17,7 +17,7 @@ import (
 type SNSTopicSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       client.SNSClient
+	client       repository.SNSRepository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -25,7 +25,7 @@ func NewSNSTopicSupplier(provider *TerraformProvider) *SNSTopicSupplier {
 	return &SNSTopicSupplier{
 		provider,
 		awsdeserializer.NewSNSTopicDeserializer(),
-		client.NewSNSClient(provider.session),
+		repository.NewSNSClient(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
@@ -33,7 +33,7 @@ func NewSNSTopicSupplier(provider *TerraformProvider) *SNSTopicSupplier {
 func (s SNSTopicSupplier) Resources() ([]resource.Resource, error) {
 	topics, err := s.client.ListAllTopics()
 	if err != nil {
-		return nil, error2.NewResourceEnumerationError(err, aws.AwsSnsTopicResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsSnsTopicResourceType)
 	}
 
 	for _, topic := range topics {

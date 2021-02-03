@@ -34,13 +34,13 @@ func TestSNSTopicSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.SNSClient)
+		mocks   func(client *mocks.SNSRepository)
 		err     error
 	}{
 		{
 			test:    "no SNS Topic",
 			dirName: "sns_topic_empty",
-			mocks: func(client *mocks.SNSClient) {
+			mocks: func(client *mocks.SNSRepository) {
 				client.On("ListAllTopics").Return([]*sns.Topic{}, nil)
 			},
 			err: nil,
@@ -48,7 +48,7 @@ func TestSNSTopicSupplier_Resources(t *testing.T) {
 		{
 			test:    "Multiple SNSTopic",
 			dirName: "sns_topic_multiple",
-			mocks: func(client *mocks.SNSClient) {
+			mocks: func(client *mocks.SNSRepository) {
 				client.On("ListAllTopics").Return([]*sns.Topic{
 					{TopicArn: aws.String("arn:aws:sns:eu-west-3:526954929923:user-updates-topic")},
 					{TopicArn: aws.String("arn:aws:sns:eu-west-3:526954929923:user-updates-topic2")},
@@ -60,7 +60,7 @@ func TestSNSTopicSupplier_Resources(t *testing.T) {
 		{
 			test:    "cannot list SNSTopic",
 			dirName: "sns_topic_empty",
-			mocks: func(client *mocks.SNSClient) {
+			mocks: func(client *mocks.SNSRepository) {
 				client.On("ListAllTopics").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSnsTopicResourceType),
@@ -83,7 +83,7 @@ func TestSNSTopicSupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeClient := mocks.SNSClient{}
+			fakeClient := mocks.SNSRepository{}
 			c.mocks(&fakeClient)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			SNSTopicDeserializer := awsdeserializer.NewSNSTopicDeserializer()
