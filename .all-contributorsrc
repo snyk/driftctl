@@ -1,0 +1,14 @@
+{
+  "files": [
+    "CONTRIBUTORS.md"
+  ],
+  "imageSize": 80,
+  "contributorsPerLine": 8,
+  "commit": false,
+  "projectName": "driftctl",
+  "projectOwner": "cloudskiff",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true,
+  "contributors": []
+}
