@@ -78,6 +78,18 @@
         "business",
         "fundingFinding"
       ]
+    },
+    {
+      "login": "GeraldC13",
+      "name": "GeraldC",
+      "avatar_url": "https://avatars.githubusercontent.com/u/39477124?v=4",
+      "profile": "http://driftctl.com/",
+      "contributions": [
+        "doc",
+        "ideas",
+        "business",
+        "content"
+      ]
     }
   ]
 }
