@@ -10,5 +10,18 @@
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true,
-  "contributors": []
+  "contributors": [
+    {
+      "login": "sjourdan",
+      "name": "Stephane Jourdan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/419121?v=4",
+      "profile": "https://github.com/sjourdan",
+      "contributions": [
+        "doc",
+        "ideas",
+        "talk",
+        "question"
+      ]
+    }
+  ]
 }
