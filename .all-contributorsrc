@@ -90,6 +90,15 @@
         "business",
         "content"
       ]
+    },
+    {
+      "login": "bertux",
+      "name": "Bertrand Juglas",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5703?v=4",
+      "profile": "http://b.juglas.name",
+      "contributions": [
+        "doc"
+      ]
     }
   ]
 }
