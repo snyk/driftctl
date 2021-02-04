@@ -2,6 +2,9 @@ package aws_test
 
 import (
 	"testing"
+	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	awsresources "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -23,6 +26,22 @@ func TestAcc_AwsSqsQueue(t *testing.T) {
 			{
 				Env: map[string]string{
 					"AWS_REGION": "us-east-1",
+				},
+				PreExec: func() {
+					err := acceptance.RetryFor(60*time.Second, func(doneCh chan struct{}) error {
+						return sqs.New(awsutils.Session()).ListQueuesPages(&sqs.ListQueuesInput{},
+							func(resp *sqs.ListQueuesOutput, lastPage bool) bool {
+								logrus.Debugf("Retrieved %d SQS queues", len(resp.QueueUrls))
+								if len(resp.QueueUrls) == 2 {
+									doneCh <- struct{}{}
+								}
+								return !lastPage
+							},
+						)
+					})
+					if err != nil {
+						t.Fatal("Timeout while fetching SQS queues")
+					}
 				},
 				Check: func(result *acceptance.ScanResult, stdout string, err error) {
 					if err != nil {

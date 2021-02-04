@@ -2,6 +2,7 @@ package acceptance
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,6 +12,7 @@ import (
 	"path"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	cmderrors "github.com/cloudskiff/driftctl/pkg/cmd/errors"
@@ -293,5 +295,36 @@ func Run(t *testing.T, c AccTestCase) {
 	}
 	if c.OnEnd != nil {
 		c.OnEnd()
+	}
+}
+
+func RetryFor(timeout time.Duration, f func(c chan struct{}) error) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	doneCh := make(chan struct{}, 1)
+	errCh := make(chan error, 1)
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				if err := f(doneCh); err != nil {
+					errCh <- err
+					return
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
+	}()
+
+	select {
+	case <-doneCh:
+		return nil
+	case err := <-errCh:
+		return err
+	case <-ctx.Done():
+		return ctx.Err()
 	}
 }
