@@ -22,6 +22,7 @@ func (s *SqsQueueDeserializer) HandledType() resource.ResourceType {
 func (s SqsQueueDeserializer) Deserialize(rawList []cty.Value) ([]resource.Resource, error) {
 	resources := make([]resource.Resource, 0)
 	for _, rawResource := range rawList {
+		rawResource := rawResource
 		resource, err := decodeSqsQueue(&rawResource)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{

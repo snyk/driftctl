@@ -24,6 +24,7 @@ func (s *VPCDeserializer) HandledType() resource.ResourceType {
 func (s VPCDeserializer) Deserialize(rawList []cty.Value) ([]resource.Resource, error) {
 	resources := make([]resource.Resource, 0)
 	for _, rawResource := range rawList {
+		rawResource := rawResource
 		resource, err := decodeVPC(&rawResource)
 		if err != nil {
 			logrus.Warnf("Error when deserializing resource %+v : %+v", rawResource, err)
