@@ -6,6 +6,10 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
+type AlerterInterface interface {
+	SendAlert(key string, alert Alert)
+}
+
 type Alerter struct {
 	alerts   Alerts
 	alertsCh chan Alerts
