@@ -25,7 +25,7 @@ func TestAccTestCase_resolveTerraformEnv(t *testing.T) {
 	testCase := AccTestCase{}
 	env := testCase.resolveTerraformEnv()
 	expected := map[string]string{
-		"TEST_VAR": "foobar",
+		"TEST_VAR":   "foobar",
 		"TEST_VAR_2": "barfoo",
 		"TEST_VAR_3": "",
 		"TEST_VAR_4": "",
