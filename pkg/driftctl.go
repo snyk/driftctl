@@ -48,6 +48,8 @@ func (d DriftCTL) Run() *analyser.Analysis {
 		middlewares.NewAwsDefaultRoute(),
 		middlewares.NewAwsNatGatewayEipAssoc(),
 		middlewares.NewAwsBucketPolicyExpander(),
+		middlewares.NewAwsSqsQueuePolicyExpander(),
+		middlewares.NewAwsDefaultSqsQueuePolicy(),
 	)
 
 	logrus.Debug("Ready to run middlewares")

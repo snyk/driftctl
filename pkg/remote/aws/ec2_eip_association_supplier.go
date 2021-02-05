@@ -39,6 +39,7 @@ func (s EC2EipAssociationSupplier) Resources() ([]resource.Resource, error) {
 	results := make([]cty.Value, 0)
 	if len(associationIds) > 0 {
 		for _, assocId := range associationIds {
+			assocId := assocId
 			s.runner.Run(func() (cty.Value, error) {
 				return s.readEIPAssociation(assocId)
 			})

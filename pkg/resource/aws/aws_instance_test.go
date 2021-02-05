@@ -76,6 +76,7 @@ func TestAcc_AwsInstance_WithBlockDevices(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
+					result.Equal(0, result.Summary().TotalDeleted)
 					result.AssertResourceHasDrift(
 						mutatedInstanceId,
 						awsresources.AwsInstanceResourceType,

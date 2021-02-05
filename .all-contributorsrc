@@ -1,0 +1,123 @@
+{
+  "files": [
+    "CONTRIBUTORS.md"
+  ],
+  "imageSize": 80,
+  "contributorsPerLine": 8,
+  "commit": false,
+  "projectName": "driftctl",
+  "projectOwner": "cloudskiff",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true,
+  "contributors": [
+    {
+      "login": "sjourdan",
+      "name": "Stephane Jourdan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/419121?v=4",
+      "profile": "https://github.com/sjourdan",
+      "contributions": [
+        "doc",
+        "ideas",
+        "talk",
+        "question"
+      ]
+    },
+    {
+      "login": "eliecharra",
+      "name": "Elie",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6154987?v=4",
+      "profile": "https://www.elie.ski",
+      "contributions": [
+        "doc",
+        "code",
+        "bug",
+        "review",
+        "maintenance",
+        "test",
+        "infra"
+      ]
+    },
+    {
+      "login": "moadibfr",
+      "name": "Martin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4931174?v=4",
+      "profile": "http://moadib.net",
+      "contributions": [
+        "doc",
+        "code",
+        "bug",
+        "review",
+        "maintenance",
+        "test"
+      ]
+    },
+    {
+      "login": "wbeuil",
+      "name": "William BEUIL",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8110579?v=4",
+      "profile": "http://wbeuil.com",
+      "contributions": [
+        "doc",
+        "code",
+        "bug",
+        "review",
+        "maintenance",
+        "test",
+        "tool"
+      ]
+    },
+    {
+      "login": "emahe22",
+      "name": "Eric MAHE",
+      "avatar_url": "https://avatars.githubusercontent.com/u/22610513?v=4",
+      "profile": "https://github.com/emahe22",
+      "contributions": [
+        "doc",
+        "ideas",
+        "business",
+        "fundingFinding"
+      ]
+    },
+    {
+      "login": "GeraldC13",
+      "name": "GeraldC",
+      "avatar_url": "https://avatars.githubusercontent.com/u/39477124?v=4",
+      "profile": "http://driftctl.com/",
+      "contributions": [
+        "doc",
+        "ideas",
+        "business",
+        "content"
+      ]
+    },
+    {
+      "login": "bertux",
+      "name": "Bertrand Juglas",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5703?v=4",
+      "profile": "http://b.juglas.name",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "sshota0809",
+      "name": "Suzuki Shota",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8736380?v=4",
+      "profile": "https://github.com/sshota0809",
+      "contributions": [
+        "code",
+        "bug"
+      ]
+    },
+    {
+      "login": "sfenman",
+      "name": "sfenman",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43748066?v=4",
+      "profile": "https://github.com/sfenman",
+      "contributions": [
+        "code"
+      ]
+    }
+  ]
+}

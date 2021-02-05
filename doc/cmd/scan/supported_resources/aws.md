@@ -126,7 +126,13 @@ As AWS documentation recommends, the below policy is granting only the permissio
                 "s3:GetMetricsConfiguration",
                 "s3:GetReplicationConfiguration",
                 "s3:ListAllMyBuckets",
-                "s3:ListBucket"
+                "s3:ListBucket",
+                "sqs:GetQueueAttributes",
+                "sqs:ListQueueTags",
+                "sqs:ListQueues"
+                "sns:ListTopics",
+                "sns:GetTopicAttributes",
+                "sns:ListTagsForResource"
             ]
         }
     ]
@@ -237,3 +243,15 @@ As AWS documentation recommends, the below policy is granting only the permissio
 - [x] aws_route_table_association
 - [x] aws_nat_gateway
 - [x] aws_internet_gateway
+
+## SQS
+
+- [x] aws_sqs_queue
+- [x] aws_sqs_queue_policy
+
+## SNS
+- [x] aws_sns_topic
+- [ ] aws_sns_topic_policy
+- [ ] aws_sns_topic_subscription
+- [ ] aws_sns_platform_application
+- [ ] aws_sns_sms_preferences
