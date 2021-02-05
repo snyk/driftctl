@@ -22,7 +22,7 @@ driftctl scan \
 
 ### S3
 
-driftctl needs read-only access so you could use the policy below to ensure minimal access to your state file
+driftctl needs read-only access so you could use the policy below to ensure minimal access to your state file or use the terraform file in the [readonly.tf](readonly.tf/) folder.
 
 ```json
 {

@@ -15,6 +15,8 @@ source_profile = user # profile to assume the role
 region = eu-west-3
 ```
 
+You can use the terraform file in the [readonly.tf](../readonly.tf/) folder to create this IAM role on your AWS account.
+
 You can now use driftctl by overriding the profile setting.
 
 ```bash
@@ -54,6 +56,8 @@ $ aws cloudformation update-stack --stack-name DRIFTCTL_STACK_NAME --template-ur
 Driftctl needs access to your cloud provider account so that it can list resources on your behalf.
 
 As AWS documentation recommends, the below policy is granting only the permissions required to perform driftctl's tasks.
+
+You can use the terraform file in the [readonly.tf](../readonly.tf/) folder to create it on your AWS account.
 
 ```
 {
