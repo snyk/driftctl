@@ -50,6 +50,7 @@ func (d DriftCTL) Run() *analyser.Analysis {
 		middlewares.NewAwsBucketPolicyExpander(),
 		middlewares.NewAwsSqsQueuePolicyExpander(),
 		middlewares.NewAwsDefaultSqsQueuePolicy(),
+		middlewares.NewAwsSNSTopicPolicyExpander(),
 	)
 
 	logrus.Debug("Ready to run middlewares")

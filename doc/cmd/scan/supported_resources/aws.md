@@ -251,7 +251,7 @@ As AWS documentation recommends, the below policy is granting only the permissio
 
 ## SNS
 - [x] aws_sns_topic
-- [ ] aws_sns_topic_policy
+- [x] aws_sns_topic_policy
 - [ ] aws_sns_topic_subscription
 - [ ] aws_sns_platform_application
 - [ ] aws_sns_sms_preferences
