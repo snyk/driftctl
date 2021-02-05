@@ -77,6 +77,7 @@ func TestTerraformStateReader_Resources(t *testing.T) {
 		{name: "SQS queue", dirName: "sqs_queue", wantErr: false},
 		{name: "SQS queue policy", dirName: "sqs_queue_policy", wantErr: false},
 		{name: "SNS Topic", dirName: "sns_topic", wantErr: false},
+		{name: "SNS Topic Policy", dirName: "sns_topic_policy", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

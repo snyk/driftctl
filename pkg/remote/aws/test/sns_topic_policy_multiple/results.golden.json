@@ -1,0 +1,12 @@
+[
+ {
+  "arn": "arn:aws:sns:us-east-1:526954929923:my-topic-with-policy2",
+  "id": "arn:aws:sns:us-east-1:526954929923:my-topic-with-policy2",
+  "policy": "{\"Version\":\"2012-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"__default_statement_ID\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"SNS:Subscribe\",\"SNS:SetTopicAttributes\",\"SNS:RemovePermission\",\"SNS:Receive\",\"SNS:Publish\",\"SNS:ListSubscriptionsByTopic\",\"SNS:GetTopicAttributes\",\"SNS:DeleteTopic\",\"SNS:AddPermission\"],\"Resource\":\"arn:aws:sns:us-east-1:526954929923:my-topic-with-policy\",\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":[]}}}]}"
+ },
+ {
+  "arn": "arn:aws:sns:us-east-1:526954929923:my-topic-with-policy",
+  "id": "arn:aws:sns:us-east-1:526954929923:my-topic-with-policy",
+  "policy": "{\"Version\":\"2012-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"__default_statement_ID\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"SNS:Subscribe\",\"SNS:SetTopicAttributes\",\"SNS:RemovePermission\",\"SNS:Receive\",\"SNS:Publish\",\"SNS:ListSubscriptionsByTopic\",\"SNS:GetTopicAttributes\",\"SNS:DeleteTopic\",\"SNS:AddPermission\"],\"Resource\":\"arn:aws:sns:us-east-1:526954929923:my-topic-with-policy\",\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":[]}}}]}"
+ }
+]
