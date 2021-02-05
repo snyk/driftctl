@@ -23,6 +23,7 @@ func (s DBInstanceDeserializer) HandledType() resource.ResourceType {
 func (s DBInstanceDeserializer) Deserialize(rawResourceList []cty.Value) ([]resource.Resource, error) {
 	resources := make([]resource.Resource, 0)
 	for _, raw := range rawResourceList {
+		raw := raw
 		res, err := decodeDBInstance(&raw)
 		if err != nil {
 			logrus.Warnf("error when deserializing aws_db_instance %+v : %+v", raw, err)

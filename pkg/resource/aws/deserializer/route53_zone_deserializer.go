@@ -24,6 +24,7 @@ func (s Route53ZoneDeserializer) HandledType() resource.ResourceType {
 func (s Route53ZoneDeserializer) Deserialize(zoneList []cty.Value) ([]resource.Resource, error) {
 	resources := make([]resource.Resource, 0)
 	for _, rawZone := range zoneList {
+		rawZone := rawZone
 		zone, err := decodeRoute53Zone(&rawZone)
 		if err != nil {
 			logrus.Warnf("error when reading zone %+v : %+v", rawZone, err)

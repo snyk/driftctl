@@ -24,6 +24,7 @@ func (s Route53RecordDeserializer) HandledType() resource.ResourceType {
 func (s Route53RecordDeserializer) Deserialize(recordList []cty.Value) ([]resource.Resource, error) {
 	resources := make([]resource.Resource, 0)
 	for _, rawResource := range recordList {
+		rawResource := rawResource
 		res, err := decodeRoute53Record(&rawResource)
 		if err != nil {
 			logrus.Warnf("Error when deserializing resource %+v : %+v", rawResource, err)

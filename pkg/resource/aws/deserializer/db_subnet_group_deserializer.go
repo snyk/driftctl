@@ -24,6 +24,7 @@ func (s *DBSubnetGroupDeserializer) HandledType() resource.ResourceType {
 func (s DBSubnetGroupDeserializer) Deserialize(recordList []cty.Value) ([]resource.Resource, error) {
 	resources := make([]resource.Resource, 0)
 	for _, rawResource := range recordList {
+		rawResource := rawResource
 		resource, err := decodeDBSubnetGroup(&rawResource)
 		if err != nil {
 			logrus.Warnf("Error when deserializing resource %+v : %+v", rawResource, err)

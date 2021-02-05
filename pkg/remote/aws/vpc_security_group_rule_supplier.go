@@ -167,6 +167,7 @@ func (s VPCSecurityGroupRuleSupplier) addSecurityGroupRule(ruleType string, rule
 	if sg.GroupName != nil && *sg.GroupName == "default" {
 		results := make([]resourceaws.AwsSecurityGroupRule, 0, len(rules))
 		for _, r := range rules {
+			r := r
 			if s.isDefaultIngress(&r) || s.isDefaultEgress(&r) {
 				continue
 			}

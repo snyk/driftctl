@@ -75,12 +75,14 @@ func listIamRolePolicies(client iamiface.IAMAPI, supplierType string) ([]string,
 
 	var resources []string
 	for _, role := range roles {
+		role := role
 		input := &iam.ListRolePoliciesInput{
 			RoleName: role.RoleName,
 		}
 
 		err := client.ListRolePoliciesPages(input, func(res *iam.ListRolePoliciesOutput, lastPage bool) bool {
 			for _, policy := range res.PolicyNames {
+				policy := policy
 				resources = append(
 					resources,
 					fmt.Sprintf(
