@@ -2,15 +2,16 @@ package acceptance
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	cmderrors "github.com/cloudskiff/driftctl/pkg/cmd/errors"
@@ -24,6 +25,9 @@ import (
 
 	"github.com/cloudskiff/driftctl/logger"
 	"github.com/cloudskiff/driftctl/pkg/cmd"
+
+	"github.com/hashicorp/terraform-exec/tfexec"
+	"github.com/hashicorp/terraform-exec/tfinstall"
 )
 
 type AccCheck struct {
@@ -41,6 +45,23 @@ type AccTestCase struct {
 	Checks            []AccCheck
 	tmpResultFilePath string
 	originalEnv       []string
+	tf                *tfexec.Terraform
+}
+
+func (c *AccTestCase) initTerraformExecutor() error {
+	execPath, err := tfinstall.LookPath().ExecPath(context.Background())
+	if err != nil {
+		return err
+	}
+	c.tf, err = tfexec.NewTerraform(c.Path, execPath)
+	if err != nil {
+		return err
+	}
+	env := c.resolveTerraformEnv()
+	if err := c.tf.SetEnv(env); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *AccTestCase) createResultFile(t *testing.T) error {
@@ -94,7 +115,7 @@ func (c *AccTestCase) getResult(t *testing.T) *ScanResult {
  * Retrieve env from os.Environ() but override every variable prefixed with ACC_
  * e.g. ACC_AWS_PROFILE will override AWS_PROFILE
  */
-func (c *AccTestCase) resolveTerraformEnv() []string {
+func (c *AccTestCase) resolveTerraformEnv() map[string]string {
 
 	environMap := make(map[string]string, len(os.Environ()))
 
@@ -112,24 +133,20 @@ func (c *AccTestCase) resolveTerraformEnv() []string {
 		}
 	}
 
-	results := make([]string, 0, len(environMap))
-	for k, v := range environMap {
-		results = append(results, fmt.Sprintf("%s=%s", k, v))
-	}
-
-	return results
+	return environMap
 }
 
 func (c *AccTestCase) terraformInit() error {
+	if err := c.initTerraformExecutor(); err != nil {
+		return err
+	}
 	_, err := os.Stat(path.Join(c.Path, ".terraform"))
 	if os.IsNotExist(err) {
 		logrus.Debug("Running terraform init ...")
-		cmd := exec.Command("terraform", "init", "-input=false")
-		cmd.Dir = c.Path
-		cmd.Env = c.resolveTerraformEnv()
-		out, err := cmd.CombinedOutput()
-		if err != nil {
-			return errors.Wrap(err, string(out))
+		stderr := new(bytes.Buffer)
+		c.tf.SetStderr(stderr)
+		if err := c.tf.Init(context.Background()); err != nil {
+			return errors.Wrap(err, stderr.String())
 		}
 		logrus.Debug("Terraform init done")
 	}
@@ -139,12 +156,10 @@ func (c *AccTestCase) terraformInit() error {
 
 func (c *AccTestCase) terraformApply() error {
 	logrus.Debug("Running terraform apply ...")
-	cmd := exec.Command("terraform", "apply", "-auto-approve")
-	cmd.Dir = c.Path
-	cmd.Env = c.resolveTerraformEnv()
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return errors.Wrap(err, string(out))
+	stderr := new(bytes.Buffer)
+	c.tf.SetStderr(stderr)
+	if err := c.tf.Apply(context.Background()); err != nil {
+		return errors.Wrap(err, stderr.String())
 	}
 	logrus.Debug("Terraform apply done")
 
@@ -153,12 +168,10 @@ func (c *AccTestCase) terraformApply() error {
 
 func (c *AccTestCase) terraformDestroy() error {
 	logrus.Debug("Running terraform destroy ...")
-	cmd := exec.Command("terraform", "destroy", "-auto-approve")
-	cmd.Dir = c.Path
-	cmd.Env = c.resolveTerraformEnv()
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return errors.Wrap(err, string(out))
+	stderr := new(bytes.Buffer)
+	c.tf.SetStderr(stderr)
+	if err := c.tf.Destroy(context.Background()); err != nil {
+		return errors.Wrap(err, stderr.String())
 	}
 	logrus.Debug("Terraform destroy done")
 
@@ -191,7 +204,12 @@ func runDriftCtlCmd(driftctlCmd *cmd.DriftctlCmd) (*cobra.Command, string, error
 
 func (c *AccTestCase) useTerraformEnv() {
 	c.originalEnv = os.Environ()
-	c.setEnv(c.resolveTerraformEnv())
+	environMap := c.resolveTerraformEnv()
+	env := make([]string, 0, len(environMap))
+	for k, v := range environMap {
+		env = append(env, fmt.Sprintf("%s=%s", k, v))
+	}
+	c.setEnv(env)
 }
 
 func (c *AccTestCase) restoreEnv() {
@@ -252,8 +270,6 @@ func Run(t *testing.T, c AccTestCase) {
 
 	logger.Init(logger.GetConfig())
 
-	driftctlCmd := cmd.NewDriftctlCmd(test.Build{})
-
 	err = c.createResultFile(t)
 	if err != nil {
 		t.Fatal(err)
@@ -268,18 +284,19 @@ func Run(t *testing.T, c AccTestCase) {
 	os.Args = c.Args
 
 	for _, check := range c.Checks {
+		driftctlCmd := cmd.NewDriftctlCmd(test.Build{})
 		if check.Check == nil {
 			t.Fatal("Check attribute must be defined")
-		}
-		if check.PreExec != nil {
-			c.useTerraformEnv()
-			check.PreExec()
-			c.restoreEnv()
 		}
 		if len(check.Env) > 0 {
 			for key, value := range check.Env {
 				os.Setenv(key, value)
 			}
+		}
+		if check.PreExec != nil {
+			c.useTerraformEnv()
+			check.PreExec()
+			c.restoreEnv()
 		}
 		_, out, cmdErr := runDriftCtlCmd(driftctlCmd)
 		if len(check.Env) > 0 {
@@ -294,5 +311,36 @@ func Run(t *testing.T, c AccTestCase) {
 	}
 	if c.OnEnd != nil {
 		c.OnEnd()
+	}
+}
+
+func RetryFor(timeout time.Duration, f func(c chan struct{}) error) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	doneCh := make(chan struct{}, 1)
+	errCh := make(chan error, 1)
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				if err := f(doneCh); err != nil {
+					errCh <- err
+					return
+				}
+				time.Sleep(1 * time.Second)
+			}
+		}
+	}()
+
+	select {
+	case <-doneCh:
+		return nil
+	case err := <-errCh:
+		return err
+	case <-ctx.Done():
+		return ctx.Err()
 	}
 }

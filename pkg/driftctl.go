@@ -15,12 +15,13 @@ import (
 type DriftCTL struct {
 	remoteSupplier resource.Supplier
 	iacSupplier    resource.Supplier
+	alerter        *alerter.Alerter
 	analyzer       analyser.Analyzer
 	filter         *jmespath.JMESPath
 }
 
 func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, filter *jmespath.JMESPath, alerter *alerter.Alerter) *DriftCTL {
-	return &DriftCTL{remoteSupplier, iacSupplier, analyser.NewAnalyzer(alerter), filter}
+	return &DriftCTL{remoteSupplier, iacSupplier, alerter, analyser.NewAnalyzer(alerter), filter}
 }
 
 func (d DriftCTL) Run() *analyser.Analysis {
@@ -42,11 +43,14 @@ func (d DriftCTL) Run() *analyser.Analysis {
 		middlewares.NewAwsDefaultInternetGateway(),
 		middlewares.NewAwsDefaultVPC(),
 		middlewares.NewAwsDefaultSubnet(),
-		middlewares.NewAwsRouteTableExpander(),
+		middlewares.NewAwsRouteTableExpander(d.alerter),
 		middlewares.NewAwsDefaultRouteTable(),
 		middlewares.NewAwsDefaultRoute(),
 		middlewares.NewAwsNatGatewayEipAssoc(),
 		middlewares.NewAwsBucketPolicyExpander(),
+		middlewares.NewAwsSqsQueuePolicyExpander(),
+		middlewares.NewAwsDefaultSqsQueuePolicy(),
+		middlewares.NewAwsSNSTopicPolicyExpander(),
 	)
 
 	logrus.Debug("Ready to run middlewares")

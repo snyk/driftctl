@@ -1,0 +1,12 @@
+[
+ {
+  "Arn": "arn:aws:sns:us-east-1:526954929923:my-topic-with-policy2",
+  "Id": "arn:aws:sns:us-east-1:526954929923:my-topic-with-policy2",
+  "Policy": "{\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Action\":[\"SNS:Subscribe\",\"SNS:SetTopicAttributes\",\"SNS:RemovePermission\",\"SNS:Receive\",\"SNS:Publish\",\"SNS:ListSubscriptionsByTopic\",\"SNS:GetTopicAttributes\",\"SNS:DeleteTopic\",\"SNS:AddPermission\"],\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":[]}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"arn:aws:sns:us-east-1:526954929923:my-topic-with-policy\",\"Sid\":\"__default_statement_ID\"}],\"Version\":\"2012-10-17\"}"
+ },
+ {
+  "Arn": "arn:aws:sns:us-east-1:526954929923:my-topic-with-policy",
+  "Id": "arn:aws:sns:us-east-1:526954929923:my-topic-with-policy",
+  "Policy": "{\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Action\":[\"SNS:Subscribe\",\"SNS:SetTopicAttributes\",\"SNS:RemovePermission\",\"SNS:Receive\",\"SNS:Publish\",\"SNS:ListSubscriptionsByTopic\",\"SNS:GetTopicAttributes\",\"SNS:DeleteTopic\",\"SNS:AddPermission\"],\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":[]}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"arn:aws:sns:us-east-1:526954929923:my-topic-with-policy\",\"Sid\":\"__default_statement_ID\"}],\"Version\":\"2012-10-17\"}"
+ }
+]

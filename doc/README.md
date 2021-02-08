@@ -22,3 +22,6 @@ Details of reported data can be found [here](./cmd/flags/error-reporting.md)
     - [Iac sources](cmd/scan/iac_source.md)
   - [Completion](cmd/completion/script.md)
 
+## Issues
+
+- [Known Issues & Limitations](LIMITATIONS.md)

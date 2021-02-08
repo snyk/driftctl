@@ -73,8 +73,10 @@ func (s RouteSupplier) readRoute(tableId string, route ec2.Route) (cty.Value, er
 		attributes["destination_ipv6_cidr_block"] = *route.DestinationIpv6CidrBlock
 	}
 
+	// We can ignore error there as remote will always return us a valid route
+	routeId, _ := aws.CalculateRouteID(&tableId, route.DestinationCidrBlock, route.DestinationIpv6CidrBlock)
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
-		ID:         aws.CalculateRouteID(&tableId, route.DestinationCidrBlock, route.DestinationIpv6CidrBlock),
+		ID:         routeId,
 		Ty:         Ty,
 		Attributes: flatmap.Flatten(attributes),
 	})

@@ -64,6 +64,12 @@ Binaries are available in the [release page](https://github.com/cloudskiff/drift
 brew install driftctl
 ```
 
+#### MacPorts for macOS
+
+```bash
+sudo port install driftctl
+```
+
 #### Docker
 
 ```bash
@@ -141,6 +147,35 @@ curl https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_wi
 curl https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_windows_386.exe -o driftctl.exe
 ```
 
+#### Verify digital signatures
+
+Cloudskiff releases are signed using PGP key (ed25519) with ID `ACC776A79C824EBD` and fingerprint `2776 6600 5A7F 01D4 84F6 376D ACC7 76A7 9C82 4EBD`
+Our key can be retrieved from common keyservers.
+
+```shell
+# Download binary, checksums and signature
+curl https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_linux_amd64 -o driftctl_linux_amd64
+curl https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_SHA256SUMS -o driftctl_SHA256SUMS
+curl https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_SHA256SUMS.gpg -o driftctl_SHA256SUMS.gpg
+
+# Import key
+$ gpg --keyserver hkps.pool.sks-keyservers.net --recv-keys 0xACC776A79C824EBD
+gpg: key ACC776A79C824EBD: public key "Cloudskiff <security@cloudskiff.com>" imported
+gpg: Total number processed: 1
+gpg:               imported: 1
+
+# Verify signature (eventually trust the key from gnupg to avoid any warning)
+$ gpg --verify bin/driftctl_SHA256SUMS.gpg
+gpg: Signature made jeu. 04 févr. 2021 14:58:06 CET
+gpg:                using EDDSA key 277666005A7F01D484F6376DACC776A79C824EBD
+gpg:                issuer "security@cloudskiff.com"
+gpg: Good signature from "Cloudskiff <security@cloudskiff.com>" [ultimate]
+
+# Verify checksum
+$ sha256sum --ignore-missing -c driftctl_SHA256SUMS
+driftctl_linux_amd64: OK
+```
+
 ### Run
 
 Be sure to have [configured](doc/cmd/scan/supported_resources/aws.md#authentication) your AWS credentials.
@@ -168,3 +203,7 @@ $ driftctl scan --from tfstate://terraform_S3.tfstate --from tfstate://terraform
 ## Contribute
 
 To learn more about compiling driftctl and contributing, please refer to the [contribution guidelines](.github/CONTRIBUTING.md) and [contributing guide](doc/contributing/README.md) for technical details.
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification and is brought to you by these [awesome contributors](CONTRIBUTORS.md).
+
+Build with ❤️️ from 🇫🇷 🇯🇵 🇬🇷

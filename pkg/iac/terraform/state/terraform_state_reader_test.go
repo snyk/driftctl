@@ -74,6 +74,11 @@ func TestTerraformStateReader_Resources(t *testing.T) {
 		{name: "route table associations", dirName: "route_assoc", wantErr: false},
 		{name: "NAT gateway", dirName: "aws_nat_gateway", wantErr: false},
 		{name: "Internet Gateway", dirName: "internet_gateway", wantErr: false},
+		{name: "SQS queue", dirName: "sqs_queue", wantErr: false},
+		{name: "SQS queue policy", dirName: "sqs_queue_policy", wantErr: false},
+		{name: "SNS Topic", dirName: "sns_topic", wantErr: false},
+		{name: "SNS Topic Policy", dirName: "sns_topic_policy", wantErr: false},
+		{name: "SNS Topic Subscription", dirName: "sns_topic_subscription", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
