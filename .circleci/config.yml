@@ -51,7 +51,7 @@ jobs:
               ${DISCORD_WEBHOOK}
       - store_test_results:
           path: ./
-  test:
+  lint:
     docker:
       - image: golang:1.15
     steps:
@@ -67,6 +67,13 @@ jobs:
               git status --porcelain
               exit 1
             fi
+      - run: make install-tools
+      - run: make lint
+  test:
+    docker:
+      - image: golang:1.15
+    steps:
+      - checkout
       - run: make install-tools
       - run: make test
       - run:
@@ -148,6 +155,11 @@ workflows:
                 - main
   pullrequest:
     jobs:
+      - lint:
+          filters:
+            branches:
+              ignore:
+                - main
       - test:
           filters:
             branches:
@@ -163,6 +175,12 @@ workflows:
   release:
     jobs:
       - build:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - lint:
           filters:
             tags:
               only: /^v.*/
@@ -186,6 +204,7 @@ workflows:
       - release:
           context: driftctl
           requires:
+            - lint
             - test
             - sign_release
           filters:

@@ -25,7 +25,7 @@ release:
 	ENV=release scripts/build.sh
 
 .PHONY: test
-test: deps lint
+test: deps
 	$(GOTEST) --format testname --junitfile unit-tests.xml -- -coverprofile=cover.out -coverpkg=.,./pkg/... ./...
 
 .PHONY: coverage
@@ -54,7 +54,7 @@ clean:
 .PHONY: lint
 lint:
 	@which golangci-lint > /dev/null 2>&1 || (curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | bash -s -- -b $(GOBINPATH) v1.31.0)
-	golangci-lint run --timeout=2m
+	golangci-lint run -v --timeout=4m
 
 .PHONY: deps
 deps:
