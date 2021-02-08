@@ -12,11 +12,19 @@ func TestAwsRoute53Zone_String(t *testing.T) {
 		zone AwsRoute53Zone
 		want string
 	}{
-		{name: "",
+		{name: "test route53 zone stringer with name and id",
 			zone: AwsRoute53Zone{
 				Name: aws.String("example.com"),
+				Id:   "Z04218102KCRRR1DWDYJT",
 			},
-			want: "example.com",
+			want: "example.com (Id: Z04218102KCRRR1DWDYJT)",
+		},
+		{name: "test route53 zone stringer without name",
+			zone: AwsRoute53Zone{
+				Name: nil,
+				Id:   "Z04218102KCRRR1DWDYJT",
+			},
+			want: "Z04218102KCRRR1DWDYJT",
 		},
 	}
 	for _, tt := range tests {
