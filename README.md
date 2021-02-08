@@ -64,6 +64,12 @@ Binaries are available in the [release page](https://github.com/cloudskiff/drift
 brew install driftctl
 ```
 
+#### MacPorts for macOS
+
+```bash
+sudo port install driftctl
+```
+
 #### Docker
 
 ```bash
