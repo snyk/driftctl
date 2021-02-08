@@ -8,7 +8,7 @@ type AwsSnsTopic struct {
 	ApplicationSuccessFeedbackRoleArn    *string           `cty:"application_success_feedback_role_arn"`
 	ApplicationSuccessFeedbackSampleRate *int              `cty:"application_success_feedback_sample_rate"`
 	Arn                                  *string           `cty:"arn" computed:"true"`
-	DeliveryPolicy                       *string           `cty:"delivery_policy"`
+	DeliveryPolicy                       *string           `cty:"delivery_policy" jsonstring:"true"`
 	DisplayName                          *string           `cty:"display_name"`
 	HttpFailureFeedbackRoleArn           *string           `cty:"http_failure_feedback_role_arn"`
 	HttpSuccessFeedbackRoleArn           *string           `cty:"http_success_feedback_role_arn"`
@@ -20,7 +20,7 @@ type AwsSnsTopic struct {
 	LambdaSuccessFeedbackSampleRate      *int              `cty:"lambda_success_feedback_sample_rate"`
 	Name                                 *string           `cty:"name" computed:"true"`
 	NamePrefix                           *string           `cty:"name_prefix"`
-	Policy                               *string           `cty:"policy" computed:"true"`
+	Policy                               *string           `cty:"policy" computed:"true" jsonstring:"true"`
 	SqsFailureFeedbackRoleArn            *string           `cty:"sqs_failure_feedback_role_arn"`
 	SqsSuccessFeedbackRoleArn            *string           `cty:"sqs_success_feedback_role_arn"`
 	SqsSuccessFeedbackSampleRate         *int              `cty:"sqs_success_feedback_sample_rate"`
