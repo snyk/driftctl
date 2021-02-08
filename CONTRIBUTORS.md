@@ -18,6 +18,7 @@ Thank you to all the people who have already contributed to driftctl.
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/sfenman"><img src="https://avatars.githubusercontent.com/u/43748066?v=4?s=80" width="80px;" alt=""/><br /><sub><b>sfenman</b></sub></a><br /><a href="https://github.com/cloudskiff/driftctl/commits?author=sfenman" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/herbygillot"><img src="https://avatars.githubusercontent.com/u/618376?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Herby Gillot</b></sub></a><br /><a href="#tool-herbygillot" title="Tools">🔧</a></td>
   </tr>
 </table>
 
