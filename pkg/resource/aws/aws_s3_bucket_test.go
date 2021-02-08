@@ -19,9 +19,8 @@ func TestAcc_AwsS3Bucket_BucketInUsEast1(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					result.Equal(1, result.Summary().TotalManaged)
+					result.AssertManagedCount(1)
 					result.Equal("aws_s3_bucket", result.Analysis.Managed()[0].TerraformType())
-					result.Equal("foobar.driftctl-test.com", result.Analysis.Managed()[0].TerraformId())
 				},
 			},
 		},

@@ -13,6 +13,7 @@ require (
 	github.com/hashicorp/go-plugin v1.3.0
 	github.com/hashicorp/go-version v1.2.1
 	github.com/hashicorp/terraform v0.14.0
+	github.com/hashicorp/terraform-exec v0.12.0
 	github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d // indirect
 	github.com/jarcoal/httpmock v1.0.6
 	github.com/jmespath/go-jmespath v0.3.0
