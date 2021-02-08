@@ -8,6 +8,7 @@ import (
 
 type SNSRepository interface {
 	ListAllTopics() ([]*sns.Topic, error)
+	ListAllSubscriptions() ([]*sns.Subscription, error)
 }
 
 type snsRepository struct {
@@ -31,4 +32,17 @@ func (r *snsRepository) ListAllTopics() ([]*sns.Topic, error) {
 		return nil, err
 	}
 	return topics, nil
+}
+
+func (r *snsRepository) ListAllSubscriptions() ([]*sns.Subscription, error) {
+	var subscriptions []*sns.Subscription
+	input := &sns.ListSubscriptionsInput{}
+	err := r.client.ListSubscriptionsPages(input, func(res *sns.ListSubscriptionsOutput, lastPage bool) bool {
+		subscriptions = append(subscriptions, res.Subscriptions...)
+		return !lastPage
+	})
+	if err != nil {
+		return nil, err
+	}
+	return subscriptions, nil
 }

@@ -132,7 +132,10 @@ As AWS documentation recommends, the below policy is granting only the permissio
                 "sqs:ListQueues"
                 "sns:ListTopics",
                 "sns:GetTopicAttributes",
-                "sns:ListTagsForResource"
+                "sns:ListTagsForResource",
+                "sns:ListSubscriptions",
+                "sns:ListSubscriptionsByTopic",
+                "sns:GetSubscriptionAttributes"
             ]
         }
     ]
@@ -252,6 +255,6 @@ As AWS documentation recommends, the below policy is granting only the permissio
 ## SNS
 - [x] aws_sns_topic
 - [x] aws_sns_topic_policy
-- [ ] aws_sns_topic_subscription
+- [x] aws_sns_topic_subscription
 - [ ] aws_sns_platform_application
 - [ ] aws_sns_sms_preferences
