@@ -6,7 +6,7 @@ const AwsSnsTopicPolicyResourceType = "aws_sns_topic_policy"
 type AwsSnsTopicPolicy struct {
 	Arn    *string `cty:"arn"`
 	Id     string  `cty:"id" computed:"true"`
-	Policy *string `cty:"policy"`
+	Policy *string `cty:"policy" jsonstring:"true"`
 }
 
 func (r *AwsSnsTopicPolicy) TerraformId() string {

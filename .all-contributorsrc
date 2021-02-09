@@ -127,6 +127,16 @@
       "contributions": [
         "tool"
       ]
+    },
+    {
+      "login": "lotoussa",
+      "name": "Toussaint Louis",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66522867?v=4",
+      "profile": "http://louistoussaint.fr",
+      "contributions": [
+        "code",
+        "doc"
+      ]
     }
   ]
 }
