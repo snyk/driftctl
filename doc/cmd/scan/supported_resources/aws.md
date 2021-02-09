@@ -129,7 +129,7 @@ As AWS documentation recommends, the below policy is granting only the permissio
                 "s3:ListBucket",
                 "sqs:GetQueueAttributes",
                 "sqs:ListQueueTags",
-                "sqs:ListQueues"
+                "sqs:ListQueues",
                 "sns:ListTopics",
                 "sns:GetTopicAttributes",
                 "sns:ListTagsForResource",
