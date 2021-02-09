@@ -22,7 +22,7 @@ type IamUserSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamUserSupplier(provider *TerraformProvider) *IamUserSupplier {
+func NewIamUserSupplier(provider *AWSTerraformProvider) *IamUserSupplier {
 	return &IamUserSupplier{
 		provider,
 		awsdeserializer.NewIamUserDeserializer(),

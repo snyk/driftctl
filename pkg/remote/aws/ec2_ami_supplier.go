@@ -23,7 +23,7 @@ type EC2AmiSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2AmiSupplier(provider *TerraformProvider) *EC2AmiSupplier {
+func NewEC2AmiSupplier(provider *AWSTerraformProvider) *EC2AmiSupplier {
 	return &EC2AmiSupplier{
 		provider,
 		awsdeserializer.NewEC2AmiDeserializer(),

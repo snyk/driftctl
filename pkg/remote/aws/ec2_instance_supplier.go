@@ -23,7 +23,7 @@ type EC2InstanceSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2InstanceSupplier(provider *TerraformProvider) *EC2InstanceSupplier {
+func NewEC2InstanceSupplier(provider *AWSTerraformProvider) *EC2InstanceSupplier {
 	return &EC2InstanceSupplier{
 		provider,
 		awsdeserializer.NewEC2InstanceDeserializer(),

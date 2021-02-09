@@ -13,7 +13,11 @@ const RemoteAWSTerraform = "aws+tf"
  * Required to use Scanner
  */
 func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, supplierLibrary *resource.SupplierLibrary) error {
-	provider, err := NewTerraFormProvider()
+	provider, err := NewAWSTerraformProvider()
+	if err != nil {
+		return err
+	}
+	err = provider.Init()
 	if err != nil {
 		return err
 	}

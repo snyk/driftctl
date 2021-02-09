@@ -20,7 +20,7 @@ type RouteSupplier struct {
 	routeRunner       *terraform.ParallelResourceReader
 }
 
-func NewRouteSupplier(provider *TerraformProvider) *RouteSupplier {
+func NewRouteSupplier(provider *AWSTerraformProvider) *RouteSupplier {
 	return &RouteSupplier{
 		provider,
 		awsdeserializer.NewRouteDeserializer(),

@@ -24,7 +24,7 @@ type DBSubnetGroupSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewDBSubnetGroupSupplier(provider *TerraformProvider) *DBSubnetGroupSupplier {
+func NewDBSubnetGroupSupplier(provider *AWSTerraformProvider) *DBSubnetGroupSupplier {
 	return &DBSubnetGroupSupplier{
 		provider,
 		awsdeserializer.NewDBSubnetGroupDeserializer(),

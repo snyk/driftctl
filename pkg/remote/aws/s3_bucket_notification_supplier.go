@@ -19,7 +19,7 @@ type S3BucketNotificationSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewS3BucketNotificationSupplier(provider *TerraformProvider, factory AwsClientFactoryInterface) *S3BucketNotificationSupplier {
+func NewS3BucketNotificationSupplier(provider *AWSTerraformProvider, factory AwsClientFactoryInterface) *S3BucketNotificationSupplier {
 	return &S3BucketNotificationSupplier{
 		provider,
 		awsdeserializer.NewS3BucketNotificationDeserializer(),

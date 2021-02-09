@@ -19,7 +19,7 @@ type SqsQueuePolicySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewSqsQueuePolicySupplier(provider *TerraformProvider) *SqsQueuePolicySupplier {
+func NewSqsQueuePolicySupplier(provider *AWSTerraformProvider) *SqsQueuePolicySupplier {
 	return &SqsQueuePolicySupplier{
 		provider,
 		awsdeserializer.NewSqsQueuePolicyDeserializer(),

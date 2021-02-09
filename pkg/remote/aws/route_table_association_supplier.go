@@ -20,7 +20,7 @@ type RouteTableAssociationSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewRouteTableAssociationSupplier(provider *TerraformProvider) *RouteTableAssociationSupplier {
+func NewRouteTableAssociationSupplier(provider *AWSTerraformProvider) *RouteTableAssociationSupplier {
 	return &RouteTableAssociationSupplier{
 		provider,
 		awsdeserializer.NewRouteTableAssociationDeserializer(),

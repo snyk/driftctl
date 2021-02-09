@@ -24,7 +24,7 @@ type IamUserPolicySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamUserPolicySupplier(provider *TerraformProvider) *IamUserPolicySupplier {
+func NewIamUserPolicySupplier(provider *AWSTerraformProvider) *IamUserPolicySupplier {
 	return &IamUserPolicySupplier{
 		provider,
 		awsdeserializer.NewIamUserPolicyDeserializer(),

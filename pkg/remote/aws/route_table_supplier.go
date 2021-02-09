@@ -26,7 +26,7 @@ type RouteTableSupplier struct {
 	routeTableRunner              *terraform.ParallelResourceReader
 }
 
-func NewRouteTableSupplier(provider *TerraformProvider) *RouteTableSupplier {
+func NewRouteTableSupplier(provider *AWSTerraformProvider) *RouteTableSupplier {
 	return &RouteTableSupplier{
 		provider,
 		awsdeserializer.NewDefaultRouteTableDeserializer(),

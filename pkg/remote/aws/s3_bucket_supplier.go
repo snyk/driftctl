@@ -23,7 +23,7 @@ type S3BucketSupplier struct {
 	runner           *terraform.ParallelResourceReader
 }
 
-func NewS3BucketSupplier(provider *TerraformProvider, factory AwsClientFactoryInterface) *S3BucketSupplier {
+func NewS3BucketSupplier(provider *AWSTerraformProvider, factory AwsClientFactoryInterface) *S3BucketSupplier {
 	return &S3BucketSupplier{
 		provider,
 		awsdeserializer.NewS3BucketDeserializer(),

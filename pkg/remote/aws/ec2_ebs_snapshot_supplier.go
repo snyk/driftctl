@@ -23,7 +23,7 @@ type EC2EbsSnapshotSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2EbsSnapshotSupplier(provider *TerraformProvider) *EC2EbsSnapshotSupplier {
+func NewEC2EbsSnapshotSupplier(provider *AWSTerraformProvider) *EC2EbsSnapshotSupplier {
 	return &EC2EbsSnapshotSupplier{
 		provider,
 		awsdeserializer.NewEC2EbsSnapshotDeserializer(),

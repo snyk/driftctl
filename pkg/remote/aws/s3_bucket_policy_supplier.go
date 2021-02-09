@@ -19,7 +19,7 @@ type S3BucketPolicySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewS3BucketPolicySupplier(provider *TerraformProvider, factory AwsClientFactoryInterface) *S3BucketPolicySupplier {
+func NewS3BucketPolicySupplier(provider *AWSTerraformProvider, factory AwsClientFactoryInterface) *S3BucketPolicySupplier {
 	return &S3BucketPolicySupplier{
 		provider,
 		awsdeserializer.NewS3BucketPolicyDeserializer(),

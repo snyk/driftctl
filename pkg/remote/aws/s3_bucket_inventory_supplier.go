@@ -24,7 +24,7 @@ type S3BucketInventorySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewS3BucketInventorySupplier(provider *TerraformProvider, factory AwsClientFactoryInterface) *S3BucketInventorySupplier {
+func NewS3BucketInventorySupplier(provider *AWSTerraformProvider, factory AwsClientFactoryInterface) *S3BucketInventorySupplier {
 	return &S3BucketInventorySupplier{
 		provider,
 		awsdeserializer.NewS3BucketInventoryDeserializer(),
