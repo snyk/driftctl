@@ -65,7 +65,11 @@ type TerraformProvider struct {
 }
 
 func NewTerraFormProvider() (*TerraformProvider, error) {
-	provider, err := tf.NewProviderInstaller()
+	provider, err := tf.NewProviderInstaller(tf.ProviderConfig{
+		Key:     "aws",
+		Version: "3.19.0",
+		Postfix: "x5",
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +120,7 @@ func (p *TerraformProvider) initSession() {
 
 func (p *TerraformProvider) configure(region string) error {
 
-	providerPath, err := p.providerSupplier.GetAws()
+	providerPath, err := p.providerSupplier.Install()
 	if err != nil {
 		return err
 	}

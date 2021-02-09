@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"runtime"
 
 	"github.com/hashicorp/go-getter"
 
@@ -15,7 +14,6 @@ import (
 
 type ProviderDownloaderInterface interface {
 	Download(url, path string) error
-	GetProviderUrl(name, version string) string
 }
 
 type ProviderDownloader struct {
@@ -30,18 +28,6 @@ func NewProviderDownloader() *ProviderDownloader {
 		unzip:      getter.ZipDecompressor{},
 		context:    context.Background(),
 	}
-}
-
-func (p *ProviderDownloader) GetProviderUrl(name, version string) string {
-	return fmt.Sprintf(
-		"https://releases.hashicorp.com/terraform-provider-%s/%s/terraform-provider-%s_%s_%s_%s.zip",
-		name,
-		version,
-		name,
-		version,
-		runtime.GOOS,
-		runtime.GOARCH,
-	)
 }
 
 func (p *ProviderDownloader) Download(url, path string) error {

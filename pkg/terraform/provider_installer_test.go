@@ -12,54 +12,65 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestProviderInstallerGetAwsDoesNotExist(t *testing.T) {
+func TestProviderInstallerInstallDoesNotExist(t *testing.T) {
 
 	assert := assert.New(t)
 	fakeTmpHome := t.TempDir()
 
 	expectedSubFolder := fmt.Sprintf("/.driftctl/plugins/%s_%s", runtime.GOOS, runtime.GOARCH)
-	fakeUrl := "https://example.com"
+
+	config := ProviderConfig{
+		Key:     "aws",
+		Version: "3.19.0",
+		Postfix: "x5",
+	}
+
 	mockDownloader := mocks.ProviderDownloaderInterface{}
-	mockDownloader.On("GetProviderUrl", "aws", "3.19.0").Return(fakeUrl)
-	mockDownloader.On("Download", fakeUrl, path.Join(fakeTmpHome, expectedSubFolder)).Return(nil)
+	mockDownloader.On("Download", config.GetDownloadUrl(), path.Join(fakeTmpHome, expectedSubFolder)).Return(nil)
 
 	installer := ProviderInstaller{
 		downloader: &mockDownloader,
+		config:     config,
 		homeDir:    fakeTmpHome,
 	}
 
-	providerPath, err := installer.GetAws()
+	providerPath, err := installer.Install()
 	mockDownloader.AssertExpectations(t)
 
 	assert.Nil(err)
-	assert.Equal(path.Join(fakeTmpHome, expectedSubFolder, awsProviderName), providerPath)
+	assert.Equal(path.Join(fakeTmpHome, expectedSubFolder, config.GetBinaryName()), providerPath)
 
 }
 
-func TestProviderInstallerGetAwsWithoutHomeDir(t *testing.T) {
+func TestProviderInstallerInstallWithoutHomeDir(t *testing.T) {
 
 	assert := assert.New(t)
 
 	expectedHomeDir := os.TempDir()
 	expectedSubFolder := fmt.Sprintf("/.driftctl/plugins/%s_%s", runtime.GOOS, runtime.GOARCH)
-	fakeUrl := "https://example.com"
+	config := ProviderConfig{
+		Key:     "aws",
+		Version: "3.19.0",
+		Postfix: "x5",
+	}
+
 	mockDownloader := mocks.ProviderDownloaderInterface{}
-	mockDownloader.On("GetProviderUrl", "aws", "3.19.0").Return(fakeUrl)
-	mockDownloader.On("Download", fakeUrl, path.Join(expectedHomeDir, expectedSubFolder)).Return(nil)
+	mockDownloader.On("Download", config.GetDownloadUrl(), path.Join(expectedHomeDir, expectedSubFolder)).Return(nil)
 
 	installer := ProviderInstaller{
+		config:     config,
 		downloader: &mockDownloader,
 	}
 
-	providerPath, err := installer.GetAws()
+	providerPath, err := installer.Install()
 	mockDownloader.AssertExpectations(t)
 
 	assert.Nil(err)
-	assert.Equal(path.Join(expectedHomeDir, expectedSubFolder, awsProviderName), providerPath)
+	assert.Equal(path.Join(expectedHomeDir, expectedSubFolder, config.GetBinaryName()), providerPath)
 
 }
 
-func TestProviderInstallerGetAwsAlreadyExist(t *testing.T) {
+func TestProviderInstallerInstallAlreadyExist(t *testing.T) {
 
 	assert := assert.New(t)
 	fakeTmpHome := t.TempDir()
@@ -68,7 +79,14 @@ func TestProviderInstallerGetAwsAlreadyExist(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = os.Create(path.Join(fakeTmpHome, expectedSubFolder, awsProviderName))
+
+	config := ProviderConfig{
+		Key:     "aws",
+		Version: "3.19.0",
+		Postfix: "x5",
+	}
+
+	_, err = os.Create(path.Join(fakeTmpHome, expectedSubFolder, config.GetBinaryName()))
 	if err != nil {
 		t.Error(err)
 	}
@@ -77,23 +95,31 @@ func TestProviderInstallerGetAwsAlreadyExist(t *testing.T) {
 
 	installer := ProviderInstaller{
 		downloader: &mockDownloader,
+		config:     config,
 		homeDir:    fakeTmpHome,
 	}
 
-	providerPath, err := installer.GetAws()
+	providerPath, err := installer.Install()
 	mockDownloader.AssertExpectations(t)
 
 	assert.Nil(err)
-	assert.Equal(path.Join(fakeTmpHome, expectedSubFolder, awsProviderName), providerPath)
+	assert.Equal(path.Join(fakeTmpHome, expectedSubFolder, config.GetBinaryName()), providerPath)
 
 }
 
-func TestProviderInstallerGetAwsAlreadyExistButIsDirectory(t *testing.T) {
+func TestProviderInstallerInstallAlreadyExistButIsDirectory(t *testing.T) {
 
 	assert := assert.New(t)
 	fakeTmpHome := t.TempDir()
 	expectedSubFolder := fmt.Sprintf("/.driftctl/plugins/%s_%s", runtime.GOOS, runtime.GOARCH)
-	invalidDirPath := path.Join(fakeTmpHome, expectedSubFolder, awsProviderName)
+
+	config := ProviderConfig{
+		Key:     "aws",
+		Version: "3.19.0",
+		Postfix: "x5",
+	}
+
+	invalidDirPath := path.Join(fakeTmpHome, expectedSubFolder, config.GetBinaryName())
 	err := os.MkdirAll(invalidDirPath, 0755)
 	if err != nil {
 		t.Error(err)
@@ -103,10 +129,11 @@ func TestProviderInstallerGetAwsAlreadyExistButIsDirectory(t *testing.T) {
 
 	installer := ProviderInstaller{
 		downloader: &mockDownloader,
+		config:     config,
 		homeDir:    fakeTmpHome,
 	}
 
-	providerPath, err := installer.GetAws()
+	providerPath, err := installer.Install()
 	mockDownloader.AssertExpectations(t)
 
 	assert.Empty(providerPath)
