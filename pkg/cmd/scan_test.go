@@ -67,14 +67,14 @@ func TestScanCmd_Invalid(t *testing.T) {
 		{args: []string{"scan", "-f"}, expected: `flag needs an argument: 'f' in -f`},
 		{args: []string{"scan", "--from"}, expected: `flag needs an argument: --from`},
 		{args: []string{"scan", "--from"}, expected: `flag needs an argument: --from`},
-		{args: []string{"scan", "--from", "tosdgjhgsdhgkjs"}, expected: "Unable to parse from flag: tosdgjhgsdhgkjs\nAccepted schemes are: tfstate://,tfstate+s3://"},
-		{args: []string{"scan", "--from", "://"}, expected: "Unable to parse from flag: ://\nAccepted schemes are: tfstate://,tfstate+s3://"},
-		{args: []string{"scan", "--from", "://test"}, expected: "Unable to parse from flag: ://test\nAccepted schemes are: tfstate://,tfstate+s3://"},
-		{args: []string{"scan", "--from", "tosdgjhgsdhgkjs://"}, expected: "Unable to parse from flag: tosdgjhgsdhgkjs://\nAccepted schemes are: tfstate://,tfstate+s3://"},
-		{args: []string{"scan", "--from", "terraform+foo+bar://test"}, expected: "Unable to parse from scheme: terraform+foo+bar\nAccepted schemes are: tfstate://,tfstate+s3://"},
-		{args: []string{"scan", "--from", "unsupported://test"}, expected: "Unsupported IaC source: unsupported\nAccepted values are: tfstate"},
-		{args: []string{"scan", "--from", "tfstate+foobar://test"}, expected: "Unsupported IaC backend: foobar\nAccepted values are: s3"},
-		{args: []string{"scan", "--from", "tfstate:///tmp/test", "--from", "tfstate+toto://test"}, expected: "Unsupported IaC backend: toto\nAccepted values are: s3"},
+		{args: []string{"scan", "--from", "tosdgjhgsdhgkjs"}, expected: "Unable to parse from flag 'tosdgjhgsdhgkjs': \nAccepted schemes are: tfstate://,tfstate+s3://"},
+		{args: []string{"scan", "--from", "://"}, expected: "Unable to parse from flag '://': \nAccepted schemes are: tfstate://,tfstate+s3://"},
+		{args: []string{"scan", "--from", "://test"}, expected: "Unable to parse from flag '://test': \nAccepted schemes are: tfstate://,tfstate+s3://"},
+		{args: []string{"scan", "--from", "tosdgjhgsdhgkjs://"}, expected: "Unable to parse from flag 'tosdgjhgsdhgkjs://': \nAccepted schemes are: tfstate://,tfstate+s3://"},
+		{args: []string{"scan", "--from", "terraform+foo+bar://test"}, expected: "Unable to parse from scheme 'terraform+foo+bar': \nAccepted schemes are: tfstate://,tfstate+s3://"},
+		{args: []string{"scan", "--from", "unsupported://test"}, expected: "Unsupported IaC source 'unsupported': \nAccepted values are: tfstate"},
+		{args: []string{"scan", "--from", "tfstate+foobar://test"}, expected: "Unsupported IaC backend 'foobar': \nAccepted values are: s3"},
+		{args: []string{"scan", "--from", "tfstate:///tmp/test", "--from", "tfstate+toto://test"}, expected: "Unsupported IaC backend 'toto': \nAccepted values are: s3"},
 		{args: []string{"scan", "--filter", "Type='test'"}, expected: "unable to parse filter expression: SyntaxError: Expected tRbracket, received: tUnknown"},
 	}
 
@@ -165,7 +165,7 @@ func Test_parseOutputFlag(t *testing.T) {
 				out: "",
 			},
 			want: nil,
-			err:  fmt.Errorf("Unable to parse output flag: \nAccepted formats are: console://,json://PATH/TO/FILE.json"),
+			err:  fmt.Errorf("Unable to parse output flag '': \nAccepted formats are: console://,json://PATH/TO/FILE.json"),
 		},
 		{
 			name: "test invalid",
@@ -173,7 +173,7 @@ func Test_parseOutputFlag(t *testing.T) {
 				out: "sdgjsdgjsdg",
 			},
 			want: nil,
-			err:  fmt.Errorf("Unable to parse output flag: sdgjsdgjsdg\nAccepted formats are: console://,json://PATH/TO/FILE.json"),
+			err:  fmt.Errorf("Unable to parse output flag 'sdgjsdgjsdg': \nAccepted formats are: console://,json://PATH/TO/FILE.json"),
 		},
 		{
 			name: "test invalid",
@@ -181,7 +181,7 @@ func Test_parseOutputFlag(t *testing.T) {
 				out: "://",
 			},
 			want: nil,
-			err:  fmt.Errorf("Unable to parse output flag: ://\nAccepted formats are: console://,json://PATH/TO/FILE.json"),
+			err:  fmt.Errorf("Unable to parse output flag '://': \nAccepted formats are: console://,json://PATH/TO/FILE.json"),
 		},
 		{
 			name: "test unsupported",
@@ -189,7 +189,7 @@ func Test_parseOutputFlag(t *testing.T) {
 				out: "foobar://",
 			},
 			want: nil,
-			err:  fmt.Errorf("Unsupported output 'foobar'\nValid formats are: console://,json://PATH/TO/FILE.json"),
+			err:  fmt.Errorf("Unsupported output 'foobar': \nValid formats are: console://,json://PATH/TO/FILE.json"),
 		},
 		{
 			name: "test empty json",
@@ -197,7 +197,7 @@ func Test_parseOutputFlag(t *testing.T) {
 				out: "json://",
 			},
 			want: nil,
-			err:  fmt.Errorf("Invalid json output 'json://'\nMust be of kind: json://PATH/TO/FILE.json"),
+			err:  fmt.Errorf("Invalid json output 'json://': \nMust be of kind: json://PATH/TO/FILE.json"),
 		},
 		{
 			name: "test valid console",
