@@ -94,7 +94,7 @@ func (s *S3BucketMetricSupplier) listBucketMetricConfiguration(name, region stri
 					Ty: aws.AwsS3BucketMetricResourceType,
 					ID: id,
 					Attributes: map[string]string{
-						"aws_region": region,
+						"alias": region,
 					},
 				},
 			)

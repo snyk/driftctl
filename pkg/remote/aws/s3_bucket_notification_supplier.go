@@ -75,7 +75,7 @@ func (s *S3BucketNotificationSupplier) listBucketNotificationConfiguration(name,
 			Ty: aws.AwsS3BucketNotificationResourceType,
 			ID: name,
 			Attributes: map[string]string{
-				"aws_region": region,
+				"alias": region,
 			},
 		})
 		if err != nil {

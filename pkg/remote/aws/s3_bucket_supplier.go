@@ -99,7 +99,7 @@ func (s *S3BucketSupplier) readBucket(bucket s3.Bucket, client *s3iface.S3API) (
 		Ty: aws.AwsS3BucketResourceType,
 		ID: name,
 		Attributes: map[string]string{
-			"aws_region": region,
+			"alias": region,
 		},
 	})
 	if err != nil {

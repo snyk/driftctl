@@ -76,7 +76,7 @@ func (s *S3BucketPolicySupplier) listBucketPolicyConfiguration(name, region stri
 				Ty: aws.AwsS3BucketPolicyResourceType,
 				ID: name,
 				Attributes: map[string]string{
-					"aws_region": region,
+					"alias": region,
 				},
 			},
 		)

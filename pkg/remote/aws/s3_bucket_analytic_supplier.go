@@ -94,7 +94,7 @@ func (s *S3BucketAnalyticSupplier) listBucketAnalyticConfiguration(name, region 
 					Ty: aws.AwsS3BucketAnalyticsConfigurationResourceType,
 					ID: id,
 					Attributes: map[string]string{
-						"aws_region": region,
+						"alias": region,
 					},
 				},
 			)

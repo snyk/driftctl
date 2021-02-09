@@ -94,7 +94,7 @@ func (s *S3BucketInventorySupplier) listBucketInventoryConfiguration(name, regio
 					Ty: aws.AwsS3BucketInventoryResourceType,
 					ID: id,
 					Attributes: map[string]string{
-						"aws_region": region,
+						"alias": region,
 					},
 				},
 			)
