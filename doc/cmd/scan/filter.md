@@ -69,4 +69,11 @@ driftctl scan --filter $'!(Type==\'aws_s3_bucket\' && Attr.Tags.terraform==\'fal
 
 # Ignore buckets that don't have tag terraform
 driftctl scan --filter $'!(Type==\'aws_s3_bucket\' && Attr.Tags != null && !contains(keys(Attr.Tags), \'terraform\'))'
+
+# Ignore buckets with an ID prefix of 'terraform-'
+driftctl scan --filter $'!(Type==\'aws_s3_bucket\' && starts_with(Id, \'terraform-\'))'
+
+# Ignore buckets with an ID suffix of '-test'
+driftctl scan --filter $'!(Type==\'aws_s3_bucket\' && ends_with(Id, \'-test\'))'
+
 ```
