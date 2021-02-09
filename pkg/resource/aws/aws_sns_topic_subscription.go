@@ -6,10 +6,10 @@ const AwsSnsTopicSubscriptionResourceType = "aws_sns_topic_subscription"
 type AwsSnsTopicSubscription struct {
 	Arn                          *string `cty:"arn" computed:"true"`
 	ConfirmationTimeoutInMinutes *int    `cty:"confirmation_timeout_in_minutes"`
-	DeliveryPolicy               *string `cty:"delivery_policy"`
+	DeliveryPolicy               *string `cty:"delivery_policy" jsonstring:"true"`
 	Endpoint                     *string `cty:"endpoint"`
 	EndpointAutoConfirms         *bool   `cty:"endpoint_auto_confirms"`
-	FilterPolicy                 *string `cty:"filter_policy"`
+	FilterPolicy                 *string `cty:"filter_policy" jsonstring:"true"`
 	Id                           string  `cty:"id" computed:"true"`
 	Protocol                     *string `cty:"protocol"`
 	RawMessageDelivery           *bool   `cty:"raw_message_delivery"`
