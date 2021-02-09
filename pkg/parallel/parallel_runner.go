@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/getsentry/sentry-go"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"go.uber.org/atomic"
@@ -91,7 +92,7 @@ func (p *ParallelRunner) Run(runnable func() (interface{}, error)) {
 		defer func() {
 			if r := recover(); r != nil {
 				sentry.CurrentHub().Recover(r)
-				p.Stop(fmt.Errorf("A runner routine paniced: %s", r))
+				p.Stop(errors.New(fmt.Sprintf("A runner routine paniced: %s", r)))
 			}
 		}()
 		res, err := runnable()

@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
+	"github.com/pkg/errors"
 )
 
 var supportedBackends = []string{
@@ -29,7 +30,7 @@ func GetBackend(config config.SupplierConfig) (Backend, error) {
 	backend := config.Backend
 
 	if !IsSupported(backend) {
-		return nil, fmt.Errorf("Unsupported backend '%s'", backend)
+		return nil, errors.New(fmt.Sprintf("Unsupported backend '%s'", backend))
 	}
 
 	switch backend {
@@ -38,7 +39,7 @@ func GetBackend(config config.SupplierConfig) (Backend, error) {
 	case backendS3:
 		return NewS3Reader(config.Path)
 	default:
-		return nil, fmt.Errorf("Unsupported backend '%s'", backend)
+		return nil, errors.New(fmt.Sprintf("Unsupported backend '%s'", backend))
 	}
 }
 

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -20,6 +19,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/jmespath/go-jmespath"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -53,10 +53,12 @@ func NewScanCmd() *cobra.Command {
 
 			to, _ := cmd.Flags().GetString("to")
 			if !remote.IsSupported(to) {
-				return fmt.Errorf(
-					"unsupported cloud provider '%s'\nValid values are: %s",
-					to,
-					strings.Join(remote.GetSupportedRemotes(), ","),
+				return errors.New(
+					fmt.Sprintf(
+						"unsupported cloud provider '%s'\nValid values are: %s",
+						to,
+						strings.Join(remote.GetSupportedRemotes(), ","),
+					),
 				)
 			}
 
@@ -71,7 +73,7 @@ func NewScanCmd() *cobra.Command {
 			if filterFlag != "" {
 				expr, err := filter.BuildExpression(filterFlag)
 				if err != nil {
-					return fmt.Errorf("unable to parse filter expression: %s", err.Error())
+					return errors.Wrap(err, "unable to parse filter expression")
 				}
 				opts.Filter = expr
 			}
@@ -180,42 +182,42 @@ func parseFromFlag(from []string) ([]config.SupplierConfig, error) {
 	for _, flag := range from {
 		schemePath := strings.Split(flag, "://")
 		if len(schemePath) != 2 || schemePath[1] == "" || schemePath[0] == "" {
-			return nil, fmt.Errorf(
+			return nil, errors.New(fmt.Sprintf(
 				"Unable to parse from flag: %s\nAccepted schemes are: %s",
 				flag,
 				strings.Join(supplier.GetSupportedSchemes(), ","),
-			)
+			))
 		}
 
 		scheme := schemePath[0]
 		path := schemePath[1]
 		supplierBackend := strings.Split(scheme, "+")
 		if len(supplierBackend) > 2 {
-			return nil, fmt.Errorf(
+			return nil, errors.New(fmt.Sprintf(
 				"Unable to parse from scheme: %s\nAccepted schemes are: %s",
 				scheme,
 				strings.Join(supplier.GetSupportedSchemes(), ","),
-			)
+			))
 		}
 
 		supplierKey := supplierBackend[0]
 		if !supplier.IsSupplierSupported(supplierKey) {
-			return nil, fmt.Errorf(
+			return nil, errors.New(fmt.Sprintf(
 				"Unsupported IaC source: %s\nAccepted values are: %s",
 				supplierKey,
 				strings.Join(supplier.GetSupportedSuppliers(), ","),
-			)
+			))
 		}
 
 		backendString := ""
 		if len(supplierBackend) == 2 {
 			backendString = supplierBackend[1]
 			if !backend.IsSupported(backendString) {
-				return nil, fmt.Errorf(
+				return nil, errors.New(fmt.Sprintf(
 					"Unsupported IaC backend: %s\nAccepted values are: %s",
 					backendString,
 					strings.Join(backend.GetSupportedBackends(), ","),
-				)
+				))
 			}
 		}
 
@@ -232,20 +234,20 @@ func parseFromFlag(from []string) ([]config.SupplierConfig, error) {
 func parseOutputFlag(out string) (*output.OutputConfig, error) {
 	schemeOpts := strings.Split(out, "://")
 	if len(schemeOpts) < 2 || schemeOpts[0] == "" {
-		return nil, fmt.Errorf(
+		return nil, errors.New(fmt.Sprintf(
 			"Unable to parse output flag: %s\nAccepted formats are: %s",
 			out,
 			strings.Join(output.SupportedOutputsExample(), ","),
-		)
+		))
 	}
 
 	o := schemeOpts[0]
 	if !output.IsSupported(o) {
-		return nil, fmt.Errorf(
+		return nil, errors.New(fmt.Sprintf(
 			"Unsupported output '%s'\nValid formats are: %s",
 			o,
 			strings.Join(output.SupportedOutputsExample(), ","),
-		)
+		))
 	}
 
 	opts := schemeOpts[1:]
@@ -254,11 +256,11 @@ func parseOutputFlag(out string) (*output.OutputConfig, error) {
 	switch o {
 	case output.JSONOutputType:
 		if len(opts) != 1 || opts[0] == "" {
-			return nil, fmt.Errorf(
+			return nil, errors.New(fmt.Sprintf(
 				"Invalid json output '%s'\nMust be of kind: %s",
 				out,
 				output.Example(output.JSONOutputType),
-			)
+			))
 		}
 		options["path"] = opts[0]
 	}

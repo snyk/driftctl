@@ -2,9 +2,9 @@ package pkg
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cloudskiff/driftctl/pkg/remote"
+	"github.com/pkg/errors"
 
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/sirupsen/logrus"
@@ -85,5 +85,5 @@ loop:
 
 func (s *Scanner) Stop() {
 	logrus.Debug("Stopping scanner")
-	s.runner.Stop(fmt.Errorf("interrupted"))
+	s.runner.Stop(errors.New("interrupted"))
 }

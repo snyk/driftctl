@@ -5,6 +5,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/hashicorp/terraform/helper/hashcode"
+	"github.com/pkg/errors"
 )
 
 func (r *AwsRoute) String() string {
@@ -28,7 +29,7 @@ func CalculateRouteID(tableId, CidrBlock, Ipv6CidrBlock *string) (string, error)
 		return fmt.Sprintf("r-%s%d", *tableId, hashcode.String(*Ipv6CidrBlock)), nil
 	}
 
-	return "", fmt.Errorf("invalid route detected for table %s", *tableId)
+	return "", errors.New(fmt.Sprintf("invalid route detected for table %s", *tableId))
 }
 
 func (r *AwsRoute) NormalizeForState() (resource.Resource, error) {
