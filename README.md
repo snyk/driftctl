@@ -154,9 +154,9 @@ Our key can be retrieved from common keyservers.
 
 ```shell
 # Download binary, checksums and signature
-curl https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_linux_amd64 -o driftctl_linux_amd64
-curl https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_SHA256SUMS -o driftctl_SHA256SUMS
-curl https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_SHA256SUMS.gpg -o driftctl_SHA256SUMS.gpg
+$ curl -L https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_linux_amd64 -o driftctl_linux_amd64
+$ curl -L https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_SHA256SUMS -o driftctl_SHA256SUMS
+$ curl -L https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_SHA256SUMS.gpg -o driftctl_SHA256SUMS.gpg
 
 # Import key
 $ gpg --keyserver hkps.pool.sks-keyservers.net --recv-keys 0xACC776A79C824EBD
@@ -164,8 +164,8 @@ gpg: key ACC776A79C824EBD: public key "Cloudskiff <security@cloudskiff.com>" imp
 gpg: Total number processed: 1
 gpg:               imported: 1
 
-# Verify signature (eventually trust the key from gnupg to avoid any warning)
-$ gpg --verify bin/driftctl_SHA256SUMS.gpg
+# Verify signature (optionally trust the key from gnupg to avoid any warning)
+$ gpg --verify driftctl_SHA256SUMS.gpg
 gpg: Signature made jeu. 04 févr. 2021 14:58:06 CET
 gpg:                using EDDSA key 277666005A7F01D484F6376DACC776A79C824EBD
 gpg:                issuer "security@cloudskiff.com"
