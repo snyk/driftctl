@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"io"
 	"log"
 
 	"github.com/sirupsen/logrus"
@@ -13,17 +12,15 @@ type Config struct {
 	ReportCaller bool
 }
 
-func Init(loggerConfig Config) {
-	logrus.SetLevel(loggerConfig.Level)
-	logrus.SetReportCaller(loggerConfig.ReportCaller)
-	logrus.SetFormatter(loggerConfig.Formatter)
+func Init() {
+	config := getConfig()
+	logrus.SetLevel(config.Level)
+	logrus.SetReportCaller(config.ReportCaller)
+	logrus.SetFormatter(config.Formatter)
 
 	// Libs that use logger (like grpc provider) will log at TRACE level
-	log.SetOutput(GetTraceWriter())
-}
-
-// Get a writer which will log at trace level
-func GetTraceWriter() io.Writer {
 	redirectLogger := logrus.New()
-	return redirectLogger.WriterLevel(logrus.TraceLevel)
+	redirectLogger.SetLevel(config.Level)
+	redirectLogger.SetFormatter(config.Formatter)
+	log.SetOutput(redirectLogger.WriterLevel(logrus.TraceLevel))
 }

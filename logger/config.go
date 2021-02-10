@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func GetConfig() Config {
+func getConfig() Config {
 
 	config := Config{
 		Level:        logrus.WarnLevel,

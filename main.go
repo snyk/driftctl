@@ -29,7 +29,7 @@ func main() {
 func run() int {
 
 	config.Init()
-	logger.Init(logger.GetConfig())
+	logger.Init()
 
 	driftctlCmd := cmd.NewDriftctlCmd(build.Build{})
 
