@@ -7,6 +7,7 @@ import (
 	"runtime"
 
 	"github.com/mitchellh/go-homedir"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -56,7 +57,10 @@ func (p *ProviderInstaller) Install() (string, error) {
 	}
 
 	if info != nil && info.IsDir() {
-		return "", fmt.Errorf("found directory instead of provider binary in %s", providerPath)
+		return "", errors.Errorf(
+			"found directory instead of provider binary in %s",
+			providerPath,
+		)
 	}
 
 	if info != nil {
