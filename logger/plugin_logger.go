@@ -17,18 +17,6 @@ func (f *terraformPluginFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return f.Formatter.Format(entry)
 }
 
-var levelMap = map[hclog.Level]logrus.Level{
-	hclog.Trace: logrus.TraceLevel,
-	hclog.Debug: logrus.DebugLevel,
-	hclog.Info:  logrus.InfoLevel,
-	hclog.Warn:  logrus.WarnLevel,
-	hclog.Error: logrus.ErrorLevel,
-}
-
-func resolveHCLLogLevels(level hclog.Level) logrus.Level {
-	return levelMap[level]
-}
-
 type TerraformPluginLogger struct {
 	logger *logrus.Logger
 }
@@ -53,39 +41,39 @@ func (t TerraformPluginLogger) Trace(msg string, args ...interface{}) {
 }
 
 func (t TerraformPluginLogger) Debug(msg string, args ...interface{}) {
-	t.logger.Debug(msg, args)
+	t.Trace(msg, args)
 }
 
 func (t TerraformPluginLogger) Info(msg string, args ...interface{}) {
-	t.logger.Info(msg, args)
+	t.Trace(msg, args)
 }
 
 func (t TerraformPluginLogger) Warn(msg string, args ...interface{}) {
-	t.logger.Warn(msg, args)
+	t.Trace(msg, args)
 }
 
 func (t TerraformPluginLogger) Error(msg string, args ...interface{}) {
-	t.logger.Error(msg, args)
+	t.Trace(msg, args)
 }
 
 func (t TerraformPluginLogger) IsTrace() bool {
-	return t.logger.IsLevelEnabled(logrus.TraceLevel)
+	return true
 }
 
 func (t TerraformPluginLogger) IsDebug() bool {
-	return t.logger.IsLevelEnabled(logrus.DebugLevel)
+	return false
 }
 
 func (t TerraformPluginLogger) IsInfo() bool {
-	return t.logger.IsLevelEnabled(logrus.InfoLevel)
+	return false
 }
 
 func (t TerraformPluginLogger) IsWarn() bool {
-	return t.logger.IsLevelEnabled(logrus.WarnLevel)
+	return false
 }
 
 func (t TerraformPluginLogger) IsError() bool {
-	return t.logger.IsLevelEnabled(logrus.ErrorLevel)
+	return false
 }
 
 func (t TerraformPluginLogger) With(args ...interface{}) hclog.Logger {
@@ -100,9 +88,7 @@ func (t TerraformPluginLogger) ResetNamed(name string) hclog.Logger {
 	return t
 }
 
-func (t TerraformPluginLogger) SetLevel(level hclog.Level) {
-	t.logger.SetLevel(resolveHCLLogLevels(level))
-}
+func (t TerraformPluginLogger) SetLevel(level hclog.Level) {}
 
 func (t TerraformPluginLogger) StandardLogger(opts *hclog.StandardLoggerOptions) *log.Logger {
 	stdLogger := log.New(t.logger.Writer(), "", log.Flags())
@@ -115,7 +101,7 @@ func (t TerraformPluginLogger) StandardWriter(opts *hclog.StandardLoggerOptions)
 }
 
 func (t TerraformPluginLogger) Log(level hclog.Level, msg string, args ...interface{}) {
-	t.logger.Log(resolveHCLLogLevels(level), msg, args)
+	t.logger.Log(logrus.TraceLevel, msg, args)
 }
 
 func (t TerraformPluginLogger) ImpliedArgs() []interface{} {
