@@ -1,4 +1,4 @@
-#Adding a new resource type to driftctl
+# Adding a new resource type to driftctl
 ![Diagram](media/resource.png)
 
 ## 1 Defining the resource
