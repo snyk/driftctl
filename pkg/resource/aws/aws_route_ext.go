@@ -29,7 +29,7 @@ func CalculateRouteID(tableId, CidrBlock, Ipv6CidrBlock *string) (string, error)
 		return fmt.Sprintf("r-%s%d", *tableId, hashcode.String(*Ipv6CidrBlock)), nil
 	}
 
-	return "", errors.New(fmt.Sprintf("invalid route detected for table %s", *tableId))
+	return "", errors.Errorf("invalid route detected for table %s", *tableId)
 }
 
 func (r *AwsRoute) NormalizeForState() (resource.Resource, error) {

@@ -57,11 +57,9 @@ func (p *ProviderInstaller) Install() (string, error) {
 	}
 
 	if info != nil && info.IsDir() {
-		return "", errors.New(
-			fmt.Sprintf(
-				"found directory instead of provider binary in %s",
-				providerPath,
-			),
+		return "", errors.Errorf(
+			"found directory instead of provider binary in %s",
+			providerPath,
 		)
 	}
 

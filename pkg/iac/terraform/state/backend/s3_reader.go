@@ -1,7 +1,6 @@
 package backend
 
 import (
-	"fmt"
 	"io"
 	"strings"
 
@@ -25,7 +24,7 @@ func NewS3Reader(path string) (*S3Backend, error) {
 	backend := S3Backend{}
 	bucketPath := strings.Split(path, "/")
 	if len(bucketPath) < 2 {
-		return nil, errors.New(fmt.Sprintf("Unable to parse S3 path: %s. Must be BUCKET_NAME/PATH/TO/OBJECT", path))
+		return nil, errors.Errorf("Unable to parse S3 path: %s. Must be BUCKET_NAME/PATH/TO/OBJECT", path)
 	}
 	bucket := bucketPath[0]
 	key := strings.Join(bucketPath[1:], "/")
@@ -47,13 +46,11 @@ func (s *S3Backend) Read(p []byte) (n int, err error) {
 		if err != nil {
 			requestFailure, ok := err.(s3.RequestFailure)
 			if ok {
-				return 0, errors.New(
-					fmt.Sprintf(
-						"Error reading state '%s' from s3 bucket '%s': %s",
-						*s.input.Key,
-						*s.input.Bucket,
-						requestFailure.Message(),
-					),
+				return 0, errors.Errorf(
+					"Error reading state '%s' from s3 bucket '%s': %s",
+					*s.input.Key,
+					*s.input.Bucket,
+					requestFailure.Message(),
 				)
 			}
 			return 0, err

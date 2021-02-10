@@ -2,7 +2,6 @@ package parallel
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"github.com/getsentry/sentry-go"
@@ -92,7 +91,7 @@ func (p *ParallelRunner) Run(runnable func() (interface{}, error)) {
 		defer func() {
 			if r := recover(); r != nil {
 				sentry.CurrentHub().Recover(r)
-				p.Stop(errors.New(fmt.Sprintf("A runner routine paniced: %s", r)))
+				p.Stop(errors.Errorf("A runner routine paniced: %s", r))
 			}
 		}()
 		res, err := runnable()

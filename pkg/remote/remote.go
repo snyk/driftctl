@@ -1,8 +1,6 @@
 package remote
 
 import (
-	"fmt"
-
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -28,7 +26,7 @@ func Activate(remote string, alerter *alerter.Alerter, providerLibrary *terrafor
 	case aws.RemoteAWSTerraform:
 		return aws.Init(alerter, providerLibrary, supplierLibrary)
 	default:
-		return errors.New(fmt.Sprintf("unsupported remote '%s'", remote))
+		return errors.Errorf("unsupported remote '%s'", remote)
 	}
 }
 

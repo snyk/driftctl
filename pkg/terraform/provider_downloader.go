@@ -2,7 +2,6 @@ package terraform
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -46,22 +45,20 @@ func (p *ProviderDownloader) Download(url, path string) error {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return errors.New(fmt.Sprintf("unsuccessful request to %s: %s", url, resp.Status))
+		return errors.Errorf("unsuccessful request to %s: %s", url, resp.Status)
 	}
 	f, err := ioutil.TempFile("", "terraform-provider")
 	if err != nil {
-		return errors.New(fmt.Sprintf("failed to open temporary file to download from %s", url))
+		return errors.Errorf("failed to open temporary file to download from %s", url)
 	}
 	defer f.Close()
 	defer os.Remove(f.Name())
 	n, err := getter.Copy(p.context, f, resp.Body)
 	if err == nil && n < resp.ContentLength {
-		err = errors.New(
-			fmt.Sprintf(
-				"incorrect response size: expected %d bytes, but got %d bytes",
-				resp.ContentLength,
-				n,
-			),
+		err = errors.Errorf(
+			"incorrect response size: expected %d bytes, but got %d bytes",
+			resp.ContentLength,
+			n,
 		)
 	}
 	if err != nil {

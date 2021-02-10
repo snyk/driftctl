@@ -53,12 +53,10 @@ func NewScanCmd() *cobra.Command {
 
 			to, _ := cmd.Flags().GetString("to")
 			if !remote.IsSupported(to) {
-				return errors.New(
-					fmt.Sprintf(
-						"unsupported cloud provider '%s'\nValid values are: %s",
-						to,
-						strings.Join(remote.GetSupportedRemotes(), ","),
-					),
+				return errors.Errorf(
+					"unsupported cloud provider '%s'\nValid values are: %s",
+					to,
+					strings.Join(remote.GetSupportedRemotes(), ","),
 				)
 			}
 
