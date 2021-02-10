@@ -1,14 +1,15 @@
-# AWS Supported resources
-
-## Authentication
+---
+id: authentication
+title: Authentication
+---
 
 To use driftctl, we need credentials to make authenticated requests to AWS. Just like the AWS CLI, we use [credentials and configuration](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) settings declared as user environment variables, or in local AWS configuration files.
 
-Driftctl supports [named profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html). By default, the CLI uses the settings found in the profile named `default`. You can override an individual setting by declaring the supported environment variables such as `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_PROFILE` ...
+driftctl supports [named profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html). By default, the CLI uses the settings found in the profile named `default`. You can override an individual setting by declaring the supported environment variables such as `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_PROFILE` ...
 
 If you are using an [IAM role](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-role.html) as an authorization tool, which is considered a good practice, please be aware that you can still use driftctl by defining a profile for the role in your `~/.aws/config` file.
 
-```bash
+```shell
 [profile driftctlrole]
 role_arn = arn:aws:iam::123456789012:role/<NAMEOFTHEROLE>
 source_profile = user # profile to assume the role
@@ -17,7 +18,7 @@ region = eu-west-3
 
 You can now use driftctl by overriding the profile setting.
 
-```bash
+```shell
 $ AWS_PROFILE=driftctlrole driftctl scan
 ```
 
@@ -45,13 +46,13 @@ Find below two ways to update the CloudFormation template:
 
 2. With the AWS CLI
 
-```console
+```shell
 $ aws cloudformation update-stack --stack-name DRIFTCTL_STACK_NAME --template-url https://driftctl-cfn-templates.s3.eu-west-3.amazonaws.com/driftctl-role.yml --capabilities CAPABILITY_NAMED_IAM
 ```
 
 ## Least privileged policy
 
-Driftctl needs access to your cloud provider account so that it can list resources on your behalf.
+driftctl needs access to your cloud provider account so that it can list resources on your behalf.
 
 As AWS documentation recommends, the below policy is granting only the permissions required to perform driftctl's tasks.
 
@@ -141,120 +142,3 @@ As AWS documentation recommends, the below policy is granting only the permissio
     ]
 }
 ```
-
-## S3
-
-- [x] aws_s3_bucket
-- [x] aws_s3_bucket_analytics_configuration
-- [x] aws_s3_bucket_inventory
-- [x] aws_s3_bucket_metric
-- [x] aws_s3_bucket_notification
-- [x] aws_s3_bucket_policy
-- [ ] aws_s3_access_point
-- [ ] aws_s3_account_public_access_block
-- [ ] aws_s3_bucket_object
-- [ ] aws_s3_bucket_public_access_block
-
-## EC2
-
-- [x] aws_instance
-- [x] aws_key_pair
-- [x] aws_ami
-- [x] aws_ebs_snapshot
-- [x] aws_ebs_volume
-- [x] aws_eip
-- [x] aws_eip_association
-
-## Lambda
-
-- [x] aws_lambda_function
-- [ ] aws_lambda_alias
-- [ ] aws_lambda_event_source_mapping
-- [ ] aws_lambda_function_event_invoke_config
-- [ ] aws_lambda_layer_version
-- [ ] aws_lambda_permission
-- [ ] aws_lambda_provisioned_concurrency_config
-
-## RDS
-
-- [x] aws_db_instance
-- [x] aws_db_subnet_group
-- [ ] aws_rds_cluster
-- [ ] aws_rds_cluster_endpoint
-- [ ] aws_rds_cluster_instance
-- [ ] aws_db_cluster_snapshot
-- [ ] aws_db_event_subscription
-- [ ] aws_db_instance_role_association
-- [ ] aws_db_option_group
-- [ ] aws_db_parameter_group
-- [ ] aws_db_proxy
-- [ ] aws_db_proxy_default_target_group
-- [ ] aws_db_snapshot
-- [ ] aws_rds_cluster_endpoint
-- [ ] aws_rds_cluster_parameter_group
-- [ ] aws_rds_global_cluster
-- [ ] aws_db_security_group
-
-## Route53
-
-- [x] aws_route53_record
-- [x] aws_route53_zone
-- [ ] aws_route53_delegation_set
-- [ ] aws_route53_health_check
-- [ ] aws_route53_query_log
-- [ ] aws_route53_vpc_association_authorization
-- [ ] aws_route53_zone_association
-
-## IAM
-
-- [x] aws_iam_access_key
-- [ ] aws_iam_instance_profile
-- [x] aws_iam_policy
-- [x] aws_iam_policy_attachment
-- [ ] aws_iam_group
-- [ ] aws_iam_group_membership
-- [ ] aws_iam_group_policy
-- [ ] aws_iam_group_policy_attachment
-- [x] aws_iam_role
-- [x] aws_iam_role_policy
-- [x] aws_iam_role_policy_attachment
-- [x] aws_iam_user
-- [ ] aws_iam_user_group_membership
-- [x] aws_iam_user_policy
-- [x] aws_iam_user_policy_attachment
-- [ ] aws_iam_user_ssh_key
-- [ ] aws_iam_account_alias
-- [ ] aws_iam_account_password_policy
-- [ ] aws_iam_openid_connect_provider
-- [ ] aws_iam_saml_provider
-- [ ] aws_iam_server_certificate
-- [ ] aws_iam_service_linked_role
-- [ ] aws_iam_user_login_profile
-
-## VPC
-
-- [x] aws_default_subnet
-- [x] aws_subnet
-- [x] aws_default_vpc
-- [x] aws_vpc
-- [x] aws_default_security_group
-- [x] aws_security_group
-- [x] aws_security_group_rule
-- [x] aws_route_table
-- [x] aws_default_route_table
-- [x] aws_route
-- [x] aws_route_table_association
-- [x] aws_nat_gateway
-- [x] aws_internet_gateway
-
-## SQS
-
-- [x] aws_sqs_queue
-- [x] aws_sqs_queue_policy
-
-## SNS
-- [x] aws_sns_topic
-- [x] aws_sns_topic_policy
-- [x] aws_sns_topic_subscription
-- [ ] aws_sns_platform_application
-- [ ] aws_sns_sms_preferences
