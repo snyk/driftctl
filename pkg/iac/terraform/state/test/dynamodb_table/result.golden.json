@@ -1,0 +1,106 @@
+[
+ {
+  "Arn": "arn:aws:dynamodb:us-east-1:526954929923:table/GameScores",
+  "BillingMode": "PROVISIONED",
+  "HashKey": "UserId",
+  "Id": "GameScores",
+  "Name": "GameScores",
+  "RangeKey": "GameTitle",
+  "ReadCapacity": 20,
+  "StreamArn": "",
+  "StreamEnabled": false,
+  "StreamLabel": "",
+  "StreamViewType": "",
+  "Tags": {
+   "Environment": "production",
+   "Name": "dynamodb-table-1"
+  },
+  "WriteCapacity": 20,
+  "Attribute": [
+   {
+    "Name": "GameTitle",
+    "Type": "S"
+   },
+   {
+    "Name": "TopScore",
+    "Type": "N"
+   },
+   {
+    "Name": "UserId",
+    "Type": "S"
+   }
+  ],
+  "GlobalSecondaryIndex": [
+   {
+    "HashKey": "GameTitle",
+    "Name": "GameTitleIndex",
+    "NonKeyAttributes": [
+     "UserId"
+    ],
+    "ProjectionType": "INCLUDE",
+    "RangeKey": "TopScore",
+    "ReadCapacity": 10,
+    "WriteCapacity": 10
+   }
+  ],
+  "LocalSecondaryIndex": [],
+  "PointInTimeRecovery": [
+   {
+    "Enabled": false
+   }
+  ],
+  "Replica": [],
+  "ServerSideEncryption": [],
+  "Timeouts": null,
+  "Ttl": [
+   {
+    "AttributeName": "",
+    "Enabled": false
+   }
+  ]
+ },
+ {
+  "Arn": "arn:aws:dynamodb:us-east-1:526954929923:table/example",
+  "BillingMode": "PAY_PER_REQUEST",
+  "HashKey": "TestTableHashKey",
+  "Id": "example",
+  "Name": "example",
+  "RangeKey": null,
+  "ReadCapacity": 0,
+  "StreamArn": "arn:aws:dynamodb:us-east-1:526954929923:table/example/stream/2021-02-10T15:07:54.928",
+  "StreamEnabled": true,
+  "StreamLabel": "2021-02-10T15:07:54.928",
+  "StreamViewType": "NEW_AND_OLD_IMAGES",
+  "Tags": {},
+  "WriteCapacity": 0,
+  "Attribute": [
+   {
+    "Name": "TestTableHashKey",
+    "Type": "S"
+   }
+  ],
+  "GlobalSecondaryIndex": [],
+  "LocalSecondaryIndex": [],
+  "PointInTimeRecovery": [
+   {
+    "Enabled": false
+   }
+  ],
+  "Replica": [
+   {
+    "RegionName": "us-east-2"
+   },
+   {
+    "RegionName": "us-west-2"
+   }
+  ],
+  "ServerSideEncryption": [],
+  "Timeouts": null,
+  "Ttl": [
+   {
+    "AttributeName": "",
+    "Enabled": false
+   }
+  ]
+ }
+]

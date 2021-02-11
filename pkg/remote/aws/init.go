@@ -62,6 +62,7 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	supplierLibrary.AddSupplier(NewSNSTopicSupplier(provider))
 	supplierLibrary.AddSupplier(NewSNSTopicPolicySupplier(provider))
 	supplierLibrary.AddSupplier(NewSNSTopicSubscriptionSupplier(provider))
+	supplierLibrary.AddSupplier(NewDynamoDBTableSupplier(provider))
 
 	return nil
 }

@@ -79,6 +79,7 @@ func TestTerraformStateReader_Resources(t *testing.T) {
 		{name: "SNS Topic", dirName: "sns_topic", wantErr: false},
 		{name: "SNS Topic Policy", dirName: "sns_topic_policy", wantErr: false},
 		{name: "SNS Topic Subscription", dirName: "sns_topic_subscription", wantErr: false},
+		{name: "DynamoDB table", dirName: "dynamodb_table", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
