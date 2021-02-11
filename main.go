@@ -11,8 +11,9 @@ import (
 	cmderrors "github.com/cloudskiff/driftctl/pkg/cmd/errors"
 	"github.com/cloudskiff/driftctl/pkg/config"
 	"github.com/cloudskiff/driftctl/pkg/version"
+	"github.com/cloudskiff/driftctl/sentry"
 	"github.com/fatih/color"
-	"github.com/getsentry/sentry-go"
+	gosentry "github.com/getsentry/sentry-go"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )
@@ -47,7 +48,7 @@ func run() int {
 		if cmd.IsReportingEnabled(&driftctlCmd.Command) {
 			err := recover()
 			if err != nil {
-				sentry.CurrentHub().Recover(err)
+				gosentry.CurrentHub().Recover(err)
 				flushSentry()
 				logrus.Fatalf("Captured panic: %s", err)
 				os.Exit(2)
@@ -80,6 +81,6 @@ func run() int {
 
 func flushSentry() {
 	fmt.Print("Sending error report ...")
-	sentry.Flush(60 * time.Second)
+	gosentry.Flush(60 * time.Second)
 	fmt.Printf(" done, thank you %s\n", color.RedString("❤️"))
 }
