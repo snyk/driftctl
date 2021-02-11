@@ -1,0 +1,97 @@
+{
+  "version-0.4.0/docs": [
+    {
+      "collapsed": true,
+      "type": "category",
+      "label": "Introduction",
+      "items": [
+        {
+          "type": "doc",
+          "id": "version-0.4.0/intro"
+        },
+        {
+          "type": "doc",
+          "id": "version-0.4.0/installation"
+        },
+        {
+          "type": "doc",
+          "id": "version-0.4.0/limitations"
+        }
+      ]
+    },
+    {
+      "collapsed": true,
+      "type": "category",
+      "label": "Commands",
+      "items": [
+        {
+          "collapsed": true,
+          "type": "category",
+          "label": "Scan",
+          "items": [
+            {
+              "type": "doc",
+              "id": "version-0.4.0/cmd/scan/iac-source"
+            },
+            {
+              "type": "doc",
+              "id": "version-0.4.0/cmd/scan/output"
+            },
+            {
+              "type": "doc",
+              "id": "version-0.4.0/cmd/scan/filtering"
+            }
+          ]
+        },
+        {
+          "collapsed": true,
+          "type": "category",
+          "label": "Flags",
+          "items": [
+            {
+              "type": "doc",
+              "id": "version-0.4.0/cmd/flags/error-reporting"
+            },
+            {
+              "type": "doc",
+              "id": "version-0.4.0/cmd/flags/version-check"
+            }
+          ]
+        },
+        {
+          "collapsed": true,
+          "type": "category",
+          "label": "Completion",
+          "items": [
+            {
+              "type": "doc",
+              "id": "version-0.4.0/cmd/completion/script"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "collapsed": true,
+      "type": "category",
+      "label": "Providers",
+      "items": [
+        {
+          "collapsed": true,
+          "type": "category",
+          "label": "AWS",
+          "items": [
+            {
+              "type": "doc",
+              "id": "version-0.4.0/providers/aws/authentication"
+            },
+            {
+              "type": "doc",
+              "id": "version-0.4.0/providers/aws/resources"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
