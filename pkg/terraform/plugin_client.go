@@ -1,31 +1,23 @@
 package terraform
 
 import (
-	"github.com/cloudskiff/driftctl/logger"
 	"os/exec"
 
+	"github.com/cloudskiff/driftctl/logger"
 	tfplugin "github.com/hashicorp/terraform/plugin"
-
-	"github.com/hashicorp/go-hclog"
 
 	"github.com/hashicorp/go-plugin"
 	"github.com/hashicorp/terraform/plugin/discovery"
 )
 
 func ClientConfig(m discovery.PluginMeta) *plugin.ClientConfig {
-	// redirect plugin logger to trace level in logrus
-	pluginLogger := hclog.New(&hclog.LoggerOptions{
-		Name:   "plugin",
-		Level:  hclog.Trace,
-		Output: logger.GetTraceWriter(),
-	})
-
+	logger := logger.NewTerraformPluginLogger()
 	return &plugin.ClientConfig{
 		Cmd:              exec.Command(m.Path),
 		HandshakeConfig:  tfplugin.Handshake,
 		VersionedPlugins: tfplugin.VersionedPlugins,
 		Managed:          true,
-		Logger:           pluginLogger,
+		Logger:           logger,
 		AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
 		AutoMTLS:         true,
 	}

@@ -268,7 +268,7 @@ func Run(t *testing.T, c AccTestCase) {
 		}
 	}()
 
-	logger.Init(logger.GetConfig())
+	logger.Init()
 
 	err = c.createResultFile(t)
 	if err != nil {
