@@ -51,7 +51,7 @@ jobs:
               ${DISCORD_WEBHOOK}
       - store_test_results:
           path: ./
-  test:
+  lint:
     docker:
       - image: golang:1.15
     steps:
@@ -68,6 +68,13 @@ jobs:
               exit 1
             fi
       - run: make install-tools
+      - run: make lint
+  test:
+    docker:
+      - image: golang:1.15
+    steps:
+      - checkout
+      - run: make install-tools
       - run: make test
       - run:
           name: Codecov upload
@@ -75,6 +82,32 @@ jobs:
             bash <(curl -s https://codecov.io/bash)
       - store_test_results:
           path: ./
+  sign_release:
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: "Ensure GnuPG is available"
+          command: gpg --version
+      - run:
+          name: "Import cloudskiff signing key"
+          command: |
+            echo ${SIGNINGKEY} | base64 -d > signingkey
+            gpg --import signingkey
+      - run:
+          name: "Sign release"
+          command: |
+            gpg --sign -u security@cloudskiff.com bin/driftctl_SHA256SUMS
+      - run:
+          name: "Verify signature"
+          command: |
+            gpg --verify bin/driftctl_SHA256SUMS.gpg
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - bin/
   release:
     environment:
         CIRCLE_PROJECT_USERNAME: cloudskiff
@@ -122,6 +155,11 @@ workflows:
                 - main
   pullrequest:
     jobs:
+      - lint:
+          filters:
+            branches:
+              ignore:
+                - main
       - test:
           filters:
             branches:
@@ -142,7 +180,22 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
+      - lint:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
       - test:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - sign_release:
+          context: cloudskiff-signing
+          requires:
+            - build
           filters:
             tags:
               only: /^v.*/
@@ -151,8 +204,9 @@ workflows:
       - release:
           context: driftctl
           requires:
+            - lint
             - test
-            - build
+            - sign_release
           filters:
             tags:
               only: /^v.*/

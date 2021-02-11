@@ -51,5 +51,6 @@ func Deserializers() []deserializer.CTYDeserializer {
 		awsdeserializer.NewSqsQueuePolicyDeserializer(),
 		awsdeserializer.NewSNSTopicDeserializer(),
 		awsdeserializer.NewSNSTopicPolicyDeserializer(),
+		awsdeserializer.NewSNSTopicSubscriptionDeserializer(),
 	}
 }

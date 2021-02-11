@@ -99,7 +99,7 @@ func TestDriftctlCmd_Scan(t *testing.T) {
 			env: map[string]string{
 				"DCTL_FROM": "test",
 			},
-			err: fmt.Errorf("Unable to parse from flag: test\nAccepted schemes are: tfstate://,tfstate+s3://"),
+			err: fmt.Errorf("Unable to parse from flag 'test': \nAccepted schemes are: tfstate://,tfstate+s3://"),
 		},
 		{
 			env: map[string]string{
@@ -111,7 +111,7 @@ func TestDriftctlCmd_Scan(t *testing.T) {
 			env: map[string]string{
 				"DCTL_OUTPUT": "test",
 			},
-			err: fmt.Errorf("Unable to parse output flag: test\nAccepted formats are: console://,json://PATH/TO/FILE.json"),
+			err: fmt.Errorf("Unable to parse output flag 'test': \nAccepted formats are: console://,json://PATH/TO/FILE.json"),
 		},
 		{
 			env: map[string]string{

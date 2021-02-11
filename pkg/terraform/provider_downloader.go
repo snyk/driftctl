@@ -2,20 +2,17 @@ package terraform
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"runtime"
 
 	"github.com/hashicorp/go-getter"
-
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
 type ProviderDownloaderInterface interface {
 	Download(url, path string) error
-	GetProviderUrl(name, version string) string
 }
 
 type ProviderDownloader struct {
@@ -30,18 +27,6 @@ func NewProviderDownloader() *ProviderDownloader {
 		unzip:      getter.ZipDecompressor{},
 		context:    context.Background(),
 	}
-}
-
-func (p *ProviderDownloader) GetProviderUrl(name, version string) string {
-	return fmt.Sprintf(
-		"https://releases.hashicorp.com/terraform-provider-%s/%s/terraform-provider-%s_%s_%s_%s.zip",
-		name,
-		version,
-		name,
-		version,
-		runtime.GOOS,
-		runtime.GOARCH,
-	)
 }
 
 func (p *ProviderDownloader) Download(url, path string) error {
@@ -60,17 +45,21 @@ func (p *ProviderDownloader) Download(url, path string) error {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unsuccessful request to %s: %s", url, resp.Status)
+		return errors.Errorf("unsuccessful request to %s: %s", url, resp.Status)
 	}
 	f, err := ioutil.TempFile("", "terraform-provider")
 	if err != nil {
-		return fmt.Errorf("failed to open temporary file to download from %s", url)
+		return errors.Errorf("failed to open temporary file to download from %s", url)
 	}
 	defer f.Close()
 	defer os.Remove(f.Name())
 	n, err := getter.Copy(p.context, f, resp.Body)
 	if err == nil && n < resp.ContentLength {
-		err = fmt.Errorf("incorrect response size: expected %d bytes, but got %d bytes", resp.ContentLength, n)
+		err = errors.Errorf(
+			"incorrect response size: expected %d bytes, but got %d bytes",
+			resp.ContentLength,
+			n,
+		)
 	}
 	if err != nil {
 		return err

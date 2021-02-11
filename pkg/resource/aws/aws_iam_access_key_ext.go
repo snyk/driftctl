@@ -1,6 +1,10 @@
 package aws
 
-import "github.com/cloudskiff/driftctl/pkg/resource"
+import (
+	"fmt"
+
+	"github.com/cloudskiff/driftctl/pkg/resource"
+)
 
 func (r *AwsIamAccessKey) NormalizeForState() (resource.Resource, error) {
 	// As we can't read secrets from aws API once access_key created we need to set
@@ -13,4 +17,11 @@ func (r *AwsIamAccessKey) NormalizeForState() (resource.Resource, error) {
 
 func (r *AwsIamAccessKey) NormalizeForProvider() (resource.Resource, error) {
 	return r, nil
+}
+
+func (r *AwsIamAccessKey) String() string {
+	if r.User == nil {
+		return r.TerraformId()
+	}
+	return fmt.Sprintf("%s (User: %s)", r.TerraformId(), *r.User)
 }

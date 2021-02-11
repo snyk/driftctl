@@ -34,12 +34,11 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 		for ty, resources := range deletedByType {
 			fmt.Printf("  %s:\n", ty)
 			for _, res := range resources {
-				stringer, ok := res.(fmt.Stringer)
-				fmt.Printf("    - %s", res.TerraformId())
-				if ok {
-					fmt.Printf(" (%s)", stringer.String())
+				humanString := res.TerraformId()
+				if stringer, ok := res.(fmt.Stringer); ok {
+					humanString = stringer.String()
 				}
-				fmt.Println()
+				fmt.Printf("    - %s\n", humanString)
 			}
 		}
 	}
@@ -50,12 +49,11 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 		for ty, resource := range unmanagedByType {
 			fmt.Printf("  %s:\n", ty)
 			for _, res := range resource {
-				stringer, ok := res.(fmt.Stringer)
-				fmt.Printf("    - %s", res.TerraformId())
-				if ok {
-					fmt.Printf(" (%s)", stringer.String())
+				humanString := res.TerraformId()
+				if stringer, ok := res.(fmt.Stringer); ok {
+					humanString = stringer.String()
 				}
-				fmt.Println()
+				fmt.Printf("    - %s\n", humanString)
 			}
 		}
 	}
@@ -63,12 +61,11 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 	if analysis.Summary().TotalDrifted > 0 {
 		fmt.Printf("Found drifted resources:\n")
 		for _, difference := range analysis.Differences() {
-			stringer, ok := difference.Res.(fmt.Stringer)
-			humanString := difference.Res.TerraformType()
-			if ok {
+			humanString := difference.Res.TerraformId()
+			if stringer, ok := difference.Res.(fmt.Stringer); ok {
 				humanString = stringer.String()
 			}
-			fmt.Printf("  - %s (%s):\n", difference.Res.TerraformId(), humanString)
+			fmt.Printf("  - %s (%s):\n", humanString, difference.Res.TerraformType())
 			for _, change := range difference.Changelog {
 				path := strings.Join(change.Path, ".")
 				pref := fmt.Sprintf("%s %s:", color.YellowString("~"), path)

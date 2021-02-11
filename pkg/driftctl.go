@@ -9,6 +9,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/middlewares"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/jmespath/go-jmespath"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,11 +25,10 @@ func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier
 	return &DriftCTL{remoteSupplier, iacSupplier, alerter, analyser.NewAnalyzer(alerter), filter}
 }
 
-func (d DriftCTL) Run() *analyser.Analysis {
+func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	remoteResources, resourcesFromState, err := d.scan()
 	if err != nil {
-		logrus.Errorf("Unable to scan resources: %+v", err)
-		return nil
+		return nil, errors.Wrap(err, "Unable to scan resources")
 	}
 
 	middleware := middlewares.NewChain(
@@ -56,21 +56,18 @@ func (d DriftCTL) Run() *analyser.Analysis {
 	logrus.Debug("Ready to run middlewares")
 	err = middleware.Execute(&remoteResources, &resourcesFromState)
 	if err != nil {
-		logrus.Errorf("Unable to run middlewares: %+v", err)
-		return nil
+		return nil, errors.Wrap(err, "Unable to run middlewares")
 	}
 
 	if d.filter != nil {
 		engine := filter.NewFilterEngine(d.filter)
 		remoteResources, err = engine.Run(remoteResources)
 		if err != nil {
-			logrus.Error(err)
-			return nil
+			return nil, errors.Wrap(err, "Unable to filter remote resources")
 		}
 		resourcesFromState, err = engine.Run(resourcesFromState)
 		if err != nil {
-			logrus.Error(err)
-			return nil
+			return nil, errors.Wrap(err, "Unable to filter state resources")
 		}
 	}
 
@@ -80,11 +77,10 @@ func (d DriftCTL) Run() *analyser.Analysis {
 	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState, driftIgnore)
 
 	if err != nil {
-		logrus.Errorf("Unable to analyse resources: %+v", err)
-		return nil
+		return nil, errors.Wrap(err, "Unable to perform resources analysis")
 	}
 
-	return &analysis
+	return &analysis, nil
 }
 
 func (d DriftCTL) Stop() {

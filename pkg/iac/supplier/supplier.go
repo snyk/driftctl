@@ -5,6 +5,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
@@ -31,7 +32,7 @@ func GetIACSupplier(configs []config.SupplierConfig, library *terraform.Provider
 	chainSupplier := resource.NewChainSupplier()
 	for _, config := range configs {
 		if !IsSupplierSupported(config.Key) {
-			return nil, fmt.Errorf("Unsupported supplier '%s'", config.Key)
+			return nil, errors.Errorf("Unsupported supplier '%s'", config.Key)
 		}
 
 		var supplier resource.Supplier
@@ -40,7 +41,7 @@ func GetIACSupplier(configs []config.SupplierConfig, library *terraform.Provider
 		case state.TerraformStateReaderSupplier:
 			supplier, err = state.NewReader(config, library)
 		default:
-			return nil, fmt.Errorf("Unsupported supplier '%s'", config.Key)
+			return nil, errors.Errorf("Unsupported supplier '%s'", config.Key)
 		}
 
 		if err != nil {

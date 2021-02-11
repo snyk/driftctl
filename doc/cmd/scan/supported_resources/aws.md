@@ -133,10 +133,13 @@ You can use the terraform file in the [readonly.tf](../readonly.tf/) folder to c
                 "s3:ListBucket",
                 "sqs:GetQueueAttributes",
                 "sqs:ListQueueTags",
-                "sqs:ListQueues"
+                "sqs:ListQueues",
                 "sns:ListTopics",
                 "sns:GetTopicAttributes",
-                "sns:ListTagsForResource"
+                "sns:ListTagsForResource",
+                "sns:ListSubscriptions",
+                "sns:ListSubscriptionsByTopic",
+                "sns:GetSubscriptionAttributes"
             ]
         }
     ]
@@ -256,6 +259,6 @@ You can use the terraform file in the [readonly.tf](../readonly.tf/) folder to c
 ## SNS
 - [x] aws_sns_topic
 - [x] aws_sns_topic_policy
-- [ ] aws_sns_topic_subscription
+- [x] aws_sns_topic_subscription
 - [ ] aws_sns_platform_application
 - [ ] aws_sns_sms_preferences
