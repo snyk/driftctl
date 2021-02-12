@@ -52,5 +52,6 @@ func Deserializers() []deserializer.CTYDeserializer {
 		awsdeserializer.NewSNSTopicDeserializer(),
 		awsdeserializer.NewSNSTopicPolicyDeserializer(),
 		awsdeserializer.NewSNSTopicSubscriptionDeserializer(),
+		awsdeserializer.NewDynamoDBTableDeserializer(),
 	}
 }

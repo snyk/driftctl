@@ -135,7 +135,14 @@ As AWS documentation recommends, the below policy is granting only the permissio
                 "sns:ListTagsForResource",
                 "sns:ListSubscriptions",
                 "sns:ListSubscriptionsByTopic",
-                "sns:GetSubscriptionAttributes"
+                "sns:GetSubscriptionAttributes",
+                "dynamodb:ListTables",
+                "dynamodb:DescribeTable",
+                "dynamodb:DescribeGlobalTable",
+                "dynamodb:ListTagsOfResource",
+                "dynamodb:DescribeTimeToLive",
+                "dynamodb:DescribeTableReplicaAutoScaling",
+                "dynamodb:DescribeContinuousBackups"
             ]
         }
     ]
@@ -258,3 +265,8 @@ As AWS documentation recommends, the below policy is granting only the permissio
 - [x] aws_sns_topic_subscription
 - [ ] aws_sns_platform_application
 - [ ] aws_sns_sms_preferences
+
+## DynamoDB
+- [x] aws_dynamodb_table
+- [ ] aws_dynamodb_global_table
+- [ ] aws_dynamodb_table_item
