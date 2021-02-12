@@ -24,7 +24,7 @@ type S3BucketMetricSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewS3BucketMetricSupplier(provider *TerraformProvider, factory AwsClientFactoryInterface) *S3BucketMetricSupplier {
+func NewS3BucketMetricSupplier(provider *AWSTerraformProvider, factory AwsClientFactoryInterface) *S3BucketMetricSupplier {
 	return &S3BucketMetricSupplier{
 		provider,
 		awsdeserializer.NewS3BucketMetricDeserializer(),
@@ -94,7 +94,7 @@ func (s *S3BucketMetricSupplier) listBucketMetricConfiguration(name, region stri
 					Ty: aws.AwsS3BucketMetricResourceType,
 					ID: id,
 					Attributes: map[string]string{
-						"aws_region": region,
+						"alias": region,
 					},
 				},
 			)

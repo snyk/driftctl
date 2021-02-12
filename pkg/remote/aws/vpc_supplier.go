@@ -25,7 +25,7 @@ type VPCSupplier struct {
 	vpcRunner              *terraform.ParallelResourceReader
 }
 
-func NewVPCSupplier(provider *TerraformProvider) *VPCSupplier {
+func NewVPCSupplier(provider *AWSTerraformProvider) *VPCSupplier {
 	return &VPCSupplier{
 		provider,
 		awsdeserializer.NewDefaultVPCDeserializer(),

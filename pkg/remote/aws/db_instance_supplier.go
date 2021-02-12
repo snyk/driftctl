@@ -21,7 +21,7 @@ type DBInstanceSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewDBInstanceSupplier(provider *TerraformProvider) *DBInstanceSupplier {
+func NewDBInstanceSupplier(provider *AWSTerraformProvider) *DBInstanceSupplier {
 	return &DBInstanceSupplier{
 		provider,
 		awsdeserializer.NewDBInstanceDeserializer(),

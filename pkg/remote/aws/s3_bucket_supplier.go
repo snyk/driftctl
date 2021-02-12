@@ -23,7 +23,7 @@ type S3BucketSupplier struct {
 	runner           *terraform.ParallelResourceReader
 }
 
-func NewS3BucketSupplier(provider *TerraformProvider, factory AwsClientFactoryInterface) *S3BucketSupplier {
+func NewS3BucketSupplier(provider *AWSTerraformProvider, factory AwsClientFactoryInterface) *S3BucketSupplier {
 	return &S3BucketSupplier{
 		provider,
 		awsdeserializer.NewS3BucketDeserializer(),
@@ -99,7 +99,7 @@ func (s *S3BucketSupplier) readBucket(bucket s3.Bucket, client *s3iface.S3API) (
 		Ty: aws.AwsS3BucketResourceType,
 		ID: name,
 		Attributes: map[string]string{
-			"aws_region": region,
+			"alias": region,
 		},
 	})
 	if err != nil {

@@ -1,4 +1,4 @@
-package aws
+package terraform
 
 import (
 	"context"
@@ -10,76 +10,47 @@ import (
 	"time"
 
 	"github.com/cloudskiff/driftctl/pkg/parallel"
-	"github.com/sirupsen/logrus"
-
 	tf "github.com/cloudskiff/driftctl/pkg/terraform"
-
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/eapache/go-resiliency/retrier"
 	"github.com/hashicorp/terraform/plugin"
 	"github.com/hashicorp/terraform/plugin/discovery"
 	"github.com/hashicorp/terraform/providers"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 )
 
-type awsConfig struct {
-	AccessKey     string
-	SecretKey     string
-	CredsFilename string
-	Profile       string
-	Token         string
-	Region        string `cty:"region"`
-	MaxRetries    int
-
-	AssumeRoleARN         string
-	AssumeRoleExternalID  string
-	AssumeRoleSessionName string
-	AssumeRolePolicy      string
-
-	AllowedAccountIds   []string
-	ForbiddenAccountIds []string
-
-	Endpoints        map[string]string
-	IgnoreTagsConfig map[string]string
-	Insecure         bool
-
-	SkipCredsValidation     bool
-	SkipGetEC2Platforms     bool
-	SkipRegionValidation    bool
-	SkipRequestingAccountId bool
-	SkipMetadataApiCheck    bool
-	S3ForcePathStyle        bool
+// "alias" in these struct are a way to namespace gRPC clients.
+// For example, if we need to read S3 bucket from multiple AWS region,
+// we'll have an alias per region, and the alias IS the region itself.
+// So we can query resources using a specific custom provider configuration
+type TerraformProviderConfig struct {
+	DefaultAlias      string
+	GetProviderConfig func(alias string) interface{}
 }
 
 type TerraformProvider struct {
-	lock             sync.Mutex
-	providerSupplier *tf.ProviderInstaller
-	session          *session.Session
-	grpcProviders    map[string]*plugin.GRPCProvider
-	schemas          map[string]providers.Schema
-	defaultRegion    string
-	runner           *parallel.ParallelRunner
+	lock              sync.Mutex
+	providerInstaller *tf.ProviderInstaller
+	grpcProviders     map[string]*plugin.GRPCProvider
+	schemas           map[string]providers.Schema
+	Config            TerraformProviderConfig
+	runner            *parallel.ParallelRunner
 }
 
-func NewTerraFormProvider() (*TerraformProvider, error) {
-	provider, err := tf.NewProviderInstaller(tf.ProviderConfig{
-		Key:     "aws",
-		Version: "3.19.0",
-		Postfix: "x5",
-	})
-	if err != nil {
-		return nil, err
-	}
+func NewTerraformProvider(installer *tf.ProviderInstaller, config TerraformProviderConfig) (*TerraformProvider, error) {
 	p := TerraformProvider{
-		providerSupplier: provider,
-		runner:           parallel.NewParallelRunner(context.TODO(), 10),
-		grpcProviders:    make(map[string]*plugin.GRPCProvider),
+		providerInstaller: installer,
+		runner:            parallel.NewParallelRunner(context.TODO(), 10),
+		grpcProviders:     make(map[string]*plugin.GRPCProvider),
+		Config:            config,
 	}
-	p.initSession()
-	p.defaultRegion = *p.session.Config.Region
+	return &p, nil
+}
+
+func (p *TerraformProvider) Init() error {
 	stopCh := make(chan bool)
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -96,12 +67,12 @@ func NewTerraFormProvider() (*TerraformProvider, error) {
 	defer func() {
 		stopCh <- true
 	}()
-	err = p.configure(p.defaultRegion)
+	err := p.configure(p.Config.DefaultAlias)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	fmt.Printf("Scanning AWS on region: %s\n", p.defaultRegion)
-	return &p, nil
+	fmt.Printf("Provider initialized (alias=%s)\n", p.Config.DefaultAlias)
+	return nil
 }
 
 func (p *TerraformProvider) Schema() map[string]providers.Schema {
@@ -112,46 +83,37 @@ func (p *TerraformProvider) Runner() *parallel.ParallelRunner {
 	return p.runner
 }
 
-func (p *TerraformProvider) initSession() {
-	p.session = session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-	}))
-}
+func (p *TerraformProvider) configure(alias string) error {
 
-func (p *TerraformProvider) configure(region string) error {
-
-	providerPath, err := p.providerSupplier.Install()
+	providerPath, err := p.providerInstaller.Install()
 	if err != nil {
 		return err
 	}
 
-	logrus.WithFields(logrus.Fields{
-		"region": region,
-	}).Debug("Starting new provider")
-	if p.grpcProviders[region] == nil {
+	if p.grpcProviders[alias] == nil {
 		logrus.WithFields(logrus.Fields{
-			"region": region,
-		}).Debug("Starting aws provider GRPC client")
-		GRPCProvider, err := tf.NewTerraformProvider(discovery.PluginMeta{
+			"alias": alias,
+		}).Debug("Starting gRPC client")
+		GRPCProvider, err := tf.NewGRPCProvider(discovery.PluginMeta{
 			Path: providerPath,
 		})
 
 		if err != nil {
 			return err
 		}
-		p.grpcProviders[region] = GRPCProvider
+		p.grpcProviders[alias] = GRPCProvider
 	}
 
-	schema := p.grpcProviders[region].GetSchema()
+	schema := p.grpcProviders[alias].GetSchema()
 	if p.schemas == nil {
 		p.schemas = schema.ResourceTypes
 	}
 	configType := schema.Provider.Block.ImpliedType()
-	val, err := gocty.ToCtyValue(getConfig(region), configType)
+	val, err := gocty.ToCtyValue(p.Config.GetProviderConfig(alias), configType)
 	if err != nil {
 		return err
 	}
-	resp := p.grpcProviders[region].Configure(providers.ConfigureRequest{
+	resp := p.grpcProviders[alias].Configure(providers.ConfigureRequest{
 		Config: val,
 	})
 
@@ -159,14 +121,11 @@ func (p *TerraformProvider) configure(region string) error {
 		return resp.Diagnostics.Err()
 	}
 
-	return nil
-}
+	logrus.WithFields(logrus.Fields{
+		"alias": alias,
+	}).Debug("New gRPC client started")
 
-func getConfig(region string) awsConfig {
-	return awsConfig{
-		Region:     region,
-		MaxRetries: 10, // TODO make this configurable
-	}
+	return nil
 }
 
 func (p *TerraformProvider) ReadResource(args tf.ReadResourceArgs) (*cty.Value, error) {
@@ -175,7 +134,7 @@ func (p *TerraformProvider) ReadResource(args tf.ReadResourceArgs) (*cty.Value, 
 		"id":    args.ID,
 		"type":  args.Ty,
 		"attrs": args.Attributes,
-	}).Debugf("Reading aws cloud resource")
+	}).Debugf("Reading cloud resource")
 
 	typ := string(args.Ty)
 	state := &terraform.InstanceState{
@@ -183,15 +142,15 @@ func (p *TerraformProvider) ReadResource(args tf.ReadResourceArgs) (*cty.Value, 
 		Attributes: map[string]string{},
 	}
 
-	region := p.defaultRegion
-	if args.Attributes["aws_region"] != "" {
-		region = args.Attributes["aws_region"]
-		delete(args.Attributes, "aws_region")
+	alias := p.Config.DefaultAlias
+	if args.Attributes["alias"] != "" {
+		alias = args.Attributes["alias"]
+		delete(args.Attributes, "alias")
 	}
 
 	p.lock.Lock()
-	if p.grpcProviders[region] == nil {
-		err := p.configure(region)
+	if p.grpcProviders[alias] == nil {
+		err := p.configure(alias)
 		if err != nil {
 			return nil, err
 		}
@@ -217,7 +176,7 @@ func (p *TerraformProvider) ReadResource(args tf.ReadResourceArgs) (*cty.Value, 
 	r := retrier.New(retrier.ConstantBackoff(3, 100*time.Millisecond), nil)
 
 	err = r.Run(func() error {
-		resp := p.grpcProviders[region].ReadResource(providers.ReadResourceRequest{
+		resp := p.grpcProviders[alias].ReadResource(providers.ReadResourceRequest{
 			TypeName:     typ,
 			PriorState:   priorState,
 			Private:      []byte{},
@@ -241,9 +200,9 @@ func (p *TerraformProvider) ReadResource(args tf.ReadResourceArgs) (*cty.Value, 
 }
 
 func (p *TerraformProvider) Cleanup() {
-	for region, client := range p.grpcProviders {
+	for alias, client := range p.grpcProviders {
 		logrus.WithFields(logrus.Fields{
-			"region": region,
+			"alias": alias,
 		}).Debug("Closing gRPC client")
 		client.Close()
 	}

@@ -25,7 +25,7 @@ type SubnetSupplier struct {
 	subnetRunner              *terraform.ParallelResourceReader
 }
 
-func NewSubnetSupplier(provider *TerraformProvider) *SubnetSupplier {
+func NewSubnetSupplier(provider *AWSTerraformProvider) *SubnetSupplier {
 	return &SubnetSupplier{
 		provider,
 		awsdeserializer.NewDefaultSubnetDeserializer(),

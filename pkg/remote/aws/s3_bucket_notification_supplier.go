@@ -19,7 +19,7 @@ type S3BucketNotificationSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewS3BucketNotificationSupplier(provider *TerraformProvider, factory AwsClientFactoryInterface) *S3BucketNotificationSupplier {
+func NewS3BucketNotificationSupplier(provider *AWSTerraformProvider, factory AwsClientFactoryInterface) *S3BucketNotificationSupplier {
 	return &S3BucketNotificationSupplier{
 		provider,
 		awsdeserializer.NewS3BucketNotificationDeserializer(),
@@ -75,7 +75,7 @@ func (s *S3BucketNotificationSupplier) listBucketNotificationConfiguration(name,
 			Ty: aws.AwsS3BucketNotificationResourceType,
 			ID: name,
 			Attributes: map[string]string{
-				"aws_region": region,
+				"alias": region,
 			},
 		})
 		if err != nil {

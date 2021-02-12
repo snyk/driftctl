@@ -24,7 +24,7 @@ type S3BucketAnalyticSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewS3BucketAnalyticSupplier(provider *TerraformProvider, factory AwsClientFactoryInterface) *S3BucketAnalyticSupplier {
+func NewS3BucketAnalyticSupplier(provider *AWSTerraformProvider, factory AwsClientFactoryInterface) *S3BucketAnalyticSupplier {
 	return &S3BucketAnalyticSupplier{
 		provider,
 		awsdeserializer.NewS3BucketAnalyticDeserializer(),
@@ -94,7 +94,7 @@ func (s *S3BucketAnalyticSupplier) listBucketAnalyticConfiguration(name, region 
 					Ty: aws.AwsS3BucketAnalyticsConfigurationResourceType,
 					ID: id,
 					Attributes: map[string]string{
-						"aws_region": region,
+						"alias": region,
 					},
 				},
 			)

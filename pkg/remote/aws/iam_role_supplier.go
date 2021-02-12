@@ -31,7 +31,7 @@ type IamRoleSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamRoleSupplier(provider *TerraformProvider) *IamRoleSupplier {
+func NewIamRoleSupplier(provider *AWSTerraformProvider) *IamRoleSupplier {
 	return &IamRoleSupplier{
 		provider,
 		awsdeserializer.NewIamRoleDeserializer(),

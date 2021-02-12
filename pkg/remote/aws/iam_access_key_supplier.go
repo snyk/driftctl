@@ -22,7 +22,7 @@ type IamAccessKeySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamAccessKeySupplier(provider *TerraformProvider) *IamAccessKeySupplier {
+func NewIamAccessKeySupplier(provider *AWSTerraformProvider) *IamAccessKeySupplier {
 	return &IamAccessKeySupplier{
 		provider,
 		awsdeserializer.NewIamAccessKeyDeserializer(),

@@ -25,7 +25,7 @@ type VPCSecurityGroupSupplier struct {
 	securityGroupRunner              *terraform.ParallelResourceReader
 }
 
-func NewVPCSecurityGroupSupplier(provider *TerraformProvider) *VPCSecurityGroupSupplier {
+func NewVPCSecurityGroupSupplier(provider *AWSTerraformProvider) *VPCSecurityGroupSupplier {
 	return &VPCSecurityGroupSupplier{
 		provider,
 		awsdeserializer.NewDefaultSecurityGroupDeserializer(),

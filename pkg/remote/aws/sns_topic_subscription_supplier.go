@@ -21,7 +21,7 @@ type SNSTopicSubscriptionSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewSNSTopicSubscriptionSupplier(provider *TerraformProvider) *SNSTopicSubscriptionSupplier {
+func NewSNSTopicSubscriptionSupplier(provider *AWSTerraformProvider) *SNSTopicSubscriptionSupplier {
 	return &SNSTopicSubscriptionSupplier{
 		provider,
 		awsdeserializer.NewSNSTopicSubscriptionDeserializer(),

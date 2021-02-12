@@ -24,7 +24,7 @@ type IamRolePolicySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamRolePolicySupplier(provider *TerraformProvider) *IamRolePolicySupplier {
+func NewIamRolePolicySupplier(provider *AWSTerraformProvider) *IamRolePolicySupplier {
 	return &IamRolePolicySupplier{
 		provider,
 		awsdeserializer.NewIamRolePolicyDeserializer(),

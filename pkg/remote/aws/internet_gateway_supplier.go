@@ -20,7 +20,7 @@ type InternetGatewaySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewInternetGatewaySupplier(provider *TerraformProvider) *InternetGatewaySupplier {
+func NewInternetGatewaySupplier(provider *AWSTerraformProvider) *InternetGatewaySupplier {
 	return &InternetGatewaySupplier{
 		provider,
 		awsdeserializer.NewInternetGatewayDeserializer(),

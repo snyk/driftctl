@@ -23,7 +23,7 @@ type EC2KeyPairSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2KeyPairSupplier(provider *TerraformProvider) *EC2KeyPairSupplier {
+func NewEC2KeyPairSupplier(provider *AWSTerraformProvider) *EC2KeyPairSupplier {
 	return &EC2KeyPairSupplier{
 		provider,
 		awsdeserializer.NewEC2KeyPairDeserializer(),

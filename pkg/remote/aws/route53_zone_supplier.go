@@ -24,7 +24,7 @@ type Route53ZoneSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewRoute53ZoneSupplier(provider *TerraformProvider) *Route53ZoneSupplier {
+func NewRoute53ZoneSupplier(provider *AWSTerraformProvider) *Route53ZoneSupplier {
 	return &Route53ZoneSupplier{
 		provider,
 		awsdeserializer.NewRoute53ZoneDeserializer(),

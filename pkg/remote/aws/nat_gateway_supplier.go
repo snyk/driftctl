@@ -20,7 +20,7 @@ type NatGatewaySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewNatGatewaySupplier(provider *TerraformProvider) *NatGatewaySupplier {
+func NewNatGatewaySupplier(provider *AWSTerraformProvider) *NatGatewaySupplier {
 	return &NatGatewaySupplier{
 		provider,
 		awsdeserializer.NewNatGatewayDeserializer(),

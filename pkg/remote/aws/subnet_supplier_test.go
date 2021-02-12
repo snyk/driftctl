@@ -115,12 +115,10 @@ func TestSubnetSupplier_Resources(t *testing.T) {
 		supplierLibrary := resource.NewSupplierLibrary()
 
 		if shouldUpdate {
-			provider, err := NewTerraFormProvider()
+			provider, err := InitTestAwsProvider(providerLibrary)
 			if err != nil {
 				t.Fatal(err)
 			}
-
-			providerLibrary.AddProvider(terraform.AWS, provider)
 			supplierLibrary.AddSupplier(NewSubnetSupplier(provider))
 		}
 

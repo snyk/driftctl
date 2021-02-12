@@ -22,7 +22,7 @@ type LambdaFunctionSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewLambdaFunctionSupplier(provider *TerraformProvider) *LambdaFunctionSupplier {
+func NewLambdaFunctionSupplier(provider *AWSTerraformProvider) *LambdaFunctionSupplier {
 	return &LambdaFunctionSupplier{
 		provider,
 		awsdeserializer.NewLambdaFunctionDeserializer(),

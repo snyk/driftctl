@@ -29,7 +29,7 @@ type VPCSecurityGroupRuleSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewVPCSecurityGroupRuleSupplier(provider *TerraformProvider) *VPCSecurityGroupRuleSupplier {
+func NewVPCSecurityGroupRuleSupplier(provider *AWSTerraformProvider) *VPCSecurityGroupRuleSupplier {
 	return &VPCSecurityGroupRuleSupplier{
 		provider,
 		awsdeserializer.NewVPCSecurityGroupRuleDeserializer(),

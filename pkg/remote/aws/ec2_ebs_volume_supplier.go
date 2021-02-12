@@ -23,7 +23,7 @@ type EC2EbsVolumeSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2EbsVolumeSupplier(provider *TerraformProvider) *EC2EbsVolumeSupplier {
+func NewEC2EbsVolumeSupplier(provider *AWSTerraformProvider) *EC2EbsVolumeSupplier {
 	return &EC2EbsVolumeSupplier{
 		provider,
 		awsdeserializer.NewEC2EbsVolumeDeserializer(),

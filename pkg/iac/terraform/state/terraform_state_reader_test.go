@@ -85,11 +85,15 @@ func TestTerraformStateReader_Resources(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			shouldUpdate := tt.dirName == *goldenfile.Update
 
-			var realProvider terraform.TerraformProvider
+			var realProvider *aws.AWSTerraformProvider
 
 			if shouldUpdate {
 				var err error
-				realProvider, err = aws.NewTerraFormProvider()
+				realProvider, err = aws.NewAWSTerraformProvider()
+				if err != nil {
+					t.Fatal(err)
+				}
+				err = realProvider.Init()
 				if err != nil {
 					t.Fatal(err)
 				}
