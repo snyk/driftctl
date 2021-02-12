@@ -76,7 +76,6 @@ func TestDynamoDBTableSupplier_Resources(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			providerLibrary.AddProvider(terraform.AWS, provider)
 			supplierLibrary.AddSupplier(NewDynamoDBTableSupplier(provider))
 		}
 
