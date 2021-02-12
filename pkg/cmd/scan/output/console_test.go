@@ -55,6 +55,12 @@ func TestConsole_Write(t *testing.T) {
 			args:       args{analysis: fakeAnalysisWithComputedFields()},
 			wantErr:    false,
 		},
+		{
+			name:       "test console output with enumeration alerts",
+			goldenfile: "output_access_denied_alert.txt",
+			args:       args{analysis: fakeAnalysisWithEnumerationError()},
+			wantErr:    false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
