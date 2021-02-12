@@ -11,6 +11,34 @@ import (
 	"github.com/r3labs/diff/v2"
 )
 
+type UnmanagedSecurityGroupRulesAlert struct{}
+
+func newUnmanagedSecurityGroupRulesAlert() *UnmanagedSecurityGroupRulesAlert {
+	return &UnmanagedSecurityGroupRulesAlert{}
+}
+
+func (u *UnmanagedSecurityGroupRulesAlert) Message() string {
+	return "You have unmanaged security group rules that could be false positives, find out more at https://github.com/cloudskiff/driftctl/blob/main/doc/LIMITATIONS.md#terraform-resources"
+}
+
+func (u *UnmanagedSecurityGroupRulesAlert) ShouldIgnoreResource() bool {
+	return false
+}
+
+type ComputedDiffAlert struct{}
+
+func NewComputedDiffAlert() *ComputedDiffAlert {
+	return &ComputedDiffAlert{}
+}
+
+func (c *ComputedDiffAlert) Message() string {
+	return "You have diffs on computed fields, check the documentation for potential false positive drifts"
+}
+
+func (c *ComputedDiffAlert) ShouldIgnoreResource() bool {
+	return false
+}
+
 type Analyzer struct {
 	alerter *alerter.Alerter
 }
@@ -80,17 +108,11 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 	}
 
 	if a.hasUnmanagedSecurityGroupRules(filteredRemoteResource) {
-		a.alerter.SendAlert("",
-			alerter.Alert{
-				Message: "You have unmanaged security group rules that could be false positives, find out more at https://github.com/cloudskiff/driftctl/blob/main/doc/LIMITATIONS.md#terraform-resources",
-			})
+		a.alerter.SendAlert("", newUnmanagedSecurityGroupRulesAlert())
 	}
 
 	if haveComputedDiff {
-		a.alerter.SendAlert("",
-			alerter.Alert{
-				Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
-			})
+		a.alerter.SendAlert("", NewComputedDiffAlert())
 	}
 
 	// Add remaining unmanaged resources
