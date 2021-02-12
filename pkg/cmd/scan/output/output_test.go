@@ -5,6 +5,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
+	"github.com/cloudskiff/driftctl/pkg/remote"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/r3labs/diff/v2"
 )
@@ -230,9 +231,19 @@ func fakeAnalysisWithComputedFields() *analyser.Analysis {
 	}})
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
-			{
-				Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
-			},
+			analyser.NewComputedDiffAlert(),
+		},
+	})
+	return &a
+}
+
+func fakeAnalysisWithEnumerationError() *analyser.Analysis {
+	a := analyser.Analysis{}
+	a.SetAlerts(alerter.Alerts{
+		"": []alerter.Alert{
+			remote.NewEnumerationAccessDeniedAlert("aws_vpc", "aws_vpc"),
+			remote.NewEnumerationAccessDeniedAlert("aws_sqs", "aws_sqs"),
+			remote.NewEnumerationAccessDeniedAlert("aws_sns", "aws_sns"),
 		},
 	})
 	return &a
