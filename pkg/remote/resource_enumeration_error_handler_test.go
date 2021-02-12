@@ -25,13 +25,13 @@ func TestHandleListAwsError(t *testing.T) {
 		{
 			name:       "Handled error 403",
 			err:        remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(awserr.New("", "", errors.New("")), 403, ""), resourceaws.AwsVpcResourceType),
-			wantAlerts: alerter.Alerts{"aws_vpc": []alerter.Alert{alerter.Alert{Message: "Ignoring aws_vpc from drift calculation: Listing aws_vpc is forbidden.", ShouldIgnoreResource: true}}},
+			wantAlerts: alerter.Alerts{"aws_vpc": []alerter.Alert{NewEnumerationAccessDeniedAlert("aws_vpc", "aws_vpc")}},
 			wantErr:    false,
 		},
 		{
 			name:       "Handled error AccessDenied",
 			err:        remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, ""), resourceaws.AwsDynamodbTableResourceType),
-			wantAlerts: alerter.Alerts{"aws_dynamodb_table": []alerter.Alert{alerter.Alert{Message: "Ignoring aws_dynamodb_table from drift calculation: Listing aws_dynamodb_table is forbidden.", ShouldIgnoreResource: true}}},
+			wantAlerts: alerter.Alerts{"aws_dynamodb_table": []alerter.Alert{NewEnumerationAccessDeniedAlert("aws_dynamodb_table", "aws_dynamodb_table")}},
 			wantErr:    false,
 		},
 		{
