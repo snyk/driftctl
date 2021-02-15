@@ -27,6 +27,7 @@ import (
 // we'll have an alias per region, and the alias IS the region itself.
 // So we can query resources using a specific custom provider configuration
 type TerraformProviderConfig struct {
+	Name              string
 	DefaultAlias      string
 	GetProviderConfig func(alias string) interface{}
 }
@@ -71,7 +72,6 @@ func (p *TerraformProvider) Init() error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Provider initialized (alias=%s)\n", p.Config.DefaultAlias)
 	return nil
 }
 
@@ -124,6 +124,12 @@ func (p *TerraformProvider) configure(alias string) error {
 	logrus.WithFields(logrus.Fields{
 		"alias": alias,
 	}).Debug("New gRPC client started")
+
+	fmt.Printf("Terraform provider initialized (name=%s", p.Config.Name)
+	if alias != "" {
+		fmt.Printf(", alias=%s", alias)
+	}
+	fmt.Print(")\n")
 
 	return nil
 }
