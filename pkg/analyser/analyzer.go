@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"sort"
 
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/r3labs/diff/v2"
@@ -77,6 +79,13 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 		}
 	}
 
+	if a.hasUnmanagedSecurityGroupRules(filteredRemoteResource) {
+		a.alerter.SendAlert("",
+			alerter.Alert{
+				Message: "You have unmanaged security group rules that could be false positives, find out more at https://github.com/cloudskiff/driftctl/blob/main/doc/LIMITATIONS.md#terraform-resources",
+			})
+	}
+
 	if haveComputedDiff {
 		a.alerter.SendAlert("",
 			alerter.Alert{
@@ -147,4 +156,15 @@ func (a Analyzer) hasNestedFields(t reflect.Type) bool {
 	default:
 		return t.Kind() == reflect.Struct
 	}
+}
+
+// hasUnmanagedSecurityGroupRules returns true if we find at least one unmanaged
+// security group rule
+func (a Analyzer) hasUnmanagedSecurityGroupRules(unmanagedResources []resource.Resource) bool {
+	for _, res := range unmanagedResources {
+		if res.TerraformType() == resourceaws.AwsSecurityGroupRuleResourceType {
+			return true
+		}
+	}
+	return false
 }
