@@ -14,10 +14,15 @@ jobs:
           paths:
             - bin/
   test_acc:
+    parameters:
+      pattern:
+        type: string
     machine:
       image: ubuntu-2004:202010-01
     environment:
+      ACC_PATTERN: << parameters.pattern >>
       AWS_DEFAULT_REGION: us-east-1
+      CHECKPOINT_DISABLE: true # Disable terraform version check
     steps:
       - checkout
       - go/install:
@@ -136,6 +141,12 @@ workflows:
   nightly:
     jobs:
       - test_acc:
+          name: "Acceptance tests: << matrix.pattern >>"
+          matrix:
+            parameters:
+              pattern:
+                - TestAcc_Aws
+                - TestAcc_Github_
           context: driftctl-acc
     triggers:
       - schedule:
