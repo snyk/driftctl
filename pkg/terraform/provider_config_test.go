@@ -26,6 +26,14 @@ func TestProviderConfig_GetBinaryName(t *testing.T) {
 			},
 			want: "terraform-provider-aws_v3.24.1_x5",
 		},
+		{
+			name: "test for github provider",
+			fields: fields{
+				Key:     "github",
+				Version: "4.4.0",
+			},
+			want: "terraform-provider-github_v4.4.0",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

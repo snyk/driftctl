@@ -10,6 +10,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/iac"
 	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
+	"github.com/cloudskiff/driftctl/pkg/remote/github"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test/goldenfile"
@@ -35,7 +36,7 @@ func TestReadStateInvalid(t *testing.T) {
 	}
 }
 
-func TestTerraformStateReader_Resources(t *testing.T) {
+func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 	tests := []struct {
 		name    string
 		dirName string
@@ -102,6 +103,76 @@ func TestTerraformStateReader_Resources(t *testing.T) {
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, realProvider, shouldUpdate)
 			library := terraform.NewProviderLibrary()
 			library.AddProvider(terraform.AWS, provider)
+
+			b, _ := backend.NewFileReader(path.Join(goldenfile.GoldenFilePath, tt.dirName, "terraform.tfstate"))
+			r := &TerraformStateReader{
+				backend:       b,
+				library:       library,
+				deserializers: iac.Deserializers(),
+			}
+
+			got, err := r.Resources()
+			resGoldenName := "result.golden.json"
+			if shouldUpdate {
+				unm, err := json.Marshal(got)
+				if err != nil {
+					panic(err)
+				}
+				goldenfile.WriteFile(tt.dirName, unm, resGoldenName)
+			}
+
+			file := goldenfile.ReadFile(tt.dirName, resGoldenName)
+			var want []interface{}
+			if err := json.Unmarshal(file, &want); err != nil {
+				panic(err)
+			}
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Resources() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			changelog, err := diff.Diff(convert(got), want)
+			if err != nil {
+				panic(err)
+			}
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s got = %v, want %v", strings.Join(change.Path, "."), change.From, change.To)
+				}
+			}
+		})
+	}
+}
+
+func TestTerraformStateReader_Github_Resources(t *testing.T) {
+	tests := []struct {
+		name    string
+		dirName string
+		wantErr bool
+	}{
+		{name: "github repository", dirName: "github_repository", wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			shouldUpdate := tt.dirName == *goldenfile.Update
+
+			var realProvider *github.GithubTerraformProvider
+
+			if shouldUpdate {
+				var err error
+				realProvider, err = github.NewGithubTerraformProvider()
+				if err != nil {
+					t.Fatal(err)
+				}
+				err = realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+			}
+
+			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, realProvider, shouldUpdate)
+			library := terraform.NewProviderLibrary()
+			library.AddProvider(terraform.GITHUB, provider)
 
 			b, _ := backend.NewFileReader(path.Join(goldenfile.GoldenFilePath, tt.dirName, "terraform.tfstate"))
 			r := &TerraformStateReader{

@@ -5,7 +5,8 @@ import (
 )
 
 const (
-	AWS string = "aws"
+	AWS    string = "aws"
+	GITHUB string = "github"
 )
 
 type ProviderLibrary struct {

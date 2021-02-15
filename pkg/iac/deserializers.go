@@ -3,6 +3,7 @@ package iac
 import (
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+	ghdeserializer "github.com/cloudskiff/driftctl/pkg/resource/github/deserializer"
 )
 
 func Deserializers() []deserializer.CTYDeserializer {
@@ -53,5 +54,7 @@ func Deserializers() []deserializer.CTYDeserializer {
 		awsdeserializer.NewSNSTopicPolicyDeserializer(),
 		awsdeserializer.NewSNSTopicSubscriptionDeserializer(),
 		awsdeserializer.NewDynamoDBTableDeserializer(),
+
+		ghdeserializer.NewGithubRepositoryDeserializer(),
 	}
 }
