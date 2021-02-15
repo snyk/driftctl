@@ -107,6 +107,8 @@ As AWS documentation recommends, the below policy is granting only the permissio
                 "route53:ListHostedZones",
                 "route53:ListResourceRecordSets",
                 "route53:ListTagsForResource",
+                "route53:ListHealthChecks",
+                "route53:GetHealthCheck",
                 "s3:GetAccelerateConfiguration",
                 "s3:GetAnalyticsConfiguration",
                 "s3:GetBucketAcl",
@@ -207,7 +209,7 @@ As AWS documentation recommends, the below policy is granting only the permissio
 - [x] aws_route53_record
 - [x] aws_route53_zone
 - [ ] aws_route53_delegation_set
-- [ ] aws_route53_health_check
+- [x] aws_route53_health_check
 - [ ] aws_route53_query_log
 - [ ] aws_route53_vpc_association_authorization
 - [ ] aws_route53_zone_association
