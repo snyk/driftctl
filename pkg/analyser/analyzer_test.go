@@ -15,6 +15,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 
 	"github.com/r3labs/diff/v2"
 
@@ -876,6 +877,47 @@ func TestAnalyze(t *testing.T) {
 					"": {
 						{
 							Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
+						},
+					},
+				},
+			},
+			hasDrifted: true,
+		},
+		{
+			name: "Test alert on unmanaged security group rules",
+			iac: []resource.Resource{
+				&aws.AwsSecurityGroup{
+					Id: "managed security group",
+				},
+			},
+			cloud: []resource.Resource{
+				&aws.AwsSecurityGroup{
+					Id: "managed security group",
+				},
+				&aws.AwsSecurityGroupRule{
+					Id: "unmanaged rule",
+				},
+			},
+			expected: Analysis{
+				managed: []resource.Resource{
+					&aws.AwsSecurityGroup{
+						Id: "managed security group",
+					},
+				},
+				unmanaged: []resource.Resource{
+					&aws.AwsSecurityGroupRule{
+						Id: "unmanaged rule",
+					},
+				},
+				summary: Summary{
+					TotalResources: 2,
+					TotalManaged:   1,
+					TotalUnmanaged: 1,
+				},
+				alerts: alerter.Alerts{
+					"": {
+						{
+							Message: "You have unmanaged security group rules that could be false positives, find out more at https://github.com/cloudskiff/driftctl/blob/main/doc/LIMITATIONS.md#terraform-resources",
 						},
 					},
 				},
