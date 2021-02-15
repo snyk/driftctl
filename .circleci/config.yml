@@ -132,15 +132,6 @@ jobs:
           name: "Update Lambda version"
           command: |
             aws lambda update-function-configuration --function-name $FUNCTION_NAME --environment "{\"Variables\":{\"LATEST_VERSION\":\"$CIRCLE_TAG\"}}"
-  bump-homebrew-core:
-    macos:
-      xcode: 12.3.0
-    steps:
-      - run:
-          name: "Bump driftctl formula"
-          command: |
-            brew install-bundler-gems -d -v
-            brew bump-formula-pr driftctl --url https://github.com/cloudskiff/driftctl/archive/$CIRCLE_TAG.tar.gz -d -v
 workflows:
   nightly:
     jobs:
@@ -214,15 +205,6 @@ workflows:
               ignore: /.*/
       - update-lambda:
           context: driftctl-version-lambda
-          requires:
-            - release
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
-      - bump-homebrew-core:
-          context: driftctl-homebrew
           requires:
             - release
           filters:
