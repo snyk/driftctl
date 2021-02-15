@@ -11,3 +11,10 @@
 - Terraform version >= 0.12 is supported
 - Terraform AWS provider version >= 3.x is supported
 
+## Terraform Resources
+
+### AWS
+
+- aws_security_group and aws_security_group_rule:
+
+For security group that has in-line egress or ingress rules, driftctl will output an alert message at the end of the scan to warn you that those rules are falsely unmanaged. The explanation is that we can't distinct, based only on the Terraform state, rules created in the console and rules created in-line in either egress or ingress blocks.
