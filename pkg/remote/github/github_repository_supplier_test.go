@@ -19,13 +19,13 @@ func TestGithubRepositorySupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *fakeRepository)
+		mocks   func(client *MockGithubRepository)
 		err     error
 	}{
 		{
 			test:    "no github repos",
 			dirName: "github_repository_empty",
-			mocks: func(client *fakeRepository) {
+			mocks: func(client *MockGithubRepository) {
 				client.On("ListRepositories").Return([]repository{}, nil)
 			},
 			err: nil,
@@ -33,7 +33,7 @@ func TestGithubRepositorySupplier_Resources(t *testing.T) {
 		{
 			test:    "Multiple github repos Table",
 			dirName: "github_repository_multiple",
-			mocks: func(client *fakeRepository) {
+			mocks: func(client *MockGithubRepository) {
 				client.On("ListRepositories").Return([]repository{
 					{
 						Name: "driftctl",
@@ -52,7 +52,7 @@ func TestGithubRepositorySupplier_Resources(t *testing.T) {
 		providerLibrary := terraform.NewProviderLibrary()
 		supplierLibrary := resource.NewSupplierLibrary()
 
-		mockedRepo := fakeRepository{}
+		mockedRepo := MockGithubRepository{}
 		c.mocks(&mockedRepo)
 
 		if shouldUpdate {
