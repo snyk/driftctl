@@ -2,6 +2,8 @@ package aws
 
 import (
 	"github.com/cloudskiff/driftctl/pkg/alerter"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
@@ -22,16 +24,16 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 		return err
 	}
 
-	factory := AwsClientFactory{config: provider.session}
+	s3Repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session))
 
 	providerLibrary.AddProvider(terraform.AWS, provider)
 
-	supplierLibrary.AddSupplier(NewS3BucketSupplier(provider, factory))
-	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, factory))
-	supplierLibrary.AddSupplier(NewS3BucketInventorySupplier(provider, factory))
-	supplierLibrary.AddSupplier(NewS3BucketMetricSupplier(provider, factory))
-	supplierLibrary.AddSupplier(NewS3BucketNotificationSupplier(provider, factory))
-	supplierLibrary.AddSupplier(NewS3BucketPolicySupplier(provider, factory))
+	supplierLibrary.AddSupplier(NewS3BucketSupplier(provider, s3Repository))
+	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository))
+	supplierLibrary.AddSupplier(NewS3BucketInventorySupplier(provider, s3Repository))
+	supplierLibrary.AddSupplier(NewS3BucketMetricSupplier(provider, s3Repository))
+	supplierLibrary.AddSupplier(NewS3BucketNotificationSupplier(provider, s3Repository))
+	supplierLibrary.AddSupplier(NewS3BucketPolicySupplier(provider, s3Repository))
 	supplierLibrary.AddSupplier(NewEC2EipSupplier(provider))
 	supplierLibrary.AddSupplier(NewEC2EipAssociationSupplier(provider))
 	supplierLibrary.AddSupplier(NewEC2EbsVolumeSupplier(provider))

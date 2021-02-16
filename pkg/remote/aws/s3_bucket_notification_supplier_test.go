@@ -4,65 +4,90 @@ import (
 	"context"
 	"testing"
 
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-
-	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-
+	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
-
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
-	"github.com/stretchr/testify/assert"
-
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
-
-	"github.com/cloudskiff/driftctl/test/goldenfile"
-
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
+	"github.com/cloudskiff/driftctl/test/goldenfile"
 	"github.com/cloudskiff/driftctl/test/mocks"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestS3BucketNotificationSupplier_Resources(t *testing.T) {
 
 	tests := []struct {
-		test           string
-		dirName        string
-		bucketsIDs     []string
-		bucketLocation map[string]string
-		listError      error
-		wantErr        error
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockS3Repository)
+		wantErr error
 	}{
 		{
 			test:    "single bucket without notifications",
 			dirName: "s3_bucket_notifications_no_notif",
-			bucketsIDs: []string{
-				"dritftctl-test-no-notifications",
-			},
-			bucketLocation: map[string]string{
-				"dritftctl-test-no-notifications": "eu-west-3",
+			mocks: func(repository *repository.MockS3Repository) {
+				repository.On(
+					"ListAllBuckets",
+				).Return([]*s3.Bucket{
+					{Name: awssdk.String("dritftctl-test-no-notifications")},
+				}, nil)
+
+				repository.On(
+					"GetBucketLocation",
+					&s3.Bucket{Name: awssdk.String("dritftctl-test-no-notifications")},
+				).Return(
+					"eu-west-3",
+					nil,
+				)
 			},
 		},
 		{
 			test: "multiple bucket with notifications", dirName: "s3_bucket_notifications_multiple",
-			bucketsIDs: []string{
-				"bucket-martin-test-drift",
-				"bucket-martin-test-drift2",
-				"bucket-martin-test-drift3",
-			},
-			bucketLocation: map[string]string{
-				"bucket-martin-test-drift":  "eu-west-1",
-				"bucket-martin-test-drift2": "eu-west-3",
-				"bucket-martin-test-drift3": "ap-northeast-1",
+			mocks: func(repository *repository.MockS3Repository) {
+				repository.On(
+					"ListAllBuckets",
+				).Return([]*s3.Bucket{
+					{Name: awssdk.String("bucket-martin-test-drift")},
+					{Name: awssdk.String("bucket-martin-test-drift2")},
+					{Name: awssdk.String("bucket-martin-test-drift3")},
+				}, nil)
+
+				repository.On(
+					"GetBucketLocation",
+					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift")},
+				).Return(
+					"eu-west-1",
+					nil,
+				)
+
+				repository.On(
+					"GetBucketLocation",
+					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift2")},
+				).Return(
+					"eu-west-3",
+					nil,
+				)
+
+				repository.On(
+					"GetBucketLocation",
+					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift3")},
+				).Return(
+					"ap-northeast-1",
+					nil,
+				)
 			},
 		},
 		{
 			test: "Cannot list bucket", dirName: "s3_bucket_notifications_list_bucket",
-			listError: awserr.NewRequestFailure(nil, 403, ""),
-			bucketLocation: map[string]string{
-				"bucket-martin-test-drift":  "eu-west-1",
-				"bucket-martin-test-drift2": "eu-west-3",
-				"bucket-martin-test-drift3": "ap-northeast-1",
+			mocks: func(repository *repository.MockS3Repository) {
+				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			wantErr: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsS3BucketNotificationResourceType, resourceaws.AwsS3BucketResourceType),
 		},
@@ -78,21 +103,21 @@ func TestS3BucketNotificationSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			factory := AwsClientFactory{config: provider.session}
-			supplierLibrary.AddSupplier(NewS3BucketNotificationSupplier(provider, factory))
+			repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session))
+			supplierLibrary.AddSupplier(NewS3BucketNotificationSupplier(provider, repository))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
 
-			mock := mocks.NewMockAWSS3Client(tt.bucketsIDs, nil, nil, nil, tt.bucketLocation, tt.listError)
-			factory := mocks.NewMockAwsClientFactory(mock)
+			mock := repository.MockS3Repository{}
+			tt.mocks(&mock)
 
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewS3BucketNotificationDeserializer()
 			s := &S3BucketNotificationSupplier{
 				provider,
 				deserializer,
-				factory,
+				&mock,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
 			got, err := s.Resources()
