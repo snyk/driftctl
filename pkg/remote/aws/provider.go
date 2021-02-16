@@ -42,8 +42,9 @@ type AWSTerraformProvider struct {
 
 func NewAWSTerraformProvider() (*AWSTerraformProvider, error) {
 	p := &AWSTerraformProvider{}
+	providerKey := "aws"
 	installer, err := tf.NewProviderInstaller(tf.ProviderConfig{
-		Key:     "aws",
+		Key:     providerKey,
 		Version: "3.19.0",
 		Postfix: "x5",
 	})
@@ -54,6 +55,7 @@ func NewAWSTerraformProvider() (*AWSTerraformProvider, error) {
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 	tfProvider, err := terraform.NewTerraformProvider(installer, terraform.TerraformProviderConfig{
+		Name:         providerKey,
 		DefaultAlias: *p.session.Config.Region,
 		GetProviderConfig: func(alias string) interface{} {
 			return awsConfig{

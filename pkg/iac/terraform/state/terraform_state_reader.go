@@ -155,10 +155,6 @@ func (r *TerraformStateReader) decode(values map[string][]cty.Value) ([]resource
 		typ := deserializer.HandledType().String()
 		vals, exists := values[typ]
 		if !exists {
-			logrus.WithFields(logrus.Fields{
-				"path":    r.config.Path,
-				"backend": r.config.Backend,
-			}).Debugf("No resource of type %s found in state", typ)
 			continue
 		}
 		decodedResources, err := deserializer.Deserialize(vals)
