@@ -8,10 +8,6 @@ import (
 )
 
 func (r *AwsSnsTopic) NormalizeForState() (resource.Resource, error) {
-	if r.Policy != nil && *r.Policy == "" {
-		r.Policy = nil
-	}
-	r.normalizeDefaultFields()
 	return r, nil
 }
 

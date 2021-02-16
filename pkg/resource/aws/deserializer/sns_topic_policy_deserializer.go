@@ -1,18 +1,34 @@
 package deserializer
 
 import (
+	"github.com/cloudskiff/driftctl/pkg/helpers"
+
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 
 	"github.com/zclconf/go-cty/cty"
-	"github.com/zclconf/go-cty/cty/gocty"
 )
 
 type SNSTopicPolicyDeserializer struct {
+	deserializer
 }
 
 func NewSNSTopicPolicyDeserializer() *SNSTopicPolicyDeserializer {
-	return &SNSTopicPolicyDeserializer{}
+	return &SNSTopicPolicyDeserializer{
+		deserializer{
+			normalize: func(res resource.Resource) error {
+				r := res.(*aws.AwsSnsTopicPolicy)
+				if r.Policy != nil {
+					jsonString, err := helpers.NormalizeJsonString(*r.Policy)
+					if err != nil {
+						return err
+					}
+					r.Policy = &jsonString
+				}
+				return nil
+			},
+		},
+	}
 }
 
 func (s *SNSTopicPolicyDeserializer) HandledType() resource.ResourceType {
@@ -20,21 +36,5 @@ func (s *SNSTopicPolicyDeserializer) HandledType() resource.ResourceType {
 }
 
 func (s SNSTopicPolicyDeserializer) Deserialize(topicList []cty.Value) ([]resource.Resource, error) {
-	policies := make([]resource.Resource, 0)
-
-	for _, value := range topicList {
-		value := value
-		policy, err := decodeSNSTopicPolicy(value)
-		if err != nil {
-			return nil, err
-		}
-		policies = append(policies, policy)
-	}
-	return policies, nil
-}
-
-func decodeSNSTopicPolicy(value cty.Value) (resource.Resource, error) {
-	var topicPolicy aws.AwsSnsTopicPolicy
-	err := gocty.FromCtyValue(value, &topicPolicy)
-	return &topicPolicy, err
+	return s.deserialize(topicList, &aws.AwsSnsTopicPolicy{})
 }

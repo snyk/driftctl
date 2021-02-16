@@ -50,12 +50,7 @@ func (m *AwsSNSTopicPolicyExpander) splitPolicy(topic *aws.AwsSnsTopic, results 
 		Policy: topic.Policy,
 	}
 
-	normalized, err := newPolicy.NormalizeForState()
-	if err != nil {
-		return err
-	}
-
-	*results = append(*results, normalized)
+	*results = append(*results, newPolicy)
 	logrus.WithFields(logrus.Fields{
 		"id": newPolicy.TerraformId(),
 	}).Debug("Created new policy from sns_topic")

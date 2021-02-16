@@ -4,17 +4,45 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/zclconf/go-cty/cty"
-	"github.com/zclconf/go-cty/cty/gocty"
 )
 
 type DefaultSecurityGroupDeserializer struct {
+	deserializer
 }
 
-func NewDefaultSecurityGroupDeserializer() *DefaultSecurityGroupDeserializer {
-	return &DefaultSecurityGroupDeserializer{}
+func NewDefaultSecurityGroupDeserializerForState() *DefaultSecurityGroupDeserializer {
+	return &DefaultSecurityGroupDeserializer{
+		deserializer{
+			normalize: func(res resource.Resource) error {
+				r := res.(*resourceaws.AwsDefaultSecurityGroup)
+				if r.Ingress != nil {
+					r.Ingress = nil
+				}
+				if r.Egress != nil {
+					r.Egress = nil
+				}
+				return nil
+			},
+		},
+	}
+}
+
+func NewDefaultSecurityGroupDeserializerForProvider() *DefaultSecurityGroupDeserializer {
+	return &DefaultSecurityGroupDeserializer{
+		deserializer{
+			normalize: func(res resource.Resource) error {
+				r := res.(*resourceaws.AwsDefaultSecurityGroup)
+				if r.Ingress != nil {
+					r.Ingress = nil
+				}
+				if r.Egress != nil {
+					r.Egress = nil
+				}
+				return nil
+			},
+		},
+	}
 }
 
 func (s *DefaultSecurityGroupDeserializer) HandledType() resource.ResourceType {
@@ -22,23 +50,5 @@ func (s *DefaultSecurityGroupDeserializer) HandledType() resource.ResourceType {
 }
 
 func (s DefaultSecurityGroupDeserializer) Deserialize(rawList []cty.Value) ([]resource.Resource, error) {
-	resources := make([]resource.Resource, 0)
-	for _, rawResource := range rawList {
-		rawResource := rawResource
-		resource, err := decodeDefaultSecurityGroup(&rawResource)
-		if err != nil {
-			logrus.Warnf("Error when deserializing resource %+v : %+v", rawResource, err)
-			return nil, err
-		}
-		resources = append(resources, resource)
-	}
-	return resources, nil
-}
-
-func decodeDefaultSecurityGroup(raw *cty.Value) (*resourceaws.AwsDefaultSecurityGroup, error) {
-	var decoded resourceaws.AwsDefaultSecurityGroup
-	if err := gocty.FromCtyValue(*raw, &decoded); err != nil {
-		return nil, err
-	}
-	return &decoded, nil
+	return s.deserialize(rawList, &resourceaws.AwsDefaultSecurityGroup{})
 }

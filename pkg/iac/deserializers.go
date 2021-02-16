@@ -26,7 +26,7 @@ func Deserializers() []deserializer.CTYDeserializer {
 		awsdeserializer.NewLambdaFunctionDeserializer(),
 		awsdeserializer.NewDBSubnetGroupDeserializer(),
 		awsdeserializer.NewVPCSecurityGroupDeserializer(),
-		awsdeserializer.NewDefaultSecurityGroupDeserializer(),
+		awsdeserializer.NewDefaultSecurityGroupDeserializerForState(),
 		awsdeserializer.NewIamUserDeserializer(),
 		awsdeserializer.NewIamUserPolicyDeserializer(),
 		awsdeserializer.NewIamUserPolicyAttachmentDeserializer(),

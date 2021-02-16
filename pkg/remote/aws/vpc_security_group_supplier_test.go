@@ -103,7 +103,7 @@ func TestVPCSecurityGroupSupplier_Resources(t *testing.T) {
 			tt.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			securityGroupDeserializer := awsdeserializer.NewVPCSecurityGroupDeserializer()
-			defaultSecurityGroupDeserializer := awsdeserializer.NewDefaultSecurityGroupDeserializer()
+			defaultSecurityGroupDeserializer := awsdeserializer.NewDefaultSecurityGroupDeserializerForProvider()
 			s := &VPCSecurityGroupSupplier{
 				provider,
 				defaultSecurityGroupDeserializer,
