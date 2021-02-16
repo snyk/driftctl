@@ -41,18 +41,11 @@ jobs:
           command: make acc
       - run:
           name: Discord notification
-          command: |
-            curl -X POST \
-              -H "Content-Type: application/json" \
-              -d "{\"content\": \"✅ Acceptance tests succeeded 🎉\n<${CIRCLE_BUILD_URL}>\" }"\
-              ${DISCORD_WEBHOOK}
-      - run:
-          name: Discord notification
           when: on_fail
           command: |
             curl -X POST \
               -H "Content-Type: application/json" \
-              -d "{\"content\": \"❌ Acceptance tests failed\n<${CIRCLE_BUILD_URL}>\" }"\
+              -d "{\"content\": \"❌ Acceptance tests failed\nSuite: ${ACC_PATTERN}\n<${CIRCLE_BUILD_URL}>\" }"\
               ${DISCORD_WEBHOOK}
       - store_test_results:
           path: ./
