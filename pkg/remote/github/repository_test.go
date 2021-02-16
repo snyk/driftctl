@@ -39,7 +39,7 @@ func TestListRepositoriesForUser(t *testing.T) {
 			if !ok {
 				return false
 			}
-			q.Viewer.Repositories.Nodes = []repository{
+			q.Viewer.Repositories.Nodes = []struct{ Name string }{
 				{
 					Name: "repo1",
 				},
@@ -64,7 +64,7 @@ func TestListRepositoriesForUser(t *testing.T) {
 			if !ok {
 				return false
 			}
-			q.Viewer.Repositories.Nodes = []repository{
+			q.Viewer.Repositories.Nodes = []struct{ Name string }{
 				{
 					Name: "repo3",
 				},
@@ -92,19 +92,11 @@ func TestListRepositoriesForUser(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal([]repository{
-		{
-			Name: "repo1",
-		},
-		{
-			Name: "repo2",
-		},
-		{
-			Name: "repo3",
-		},
-		{
-			Name: "repo4",
-		},
+	assert.Equal([]string{
+		"repo1",
+		"repo2",
+		"repo3",
+		"repo4",
 	}, repos)
 }
 
@@ -137,7 +129,9 @@ func TestListRepositoriesForOrganization(t *testing.T) {
 			if !ok {
 				return false
 			}
-			q.Organization.Repositories.Nodes = []repository{
+			q.Organization.Repositories.Nodes = []struct {
+				Name string
+			}{
 				{
 					Name: "repo1",
 				},
@@ -163,7 +157,9 @@ func TestListRepositoriesForOrganization(t *testing.T) {
 			if !ok {
 				return false
 			}
-			q.Organization.Repositories.Nodes = []repository{
+			q.Organization.Repositories.Nodes = []struct {
+				Name string
+			}{
 				{
 					Name: "repo3",
 				},
@@ -194,18 +190,10 @@ func TestListRepositoriesForOrganization(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal([]repository{
-		{
-			Name: "repo1",
-		},
-		{
-			Name: "repo2",
-		},
-		{
-			Name: "repo3",
-		},
-		{
-			Name: "repo4",
-		},
+	assert.Equal([]string{
+		"repo1",
+		"repo2",
+		"repo3",
+		"repo4",
 	}, repos)
 }

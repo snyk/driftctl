@@ -26,7 +26,7 @@ func TestGithubRepositorySupplier_Resources(t *testing.T) {
 			test:    "no github repos",
 			dirName: "github_repository_empty",
 			mocks: func(client *MockGithubRepository) {
-				client.On("ListRepositories").Return([]repository{}, nil)
+				client.On("ListRepositories").Return([]string{}, nil)
 			},
 			err: nil,
 		},
@@ -34,13 +34,9 @@ func TestGithubRepositorySupplier_Resources(t *testing.T) {
 			test:    "Multiple github repos Table",
 			dirName: "github_repository_multiple",
 			mocks: func(client *MockGithubRepository) {
-				client.On("ListRepositories").Return([]repository{
-					{
-						Name: "driftctl",
-					},
-					{
-						Name: "driftctl-demos",
-					},
+				client.On("ListRepositories").Return([]string{
+					"driftctl",
+					"driftctl-demos",
 				}, nil)
 			},
 			err: nil,

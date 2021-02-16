@@ -35,8 +35,8 @@ func (s GithubRepositorySupplier) Resources() ([]resource.Resource, error) {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourcegithub.GithubRepositoryResourceType)
 	}
 
-	for _, res := range resourceList {
-		id := res.Name
+	for _, id := range resourceList {
+		id := id
 		s.runner.Run(func() (cty.Value, error) {
 			completeResource, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 				Ty: resourcegithub.GithubRepositoryResourceType,

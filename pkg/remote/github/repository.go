@@ -8,7 +8,7 @@ import (
 )
 
 type GithubRepository interface {
-	ListRepositories() ([]repository, error)
+	ListRepositories() ([]string, error)
 }
 
 type GithubGraphQLClient interface {
@@ -19,10 +19,6 @@ type githubRepository struct {
 	client GithubGraphQLClient
 	ctx    context.Context
 	config githubConfig
-}
-
-type repository struct {
-	Name string
 }
 
 func NewGithubRepository(config githubConfig) *githubRepository {
@@ -41,7 +37,7 @@ func NewGithubRepository(config githubConfig) *githubRepository {
 	return repo
 }
 
-func (r *githubRepository) ListRepositories() ([]repository, error) {
+func (r *githubRepository) ListRepositories() ([]string, error) {
 	if r.config.Organization != "" {
 		return r.listRepoForOrg()
 	}
@@ -56,25 +52,29 @@ type pageInfo struct {
 type listRepoForOrgQuery struct {
 	Organization struct {
 		Repositories struct {
-			Nodes    []repository
+			Nodes []struct {
+				Name string
+			}
 			PageInfo pageInfo
 		} `graphql:"repositories(first: 100, after: $cursor)"`
 	} `graphql:"organization(login: $org)"`
 }
 
-func (r *githubRepository) listRepoForOrg() ([]repository, error) {
+func (r *githubRepository) listRepoForOrg() ([]string, error) {
 	query := listRepoForOrgQuery{}
 	variables := map[string]interface{}{
 		"org":    (githubv4.String)(r.config.Organization),
 		"cursor": (*githubv4.String)(nil),
 	}
-	var results []repository
+	var results []string
 	for {
 		err := r.client.Query(r.ctx, &query, variables)
 		if err != nil {
 			return nil, err
 		}
-		results = append(results, query.Organization.Repositories.Nodes...)
+		for _, repo := range query.Organization.Repositories.Nodes {
+			results = append(results, repo.Name)
+		}
 		if !query.Organization.Repositories.PageInfo.HasNextPage {
 			break
 		}
@@ -86,7 +86,9 @@ func (r *githubRepository) listRepoForOrg() ([]repository, error) {
 type listRepoForOwnerQuery struct {
 	Viewer struct {
 		Repositories struct {
-			Nodes    []repository
+			Nodes []struct {
+				Name string
+			}
 			PageInfo struct {
 				EndCursor   githubv4.String
 				HasNextPage bool
@@ -95,18 +97,20 @@ type listRepoForOwnerQuery struct {
 	}
 }
 
-func (r githubRepository) listRepoForOwner() ([]repository, error) {
+func (r githubRepository) listRepoForOwner() ([]string, error) {
 	query := listRepoForOwnerQuery{}
 	variables := map[string]interface{}{
 		"cursor": (*githubv4.String)(nil),
 	}
-	var results []repository
+	var results []string
 	for {
 		err := r.client.Query(r.ctx, &query, variables)
 		if err != nil {
 			return nil, err
 		}
-		results = append(results, query.Viewer.Repositories.Nodes...)
+		for _, repo := range query.Viewer.Repositories.Nodes {
+			results = append(results, repo.Name)
+		}
 		if !query.Viewer.Repositories.PageInfo.HasNextPage {
 			break
 		}
