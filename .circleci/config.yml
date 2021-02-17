@@ -5,7 +5,7 @@ orbs:
 jobs:
   build:
     docker:
-      - image: golang:1.15
+      - image: golang:1.16
     steps:
       - checkout
       - run: make release
@@ -26,7 +26,7 @@ jobs:
     steps:
       - checkout
       - go/install:
-          version: 1.15.7
+          version: "1.16"
       - run:
           name: install dependencies
           command: |
@@ -51,7 +51,7 @@ jobs:
           path: ./
   lint:
     docker:
-      - image: golang:1.15
+      - image: golang:1.16
     steps:
       - checkout
       - run:
@@ -69,7 +69,7 @@ jobs:
       - run: make lint
   test:
     docker:
-      - image: golang:1.15
+      - image: golang:1.16
     steps:
       - checkout
       - run: make install-tools

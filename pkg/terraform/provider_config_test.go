@@ -50,6 +50,10 @@ func TestProviderConfig_GetBinaryName(t *testing.T) {
 }
 
 func TestProviderConfig_GetDownloadUrl(t *testing.T) {
+	arch := runtime.GOOS
+	if runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
+		arch = "amd64"
+	}
 	type fields struct {
 		Key     string
 		Version string
@@ -69,7 +73,7 @@ func TestProviderConfig_GetDownloadUrl(t *testing.T) {
 			want: fmt.Sprintf(
 				"https://releases.hashicorp.com/terraform-provider-aws/3.24.1/terraform-provider-aws_3.24.1_%s_%s.zip",
 				runtime.GOOS,
-				runtime.GOARCH,
+				arch,
 			),
 		},
 	}

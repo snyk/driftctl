@@ -1,6 +1,6 @@
 module github.com/cloudskiff/driftctl
 
-go 1.15
+go 1.16
 
 require (
 	github.com/aws/aws-sdk-go v1.34.2

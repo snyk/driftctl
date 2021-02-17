@@ -23,6 +23,7 @@ LD_FLAGS="-X github.com/cloudskiff/driftctl/pkg/version.version=${VERSION}"
 # https://github.com/golang/go/blob/master/src/go/build/syslist.go
 os_archs=(
     darwin/amd64
+    darwin/arm64
     linux/386
     linux/amd64
     linux/arm

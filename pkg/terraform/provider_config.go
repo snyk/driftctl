@@ -12,6 +12,10 @@ type ProviderConfig struct {
 }
 
 func (c *ProviderConfig) GetDownloadUrl() string {
+	arch := runtime.GOOS
+	if runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
+		arch = "amd64"
+	}
 	return fmt.Sprintf(
 		"https://releases.hashicorp.com/terraform-provider-%s/%s/terraform-provider-%s_%s_%s_%s.zip",
 		c.Key,
@@ -19,7 +23,7 @@ func (c *ProviderConfig) GetDownloadUrl() string {
 		c.Key,
 		c.Version,
 		runtime.GOOS,
-		runtime.GOARCH,
+		arch,
 	)
 }
 
