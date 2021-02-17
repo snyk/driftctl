@@ -38,14 +38,15 @@ type AccCheck struct {
 }
 
 type AccTestCase struct {
-	Path              string
-	Args              []string
-	OnStart           func()
-	OnEnd             func()
-	Checks            []AccCheck
-	tmpResultFilePath string
-	originalEnv       []string
-	tf                *tfexec.Terraform
+	Path                       string
+	Args                       []string
+	OnStart                    func()
+	OnEnd                      func()
+	Checks                     []AccCheck
+	tmpResultFilePath          string
+	originalEnv                []string
+	tf                         *tfexec.Terraform
+	ShouldRefreshBeforeDestroy bool
 }
 
 func (c *AccTestCase) initTerraformExecutor() error {
@@ -167,6 +168,12 @@ func (c *AccTestCase) terraformApply() error {
 }
 
 func (c *AccTestCase) terraformDestroy() error {
+	if c.ShouldRefreshBeforeDestroy {
+		if err := c.terraformRefresh(); err != nil {
+			return err
+		}
+	}
+
 	logrus.Debug("Running terraform destroy ...")
 	stderr := new(bytes.Buffer)
 	c.tf.SetStderr(stderr)
@@ -174,6 +181,18 @@ func (c *AccTestCase) terraformDestroy() error {
 		return errors.Wrap(err, stderr.String())
 	}
 	logrus.Debug("Terraform destroy done")
+
+	return nil
+}
+
+func (c *AccTestCase) terraformRefresh() error {
+	logrus.Debug("Running terraform refresh ...")
+	stderr := new(bytes.Buffer)
+	c.tf.SetStderr(stderr)
+	if err := c.tf.Refresh(context.Background()); err != nil {
+		return errors.Wrap(err, stderr.String())
+	}
+	logrus.Debug("Terraform refresh done")
 
 	return nil
 }

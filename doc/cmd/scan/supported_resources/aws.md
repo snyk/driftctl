@@ -63,6 +63,9 @@ As AWS documentation recommends, the below policy is granting only the permissio
             "Effect": "Allow",
             "Resource": "*",
             "Action": [
+                "cloudfront:GetDistribution",
+                "cloudfront:ListDistributions",
+                "cloudfront:ListTagsForResource",
                 "ec2:DescribeAddresses",
                 "ec2:DescribeImages",
                 "ec2:DescribeInstanceAttribute",
@@ -262,6 +265,7 @@ As AWS documentation recommends, the below policy is granting only the permissio
 - [x] aws_sqs_queue_policy
 
 ## SNS
+
 - [x] aws_sns_topic
 - [x] aws_sns_topic_policy
 - [x] aws_sns_topic_subscription
@@ -269,6 +273,11 @@ As AWS documentation recommends, the below policy is granting only the permissio
 - [ ] aws_sns_sms_preferences
 
 ## DynamoDB
+
 - [x] aws_dynamodb_table
 - [ ] aws_dynamodb_global_table
 - [ ] aws_dynamodb_table_item
+
+## Cloudfront
+
+- [x] aws_cloudfront_distribution
