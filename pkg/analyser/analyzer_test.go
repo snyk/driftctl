@@ -272,9 +272,7 @@ func TestAnalyze(t *testing.T) {
 				},
 				alerts: alerter.Alerts{
 					"": {
-						{
-							Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
-						},
+						NewComputedDiffAlert(),
 					},
 				},
 			},
@@ -351,9 +349,7 @@ func TestAnalyze(t *testing.T) {
 				},
 				alerts: alerter.Alerts{
 					"": {
-						{
-							Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
-						},
+						NewComputedDiffAlert(),
 					},
 				},
 			},
@@ -520,21 +516,13 @@ func TestAnalyze(t *testing.T) {
 			},
 			alerts: alerter.Alerts{
 				"fakeres": {
-					{
-						Message:              "Should be ignored",
-						ShouldIgnoreResource: true,
-					},
+					&alerter.FakeAlert{Msg: "Should be ignored", IgnoreResource: true},
 				},
 				"other.foobaz": {
-					{
-						Message:              "Should be ignored",
-						ShouldIgnoreResource: true,
-					},
+					&alerter.FakeAlert{Msg: "Should be ignored", IgnoreResource: true},
 				},
 				"other.resource": {
-					{
-						Message: "Should not be ignored",
-					},
+					&alerter.FakeAlert{Msg: "Should not be ignored"},
 				},
 			},
 			expected: Analysis{
@@ -656,26 +644,16 @@ func TestAnalyze(t *testing.T) {
 				},
 				alerts: alerter.Alerts{
 					"fakeres": {
-						{
-							Message:              "Should be ignored",
-							ShouldIgnoreResource: true,
-						},
+						&alerter.FakeAlert{Msg: "Should be ignored", IgnoreResource: true},
 					},
 					"other.foobaz": {
-						{
-							Message:              "Should be ignored",
-							ShouldIgnoreResource: true,
-						},
+						&alerter.FakeAlert{Msg: "Should be ignored", IgnoreResource: true},
 					},
 					"other.resource": {
-						{
-							Message: "Should not be ignored",
-						},
+						&alerter.FakeAlert{Msg: "Should not be ignored"},
 					},
 					"": {
-						{
-							Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
-						},
+						NewComputedDiffAlert(),
 					},
 				},
 			},
@@ -875,9 +853,7 @@ func TestAnalyze(t *testing.T) {
 				},
 				alerts: alerter.Alerts{
 					"": {
-						{
-							Message: "You have diffs on computed fields, check the documentation for potential false positive drifts",
-						},
+						NewComputedDiffAlert(),
 					},
 				},
 			},
@@ -916,9 +892,7 @@ func TestAnalyze(t *testing.T) {
 				},
 				alerts: alerter.Alerts{
 					"": {
-						{
-							Message: "You have unmanaged security group rules that could be false positives, find out more at https://github.com/cloudskiff/driftctl/blob/main/doc/LIMITATIONS.md#terraform-resources",
-						},
+						newUnmanagedSecurityGroupRulesAlert(),
 					},
 				},
 			},
@@ -1069,9 +1043,7 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 	})
 	analysis.SetAlerts(alerter.Alerts{
 		"aws_iam_access_key": {
-			{
-				Message: "This is an alert",
-			},
+			&alerter.FakeAlert{Msg: "This is an alert"},
 		},
 	})
 
@@ -1151,8 +1123,8 @@ func TestAnalysis_UnmarshalJSON(t *testing.T) {
 		},
 		alerts: alerter.Alerts{
 			"aws_iam_access_key": {
-				{
-					Message: "This is an alert",
+				&alerter.SerializedAlert{
+					Msg: "This is an alert",
 				},
 			},
 		},
@@ -1174,4 +1146,6 @@ func TestAnalysis_UnmarshalJSON(t *testing.T) {
 	assert.Equal(t, 2, got.Summary().TotalDeleted)
 	assert.Equal(t, 6, got.Summary().TotalResources)
 	assert.Equal(t, 1, got.Summary().TotalDrifted)
+	assert.Len(t, got.alerts, 1)
+	assert.Equal(t, got.alerts["aws_iam_access_key"][0].Message(), "This is an alert")
 }

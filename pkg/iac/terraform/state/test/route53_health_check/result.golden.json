@@ -1,0 +1,50 @@
+[
+ {
+  "ChildHealthThreshold": 0,
+  "ChildHealthchecks": [],
+  "CloudwatchAlarmName": null,
+  "CloudwatchAlarmRegion": null,
+  "Disabled": false,
+  "EnableSni": false,
+  "FailureThreshold": 5,
+  "Fqdn": "moadib.net",
+  "Id": "70994c67-b616-4caa-89bc-557153b65845",
+  "InsufficientDataHealthStatus": "",
+  "InvertHealthcheck": false,
+  "IpAddress": "",
+  "MeasureLatency": false,
+  "Port": 80,
+  "ReferenceName": null,
+  "Regions": [],
+  "RequestInterval": 30,
+  "ResourcePath": "/",
+  "SearchString": "",
+  "Tags": {
+   "Name": "tf-test-health-check"
+  },
+  "Type": "HTTP"
+ },
+ {
+  "ChildHealthThreshold": 0,
+  "ChildHealthchecks": [],
+  "CloudwatchAlarmName": null,
+  "CloudwatchAlarmRegion": null,
+  "Disabled": false,
+  "EnableSni": true,
+  "FailureThreshold": 5,
+  "Fqdn": "moadib.net",
+  "Id": "45b0a22b-c9db-4271-96b3-23ac49debbf3",
+  "InsufficientDataHealthStatus": "",
+  "InvertHealthcheck": false,
+  "IpAddress": "",
+  "MeasureLatency": false,
+  "Port": 443,
+  "ReferenceName": null,
+  "Regions": [],
+  "RequestInterval": 30,
+  "ResourcePath": "/",
+  "SearchString": "MoAdiB",
+  "Tags": null,
+  "Type": "HTTPS_STR_MATCH"
+ }
+]

@@ -63,6 +63,9 @@ As AWS documentation recommends, the below policy is granting only the permissio
             "Effect": "Allow",
             "Resource": "*",
             "Action": [
+                "cloudfront:GetDistribution",
+                "cloudfront:ListDistributions",
+                "cloudfront:ListTagsForResource",
                 "ec2:DescribeAddresses",
                 "ec2:DescribeImages",
                 "ec2:DescribeInstanceAttribute",
@@ -107,6 +110,8 @@ As AWS documentation recommends, the below policy is granting only the permissio
                 "route53:ListHostedZones",
                 "route53:ListResourceRecordSets",
                 "route53:ListTagsForResource",
+                "route53:ListHealthChecks",
+                "route53:GetHealthCheck",
                 "s3:GetAccelerateConfiguration",
                 "s3:GetAnalyticsConfiguration",
                 "s3:GetBucketAcl",
@@ -207,7 +212,7 @@ As AWS documentation recommends, the below policy is granting only the permissio
 - [x] aws_route53_record
 - [x] aws_route53_zone
 - [ ] aws_route53_delegation_set
-- [ ] aws_route53_health_check
+- [x] aws_route53_health_check
 - [ ] aws_route53_query_log
 - [ ] aws_route53_vpc_association_authorization
 - [ ] aws_route53_zone_association
@@ -260,6 +265,7 @@ As AWS documentation recommends, the below policy is granting only the permissio
 - [x] aws_sqs_queue_policy
 
 ## SNS
+
 - [x] aws_sns_topic
 - [x] aws_sns_topic_policy
 - [x] aws_sns_topic_subscription
@@ -267,6 +273,11 @@ As AWS documentation recommends, the below policy is granting only the permissio
 - [ ] aws_sns_sms_preferences
 
 ## DynamoDB
+
 - [x] aws_dynamodb_table
 - [ ] aws_dynamodb_global_table
 - [ ] aws_dynamodb_table_item
+
+## Cloudfront
+
+- [x] aws_cloudfront_distribution

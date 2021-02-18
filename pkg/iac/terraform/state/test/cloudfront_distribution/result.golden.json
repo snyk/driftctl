@@ -1,0 +1,98 @@
+[
+ {
+  "Aliases": null,
+  "Arn": "arn:aws:cloudfront::047081014315:distribution/E1M9CNS0XSHI19",
+  "CallerReference": "terraform-20210216101734792900000001",
+  "Comment": null,
+  "DefaultRootObject": "",
+  "DomainName": "d1g0dw0i1wvlgd.cloudfront.net",
+  "Enabled": false,
+  "Etag": "E2CKBANLXUPWGQ",
+  "HostedZoneId": "Z2FDTNDATAQYW2",
+  "HttpVersion": "http2",
+  "Id": "E1M9CNS0XSHI19",
+  "InProgressValidationBatches": 0,
+  "IsIpv6Enabled": false,
+  "LastModifiedTime": "2021-02-16 10:17:35.404 +0000 UTC",
+  "PriceClass": "PriceClass_All",
+  "RetainOnDelete": false,
+  "Status": "Deployed",
+  "Tags": {},
+  "TrustedSigners": [
+   {
+    "Enabled": false,
+    "Items": []
+   }
+  ],
+  "WaitForDeployment": true,
+  "WebAclId": "",
+  "CustomErrorResponse": [],
+  "DefaultCacheBehavior": [
+   {
+    "AllowedMethods": [
+     "GET",
+     "HEAD"
+    ],
+    "CachedMethods": [
+     "GET",
+     "HEAD"
+    ],
+    "Compress": false,
+    "DefaultTtl": 86400,
+    "FieldLevelEncryptionId": "",
+    "MaxTtl": 31536000,
+    "MinTtl": 0,
+    "SmoothStreaming": false,
+    "TargetOriginId": "S3-foo-cloudfront",
+    "TrustedSigners": [],
+    "ViewerProtocolPolicy": "allow-all",
+    "ForwardedValues": [
+     {
+      "Headers": null,
+      "QueryString": false,
+      "QueryStringCacheKeys": [],
+      "Cookies": [
+       {
+        "Forward": "none",
+        "WhitelistedNames": null
+       }
+      ]
+     }
+    ],
+    "LambdaFunctionAssociation": []
+   }
+  ],
+  "LoggingConfig": [],
+  "OrderedCacheBehavior": [],
+  "Origin": [
+   {
+    "DomainName": "foo-cloudfront.s3.eu-west-3.amazonaws.com",
+    "OriginId": "S3-foo-cloudfront",
+    "OriginPath": "",
+    "CustomHeader": [],
+    "CustomOriginConfig": [],
+    "S3OriginConfig": []
+   }
+  ],
+  "OriginGroup": null,
+  "Restrictions": [
+   {
+    "GeoRestriction": [
+     {
+      "Locations": null,
+      "RestrictionType": "none"
+     }
+    ]
+   }
+  ],
+  "ViewerCertificate": [
+   {
+    "AcmCertificateArn": "",
+    "CloudfrontDefaultCertificate": true,
+    "IamCertificateId": "",
+    "MinimumProtocolVersion": "TLSv1",
+    "SslSupportMethod": ""
+   }
+  ]
+ }
+]

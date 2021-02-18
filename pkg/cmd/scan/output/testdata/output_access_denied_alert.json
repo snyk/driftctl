@@ -1,0 +1,27 @@
+{
+	"summary": {
+		"total_resources": 0,
+		"total_drifted": 0,
+		"total_unmanaged": 0,
+		"total_deleted": 0,
+		"total_managed": 0
+	},
+	"managed": null,
+	"unmanaged": null,
+	"deleted": null,
+	"differences": null,
+	"coverage": 0,
+	"alerts": {
+		"": [
+			{
+				"message": "Ignoring aws_vpc from drift calculation: Listing aws_vpc is forbidden."
+			},
+			{
+				"message": "Ignoring aws_sqs from drift calculation: Listing aws_sqs is forbidden."
+			},
+			{
+				"message": "Ignoring aws_sns from drift calculation: Listing aws_sns is forbidden."
+			}
+		]
+	}
+}
