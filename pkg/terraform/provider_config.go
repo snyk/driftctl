@@ -12,7 +12,7 @@ type ProviderConfig struct {
 }
 
 func (c *ProviderConfig) GetDownloadUrl() string {
-	arch := runtime.GOOS
+	arch := runtime.GOARCH
 	if runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
 		arch = "amd64"
 	}
