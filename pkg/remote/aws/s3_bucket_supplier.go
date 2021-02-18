@@ -81,6 +81,10 @@ func readBucketRegion(client *s3iface.S3API, name string) (string, error) {
 		return "us-east-1", err
 	}
 
+	if *bucketLocationResponse.LocationConstraint == "EU" {
+		return "eu-west-1", err
+	}
+
 	return *bucketLocationResponse.LocationConstraint, nil
 }
 
