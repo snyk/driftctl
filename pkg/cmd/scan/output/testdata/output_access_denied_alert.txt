@@ -1,0 +1,8 @@
+Found 0 resource(s)
+ - 0% coverage
+Congrats! Your infrastructure is fully in sync.
+Ignoring aws_vpc from drift calculation: Listing aws_vpc is forbidden.
+Ignoring aws_sqs from drift calculation: Listing aws_sqs is forbidden.
+Ignoring aws_sns from drift calculation: Listing aws_sns is forbidden.
+
+The latest minimal read-only policy for driftctl is always available here, please update yours: https://github.com/cloudskiff/driftctl/blob/main/doc/cmd/scan/supported_resources/aws.md

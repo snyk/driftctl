@@ -43,13 +43,13 @@ type serializableDifference struct {
 }
 
 type serializableAnalysis struct {
-	Summary     Summary                         `json:"summary"`
-	Managed     []resource.SerializableResource `json:"managed"`
-	Unmanaged   []resource.SerializableResource `json:"unmanaged"`
-	Deleted     []resource.SerializableResource `json:"deleted"`
-	Differences []serializableDifference        `json:"differences"`
-	Coverage    int                             `json:"coverage"`
-	Alerts      alerter.Alerts                  `json:"alerts"`
+	Summary     Summary                                `json:"summary"`
+	Managed     []resource.SerializableResource        `json:"managed"`
+	Unmanaged   []resource.SerializableResource        `json:"unmanaged"`
+	Deleted     []resource.SerializableResource        `json:"deleted"`
+	Differences []serializableDifference               `json:"differences"`
+	Coverage    int                                    `json:"coverage"`
+	Alerts      map[string][]alerter.SerializableAlert `json:"alerts"`
 }
 
 func (a Analysis) MarshalJSON() ([]byte, error) {
@@ -69,9 +69,16 @@ func (a Analysis) MarshalJSON() ([]byte, error) {
 			Changelog: di.Changelog,
 		})
 	}
+	if len(a.alerts) > 0 {
+		bla.Alerts = make(map[string][]alerter.SerializableAlert)
+		for k, v := range a.alerts {
+			for _, al := range v {
+				bla.Alerts[k] = append(bla.Alerts[k], alerter.SerializableAlert{Alert: al})
+			}
+		}
+	}
 	bla.Summary = a.summary
 	bla.Coverage = a.Coverage()
-	bla.Alerts = a.alerts
 
 	return json.Marshal(bla)
 }
@@ -108,7 +115,16 @@ func (a *Analysis) UnmarshalJSON(bytes []byte) error {
 			Changelog: di.Changelog,
 		})
 	}
-	a.SetAlerts(bla.Alerts)
+	if len(bla.Alerts) > 0 {
+		a.alerts = make(alerter.Alerts)
+		for k, v := range bla.Alerts {
+			for _, al := range v {
+				a.alerts[k] = append(a.alerts[k], &alerter.SerializedAlert{
+					Msg: al.Message(),
+				})
+			}
+		}
+	}
 	return nil
 }
 

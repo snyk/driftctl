@@ -67,7 +67,7 @@ func (a *Alerter) IsResourceIgnored(res resource.Resource) bool {
 
 func (a *Alerter) shouldBeIgnored(alert []Alert) bool {
 	for _, a := range alert {
-		if a.ShouldIgnoreResource {
+		if a.ShouldIgnoreResource() {
 			return true
 		}
 	}

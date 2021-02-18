@@ -38,6 +38,14 @@ func TestJSON_Write(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name:       "test json output with enumeration alerts",
+			goldenfile: "output_access_denied_alert.json",
+			args: args{
+				analysis: fakeAnalysisWithEnumerationError(),
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

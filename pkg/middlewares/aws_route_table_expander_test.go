@@ -7,7 +7,6 @@ import (
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/cloudskiff/driftctl/mocks"
-	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	resource2 "github.com/cloudskiff/driftctl/test/resource"
@@ -215,12 +214,12 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 func TestAwsRouteTableExpander_ExecuteWithInvalidRoutes(t *testing.T) {
 
 	mockedAlerter := &mocks.AlerterInterface{}
-	mockedAlerter.On("SendAlert", aws.AwsRouteTableResourceType, alerter.Alert{
-		Message: "Skipped invalid route found in state for aws_route_table.table_from_state",
-	})
-	mockedAlerter.On("SendAlert", aws.AwsDefaultRouteTableResourceType, alerter.Alert{
-		Message: "Skipped invalid route found in state for aws_default_route_table.default_table_from_state",
-	})
+	mockedAlerter.On("SendAlert", aws.AwsRouteTableResourceType, newInvalidRouteAlert(
+		"aws_route_table", "table_from_state",
+	))
+	mockedAlerter.On("SendAlert", aws.AwsDefaultRouteTableResourceType, newInvalidRouteAlert(
+		"aws_default_route_table", "default_table_from_state",
+	))
 
 	input := []resource.Resource{
 		&aws.AwsRouteTable{

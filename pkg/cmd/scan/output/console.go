@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/cloudskiff/driftctl/pkg/remote"
+
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/fatih/color"
@@ -93,10 +95,19 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 
 	c.writeSummary(analysis)
 
+	policy := false
 	for _, alerts := range analysis.Alerts() {
 		for _, alert := range alerts {
-			fmt.Printf("%s\n", color.YellowString(alert.Message))
+			fmt.Printf("%s\n", color.YellowString(alert.Message()))
+
+			if _, ok := alert.(*remote.EnumerationAccessDeniedAlert); ok {
+				policy = true
+			}
 		}
+	}
+
+	if policy {
+		fmt.Println(color.YellowString("\nThe latest minimal read-only policy for driftctl is always available here, please update yours: https://github.com/cloudskiff/driftctl/blob/main/doc/cmd/scan/supported_resources/aws.md"))
 	}
 
 	return nil

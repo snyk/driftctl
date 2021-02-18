@@ -23,18 +23,12 @@ func TestAlerter_Alert(t *testing.T) {
 			name: "TestWithSingleAlert",
 			alerts: Alerts{
 				"fakeres.foobar": []Alert{
-					{
-						Message:              "This is an alert",
-						ShouldIgnoreResource: false,
-					},
+					&FakeAlert{"This is an alert", false},
 				},
 			},
 			expected: Alerts{
 				"fakeres.foobar": []Alert{
-					{
-						Message:              "This is an alert",
-						ShouldIgnoreResource: false,
-					},
+					&FakeAlert{"This is an alert", false},
 				},
 			},
 		},
@@ -42,38 +36,20 @@ func TestAlerter_Alert(t *testing.T) {
 			name: "TestWithMultipleAlerts",
 			alerts: Alerts{
 				"fakeres.foobar": []Alert{
-					{
-						Message:              "This is an alert",
-						ShouldIgnoreResource: false,
-					},
-					{
-						Message:              "This is a second alert",
-						ShouldIgnoreResource: true,
-					},
+					&FakeAlert{"This is an alert", false},
+					&FakeAlert{"This is a second alert", true},
 				},
 				"fakeres.barfoo": []Alert{
-					{
-						Message:              "This is a third alert",
-						ShouldIgnoreResource: true,
-					},
+					&FakeAlert{"This is a third alert", true},
 				},
 			},
 			expected: Alerts{
 				"fakeres.foobar": []Alert{
-					{
-						Message:              "This is an alert",
-						ShouldIgnoreResource: false,
-					},
-					{
-						Message:              "This is a second alert",
-						ShouldIgnoreResource: true,
-					},
+					&FakeAlert{"This is an alert", false},
+					&FakeAlert{"This is a second alert", true},
 				},
 				"fakeres.barfoo": []Alert{
-					{
-						Message:              "This is a third alert",
-						ShouldIgnoreResource: true,
-					},
+					&FakeAlert{"This is a third alert", true},
 				},
 			},
 		},
@@ -116,24 +92,16 @@ func TestAlerter_IgnoreResources(t *testing.T) {
 			name: "TestShouldNotBeIgnoredWithAlerts",
 			alerts: Alerts{
 				"fakeres": {
-					{
-						Message: "Should not be ignored",
-					},
+					&FakeAlert{"Should not be ignored", false},
 				},
 				"fakeres.foobar": {
-					{
-						Message: "Should not be ignored",
-					},
+					&FakeAlert{"Should not be ignored", false},
 				},
 				"fakeres.barfoo": {
-					{
-						Message: "Should not be ignored",
-					},
+					&FakeAlert{"Should not be ignored", false},
 				},
 				"other.resource": {
-					{
-						Message: "Should not be ignored",
-					},
+					&FakeAlert{"Should not be ignored", false},
 				},
 			},
 			resource: &resource2.FakeResource{
@@ -146,21 +114,13 @@ func TestAlerter_IgnoreResources(t *testing.T) {
 			name: "TestShouldBeIgnoredWithAlertsOnWildcard",
 			alerts: Alerts{
 				"fakeres": {
-					{
-						Message:              "Should be ignored",
-						ShouldIgnoreResource: true,
-					},
+					&FakeAlert{"Should be ignored", true},
 				},
 				"other.foobaz": {
-					{
-						Message:              "Should be ignored",
-						ShouldIgnoreResource: true,
-					},
+					&FakeAlert{"Should be ignored", true},
 				},
 				"other.resource": {
-					{
-						Message: "Should not be ignored",
-					},
+					&FakeAlert{"Should not be ignored", false},
 				},
 			},
 			resource: &resource2.FakeResource{
@@ -173,21 +133,13 @@ func TestAlerter_IgnoreResources(t *testing.T) {
 			name: "TestShouldBeIgnoredWithAlertsOnResource",
 			alerts: Alerts{
 				"fakeres": {
-					{
-						Message:              "Should be ignored",
-						ShouldIgnoreResource: true,
-					},
+					&FakeAlert{"Should be ignored", true},
 				},
 				"other.foobaz": {
-					{
-						Message:              "Should be ignored",
-						ShouldIgnoreResource: true,
-					},
+					&FakeAlert{"Should be ignored", true},
 				},
 				"other.resource": {
-					{
-						Message: "Should not be ignored",
-					},
+					&FakeAlert{"Should not be ignored", false},
 				},
 			},
 			resource: &resource2.FakeResource{
