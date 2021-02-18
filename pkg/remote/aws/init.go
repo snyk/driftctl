@@ -68,6 +68,7 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	supplierLibrary.AddSupplier(NewSNSTopicSubscriptionSupplier(provider))
 	supplierLibrary.AddSupplier(NewDynamoDBTableSupplier(provider))
 	supplierLibrary.AddSupplier(NewRoute53HealthCheckSupplier(provider))
+	supplierLibrary.AddSupplier(NewCloudfrontDistributionSupplier(provider))
 
 	return nil
 }

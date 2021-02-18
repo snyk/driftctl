@@ -55,6 +55,7 @@ func Deserializers() []deserializer.CTYDeserializer {
 		awsdeserializer.NewSNSTopicSubscriptionDeserializer(),
 		awsdeserializer.NewDynamoDBTableDeserializer(),
 		awsdeserializer.NewRoute53HealthCheckDeserializer(),
+		awsdeserializer.NewCloudfrontDistributionDeserializer(),
 
 		ghdeserializer.NewGithubRepositoryDeserializer(),
 	}
