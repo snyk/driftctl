@@ -76,4 +76,6 @@ driftctl scan --filter $'!(Type==\'aws_s3_bucket\' && starts_with(Id, \'terrafor
 # Ignore buckets with an ID suffix of '-test'
 driftctl scan --filter $'!(Type==\'aws_s3_bucket\' && ends_with(Id, \'-test\'))'
 
+# Ignore github archived repositories
+driftctl scan --to github+tf --filter '!(Attr.Archived)'
 ```
