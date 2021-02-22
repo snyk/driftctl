@@ -4,6 +4,10 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+
+	testmocks "github.com/cloudskiff/driftctl/test/mocks"
+
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -21,228 +25,151 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
-	"github.com/cloudskiff/driftctl/test/mocks"
 )
 
 func TestRoute53RecordSupplier_Resources(t *testing.T) {
 
 	tests := []struct {
-		test         string
-		dirName      string
-		zonesPages   mocks.ListHostedZonesPagesOutput
-		recordsPages mocks.ListResourceRecordSetsPagesOutput
-		listError    error
-		err          error
+		test    string
+		dirName string
+		mocks   func(client *repository.MockRoute53Repository)
+		err     error
 	}{
 		{
 			test:    "no records",
 			dirName: "route53_zone_with_no_record",
-			zonesPages: mocks.ListHostedZonesPagesOutput{
-				{
-					true,
-					&route53.ListHostedZonesOutput{
-						HostedZones: []*route53.HostedZone{
-							{
-								Id:   awssdk.String("Z1035360GLIB82T1EH2G"),
-								Name: awssdk.String("foo-0.com"),
-							},
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{
+						{
+							Id:   awssdk.String("Z1035360GLIB82T1EH2G"),
+							Name: awssdk.String("foo-0.com"),
 						},
 					},
-				},
-			},
-			recordsPages: mocks.ListResourceRecordSetsPagesOutput{
-				{
-					true,
-					&route53.ListResourceRecordSetsOutput{},
-					"Z1035360GLIB82T1EH2G",
-				},
+					nil,
+				)
+				client.On("ListRecordsForZone", "Z1035360GLIB82T1EH2G").Return([]*route53.ResourceRecordSet{}, nil)
 			},
 			err: nil,
 		},
 		{
-			test:    "multiples records in multiples zones (test pagination)",
+			test:    "multiples records in multiples zones",
 			dirName: "route53_record_multiples",
-			zonesPages: mocks.ListHostedZonesPagesOutput{
-				{
-					true,
-					&route53.ListHostedZonesOutput{
-						HostedZones: []*route53.HostedZone{
-							{
-								Id:   awssdk.String("Z1035360GLIB82T1EH2G"),
-								Name: awssdk.String("foo-0.com"),
-							},
-							{
-								Id:   awssdk.String("Z10347383HV75H96J919W"),
-								Name: awssdk.String("foo-1.com"),
-							},
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{
+						{
+							Id:   awssdk.String("Z1035360GLIB82T1EH2G"),
+							Name: awssdk.String("foo-0.com"),
+						},
+						{
+							Id:   awssdk.String("Z10347383HV75H96J919W"),
+							Name: awssdk.String("foo-1.com"),
 						},
 					},
-				},
-			},
-			recordsPages: mocks.ListResourceRecordSetsPagesOutput{
-				// Zone foo-0.com records below
-				{
-					false,
-					&route53.ListResourceRecordSetsOutput{
-						ResourceRecordSets: []*route53.ResourceRecordSet{
-							{
-								Name: awssdk.String("foo-0.com"),
-								Type: awssdk.String("NS"),
-							},
-							{
-								Name: awssdk.String("test0"),
-								Type: awssdk.String("A"),
-							},
-							{
-								Name: awssdk.String("test1"),
-								Type: awssdk.String("A"),
-							},
-						},
+					nil,
+				)
+				client.On("ListRecordsForZone", "Z1035360GLIB82T1EH2G").Return([]*route53.ResourceRecordSet{
+					{
+						Name: awssdk.String("foo-0.com"),
+						Type: awssdk.String("NS"),
 					},
-					"Z1035360GLIB82T1EH2G",
-				},
-				{
-					true,
-					&route53.ListResourceRecordSetsOutput{
-						ResourceRecordSets: []*route53.ResourceRecordSet{
-							{
-								Name: awssdk.String("test2"),
-								Type: awssdk.String("A"),
-							},
-							{
-								Name: awssdk.String("test3"),
-								Type: awssdk.String("A"),
-							},
-						},
+					{
+						Name: awssdk.String("test0"),
+						Type: awssdk.String("A"),
 					},
-					"Z1035360GLIB82T1EH2G",
-				},
-				// Zone foo-1.com records below
-				{
-					true,
-					&route53.ListResourceRecordSetsOutput{
-						ResourceRecordSets: []*route53.ResourceRecordSet{
-							{
-								Name: awssdk.String("test2"),
-								Type: awssdk.String("A"),
-							},
-						},
+					{
+						Name: awssdk.String("test1"),
+						Type: awssdk.String("A"),
 					},
-					"Z10347383HV75H96J919W",
-				},
+					{
+						Name: awssdk.String("test2"),
+						Type: awssdk.String("A"),
+					},
+					{
+						Name: awssdk.String("test3"),
+						Type: awssdk.String("A"),
+					},
+				}, nil)
+				client.On("ListRecordsForZone", "Z10347383HV75H96J919W").Return([]*route53.ResourceRecordSet{
+					{
+						Name: awssdk.String("test2"),
+						Type: awssdk.String("A"),
+					},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "explicit subdomain records",
 			dirName: "route53_record_explicit_subdomain",
-			zonesPages: mocks.ListHostedZonesPagesOutput{
-				{
-					true,
-					&route53.ListHostedZonesOutput{
-						HostedZones: []*route53.HostedZone{
-							{
-								Id:   awssdk.String("Z06486383UC8WYSBZTWFM"),
-								Name: awssdk.String("foo-2.com"),
-							},
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{
+						{
+							Id:   awssdk.String("Z06486383UC8WYSBZTWFM"),
+							Name: awssdk.String("foo-2.com"),
 						},
 					},
-				},
-			},
-			recordsPages: mocks.ListResourceRecordSetsPagesOutput{
-				{
-					true,
-					&route53.ListResourceRecordSetsOutput{
-						ResourceRecordSets: []*route53.ResourceRecordSet{
-							{
-								Name: awssdk.String("test0"),
-								Type: awssdk.String("TXT"),
-							},
-							{
-								Name: awssdk.String("test0"),
-								Type: awssdk.String("A"),
-							},
-							{
-								Name: awssdk.String("test1.foo-2.com"),
-								Type: awssdk.String("TXT"),
-							},
-							{
-								Name: awssdk.String("test1.foo-2.com"),
-								Type: awssdk.String("A"),
-							},
-							{
-								Name: awssdk.String("_test2.foo-2.com"),
-								Type: awssdk.String("TXT"),
-							},
-							{
-								Name: awssdk.String("_test2.foo-2.com"),
-								Type: awssdk.String("A"),
-							},
-						},
+					nil,
+				)
+				client.On("ListRecordsForZone", "Z06486383UC8WYSBZTWFM").Return([]*route53.ResourceRecordSet{
+					{
+						Name: awssdk.String("test0"),
+						Type: awssdk.String("TXT"),
 					},
-					"Z06486383UC8WYSBZTWFM",
-				},
+					{
+						Name: awssdk.String("test0"),
+						Type: awssdk.String("A"),
+					},
+					{
+						Name: awssdk.String("test1.foo-2.com"),
+						Type: awssdk.String("TXT"),
+					},
+					{
+						Name: awssdk.String("test1.foo-2.com"),
+						Type: awssdk.String("A"),
+					},
+					{
+						Name: awssdk.String("_test2.foo-2.com"),
+						Type: awssdk.String("TXT"),
+					},
+					{
+						Name: awssdk.String("_test2.foo-2.com"),
+						Type: awssdk.String("A"),
+					},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
-			test:      "cannot list zones",
-			dirName:   "route53_zone_with_no_record",
-			listError: awserr.NewRequestFailure(nil, 403, ""),
-			recordsPages: mocks.ListResourceRecordSetsPagesOutput{
-				{
-					true,
-					&route53.ListResourceRecordSetsOutput{
-						ResourceRecordSets: []*route53.ResourceRecordSet{
-							{
-								Name: awssdk.String("test0"),
-								Type: awssdk.String("TXT"),
-							},
-							{
-								Name: awssdk.String("test0"),
-								Type: awssdk.String("A"),
-							},
-							{
-								Name: awssdk.String("test1.foo-2.com"),
-								Type: awssdk.String("TXT"),
-							},
-							{
-								Name: awssdk.String("test1.foo-2.com"),
-								Type: awssdk.String("A"),
-							},
-							{
-								Name: awssdk.String("_test2.foo-2.com"),
-								Type: awssdk.String("TXT"),
-							},
-							{
-								Name: awssdk.String("_test2.foo-2.com"),
-								Type: awssdk.String("A"),
-							},
-						},
-					},
-					"Z06486383UC8WYSBZTWFM",
-				},
+			test:    "cannot list zones",
+			dirName: "route53_zone_with_no_record",
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{},
+					awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRoute53RecordResourceType, resourceaws.AwsRoute53ZoneResourceType),
 		},
 		{
 			test:    "cannot list records",
 			dirName: "route53_zone_with_no_record",
-			zonesPages: mocks.ListHostedZonesPagesOutput{
-				{
-					true,
-					&route53.ListHostedZonesOutput{
-						HostedZones: []*route53.HostedZone{
-							{
-								Id:   awssdk.String("Z06486383UC8WYSBZTWFM"),
-								Name: awssdk.String("foo-2.com"),
-							},
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{
+						{
+							Id:   awssdk.String("Z06486383UC8WYSBZTWFM"),
+							Name: awssdk.String("foo-2.com"),
 						},
 					},
-				},
+					nil)
+				client.On("ListRecordsForZone", "Z06486383UC8WYSBZTWFM").Return(
+					[]*route53.ResourceRecordSet{},
+					awserr.NewRequestFailure(nil, 403, ""))
+
 			},
-			listError: awserr.NewRequestFailure(nil, 403, ""),
-			err:       remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRoute53RecordResourceType),
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRoute53RecordResourceType),
 		},
 	}
 	for _, tt := range tests {
@@ -260,9 +187,10 @@ func TestRoute53RecordSupplier_Resources(t *testing.T) {
 				supplierLibrary.AddSupplier(NewRoute53RecordSupplier(provider))
 			}
 
-			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
+			provider := testmocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewRoute53RecordDeserializer()
-			client := mocks.NewMockAWSRoute53RecordClient(tt.zonesPages, tt.recordsPages, tt.listError)
+			client := &repository.MockRoute53Repository{}
+			tt.mocks(client)
 			s := &Route53RecordSupplier{
 				provider,
 				deserializer,

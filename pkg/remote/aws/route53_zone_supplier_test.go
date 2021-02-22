@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -28,79 +30,72 @@ import (
 func TestRoute53ZoneSupplier_Resources(t *testing.T) {
 
 	tests := []struct {
-		test       string
-		dirName    string
-		zonesPages mocks.ListHostedZonesPagesOutput
-		listError  error
-		err        error
+		test    string
+		dirName string
+		mocks   func(client *repository.MockRoute53Repository)
+		err     error
 	}{
 		{
 			test:    "no zones",
 			dirName: "route53_zone_empty",
-			zonesPages: mocks.ListHostedZonesPagesOutput{
-				{
-					true,
-					&route53.ListHostedZonesOutput{},
-				},
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{},
+					nil,
+				)
 			},
 			err: nil,
 		},
 		{
 			test:    "single zone",
 			dirName: "route53_zone_single",
-			zonesPages: mocks.ListHostedZonesPagesOutput{
-				{
-					true,
-					&route53.ListHostedZonesOutput{
-						HostedZones: []*route53.HostedZone{
-							{
-								Id:   awssdk.String("Z08068311RGDXPHF8KE62"),
-								Name: awssdk.String("foo.bar"),
-							},
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{
+						{
+							Id:   awssdk.String("Z08068311RGDXPHF8KE62"),
+							Name: awssdk.String("foo.bar"),
 						},
 					},
-				},
+					nil,
+				)
 			},
 			err: nil,
 		},
 		{
 			test:    "multiples zone (test pagination)",
 			dirName: "route53_zone_multiples",
-			zonesPages: mocks.ListHostedZonesPagesOutput{
-				{
-					false,
-					&route53.ListHostedZonesOutput{
-						HostedZones: []*route53.HostedZone{
-							{
-								Id:   awssdk.String("Z01809283VH9BBALZHO7B"),
-								Name: awssdk.String("foo-0.com"),
-							},
-							{
-								Id:   awssdk.String("Z01804312AV8PHE3C43AD"),
-								Name: awssdk.String("foo-1.com"),
-							},
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{
+						{
+							Id:   awssdk.String("Z01809283VH9BBALZHO7B"),
+							Name: awssdk.String("foo-0.com"),
+						},
+						{
+							Id:   awssdk.String("Z01804312AV8PHE3C43AD"),
+							Name: awssdk.String("foo-1.com"),
+						},
+						{
+							Id:   awssdk.String("Z01874941AR1TCGV5K65C"),
+							Name: awssdk.String("foo-2.com"),
 						},
 					},
-				},
-				{
-					true,
-					&route53.ListHostedZonesOutput{
-						HostedZones: []*route53.HostedZone{
-							{
-								Id:   awssdk.String("Z01874941AR1TCGV5K65C"),
-								Name: awssdk.String("foo-2.com"),
-							},
-						},
-					},
-				},
+					nil,
+				)
 			},
 			err: nil,
 		},
 		{
-			test:      "cannot list zones",
-			dirName:   "route53_zone_empty",
-			listError: awserr.NewRequestFailure(nil, 403, ""),
-			err:       remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRoute53ZoneResourceType),
+			test:    "cannot list zones",
+			dirName: "route53_zone_empty",
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{},
+					awserr.NewRequestFailure(nil, 403, ""),
+				)
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRoute53ZoneResourceType),
 		},
 	}
 	for _, tt := range tests {
@@ -120,7 +115,8 @@ func TestRoute53ZoneSupplier_Resources(t *testing.T) {
 		t.Run(tt.test, func(t *testing.T) {
 			deserializer := awsdeserializer.NewRoute53ZoneDeserializer()
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
-			client := mocks.NewMockAWSRoute53ZoneClient(tt.zonesPages, tt.listError)
+			client := &repository.MockRoute53Repository{}
+			tt.mocks(client)
 			s := &Route53ZoneSupplier{
 				provider,
 				deserializer,

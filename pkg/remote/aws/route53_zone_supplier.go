@@ -3,6 +3,8 @@ package aws
 import (
 	"strings"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
@@ -12,7 +14,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/aws/aws-sdk-go/service/route53"
-	"github.com/aws/aws-sdk-go/service/route53/route53iface"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -20,7 +21,7 @@ import (
 type Route53ZoneSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       route53iface.Route53API
+	client       repository.Route53Repository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -28,27 +29,14 @@ func NewRoute53ZoneSupplier(provider *AWSTerraformProvider) *Route53ZoneSupplier
 	return &Route53ZoneSupplier{
 		provider,
 		awsdeserializer.NewRoute53ZoneDeserializer(),
-		route53.New(provider.session),
+		repository.NewRoute53Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
-func listAwsRoute53Zones(client route53iface.Route53API) ([]*route53.HostedZone, error) {
-	var result []*route53.HostedZone
-	input := &route53.ListHostedZonesInput{}
-	err := client.ListHostedZonesPages(input, func(res *route53.ListHostedZonesOutput, lastPage bool) bool {
-		result = append(result, res.HostedZones...)
-		return !lastPage
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
 func (s Route53ZoneSupplier) Resources() ([]resource.Resource, error) {
 
-	zones, err := listAwsRoute53Zones(s.client)
+	zones, err := s.client.ListAllZones()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsRoute53ZoneResourceType)
 	}
