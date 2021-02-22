@@ -27,6 +27,7 @@ jobs:
       - checkout
       - go/install:
           version: "1.16"
+          cache: false
       - run:
           name: install dependencies
           command: |
