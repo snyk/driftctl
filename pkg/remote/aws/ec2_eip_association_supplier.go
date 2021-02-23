@@ -1,17 +1,15 @@
 package aws
 
 import (
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -19,7 +17,7 @@ import (
 type EC2EipAssociationSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       ec2iface.EC2API
+	client       repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -27,12 +25,12 @@ func NewEC2EipAssociationSupplier(provider *AWSTerraformProvider) *EC2EipAssocia
 	return &EC2EipAssociationSupplier{
 		provider,
 		awsdeserializer.NewEC2EipAssociationDeserializer(),
-		ec2.New(provider.session),
+		repository.NewEC2Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner())}
 }
 
 func (s EC2EipAssociationSupplier) Resources() ([]resource.Resource, error) {
-	associationIds, err := listAddressesAssociationIds(s.client)
+	associationIds, err := s.client.ListAllAddressesAssociation()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEipAssociationResourceType)
 	}
@@ -62,18 +60,4 @@ func (s EC2EipAssociationSupplier) readEIPAssociation(assocId string) (cty.Value
 		return cty.NilVal, err
 	}
 	return *resAssoc, nil
-}
-
-func listAddressesAssociationIds(client ec2iface.EC2API) ([]string, error) {
-	results := make([]string, 0)
-	addresses, err := listAddresses(client)
-	if err != nil {
-		return nil, err
-	}
-	for _, address := range addresses {
-		if address.AssociationId != nil {
-			results = append(results, aws.StringValue(address.AssociationId))
-		}
-	}
-	return results, nil
 }

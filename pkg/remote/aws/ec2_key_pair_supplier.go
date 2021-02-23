@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
@@ -10,8 +11,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -19,7 +18,7 @@ import (
 type EC2KeyPairSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       ec2iface.EC2API
+	client       repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -27,20 +26,19 @@ func NewEC2KeyPairSupplier(provider *AWSTerraformProvider) *EC2KeyPairSupplier {
 	return &EC2KeyPairSupplier{
 		provider,
 		awsdeserializer.NewEC2KeyPairDeserializer(),
-		ec2.New(provider.session),
+		repository.NewEC2Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s EC2KeyPairSupplier) Resources() ([]resource.Resource, error) {
-	input := &ec2.DescribeKeyPairsInput{}
-	response, err := s.client.DescribeKeyPairs(input)
+	keyPairs, err := s.client.ListAllKeyPairs()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsKeyPairResourceType)
 	}
 	results := make([]cty.Value, 0)
-	if len(response.KeyPairs) > 0 {
-		for _, kp := range response.KeyPairs {
+	if len(keyPairs) > 0 {
+		for _, kp := range keyPairs {
 			name := aws.StringValue(kp.KeyName)
 			s.runner.Run(func() (cty.Value, error) {
 				return s.readKeyPair(name)

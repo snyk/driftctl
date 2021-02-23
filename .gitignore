@@ -16,6 +16,7 @@
 /unit-tests.xml
 /unit-tests-acc.xml
 /cover.out
+/cover.out.tmp
 /cover-acc.out
 
 ### coverage folder inside pkg ###

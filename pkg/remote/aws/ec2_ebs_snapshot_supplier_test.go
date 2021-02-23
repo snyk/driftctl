@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -27,55 +29,41 @@ import (
 
 func TestEC2EbsSnapshotSupplier_Resources(t *testing.T) {
 	tests := []struct {
-		test                string
-		dirName             string
-		snapshotsPages      mocks.DescribeSnapshotsPagesOutput
-		snapshotsPagesError error
-		err                 error
+		test    string
+		dirName string
+		mock    func(mock *repository.MockEC2Repository)
+		err     error
 	}{
 		{
 			test:    "no snapshots",
 			dirName: "ec2_ebs_snapshot_empty",
-			snapshotsPages: mocks.DescribeSnapshotsPagesOutput{
-				{
-					true,
-					&ec2.DescribeSnapshotsOutput{},
-				},
+			mock: func(mock *repository.MockEC2Repository) {
+				mock.On("ListAllSnapshots").Return([]*ec2.Snapshot{}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "with snapshots",
 			dirName: "ec2_ebs_snapshot_multiple",
-			snapshotsPages: mocks.DescribeSnapshotsPagesOutput{
-				{
-					false,
-					&ec2.DescribeSnapshotsOutput{
-						Snapshots: []*ec2.Snapshot{
-							{
-								SnapshotId: aws.String("snap-0c509a2a880d95a39"),
-							},
-						},
+			mock: func(mock *repository.MockEC2Repository) {
+				mock.On("ListAllSnapshots").Return([]*ec2.Snapshot{
+					{
+						SnapshotId: aws.String("snap-0c509a2a880d95a39"),
 					},
-				},
-				{
-					true,
-					&ec2.DescribeSnapshotsOutput{
-						Snapshots: []*ec2.Snapshot{
-							{
-								SnapshotId: aws.String("snap-00672558cecd93a61"),
-							},
-						},
+					{
+						SnapshotId: aws.String("snap-00672558cecd93a61"),
 					},
-				},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
-			test:                "cannot list snapshots",
-			dirName:             "ec2_ebs_snapshot_empty",
-			snapshotsPagesError: awserr.NewRequestFailure(nil, 403, ""),
-			err:                 remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsEbsSnapshotResourceType),
+			test:    "cannot list snapshots",
+			dirName: "ec2_ebs_snapshot_empty",
+			mock: func(mock *repository.MockEC2Repository) {
+				mock.On("ListAllSnapshots").Return([]*ec2.Snapshot{}, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsEbsSnapshotResourceType),
 		},
 	}
 	for _, tt := range tests {
@@ -96,10 +84,8 @@ func TestEC2EbsSnapshotSupplier_Resources(t *testing.T) {
 		t.Run(tt.test, func(t *testing.T) {
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewEC2EbsSnapshotDeserializer()
-			client := mocks.NewMockAWSEC2EbsSnapshotClient(tt.snapshotsPages)
-			if tt.snapshotsPagesError != nil {
-				client = mocks.NewMockAWSEC2ErrorClient(tt.snapshotsPagesError)
-			}
+			client := &repository.MockEC2Repository{}
+			tt.mock(client)
 			s := &EC2EbsSnapshotSupplier{
 				provider,
 				deserializer,

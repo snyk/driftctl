@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -21,40 +23,40 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
 	"github.com/cloudskiff/driftctl/test/mocks"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
 func TestEC2EipAssociationSupplier_Resources(t *testing.T) {
 	tests := []struct {
-		test      string
-		dirName   string
-		addresses []*ec2.Address
-		listError error
-		err       error
+		test    string
+		dirName string
+		mock    func(mock *repository.MockEC2Repository)
+		err     error
 	}{
 		{
-			test:      "no eip associations",
-			dirName:   "ec2_eip_association_empty",
-			addresses: []*ec2.Address{},
-			err:       nil,
-		},
-		{
-			test:    "with eip associations",
-			dirName: "ec2_eip_association_single",
-			addresses: []*ec2.Address{
-				{
-					AssociationId: aws.String("eipassoc-0e9a7356e30f0c3d1"),
-				},
+			test:    "no eip associations",
+			dirName: "ec2_eip_association_empty",
+			mock: func(mock *repository.MockEC2Repository) {
+				mock.On("ListAllAddressesAssociation").Return([]string{}, nil)
 			},
 			err: nil,
 		},
 		{
-			test:      "Cannot list eip associations",
-			dirName:   "ec2_eip_association_empty",
-			listError: awserr.NewRequestFailure(nil, 403, ""),
-			err:       remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsEipAssociationResourceType),
+			test:    "with eip associations",
+			dirName: "ec2_eip_association_single",
+			mock: func(mock *repository.MockEC2Repository) {
+				mock.On("ListAllAddressesAssociation").Return([]string{
+					"eipassoc-0e9a7356e30f0c3d1",
+				}, nil)
+			},
+			err: nil,
+		},
+		{
+			test:    "Cannot list eip associations",
+			dirName: "ec2_eip_association_empty",
+			mock: func(mock *repository.MockEC2Repository) {
+				mock.On("ListAllAddressesAssociation").Return([]string{}, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsEipAssociationResourceType),
 		},
 	}
 	for _, tt := range tests {
@@ -74,10 +76,8 @@ func TestEC2EipAssociationSupplier_Resources(t *testing.T) {
 		t.Run(tt.test, func(t *testing.T) {
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewEC2EipAssociationDeserializer()
-			client := mocks.NewMockAWSEC2EipClient(tt.addresses)
-			if tt.listError != nil {
-				client = mocks.NewMockAWSEC2ErrorClient(tt.listError)
-			}
+			client := &repository.MockEC2Repository{}
+			tt.mock(client)
 			s := &EC2EipAssociationSupplier{
 				provider,
 				deserializer,

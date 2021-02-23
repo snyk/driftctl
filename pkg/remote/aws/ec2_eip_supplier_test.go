@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -28,36 +30,41 @@ import (
 
 func TestEC2EipSupplier_Resources(t *testing.T) {
 	tests := []struct {
-		test      string
-		dirName   string
-		addresses []*ec2.Address
-		listError error
-		err       error
+		test    string
+		dirName string
+		mock    func(mock *repository.MockEC2Repository)
+		err     error
 	}{
 		{
-			test:      "no eips",
-			dirName:   "ec2_eip_empty",
-			addresses: []*ec2.Address{},
-			err:       nil,
-		},
-		{
-			test:    "with eips",
-			dirName: "ec2_eip_multiple",
-			addresses: []*ec2.Address{
-				{
-					AllocationId: aws.String("eipalloc-017d5267e4dda73f1"),
-				},
-				{
-					AllocationId: aws.String("eipalloc-0cf714dc097c992cc"),
-				},
+			test:    "no eips",
+			dirName: "ec2_eip_empty",
+			mock: func(mock *repository.MockEC2Repository) {
+				mock.On("ListAllAddresses").Return([]*ec2.Address{}, nil)
 			},
 			err: nil,
 		},
 		{
-			test:      "Cannot list eips",
-			dirName:   "ec2_eip_empty",
-			listError: awserr.NewRequestFailure(nil, 403, ""),
-			err:       remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsEipResourceType),
+			test:    "with eips",
+			dirName: "ec2_eip_multiple",
+			mock: func(mock *repository.MockEC2Repository) {
+				mock.On("ListAllAddresses").Return([]*ec2.Address{
+					{
+						AllocationId: aws.String("eipalloc-017d5267e4dda73f1"),
+					},
+					{
+						AllocationId: aws.String("eipalloc-0cf714dc097c992cc"),
+					},
+				}, nil)
+			},
+			err: nil,
+		},
+		{
+			test:    "Cannot list eips",
+			dirName: "ec2_eip_empty",
+			mock: func(mock *repository.MockEC2Repository) {
+				mock.On("ListAllAddresses").Return([]*ec2.Address{}, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsEipResourceType),
 		},
 	}
 	for _, tt := range tests {
@@ -77,10 +84,8 @@ func TestEC2EipSupplier_Resources(t *testing.T) {
 		t.Run(tt.test, func(t *testing.T) {
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewEC2EipDeserializer()
-			client := mocks.NewMockAWSEC2EipClient(tt.addresses)
-			if tt.listError != nil {
-				client = mocks.NewMockAWSEC2ErrorClient(tt.listError)
-			}
+			client := &repository.MockEC2Repository{}
+			tt.mock(client)
 			s := &EC2EipSupplier{
 				provider,
 				deserializer,
