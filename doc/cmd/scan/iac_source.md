@@ -11,6 +11,9 @@ Example:
 driftctl scan \
    --from tfstate+s3://statebucketdriftctl/terraform.tfstate \
    --from tfstate://terraform_toto.tfstate
+
+# You can also use every file under a given prefix for S3
+driftctl scan --from tfstate+s3://statebucketdriftctl/states
 ```
 
 
