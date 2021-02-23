@@ -16,8 +16,8 @@ import (
 func TestAcc_AwsRoute53HealthCheck(t *testing.T) {
 	var mutatedHealthCheckID string
 	acceptance.Run(t, acceptance.AccTestCase{
-		Path: "./testdata/acc/aws_route53_health_check",
-		Args: []string{"scan", "--filter", "Type=='aws_route53_health_check'"},
+		Paths: []string{"./testdata/acc/aws_route53_health_check"},
+		Args:  []string{"scan", "--filter", "Type=='aws_route53_health_check'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

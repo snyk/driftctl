@@ -20,8 +20,8 @@ import (
 func TestAcc_AwsSqsQueue(t *testing.T) {
 	var mutatedQueue string
 	acceptance.Run(t, acceptance.AccTestCase{
-		Path: "./testdata/acc/aws_sqs_queue",
-		Args: []string{"scan", "--filter", "Type=='aws_sqs_queue'"},
+		Paths: []string{"./testdata/acc/aws_sqs_queue"},
+		Args:  []string{"scan", "--filter", "Type=='aws_sqs_queue'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

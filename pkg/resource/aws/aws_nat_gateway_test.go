@@ -8,7 +8,7 @@ import (
 
 func TestAcc_AwsNATGateway(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Path: "./testdata/acc/aws_nat_gateway",
+		Paths: []string{"./testdata/acc/aws_nat_gateway"},
 		// We filter on aws_eip_association too to test the middleware behavior
 		Args: []string{"scan", "--filter", "Type=='aws_nat_gateway' || Type=='aws_eip_association'"},
 		Checks: []acceptance.AccCheck{
