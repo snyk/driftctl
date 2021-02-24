@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -30,85 +32,68 @@ import (
 func TestDBInstanceSupplier_Resources(t *testing.T) {
 
 	tests := []struct {
-		test                string
-		dirName             string
-		instancesPages      mocks.DescribeDBInstancesPagesOutput
-		instancesPagesError error
-		err                 error
+		test    string
+		dirName string
+		mocks   func(client *repository.MockRDSRepository)
+		err     error
 	}{
 		{
 			test:    "no dbs",
 			dirName: "db_instance_empty",
-			instancesPages: mocks.DescribeDBInstancesPagesOutput{
-				{
-					true,
-					&rds.DescribeDBInstancesOutput{},
-				},
+			mocks: func(client *repository.MockRDSRepository) {
+				client.On("ListAllDBInstances").Return([]*rds.DBInstance{}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "single db",
 			dirName: "db_instance_single",
-			instancesPages: mocks.DescribeDBInstancesPagesOutput{
-				{
-					true,
-					&rds.DescribeDBInstancesOutput{
-						DBInstances: []*rds.DBInstance{
-							{
-								DBInstanceIdentifier: awssdk.String("terraform-20201015115018309600000001"),
-							},
-						},
+			mocks: func(client *repository.MockRDSRepository) {
+				client.On("ListAllDBInstances").Return([]*rds.DBInstance{
+					{
+						DBInstanceIdentifier: awssdk.String("terraform-20201015115018309600000001"),
 					},
-				},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "multiples mixed db",
 			dirName: "db_instance_multiple",
-			instancesPages: mocks.DescribeDBInstancesPagesOutput{
-				{
-					true,
-					&rds.DescribeDBInstancesOutput{
-						DBInstances: []*rds.DBInstance{
-							{
-								DBInstanceIdentifier: awssdk.String("terraform-20201015115018309600000001"),
-							},
-							{
-								DBInstanceIdentifier: awssdk.String("database-1"),
-							},
-						},
+			mocks: func(client *repository.MockRDSRepository) {
+				client.On("ListAllDBInstances").Return([]*rds.DBInstance{
+					{
+						DBInstanceIdentifier: awssdk.String("terraform-20201015115018309600000001"),
 					},
-				},
+					{
+						DBInstanceIdentifier: awssdk.String("database-1"),
+					},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "multiples mixed db",
 			dirName: "db_instance_multiple",
-			instancesPages: mocks.DescribeDBInstancesPagesOutput{
-				{
-					true,
-					&rds.DescribeDBInstancesOutput{
-						DBInstances: []*rds.DBInstance{
-							{
-								DBInstanceIdentifier: awssdk.String("terraform-20201015115018309600000001"),
-							},
-							{
-								DBInstanceIdentifier: awssdk.String("database-1"),
-							},
-						},
+			mocks: func(client *repository.MockRDSRepository) {
+				client.On("ListAllDBInstances").Return([]*rds.DBInstance{
+					{
+						DBInstanceIdentifier: awssdk.String("terraform-20201015115018309600000001"),
 					},
-				},
+					{
+						DBInstanceIdentifier: awssdk.String("database-1"),
+					},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
-			test:                "Cannot list db instances",
-			dirName:             "db_instance_empty",
-			instancesPagesError: awserr.NewRequestFailure(nil, 403, ""),
-			err:                 remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsDbInstanceResourceType),
+			test:    "Cannot list db instances",
+			dirName: "db_instance_empty",
+			mocks: func(client *repository.MockRDSRepository) {
+				client.On("ListAllDBInstances").Return([]*rds.DBInstance{}, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsDbInstanceResourceType),
 		},
 	}
 	for _, tt := range tests {
@@ -129,11 +114,8 @@ func TestDBInstanceSupplier_Resources(t *testing.T) {
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewDBInstanceDeserializer()
 
-			client := mocks.NewMockAWSRDSClient(tt.instancesPages)
-			if tt.instancesPagesError != nil {
-				client = mocks.NewMockAWSRDSErrorClient(tt.instancesPagesError)
-			}
-
+			client := &repository.MockRDSRepository{}
+			tt.mocks(client)
 			s := &DBInstanceSupplier{
 				provider,
 				deserializer,
