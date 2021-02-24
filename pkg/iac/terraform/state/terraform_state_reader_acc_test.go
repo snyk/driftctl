@@ -9,6 +9,33 @@ import (
 	"github.com/cloudskiff/driftctl/test/acceptance/awsutils"
 )
 
+func TestAcc_StateReader_WithMultipleStatesInDirectory(t *testing.T) {
+	acceptance.Run(t, acceptance.AccTestCase{
+		Paths: []string{
+			"./testdata/acc/multiple_states_local/s3",
+			"./testdata/acc/multiple_states_local/route53",
+		},
+		Args: []string{
+			"scan",
+			"--from", "tfstate://testdata/acc/multiple_states_local/states",
+			"--filter", "Type=='aws_s3_bucket' || Type=='aws_route53_zone'",
+		},
+		Checks: []acceptance.AccCheck{
+			{
+				Check: func(result *acceptance.ScanResult, stdout string, err error) {
+					if err != nil {
+						t.Fatal(err)
+					}
+					result.AssertInfrastructureIsInSync()
+					result.AssertManagedCount(2)
+					result.Equal("aws_route53_zone", result.Managed()[0].TerraformType())
+					result.Equal("aws_s3_bucket", result.Managed()[1].TerraformType())
+				},
+			},
+		},
+	})
+}
+
 func TestAcc_StateReader_WithMultiplesStatesInS3(t *testing.T) {
 	stateBucketName := "driftctl-acc-test-only"
 	acceptance.Run(t, acceptance.AccTestCase{

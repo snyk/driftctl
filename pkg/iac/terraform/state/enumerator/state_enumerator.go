@@ -12,7 +12,10 @@ type StateEnumerator interface {
 
 func GetEnumerator(config config.SupplierConfig) StateEnumerator {
 
-	if config.Backend == backend.BackendKeyS3 {
+	switch config.Backend {
+	case backend.BackendKeyFile:
+		return NewFileEnumerator(config)
+	case backend.BackendKeyS3:
 		return NewS3Enumerator(config)
 	}
 
