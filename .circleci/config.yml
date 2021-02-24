@@ -27,7 +27,8 @@ jobs:
       - checkout
       - go/install:
           version: "1.16"
-          cache-key: "1.16"
+          # Disable cache at it seem to broke go 1.16 installation
+          cache: false
       - run:
           name: install dependencies
           command: |
