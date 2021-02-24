@@ -99,6 +99,11 @@ As AWS documentation recommends, the below policy is granting only the permissio
                 "iam:ListRoles",
                 "iam:ListUserPolicies",
                 "iam:ListUsers",
+                "kms:DescribeKey",
+                "kms:GetKeyPolicy",
+                "kms:GetKeyRotationStatus",
+                "kms:ListKeys",
+                "kms:ListResourceTags",
                 "lambda:GetFunction",
                 "lambda:GetFunctionCodeSigningConfig",
                 "lambda:ListFunctions",
@@ -281,3 +286,9 @@ As AWS documentation recommends, the below policy is granting only the permissio
 ## Cloudfront
 
 - [x] aws_cloudfront_distribution
+
+## KMS
+
+- [x] aws_kms_key
+- [ ] aws_kms_alias
+- [ ] aws_kms_external_key
