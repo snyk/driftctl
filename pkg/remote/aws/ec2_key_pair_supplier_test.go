@@ -4,6 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -28,30 +31,41 @@ import (
 
 func TestEC2KeyPairSupplier_Resources(t *testing.T) {
 	tests := []struct {
-		test      string
-		dirName   string
-		kpNames   []string
-		listError error
-		err       error
+		test    string
+		dirName string
+		mock    func(mock *repository.MockEC2Repository)
+		err     error
 	}{
 		{
 			test:    "no key pairs",
 			dirName: "ec2_key_pair_empty",
-			kpNames: []string{},
-			err:     nil,
+			mock: func(mock *repository.MockEC2Repository) {
+				mock.On("ListAllKeyPairs").Return([]*ec2.KeyPairInfo{}, nil)
+			},
+			err: nil,
 		},
 		{
 			test:    "with key pairs",
 			dirName: "ec2_key_pair_multiple",
-			kpNames: []string{"test", "bar"},
-			err:     nil,
+			mock: func(mock *repository.MockEC2Repository) {
+				mock.On("ListAllKeyPairs").Return([]*ec2.KeyPairInfo{
+					{
+						KeyName: aws.String("test"),
+					},
+					{
+						KeyName: aws.String("bar"),
+					},
+				}, nil)
+			},
+			err: nil,
 		},
 		{
-			test:      "cannot list key pairs",
-			dirName:   "ec2_key_pair_empty",
-			kpNames:   []string{},
-			listError: awserr.NewRequestFailure(nil, 403, ""),
-			err:       remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsKeyPairResourceType),
+			test:    "cannot list key pairs",
+			dirName: "ec2_key_pair_empty",
+			mock: func(mock *repository.MockEC2Repository) {
+				mock.On("ListAllKeyPairs").Return([]*ec2.KeyPairInfo{}, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsKeyPairResourceType),
 		},
 	}
 	for _, tt := range tests {
@@ -71,10 +85,8 @@ func TestEC2KeyPairSupplier_Resources(t *testing.T) {
 		t.Run(tt.test, func(t *testing.T) {
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewEC2KeyPairDeserializer()
-			client := mocks.NewMockAWSEC2KeyPairClient(tt.kpNames)
-			if tt.listError != nil {
-				client = mocks.NewMockAWSEC2ErrorClient(tt.listError)
-			}
+			client := &repository.MockEC2Repository{}
+			tt.mock(client)
 			s := &EC2KeyPairSupplier{
 				provider,
 				deserializer,
