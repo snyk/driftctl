@@ -1,0 +1,41 @@
+[
+ {
+  "create_default_maintainer": null,
+  "description": "test 2",
+  "etag": "W/\"c7192e5edb122a28f3635512f14fc80a1f8c376fd27a7fb10b8b6b4bfddaef66\"",
+  "id": "4556812",
+  "ldap_dn": "",
+  "members_count": 0,
+  "name": "team2",
+  "node_id": "MDQ6VGVhbTQ1NTY4MTI=",
+  "parent_team_id": null,
+  "privacy": "secret",
+  "slug": "team2"
+ },
+ {
+  "create_default_maintainer": null,
+  "description": "test parent team",
+  "etag": "W/\"259854d95a2a90855b94e67f564eade7537c334e945b2b5a531e80b21b3f6b4b\"",
+  "id": "4556814",
+  "ldap_dn": "",
+  "members_count": 0,
+  "name": "new team with parent",
+  "node_id": "MDQ6VGVhbTQ1NTY4MTQ=",
+  "parent_team_id": 4556811,
+  "privacy": "closed",
+  "slug": "new-team-with-parent"
+ },
+ {
+  "create_default_maintainer": null,
+  "description": "test",
+  "etag": "W/\"79a865b521c970e4cbf2dc00552f13450d2c5a239273e3117ee871b3df5fd05e\"",
+  "id": "4556811",
+  "ldap_dn": "",
+  "members_count": 0,
+  "name": "team1",
+  "node_id": "MDQ6VGVhbTQ1NTY4MTE=",
+  "parent_team_id": null,
+  "privacy": "closed",
+  "slug": "team1"
+ }
+]

@@ -58,5 +58,6 @@ func Deserializers() []deserializer.CTYDeserializer {
 		awsdeserializer.NewCloudfrontDistributionDeserializer(),
 
 		ghdeserializer.NewGithubRepositoryDeserializer(),
+		ghdeserializer.NewGithubTeamDeserializer(),
 	}
 }

@@ -14,6 +14,7 @@ Below you can find the minimal scope required for driftctl to be able to scan ev
 
 ```shell
 repo # Required to enumerate public and private repos
+read:org # Used to list your organization teams
 ```
 
 **⚠️ Beware that if you don't set correct permissions for your token, you won't see any errors and all resources will appear as deleted from remote**
@@ -21,3 +22,4 @@ repo # Required to enumerate public and private repos
 ## Supported resources
 
 - [x] github_repository
+- [x] github_team
