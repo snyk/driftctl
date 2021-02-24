@@ -63,7 +63,81 @@
    }
   ],
   "LoggingConfig": [],
-  "OrderedCacheBehavior": [],
+  "OrderedCacheBehavior": [
+   {
+    "AllowedMethods": [
+     "GET",
+     "HEAD",
+     "OPTIONS"
+    ],
+    "CachedMethods": [
+     "GET",
+     "HEAD",
+     "OPTIONS"
+    ],
+    "Compress": true,
+    "DefaultTtl": 86400,
+    "FieldLevelEncryptionId": null,
+    "MaxTtl": 31536000,
+    "MinTtl": 0,
+    "PathPattern": "/content/immutable/*",
+    "SmoothStreaming": false,
+    "TargetOriginId": "S3-foo-cloudfront",
+    "TrustedSigners": null,
+    "ViewerProtocolPolicy": "redirect-to-https",
+    "ForwardedValues": [
+     {
+      "Headers": [
+       "Origin"
+      ],
+      "QueryString": false,
+      "QueryStringCacheKeys": null,
+      "Cookies": [
+       {
+        "Forward": "none",
+        "WhitelistedNames": null
+       }
+      ]
+     }
+    ],
+    "LambdaFunctionAssociation": null
+   },
+   {
+    "AllowedMethods": [
+     "GET",
+     "HEAD",
+     "OPTIONS"
+    ],
+    "CachedMethods": [
+     "GET",
+     "HEAD"
+    ],
+    "Compress": true,
+    "DefaultTtl": 3600,
+    "FieldLevelEncryptionId": null,
+    "MaxTtl": 86400,
+    "MinTtl": 0,
+    "PathPattern": "/content/*",
+    "SmoothStreaming": false,
+    "TargetOriginId": "S3-foo-cloudfront",
+    "TrustedSigners": null,
+    "ViewerProtocolPolicy": "redirect-to-https",
+    "ForwardedValues": [
+     {
+      "Headers": null,
+      "QueryString": false,
+      "QueryStringCacheKeys": null,
+      "Cookies": [
+       {
+        "Forward": "none",
+        "WhitelistedNames": null
+       }
+      ]
+     }
+    ],
+    "LambdaFunctionAssociation": null
+   }
+  ],
   "Origin": [
    {
     "DomainName": "foo-cloudfront.s3.eu-west-3.amazonaws.com",
