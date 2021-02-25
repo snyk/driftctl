@@ -102,6 +102,7 @@ As AWS documentation recommends, the below policy is granting only the permissio
                 "kms:DescribeKey",
                 "kms:GetKeyPolicy",
                 "kms:GetKeyRotationStatus",
+                "kms:ListAliases",
                 "kms:ListKeys",
                 "kms:ListResourceTags",
                 "lambda:GetFunction",
@@ -290,5 +291,5 @@ As AWS documentation recommends, the below policy is granting only the permissio
 ## KMS
 
 - [x] aws_kms_key
-- [ ] aws_kms_alias
+- [x] aws_kms_alias
 - [ ] aws_kms_external_key

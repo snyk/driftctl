@@ -90,3 +90,60 @@ func Test_KMSRepository_ListAllKeys(t *testing.T) {
 		})
 	}
 }
+
+func Test_KMSRepository_ListAllAliases(t *testing.T) {
+	tests := []struct {
+		name    string
+		mocks   func(client *mocks.KMSClient)
+		want    []*kms.AliasListEntry
+		wantErr error
+	}{
+		{
+			name: "List only customer aliases",
+			mocks: func(client *mocks.KMSClient) {
+				client.On("ListAliasesPages",
+					&kms.ListAliasesInput{},
+					mock.MatchedBy(func(callback func(res *kms.ListAliasesOutput, lastPage bool) bool) bool {
+						callback(&kms.ListAliasesOutput{
+							Aliases: []*kms.AliasListEntry{
+								{AliasName: aws.String("alias/1")},
+								{AliasName: aws.String("alias/foo/2")},
+								{AliasName: aws.String("alias/aw/3")},
+								{AliasName: aws.String("alias/aws/4")},
+								{AliasName: aws.String("alias/aws/5")},
+								{AliasName: aws.String("alias/awss/6")},
+								{AliasName: aws.String("alias/aws7")},
+							},
+						}, true)
+						return true
+					})).Return(nil)
+			},
+			want: []*kms.AliasListEntry{
+				{AliasName: aws.String("alias/1")},
+				{AliasName: aws.String("alias/foo/2")},
+				{AliasName: aws.String("alias/aw/3")},
+				{AliasName: aws.String("alias/awss/6")},
+				{AliasName: aws.String("alias/aws7")},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := &mocks.KMSClient{}
+			tt.mocks(client)
+			r := &kmsRepository{
+				client: client,
+			}
+			got, err := r.ListAllAliases()
+			assert.Equal(t, tt.wantErr, err)
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %v -> %v", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}
