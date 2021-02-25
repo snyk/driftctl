@@ -93,6 +93,10 @@ func (r *ScanResult) AssertManagedCount(count int) {
 	r.Equal(count, len(r.Managed()))
 }
 
+func (r *ScanResult) AssertUnmanagedCount(count int) {
+	r.Equal(count, len(r.Unmanaged()))
+}
+
 func (r ScanResult) AssertInfrastructureIsInSync() {
 	r.Equal(
 		true,

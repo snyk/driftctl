@@ -8,8 +8,8 @@ import (
 
 func TestAcc_AwsDynamoDBTable(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Path: "./testdata/acc/aws_dynamodb_table",
-		Args: []string{"scan", "--filter", "Type=='aws_dynamodb_table'"},
+		Paths: []string{"./testdata/acc/aws_dynamodb_table"},
+		Args:  []string{"scan", "--filter", "Type=='aws_dynamodb_table'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

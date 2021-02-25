@@ -12,8 +12,8 @@ import (
 
 func TestAcc_AwsSNSTopicSubscription(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Path: "./testdata/acc/aws_sns_topic_subscription",
-		Args: []string{"scan", "--filter", "Type=='aws_sns_topic_subscription'"},
+		Paths: []string{"./testdata/acc/aws_sns_topic_subscription"},
+		Args:  []string{"scan", "--filter", "Type=='aws_sns_topic_subscription'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

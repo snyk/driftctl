@@ -18,7 +18,7 @@ import (
 func TestAcc_Aws_CloudfrontDistribution(t *testing.T) {
 	var mutatedDistribution string
 	acceptance.Run(t, acceptance.AccTestCase{
-		Path:                       "./testdata/acc/aws_cloudfront_distribution",
+		Paths:                      []string{"./testdata/acc/aws_cloudfront_distribution"},
 		Args:                       []string{"scan", "--filter", "Type=='aws_cloudfront_distribution'"},
 		ShouldRefreshBeforeDestroy: true,
 		Checks: []acceptance.AccCheck{

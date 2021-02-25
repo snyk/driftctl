@@ -22,8 +22,8 @@ import (
 func TestAcc_AwsSNSTopic(t *testing.T) {
 	var mutatedTopicArn string
 	acceptance.Run(t, acceptance.AccTestCase{
-		Path: "./testdata/acc/aws_sns_topic",
-		Args: []string{"scan", "--filter", "Type=='aws_sns_topic'"},
+		Paths: []string{"./testdata/acc/aws_sns_topic"},
+		Args:  []string{"scan", "--filter", "Type=='aws_sns_topic'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

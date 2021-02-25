@@ -8,7 +8,7 @@ import (
 
 func TestAcc_Github_Repository(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Path: "./testdata/acc/github_repository",
+		Paths: []string{"./testdata/acc/github_repository"},
 		Args: []string{
 			"scan",
 			"--to", "github+tf",
