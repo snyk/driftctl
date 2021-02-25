@@ -27,6 +27,7 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	providerLibrary.AddProvider(terraform.GITHUB, provider)
 
 	supplierLibrary.AddSupplier(NewGithubRepositorySupplier(provider, repository))
+	supplierLibrary.AddSupplier(NewGithubTeamSupplier(provider, repository))
 
 	return nil
 }

@@ -197,3 +197,106 @@ func TestListRepositoriesForOrganization(t *testing.T) {
 		"repo4",
 	}, repos)
 }
+
+func TestListTeams_WithError(t *testing.T) {
+	assert := assert.New(t)
+
+	mockedClient := mocks.GithubGraphQLClient{}
+	expectedError := errors.New("test error from graphql")
+	mockedClient.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(expectedError)
+
+	r := githubRepository{
+		client: &mockedClient,
+		config: githubConfig{
+			Organization: "testorg",
+		},
+	}
+
+	_, err := r.ListTeams()
+	assert.Equal(expectedError, err)
+}
+
+func TestListTeams_WithoutOrganization(t *testing.T) {
+	assert := assert.New(t)
+
+	r := githubRepository{}
+
+	teams, err := r.ListTeams()
+	assert.Nil(err)
+	assert.Equal([]int{}, teams)
+}
+
+func TestListTeams(t *testing.T) {
+	assert := assert.New(t)
+
+	mockedClient := mocks.GithubGraphQLClient{}
+	mockedClient.On("Query",
+		mock.Anything,
+		mock.MatchedBy(func(query interface{}) bool {
+			q, ok := query.(*listTeamsQuery)
+			if !ok {
+				return false
+			}
+			q.Organization.Teams.Nodes = []struct {
+				DatabaseId int
+			}{
+				{
+					DatabaseId: 1,
+				},
+				{
+					DatabaseId: 2,
+				},
+			}
+			q.Organization.Teams.PageInfo = pageInfo{
+				EndCursor:   "next",
+				HasNextPage: true,
+			}
+			return true
+		}),
+		map[string]interface{}{
+			"login":  (githubv4.String)("testorg"),
+			"cursor": (*githubv4.String)(nil),
+		}).Return(nil)
+
+	mockedClient.On("Query",
+		mock.Anything,
+		mock.MatchedBy(func(query interface{}) bool {
+			q, ok := query.(*listTeamsQuery)
+			if !ok {
+				return false
+			}
+			q.Organization.Teams.Nodes = []struct {
+				DatabaseId int
+			}{
+				{
+					DatabaseId: 3,
+				},
+				{
+					DatabaseId: 4,
+				},
+			}
+			q.Organization.Teams.PageInfo = pageInfo{
+				HasNextPage: false,
+			}
+			return true
+		}),
+		map[string]interface{}{
+			"login":  (githubv4.String)("testorg"),
+			"cursor": githubv4.NewString("next"),
+		}).Return(nil)
+
+	r := githubRepository{
+		client: &mockedClient,
+		ctx:    context.TODO(),
+		config: githubConfig{
+			Organization: "testorg",
+		},
+	}
+
+	teams, err := r.ListTeams()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal([]int{1, 2, 3, 4}, teams)
+}
