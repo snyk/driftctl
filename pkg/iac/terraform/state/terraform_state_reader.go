@@ -6,6 +6,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/iac"
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
+	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/enumerator"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -24,15 +25,12 @@ type TerraformStateReader struct {
 	library       *terraform.ProviderLibrary
 	config        config.SupplierConfig
 	backend       backend.Backend
+	enumerator    enumerator.StateEnumerator
 	deserializers []deserializer.CTYDeserializer
 }
 
 func (r *TerraformStateReader) initReader() error {
-	b, err := backend.GetBackend(r.config)
-	r.backend = b
-	if err != nil {
-		return err
-	}
+	r.enumerator = enumerator.GetEnumerator(r.config)
 	return nil
 }
 
@@ -46,6 +44,12 @@ func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary)
 }
 
 func (r *TerraformStateReader) retrieve() (map[string][]cty.Value, error) {
+
+	b, err := backend.GetBackend(r.config)
+	if err != nil {
+		return nil, err
+	}
+	r.backend = b
 
 	state, err := read(r.backend)
 	defer r.backend.Close()
@@ -191,15 +195,46 @@ func (r *TerraformStateReader) decode(values map[string][]cty.Value) ([]resource
 }
 
 func (r *TerraformStateReader) Resources() ([]resource.Resource, error) {
+
+	if r.enumerator == nil {
+		return r.retrieveForState(r.config.Path)
+	}
+
+	return r.retrieveMultiplesStates()
+}
+
+func (r *TerraformStateReader) retrieveForState(path string) ([]resource.Resource, error) {
+	r.config.Path = path
 	logrus.WithFields(logrus.Fields{
 		"path":    r.config.Path,
 		"backend": r.config.Backend,
-	}).Debug("Starting state reader supplier")
+	}).Debug("Reading resources from state")
 	values, err := r.retrieve()
 	if err != nil {
 		return nil, err
 	}
 	return r.decode(values)
+}
+
+func (r *TerraformStateReader) retrieveMultiplesStates() ([]resource.Resource, error) {
+	keys, err := r.enumerator.Enumerate()
+	if err != nil {
+		return nil, err
+	}
+	logrus.WithFields(logrus.Fields{
+		"keys": keys,
+	}).Debug("Enumerated keys")
+	results := make([]resource.Resource, 0)
+
+	for _, key := range keys {
+		resources, err := r.retrieveForState(key)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, resources...)
+	}
+
+	return results, nil
 }
 
 func read(reader backend.Backend) (*states.State, error) {

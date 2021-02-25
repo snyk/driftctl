@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/iac"
-	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
+	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/github"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -106,9 +106,10 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 			library := terraform.NewProviderLibrary()
 			library.AddProvider(terraform.AWS, provider)
 
-			b, _ := backend.NewFileReader(path.Join(goldenfile.GoldenFilePath, tt.dirName, "terraform.tfstate"))
 			r := &TerraformStateReader{
-				backend:       b,
+				config: config.SupplierConfig{
+					Path: path.Join(goldenfile.GoldenFilePath, tt.dirName, "terraform.tfstate"),
+				},
 				library:       library,
 				deserializers: iac.Deserializers(),
 			}
@@ -176,9 +177,10 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 			library := terraform.NewProviderLibrary()
 			library.AddProvider(terraform.GITHUB, provider)
 
-			b, _ := backend.NewFileReader(path.Join(goldenfile.GoldenFilePath, tt.dirName, "terraform.tfstate"))
 			r := &TerraformStateReader{
-				backend:       b,
+				config: config.SupplierConfig{
+					Path: path.Join(goldenfile.GoldenFilePath, tt.dirName, "terraform.tfstate"),
+				},
 				library:       library,
 				deserializers: iac.Deserializers(),
 			}

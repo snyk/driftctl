@@ -38,29 +38,32 @@ type AccCheck struct {
 }
 
 type AccTestCase struct {
-	Path                       string
+	Paths                      []string
 	Args                       []string
 	OnStart                    func()
 	OnEnd                      func()
 	Checks                     []AccCheck
 	tmpResultFilePath          string
 	originalEnv                []string
-	tf                         *tfexec.Terraform
+	tf                         map[string]*tfexec.Terraform
 	ShouldRefreshBeforeDestroy bool
 }
 
 func (c *AccTestCase) initTerraformExecutor() error {
-	execPath, err := tfinstall.LookPath().ExecPath(context.Background())
-	if err != nil {
-		return err
-	}
-	c.tf, err = tfexec.NewTerraform(c.Path, execPath)
-	if err != nil {
-		return err
-	}
-	env := c.resolveTerraformEnv()
-	if err := c.tf.SetEnv(env); err != nil {
-		return err
+	c.tf = make(map[string]*tfexec.Terraform, 1)
+	for _, path := range c.Paths {
+		execPath, err := tfinstall.LookPath().ExecPath(context.Background())
+		if err != nil {
+			return err
+		}
+		c.tf[path], err = tfexec.NewTerraform(path, execPath)
+		if err != nil {
+			return err
+		}
+		env := c.resolveTerraformEnv()
+		if err := c.tf[path].SetEnv(env); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -81,8 +84,8 @@ func (c *AccTestCase) validate() error {
 		return fmt.Errorf("checks attribute must be defined")
 	}
 
-	if c.Path == "" {
-		return fmt.Errorf("path attribute must be defined")
+	if len(c.Paths) < 1 {
+		return fmt.Errorf("Paths attribute must be defined")
 	}
 
 	for _, arg := range c.Args {
@@ -141,28 +144,40 @@ func (c *AccTestCase) terraformInit() error {
 	if err := c.initTerraformExecutor(); err != nil {
 		return err
 	}
-	_, err := os.Stat(path.Join(c.Path, ".terraform"))
-	if os.IsNotExist(err) {
-		logrus.Debug("Running terraform init ...")
-		stderr := new(bytes.Buffer)
-		c.tf.SetStderr(stderr)
-		if err := c.tf.Init(context.Background()); err != nil {
-			return errors.Wrap(err, stderr.String())
+	for _, p := range c.Paths {
+		_, err := os.Stat(path.Join(p, ".terraform"))
+		if os.IsNotExist(err) {
+			logrus.WithFields(logrus.Fields{
+				"path": p,
+			}).Debug("Running terraform init ...")
+			stderr := new(bytes.Buffer)
+			c.tf[p].SetStderr(stderr)
+			if err := c.tf[p].Init(context.Background()); err != nil {
+				return errors.Wrap(err, stderr.String())
+			}
+			logrus.WithFields(logrus.Fields{
+				"path": p,
+			}).Debug("Terraform init done")
 		}
-		logrus.Debug("Terraform init done")
 	}
 
 	return nil
 }
 
 func (c *AccTestCase) terraformApply() error {
-	logrus.Debug("Running terraform apply ...")
-	stderr := new(bytes.Buffer)
-	c.tf.SetStderr(stderr)
-	if err := c.tf.Apply(context.Background()); err != nil {
-		return errors.Wrap(err, stderr.String())
+	for _, p := range c.Paths {
+		logrus.WithFields(logrus.Fields{
+			"p": p,
+		}).Debug("Running terraform apply ...")
+		stderr := new(bytes.Buffer)
+		c.tf[p].SetStderr(stderr)
+		if err := c.tf[p].Apply(context.Background()); err != nil {
+			return errors.Wrap(err, stderr.String())
+		}
+		logrus.WithFields(logrus.Fields{
+			"p": p,
+		}).Debug("Terraform apply done")
 	}
-	logrus.Debug("Terraform apply done")
 
 	return nil
 }
@@ -174,25 +189,37 @@ func (c *AccTestCase) terraformDestroy() error {
 		}
 	}
 
-	logrus.Debug("Running terraform destroy ...")
-	stderr := new(bytes.Buffer)
-	c.tf.SetStderr(stderr)
-	if err := c.tf.Destroy(context.Background()); err != nil {
-		return errors.Wrap(err, stderr.String())
+	for _, p := range c.Paths {
+		logrus.WithFields(logrus.Fields{
+			"p": p,
+		}).Debug("Running terraform destroy ...")
+		stderr := new(bytes.Buffer)
+		c.tf[p].SetStderr(stderr)
+		if err := c.tf[p].Destroy(context.Background()); err != nil {
+			return errors.Wrap(err, stderr.String())
+		}
+		logrus.WithFields(logrus.Fields{
+			"p": p,
+		}).Debug("Terraform destroy done")
 	}
-	logrus.Debug("Terraform destroy done")
 
 	return nil
 }
 
 func (c *AccTestCase) terraformRefresh() error {
-	logrus.Debug("Running terraform refresh ...")
-	stderr := new(bytes.Buffer)
-	c.tf.SetStderr(stderr)
-	if err := c.tf.Refresh(context.Background()); err != nil {
-		return errors.Wrap(err, stderr.String())
+	for _, p := range c.Paths {
+		logrus.WithFields(logrus.Fields{
+			"p": p,
+		}).Debug("Running terraform refresh ...")
+		stderr := new(bytes.Buffer)
+		c.tf[p].SetStderr(stderr)
+		if err := c.tf[p].Refresh(context.Background()); err != nil {
+			return errors.Wrap(err, stderr.String())
+		}
+		logrus.WithFields(logrus.Fields{
+			"p": p,
+		}).Debug("Terraform refresh done")
 	}
-	logrus.Debug("Terraform refresh done")
 
 	return nil
 }
@@ -259,7 +286,16 @@ func Run(t *testing.T, c AccTestCase) {
 	}
 
 	if c.OnStart != nil {
+		c.useTerraformEnv()
 		c.OnStart()
+		if c.OnEnd != nil {
+			defer func() {
+				c.useTerraformEnv()
+				c.OnEnd()
+				c.restoreEnv()
+			}()
+		}
+		c.restoreEnv()
 	}
 
 	// Disable terraform version checks
@@ -295,8 +331,21 @@ func Run(t *testing.T, c AccTestCase) {
 	}
 	if c.Args != nil {
 		c.Args = append([]string{""}, c.Args...)
+		isFromSet := false
+		for _, arg := range c.Args {
+			if arg == "--from" || arg == "-f" {
+				isFromSet = true
+				break
+			}
+		}
+		if !isFromSet {
+			for _, p := range c.Paths {
+				c.Args = append(c.Args,
+					"--from", fmt.Sprintf("tfstate://%s", path.Join(p, "terraform.tfstate")),
+				)
+			}
+		}
 		c.Args = append(c.Args,
-			"--from", fmt.Sprintf("tfstate://%s", path.Join(c.Path, "terraform.tfstate")),
 			"--output", fmt.Sprintf("json://%s", c.getResultFilePath()),
 		)
 	}
@@ -327,9 +376,6 @@ func Run(t *testing.T, c AccTestCase) {
 		if check.PostExec != nil {
 			check.PostExec()
 		}
-	}
-	if c.OnEnd != nil {
-		c.OnEnd()
 	}
 }
 

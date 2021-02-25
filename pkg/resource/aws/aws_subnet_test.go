@@ -8,8 +8,8 @@ import (
 
 func TestAcc_AwsSubnet(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Path: "./testdata/acc/aws_subnet",
-		Args: []string{"scan", "--filter", "Type=='aws_subnet' || Type=='aws_default_subnet'"},
+		Paths: []string{"./testdata/acc/aws_subnet"},
+		Args:  []string{"scan", "--filter", "Type=='aws_subnet' || Type=='aws_default_subnet'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

@@ -8,8 +8,8 @@ import (
 
 func TestAcc_AwsRoute(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Path: "./testdata/acc/aws_route",
-		Args: []string{"scan", "--filter", "Type=='aws_route'"},
+		Paths: []string{"./testdata/acc/aws_route"},
+		Args:  []string{"scan", "--filter", "Type=='aws_route'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
