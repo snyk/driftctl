@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
@@ -10,7 +11,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/aws/aws-sdk-go/service/lambda"
-	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -18,7 +18,7 @@ import (
 type LambdaFunctionSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       lambdaiface.LambdaAPI
+	client       repository.LambdaRepository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -26,13 +26,13 @@ func NewLambdaFunctionSupplier(provider *AWSTerraformProvider) *LambdaFunctionSu
 	return &LambdaFunctionSupplier{
 		provider,
 		awsdeserializer.NewLambdaFunctionDeserializer(),
-		lambda.New(provider.session),
+		repository.NewLambdaRepository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s LambdaFunctionSupplier) Resources() ([]resource.Resource, error) {
-	functions, err := listLambdaFunctions(s.client)
+	functions, err := s.client.ListAllLambdaFunctions()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsLambdaFunctionResourceType)
 	}
@@ -69,17 +69,4 @@ func (s LambdaFunctionSupplier) readLambda(function lambda.FunctionConfiguration
 	}
 
 	return *resFunction, nil
-}
-
-func listLambdaFunctions(client lambdaiface.LambdaAPI) ([]*lambda.FunctionConfiguration, error) {
-	var functions []*lambda.FunctionConfiguration
-	input := &lambda.ListFunctionsInput{}
-	err := client.ListFunctionsPages(input, func(res *lambda.ListFunctionsOutput, lastPage bool) bool {
-		functions = append(functions, res.Functions...)
-		return !lastPage
-	})
-	if err != nil {
-		return nil, err
-	}
-	return functions, nil
 }

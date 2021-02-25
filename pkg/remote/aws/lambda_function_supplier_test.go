@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -28,72 +30,53 @@ import (
 
 func TestLambdaFunctionSupplier_Resources(t *testing.T) {
 	tests := []struct {
-		test           string
-		dirName        string
-		functionsPages mocks.ListFunctionsPagesOutput
-		listError      error
-		err            error
+		test    string
+		dirName string
+		mocks   func(repo *repository.MockLambdaRepository)
+		err     error
 	}{
 		{
 			test:    "no lambda functions",
 			dirName: "lambda_function_empty",
-			functionsPages: mocks.ListFunctionsPagesOutput{
-				{
-					true,
-					&lambda.ListFunctionsOutput{},
-				},
+			mocks: func(repo *repository.MockLambdaRepository) {
+				repo.On("ListAllLambdaFunctions").Return([]*lambda.FunctionConfiguration{}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "with lambda functions",
 			dirName: "lambda_function_multiple",
-			functionsPages: mocks.ListFunctionsPagesOutput{
-				{
-					false,
-					&lambda.ListFunctionsOutput{
-						Functions: []*lambda.FunctionConfiguration{
-							{
-								FunctionName: aws.String("foo"),
-							},
-						},
+			mocks: func(repo *repository.MockLambdaRepository) {
+				repo.On("ListAllLambdaFunctions").Return([]*lambda.FunctionConfiguration{
+					{
+						FunctionName: aws.String("foo"),
 					},
-				},
-				{
-					true,
-					&lambda.ListFunctionsOutput{
-						Functions: []*lambda.FunctionConfiguration{
-							{
-								FunctionName: aws.String("bar"),
-							},
-						},
+					{
+						FunctionName: aws.String("bar"),
 					},
-				},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "One lambda with signing",
 			dirName: "lambda_function_signed",
-			functionsPages: mocks.ListFunctionsPagesOutput{
-				{
-					false,
-					&lambda.ListFunctionsOutput{
-						Functions: []*lambda.FunctionConfiguration{
-							{
-								FunctionName: aws.String("foo"),
-							},
-						},
+			mocks: func(repo *repository.MockLambdaRepository) {
+				repo.On("ListAllLambdaFunctions").Return([]*lambda.FunctionConfiguration{
+					{
+						FunctionName: aws.String("foo"),
 					},
-				},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
-			test:      "cannot list lambda functions",
-			dirName:   "lambda_function_empty",
-			listError: awserr.NewRequestFailure(nil, 403, ""),
-			err:       remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsLambdaFunctionResourceType),
+			test:    "cannot list lambda functions",
+			dirName: "lambda_function_empty",
+			mocks: func(repo *repository.MockLambdaRepository) {
+				repo.On("ListAllLambdaFunctions").Return([]*lambda.FunctionConfiguration{}, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsLambdaFunctionResourceType),
 		},
 	}
 	for _, tt := range tests {
@@ -113,10 +96,8 @@ func TestLambdaFunctionSupplier_Resources(t *testing.T) {
 		t.Run(tt.test, func(t *testing.T) {
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewLambdaFunctionDeserializer()
-			client := mocks.NewMockAWSLambdaClient(tt.functionsPages)
-			if tt.listError != nil {
-				client = mocks.NewMockAWSLambdaErrorClient(tt.listError)
-			}
+			client := &repository.MockLambdaRepository{}
+			tt.mocks(client)
 			s := &LambdaFunctionSupplier{
 				provider,
 				deserializer,

@@ -8,8 +8,8 @@ import (
 
 func TestAcc_AwsRouteTableAssociation(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Path: "./testdata/acc/aws_route_table_association",
-		Args: []string{"scan", "--filter", "Type=='aws_route_table_association'"},
+		Paths: []string{"./testdata/acc/aws_route_table_association"},
+		Args:  []string{"scan", "--filter", "Type=='aws_route_table_association'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

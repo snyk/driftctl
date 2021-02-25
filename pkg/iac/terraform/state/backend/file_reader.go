@@ -4,7 +4,7 @@ import (
 	"os"
 )
 
-const backendFile = ""
+const BackendKeyFile = ""
 
 func NewFileReader(path string) (Backend, error) {
 	return os.Open(path)

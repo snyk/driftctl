@@ -46,15 +46,6 @@ func TestGetIACSupplier(t *testing.T) {
 			wantErr: fmt.Errorf("Unsupported supplier 'foobar'"),
 		},
 		{
-			name: "test unknown backend",
-			args: args{
-				config: []config.SupplierConfig{
-					{Key: "tfstate", Backend: "foobar"},
-				},
-			},
-			wantErr: fmt.Errorf("Unsupported backend 'foobar'"),
-		},
-		{
 			name: "test valid tfstate://terraform.tfstate",
 			args: args{
 				config: []config.SupplierConfig{

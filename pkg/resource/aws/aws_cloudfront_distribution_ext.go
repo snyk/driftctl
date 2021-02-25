@@ -52,4 +52,34 @@ func (r *AwsCloudfrontDistribution) normalizeNilPtr() {
 			}
 		}
 	}
+	if r.OrderedCacheBehavior != nil {
+		for i, b := range *r.OrderedCacheBehavior {
+			if b.LambdaFunctionAssociation != nil && len(*b.LambdaFunctionAssociation) == 0 {
+				(*r.OrderedCacheBehavior)[i].LambdaFunctionAssociation = nil
+			}
+			if b.ForwardedValues != nil && len(*b.ForwardedValues) == 0 {
+				(*r.OrderedCacheBehavior)[i].ForwardedValues = nil
+			}
+			if b.TrustedSigners != nil && len(*b.TrustedSigners) == 0 {
+				(*r.OrderedCacheBehavior)[i].TrustedSigners = nil
+			}
+			if b.ForwardedValues != nil {
+				for j, f := range *b.ForwardedValues {
+					if f.Headers != nil && len(*f.Headers) == 0 {
+						(*(*r.OrderedCacheBehavior)[i].ForwardedValues)[j].Headers = nil
+					}
+					if f.Cookies != nil {
+						for k, c := range *f.Cookies {
+							if c.WhitelistedNames != nil && len(*c.WhitelistedNames) == 0 {
+								(*(*(*r.OrderedCacheBehavior)[i].ForwardedValues)[j].Cookies)[k].WhitelistedNames = nil
+							}
+						}
+					}
+				}
+			}
+			if b.FieldLevelEncryptionId != nil && *b.FieldLevelEncryptionId == "" {
+				(*r.OrderedCacheBehavior)[i].FieldLevelEncryptionId = nil
+			}
+		}
+	}
 }
