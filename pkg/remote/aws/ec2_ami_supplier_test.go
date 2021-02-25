@@ -4,6 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/aws/aws-sdk-go/aws"
+
+	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -23,29 +28,37 @@ import (
 
 func TestEC2AmiSupplier_Resources(t *testing.T) {
 	tests := []struct {
-		test      string
-		dirName   string
-		amiIDs    []string
-		listError error
-		err       error
+		test    string
+		dirName string
+		mock    func(mock *repository.MockEC2Repository)
+		err     error
 	}{
 		{
 			test:    "no amis",
 			dirName: "ec2_ami_empty",
-			amiIDs:  []string{},
-			err:     nil,
+			mock: func(mock *repository.MockEC2Repository) {
+				mock.On("ListAllImages").Return([]*ec2.Image{}, nil)
+			},
+			err: nil,
 		},
 		{
 			test:    "with amis",
 			dirName: "ec2_ami_multiple",
-			amiIDs:  []string{"ami-03a578b46f4c3081b", "ami-025962fd8b456731f"},
-			err:     nil,
+			mock: func(mock *repository.MockEC2Repository) {
+				mock.On("ListAllImages").Return([]*ec2.Image{
+					{ImageId: aws.String("ami-03a578b46f4c3081b")},
+					{ImageId: aws.String("ami-025962fd8b456731f")},
+				}, nil)
+			},
+			err: nil,
 		},
 		{
-			test:      "cannot list amis",
-			dirName:   "ec2_ami_empty",
-			listError: awserr.NewRequestFailure(nil, 403, ""),
-			err:       remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsAmiResourceType),
+			test:    "cannot list amis",
+			dirName: "ec2_ami_empty",
+			mock: func(mock *repository.MockEC2Repository) {
+				mock.On("ListAllImages").Return([]*ec2.Image{}, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsAmiResourceType),
 		},
 	}
 	for _, tt := range tests {
@@ -65,10 +78,8 @@ func TestEC2AmiSupplier_Resources(t *testing.T) {
 		t.Run(tt.test, func(t *testing.T) {
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewEC2AmiDeserializer()
-			client := mocks.NewMockAWSEC2AmiClient(tt.amiIDs)
-			if tt.listError != nil {
-				client = mocks.NewMockAWSEC2ErrorClient(tt.listError)
-			}
+			client := &repository.MockEC2Repository{}
+			tt.mock(client)
 			s := &EC2AmiSupplier{
 				provider,
 				deserializer,

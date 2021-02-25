@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
@@ -11,7 +12,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -19,7 +19,7 @@ import (
 type EC2EbsSnapshotSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       ec2iface.EC2API
+	client       repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -27,13 +27,13 @@ func NewEC2EbsSnapshotSupplier(provider *AWSTerraformProvider) *EC2EbsSnapshotSu
 	return &EC2EbsSnapshotSupplier{
 		provider,
 		awsdeserializer.NewEC2EbsSnapshotDeserializer(),
-		ec2.New(provider.session),
+		repository.NewEC2Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s EC2EbsSnapshotSupplier) Resources() ([]resource.Resource, error) {
-	snapshots, err := listSnapshots(s.client)
+	snapshots, err := s.client.ListAllSnapshots()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEbsSnapshotResourceType)
 	}
@@ -64,21 +64,4 @@ func (s EC2EbsSnapshotSupplier) readEbsSnapshot(snapshot ec2.Snapshot) (cty.Valu
 		return cty.NilVal, err
 	}
 	return *resSnapshot, nil
-}
-
-func listSnapshots(client ec2iface.EC2API) ([]*ec2.Snapshot, error) {
-	var snapshots []*ec2.Snapshot
-	input := &ec2.DescribeSnapshotsInput{
-		OwnerIds: []*string{
-			aws.String("self"),
-		},
-	}
-	err := client.DescribeSnapshotsPages(input, func(res *ec2.DescribeSnapshotsOutput, lastPage bool) bool {
-		snapshots = append(snapshots, res.Snapshots...)
-		return !lastPage
-	})
-	if err != nil {
-		return nil, err
-	}
-	return snapshots, err
 }

@@ -28,7 +28,8 @@ release:
 
 .PHONY: test
 test: deps
-	$(GOTEST) --format testname --junitfile unit-tests.xml -- -coverprofile=cover.out -coverpkg=.,./pkg/... ./...
+	$(GOTEST) --format testname --junitfile unit-tests.xml -- -coverprofile=cover.out.tmp -coverpkg=.,./pkg/... ./...
+	cat cover.out.tmp | grep -v "mock_" > cover.out
 
 .PHONY: coverage
 coverage: test
