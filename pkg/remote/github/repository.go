@@ -9,6 +9,7 @@ import (
 
 type GithubRepository interface {
 	ListRepositories() ([]string, error)
+	ListTeams() ([]int, error)
 }
 
 type GithubGraphQLClient interface {
@@ -115,6 +116,46 @@ func (r githubRepository) listRepoForOwner() ([]string, error) {
 			break
 		}
 		variables["cursor"] = githubv4.NewString(query.Viewer.Repositories.PageInfo.EndCursor)
+	}
+	return results, nil
+}
+
+type listTeamsQuery struct {
+	Organization struct {
+		Teams struct {
+			Nodes []struct {
+				DatabaseId int
+			}
+			PageInfo struct {
+				EndCursor   githubv4.String
+				HasNextPage bool
+			}
+		} `graphql:"teams(first: 100, after: $cursor)"`
+	} `graphql:"organization(login: $login)"`
+}
+
+func (r githubRepository) ListTeams() ([]int, error) {
+	query := listTeamsQuery{}
+	results := make([]int, 0)
+	if r.config.Organization == "" {
+		return results, nil
+	}
+	variables := map[string]interface{}{
+		"cursor": (*githubv4.String)(nil),
+		"login":  (githubv4.String)(r.config.Organization),
+	}
+	for {
+		err := r.client.Query(r.ctx, &query, variables)
+		if err != nil {
+			return nil, err
+		}
+		for _, team := range query.Organization.Teams.Nodes {
+			results = append(results, team.DatabaseId)
+		}
+		if !query.Organization.Teams.PageInfo.HasNextPage {
+			break
+		}
+		variables["cursor"] = githubv4.NewString(query.Organization.Teams.PageInfo.EndCursor)
 	}
 	return results, nil
 }

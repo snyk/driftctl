@@ -31,3 +31,26 @@ func (_m *MockGithubRepository) ListRepositories() ([]string, error) {
 
 	return r0, r1
 }
+
+// ListTeams provides a mock function with given fields:
+func (_m *MockGithubRepository) ListTeams() ([]int, error) {
+	ret := _m.Called()
+
+	var r0 []int
+	if rf, ok := ret.Get(0).(func() []int); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]int)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

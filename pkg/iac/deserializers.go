@@ -59,5 +59,6 @@ func Deserializers() []deserializer.CTYDeserializer {
 		awsdeserializer.NewKMSKeyDeserializer(),
 
 		ghdeserializer.NewGithubRepositoryDeserializer(),
+		ghdeserializer.NewGithubTeamDeserializer(),
 	}
 }

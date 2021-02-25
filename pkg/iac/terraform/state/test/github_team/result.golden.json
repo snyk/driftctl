@@ -1,0 +1,41 @@
+[
+ {
+  "CreateDefaultMaintainer": false,
+  "Description": "test",
+  "Etag": "W/\"04b608322c60381373485f1154b7670f1daeb6bdfa9062f7eba05739171fcac0\"",
+  "Id": "4556715",
+  "LdapDn": "",
+  "MembersCount": 1,
+  "Name": "team1",
+  "NodeId": "MDQ6VGVhbTQ1NTY3MTU=",
+  "ParentTeamId": null,
+  "Privacy": "closed",
+  "Slug": "team1"
+ },
+ {
+  "CreateDefaultMaintainer": false,
+  "Description": "test 2",
+  "Etag": "W/\"1af373c3f173859e7f06690e8e353c21a9a1a90224963e8f162546f1022af224\"",
+  "Id": "4556719",
+  "LdapDn": "",
+  "MembersCount": 1,
+  "Name": "team2",
+  "NodeId": "MDQ6VGVhbTQ1NTY3MTk=",
+  "ParentTeamId": null,
+  "Privacy": "secret",
+  "Slug": "team2"
+ },
+ {
+  "CreateDefaultMaintainer": false,
+  "Description": "test parent team",
+  "Etag": "W/\"d6fded1b23237d988a0914455547a2e66789bb625fc0a519babe993429facd37\"",
+  "Id": "4556747",
+  "LdapDn": "",
+  "MembersCount": 1,
+  "Name": "new team with parent",
+  "NodeId": "MDQ6VGVhbTQ1NTY3NDc=",
+  "ParentTeamId": 4556715,
+  "Privacy": "closed",
+  "Slug": "new-team-with-parent"
+ }
+]

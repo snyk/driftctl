@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -8,8 +9,6 @@ import (
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
-	"github.com/aws/aws-sdk-go/service/rds"
-	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -17,7 +16,7 @@ import (
 type DBInstanceSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       rdsiface.RDSAPI
+	client       repository.RDSRepository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -25,27 +24,14 @@ func NewDBInstanceSupplier(provider *AWSTerraformProvider) *DBInstanceSupplier {
 	return &DBInstanceSupplier{
 		provider,
 		awsdeserializer.NewDBInstanceDeserializer(),
-		rds.New(provider.session),
+		repository.NewRDSRepository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
-func listAwsDBInstances(client rdsiface.RDSAPI) ([]*rds.DBInstance, error) {
-	var result []*rds.DBInstance
-	input := &rds.DescribeDBInstancesInput{}
-	err := client.DescribeDBInstancesPages(input, func(res *rds.DescribeDBInstancesOutput, lastPage bool) bool {
-		result = append(result, res.DBInstances...)
-		return !lastPage
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
 func (s DBInstanceSupplier) Resources() ([]resource.Resource, error) {
 
-	resourceList, err := listAwsDBInstances(s.client)
+	resourceList, err := s.client.ListAllDBInstances()
 
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsDbInstanceResourceType)
