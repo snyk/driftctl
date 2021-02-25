@@ -8,8 +8,8 @@ import (
 
 func TestAcc_AwsInternetGateway(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Path: "./testdata/acc/aws_internet_gateway",
-		Args: []string{"scan", "--filter", "Type=='aws_internet_gateway'"},
+		Paths: []string{"./testdata/acc/aws_internet_gateway"},
+		Args:  []string{"scan", "--filter", "Type=='aws_internet_gateway'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

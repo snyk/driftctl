@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 )
 
-const backendS3 = "s3"
+const BackendKeyS3 = "s3"
 
 type S3Backend struct {
 	input    s3.GetObjectInput

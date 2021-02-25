@@ -8,8 +8,8 @@ import (
 
 func TestAcc_AwsRouteTable(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Path: "./testdata/acc/aws_route_table",
-		Args: []string{"scan", "--filter", "Type=='aws_route_table' || Type=='aws_default_route_table'"},
+		Paths: []string{"./testdata/acc/aws_route_table"},
+		Args:  []string{"scan", "--filter", "Type=='aws_route_table' || Type=='aws_default_route_table'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

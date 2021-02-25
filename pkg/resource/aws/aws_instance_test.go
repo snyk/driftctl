@@ -16,8 +16,8 @@ import (
 func TestAcc_AwsInstance_WithBlockDevices(t *testing.T) {
 	var mutatedInstanceId string
 	acceptance.Run(t, acceptance.AccTestCase{
-		Path: "./testdata/acc/aws_instance",
-		Args: []string{"scan", "--filter", "Type=='aws_instance'"},
+		Paths: []string{"./testdata/acc/aws_instance"},
+		Args:  []string{"scan", "--filter", "Type=='aws_instance'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

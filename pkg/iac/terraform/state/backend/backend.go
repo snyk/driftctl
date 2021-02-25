@@ -8,8 +8,8 @@ import (
 )
 
 var supportedBackends = []string{
-	backendFile,
-	backendS3,
+	BackendKeyFile,
+	BackendKeyS3,
 }
 
 type Backend io.ReadCloser
@@ -33,9 +33,9 @@ func GetBackend(config config.SupplierConfig) (Backend, error) {
 	}
 
 	switch backend {
-	case backendFile:
+	case BackendKeyFile:
 		return NewFileReader(config.Path)
-	case backendS3:
+	case BackendKeyS3:
 		return NewS3Reader(config.Path)
 	default:
 		return nil, errors.Errorf("Unsupported backend '%s'", backend)

@@ -13,8 +13,8 @@ import (
 
 func TestAcc_AwsSqsQueuePolicy(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Path: "./testdata/acc/aws_sqs_queue_policy",
-		Args: []string{"scan", "--filter", "Type=='aws_sqs_queue_policy'"},
+		Paths: []string{"./testdata/acc/aws_sqs_queue_policy"},
+		Args:  []string{"scan", "--filter", "Type=='aws_sqs_queue_policy'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
