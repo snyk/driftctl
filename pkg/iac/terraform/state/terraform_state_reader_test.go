@@ -83,6 +83,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "DynamoDB table", dirName: "dynamodb_table", wantErr: false},
 		{name: "Route53 Health Check", dirName: "route53_health_check", wantErr: false},
 		{name: "Cloudfront distribution", dirName: "cloudfront_distribution", wantErr: false},
+		{name: "KMS key", dirName: "kms_key", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
