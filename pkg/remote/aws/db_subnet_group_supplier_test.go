@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -29,55 +31,41 @@ import (
 func TestDBSubnetGroupSupplier_Resources(t *testing.T) {
 
 	tests := []struct {
-		test             string
-		dirName          string
-		subnets          mocks.DescribeSubnetGroupResponse
-		subnetsListError error
-		err              error
+		test    string
+		dirName string
+		mocks   func(client *repository.MockRDSRepository)
+		err     error
 	}{
 		{
 			test:    "no subnets",
 			dirName: "db_subnet_empty",
-			subnets: mocks.DescribeSubnetGroupResponse{
-				{
-					true,
-					&rds.DescribeDBSubnetGroupsOutput{},
-				},
+			mocks: func(client *repository.MockRDSRepository) {
+				client.On("ListAllDbSubnetGroups").Return([]*rds.DBSubnetGroup{}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "multiples db subnets",
 			dirName: "db_subnet_multiples",
-			subnets: mocks.DescribeSubnetGroupResponse{
-				{
-					false,
-					&rds.DescribeDBSubnetGroupsOutput{
-						DBSubnetGroups: []*rds.DBSubnetGroup{
-							&rds.DBSubnetGroup{
-								DBSubnetGroupName: aws.String("foo"),
-							},
-						},
+			mocks: func(client *repository.MockRDSRepository) {
+				client.On("ListAllDbSubnetGroups").Return([]*rds.DBSubnetGroup{
+					{
+						DBSubnetGroupName: aws.String("foo"),
 					},
-				},
-				{
-					true,
-					&rds.DescribeDBSubnetGroupsOutput{
-						DBSubnetGroups: []*rds.DBSubnetGroup{
-							&rds.DBSubnetGroup{
-								DBSubnetGroupName: aws.String("bar"),
-							},
-						},
+					{
+						DBSubnetGroupName: aws.String("bar"),
 					},
-				},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
-			test:             "Cannot list subnet",
-			dirName:          "db_subnet_empty",
-			subnetsListError: awserr.NewRequestFailure(nil, 403, ""),
-			err:              remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsDbSubnetGroupResourceType),
+			test:    "Cannot list subnet",
+			dirName: "db_subnet_empty",
+			mocks: func(client *repository.MockRDSRepository) {
+				client.On("ListAllDbSubnetGroups").Return([]*rds.DBSubnetGroup{}, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsDbSubnetGroupResourceType),
 		},
 	}
 	for _, tt := range tests {
@@ -98,10 +86,8 @@ func TestDBSubnetGroupSupplier_Resources(t *testing.T) {
 		t.Run(tt.test, func(t *testing.T) {
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewDBSubnetGroupDeserializer()
-			client := mocks.NewMockAWSRDSSubnetGroupClient(tt.subnets)
-			if tt.subnetsListError != nil {
-				client = mocks.NewMockAWSRDSErrorClient(tt.subnetsListError)
-			}
+			client := &repository.MockRDSRepository{}
+			tt.mocks(client)
 			s := &DBSubnetGroupSupplier{
 				provider,
 				deserializer,
