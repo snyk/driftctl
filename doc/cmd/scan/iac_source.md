@@ -14,6 +14,13 @@ driftctl scan \
 
 # You can also use every file under a given prefix for S3
 driftctl scan --from tfstate+s3://statebucketdriftctl/states
+
+# ... or in a given local folder
+# driftctl will recursively use all files under this folder.
+#
+# N.B. Symlinks under the root folder will be ignored.
+#      If the folder itself is a symlink it will be followed.
+driftctl scan --from tfstate://my-states/directory
 ```
 
 
