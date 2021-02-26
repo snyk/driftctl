@@ -85,6 +85,8 @@ As AWS documentation recommends, the below policy is granting only the permissio
                 "ec2:DescribeVpcClassicLinkDnsSupport",
                 "ec2:DescribeSubnets",
                 "ec2:DescribeNatGateways",
+                "ecr:DescribeRepositories",
+                "ecr:ListTagsForResource",
                 "iam:GetPolicy",
                 "iam:GetPolicyVersion",
                 "iam:GetRole",
@@ -289,6 +291,10 @@ As AWS documentation recommends, the below policy is granting only the permissio
 ## Cloudfront
 
 - [x] aws_cloudfront_distribution
+
+## ECR
+
+- [x] aws_ecr_repository
 
 ## KMS
 
