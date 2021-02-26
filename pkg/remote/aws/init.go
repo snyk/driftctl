@@ -72,6 +72,7 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	supplierLibrary.AddSupplier(NewRoute53HealthCheckSupplier(provider))
 	supplierLibrary.AddSupplier(NewCloudfrontDistributionSupplier(provider))
 	supplierLibrary.AddSupplier(NewKMSKeySupplier(provider))
+	supplierLibrary.AddSupplier(NewKMSAliasSupplier(provider))
 
 	return nil
 }

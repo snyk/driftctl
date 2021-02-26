@@ -57,6 +57,7 @@ func Deserializers() []deserializer.CTYDeserializer {
 		awsdeserializer.NewRoute53HealthCheckDeserializer(),
 		awsdeserializer.NewCloudfrontDistributionDeserializer(),
 		awsdeserializer.NewKMSKeyDeserializer(),
+		awsdeserializer.NewKMSAliasDeserializer(),
 
 		ghdeserializer.NewGithubRepositoryDeserializer(),
 		ghdeserializer.NewGithubTeamDeserializer(),

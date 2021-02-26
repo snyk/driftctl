@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"strings"
+
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/aws/aws-sdk-go/service/kms/kmsiface"
@@ -8,6 +10,7 @@ import (
 
 type KMSRepository interface {
 	ListAllKeys() ([]*kms.KeyListEntry, error)
+	ListAllAliases() ([]*kms.AliasListEntry, error)
 }
 
 type kmsRepository struct {
@@ -39,6 +42,21 @@ func (r *kmsRepository) ListAllKeys() ([]*kms.KeyListEntry, error) {
 	return customerKeys, nil
 }
 
+func (r *kmsRepository) ListAllAliases() ([]*kms.AliasListEntry, error) {
+	var aliases []*kms.AliasListEntry
+	input := kms.ListAliasesInput{}
+	err := r.client.ListAliasesPages(&input,
+		func(resp *kms.ListAliasesOutput, lastPage bool) bool {
+			aliases = append(aliases, resp.Aliases...)
+			return !lastPage
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return r.filterAliases(aliases), nil
+}
+
 func (r *kmsRepository) filterKeys(keys []*kms.KeyListEntry) ([]*kms.KeyListEntry, error) {
 	var customerKeys []*kms.KeyListEntry
 	for _, key := range keys {
@@ -53,4 +71,14 @@ func (r *kmsRepository) filterKeys(keys []*kms.KeyListEntry) ([]*kms.KeyListEntr
 		}
 	}
 	return customerKeys, nil
+}
+
+func (r *kmsRepository) filterAliases(aliases []*kms.AliasListEntry) []*kms.AliasListEntry {
+	var customerAliases []*kms.AliasListEntry
+	for _, alias := range aliases {
+		if alias.AliasName != nil && !strings.HasPrefix(*alias.AliasName, "alias/aws/") {
+			customerAliases = append(customerAliases, alias)
+		}
+	}
+	return customerAliases
 }
