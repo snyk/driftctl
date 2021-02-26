@@ -634,3 +634,264 @@ func TestListMembership(t *testing.T) {
 		"testorg:user-non-admin-3",
 	}, teams)
 }
+
+func TestListBranchProtection_WithRepoListingError(t *testing.T) {
+	assert := assert.New(t)
+
+	mockedClient := mocks.GithubGraphQLClient{}
+	expectedError := errors.New("test error from graphql")
+	mockedClient.On("Query",
+		mock.Anything,
+		mock.MatchedBy(func(query interface{}) bool {
+			q, ok := query.(*listRepoForOrgQuery)
+			if !ok {
+				return false
+			}
+			q.Organization.Repositories.Nodes = []struct {
+				Name string
+			}{
+				{
+					Name: "repo1",
+				},
+				{
+					Name: "repo2",
+				},
+			}
+			q.Organization.Repositories.PageInfo = pageInfo{
+				HasNextPage: false,
+			}
+			return true
+		}),
+		map[string]interface{}{
+			"org":    (githubv4.String)("my-organization"),
+			"cursor": (*githubv4.String)(nil),
+		}).Return(expectedError)
+
+	r := githubRepository{
+		client: &mockedClient,
+		config: githubConfig{
+			Organization: "my-organization",
+		},
+	}
+
+	_, err := r.ListBranchProtection()
+	assert.Equal(expectedError, err)
+}
+
+func TestListBranchProtection_WithError(t *testing.T) {
+	assert := assert.New(t)
+
+	mockedClient := mocks.GithubGraphQLClient{}
+	expectedError := errors.New("test error from graphql")
+	mockedClient.On("Query",
+		mock.Anything,
+		mock.MatchedBy(func(query interface{}) bool {
+			q, ok := query.(*listRepoForOrgQuery)
+			if !ok {
+				return false
+			}
+			q.Organization.Repositories.Nodes = []struct {
+				Name string
+			}{
+				{
+					Name: "repo1",
+				},
+				{
+					Name: "repo2",
+				},
+			}
+			q.Organization.Repositories.PageInfo = pageInfo{
+				HasNextPage: false,
+			}
+			return true
+		}),
+		map[string]interface{}{
+			"org":    (githubv4.String)("testorg"),
+			"cursor": (*githubv4.String)(nil),
+		}).Return(nil)
+
+	mockedClient.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(expectedError)
+
+	r := githubRepository{
+		client: &mockedClient,
+		config: githubConfig{
+			Organization: "testorg",
+		},
+	}
+
+	_, err := r.ListBranchProtection()
+	assert.Equal(expectedError, err)
+}
+
+func TestListBranchProtection(t *testing.T) {
+	assert := assert.New(t)
+
+	mockedClient := mocks.GithubGraphQLClient{}
+
+	mockedClient.On("Query",
+		mock.Anything,
+		mock.MatchedBy(func(query interface{}) bool {
+			q, ok := query.(*listRepoForOrgQuery)
+			if !ok {
+				return false
+			}
+			q.Organization.Repositories.Nodes = []struct {
+				Name string
+			}{
+				{
+					Name: "repo1",
+				},
+				{
+					Name: "repo2",
+				},
+			}
+			q.Organization.Repositories.PageInfo = pageInfo{
+				HasNextPage: false,
+			}
+			return true
+		}),
+		map[string]interface{}{
+			"org":    (githubv4.String)("my-organization"),
+			"cursor": (*githubv4.String)(nil),
+		}).Return(nil)
+
+	mockedClient.On("Query",
+		mock.Anything,
+		mock.MatchedBy(func(query interface{}) bool {
+			q, ok := query.(*listBranchProtectionQuery)
+			if !ok {
+				return false
+			}
+			q.Repository.BranchProtectionRules.Nodes = []struct {
+				Id string
+			}{
+				{
+					Id: "id1",
+				},
+				{
+					Id: "id2",
+				},
+			}
+			q.Repository.BranchProtectionRules.PageInfo = pageInfo{
+				EndCursor:   "nextPage",
+				HasNextPage: true,
+			}
+			return true
+		}),
+		map[string]interface{}{
+			"owner":  (githubv4.String)("my-organization"),
+			"name":   (githubv4.String)("repo1"),
+			"cursor": (*githubv4.String)(nil),
+		}).Return(nil)
+
+	mockedClient.On("Query",
+		mock.Anything,
+		mock.MatchedBy(func(query interface{}) bool {
+			q, ok := query.(*listBranchProtectionQuery)
+			if !ok {
+				return false
+			}
+			q.Repository.BranchProtectionRules.Nodes = []struct {
+				Id string
+			}{
+				{
+					Id: "id3",
+				},
+				{
+					Id: "id4",
+				},
+			}
+			q.Repository.BranchProtectionRules.PageInfo = pageInfo{
+				EndCursor:   "nextPage",
+				HasNextPage: false,
+			}
+			return true
+		}),
+		map[string]interface{}{
+			"owner":  (githubv4.String)("my-organization"),
+			"name":   (githubv4.String)("repo1"),
+			"cursor": (githubv4.String)("nextPage"),
+		}).Return(nil)
+
+	mockedClient.On("Query",
+		mock.Anything,
+		mock.MatchedBy(func(query interface{}) bool {
+			q, ok := query.(*listBranchProtectionQuery)
+			if !ok {
+				return false
+			}
+			q.Repository.BranchProtectionRules.Nodes = []struct {
+				Id string
+			}{
+				{
+					Id: "id5",
+				},
+				{
+					Id: "id6",
+				},
+			}
+			q.Repository.BranchProtectionRules.PageInfo = pageInfo{
+				EndCursor:   "nextPage",
+				HasNextPage: true,
+			}
+			return true
+		}),
+		map[string]interface{}{
+			"owner":  (githubv4.String)("my-organization"),
+			"name":   (githubv4.String)("repo2"),
+			"cursor": (*githubv4.String)(nil),
+		}).Return(nil)
+
+	mockedClient.On("Query",
+		mock.Anything,
+		mock.MatchedBy(func(query interface{}) bool {
+			q, ok := query.(*listBranchProtectionQuery)
+			if !ok {
+				return false
+			}
+			q.Repository.BranchProtectionRules.Nodes = []struct {
+				Id string
+			}{
+				{
+					Id: "id7",
+				},
+				{
+					Id: "id8",
+				},
+			}
+			q.Repository.BranchProtectionRules.PageInfo = pageInfo{
+				EndCursor:   "nextPage",
+				HasNextPage: false,
+			}
+			return true
+		}),
+		map[string]interface{}{
+			"owner":  (githubv4.String)("my-organization"),
+			"name":   (githubv4.String)("repo2"),
+			"cursor": (githubv4.String)("nextPage"),
+		}).Return(nil)
+
+	r := githubRepository{
+		client: &mockedClient,
+		ctx:    context.TODO(),
+		config: githubConfig{
+			Organization: "my-organization",
+		},
+	}
+
+	teams, err := r.ListBranchProtection()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal([]string{
+		"id1",
+		"id2",
+		"id3",
+		"id4",
+		"id5",
+		"id6",
+		"id7",
+		"id8",
+	}, teams)
+}

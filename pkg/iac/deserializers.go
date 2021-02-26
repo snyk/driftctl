@@ -63,5 +63,6 @@ func Deserializers() []deserializer.CTYDeserializer {
 		ghdeserializer.NewGithubTeamDeserializer(),
 		ghdeserializer.NewGithubMembershipDeserializer(),
 		ghdeserializer.NewGithubTeamMembershipDeserializer(),
+		ghdeserializer.NewGithubBranchProtectionDeserializer(),
 	}
 }

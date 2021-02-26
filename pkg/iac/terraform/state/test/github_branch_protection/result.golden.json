@@ -1,0 +1,90 @@
+[
+ {
+  "AllowsDeletions": true,
+  "AllowsForcePushes": true,
+  "EnforceAdmins": true,
+  "Id": "MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0NzI=",
+  "Pattern": "main",
+  "PushRestrictions": [
+   "MDQ6VXNlcjYxNTQ5ODc="
+  ],
+  "RepositoryId": "MDEwOlJlcG9zaXRvcnkzNDI1MzIzNzE=",
+  "RequireSignedCommits": false,
+  "RequiredPullRequestReviews": [
+   {
+    "DismissStaleReviews": true,
+    "DismissalRestrictions": [
+     "MDQ6VXNlcjYxNTQ5ODc="
+    ],
+    "RequireCodeOwnerReviews": false,
+    "RequiredApprovingReviewCount": 1
+   }
+  ],
+  "RequiredStatusChecks": [
+   {
+    "Contexts": [
+     "ci/travis"
+    ],
+    "Strict": false
+   }
+  ]
+ },
+ {
+  "AllowsDeletions": true,
+  "AllowsForcePushes": true,
+  "EnforceAdmins": true,
+  "Id": "MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0NzQ=",
+  "Pattern": "main",
+  "PushRestrictions": [
+   "MDQ6VXNlcjYxNTQ5ODc="
+  ],
+  "RepositoryId": "MDEwOlJlcG9zaXRvcnkzNDI1MzIzODI=",
+  "RequireSignedCommits": false,
+  "RequiredPullRequestReviews": [
+   {
+    "DismissStaleReviews": true,
+    "DismissalRestrictions": [
+     "MDQ6VXNlcjYxNTQ5ODc="
+    ],
+    "RequireCodeOwnerReviews": false,
+    "RequiredApprovingReviewCount": 1
+   }
+  ],
+  "RequiredStatusChecks": [
+   {
+    "Contexts": [
+     "ci/travis"
+    ],
+    "Strict": false
+   }
+  ]
+ },
+ {
+  "AllowsDeletions": true,
+  "AllowsForcePushes": true,
+  "EnforceAdmins": true,
+  "Id": "MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0NzE=",
+  "Pattern": "main",
+  "PushRestrictions": null,
+  "RepositoryId": "MDEwOlJlcG9zaXRvcnkzNDI1MzIzOTE=",
+  "RequireSignedCommits": false,
+  "RequiredPullRequestReviews": [
+   {
+    "DismissStaleReviews": true,
+    "DismissalRestrictions": [
+     "MDQ6VXNlcjYxNTQ5ODc="
+    ],
+    "RequireCodeOwnerReviews": false,
+    "RequiredApprovingReviewCount": 1
+   }
+  ],
+  "RequiredStatusChecks": [
+   {
+    "Contexts": [
+     "ci/travis"
+    ],
+    "Strict": false
+   }
+  ]
+ }
+]
