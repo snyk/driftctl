@@ -1,0 +1,2686 @@
+{
+ "github_actions_organization_secret": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "created_at": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "plaintext_value": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": true,
+     "Deprecated": false
+    },
+    "secret_name": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "selected_repository_ids": {
+     "Type": [
+      "set",
+      "number"
+     ],
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "updated_at": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "visibility": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_actions_secret": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "created_at": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "plaintext_value": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": true,
+     "Deprecated": false
+    },
+    "repository": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "secret_name": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "updated_at": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_branch": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "branch": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "ref": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "repository": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "sha": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "source_branch": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "source_sha": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_branch_default": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "branch": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "repository": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_branch_protection": {
+  "Version": 1,
+  "Block": {
+   "Attributes": {
+    "allows_deletions": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "allows_force_pushes": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "enforce_admins": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "pattern": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "push_restrictions": {
+     "Type": [
+      "set",
+      "string"
+     ],
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "repository_id": {
+     "Type": "string",
+     "Description": "Node ID or name of repository",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "require_signed_commits": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {
+    "required_pull_request_reviews": {
+     "Attributes": {
+      "dismiss_stale_reviews": {
+       "Type": "bool",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "dismissal_restrictions": {
+       "Type": [
+        "set",
+        "string"
+       ],
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "require_code_owner_reviews": {
+       "Type": "bool",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "required_approving_review_count": {
+       "Type": "number",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      }
+     },
+     "BlockTypes": {},
+     "Description": "",
+     "DescriptionKind": 0,
+     "Deprecated": false,
+     "Nesting": 3,
+     "MinItems": 0,
+     "MaxItems": 0
+    },
+    "required_status_checks": {
+     "Attributes": {
+      "contexts": {
+       "Type": [
+        "set",
+        "string"
+       ],
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "strict": {
+       "Type": "bool",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      }
+     },
+     "BlockTypes": {},
+     "Description": "",
+     "DescriptionKind": 0,
+     "Deprecated": false,
+     "Nesting": 3,
+     "MinItems": 0,
+     "MaxItems": 0
+    }
+   },
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_branch_protection_v3": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "branch": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "enforce_admins": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "repository": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "require_signed_commits": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {
+    "required_pull_request_reviews": {
+     "Attributes": {
+      "dismiss_stale_reviews": {
+       "Type": "bool",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "dismissal_teams": {
+       "Type": [
+        "set",
+        "string"
+       ],
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "dismissal_users": {
+       "Type": [
+        "set",
+        "string"
+       ],
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "include_admins": {
+       "Type": "bool",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "require_code_owner_reviews": {
+       "Type": "bool",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "required_approving_review_count": {
+       "Type": "number",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      }
+     },
+     "BlockTypes": {},
+     "Description": "",
+     "DescriptionKind": 0,
+     "Deprecated": false,
+     "Nesting": 3,
+     "MinItems": 0,
+     "MaxItems": 1
+    },
+    "required_status_checks": {
+     "Attributes": {
+      "contexts": {
+       "Type": [
+        "set",
+        "string"
+       ],
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "include_admins": {
+       "Type": "bool",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "strict": {
+       "Type": "bool",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      }
+     },
+     "BlockTypes": {},
+     "Description": "",
+     "DescriptionKind": 0,
+     "Deprecated": false,
+     "Nesting": 3,
+     "MinItems": 0,
+     "MaxItems": 1
+    },
+    "restrictions": {
+     "Attributes": {
+      "apps": {
+       "Type": [
+        "set",
+        "string"
+       ],
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "teams": {
+       "Type": [
+        "set",
+        "string"
+       ],
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "users": {
+       "Type": [
+        "set",
+        "string"
+       ],
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      }
+     },
+     "BlockTypes": {},
+     "Description": "",
+     "DescriptionKind": 0,
+     "Deprecated": false,
+     "Nesting": 3,
+     "MinItems": 0,
+     "MaxItems": 1
+    }
+   },
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_issue_label": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "color": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "description": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "name": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "repository": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "url": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_membership": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "role": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "username": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_organization_block": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "username": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_organization_project": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "body": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "name": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "url": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_organization_webhook": {
+  "Version": 1,
+  "Block": {
+   "Attributes": {
+    "active": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "events": {
+     "Type": [
+      "set",
+      "string"
+     ],
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "name": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "url": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {
+    "configuration": {
+     "Attributes": {
+      "content_type": {
+       "Type": "string",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "insecure_ssl": {
+       "Type": "bool",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "secret": {
+       "Type": "string",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": true,
+       "Deprecated": false
+      },
+      "url": {
+       "Type": "string",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": true,
+       "Optional": false,
+       "Computed": false,
+       "Sensitive": true,
+       "Deprecated": false
+      }
+     },
+     "BlockTypes": {},
+     "Description": "",
+     "DescriptionKind": 0,
+     "Deprecated": false,
+     "Nesting": 3,
+     "MinItems": 0,
+     "MaxItems": 1
+    }
+   },
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_project_card": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "card_id": {
+     "Type": "number",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "column_id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "note": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_project_column": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "column_id": {
+     "Type": "number",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "name": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "project_id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_repository": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "allow_merge_commit": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "allow_rebase_merge": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "allow_squash_merge": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "archive_on_destroy": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "archived": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "auto_init": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "default_branch": {
+     "Type": "string",
+     "Description": "Can only be set after initial repository creation, and only if the target branch exists",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "delete_branch_on_merge": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "description": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "full_name": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "git_clone_url": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "gitignore_template": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "has_downloads": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "has_issues": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "has_projects": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "has_wiki": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "homepage_url": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "html_url": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "http_clone_url": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "is_template": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "license_template": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "name": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "node_id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "private": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "repo_id": {
+     "Type": "number",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "ssh_clone_url": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "svn_url": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "topics": {
+     "Type": [
+      "set",
+      "string"
+     ],
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "visibility": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "vulnerability_alerts": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {
+    "pages": {
+     "Attributes": {
+      "cname": {
+       "Type": "string",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "custom_404": {
+       "Type": "bool",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": false,
+       "Computed": true,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "html_url": {
+       "Type": "string",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": false,
+       "Computed": true,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "status": {
+       "Type": "string",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": false,
+       "Computed": true,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "url": {
+       "Type": "string",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": false,
+       "Computed": true,
+       "Sensitive": false,
+       "Deprecated": false
+      }
+     },
+     "BlockTypes": {
+      "source": {
+       "Attributes": {
+        "branch": {
+         "Type": "string",
+         "Description": "",
+         "DescriptionKind": 0,
+         "Required": true,
+         "Optional": false,
+         "Computed": false,
+         "Sensitive": false,
+         "Deprecated": false
+        },
+        "path": {
+         "Type": "string",
+         "Description": "",
+         "DescriptionKind": 0,
+         "Required": false,
+         "Optional": true,
+         "Computed": false,
+         "Sensitive": false,
+         "Deprecated": false
+        }
+       },
+       "BlockTypes": {},
+       "Description": "",
+       "DescriptionKind": 0,
+       "Deprecated": false,
+       "Nesting": 3,
+       "MinItems": 1,
+       "MaxItems": 1
+      }
+     },
+     "Description": "",
+     "DescriptionKind": 0,
+     "Deprecated": false,
+     "Nesting": 3,
+     "MinItems": 0,
+     "MaxItems": 1
+    },
+    "template": {
+     "Attributes": {
+      "owner": {
+       "Type": "string",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": true,
+       "Optional": false,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "repository": {
+       "Type": "string",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": true,
+       "Optional": false,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      }
+     },
+     "BlockTypes": {},
+     "Description": "",
+     "DescriptionKind": 0,
+     "Deprecated": false,
+     "Nesting": 3,
+     "MinItems": 0,
+     "MaxItems": 1
+    }
+   },
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_repository_collaborator": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "invitation_id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "permission": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "permission_diff_suppression": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "repository": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "username": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_repository_deploy_key": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "key": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "read_only": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "repository": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "title": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_repository_file": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "branch": {
+     "Type": "string",
+     "Description": "The branch name, defaults to \"main\"",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "commit_author": {
+     "Type": "string",
+     "Description": "The commit author name, defaults to the authenticated user's name",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "commit_email": {
+     "Type": "string",
+     "Description": "The commit author email address, defaults to the authenticated user's email address",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "commit_message": {
+     "Type": "string",
+     "Description": "The commit message when creating or updating the file",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "commit_sha": {
+     "Type": "string",
+     "Description": "The SHA of the commit that modified the file",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "content": {
+     "Type": "string",
+     "Description": "The file's content",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "file": {
+     "Type": "string",
+     "Description": "The file path to manage",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "overwrite_on_create": {
+     "Type": "bool",
+     "Description": "Enable overwriting existing files, defaults to \"false\"",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "repository": {
+     "Type": "string",
+     "Description": "The repository name",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "sha": {
+     "Type": "string",
+     "Description": "The blob SHA of the file",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_repository_milestone": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "description": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "due_date": {
+     "Type": "string",
+     "Description": "in yyyy-mm-dd format",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "number": {
+     "Type": "number",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "owner": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "repository": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "state": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "title": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_repository_project": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "body": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "name": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "repository": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "url": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_repository_webhook": {
+  "Version": 1,
+  "Block": {
+   "Attributes": {
+    "active": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "events": {
+     "Type": [
+      "set",
+      "string"
+     ],
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "name": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "repository": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "url": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {
+    "configuration": {
+     "Attributes": {
+      "content_type": {
+       "Type": "string",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "insecure_ssl": {
+       "Type": "bool",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "secret": {
+       "Type": "string",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": false,
+       "Optional": true,
+       "Computed": false,
+       "Sensitive": true,
+       "Deprecated": false
+      },
+      "url": {
+       "Type": "string",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": true,
+       "Optional": false,
+       "Computed": false,
+       "Sensitive": true,
+       "Deprecated": false
+      }
+     },
+     "BlockTypes": {},
+     "Description": "",
+     "DescriptionKind": 0,
+     "Deprecated": false,
+     "Nesting": 3,
+     "MinItems": 0,
+     "MaxItems": 1
+    }
+   },
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_team": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "create_default_maintainer": {
+     "Type": "bool",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "description": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "ldap_dn": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "members_count": {
+     "Type": "number",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "name": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "node_id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "parent_team_id": {
+     "Type": "number",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "privacy": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "slug": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_team_membership": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "role": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "team_id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "username": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_team_repository": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "permission": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "repository": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "team_id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_team_sync_group_mapping": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "team_slug": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {
+    "group": {
+     "Attributes": {
+      "group_description": {
+       "Type": "string",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": true,
+       "Optional": false,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "group_id": {
+       "Type": "string",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": true,
+       "Optional": false,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      },
+      "group_name": {
+       "Type": "string",
+       "Description": "",
+       "DescriptionKind": 0,
+       "Required": true,
+       "Optional": false,
+       "Computed": false,
+       "Sensitive": false,
+       "Deprecated": false
+      }
+     },
+     "BlockTypes": {},
+     "Description": "",
+     "DescriptionKind": 0,
+     "Deprecated": false,
+     "Nesting": 4,
+     "MinItems": 0,
+     "MaxItems": 0
+    }
+   },
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_user_gpg_key": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "armored_public_key": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "key_id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_user_invitation_accepter": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "invitation_id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ },
+ "github_user_ssh_key": {
+  "Version": 0,
+  "Block": {
+   "Attributes": {
+    "etag": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "id": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": true,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "key": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "title": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": true,
+     "Optional": false,
+     "Computed": false,
+     "Sensitive": false,
+     "Deprecated": false
+    },
+    "url": {
+     "Type": "string",
+     "Description": "",
+     "DescriptionKind": 0,
+     "Required": false,
+     "Optional": false,
+     "Computed": true,
+     "Sensitive": false,
+     "Deprecated": false
+    }
+   },
+   "BlockTypes": {},
+   "Description": "",
+   "DescriptionKind": 0,
+   "Deprecated": false
+  }
+ }
+}

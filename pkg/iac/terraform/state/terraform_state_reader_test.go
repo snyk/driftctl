@@ -157,6 +157,7 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 	}{
 		{name: "github repository", dirName: "github_repository", wantErr: false},
 		{name: "github team", dirName: "github_team", wantErr: false},
+		{name: "github membership", dirName: "github_membership", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

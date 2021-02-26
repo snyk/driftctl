@@ -1,0 +1,14 @@
+[
+ {
+  "Etag": "W/\"2d1cae5b1a58be39bd09bad91fb225b3b589ddc47ff101cf4b8a86d3d8b6f65d\"",
+  "Id": "driftctl-test:driftctl-acceptance-tester",
+  "Role": "admin",
+  "Username": "driftctl-acceptance-tester"
+ },
+ {
+  "Etag": "W/\"d2a4eb901334f41629f5ead98a4b6e02489ae2f13b2152630f00e4dfa6488586\"",
+  "Id": "driftctl-test:eliecharra",
+  "Role": "admin",
+  "Username": "eliecharra"
+ }
+]
