@@ -91,7 +91,7 @@ As you make your changes, you can re-run the above command to ensure that the te
 go test ./pkg/iac/...
 ```
 
-For more details on testing, check the [contributing guide](../doc/contributing/tests.md).
+For more details on testing, check the [contributing guide](../docs/testing.md).
 
 ### Acceptance Tests: Testing interactions with external services
 
@@ -104,7 +104,7 @@ We recommend focusing only on the specific package you are working on when enabl
 Because the acceptance tests depend on services outside of the driftctl codebase, and because the acceptance tests are usually used only when making changes to the systems they cover, it is common and expected that drift in those external systems will cause test failures.
 Because of this, prior to working on a system covered by acceptance tests it's important to run the existing tests for that system in an *unchanged* work tree first and respond to any test failures that preexist, to avoid misinterpreting such failures as bugs in your new changes.
 
-More details on acceptance on the [contributing guide](../doc/contributing/README.md)
+More details on acceptance on the [contributing guide](../docs/README.md)
 
 ## Generated Code
 

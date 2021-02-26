@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="201" src="assets/new_icon.svg" alt="Driftctl">
+  <img width="200" src="https://docs.driftctl.com/img/driftctl_dark.svg" alt="driftctl">
 </p>
 
 <p align="center">
@@ -23,11 +23,11 @@
 
 <p align="center">
   Measures infrastructure as code coverage, and tracks infrastructure drift.<br>
-  <strong>IaC:</strong> Terraform, <strong>Cloud platform:</strong> AWS (Azure and GCP on the roadmap for 2021).<br>
+  <strong>IaC:</strong> Terraform, <strong>Cloud providers:</strong> AWS, GitHub (Azure and GCP on the roadmap for 2021).<br>
   :warning: <strong>This tool is still in beta state and will evolve in the future with potential breaking changes</strong> :warning:
 </p>
 
-## Why ?
+## Why driftctl ?
 
 Infrastructure as code is awesome, but there are too many moving parts: codebase, state file, actual cloud state. Things tend to drift.
 
@@ -40,169 +40,23 @@ driftctl tracks how well your IaC codebase covers your cloud configuration. drif
 ## Features
 
 - **Scan** cloud provider and map resources with IaC code
-- Analyze diff, and warn about drift and unwanted unmanaged resources
+- Analyze diffs, and warn about drift and unwanted unmanaged resources
 - Allow users to **ignore** resources
 - Multiple output formats
 
-## Documentation & support
+---
 
-- [Get started](https://driftctl.com/product/quick-tutorial/)
-- [User guide](doc/README.md)
-- [Discord](https://discord.gg/NMCBxtD7Nd)
+**[Get Started](https://driftctl.com/product/quick-tutorial/)**
 
-## Getting started
+**[Documentation](https://docs.driftctl.com)**
 
-### Installation
+**[Discord](https://discord.gg/NMCBxtD7Nd)**
 
-driftctl is available on Linux, macOS and Windows.
-
-Binaries are available in the [release page](https://github.com/cloudskiff/driftctl/releases).
-
-#### Homebrew for macOS
-
-```bash
-brew install driftctl
-```
-
-#### MacPorts for macOS
-
-```bash
-sudo port install driftctl
-```
-
-#### Docker
-
-```bash
-docker run -t --rm \
-  -v ~/.aws:/home/.aws:ro \
-  -v $(pwd):/app:ro \
-  -v ~/.driftctl:/home/.driftctl \
-  -e AWS_PROFILE=non-default-profile \
-  cloudskiff/driftctl scan
-```
-
-`-v ~/.aws:/home/.aws:ro` (optionally) mounts your `~/.aws` containing AWS credentials and profile
-
-`-v $(pwd):/app:ro` (optionally) mounts your working dir containing the terraform state
-
-`-v ~/.driftctl:/home/.driftctl` (optionally) prevents driftctl to download the provider at each run
-
-`-e AWS_PROFILE=cloudskiff` (optionally) exports the non-default AWS profile name to use
-
-`cloudskiff/driftctl:<VERSION_TAG>` run a specific driftctl tagged release
-
-#### Manual
-
-- **Linux**
-
-This is an example using `curl`. If you don't have `curl`, install it, or use `wget`.
-
-```bash
-# x64
-curl -L https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_linux_amd64 -o driftctl
-
-# x86
-curl -L https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_linux_386 -o driftctl
-```
-
-Make the binary executable:
-
-```bash
-chmod +x driftctl
-```
-
-Optionally install driftctl to a central location in your `PATH`:
-
-```bash
-# use any path that suits you, this is just a standard example. Install sudo if needed.
-sudo mv driftctl /usr/local/bin/
-```
-
-- **macOS**
-
-```bash
-# x64
-curl -L https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_darwin_amd64 -o driftctl
-```
-
-Make the binary executable:
-
-```bash
-chmod +x driftctl
-```
-
-Optionally install driftctl to a central location in your `PATH`:
-
-```bash
-# use any path that suits you, this is just a standard example. Install sudo if needed.
-sudo mv driftctl /usr/local/bin/
-```
-
-- **Windows**
-
-```bash
-# x64
-curl https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_windows_amd64.exe -o driftctl.exe
-# x86
-curl https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_windows_386.exe -o driftctl.exe
-```
-
-#### Verify digital signatures
-
-Cloudskiff releases are signed using PGP key (ed25519) with ID `ACC776A79C824EBD` and fingerprint `2776 6600 5A7F 01D4 84F6 376D ACC7 76A7 9C82 4EBD`
-Our key can be retrieved from common keyservers.
-
-```shell
-# Download binary, checksums and signature
-$ curl -L https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_linux_amd64 -o driftctl_linux_amd64
-$ curl -L https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_SHA256SUMS -o driftctl_SHA256SUMS
-$ curl -L https://github.com/cloudskiff/driftctl/releases/latest/download/driftctl_SHA256SUMS.gpg -o driftctl_SHA256SUMS.gpg
-
-# Import key
-$ gpg --keyserver hkps.pool.sks-keyservers.net --recv-keys 0xACC776A79C824EBD
-gpg: key ACC776A79C824EBD: public key "Cloudskiff <security@cloudskiff.com>" imported
-gpg: Total number processed: 1
-gpg:               imported: 1
-
-# Verify signature (optionally trust the key from gnupg to avoid any warning)
-$ gpg --verify driftctl_SHA256SUMS.gpg
-gpg: Signature made jeu. 04 févr. 2021 14:58:06 CET
-gpg:                using EDDSA key 277666005A7F01D484F6376DACC776A79C824EBD
-gpg:                issuer "security@cloudskiff.com"
-gpg: Good signature from "Cloudskiff <security@cloudskiff.com>" [ultimate]
-
-# Verify checksum
-$ sha256sum --ignore-missing -c driftctl_SHA256SUMS
-driftctl_linux_amd64: OK
-```
-
-### Run
-
-Be sure to have [configured](doc/cmd/scan/supported_resources/aws.md#authentication) your AWS credentials.
-
-You will need to assign [proper permissions](doc/cmd/scan/supported_resources/aws.md#least-privileged-policy) to allow driftctl to scan your account.
-
-```bash
-# With a local state
-$ driftctl scan
-# Same as
-$ driftctl scan --from tfstate://terraform.tfstate
-
-# To specify AWS credentials
-$ AWS_ACCESS_KEY_ID=XXX AWS_SECRET_ACCESS_KEY=XXX driftctl scan
-# or using a profile
-$ AWS_PROFILE=profile_name driftctl scan
-
-# With state stored on a s3 backend
-$ driftctl scan --from tfstate+s3://my-bucket/path/to/state.tfstate
-
-# With multiples states
-$ driftctl scan --from tfstate://terraform_S3.tfstate --from tfstate://terraform_VPC.tfstate
-```
+---
 
 ## Contribute
 
-To learn more about compiling driftctl and contributing, please refer to the [contribution guidelines](.github/CONTRIBUTING.md) and [contributing guide](doc/contributing/README.md) for technical details.
+To learn more about compiling driftctl and contributing, please refer to the [contribution guidelines](.github/CONTRIBUTING.md) and the [contributing guide](docs/README.md) for technical details.
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification and is brought to you by these [awesome contributors](CONTRIBUTORS.md).
 
