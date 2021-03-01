@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestGithubTeamSupplier_Resources(t *testing.T) {
+func TestGithubTeamMembershipSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
@@ -23,21 +23,20 @@ func TestGithubTeamSupplier_Resources(t *testing.T) {
 		err     error
 	}{
 		{
-			test:    "no github teams",
-			dirName: "github_teams_empty",
+			test:    "no github team memberships",
+			dirName: "github_team_membership_empty",
 			mocks: func(client *MockGithubRepository) {
-				client.On("ListTeams").Return([]Team{}, nil)
+				client.On("ListTeamMemberships").Return([]string{}, nil)
 			},
 			err: nil,
 		},
 		{
-			test:    "Multiple github teams with parent",
-			dirName: "github_teams_multiple",
+			test:    "multiple github team memberships",
+			dirName: "github_team_membership_multiple",
 			mocks: func(client *MockGithubRepository) {
-				client.On("ListTeams").Return([]Team{
-					{4556811, "team1"},       // github_team.team1
-					{4556812, "team2"},       // github_team.team2
-					{4556814, "with_parent"}, // github_team.with_parent
+				client.On("ListTeamMemberships").Return([]string{
+					"4570529:driftctl-acceptance-tester",
+					"4570529:wbeuil",
 				}, nil)
 			},
 			err: nil,
@@ -58,15 +57,15 @@ func TestGithubTeamSupplier_Resources(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			supplierLibrary.AddSupplier(NewGithubTeamSupplier(provider, &mockedRepo))
+			supplierLibrary.AddSupplier(NewGithubTeamMembershipSupplier(provider, &mockedRepo))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
 			provider := dritftctlmocks.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.GITHUB), shouldUpdate)
-			GithubTeamDeserializer := ghdeserializer.NewGithubTeamDeserializer()
-			s := &GithubTeamSupplier{
+			deserializer := ghdeserializer.NewGithubTeamMembershipDeserializer()
+			s := &GithubTeamMembershipSupplier{
 				provider,
-				GithubTeamDeserializer,
+				deserializer,
 				&mockedRepo,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
@@ -74,7 +73,7 @@ func TestGithubTeamSupplier_Resources(t *testing.T) {
 			assert.Equal(tt, c.err, err)
 
 			mock.AssertExpectationsForObjects(tt)
-			test.CtyTestDiff(got, c.dirName, provider, GithubTeamDeserializer, shouldUpdate, tt)
+			test.CtyTestDiff(got, c.dirName, provider, deserializer, shouldUpdate, tt)
 		})
 	}
 }

@@ -37,15 +37,15 @@ func (s GithubTeamSupplier) Resources() ([]resource.Resource, error) {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourcegithub.GithubTeamResourceType)
 	}
 
-	for _, id := range resourceList {
-		id := id
+	for _, team := range resourceList {
+		team := team
 		s.runner.Run(func() (cty.Value, error) {
 			completeResource, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 				Ty: resourcegithub.GithubTeamResourceType,
-				ID: fmt.Sprintf("%d", id),
+				ID: fmt.Sprintf("%d", team.DatabaseId),
 			})
 			if err != nil {
-				logrus.Warnf("Error reading %d[%s]: %+v", id, resourcegithub.GithubTeamResourceType, err)
+				logrus.Warnf("Error reading %d[%s]: %+v", team.DatabaseId, resourcegithub.GithubTeamResourceType, err)
 				return cty.NilVal, err
 			}
 			return *completeResource, nil

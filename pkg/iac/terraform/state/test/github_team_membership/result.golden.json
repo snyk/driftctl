@@ -1,0 +1,16 @@
+[
+ {
+  "Etag": "W/\"7d708fe20649b975d112449eb87681183b03ec1eee387e9cad2559fcc6b1fb3b\"",
+  "Id": "4564046:wbeuil",
+  "Role": "member",
+  "TeamId": "4564046",
+  "Username": "wbeuil"
+ },
+ {
+  "Etag": "W/\"1ecb16111126288558af7851ad1fb6eb99a57393235bd0600bf39c85dcd98563\"",
+  "Id": "4564046:driftctl-acceptance-tester",
+  "Role": "maintainer",
+  "TeamId": "4564046",
+  "Username": "driftctl-acceptance-tester"
+ }
+]
