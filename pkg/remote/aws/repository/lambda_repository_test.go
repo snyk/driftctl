@@ -78,3 +78,69 @@ func Test_lambdaRepository_ListAllLambdaFunctions(t *testing.T) {
 		})
 	}
 }
+
+func Test_lambdaRepository_ListAllLambdaEventSourceMappings(t *testing.T) {
+	tests := []struct {
+		name    string
+		mocks   func(mock *MockLambdaClient)
+		want    []*lambda.EventSourceMappingConfiguration
+		wantErr error
+	}{
+		{
+			name: "List with 2 pages",
+			mocks: func(client *MockLambdaClient) {
+				client.On("ListEventSourceMappingsPages",
+					&lambda.ListEventSourceMappingsInput{},
+					mock.MatchedBy(func(callback func(res *lambda.ListEventSourceMappingsOutput, lastPage bool) bool) bool {
+						callback(&lambda.ListEventSourceMappingsOutput{
+							EventSourceMappings: []*lambda.EventSourceMappingConfiguration{
+								{UUID: aws.String("1")},
+								{UUID: aws.String("2")},
+								{UUID: aws.String("3")},
+								{UUID: aws.String("4")},
+							},
+						}, false)
+						callback(&lambda.ListEventSourceMappingsOutput{
+							EventSourceMappings: []*lambda.EventSourceMappingConfiguration{
+								{UUID: aws.String("5")},
+								{UUID: aws.String("6")},
+								{UUID: aws.String("7")},
+								{UUID: aws.String("8")},
+							},
+						}, true)
+						return true
+					})).Return(nil)
+			},
+			want: []*lambda.EventSourceMappingConfiguration{
+				{UUID: aws.String("1")},
+				{UUID: aws.String("2")},
+				{UUID: aws.String("3")},
+				{UUID: aws.String("4")},
+				{UUID: aws.String("5")},
+				{UUID: aws.String("6")},
+				{UUID: aws.String("7")},
+				{UUID: aws.String("8")},
+			},
+			wantErr: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := &MockLambdaClient{}
+			tt.mocks(client)
+			r := &lambdaRepository{
+				client: client,
+			}
+			got, err := r.ListAllLambdaEventSourceMappings()
+			assert.Equal(t, tt.wantErr, err)
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}
