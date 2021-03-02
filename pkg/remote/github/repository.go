@@ -2,6 +2,7 @@ package github
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/oauth2"
@@ -10,6 +11,7 @@ import (
 type GithubRepository interface {
 	ListRepositories() ([]string, error)
 	ListTeams() ([]int, error)
+	ListMembership() ([]string, error)
 }
 
 type GithubGraphQLClient interface {
@@ -156,6 +158,46 @@ func (r githubRepository) ListTeams() ([]int, error) {
 			break
 		}
 		variables["cursor"] = githubv4.NewString(query.Organization.Teams.PageInfo.EndCursor)
+	}
+	return results, nil
+}
+
+type listMembership struct {
+	Organization struct {
+		MembersWithRole struct {
+			Nodes []struct {
+				Login string
+			}
+			PageInfo struct {
+				EndCursor   githubv4.String
+				HasNextPage bool
+			}
+		} `graphql:"membersWithRole(first: 100, after: $cursor)"`
+	} `graphql:"organization(login: $login)"`
+}
+
+func (r *githubRepository) ListMembership() ([]string, error) {
+	query := listMembership{}
+	results := make([]string, 0)
+	if r.config.Organization == "" {
+		return results, nil
+	}
+	variables := map[string]interface{}{
+		"cursor": (*githubv4.String)(nil),
+		"login":  (githubv4.String)(r.config.Organization),
+	}
+	for {
+		err := r.client.Query(r.ctx, &query, variables)
+		if err != nil {
+			return nil, err
+		}
+		for _, membership := range query.Organization.MembersWithRole.Nodes {
+			results = append(results, fmt.Sprintf("%s:%s", r.config.Organization, membership.Login))
+		}
+		if !query.Organization.MembersWithRole.PageInfo.HasNextPage {
+			break
+		}
+		variables["cursor"] = githubv4.NewString(query.Organization.MembersWithRole.PageInfo.EndCursor)
 	}
 	return results, nil
 }
