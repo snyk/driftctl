@@ -12,8 +12,8 @@ type MockECRRepository struct {
 	mock.Mock
 }
 
-// ListAllRepository provides a mock function with given fields:
-func (_m *MockECRRepository) ListAllRepository() ([]*ecr.Repository, error) {
+// ListAllRepositories provides a mock function with given fields:
+func (_m *MockECRRepository) ListAllRepositories() ([]*ecr.Repository, error) {
 	ret := _m.Called()
 
 	var r0 []*ecr.Repository

@@ -35,7 +35,7 @@ func TestEcrRepositorySupplier_Resources(t *testing.T) {
 			test:    "no repository",
 			dirName: "ecr_repository_empty",
 			mocks: func(client *repository.MockECRRepository) {
-				client.On("ListAllRepository").Return([]*ecr.Repository{}, nil)
+				client.On("ListAllRepositories").Return([]*ecr.Repository{}, nil)
 			},
 			err: nil,
 		},
@@ -43,7 +43,7 @@ func TestEcrRepositorySupplier_Resources(t *testing.T) {
 			test:    "multiple repositories",
 			dirName: "ecr_repository_multiple",
 			mocks: func(client *repository.MockECRRepository) {
-				client.On("ListAllRepository").Return([]*ecr.Repository{
+				client.On("ListAllRepositories").Return([]*ecr.Repository{
 					{RepositoryName: aws.String("test_ecr")},
 					{RepositoryName: aws.String("bar")},
 				}, nil)
@@ -54,7 +54,7 @@ func TestEcrRepositorySupplier_Resources(t *testing.T) {
 			test:    "cannot list repository",
 			dirName: "ecr_repository_empty",
 			mocks: func(client *repository.MockECRRepository) {
-				client.On("ListAllRepository").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				client.On("ListAllRepositories").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsEcrRepositoryResourceType),
 		},

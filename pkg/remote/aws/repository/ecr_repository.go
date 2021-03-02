@@ -7,7 +7,7 @@ import (
 )
 
 type ECRRepository interface {
-	ListAllRepository() ([]*ecr.Repository, error)
+	ListAllRepositories() ([]*ecr.Repository, error)
 }
 
 type ecrRepository struct {
@@ -20,15 +20,15 @@ func NewECRRepository(session *session.Session) *ecrRepository {
 	}
 }
 
-func (r *ecrRepository) ListAllRepository() ([]*ecr.Repository, error) {
-	var tables []*ecr.Repository
+func (r *ecrRepository) ListAllRepositories() ([]*ecr.Repository, error) {
+	var repositories []*ecr.Repository
 	input := &ecr.DescribeRepositoriesInput{}
 	err := r.client.DescribeRepositoriesPages(input, func(res *ecr.DescribeRepositoriesOutput, lastPage bool) bool {
-		tables = append(tables, res.Repositories...)
+		repositories = append(repositories, res.Repositories...)
 		return !lastPage
 	})
 	if err != nil {
 		return nil, err
 	}
-	return tables, nil
+	return repositories, nil
 }

@@ -31,7 +31,7 @@ func NewECRRepositorySupplier(provider *AWSTerraformProvider) *ECRRepositorySupp
 }
 
 func (r ECRRepositorySupplier) Resources() ([]resource.Resource, error) {
-	repositories, err := r.client.ListAllRepository()
+	repositories, err := r.client.ListAllRepositories()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsEcrRepositoryResourceType)
 	}

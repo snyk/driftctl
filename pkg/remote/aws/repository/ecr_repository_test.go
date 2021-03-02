@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_ecrRepository_ListAllRepository(t *testing.T) {
+func Test_ecrRepository_ListAllRepositories(t *testing.T) {
 
 	tests := []struct {
 		name    string
@@ -63,7 +63,7 @@ func Test_ecrRepository_ListAllRepository(t *testing.T) {
 			r := &ecrRepository{
 				client: client,
 			}
-			got, err := r.ListAllRepository()
+			got, err := r.ListAllRepositories()
 			assert.Equal(t, tt.wantErr, err)
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
