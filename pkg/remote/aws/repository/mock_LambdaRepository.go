@@ -12,6 +12,29 @@ type MockLambdaRepository struct {
 	mock.Mock
 }
 
+// ListAllLambdaEventSourceMappings provides a mock function with given fields:
+func (_m *MockLambdaRepository) ListAllLambdaEventSourceMappings() ([]*lambda.EventSourceMappingConfiguration, error) {
+	ret := _m.Called()
+
+	var r0 []*lambda.EventSourceMappingConfiguration
+	if rf, ok := ret.Get(0).(func() []*lambda.EventSourceMappingConfiguration); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*lambda.EventSourceMappingConfiguration)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListAllLambdaFunctions provides a mock function with given fields:
 func (_m *MockLambdaRepository) ListAllLambdaFunctions() ([]*lambda.FunctionConfiguration, error) {
 	ret := _m.Called()
