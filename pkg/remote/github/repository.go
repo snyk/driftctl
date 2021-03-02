@@ -240,9 +240,7 @@ func (r githubRepository) ListTeamMemberships() ([]string, error) {
 		return results, nil
 	}
 	variables := map[string]interface{}{
-		"cursor": (*githubv4.String)(nil),
-		"slug":   (githubv4.String)(""),
-		"login":  (githubv4.String)(r.config.Organization),
+		"login": (githubv4.String)(r.config.Organization),
 	}
 
 	for _, team := range teamList {
@@ -259,7 +257,7 @@ func (r githubRepository) ListTeamMemberships() ([]string, error) {
 			if !query.Organization.Team.Members.PageInfo.HasNextPage {
 				break
 			}
-			variables["cursor"] = githubv4.NewString(query.Organization.Team.Members.PageInfo.EndCursor)
+			variables["cursor"] = query.Organization.Team.Members.PageInfo.EndCursor
 		}
 	}
 	return results, nil

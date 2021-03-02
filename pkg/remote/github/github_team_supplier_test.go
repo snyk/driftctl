@@ -35,9 +35,9 @@ func TestGithubTeamSupplier_Resources(t *testing.T) {
 			dirName: "github_teams_multiple",
 			mocks: func(client *MockGithubRepository) {
 				client.On("ListTeams").Return([]Team{
-					{4556811, "team1"},       // github_team.team1
-					{4556812, "team2"},       // github_team.team2
-					{4556814, "with_parent"}, // github_team.with_parent
+					{DatabaseId: 4556811}, // github_team.team1
+					{DatabaseId: 4556812}, // github_team.team2
+					{DatabaseId: 4556814}, // github_team.with_parent
 				}, nil)
 			},
 			err: nil,

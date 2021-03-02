@@ -472,7 +472,7 @@ func TestListTeamMemberships(t *testing.T) {
 		}),
 		map[string]interface{}{
 			"login":  (githubv4.String)("testorg"),
-			"cursor": githubv4.NewString("next"),
+			"cursor": (githubv4.String)("next"),
 			"slug":   (githubv4.String)("foo"),
 		}).Return(nil)
 
