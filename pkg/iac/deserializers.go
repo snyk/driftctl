@@ -56,6 +56,7 @@ func Deserializers() []deserializer.CTYDeserializer {
 		awsdeserializer.NewDynamoDBTableDeserializer(),
 		awsdeserializer.NewRoute53HealthCheckDeserializer(),
 		awsdeserializer.NewCloudfrontDistributionDeserializer(),
+		awsdeserializer.NewECRRepositoryDeserializer(),
 		awsdeserializer.NewKMSKeyDeserializer(),
 		awsdeserializer.NewKMSAliasDeserializer(),
 		awsdeserializer.NewLambdaEventSourceMappingDeserializer(),
