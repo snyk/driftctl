@@ -30,6 +30,7 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	supplierLibrary.AddSupplier(NewGithubTeamSupplier(provider, repository))
 	supplierLibrary.AddSupplier(NewGithubMembershipSupplier(provider, repository))
 	supplierLibrary.AddSupplier(NewGithubTeamMembershipSupplier(provider, repository))
+	supplierLibrary.AddSupplier(NewGithubBranchProtectionSupplier(provider, repository))
 
 	return nil
 }
