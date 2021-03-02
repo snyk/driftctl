@@ -10,8 +10,9 @@ import (
 
 type GithubRepository interface {
 	ListRepositories() ([]string, error)
-	ListTeams() ([]int, error)
+	ListTeams() ([]Team, error)
 	ListMembership() ([]string, error)
+	ListTeamMemberships() ([]string, error)
 }
 
 type GithubGraphQLClient interface {
@@ -127,6 +128,7 @@ type listTeamsQuery struct {
 		Teams struct {
 			Nodes []struct {
 				DatabaseId int
+				Slug       string
 			}
 			PageInfo struct {
 				EndCursor   githubv4.String
@@ -136,9 +138,14 @@ type listTeamsQuery struct {
 	} `graphql:"organization(login: $login)"`
 }
 
-func (r githubRepository) ListTeams() ([]int, error) {
+type Team struct {
+	DatabaseId int
+	Slug       string
+}
+
+func (r githubRepository) ListTeams() ([]Team, error) {
 	query := listTeamsQuery{}
-	results := make([]int, 0)
+	results := make([]Team, 0)
 	if r.config.Organization == "" {
 		return results, nil
 	}
@@ -152,7 +159,10 @@ func (r githubRepository) ListTeams() ([]int, error) {
 			return nil, err
 		}
 		for _, team := range query.Organization.Teams.Nodes {
-			results = append(results, team.DatabaseId)
+			results = append(results, Team{
+				DatabaseId: team.DatabaseId,
+				Slug:       team.Slug,
+			})
 		}
 		if !query.Organization.Teams.PageInfo.HasNextPage {
 			break
@@ -198,6 +208,57 @@ func (r *githubRepository) ListMembership() ([]string, error) {
 			break
 		}
 		variables["cursor"] = githubv4.NewString(query.Organization.MembersWithRole.PageInfo.EndCursor)
+	}
+	return results, nil
+}
+
+type listTeamMembershipsQuery struct {
+	Organization struct {
+		Team struct {
+			Members struct {
+				Nodes []struct {
+					Login string
+				}
+				PageInfo struct {
+					EndCursor   githubv4.String
+					HasNextPage bool
+				}
+			} `graphql:"members(first: 100, after: $cursor)"`
+		} `graphql:"team(slug: $slug)"`
+	} `graphql:"organization(login: $login)"`
+}
+
+func (r githubRepository) ListTeamMemberships() ([]string, error) {
+	teamList, err := r.ListTeams()
+	if err != nil {
+		return nil, err
+	}
+
+	query := listTeamMembershipsQuery{}
+	results := make([]string, 0)
+	if r.config.Organization == "" {
+		return results, nil
+	}
+	variables := map[string]interface{}{
+		"login": (githubv4.String)(r.config.Organization),
+	}
+
+	for _, team := range teamList {
+		variables["slug"] = (githubv4.String)(team.Slug)
+		variables["cursor"] = (*githubv4.String)(nil)
+		for {
+			err := r.client.Query(r.ctx, &query, variables)
+			if err != nil {
+				return nil, err
+			}
+			for _, membership := range query.Organization.Team.Members.Nodes {
+				results = append(results, fmt.Sprintf("%d:%s", team.DatabaseId, membership.Login))
+			}
+			if !query.Organization.Team.Members.PageInfo.HasNextPage {
+				break
+			}
+			variables["cursor"] = query.Organization.Team.Members.PageInfo.EndCursor
+		}
 	}
 	return results, nil
 }
