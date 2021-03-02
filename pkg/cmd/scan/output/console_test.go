@@ -56,9 +56,15 @@ func TestConsole_Write(t *testing.T) {
 			wantErr:    false,
 		},
 		{
-			name:       "test console output with enumeration alerts",
-			goldenfile: "output_access_denied_alert.txt",
-			args:       args{analysis: fakeAnalysisWithEnumerationError()},
+			name:       "test console output with AWS enumeration alerts",
+			goldenfile: "output_access_denied_alert_aws.txt",
+			args:       args{analysis: fakeAnalysisWithAWSEnumerationError()},
+			wantErr:    false,
+		},
+		{
+			name:       "test console output with Github enumeration alerts",
+			goldenfile: "output_access_denied_alert_github.txt",
+			args:       args{analysis: fakeAnalysisWithGithubEnumerationError()},
 			wantErr:    false,
 		},
 	}

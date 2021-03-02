@@ -39,10 +39,18 @@ func TestJSON_Write(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:       "test json output with enumeration alerts",
-			goldenfile: "output_access_denied_alert.json",
+			name:       "test json output with AWS enumeration alerts",
+			goldenfile: "output_access_denied_alert_aws.json",
 			args: args{
-				analysis: fakeAnalysisWithEnumerationError(),
+				analysis: fakeAnalysisWithAWSEnumerationError(),
+			},
+			wantErr: false,
+		},
+		{
+			name:       "test json output with Github enumeration alerts",
+			goldenfile: "output_access_denied_alert_github.json",
+			args: args{
+				analysis: fakeAnalysisWithGithubEnumerationError(),
 			},
 			wantErr: false,
 		},

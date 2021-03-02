@@ -6,6 +6,8 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/cloudskiff/driftctl/pkg/remote"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws"
+	"github.com/cloudskiff/driftctl/pkg/remote/github"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/r3labs/diff/v2"
 )
@@ -237,13 +239,24 @@ func fakeAnalysisWithComputedFields() *analyser.Analysis {
 	return &a
 }
 
-func fakeAnalysisWithEnumerationError() *analyser.Analysis {
+func fakeAnalysisWithAWSEnumerationError() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
-			remote.NewEnumerationAccessDeniedAlert("aws_vpc", "aws_vpc"),
-			remote.NewEnumerationAccessDeniedAlert("aws_sqs", "aws_sqs"),
-			remote.NewEnumerationAccessDeniedAlert("aws_sns", "aws_sns"),
+			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_vpc", "aws_vpc"),
+			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sqs", "aws_sqs"),
+			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sns", "aws_sns"),
+		},
+	})
+	return &a
+}
+
+func fakeAnalysisWithGithubEnumerationError() *analyser.Analysis {
+	a := analyser.Analysis{}
+	a.SetAlerts(alerter.Alerts{
+		"": []alerter.Alert{
+			remote.NewEnumerationAccessDeniedAlert(github.RemoteGithubTerraform, "github_team", "github_team"),
+			remote.NewEnumerationAccessDeniedAlert(github.RemoteGithubTerraform, "github_team_membership", "github_team"),
 		},
 	})
 	return &a
