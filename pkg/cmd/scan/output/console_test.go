@@ -72,9 +72,11 @@ func TestConsole_Write(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := NewConsole()
 
-			old := os.Stdout // keep backup of the real stdout
+			stdout := os.Stdout // keep backup of the real stdout
+			stderr := os.Stderr // keep backup of the real stderr
 			r, w, _ := os.Pipe()
 			os.Stdout = w
+			os.Stderr = w
 
 			if err := c.Write(tt.args.analysis); (err != nil) != tt.wantErr {
 				t.Errorf("Write() error = %v, wantErr %v", err, tt.wantErr)
@@ -90,7 +92,8 @@ func TestConsole_Write(t *testing.T) {
 
 			// back to normal state
 			w.Close()
-			os.Stdout = old // restoring the real stdout
+			os.Stdout = stdout // restoring the real stdout
+			os.Stderr = stderr
 			out := <-outC
 
 			expectedFilePath := path.Join("./testdata", tt.goldenfile)

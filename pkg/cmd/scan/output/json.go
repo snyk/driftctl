@@ -19,11 +19,15 @@ func NewJSON(path string) *JSON {
 }
 
 func (c *JSON) Write(analysis *analyser.Analysis) error {
-	file, err := os.OpenFile(c.path, os.O_CREATE|os.O_RDWR, 0600)
-	if err != nil {
-		return err
+	file := os.Stdout
+	if !isStdOut(c.path) {
+		f, err := os.OpenFile(c.path, os.O_CREATE|os.O_RDWR, 0600)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		file = f
 	}
-	defer file.Close()
 
 	json, err := json.MarshalIndent(analysis, "", "\t")
 	if err != nil {
