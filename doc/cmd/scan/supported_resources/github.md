@@ -25,3 +25,4 @@ read:org # Used to list your organization teams
 - [x] github_team
 - [x] github_membership
 - [x] github_team_membership
+- [x] github_branch_protection

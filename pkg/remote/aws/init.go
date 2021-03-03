@@ -71,8 +71,10 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	supplierLibrary.AddSupplier(NewDynamoDBTableSupplier(provider))
 	supplierLibrary.AddSupplier(NewRoute53HealthCheckSupplier(provider))
 	supplierLibrary.AddSupplier(NewCloudfrontDistributionSupplier(provider))
+	supplierLibrary.AddSupplier(NewECRRepositorySupplier(provider))
 	supplierLibrary.AddSupplier(NewKMSKeySupplier(provider))
 	supplierLibrary.AddSupplier(NewKMSAliasSupplier(provider))
+	supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider))
 
 	return nil
 }

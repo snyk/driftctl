@@ -29,10 +29,10 @@ func NewGithubTerraformProvider() (*GithubTerraformProvider, error) {
 	}
 	tfProvider, err := terraform.NewTerraformProvider(installer, terraform.TerraformProviderConfig{
 		Name:         providerKey,
-		DefaultAlias: p.getDefaultOwner(),
+		DefaultAlias: p.GetConfig().getDefaultOwner(),
 		GetProviderConfig: func(owner string) interface{} {
 			return githubConfig{
-				Owner: p.getDefaultOwner(),
+				Owner: p.GetConfig().getDefaultOwner(),
 			}
 		},
 	})
@@ -43,12 +43,11 @@ func NewGithubTerraformProvider() (*GithubTerraformProvider, error) {
 	return p, err
 }
 
-func (p GithubTerraformProvider) getDefaultOwner() string {
-	conf := p.GetConfig()
-	if conf.Organization != "" {
-		return conf.Organization
+func (c githubConfig) getDefaultOwner() string {
+	if c.Organization != "" {
+		return c.Organization
 	}
-	return conf.Owner
+	return c.Owner
 }
 
 func (p GithubTerraformProvider) GetConfig() githubConfig {

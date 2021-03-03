@@ -1,16 +1,14 @@
 package aws
 
 import (
+	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
-
-	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 )

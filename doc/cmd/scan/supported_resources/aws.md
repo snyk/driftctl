@@ -85,6 +85,8 @@ As AWS documentation recommends, the below policy is granting only the permissio
                 "ec2:DescribeVpcClassicLinkDnsSupport",
                 "ec2:DescribeSubnets",
                 "ec2:DescribeNatGateways",
+                "ecr:DescribeRepositories",
+                "ecr:ListTagsForResource",
                 "iam:GetPolicy",
                 "iam:GetPolicyVersion",
                 "iam:GetRole",
@@ -105,8 +107,10 @@ As AWS documentation recommends, the below policy is granting only the permissio
                 "kms:ListAliases",
                 "kms:ListKeys",
                 "kms:ListResourceTags",
+                "lambda:GetEventSourceMapping",
                 "lambda:GetFunction",
                 "lambda:GetFunctionCodeSigningConfig",
+                "lambda:ListEventSourceMappings",
                 "lambda:ListFunctions",
                 "lambda:ListVersionsByFunction",
                 "rds:DescribeDBInstances",
@@ -187,7 +191,7 @@ As AWS documentation recommends, the below policy is granting only the permissio
 
 - [x] aws_lambda_function
 - [ ] aws_lambda_alias
-- [ ] aws_lambda_event_source_mapping
+- [x] aws_lambda_event_source_mapping
 - [ ] aws_lambda_function_event_invoke_config
 - [ ] aws_lambda_layer_version
 - [ ] aws_lambda_permission
@@ -287,6 +291,10 @@ As AWS documentation recommends, the below policy is granting only the permissio
 ## Cloudfront
 
 - [x] aws_cloudfront_distribution
+
+## ECR
+
+- [x] aws_ecr_repository
 
 ## KMS
 

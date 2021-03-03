@@ -83,8 +83,10 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "DynamoDB table", dirName: "dynamodb_table", wantErr: false},
 		{name: "Route53 Health Check", dirName: "route53_health_check", wantErr: false},
 		{name: "Cloudfront distribution", dirName: "cloudfront_distribution", wantErr: false},
+		{name: "ECR Repository", dirName: "ecr_repository", wantErr: false},
 		{name: "KMS key", dirName: "kms_key", wantErr: false},
 		{name: "KMS alias", dirName: "kms_alias", wantErr: false},
+		{name: "lambda event source mapping", dirName: "aws_lambda_event_source_mapping", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -159,6 +161,7 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 		{name: "github team", dirName: "github_team", wantErr: false},
 		{name: "github membership", dirName: "github_membership", wantErr: false},
 		{name: "github team membership", dirName: "github_team_membership", wantErr: false},
+		{name: "github branch protection", dirName: "github_branch_protection", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
