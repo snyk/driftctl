@@ -9,6 +9,7 @@ comment:
   require_head: yes
 
 coverage:
+  range: 50..70
   status:
     project:
       default:
