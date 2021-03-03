@@ -1,10 +1,12 @@
-# Adding a new resource type to driftctl
+# Add new resources
+
 ![Diagram](media/resource.png)
 
-## 1 Defining the resource
+## Defining the resource
 
-First step is to implement a new resource will be to define a go struct representing all fields that needs to be monitored for this kind of resource.
-You can find example in already implemented resource like aws.S3Bucket
+First step is to implement a new resource. To do that you need to define a go struct representing all fields that need to be monitored for this kind of resource.
+
+You can find several examples in already implemented resources like aws.S3Bucket:
 
 ```go
 type AwsS3Bucket struct {
@@ -45,6 +47,7 @@ func (s S3Bucket) NormalizeForProvider() (resource.Resource, error) {
 	err := normalizePolicy(&s)
 	return &s, err
 }
+
 func normalizePolicy(s *S3Bucket) error {
 	if s.Policy.Policy != nil {
 		jsonString, err := structure.NormalizeJsonString(*s.Policy.Policy)
@@ -59,19 +62,21 @@ func normalizePolicy(s *S3Bucket) error {
 
 You can implement different normalization for the state representation and the supplier one.
 
-## 2 Supplier and Deserializer
+## Supplier and Deserializer
 
 Then you will have to implement two interfaces:
-- `resource.supplier` is used to read resources list. It will call the cloud provider sdk to get the list of resources, and
-  the terraform provider to get the details for each of these resources.
+
+- `resource.supplier` is used to read resources list. It will call the cloud provider SDK to get the list of resources, and
+  the terraform provider to get the details for each of these resources
 - `remote.CTYDeserializer` is used to transform terraform cty output into your resource
 
 ### Supplier
 
-This is used to read resources list. It will call the cloud provider sdk to get the list of resources, and the
+This is used to read resources list. It will call the cloud provider SDK to get the list of resources, and the
 terraform provider to get the details for each of these resources.
 You can use an already implemented resource as example.
 Supplier constructor could use these arguments:
+
 - an instance of `ParallelRunner` that you will use to parallelize your call to the supplier:
 
 ```go
@@ -98,7 +103,7 @@ if err != nil {
 appendValueIntoMap(results, aws.AwsS3BucketResourceType, s3Bucket)
 ```
 
-- an instance of the cloud provider sdk that you will use to retrieve resources list.
+- an instance of the cloud provider SDK that you will use to retrieve resources list
 
 ### Deserializer
 
@@ -107,14 +112,15 @@ The interface contains a `Deserialize(values []cty.Value) ([]resource.Resource, 
 
 You should then deserialize the obtained cty values into your resource and return the list.
 
-Example: [aws_s3_bucket_deserializer.go](https://github.com/cloudskiff/driftctl/blob/master/pkg/resource/aws/deserializer/s3_bucket_deserializer.go)
+Example: [aws_s3_bucket_deserializer.go](https://github.com/cloudskiff/driftctl/blob/main/pkg/resource/aws/deserializer/s3_bucket_deserializer.go)
 
-## 3 Adding your resource
+## Adding your resource
 
 There are two files you are going to edit to make driftctl aware of your new resource.
 
-For the state reader you will need to add your `CTYDeserializer` implementation into `iac/deserializers.go`
+For the state reader you will need to add your `CTYDeserializer` implementation into `iac/deserializers.go`.
 Just add an instance in the list:
+
 ```go
 func Deserializers() []remote.CTYDeserializer {
 	return []remote.CTYDeserializer{
@@ -124,7 +130,8 @@ func Deserializers() []remote.CTYDeserializer {
 }
 ```
 
-Then in the cloud provider's init file (e.g. in `remote/aws/init.go`) add your new implementation for `resource.Supplier`:
+Then in the cloud provider's init file (e.g. in `remote/aws/init.go`), add your new implementation for `resource.Supplier`:
+
 ```go
 func Init() error {
 	provider, err := NewTerraFormProvider()
@@ -139,4 +146,4 @@ func Init() error {
 ```
 
 Don't forget to add unit tests after adding a new resource.
-You can also add acceptance test if you think it makes sense.
+You can also add acceptance tests if you think it makes sense.
