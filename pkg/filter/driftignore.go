@@ -12,14 +12,16 @@ import (
 )
 
 type DriftIgnore struct {
-	resExclusionList   map[string]struct{} // map[type.id] exists to ignore
-	driftExclusionList map[string][]string // map[type.id] contains path for drift to ignore
+	resExclusionList         map[string]struct{} // map[type.id] exists to ignore
+	resExclusionWildcardList map[string]struct{} // map[type.id] exists with wildcard to ignore
+	driftExclusionList       map[string][]string // map[type.id] contains path for drift to ignore
 }
 
 func NewDriftIgnore() *DriftIgnore {
 	d := DriftIgnore{
-		resExclusionList:   map[string]struct{}{},
-		driftExclusionList: map[string][]string{},
+		resExclusionList:         map[string]struct{}{},
+		resExclusionWildcardList: map[string]struct{}{},
+		driftExclusionList:       map[string][]string{},
 	}
 	err := d.readIgnoreFile()
 	if err != nil {
@@ -53,16 +55,20 @@ func (r *DriftIgnore) readIgnoreFile() error {
 			}).Warnf("unable to parse line, invalid length, got %d expected >= 2", nbArgs)
 			continue
 		}
+		res := strings.Join(typeVal[0:2], ".")
 		if nbArgs == 2 { // We want to ignore a resource (type.id)
 			logrus.WithFields(logrus.Fields{
 				"type": typeVal[0],
 				"id":   typeVal[1],
 			}).Debug("Found ignore resource rule in .driftignore")
-			r.resExclusionList[strings.Join(typeVal, ".")] = struct{}{}
+			resExclusionTypeList := r.resExclusionList
+			if strings.Contains(res, "*") {
+				resExclusionTypeList = r.resExclusionWildcardList
+			}
+			resExclusionTypeList[res] = struct{}{}
 			continue
 		}
 		// Here we want to ignore a drift (type.id.path.to.field)
-		res := strings.Join(typeVal[0:2], ".")
 		ignoreSublist, exists := r.driftExclusionList[res]
 		if !exists {
 			ignoreSublist = make([]string, 0, 1)
@@ -87,9 +93,17 @@ func (r *DriftIgnore) readIgnoreFile() error {
 }
 
 func (r *DriftIgnore) IsResourceIgnored(res resource.Resource) bool {
-	_, isExclusionRule := r.resExclusionList[fmt.Sprintf("%s.%s", res.TerraformType(), res.TerraformId())]
-	_, isExclusionWildcardRule := r.resExclusionList[fmt.Sprintf("%s.*", res.TerraformType())]
-	return isExclusionRule || isExclusionWildcardRule
+	strRes := fmt.Sprintf("%s.%s", res.TerraformType(), res.TerraformId())
+
+	if _, isExclusionRule := r.resExclusionList[strRes]; isExclusionRule {
+		return true
+	}
+	for resExclusion := range r.resExclusionWildcardList {
+		if wildcardMatchChecker(strRes, resExclusion) {
+			return true
+		}
+	}
+	return false
 }
 
 func (r *DriftIgnore) IsFieldIgnored(res resource.Resource, path []string) bool {
@@ -129,11 +143,33 @@ RuleCheck:
 	return false
 }
 
+//Check two strings recursively, pattern can contain wildcard
+func wildcardMatchChecker(str, pattern string) bool {
+	if str == "" && pattern == "" {
+		return true
+	}
+	if strings.HasPrefix(pattern, "*") {
+		if str != "" {
+			return wildcardMatchChecker(str[1:], pattern) || wildcardMatchChecker(str, pattern[1:])
+		}
+		return wildcardMatchChecker(str, pattern[1:])
+	}
+	if str != "" && pattern != "" && str[0] == pattern[0] {
+		return wildcardMatchChecker(str[1:], pattern[1:])
+	}
+	return false
+}
+
 /**
  * Read a line of ignore
+ * Handle multiple asterisks escaping
  * Handle split on dots and escaping
  */
 func readDriftIgnoreLine(line string) []string {
+	for strings.Contains(line, "**") {
+		line = strings.ReplaceAll(line, "**", "*")
+	}
+
 	var splitted []string
 	lastWordEnd := 0
 	for i := range line {
