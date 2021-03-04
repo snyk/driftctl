@@ -33,19 +33,19 @@ func TestIamPolicyAttachmentSanitizer_Execute(t *testing.T) {
 					&aws.AwsIamPolicyAttachment{
 						Id:        "wrongId",
 						PolicyArn: awssdk.String("arn"),
-						Users:     []string{"jean", "paul", "pierre"},
+						Users:     &[]string{"jean", "paul", "pierre"},
 					},
 					&aws.AwsIamPolicyAttachment{
 						Id:        "wrongId2",
 						PolicyArn: awssdk.String("thisisarn"),
-						Users:     []string{"jean", "paul", "jacques"},
+						Users:     &[]string{"jean", "paul", "jacques"},
 					},
 				},
 				ResourcesFromState: &[]resource.Resource{
 					&aws.AwsIamPolicyAttachment{
 						Id:        "wrongId",
 						PolicyArn: awssdk.String("fromstatearn"),
-						Users:     []string{"jean"},
+						Users:     &[]string{"jean"},
 					},
 				},
 			},
@@ -57,39 +57,39 @@ func TestIamPolicyAttachmentSanitizer_Execute(t *testing.T) {
 					&aws.AwsIamPolicyAttachment{
 						Id:        "jean-arn",
 						PolicyArn: awssdk.String("arn"),
-						Users:     []string{"jean"},
+						Users:     &[]string{"jean"},
 					},
 					&aws.AwsIamPolicyAttachment{
 						Id:        "paul-arn",
 						PolicyArn: awssdk.String("arn"),
-						Users:     []string{"paul"},
+						Users:     &[]string{"paul"},
 					},
 					&aws.AwsIamPolicyAttachment{
 						Id:        "pierre-arn",
 						PolicyArn: awssdk.String("arn"),
-						Users:     []string{"pierre"},
+						Users:     &[]string{"pierre"},
 					},
 					&aws.AwsIamPolicyAttachment{
 						Id:        "jean-thisisarn",
 						PolicyArn: awssdk.String("thisisarn"),
-						Users:     []string{"jean"},
+						Users:     &[]string{"jean"},
 					},
 					&aws.AwsIamPolicyAttachment{
 						Id:        "paul-thisisarn",
 						PolicyArn: awssdk.String("thisisarn"),
-						Users:     []string{"paul"},
+						Users:     &[]string{"paul"},
 					},
 					&aws.AwsIamPolicyAttachment{
 						Id:        "jacques-thisisarn",
 						PolicyArn: awssdk.String("thisisarn"),
-						Users:     []string{"jacques"},
+						Users:     &[]string{"jacques"},
 					},
 				},
 				ResourcesFromState: &[]resource.Resource{
 					&aws.AwsIamPolicyAttachment{
 						Id:        "jean-fromstatearn",
 						PolicyArn: awssdk.String("fromstatearn"),
-						Users:     []string{"jean"},
+						Users:     &[]string{"jean"},
 					},
 				},
 			},
@@ -104,19 +104,19 @@ func TestIamPolicyAttachmentSanitizer_Execute(t *testing.T) {
 					&aws.AwsIamPolicyAttachment{
 						Id:        "wrongId",
 						PolicyArn: awssdk.String("arn"),
-						Roles:     []string{"role1", "role2", "pierre"},
+						Roles:     &[]string{"role1", "role2", "pierre"},
 					},
 					&aws.AwsIamPolicyAttachment{
 						Id:        "wrongId2",
 						PolicyArn: awssdk.String("thisisarn"),
-						Roles:     []string{"role1", "role2", "role3"},
+						Roles:     &[]string{"role1", "role2", "role3"},
 					},
 				},
 				ResourcesFromState: &[]resource.Resource{
 					&aws.AwsIamPolicyAttachment{
 						Id:        "wrongId",
 						PolicyArn: awssdk.String("fromstatearn"),
-						Roles:     []string{"role1"},
+						Roles:     &[]string{"role1"},
 					},
 				},
 			},
@@ -128,39 +128,39 @@ func TestIamPolicyAttachmentSanitizer_Execute(t *testing.T) {
 					&aws.AwsIamPolicyAttachment{
 						Id:        "role1-arn",
 						PolicyArn: awssdk.String("arn"),
-						Roles:     []string{"role1"},
+						Roles:     &[]string{"role1"},
 					},
 					&aws.AwsIamPolicyAttachment{
 						Id:        "role2-arn",
 						PolicyArn: awssdk.String("arn"),
-						Roles:     []string{"role2"},
+						Roles:     &[]string{"role2"},
 					},
 					&aws.AwsIamPolicyAttachment{
 						Id:        "pierre-arn",
 						PolicyArn: awssdk.String("arn"),
-						Roles:     []string{"pierre"},
+						Roles:     &[]string{"pierre"},
 					},
 					&aws.AwsIamPolicyAttachment{
 						Id:        "role1-thisisarn",
 						PolicyArn: awssdk.String("thisisarn"),
-						Roles:     []string{"role1"},
+						Roles:     &[]string{"role1"},
 					},
 					&aws.AwsIamPolicyAttachment{
 						Id:        "role2-thisisarn",
 						PolicyArn: awssdk.String("thisisarn"),
-						Roles:     []string{"role2"},
+						Roles:     &[]string{"role2"},
 					},
 					&aws.AwsIamPolicyAttachment{
 						Id:        "role3-thisisarn",
 						PolicyArn: awssdk.String("thisisarn"),
-						Roles:     []string{"role3"},
+						Roles:     &[]string{"role3"},
 					},
 				},
 				ResourcesFromState: &[]resource.Resource{
 					&aws.AwsIamPolicyAttachment{
 						Id:        "role1-fromstatearn",
 						PolicyArn: awssdk.String("fromstatearn"),
-						Roles:     []string{"role1"},
+						Roles:     &[]string{"role1"},
 					},
 				},
 			},

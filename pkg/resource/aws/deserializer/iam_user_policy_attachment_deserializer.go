@@ -36,9 +36,9 @@ func (s IamUserPolicyAttachmentDeserializer) Deserialize(rawList []cty.Value) ([
 			Id:        fmt.Sprintf("%s-%s", *userPolicyAttachment.User, *userPolicyAttachment.PolicyArn), // generate unique id,
 			Name:      awssdk.String(userPolicyAttachment.Id),
 			PolicyArn: userPolicyAttachment.PolicyArn,
-			Users:     []string{*userPolicyAttachment.User},
-			Groups:    []string{},
-			Roles:     []string{},
+			Users:     &[]string{*userPolicyAttachment.User},
+			Groups:    &[]string{},
+			Roles:     &[]string{},
 		}
 		resources = append(resources, &policyAttachment)
 	}
