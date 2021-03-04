@@ -109,6 +109,48 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 				true,
 			},
 		},
+		{
+			name: "drift_ignore_wildcard",
+			resources: []resource.Resource{
+				&resource2.FakeResource{
+					Type: "type1",
+					Id:   "id1",
+				},
+				&resource2.FakeResource{
+					Type: "type2",
+					Id:   "id1",
+				},
+				&resource2.FakeResource{
+					Type: "type2",
+					Id:   "id11",
+				},
+				&resource2.FakeResource{
+					Type: "type2",
+					Id:   "id2",
+				},
+				&resource2.FakeResource{
+					Type: "type3",
+					Id:   "id100",
+				},
+				&resource2.FakeResource{
+					Type: "type3",
+					Id:   "id101",
+				},
+				&resource2.FakeResource{
+					Type: "type4",
+					Id:   "id\\WithBac*slash***\\*\\",
+				},
+			},
+			want: []bool{
+				false,
+				true,
+				true,
+				false,
+				true,
+				false,
+				true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -279,6 +321,31 @@ func Test_escapableSplit(t *testing.T) {
 			name: "wildcard dot",
 			line: "*.subfoobar",
 			want: []string{"*", "subfoobar"},
+		},
+		{
+			name: "text wildcard dot",
+			line: "res*.subfoobar",
+			want: []string{"res*", "subfoobar"},
+		},
+		{
+			name: "missing text multiple wildcard dot",
+			line: "r*s*.s**ub***ob********a*r",
+			want: []string{"r*s*", "s*ub*ob*a*r"},
+		},
+		{
+			name: "prefix wildcard dot",
+			line: "*res.subfoobar",
+			want: []string{"*res", "subfoobar"},
+		},
+		{
+			name: "suffix multiple wildcard dot",
+			line: "res.subfoobar*****",
+			want: []string{"res", "subfoobar*"},
+		},
+		{
+			name: "dot wildcard",
+			line: "res.*",
+			want: []string{"res", "*"},
 		},
 	}
 	for _, tt := range tests {
