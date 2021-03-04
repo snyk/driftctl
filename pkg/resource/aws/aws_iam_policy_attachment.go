@@ -4,12 +4,12 @@ package aws
 const AwsIamPolicyAttachmentResourceType = "aws_iam_policy_attachment"
 
 type AwsIamPolicyAttachment struct {
-	Groups    []string `cty:"groups"`
-	Id        string   `cty:"id" diff:"Id, identifier" computed:"true"`
-	Name      *string  `cty:"name" diff:"-"`
-	PolicyArn *string  `cty:"policy_arn"`
-	Roles     []string `cty:"roles"`
-	Users     []string `cty:"users"`
+	Groups    *[]string `cty:"groups"`
+	Id        string    `cty:"id" diff:"Id, identifier" computed:"true"`
+	Name      *string   `cty:"name" diff:"-"`
+	PolicyArn *string   `cty:"policy_arn"`
+	Roles     *[]string `cty:"roles"`
+	Users     *[]string `cty:"users"`
 }
 
 func (r *AwsIamPolicyAttachment) TerraformId() string {

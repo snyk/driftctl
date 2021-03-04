@@ -50,28 +50,33 @@ func (m IamPolicyAttachmentSanitizer) Execute(remoteResources, resourcesFromStat
 }
 
 func (m IamPolicyAttachmentSanitizer) sanitize(policyAttachment *resourceaws.AwsIamPolicyAttachment) []resource.Resource {
-	newResources := make([]resource.Resource, 0, len(policyAttachment.Users))
 
-	// we create one attachment per user
-	for _, user := range policyAttachment.Users {
-		newAttachment := *policyAttachment
+	var newResources []resource.Resource
 
-		// Id is generated with unique id in state so we override it with something repeatable
-		newAttachment.Id = fmt.Sprintf("%s-%s", user, *policyAttachment.PolicyArn)
+	if policyAttachment.Users != nil {
+		// we create one attachment per user
+		for _, user := range *policyAttachment.Users {
+			newAttachment := *policyAttachment
 
-		newAttachment.Users = []string{user}
-		newResources = append(newResources, &newAttachment)
+			// Id is generated with unique id in state so we override it with something repeatable
+			newAttachment.Id = fmt.Sprintf("%s-%s", user, *policyAttachment.PolicyArn)
+
+			newAttachment.Users = &[]string{user}
+			newResources = append(newResources, &newAttachment)
+		}
 	}
 
-	// we create one attachment per role
-	for _, role := range policyAttachment.Roles {
-		newAttachment := *policyAttachment
+	if policyAttachment.Roles != nil {
+		// we create one attachment per role
+		for _, role := range *policyAttachment.Roles {
+			newAttachment := *policyAttachment
 
-		// Id is generated with unique id in state so we override it with something repeatable
-		newAttachment.Id = fmt.Sprintf("%s-%s", role, *policyAttachment.PolicyArn)
+			// Id is generated with unique id in state so we override it with something repeatable
+			newAttachment.Id = fmt.Sprintf("%s-%s", role, *policyAttachment.PolicyArn)
 
-		newAttachment.Roles = []string{role}
-		newResources = append(newResources, &newAttachment)
+			newAttachment.Roles = &[]string{role}
+			newResources = append(newResources, &newAttachment)
+		}
 	}
 	return newResources
 }
