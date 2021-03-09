@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -35,7 +36,7 @@ func (r *DriftIgnore) readIgnoreFile() error {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
+	for lineNumber := 1; scanner.Scan(); lineNumber++ {
 		line := scanner.Text()
 		if line == "" || strings.HasPrefix(line, "#") {
 			logrus.WithFields(logrus.Fields{
@@ -47,7 +48,8 @@ func (r *DriftIgnore) readIgnoreFile() error {
 		nbArgs := len(typeVal)
 		if nbArgs < 2 {
 			logrus.WithFields(logrus.Fields{
-				"line": line,
+				"line":    strconv.Itoa(lineNumber),
+				"content": line,
 			}).Warnf("unable to parse line, invalid length, got %d expected >= 2", nbArgs)
 			continue
 		}
