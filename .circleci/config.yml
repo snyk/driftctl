@@ -41,6 +41,7 @@ jobs:
       - run:
           name: Run acceptance tests
           command: make acc
+          no_output_timeout: 30m
       - run:
           name: Discord notification
           when: on_fail
