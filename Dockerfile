@@ -9,11 +9,10 @@ RUN make deps
 COPY . .
 RUN OS_ARCH=${OS}/${ARCH} make release
 
-FROM gcr.io/distroless/base-debian10
+FROM alpine:3.13
 
 ARG OS="linux"
 ARG ARCH="amd64"
-ENV HOME=/home
 
 WORKDIR /app
 COPY --from=builder /go/src/app/bin/driftctl_${OS}_${ARCH} /bin/driftctl
