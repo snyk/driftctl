@@ -8,7 +8,7 @@ type AwsDbSubnetGroup struct {
 	Description *string           `cty:"description"`
 	Id          string            `cty:"id" computed:"true"`
 	Name        *string           `cty:"name" computed:"true"`
-	NamePrefix  *string           `cty:"name_prefix" computed:"true"`
+	NamePrefix  *string           `cty:"name_prefix" computed:"true" diff:"-"`
 	SubnetIds   []string          `cty:"subnet_ids"`
 	Tags        map[string]string `cty:"tags"`
 }
