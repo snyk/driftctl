@@ -34,7 +34,7 @@ type AwsDbInstance struct {
 	InstanceClass                      *string            `cty:"instance_class"`
 	Iops                               *int               `cty:"iops"`
 	KmsKeyId                           *string            `cty:"kms_key_id" computed:"true"`
-	LatestRestorableTime               *string            `cty:"latest_restorable_time" computed:"true"`
+	LatestRestorableTime               *string            `cty:"latest_restorable_time" computed:"true" diff:"-"`
 	LicenseModel                       *string            `cty:"license_model" computed:"true"`
 	MaintenanceWindow                  *string            `cty:"maintenance_window" computed:"true"`
 	MaxAllocatedStorage                *int               `cty:"max_allocated_storage"`
