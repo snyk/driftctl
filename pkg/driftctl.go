@@ -28,7 +28,7 @@ func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier
 func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	remoteResources, resourcesFromState, err := d.scan()
 	if err != nil {
-		return nil, errors.Wrap(err, "Unable to scan resources")
+		return nil, errors.WithStack(err)
 	}
 
 	middleware := middlewares.NewChain(
