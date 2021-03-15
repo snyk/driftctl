@@ -2,18 +2,18 @@ package output
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"strings"
 
-	"github.com/cloudskiff/driftctl/pkg/remote"
-
-	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/fatih/color"
 	"github.com/nsf/jsondiff"
 	"github.com/r3labs/diff/v2"
 
-	"github.com/aws/aws-sdk-go/aws/awsutil"
+	"github.com/cloudskiff/driftctl/pkg/analyser"
+	"github.com/cloudskiff/driftctl/pkg/remote"
+	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
 const ConsoleOutputType = "console"
@@ -106,7 +106,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 	}
 
 	if enumerationErrorMessage != "" {
-		fmt.Printf("\n%s\n", color.YellowString(enumerationErrorMessage))
+		_, _ = fmt.Fprintf(os.Stderr, "\n%s\n", color.YellowString(enumerationErrorMessage))
 	}
 
 	return nil

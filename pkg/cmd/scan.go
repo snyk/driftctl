@@ -7,6 +7,11 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/jmespath/go-jmespath"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+
 	"github.com/cloudskiff/driftctl/pkg"
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	cmderrors "github.com/cloudskiff/driftctl/pkg/cmd/errors"
@@ -18,10 +23,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
-	"github.com/jmespath/go-jmespath"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 )
 
 type ScanOptions struct {
@@ -122,6 +123,8 @@ func NewScanCmd() *cobra.Command {
 }
 
 func scanRun(opts *ScanOptions) error {
+	selectedOutput := output.GetOutput(opts.Output)
+
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
@@ -161,7 +164,7 @@ func scanRun(opts *ScanOptions) error {
 		return err
 	}
 
-	err = output.GetOutput(opts.Output).Write(analysis)
+	err = selectedOutput.Write(analysis)
 	if err != nil {
 		return err
 	}

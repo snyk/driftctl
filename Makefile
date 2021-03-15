@@ -65,7 +65,7 @@ deps:
 
 .PHONY: install-tools
 install-tools:
-	$(GOGET) -u gotest.tools/gotestsum
+	$(GOGET) gotest.tools/gotestsum
 	$(GOGET) github.com/vektra/mockery/.../
 
 

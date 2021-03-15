@@ -2,12 +2,13 @@ package terraform
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/cloudskiff/driftctl/pkg/output"
 
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	tf "github.com/cloudskiff/driftctl/pkg/terraform"
@@ -125,11 +126,11 @@ func (p *TerraformProvider) configure(alias string) error {
 		"alias": alias,
 	}).Debug("New gRPC client started")
 
-	fmt.Printf("Terraform provider initialized (name=%s", p.Config.Name)
+	output.Printf("Terraform provider initialized (name=%s", p.Config.Name)
 	if alias != "" {
-		fmt.Printf(", alias=%s", alias)
+		output.Printf(", alias=%s", alias)
 	}
-	fmt.Print(")\n")
+	output.Printf(")\n")
 
 	return nil
 }

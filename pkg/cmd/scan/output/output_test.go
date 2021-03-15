@@ -2,9 +2,12 @@ package output
 
 import (
 	"fmt"
+	"reflect"
+	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
+	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/github"
@@ -260,4 +263,50 @@ func fakeAnalysisWithGithubEnumerationError() *analyser.Analysis {
 		},
 	})
 	return &a
+}
+
+func TestGetPrinter(t *testing.T) {
+	tests := []struct {
+		name string
+		path string
+		key  string
+		want output.Printer
+	}{
+		{
+			name: "json file output",
+			path: "/path/to/file",
+			key:  JSONOutputType,
+			want: output.NewConsolePrinter(),
+		},
+		{
+			name: "json stdout output",
+			path: "stdout",
+			key:  JSONOutputType,
+			want: &output.VoidPrinter{},
+		},
+		{
+			name: "json /dev/stdout output",
+			path: "/dev/stdout",
+			key:  JSONOutputType,
+			want: &output.VoidPrinter{},
+		},
+		{
+			name: "console stdout output",
+			path: "stdout",
+			key:  ConsoleOutputType,
+			want: output.NewConsolePrinter(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GetPrinter(OutputConfig{
+				Key: tt.key,
+				Options: map[string]string{
+					"path": tt.path,
+				},
+			}); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetPrinter() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
