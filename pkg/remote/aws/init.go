@@ -2,6 +2,7 @@ package aws
 
 import (
 	"github.com/cloudskiff/driftctl/pkg/alerter"
+	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -14,8 +15,8 @@ const RemoteAWSTerraform = "aws+tf"
  * Initialize remote (configure credentials, launch tf providers and start gRPC clients)
  * Required to use Scanner
  */
-func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, supplierLibrary *resource.SupplierLibrary) error {
-	provider, err := NewAWSTerraformProvider()
+func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, supplierLibrary *resource.SupplierLibrary, progress output.Progress) error {
+	provider, err := NewAWSTerraformProvider(progress)
 	if err != nil {
 		return err
 	}
