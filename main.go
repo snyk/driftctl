@@ -64,15 +64,15 @@ func run() int {
 		if cmd.IsReportingEnabled(&driftctlCmd.Command) {
 			sentry.CaptureException(err)
 		}
-		fmt.Fprintln(os.Stderr, color.RedString("%s", err))
+		_, _ = fmt.Fprintln(os.Stderr, color.RedString("%s", err))
 		return 1
 	}
 
 	if checkVersion {
 		newVersion := <-latestVersionChan
 		if newVersion != "" {
-			fmt.Println("\n\nYour version of driftctl is outdated, please upgrade !")
-			fmt.Printf("Current: %s; Latest: %s\n", version.Current(), newVersion)
+			_, _ = fmt.Fprintln(os.Stderr, "\n\nYour version of driftctl is outdated, please upgrade !")
+			_, _ = fmt.Fprintf(os.Stderr, "Current: %s; Latest: %s\n", version.Current(), newVersion)
 		}
 	}
 
