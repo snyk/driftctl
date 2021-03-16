@@ -7,13 +7,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestProgressTimeout(t *testing.T) {
+func TestProgressTimeoutDoesNotInc(t *testing.T) {
 	progress := NewProgress()
 	progress.Start()
-	time.Sleep(progressTimeout + 1)
-	progress.Inc()  // should not hang
+	progress.Stop() // should not hang
+	progress.Inc()  // should not hang or inc
+	assert.Equal(t, uint64(0), progress.Val())
+}
+
+func TestProgressTimeoutDoesNotHang(t *testing.T) {
+	progress := NewProgress()
+	progress.Start()
+	time.Sleep(progressTimeout)
+	for progress.started.Load() == true {
+	}
+	progress.Inc()  // should not hang or inc
 	progress.Stop() // should not hang
 	assert.Equal(t, uint64(0), progress.Val())
+
 }
 
 func TestProgress(t *testing.T) {
