@@ -47,8 +47,8 @@ func IsSupported(key string) bool {
 	return false
 }
 
-func GetOutput(config OutputConfig) Output {
-	output.ChangePrinter(GetPrinter(config))
+func GetOutput(config OutputConfig, quiet bool) Output {
+	output.ChangePrinter(GetPrinter(config, quiet))
 
 	switch config.Key {
 	case JSONOutputType:
@@ -60,7 +60,11 @@ func GetOutput(config OutputConfig) Output {
 	}
 }
 
-func GetPrinter(config OutputConfig) output.Printer {
+func GetPrinter(config OutputConfig, quiet bool) output.Printer {
+	if quiet {
+		return &output.VoidPrinter{}
+	}
+
 	switch config.Key {
 	case JSONOutputType:
 		if isStdOut(config.Options["path"]) {

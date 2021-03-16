@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/output"
+
 	"github.com/cloudskiff/driftctl/pkg/iac"
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
@@ -96,7 +98,9 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 
 			if shouldUpdate {
 				var err error
-				realProvider, err = aws.NewAWSTerraformProvider()
+				progress := &output.MockProgress{}
+				progress.On("Inc").Return()
+				realProvider, err = aws.NewAWSTerraformProvider(progress)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -171,7 +175,9 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 
 			if shouldUpdate {
 				var err error
-				realProvider, err = github.NewGithubTerraformProvider()
+				progress := &output.MockProgress{}
+				progress.On("Inc").Return()
+				realProvider, err = github.NewGithubTerraformProvider(progress)
 				if err != nil {
 					t.Fatal(err)
 				}

@@ -40,14 +40,16 @@ type TerraformProvider struct {
 	schemas           map[string]providers.Schema
 	Config            TerraformProviderConfig
 	runner            *parallel.ParallelRunner
+	progress          output.Progress
 }
 
-func NewTerraformProvider(installer *tf.ProviderInstaller, config TerraformProviderConfig) (*TerraformProvider, error) {
+func NewTerraformProvider(installer *tf.ProviderInstaller, config TerraformProviderConfig, progress output.Progress) (*TerraformProvider, error) {
 	p := TerraformProvider{
 		providerInstaller: installer,
 		runner:            parallel.NewParallelRunner(context.TODO(), 10),
 		grpcProviders:     make(map[string]*plugin.GRPCProvider),
 		Config:            config,
+		progress:          progress,
 	}
 	return &p, nil
 }
@@ -203,6 +205,7 @@ func (p *TerraformProvider) ReadResource(args tf.ReadResourceArgs) (*cty.Value, 
 	if err != nil {
 		return nil, err
 	}
+	p.progress.Inc()
 	return &newState, nil
 }
 

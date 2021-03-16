@@ -267,16 +267,24 @@ func fakeAnalysisWithGithubEnumerationError() *analyser.Analysis {
 
 func TestGetPrinter(t *testing.T) {
 	tests := []struct {
-		name string
-		path string
-		key  string
-		want output.Printer
+		name  string
+		path  string
+		key   string
+		quiet bool
+		want  output.Printer
 	}{
 		{
 			name: "json file output",
 			path: "/path/to/file",
 			key:  JSONOutputType,
 			want: output.NewConsolePrinter(),
+		},
+		{
+			name:  "json file output quiet",
+			path:  "/path/to/file",
+			key:   JSONOutputType,
+			quiet: true,
+			want:  &output.VoidPrinter{},
 		},
 		{
 			name: "json stdout output",
@@ -296,6 +304,13 @@ func TestGetPrinter(t *testing.T) {
 			key:  ConsoleOutputType,
 			want: output.NewConsolePrinter(),
 		},
+		{
+			name:  "quiet console stdout output",
+			path:  "stdout",
+			quiet: true,
+			key:   ConsoleOutputType,
+			want:  &output.VoidPrinter{},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -304,7 +319,7 @@ func TestGetPrinter(t *testing.T) {
 				Options: map[string]string{
 					"path": tt.path,
 				},
-			}); !reflect.DeepEqual(got, tt.want) {
+			}, tt.quiet); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetPrinter() = %v, want %v", got, tt.want)
 			}
 		})
