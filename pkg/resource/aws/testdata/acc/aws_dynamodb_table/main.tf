@@ -2,8 +2,12 @@ provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_dynamodb_table" "basic-dynamodb-table" {
-  name           = "GameScores"
+locals {
+    timestamp = formatdate("YYYYMMDDhhmmss", timestamp())
+}
+
+resource "aws_dynamodb_table" "simple-dynamo-test" {
+  name           = "simple-dynamo-test-${local.timestamp}"
   billing_mode   = "PROVISIONED"
   read_capacity  = 20
   write_capacity = 20
@@ -46,8 +50,8 @@ resource "aws_dynamodb_table" "basic-dynamodb-table" {
   }
 }
 
-resource "aws_dynamodb_table" "example" {
-  name = "example"
+resource "aws_dynamodb_table" "global-dynamo-test" {
+  name = "global-dynamo-test-${local.timestamp}"
   hash_key = "TestTableHashKey"
   billing_mode = "PAY_PER_REQUEST"
   stream_enabled = true
