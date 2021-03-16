@@ -20,6 +20,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/cloudskiff/driftctl/pkg/iac/supplier"
 	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
+	globaloutput "github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -32,6 +33,7 @@ type ScanOptions struct {
 	To       string
 	Output   output.OutputConfig
 	Filter   *jmespath.JMESPath
+	Quiet    bool
 }
 
 func NewScanCmd() *cobra.Command {
@@ -77,6 +79,8 @@ func NewScanCmd() *cobra.Command {
 				opts.Filter = expr
 			}
 
+			opts.Quiet, _ = cmd.Flags().GetBool("quiet")
+
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -85,6 +89,12 @@ func NewScanCmd() *cobra.Command {
 	}
 
 	fl := cmd.Flags()
+	fl.BoolP(
+		"quiet",
+		"",
+		false,
+		"Do not display anything but scan results",
+	)
 	fl.StringP(
 		"filter",
 		"",
@@ -123,7 +133,7 @@ func NewScanCmd() *cobra.Command {
 }
 
 func scanRun(opts *ScanOptions) error {
-	selectedOutput := output.GetOutput(opts.Output)
+	selectedOutput := output.GetOutput(opts.Output, opts.Quiet)
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -132,7 +142,9 @@ func scanRun(opts *ScanOptions) error {
 	providerLibrary := terraform.NewProviderLibrary()
 	supplierLibrary := resource.NewSupplierLibrary()
 
-	err := remote.Activate(opts.To, alerter, providerLibrary, supplierLibrary)
+	progress := globaloutput.NewProgress()
+
+	err := remote.Activate(opts.To, alerter, providerLibrary, supplierLibrary, progress)
 	if err != nil {
 		return err
 	}
@@ -158,7 +170,9 @@ func scanRun(opts *ScanOptions) error {
 		ctl.Stop()
 	}()
 
+	progress.Start()
 	analysis, err := ctl.Run()
+	progress.Stop()
 
 	if err != nil {
 		return err

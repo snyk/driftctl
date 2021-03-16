@@ -2,6 +2,7 @@ package remote
 
 import (
 	"github.com/cloudskiff/driftctl/pkg/alerter"
+	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/github"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -23,12 +24,12 @@ func IsSupported(remote string) bool {
 	return false
 }
 
-func Activate(remote string, alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, supplierLibrary *resource.SupplierLibrary) error {
+func Activate(remote string, alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, supplierLibrary *resource.SupplierLibrary, progress output.Progress) error {
 	switch remote {
 	case aws.RemoteAWSTerraform:
-		return aws.Init(alerter, providerLibrary, supplierLibrary)
+		return aws.Init(alerter, providerLibrary, supplierLibrary, progress)
 	case github.RemoteGithubTerraform:
-		return github.Init(alerter, providerLibrary, supplierLibrary)
+		return github.Init(alerter, providerLibrary, supplierLibrary, progress)
 	default:
 		return errors.Errorf("unsupported remote '%s'", remote)
 	}
