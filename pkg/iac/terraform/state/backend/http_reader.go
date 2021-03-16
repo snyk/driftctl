@@ -15,15 +15,23 @@ type HTTPBackend struct {
 	reader io.ReadCloser
 }
 
-func NewHTTPReader(url string) (*HTTPBackend, error) {
-	client := &http.Client{}
-
-	res, err := client.Get(url)
+func NewHTTPReader(rawURL string, opts *Options) (*HTTPBackend, error) {
+	req, err := http.NewRequest(http.MethodGet, rawURL, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return &HTTPBackend{url, res.Body}, nil
+	for key, value := range opts.Headers {
+		req.Header.Add(key, value)
+	}
+
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &HTTPBackend{rawURL, res.Body}, nil
 }
 
 func (h *HTTPBackend) Read(p []byte) (n int, err error) {

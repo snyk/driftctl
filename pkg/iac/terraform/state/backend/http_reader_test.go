@@ -11,7 +11,8 @@ import (
 
 func TestNewHTTPReader(t *testing.T) {
 	type args struct {
-		url string
+		url     string
+		options *Options
 	}
 	tests := []struct {
 		name    string
@@ -20,17 +21,25 @@ func TestNewHTTPReader(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Should fail on wrong URL",
+			name: "Should fail with wrong URL",
 			args: args{
 				url: "wrong_url",
+				options: &Options{
+					Headers: map[string]string{},
+				},
 			},
 			wantURL: "",
 			wantErr: true,
 		},
 		{
-			name: "Should fetch URL",
+			name: "Should fetch URL with auth header",
 			args: args{
 				url: "https://raw.githubusercontent.com/cloudskiff/driftctl/main/.dockerignore",
+				options: &Options{
+					Headers: map[string]string{
+						"Authorization": "Basic Test",
+					},
+				},
 			},
 			wantURL: "https://raw.githubusercontent.com/cloudskiff/driftctl/main/.dockerignore",
 			wantErr: false,
@@ -38,7 +47,7 @@ func TestNewHTTPReader(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewHTTPReader(tt.args.url)
+			got, err := NewHTTPReader(tt.args.url, tt.args.options)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
