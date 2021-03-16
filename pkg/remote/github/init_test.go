@@ -1,9 +1,12 @@
 package github
 
-import "github.com/cloudskiff/driftctl/pkg/terraform"
+import (
+	"github.com/cloudskiff/driftctl/pkg/output"
+	"github.com/cloudskiff/driftctl/pkg/terraform"
+)
 
 func InitTestGithubProvider(providerLibrary *terraform.ProviderLibrary) (*GithubTerraformProvider, error) {
-	provider, err := NewGithubTerraformProvider()
+	provider, err := NewGithubTerraformProvider(&output.MockProgress{})
 	if err != nil {
 		return nil, err
 	}

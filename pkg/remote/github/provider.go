@@ -3,6 +3,8 @@ package github
 import (
 	"os"
 
+	"github.com/cloudskiff/driftctl/pkg/output"
+
 	"github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	tf "github.com/cloudskiff/driftctl/pkg/terraform"
 )
@@ -17,7 +19,7 @@ type githubConfig struct {
 	Organization string
 }
 
-func NewGithubTerraformProvider() (*GithubTerraformProvider, error) {
+func NewGithubTerraformProvider(progress output.Progress) (*GithubTerraformProvider, error) {
 	p := &GithubTerraformProvider{}
 	providerKey := "github"
 	installer, err := tf.NewProviderInstaller(tf.ProviderConfig{
@@ -35,7 +37,7 @@ func NewGithubTerraformProvider() (*GithubTerraformProvider, error) {
 				Owner: p.GetConfig().getDefaultOwner(),
 			}
 		},
-	})
+	}, progress)
 	if err != nil {
 		return nil, err
 	}
