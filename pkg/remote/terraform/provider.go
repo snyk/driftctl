@@ -128,11 +128,11 @@ func (p *TerraformProvider) configure(alias string) error {
 		"alias": alias,
 	}).Debug("New gRPC client started")
 
-	output.Printf("Terraform provider initialized (name=%s", p.Config.Name)
+	logrus.Debugf("Terraform provider initialized (name=%s", p.Config.Name)
 	if alias != "" {
-		output.Printf(", alias=%s", alias)
+		logrus.Debugf(", alias=%s", alias)
 	}
-	output.Printf(")\n")
+	logrus.Debugf(")\n")
 
 	return nil
 }
