@@ -135,7 +135,7 @@ func NewScanCmd() *cobra.Command {
 		"H",
 		map[string]string{},
 		"Use those HTTP headers to query the provided URL.\n"+
-			"Only used with tfstate+http backend for now.\n",
+			"Only used with tfstate+http(s) backend for now.\n",
 	)
 
 	return cmd
