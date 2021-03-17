@@ -157,6 +157,10 @@ func (p *TerraformProvider) ReadResource(args tf.ReadResourceArgs) (*cty.Value, 
 		delete(args.Attributes, "alias")
 	}
 
+	if alias != p.Config.DefaultAlias {
+		return &cty.NilVal, nil
+	}
+
 	p.lock.Lock()
 	if p.grpcProviders[alias] == nil {
 		err := p.configure(alias)
@@ -216,4 +220,8 @@ func (p *TerraformProvider) Cleanup() {
 		}).Debug("Closing gRPC client")
 		client.Close()
 	}
+}
+
+func (p *TerraformProvider) GetConfig() TerraformProviderConfig {
+	return p.Config
 }
