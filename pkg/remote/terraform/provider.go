@@ -10,8 +10,6 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/output"
 
-	"github.com/cloudskiff/driftctl/pkg/parallel"
-	tf "github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/eapache/go-resiliency/retrier"
 	"github.com/hashicorp/terraform/plugin"
 	"github.com/hashicorp/terraform/plugin/discovery"
@@ -21,6 +19,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+
+	"github.com/cloudskiff/driftctl/pkg/parallel"
+	tf "github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
 // "alias" in these struct are a way to namespace gRPC clients.
@@ -128,11 +129,10 @@ func (p *TerraformProvider) configure(alias string) error {
 		"alias": alias,
 	}).Debug("New gRPC client started")
 
-	logrus.Debugf("Terraform provider initialized (name=%s", p.Config.Name)
-	if alias != "" {
-		logrus.Debugf(", alias=%s", alias)
-	}
-	logrus.Debugf(")\n")
+	logrus.WithFields(logrus.Fields{
+		"name":  p.Config.Name,
+		"alias": alias,
+	}).Debug("Terraform provider initialized")
 
 	return nil
 }
