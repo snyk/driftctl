@@ -131,7 +131,7 @@ func NewScanCmd() *cobra.Command {
 			"Accepted values are: "+strings.Join(supportedRemotes, ",")+"\n",
 	)
 	fl.StringToStringVarP(&opts.BackendOptions.Headers,
-		"header",
+		"headers",
 		"H",
 		map[string]string{},
 		"Use those HTTP headers to query the provided URL.\n"+
