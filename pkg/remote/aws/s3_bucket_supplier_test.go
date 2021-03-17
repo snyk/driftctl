@@ -7,7 +7,6 @@ import (
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
@@ -20,6 +19,7 @@ import (
 	"github.com/cloudskiff/driftctl/test"
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	"github.com/cloudskiff/driftctl/test/mocks"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestS3BucketSupplier_Resources(t *testing.T) {
