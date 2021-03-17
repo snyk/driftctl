@@ -29,7 +29,7 @@ func NewCloudfrontDistributionSupplier(provider *AWSTerraformProvider) *Cloudfro
 	}
 }
 
-func (s CloudfrontDistributionSupplier) Resources() ([]resource.Resource, error) {
+func (s *CloudfrontDistributionSupplier) Resources() ([]resource.Resource, error) {
 	distributions, err := s.client.ListAllDistributions()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsCloudfrontDistributionResourceType)
@@ -50,7 +50,7 @@ func (s CloudfrontDistributionSupplier) Resources() ([]resource.Resource, error)
 	return s.deserializer.Deserialize(resources)
 }
 
-func (s CloudfrontDistributionSupplier) readCloudfrontDistribution(distribution cloudfront.DistributionSummary) (cty.Value, error) {
+func (s *CloudfrontDistributionSupplier) readCloudfrontDistribution(distribution cloudfront.DistributionSummary) (cty.Value, error) {
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *distribution.Id,
 		Ty: aws.AwsCloudfrontDistributionResourceType,

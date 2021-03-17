@@ -33,7 +33,7 @@ func NewIamRolePolicySupplier(provider *AWSTerraformProvider) *IamRolePolicySupp
 	}
 }
 
-func (s IamRolePolicySupplier) Resources() ([]resource.Resource, error) {
+func (s *IamRolePolicySupplier) Resources() ([]resource.Resource, error) {
 	policies, err := listIamRolePolicies(s.client, resourceaws.AwsIamRolePolicyResourceType)
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (s IamRolePolicySupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s IamRolePolicySupplier) readRes(name string) (cty.Value, error) {
+func (s *IamRolePolicySupplier) readRes(name string) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamRolePolicyResourceType,

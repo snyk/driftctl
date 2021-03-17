@@ -33,7 +33,7 @@ func NewIamUserPolicySupplier(provider *AWSTerraformProvider) *IamUserPolicySupp
 	}
 }
 
-func (s IamUserPolicySupplier) Resources() ([]resource.Resource, error) {
+func (s *IamUserPolicySupplier) Resources() ([]resource.Resource, error) {
 	users, err := listIamUsers(s.client, resourceaws.AwsIamUserPolicyResourceType)
 	if err != nil {
 		return nil, err
@@ -66,7 +66,7 @@ func (s IamUserPolicySupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s IamUserPolicySupplier) readRes(policyName string) (cty.Value, error) {
+func (s *IamUserPolicySupplier) readRes(policyName string) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamUserPolicyResourceType,

@@ -32,7 +32,7 @@ func NewEC2EbsVolumeSupplier(provider *AWSTerraformProvider) *EC2EbsVolumeSuppli
 	}
 }
 
-func (s EC2EbsVolumeSupplier) Resources() ([]resource.Resource, error) {
+func (s *EC2EbsVolumeSupplier) Resources() ([]resource.Resource, error) {
 	volumes, err := s.client.ListAllVolumes()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEbsVolumeResourceType)
@@ -53,7 +53,7 @@ func (s EC2EbsVolumeSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s EC2EbsVolumeSupplier) readEbsVolume(volume ec2.Volume) (cty.Value, error) {
+func (s *EC2EbsVolumeSupplier) readEbsVolume(volume ec2.Volume) (cty.Value, error) {
 	id := aws.StringValue(volume.VolumeId)
 	resVolume, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: resourceaws.AwsEbsVolumeResourceType,

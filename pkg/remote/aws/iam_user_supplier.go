@@ -31,7 +31,7 @@ func NewIamUserSupplier(provider *AWSTerraformProvider) *IamUserSupplier {
 	}
 }
 
-func (s IamUserSupplier) Resources() ([]resource.Resource, error) {
+func (s *IamUserSupplier) Resources() ([]resource.Resource, error) {
 	users, err := listIamUsers(s.client, resourceaws.AwsIamUserResourceType)
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (s IamUserSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s IamUserSupplier) readRes(user *iam.User) (cty.Value, error) {
+func (s *IamUserSupplier) readRes(user *iam.User) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamUserResourceType,

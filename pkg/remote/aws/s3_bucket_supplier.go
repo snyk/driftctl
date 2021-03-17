@@ -28,7 +28,7 @@ func NewS3BucketSupplier(provider *AWSTerraformProvider, repository repository.S
 	}
 }
 
-func (s S3BucketSupplier) Resources() ([]resource.Resource, error) {
+func (s *S3BucketSupplier) Resources() ([]resource.Resource, error) {
 	buckets, err := s.repository.ListAllBuckets()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsS3BucketResourceType)

@@ -36,7 +36,7 @@ func NewSubnetSupplier(provider *AWSTerraformProvider) *SubnetSupplier {
 	}
 }
 
-func (s SubnetSupplier) Resources() ([]resource.Resource, error) {
+func (s *SubnetSupplier) Resources() ([]resource.Resource, error) {
 	input := ec2.DescribeSubnetsInput{}
 	var subnets []*ec2.Subnet
 	var defaultSubnets []*ec2.Subnet
@@ -64,6 +64,11 @@ func (s SubnetSupplier) Resources() ([]resource.Resource, error) {
 		})
 	}
 
+	subnetResources, err := s.subnetRunner.Wait()
+	if err != nil {
+		return nil, err
+	}
+
 	for _, item := range defaultSubnets {
 		res := *item
 		s.defaultSubnetRunner.Run(func() (cty.Value, error) {
@@ -73,10 +78,6 @@ func (s SubnetSupplier) Resources() ([]resource.Resource, error) {
 
 	// Retrieve results from terraform provider
 	defaultSubnetResources, err := s.defaultSubnetRunner.Wait()
-	if err != nil {
-		return nil, err
-	}
-	subnetResources, err := s.subnetRunner.Wait()
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +99,7 @@ func (s SubnetSupplier) Resources() ([]resource.Resource, error) {
 	return resources, nil
 }
 
-func (s SubnetSupplier) readSubnet(subnet ec2.Subnet) (cty.Value, error) {
+func (s *SubnetSupplier) readSubnet(subnet ec2.Subnet) (cty.Value, error) {
 	var Ty resource.ResourceType = aws.AwsSubnetResourceType
 	if subnet.DefaultForAz != nil && *subnet.DefaultForAz {
 		Ty = aws.AwsDefaultSubnetResourceType

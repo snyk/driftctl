@@ -31,7 +31,7 @@ func NewEC2AmiSupplier(provider *AWSTerraformProvider) *EC2AmiSupplier {
 	}
 }
 
-func (s EC2AmiSupplier) Resources() ([]resource.Resource, error) {
+func (s *EC2AmiSupplier) Resources() ([]resource.Resource, error) {
 	images, err := s.client.ListAllImages()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsAmiResourceType)
@@ -52,7 +52,7 @@ func (s EC2AmiSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s EC2AmiSupplier) readAMI(id string) (cty.Value, error) {
+func (s *EC2AmiSupplier) readAMI(id string) (cty.Value, error) {
 	resImage, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: resourceaws.AwsAmiResourceType,
 		ID: id,

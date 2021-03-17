@@ -45,7 +45,7 @@ func awsIamRoleShouldBeIgnored(roleName string) bool {
 	return ok
 }
 
-func (s IamRoleSupplier) Resources() ([]resource.Resource, error) {
+func (s *IamRoleSupplier) Resources() ([]resource.Resource, error) {
 	roles, err := listIamRoles(s.client, resourceaws.AwsIamRoleResourceType)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (s IamRoleSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s IamRoleSupplier) readRes(resource *iam.Role) (cty.Value, error) {
+func (s *IamRoleSupplier) readRes(resource *iam.Role) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamRoleResourceType,
