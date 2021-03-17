@@ -221,7 +221,3 @@ func (p *TerraformProvider) Cleanup() {
 		client.Close()
 	}
 }
-
-func (p *TerraformProvider) GetConfig() TerraformProviderConfig {
-	return p.Config
-}
