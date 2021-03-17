@@ -36,7 +36,7 @@ func NewVPCSecurityGroupSupplier(provider *AWSTerraformProvider) *VPCSecurityGro
 	}
 }
 
-func (s VPCSecurityGroupSupplier) Resources() ([]resource.Resource, error) {
+func (s *VPCSecurityGroupSupplier) Resources() ([]resource.Resource, error) {
 	securityGroups, defaultSecurityGroups, err := listSecurityGroups(s.client)
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsSecurityGroupResourceType)
@@ -81,7 +81,7 @@ func (s VPCSecurityGroupSupplier) Resources() ([]resource.Resource, error) {
 	return resources, nil
 }
 
-func (s VPCSecurityGroupSupplier) readSecurityGroup(securityGroup ec2.SecurityGroup) (cty.Value, error) {
+func (s *VPCSecurityGroupSupplier) readSecurityGroup(securityGroup ec2.SecurityGroup) (cty.Value, error) {
 	var Ty resource.ResourceType = resourceaws.AwsSecurityGroupResourceType
 	if isDefaultSecurityGroup(securityGroup) {
 		Ty = resourceaws.AwsDefaultSecurityGroupResourceType

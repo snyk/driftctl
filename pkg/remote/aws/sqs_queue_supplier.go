@@ -28,7 +28,7 @@ func NewSqsQueueSupplier(provider *AWSTerraformProvider) *SqsQueueSupplier {
 	}
 }
 
-func (s SqsQueueSupplier) Resources() ([]resource.Resource, error) {
+func (s *SqsQueueSupplier) Resources() ([]resource.Resource, error) {
 	queues, err := s.client.ListAllQueues()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsSqsQueueResourceType)
@@ -49,7 +49,7 @@ func (s SqsQueueSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(resources)
 }
 
-func (s SqsQueueSupplier) readSqsQueue(queueURL string) (cty.Value, error) {
+func (s *SqsQueueSupplier) readSqsQueue(queueURL string) (cty.Value, error) {
 	var Ty resource.ResourceType = aws.AwsSqsQueueResourceType
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: Ty,

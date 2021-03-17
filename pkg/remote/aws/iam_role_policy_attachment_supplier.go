@@ -31,7 +31,7 @@ func NewIamRolePolicyAttachmentSupplier(provider *AWSTerraformProvider) *IamRole
 	}
 }
 
-func (s IamRolePolicyAttachmentSupplier) Resources() ([]resource.Resource, error) {
+func (s *IamRolePolicyAttachmentSupplier) Resources() ([]resource.Resource, error) {
 	roles, err := listIamRoles(s.client, resourceaws.AwsIamRolePolicyAttachmentResourceType)
 	if err != nil {
 		return nil, err
@@ -66,7 +66,7 @@ func (s IamRolePolicyAttachmentSupplier) Resources() ([]resource.Resource, error
 	return s.deserializer.Deserialize(results)
 }
 
-func (s IamRolePolicyAttachmentSupplier) readRes(attachedPol attachedRolePolicy) (cty.Value, error) {
+func (s *IamRolePolicyAttachmentSupplier) readRes(attachedPol attachedRolePolicy) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamRolePolicyAttachmentResourceType,

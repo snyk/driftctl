@@ -32,7 +32,7 @@ func NewEC2EipSupplier(provider *AWSTerraformProvider) *EC2EipSupplier {
 	}
 }
 
-func (s EC2EipSupplier) Resources() ([]resource.Resource, error) {
+func (s *EC2EipSupplier) Resources() ([]resource.Resource, error) {
 	addresses, err := s.client.ListAllAddresses()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEipResourceType)
@@ -53,7 +53,7 @@ func (s EC2EipSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s EC2EipSupplier) readEIP(address ec2.Address) (cty.Value, error) {
+func (s *EC2EipSupplier) readEIP(address ec2.Address) (cty.Value, error) {
 	id := aws.StringValue(address.AllocationId)
 	resAddress, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: resourceaws.AwsEipResourceType,

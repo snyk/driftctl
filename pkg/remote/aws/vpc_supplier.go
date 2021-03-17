@@ -36,7 +36,7 @@ func NewVPCSupplier(provider *AWSTerraformProvider) *VPCSupplier {
 	}
 }
 
-func (s VPCSupplier) Resources() ([]resource.Resource, error) {
+func (s *VPCSupplier) Resources() ([]resource.Resource, error) {
 	input := ec2.DescribeVpcsInput{}
 	var VPCs []*ec2.Vpc
 	var defaultVPCs []*ec2.Vpc
@@ -64,6 +64,11 @@ func (s VPCSupplier) Resources() ([]resource.Resource, error) {
 		})
 	}
 
+	VPCResources, err := s.vpcRunner.Wait()
+	if err != nil {
+		return nil, err
+	}
+
 	for _, item := range defaultVPCs {
 		res := *item
 		s.defaultVPCRunner.Run(func() (cty.Value, error) {
@@ -73,10 +78,6 @@ func (s VPCSupplier) Resources() ([]resource.Resource, error) {
 
 	// Retrieve results from terraform provider
 	defaultVPCResources, err := s.defaultVPCRunner.Wait()
-	if err != nil {
-		return nil, err
-	}
-	VPCResources, err := s.vpcRunner.Wait()
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +99,7 @@ func (s VPCSupplier) Resources() ([]resource.Resource, error) {
 	return resources, nil
 }
 
-func (s VPCSupplier) readVPC(vpc ec2.Vpc) (cty.Value, error) {
+func (s *VPCSupplier) readVPC(vpc ec2.Vpc) (cty.Value, error) {
 	var Ty resource.ResourceType = aws.AwsVpcResourceType
 	if vpc.IsDefault != nil && *vpc.IsDefault {
 		Ty = aws.AwsDefaultVpcResourceType

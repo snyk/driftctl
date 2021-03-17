@@ -29,7 +29,7 @@ func NewDBInstanceSupplier(provider *AWSTerraformProvider) *DBInstanceSupplier {
 	}
 }
 
-func (s DBInstanceSupplier) Resources() ([]resource.Resource, error) {
+func (s *DBInstanceSupplier) Resources() ([]resource.Resource, error) {
 
 	resourceList, err := s.client.ListAllDBInstances()
 
