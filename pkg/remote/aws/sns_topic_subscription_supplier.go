@@ -30,7 +30,7 @@ func NewSNSTopicSubscriptionSupplier(provider *AWSTerraformProvider) *SNSTopicSu
 	}
 }
 
-func (s SNSTopicSubscriptionSupplier) Resources() ([]resource.Resource, error) {
+func (s *SNSTopicSubscriptionSupplier) Resources() ([]resource.Resource, error) {
 	subscriptions, err := s.client.ListAllSubscriptions()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsSnsTopicSubscriptionResourceType)
@@ -50,7 +50,7 @@ func (s SNSTopicSubscriptionSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(retrieve)
 }
 
-func (s SNSTopicSubscriptionSupplier) readTopicSubscription(subscription *sns.Subscription) (cty.Value, error) {
+func (s *SNSTopicSubscriptionSupplier) readTopicSubscription(subscription *sns.Subscription) (cty.Value, error) {
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *subscription.SubscriptionArn,
 		Ty: aws.AwsSnsTopicSubscriptionResourceType,

@@ -31,7 +31,7 @@ func NewIamUserPolicyAttachmentSupplier(provider *AWSTerraformProvider) *IamUser
 	}
 }
 
-func (s IamUserPolicyAttachmentSupplier) Resources() ([]resource.Resource, error) {
+func (s *IamUserPolicyAttachmentSupplier) Resources() ([]resource.Resource, error) {
 	users, err := listIamUsers(s.client, resourceaws.AwsIamUserPolicyAttachmentResourceType)
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func (s IamUserPolicyAttachmentSupplier) Resources() ([]resource.Resource, error
 	return s.deserializer.Deserialize(results)
 }
 
-func (s IamUserPolicyAttachmentSupplier) readRes(attachedPol attachedUserPolicy) (cty.Value, error) {
+func (s *IamUserPolicyAttachmentSupplier) readRes(attachedPol attachedUserPolicy) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamUserPolicyAttachmentResourceType,

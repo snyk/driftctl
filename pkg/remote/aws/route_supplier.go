@@ -29,7 +29,7 @@ func NewRouteSupplier(provider *AWSTerraformProvider) *RouteSupplier {
 	}
 }
 
-func (s RouteSupplier) Resources() ([]resource.Resource, error) {
+func (s *RouteSupplier) Resources() ([]resource.Resource, error) {
 
 	routeTables, err := listRouteTables(s.client, aws.AwsRouteResourceType)
 	if err != nil {
@@ -59,7 +59,7 @@ func (s RouteSupplier) Resources() ([]resource.Resource, error) {
 	return deserializedRoutes, nil
 }
 
-func (s RouteSupplier) readRoute(tableId string, route ec2.Route) (cty.Value, error) {
+func (s *RouteSupplier) readRoute(tableId string, route ec2.Route) (cty.Value, error) {
 	var Ty resource.ResourceType = aws.AwsRouteResourceType
 
 	attributes := map[string]interface{}{

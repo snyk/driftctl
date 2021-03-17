@@ -30,7 +30,7 @@ func NewKMSKeySupplier(provider *AWSTerraformProvider) *KMSKeySupplier {
 	}
 }
 
-func (s KMSKeySupplier) Resources() ([]resource.Resource, error) {
+func (s *KMSKeySupplier) Resources() ([]resource.Resource, error) {
 	keys, err := s.client.ListAllKeys()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsKmsKeyResourceType)
@@ -51,7 +51,7 @@ func (s KMSKeySupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(retrieve)
 }
 
-func (s KMSKeySupplier) readKey(key *kms.KeyListEntry) (cty.Value, error) {
+func (s *KMSKeySupplier) readKey(key *kms.KeyListEntry) (cty.Value, error) {
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *key.KeyId,
 		Ty: aws.AwsKmsKeyResourceType,

@@ -29,7 +29,7 @@ func NewRouteTableAssociationSupplier(provider *AWSTerraformProvider) *RouteTabl
 	}
 }
 
-func (s RouteTableAssociationSupplier) Resources() ([]resource.Resource, error) {
+func (s *RouteTableAssociationSupplier) Resources() ([]resource.Resource, error) {
 
 	tables, err := listRouteTables(s.client, aws.AwsRouteTableAssociationResourceType)
 	if err != nil {
@@ -64,7 +64,7 @@ func (s RouteTableAssociationSupplier) Resources() ([]resource.Resource, error) 
 	return deserializedRouteTableAssociations, nil
 }
 
-func (s RouteTableAssociationSupplier) readRouteTableAssociation(assoc ec2.RouteTableAssociation) (cty.Value, error) {
+func (s *RouteTableAssociationSupplier) readRouteTableAssociation(assoc ec2.RouteTableAssociation) (cty.Value, error) {
 	var Ty resource.ResourceType = aws.AwsRouteTableAssociationResourceType
 	attributes := map[string]interface{}{
 		"route_table_id": *assoc.RouteTableId,
@@ -83,7 +83,7 @@ func (s RouteTableAssociationSupplier) readRouteTableAssociation(assoc ec2.Route
 	return *val, nil
 }
 
-func (s RouteTableAssociationSupplier) shouldBeIgnored(assoc *ec2.RouteTableAssociation) bool {
+func (s *RouteTableAssociationSupplier) shouldBeIgnored(assoc *ec2.RouteTableAssociation) bool {
 
 	// Ignore when nothing is associated
 	if assoc.GatewayId == nil && assoc.SubnetId == nil {
