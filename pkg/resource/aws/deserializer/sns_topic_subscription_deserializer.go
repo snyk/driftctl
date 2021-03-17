@@ -23,6 +23,7 @@ func (s SNSTopicSubscriptionDeserializer) Deserialize(subscriptionsList []cty.Va
 	subscriptions := make([]resource.Resource, 0)
 
 	for _, value := range subscriptionsList {
+
 		value := value
 		subscription, err := decodeSNSTopicSubscription(value)
 		if err != nil {

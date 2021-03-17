@@ -68,7 +68,7 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	supplierLibrary.AddSupplier(NewSqsQueuePolicySupplier(provider))
 	supplierLibrary.AddSupplier(NewSNSTopicSupplier(provider))
 	supplierLibrary.AddSupplier(NewSNSTopicPolicySupplier(provider))
-	supplierLibrary.AddSupplier(NewSNSTopicSubscriptionSupplier(provider))
+	supplierLibrary.AddSupplier(NewSNSTopicSubscriptionSupplier(provider, alerter))
 	supplierLibrary.AddSupplier(NewDynamoDBTableSupplier(provider))
 	supplierLibrary.AddSupplier(NewRoute53HealthCheckSupplier(provider))
 	supplierLibrary.AddSupplier(NewCloudfrontDistributionSupplier(provider))
