@@ -23,7 +23,6 @@ type Progress interface {
 }
 
 type progress struct {
-	ticChan chan struct{}
 	endChan chan struct{}
 	started *atomic.Bool
 	count   *atomic.Uint64
@@ -31,8 +30,7 @@ type progress struct {
 
 func NewProgress() *progress {
 	return &progress{
-		make(chan struct{}),
-		make(chan struct{}),
+		nil,
 		atomic.NewBool(false),
 		atomic.NewUint64(0),
 	}
@@ -40,6 +38,8 @@ func NewProgress() *progress {
 
 func (p *progress) Start() {
 	if !p.started.Swap(true) {
+		p.count.Store(0)
+		p.endChan = make(chan struct{})
 		go p.watch()
 		go p.render()
 	}
@@ -47,14 +47,14 @@ func (p *progress) Start() {
 
 func (p *progress) Stop() {
 	if p.started.Swap(false) {
-		p.endChan <- struct{}{}
+		close(p.endChan)
 		Printf("\n")
 	}
 }
 
 func (p *progress) Inc() {
 	if p.started.Load() {
-		p.ticChan <- struct{}{}
+		p.count.Inc()
 	}
 }
 
@@ -82,17 +82,19 @@ func (p *progress) render() {
 func (p *progress) watch() {
 Loop:
 	for {
+		lastVal := p.count.Load()
 		select {
-		case <-p.ticChan:
-			p.count.Inc()
-			continue Loop
 		case <-time.After(progressTimeout):
-			p.started.Store(false)
-			break Loop
+			if p.count.Load() != lastVal {
+				continue
+			}
+			if p.started.Swap(false) {
+				close(p.endChan)
+				break Loop
+			}
 		case <-p.endChan:
 			return
 		}
 	}
 	logrus.Debug("Progress did not receive any tic. Stopping...")
-	p.endChan <- struct{}{}
 }
