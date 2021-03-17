@@ -62,3 +62,11 @@ To learn more about compiling driftctl and contributing, please refer to the [co
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification and is brought to you by these [awesome contributors](CONTRIBUTORS.md).
 
 Build with ❤️️ from 🇫🇷 🇯🇵 🇬🇷 🇸🇪 🇺🇸
+
+---
+
+## Collecting users feedback
+
+Have you launched driftctl ? Please take a moment to answer the [following questions](https://driftctl.typeform.com/to/fYUOOMj3) and help us improve the tool. 
+
+3 minutes, tops!
