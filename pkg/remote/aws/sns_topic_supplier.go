@@ -30,7 +30,7 @@ func NewSNSTopicSupplier(provider *AWSTerraformProvider) *SNSTopicSupplier {
 	}
 }
 
-func (s SNSTopicSupplier) Resources() ([]resource.Resource, error) {
+func (s *SNSTopicSupplier) Resources() ([]resource.Resource, error) {
 	topics, err := s.client.ListAllTopics()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsSnsTopicResourceType)
@@ -51,7 +51,7 @@ func (s SNSTopicSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(retrieve)
 }
 
-func (s SNSTopicSupplier) readTopic(topic sns.Topic) (cty.Value, error) {
+func (s *SNSTopicSupplier) readTopic(topic sns.Topic) (cty.Value, error) {
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *topic.TopicArn,
 		Ty: aws.AwsSnsTopicResourceType,

@@ -37,14 +37,17 @@ func NewRouteTableSupplier(provider *AWSTerraformProvider) *RouteTableSupplier {
 	}
 }
 
-func (s RouteTableSupplier) Resources() ([]resource.Resource, error) {
+func (s *RouteTableSupplier) Resources() ([]resource.Resource, error) {
 
-	retrievedRouteTables, err := listRouteTables(s.client, aws.AwsRouteTableResourceType)
+	results, err := listRouteTables(s.client, aws.AwsRouteTableResourceType)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, routeTable := range retrievedRouteTables {
+	retrievedDefaultRouteTables := []*ec2.RouteTable{}
+	retrievedRouteTables := []*ec2.RouteTable{}
+
+	for _, routeTable := range results {
 		res := *routeTable
 		var isMain bool
 		for _, assoc := range res.Associations {
@@ -54,13 +57,16 @@ func (s RouteTableSupplier) Resources() ([]resource.Resource, error) {
 			}
 		}
 		if isMain {
-			s.defaultRouteTableRunner.Run(func() (cty.Value, error) {
-				return s.readRouteTable(res, true)
-			})
+			retrievedDefaultRouteTables = append(retrievedDefaultRouteTables, &res)
 			continue
 		}
-		s.routeTableRunner.Run(func() (cty.Value, error) {
-			return s.readRouteTable(res, false)
+		retrievedRouteTables = append(retrievedRouteTables, &res)
+	}
+
+	for _, routeTable := range retrievedDefaultRouteTables {
+		res := *routeTable
+		s.defaultRouteTableRunner.Run(func() (cty.Value, error) {
+			return s.readRouteTable(res, true)
 		})
 	}
 
@@ -69,6 +75,14 @@ func (s RouteTableSupplier) Resources() ([]resource.Resource, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	for _, routeTable := range retrievedRouteTables {
+		res := *routeTable
+		s.routeTableRunner.Run(func() (cty.Value, error) {
+			return s.readRouteTable(res, false)
+		})
+	}
+
 	routeTableResources, err := s.routeTableRunner.Wait()
 	if err != nil {
 		return nil, err
@@ -91,7 +105,7 @@ func (s RouteTableSupplier) Resources() ([]resource.Resource, error) {
 	return resources, nil
 }
 
-func (s RouteTableSupplier) readRouteTable(routeTable ec2.RouteTable, isMain bool) (cty.Value, error) {
+func (s *RouteTableSupplier) readRouteTable(routeTable ec2.RouteTable, isMain bool) (cty.Value, error) {
 	var Ty resource.ResourceType = aws.AwsRouteTableResourceType
 	attributes := map[string]interface{}{}
 	if isMain {

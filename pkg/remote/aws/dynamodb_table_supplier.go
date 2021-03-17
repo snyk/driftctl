@@ -29,7 +29,7 @@ func NewDynamoDBTableSupplier(provider *AWSTerraformProvider) *DynamoDBTableSupp
 	}
 }
 
-func (s DynamoDBTableSupplier) Resources() ([]resource.Resource, error) {
+func (s *DynamoDBTableSupplier) Resources() ([]resource.Resource, error) {
 	tables, err := s.repository.ListAllTables()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsDynamodbTableResourceType)
@@ -50,7 +50,7 @@ func (s DynamoDBTableSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(retrieve)
 }
 
-func (s DynamoDBTableSupplier) readTable(tableName *string) (cty.Value, error) {
+func (s *DynamoDBTableSupplier) readTable(tableName *string) (cty.Value, error) {
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *tableName,
 		Ty: aws.AwsDynamodbTableResourceType,

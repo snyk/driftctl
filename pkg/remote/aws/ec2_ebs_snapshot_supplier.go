@@ -32,7 +32,7 @@ func NewEC2EbsSnapshotSupplier(provider *AWSTerraformProvider) *EC2EbsSnapshotSu
 	}
 }
 
-func (s EC2EbsSnapshotSupplier) Resources() ([]resource.Resource, error) {
+func (s *EC2EbsSnapshotSupplier) Resources() ([]resource.Resource, error) {
 	snapshots, err := s.client.ListAllSnapshots()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEbsSnapshotResourceType)
@@ -53,7 +53,7 @@ func (s EC2EbsSnapshotSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s EC2EbsSnapshotSupplier) readEbsSnapshot(snapshot ec2.Snapshot) (cty.Value, error) {
+func (s *EC2EbsSnapshotSupplier) readEbsSnapshot(snapshot ec2.Snapshot) (cty.Value, error) {
 	id := aws.StringValue(snapshot.SnapshotId)
 	resSnapshot, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: resourceaws.AwsEbsSnapshotResourceType,

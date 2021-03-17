@@ -29,7 +29,7 @@ func NewNatGatewaySupplier(provider *AWSTerraformProvider) *NatGatewaySupplier {
 	}
 }
 
-func (s NatGatewaySupplier) Resources() ([]resource.Resource, error) {
+func (s *NatGatewaySupplier) Resources() ([]resource.Resource, error) {
 
 	retrievedNatGateways, err := listNatGateways(s.client)
 	if err != nil {
@@ -58,7 +58,7 @@ func (s NatGatewaySupplier) Resources() ([]resource.Resource, error) {
 	return resources, nil
 }
 
-func (s NatGatewaySupplier) readNatGateway(gateway ec2.NatGateway) (cty.Value, error) {
+func (s *NatGatewaySupplier) readNatGateway(gateway ec2.NatGateway) (cty.Value, error) {
 	var Ty resource.ResourceType = aws.AwsNatGatewayResourceType
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *gateway.NatGatewayId,

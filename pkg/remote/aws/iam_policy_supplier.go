@@ -32,7 +32,7 @@ func NewIamPolicySupplier(provider *AWSTerraformProvider) *IamPolicySupplier {
 	}
 }
 
-func (s IamPolicySupplier) Resources() ([]resource.Resource, error) {
+func (s *IamPolicySupplier) Resources() ([]resource.Resource, error) {
 	policies, err := listIamPolicies(s.client)
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamPolicyResourceType)
@@ -53,7 +53,7 @@ func (s IamPolicySupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s IamPolicySupplier) readRes(resource *iam.Policy) (cty.Value, error) {
+func (s *IamPolicySupplier) readRes(resource *iam.Policy) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamPolicyResourceType,

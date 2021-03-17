@@ -29,7 +29,7 @@ func NewLambdaFunctionSupplier(provider *AWSTerraformProvider) *LambdaFunctionSu
 	}
 }
 
-func (s LambdaFunctionSupplier) Resources() ([]resource.Resource, error) {
+func (s *LambdaFunctionSupplier) Resources() ([]resource.Resource, error) {
 	functions, err := s.client.ListAllLambdaFunctions()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsLambdaFunctionResourceType)
@@ -50,7 +50,7 @@ func (s LambdaFunctionSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s LambdaFunctionSupplier) readLambda(function lambda.FunctionConfiguration) (cty.Value, error) {
+func (s *LambdaFunctionSupplier) readLambda(function lambda.FunctionConfiguration) (cty.Value, error) {
 	name := *function.FunctionName
 	resFunction, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{

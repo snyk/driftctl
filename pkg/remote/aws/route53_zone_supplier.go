@@ -34,7 +34,7 @@ func NewRoute53ZoneSupplier(provider *AWSTerraformProvider) *Route53ZoneSupplier
 	}
 }
 
-func (s Route53ZoneSupplier) Resources() ([]resource.Resource, error) {
+func (s *Route53ZoneSupplier) Resources() ([]resource.Resource, error) {
 
 	zones, err := s.client.ListAllZones()
 	if err != nil {
@@ -55,7 +55,7 @@ func (s Route53ZoneSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s Route53ZoneSupplier) readZone(hostedZone route53.HostedZone) (cty.Value, error) {
+func (s *Route53ZoneSupplier) readZone(hostedZone route53.HostedZone) (cty.Value, error) {
 	name := *hostedZone.Name
 
 	zone, err := s.reader.ReadResource(terraform.ReadResourceArgs{

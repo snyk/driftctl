@@ -38,7 +38,7 @@ func NewVPCSecurityGroupRuleSupplier(provider *AWSTerraformProvider) *VPCSecurit
 	}
 }
 
-func (s VPCSecurityGroupRuleSupplier) Resources() ([]resource.Resource, error) {
+func (s *VPCSecurityGroupRuleSupplier) Resources() ([]resource.Resource, error) {
 	securityGroups, defaultSecurityGroups, err := listSecurityGroups(s.client)
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsSecurityGroupRuleResourceType)
@@ -63,7 +63,7 @@ func (s VPCSecurityGroupRuleSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s VPCSecurityGroupRuleSupplier) readSecurityGroupRule(securityGroupRule resourceaws.AwsSecurityGroupRule) (cty.Value, error) {
+func (s *VPCSecurityGroupRuleSupplier) readSecurityGroupRule(securityGroupRule resourceaws.AwsSecurityGroupRule) (cty.Value, error) {
 	id := securityGroupRule.Id
 	f := func(v *[]string) []string {
 		if v != nil {
@@ -94,7 +94,7 @@ func (s VPCSecurityGroupRuleSupplier) readSecurityGroupRule(securityGroupRule re
 	return *resSgRule, nil
 }
 
-func (s VPCSecurityGroupRuleSupplier) listSecurityGroupsRules(securityGroups []*ec2.SecurityGroup) []resourceaws.AwsSecurityGroupRule {
+func (s *VPCSecurityGroupRuleSupplier) listSecurityGroupsRules(securityGroups []*ec2.SecurityGroup) []resourceaws.AwsSecurityGroupRule {
 	var securityGroupsRules []resourceaws.AwsSecurityGroupRule
 	for _, sg := range securityGroups {
 		for _, rule := range sg.IpPermissions {
@@ -109,7 +109,7 @@ func (s VPCSecurityGroupRuleSupplier) listSecurityGroupsRules(securityGroups []*
 
 // addSecurityGroupRule will iterate through each "Source" as per Aws definition and create a
 // rule with custom attributes
-func (s VPCSecurityGroupRuleSupplier) addSecurityGroupRule(ruleType string, rule *ec2.IpPermission, sg *ec2.SecurityGroup) []resourceaws.AwsSecurityGroupRule {
+func (s *VPCSecurityGroupRuleSupplier) addSecurityGroupRule(ruleType string, rule *ec2.IpPermission, sg *ec2.SecurityGroup) []resourceaws.AwsSecurityGroupRule {
 	var rules []resourceaws.AwsSecurityGroupRule
 	for _, groupPair := range rule.UserIdGroupPairs {
 		r := resourceaws.AwsSecurityGroupRule{
@@ -179,7 +179,7 @@ func (s VPCSecurityGroupRuleSupplier) addSecurityGroupRule(ruleType string, rule
 	return rules
 }
 
-func (s VPCSecurityGroupRuleSupplier) isDefaultIngress(rule *resourceaws.AwsSecurityGroupRule) bool {
+func (s *VPCSecurityGroupRuleSupplier) isDefaultIngress(rule *resourceaws.AwsSecurityGroupRule) bool {
 	return rule.Type != nil &&
 		*rule.Type == sgRuleTypeIngress &&
 		rule.FromPort != nil &&
@@ -196,7 +196,7 @@ func (s VPCSecurityGroupRuleSupplier) isDefaultIngress(rule *resourceaws.AwsSecu
 		*rule.Self
 }
 
-func (s VPCSecurityGroupRuleSupplier) isDefaultEgress(rule *resourceaws.AwsSecurityGroupRule) bool {
+func (s *VPCSecurityGroupRuleSupplier) isDefaultEgress(rule *resourceaws.AwsSecurityGroupRule) bool {
 	return rule.Type != nil &&
 		*rule.Type == sgRuleTypeEgress &&
 		rule.FromPort != nil &&
