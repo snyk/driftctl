@@ -157,10 +157,6 @@ func (p *TerraformProvider) ReadResource(args tf.ReadResourceArgs) (*cty.Value, 
 		delete(args.Attributes, "alias")
 	}
 
-	if alias != p.Config.DefaultAlias {
-		return &cty.NilVal, nil
-	}
-
 	p.lock.Lock()
 	if p.grpcProviders[alias] == nil {
 		err := p.configure(alias)

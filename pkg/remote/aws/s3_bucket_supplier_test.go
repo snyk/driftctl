@@ -12,6 +12,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
@@ -101,6 +102,10 @@ func TestS3BucketSupplier_Resources(t *testing.T) {
 				deserializer,
 				&mock,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
+				tf.TerraformProviderConfig{
+					Name:         "test",
+					DefaultAlias: "eu-west-1",
+				},
 			}
 			got, err := s.Resources()
 			assert.Equal(t, err, tt.wantErr)
