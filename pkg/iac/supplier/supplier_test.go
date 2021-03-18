@@ -6,12 +6,14 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
+	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
 func TestGetIACSupplier(t *testing.T) {
 	type args struct {
-		config []config.SupplierConfig
+		config  []config.SupplierConfig
+		options *backend.Options
 	}
 	tests := []struct {
 		name    string
@@ -25,6 +27,9 @@ func TestGetIACSupplier(t *testing.T) {
 					{
 						Key: "foobar",
 					},
+				},
+				options: &backend.Options{
+					Headers: map[string]string{},
 				},
 			},
 			wantErr: fmt.Errorf("Unsupported supplier 'foobar'"),
@@ -42,6 +47,9 @@ func TestGetIACSupplier(t *testing.T) {
 						Path:    "terraform.tfstate",
 					},
 				},
+				options: &backend.Options{
+					Headers: map[string]string{},
+				},
 			},
 			wantErr: fmt.Errorf("Unsupported supplier 'foobar'"),
 		},
@@ -50,6 +58,9 @@ func TestGetIACSupplier(t *testing.T) {
 			args: args{
 				config: []config.SupplierConfig{
 					{Key: "tfstate", Backend: "", Path: "terraform.tfstate"},
+				},
+				options: &backend.Options{
+					Headers: map[string]string{},
 				},
 			},
 			wantErr: nil,
@@ -62,13 +73,16 @@ func TestGetIACSupplier(t *testing.T) {
 					{Key: "tfstate", Backend: "s3", Path: "terraform.tfstate"},
 					{Key: "tfstate", Backend: "", Path: "terraform2.tfstate"},
 				},
+				options: &backend.Options{
+					Headers: map[string]string{},
+				},
 			},
 			wantErr: nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := GetIACSupplier(tt.args.config, terraform.NewProviderLibrary())
+			_, err := GetIACSupplier(tt.args.config, terraform.NewProviderLibrary(), tt.args.options)
 			if tt.wantErr != nil && err.Error() != tt.wantErr.Error() {
 				t.Errorf("GetIACSupplier() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -82,6 +96,8 @@ func TestGetSupportedSchemes(t *testing.T) {
 	want := []string{
 		"tfstate://",
 		"tfstate+s3://",
+		"tfstate+http://",
+		"tfstate+https://",
 	}
 
 	if got := GetSupportedSchemes(); !reflect.DeepEqual(got, want) {

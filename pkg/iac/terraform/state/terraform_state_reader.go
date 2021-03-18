@@ -22,11 +22,12 @@ import (
 const TerraformStateReaderSupplier = "tfstate"
 
 type TerraformStateReader struct {
-	library       *terraform.ProviderLibrary
-	config        config.SupplierConfig
-	backend       backend.Backend
-	enumerator    enumerator.StateEnumerator
-	deserializers []deserializer.CTYDeserializer
+	library        *terraform.ProviderLibrary
+	config         config.SupplierConfig
+	backend        backend.Backend
+	enumerator     enumerator.StateEnumerator
+	deserializers  []deserializer.CTYDeserializer
+	backendOptions *backend.Options
 }
 
 func (r *TerraformStateReader) initReader() error {
@@ -34,8 +35,8 @@ func (r *TerraformStateReader) initReader() error {
 	return nil
 }
 
-func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary) (*TerraformStateReader, error) {
-	reader := TerraformStateReader{library: library, config: config, deserializers: iac.Deserializers()}
+func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options) (*TerraformStateReader, error) {
+	reader := TerraformStateReader{library: library, config: config, deserializers: iac.Deserializers(), backendOptions: backendOpts}
 	err := reader.initReader()
 	if err != nil {
 		return nil, err
@@ -44,8 +45,7 @@ func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary)
 }
 
 func (r *TerraformStateReader) retrieve() (map[string][]cty.Value, error) {
-
-	b, err := backend.GetBackend(r.config)
+	b, err := backend.GetBackend(r.config, r.backendOptions)
 	if err != nil {
 		return nil, err
 	}

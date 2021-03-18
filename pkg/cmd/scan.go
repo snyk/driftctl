@@ -27,17 +27,19 @@ import (
 )
 
 type ScanOptions struct {
-	Coverage bool
-	Detect   bool
-	From     []config.SupplierConfig
-	To       string
-	Output   output.OutputConfig
-	Filter   *jmespath.JMESPath
-	Quiet    bool
+	Coverage       bool
+	Detect         bool
+	From           []config.SupplierConfig
+	To             string
+	Output         output.OutputConfig
+	Filter         *jmespath.JMESPath
+	Quiet          bool
+	BackendOptions *backend.Options
 }
 
 func NewScanCmd() *cobra.Command {
 	opts := &ScanOptions{}
+	opts.BackendOptions = &backend.Options{}
 
 	cmd := &cobra.Command{
 		Use:   "scan",
@@ -128,6 +130,13 @@ func NewScanCmd() *cobra.Command {
 		"Cloud provider source\n"+
 			"Accepted values are: "+strings.Join(supportedRemotes, ",")+"\n",
 	)
+	fl.StringToStringVarP(&opts.BackendOptions.Headers,
+		"headers",
+		"H",
+		map[string]string{},
+		"Use those HTTP headers to query the provided URL.\n"+
+			"Only used with tfstate+http(s) backend for now.\n",
+	)
 
 	return cmd
 }
@@ -158,7 +167,7 @@ func scanRun(opts *ScanOptions) error {
 
 	scanner := pkg.NewScanner(supplierLibrary.Suppliers(), alerter)
 
-	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary)
+	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions)
 	if err != nil {
 		return err
 	}
