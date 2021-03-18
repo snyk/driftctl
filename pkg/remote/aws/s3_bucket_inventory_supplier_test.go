@@ -11,6 +11,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
@@ -66,36 +67,12 @@ func TestS3BucketInventorySupplier_Resources(t *testing.T) {
 
 				repository.On(
 					"ListBucketInventoryConfigurations",
-					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift")},
-					"eu-west-1",
-				).Return(
-					[]*s3.InventoryConfiguration{
-						{Id: awssdk.String("Inventory_Bucket1")},
-						{Id: awssdk.String("Inventory2_Bucket1")},
-					},
-					nil,
-				)
-
-				repository.On(
-					"ListBucketInventoryConfigurations",
 					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift2")},
 					"eu-west-3",
 				).Return(
 					[]*s3.InventoryConfiguration{
 						{Id: awssdk.String("Inventory_Bucket2")},
 						{Id: awssdk.String("Inventory2_Bucket2")},
-					},
-					nil,
-				)
-
-				repository.On(
-					"ListBucketInventoryConfigurations",
-					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift3")},
-					"eu-west-1",
-				).Return(
-					[]*s3.InventoryConfiguration{
-						{Id: awssdk.String("Inventory_Bucket3")},
-						{Id: awssdk.String("Inventory2_Bucket3")},
 					},
 					nil,
 				)
@@ -121,18 +98,17 @@ func TestS3BucketInventorySupplier_Resources(t *testing.T) {
 					"GetBucketLocation",
 					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift")},
 				).Return(
-					"eu-west-1",
+					"eu-west-3",
 					nil,
 				)
 				repository.On(
 					"ListBucketInventoryConfigurations",
 					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift")},
-					"eu-west-1",
+					"eu-west-3",
 				).Return(
 					nil,
 					awserr.NewRequestFailure(nil, 403, ""),
 				)
-
 			},
 			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsS3BucketInventoryResourceType),
 		},
@@ -165,6 +141,10 @@ func TestS3BucketInventorySupplier_Resources(t *testing.T) {
 				deserializer,
 				&mock,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
+				tf.TerraformProviderConfig{
+					Name:         "test",
+					DefaultAlias: "eu-west-3",
+				},
 			}
 			got, err := s.Resources()
 			assert.Equal(t, err, tt.wantErr)
