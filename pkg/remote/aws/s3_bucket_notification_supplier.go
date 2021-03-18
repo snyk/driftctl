@@ -4,6 +4,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
@@ -12,10 +13,11 @@ import (
 )
 
 type S3BucketNotificationSupplier struct {
-	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
-	repository   repository.S3Repository
-	runner       *terraform.ParallelResourceReader
+	reader         terraform.ResourceReader
+	deserializer   deserializer.CTYDeserializer
+	repository     repository.S3Repository
+	runner         *terraform.ParallelResourceReader
+	providerConfig tf.TerraformProviderConfig
 }
 
 func NewS3BucketNotificationSupplier(provider *AWSTerraformProvider, repository repository.S3Repository) *S3BucketNotificationSupplier {
@@ -24,6 +26,7 @@ func NewS3BucketNotificationSupplier(provider *AWSTerraformProvider, repository 
 		awsdeserializer.NewS3BucketNotificationDeserializer(),
 		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
+		provider.Config,
 	}
 }
 
@@ -39,7 +42,7 @@ func (s *S3BucketNotificationSupplier) Resources() ([]resource.Resource, error) 
 		if err != nil {
 			return nil, err
 		}
-		if region == "" {
+		if region == "" || region != s.providerConfig.DefaultAlias {
 			continue
 		}
 		s.runner.Run(func() (cty.Value, error) {
