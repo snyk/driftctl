@@ -10,8 +10,6 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/output"
 
-	"github.com/cloudskiff/driftctl/pkg/parallel"
-	tf "github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/eapache/go-resiliency/retrier"
 	"github.com/hashicorp/terraform/plugin"
 	"github.com/hashicorp/terraform/plugin/discovery"
@@ -21,6 +19,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+
+	"github.com/cloudskiff/driftctl/pkg/parallel"
+	tf "github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
 // "alias" in these struct are a way to namespace gRPC clients.
@@ -40,14 +41,16 @@ type TerraformProvider struct {
 	schemas           map[string]providers.Schema
 	Config            TerraformProviderConfig
 	runner            *parallel.ParallelRunner
+	progress          output.Progress
 }
 
-func NewTerraformProvider(installer *tf.ProviderInstaller, config TerraformProviderConfig) (*TerraformProvider, error) {
+func NewTerraformProvider(installer *tf.ProviderInstaller, config TerraformProviderConfig, progress output.Progress) (*TerraformProvider, error) {
 	p := TerraformProvider{
 		providerInstaller: installer,
 		runner:            parallel.NewParallelRunner(context.TODO(), 10),
 		grpcProviders:     make(map[string]*plugin.GRPCProvider),
 		Config:            config,
+		progress:          progress,
 	}
 	return &p, nil
 }
@@ -126,11 +129,10 @@ func (p *TerraformProvider) configure(alias string) error {
 		"alias": alias,
 	}).Debug("New gRPC client started")
 
-	output.Printf("Terraform provider initialized (name=%s", p.Config.Name)
-	if alias != "" {
-		output.Printf(", alias=%s", alias)
-	}
-	output.Printf(")\n")
+	logrus.WithFields(logrus.Fields{
+		"name":  p.Config.Name,
+		"alias": alias,
+	}).Debug("Terraform provider initialized")
 
 	return nil
 }
@@ -203,6 +205,7 @@ func (p *TerraformProvider) ReadResource(args tf.ReadResourceArgs) (*cty.Value, 
 	if err != nil {
 		return nil, err
 	}
+	p.progress.Inc()
 	return &newState, nil
 }
 

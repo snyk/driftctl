@@ -29,7 +29,7 @@ func NewEC2EipAssociationSupplier(provider *AWSTerraformProvider) *EC2EipAssocia
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner())}
 }
 
-func (s EC2EipAssociationSupplier) Resources() ([]resource.Resource, error) {
+func (s *EC2EipAssociationSupplier) Resources() ([]resource.Resource, error) {
 	associationIds, err := s.client.ListAllAddressesAssociation()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEipAssociationResourceType)
@@ -50,7 +50,7 @@ func (s EC2EipAssociationSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s EC2EipAssociationSupplier) readEIPAssociation(assocId string) (cty.Value, error) {
+func (s *EC2EipAssociationSupplier) readEIPAssociation(assocId string) (cty.Value, error) {
 	resAssoc, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: resourceaws.AwsEipAssociationResourceType,
 		ID: assocId,

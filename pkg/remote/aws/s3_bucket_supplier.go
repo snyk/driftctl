@@ -2,21 +2,25 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go/service/s3"
+
+	"github.com/zclconf/go-cty/cty"
+
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
-	"github.com/zclconf/go-cty/cty"
 )
 
 type S3BucketSupplier struct {
-	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
-	repository   repository.S3Repository
-	runner       *terraform.ParallelResourceReader
+	reader         terraform.ResourceReader
+	deserializer   deserializer.CTYDeserializer
+	repository     repository.S3Repository
+	runner         *terraform.ParallelResourceReader
+	providerConfig tf.TerraformProviderConfig
 }
 
 func NewS3BucketSupplier(provider *AWSTerraformProvider, repository repository.S3Repository) *S3BucketSupplier {
@@ -25,10 +29,11 @@ func NewS3BucketSupplier(provider *AWSTerraformProvider, repository repository.S
 		awsdeserializer.NewS3BucketDeserializer(),
 		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
+		provider.Config,
 	}
 }
 
-func (s S3BucketSupplier) Resources() ([]resource.Resource, error) {
+func (s *S3BucketSupplier) Resources() ([]resource.Resource, error) {
 	buckets, err := s.repository.ListAllBuckets()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsS3BucketResourceType)
@@ -53,7 +58,7 @@ func (s *S3BucketSupplier) readBucket(bucket s3.Bucket) (cty.Value, error) {
 	if err != nil {
 		return cty.NilVal, err
 	}
-	if region == "" {
+	if region == "" || region != s.providerConfig.DefaultAlias {
 		return cty.NilVal, nil
 	}
 

@@ -30,7 +30,7 @@ func NewKMSAliasSupplier(provider *AWSTerraformProvider) *KMSAliasSupplier {
 	}
 }
 
-func (s KMSAliasSupplier) Resources() ([]resource.Resource, error) {
+func (s *KMSAliasSupplier) Resources() ([]resource.Resource, error) {
 	aliases, err := s.client.ListAllAliases()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsKmsAliasResourceType)
@@ -51,7 +51,7 @@ func (s KMSAliasSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(retrieve)
 }
 
-func (s KMSAliasSupplier) readAlias(alias *kms.AliasListEntry) (cty.Value, error) {
+func (s *KMSAliasSupplier) readAlias(alias *kms.AliasListEntry) (cty.Value, error) {
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *alias.AliasName,
 		Ty: aws.AwsKmsAliasResourceType,

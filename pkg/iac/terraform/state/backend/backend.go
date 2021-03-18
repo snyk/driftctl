@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
@@ -10,9 +11,15 @@ import (
 var supportedBackends = []string{
 	BackendKeyFile,
 	BackendKeyS3,
+	BackendKeyHTTP,
+	BackendKeyHTTPS,
 }
 
 type Backend io.ReadCloser
+
+type Options struct {
+	Headers map[string]string
+}
 
 func IsSupported(backend string) bool {
 	for _, b := range supportedBackends {
@@ -24,8 +31,7 @@ func IsSupported(backend string) bool {
 	return false
 }
 
-func GetBackend(config config.SupplierConfig) (Backend, error) {
-
+func GetBackend(config config.SupplierConfig, opts *Options) (Backend, error) {
 	backend := config.Backend
 
 	if !IsSupported(backend) {
@@ -37,6 +43,10 @@ func GetBackend(config config.SupplierConfig) (Backend, error) {
 		return NewFileReader(config.Path)
 	case BackendKeyS3:
 		return NewS3Reader(config.Path)
+	case BackendKeyHTTP:
+		fallthrough
+	case BackendKeyHTTPS:
+		return NewHTTPReader(fmt.Sprintf("%s://%s", config.Backend, config.Path), opts)
 	default:
 		return nil, errors.Errorf("Unsupported backend '%s'", backend)
 	}

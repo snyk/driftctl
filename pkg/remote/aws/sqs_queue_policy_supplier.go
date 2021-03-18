@@ -28,7 +28,7 @@ func NewSqsQueuePolicySupplier(provider *AWSTerraformProvider) *SqsQueuePolicySu
 	}
 }
 
-func (s SqsQueuePolicySupplier) Resources() ([]resource.Resource, error) {
+func (s *SqsQueuePolicySupplier) Resources() ([]resource.Resource, error) {
 	queues, err := s.client.ListAllQueues()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, aws.AwsSqsQueuePolicyResourceType, aws.AwsSqsQueueResourceType)
@@ -49,7 +49,7 @@ func (s SqsQueuePolicySupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(resources)
 }
 
-func (s SqsQueuePolicySupplier) readSqsQueuePolicy(queueURL string) (cty.Value, error) {
+func (s *SqsQueuePolicySupplier) readSqsQueuePolicy(queueURL string) (cty.Value, error) {
 	var Ty resource.ResourceType = aws.AwsSqsQueuePolicyResourceType
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: Ty,

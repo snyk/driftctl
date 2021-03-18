@@ -30,7 +30,7 @@ func NewRoute53HealthCheckSupplier(provider *AWSTerraformProvider) *Route53Healt
 	}
 }
 
-func (s Route53HealthCheckSupplier) Resources() ([]resource.Resource, error) {
+func (s *Route53HealthCheckSupplier) Resources() ([]resource.Resource, error) {
 	healthChecks, err := s.client.ListAllHealthChecks()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsRoute53HealthCheckResourceType)
@@ -51,7 +51,7 @@ func (s Route53HealthCheckSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(retrieve)
 }
 
-func (s Route53HealthCheckSupplier) readHealthCheck(healthCheck *route53.HealthCheck) (cty.Value, error) {
+func (s *Route53HealthCheckSupplier) readHealthCheck(healthCheck *route53.HealthCheck) (cty.Value, error) {
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *healthCheck.Id,
 		Ty: aws.AwsRoute53HealthCheckResourceType,

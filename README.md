@@ -14,7 +14,6 @@
     <img src="https://codecov.io/gh/cloudskiff/driftctl/branch/main/graph/badge.svg?token=8C5R02G5S7"/>
   </a>
   <img src="https://img.shields.io/docker/pulls/cloudskiff/driftctl"/>
-  <img src="https://img.shields.io/microbadger/layers/cloudskiff/driftctl"/>
   <img src="https://img.shields.io/docker/image-size/cloudskiff/driftctl"/>
   <a href="https://discord.gg/NMCBxtD7Nd">
     <img src="https://img.shields.io/discord/783720783469871124?color=%237289da&label=discord&logo=discord"/>
@@ -63,3 +62,11 @@ To learn more about compiling driftctl and contributing, please refer to the [co
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification and is brought to you by these [awesome contributors](CONTRIBUTORS.md).
 
 Build with ❤️️ from 🇫🇷 🇯🇵 🇬🇷 🇸🇪 🇺🇸
+
+---
+
+## Collecting users feedback
+
+Have you launched driftctl ? Please take a moment to answer the [following questions](https://driftctl.typeform.com/to/fYUOOMj3) and help us improve the tool. 
+
+3 minutes, tops!
