@@ -67,36 +67,12 @@ func TestS3BucketInventorySupplier_Resources(t *testing.T) {
 
 				repository.On(
 					"ListBucketInventoryConfigurations",
-					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift")},
-					"eu-west-1",
-				).Return(
-					[]*s3.InventoryConfiguration{
-						{Id: awssdk.String("Inventory_Bucket1")},
-						{Id: awssdk.String("Inventory2_Bucket1")},
-					},
-					nil,
-				)
-
-				repository.On(
-					"ListBucketInventoryConfigurations",
 					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift2")},
 					"eu-west-3",
 				).Return(
 					[]*s3.InventoryConfiguration{
 						{Id: awssdk.String("Inventory_Bucket2")},
 						{Id: awssdk.String("Inventory2_Bucket2")},
-					},
-					nil,
-				)
-
-				repository.On(
-					"ListBucketInventoryConfigurations",
-					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift3")},
-					"eu-west-1",
-				).Return(
-					[]*s3.InventoryConfiguration{
-						{Id: awssdk.String("Inventory_Bucket3")},
-						{Id: awssdk.String("Inventory2_Bucket3")},
 					},
 					nil,
 				)
