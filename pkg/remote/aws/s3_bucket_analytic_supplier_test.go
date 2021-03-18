@@ -69,36 +69,12 @@ func TestS3BucketAnalyticSupplier_Resources(t *testing.T) {
 
 				repository.On(
 					"ListBucketAnalyticsConfigurations",
-					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift")},
-					"eu-west-1",
-				).Return(
-					[]*s3.AnalyticsConfiguration{
-						{Id: awssdk.String("Analytics_Bucket1")},
-						{Id: awssdk.String("Analytics2_Bucket1")},
-					},
-					nil,
-				)
-
-				repository.On(
-					"ListBucketAnalyticsConfigurations",
 					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift2")},
 					"eu-west-3",
 				).Return(
 					[]*s3.AnalyticsConfiguration{
 						{Id: awssdk.String("Analytics_Bucket2")},
 						{Id: awssdk.String("Analytics2_Bucket2")},
-					},
-					nil,
-				)
-
-				repository.On(
-					"ListBucketAnalyticsConfigurations",
-					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift3")},
-					"ap-northeast-1",
-				).Return(
-					[]*s3.AnalyticsConfiguration{
-						{Id: awssdk.String("Analytics_Bucket3")},
-						{Id: awssdk.String("Analytics2_Bucket3")},
 					},
 					nil,
 				)
