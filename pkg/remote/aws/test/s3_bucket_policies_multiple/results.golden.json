@@ -3,15 +3,5 @@
   "bucket": "bucket-martin-test-drift2",
   "id": "bucket-martin-test-drift2",
   "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"PublicReadGetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift2/*\"}]}"
- },
- {
-  "bucket": "bucket-martin-test-drift3",
-  "id": "bucket-martin-test-drift3",
-  "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"PublicReadGetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift3/*\"}]}"
- },
- {
-  "bucket": "bucket-martin-test-drift",
-  "id": "bucket-martin-test-drift",
-  "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"PublicReadGetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift/*\"}]}"
  }
 ]
