@@ -6,7 +6,9 @@ import (
 )
 
 func InitTestAwsProvider(providerLibrary *terraform.ProviderLibrary) (*AWSTerraformProvider, error) {
-	provider, err := NewAWSTerraformProvider(&output.MockProgress{})
+	progress := &output.MockProgress{}
+	progress.On("Inc").Maybe().Return()
+	provider, err := NewAWSTerraformProvider(progress)
 	if err != nil {
 		return nil, err
 	}
