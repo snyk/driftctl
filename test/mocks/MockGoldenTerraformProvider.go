@@ -6,13 +6,12 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 
 	"github.com/hashicorp/terraform/providers"
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
-
-	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
 type MockedGoldenTFProvider struct {
@@ -167,4 +166,4 @@ func getFileNameSuffix(args terraform.ReadResourceArgs) string {
 	return suffix
 }
 
-func (m MockedGoldenTFProvider) Cleanup() {}
+func (p MockedGoldenTFProvider) Cleanup() {}
