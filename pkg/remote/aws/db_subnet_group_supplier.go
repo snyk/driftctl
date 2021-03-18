@@ -32,7 +32,7 @@ func NewDBSubnetGroupSupplier(provider *AWSTerraformProvider) *DBSubnetGroupSupp
 	}
 }
 
-func (s DBSubnetGroupSupplier) Resources() ([]resource.Resource, error) {
+func (s *DBSubnetGroupSupplier) Resources() ([]resource.Resource, error) {
 
 	subnetGroups, err := s.client.ListAllDbSubnetGroups()
 
@@ -53,7 +53,7 @@ func (s DBSubnetGroupSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(ctyValues)
 }
 
-func (s DBSubnetGroupSupplier) readSubnetGroup(subnetGroup rds.DBSubnetGroup) (cty.Value, error) {
+func (s *DBSubnetGroupSupplier) readSubnetGroup(subnetGroup rds.DBSubnetGroup) (cty.Value, error) {
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *subnetGroup.DBSubnetGroupName,
 		Ty: aws.AwsDbSubnetGroupResourceType,

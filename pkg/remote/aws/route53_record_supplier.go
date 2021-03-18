@@ -32,7 +32,7 @@ func NewRoute53RecordSupplier(provider *AWSTerraformProvider) *Route53RecordSupp
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner())}
 }
 
-func (s Route53RecordSupplier) Resources() ([]resource.Resource, error) {
+func (s *Route53RecordSupplier) Resources() ([]resource.Resource, error) {
 
 	zones, err := s.listZones()
 	if err != nil {
@@ -52,7 +52,7 @@ func (s Route53RecordSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s Route53RecordSupplier) listZones() ([][2]string, error) {
+func (s *Route53RecordSupplier) listZones() ([][2]string, error) {
 	results := make([][2]string, 0)
 	zones, err := s.client.ListAllZones()
 	if err != nil {
@@ -66,7 +66,7 @@ func (s Route53RecordSupplier) listZones() ([][2]string, error) {
 	return results, nil
 }
 
-func (s Route53RecordSupplier) listRecordsForZone(zoneId string, zoneName string) error {
+func (s *Route53RecordSupplier) listRecordsForZone(zoneId string, zoneName string) error {
 
 	records, err := s.client.ListRecordsForZone(zoneId)
 

@@ -29,7 +29,7 @@ func NewLambdaEventSourceMappingSupplier(provider *AWSTerraformProvider) *Lambda
 	}
 }
 
-func (s LambdaEventSourceMappingSupplier) Resources() ([]resource.Resource, error) {
+func (s *LambdaEventSourceMappingSupplier) Resources() ([]resource.Resource, error) {
 	functions, err := s.client.ListAllLambdaEventSourceMappings()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsLambdaEventSourceMappingResourceType)
@@ -49,7 +49,7 @@ func (s LambdaEventSourceMappingSupplier) Resources() ([]resource.Resource, erro
 	return s.deserializer.Deserialize(results)
 }
 
-func (s LambdaEventSourceMappingSupplier) readLambdaEventSourceMapping(sourceMappingConfig lambda.EventSourceMappingConfiguration) (cty.Value, error) {
+func (s *LambdaEventSourceMappingSupplier) readLambdaEventSourceMapping(sourceMappingConfig lambda.EventSourceMappingConfiguration) (cty.Value, error) {
 	resFunction, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsLambdaEventSourceMappingResourceType,

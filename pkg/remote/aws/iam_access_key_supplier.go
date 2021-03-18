@@ -31,7 +31,7 @@ func NewIamAccessKeySupplier(provider *AWSTerraformProvider) *IamAccessKeySuppli
 	}
 }
 
-func (s IamAccessKeySupplier) Resources() ([]resource.Resource, error) {
+func (s *IamAccessKeySupplier) Resources() ([]resource.Resource, error) {
 	keys, err := listIamAccessKeys(s.client)
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (s IamAccessKeySupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s IamAccessKeySupplier) readRes(key *iam.AccessKeyMetadata) (cty.Value, error) {
+func (s *IamAccessKeySupplier) readRes(key *iam.AccessKeyMetadata) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamAccessKeyResourceType,
