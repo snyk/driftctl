@@ -67,36 +67,12 @@ func TestS3BucketMetricSupplier_Resources(t *testing.T) {
 
 				repository.On(
 					"ListBucketMetricsConfigurations",
-					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift")},
-					"eu-west-1",
-				).Return(
-					[]*s3.MetricsConfiguration{
-						{Id: awssdk.String("Metrics_Bucket1")},
-						{Id: awssdk.String("Metrics2_Bucket1")},
-					},
-					nil,
-				)
-
-				repository.On(
-					"ListBucketMetricsConfigurations",
 					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift2")},
 					"eu-west-3",
 				).Return(
 					[]*s3.MetricsConfiguration{
 						{Id: awssdk.String("Metrics_Bucket2")},
 						{Id: awssdk.String("Metrics2_Bucket2")},
-					},
-					nil,
-				)
-
-				repository.On(
-					"ListBucketMetricsConfigurations",
-					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift3")},
-					"ap-northeast-1",
-				).Return(
-					[]*s3.MetricsConfiguration{
-						{Id: awssdk.String("Metrics_Bucket3")},
-						{Id: awssdk.String("Metrics2_Bucket3")},
 					},
 					nil,
 				)
