@@ -40,7 +40,6 @@ func TestS3BucketSupplier_Resources(t *testing.T) {
 					{Name: awssdk.String("bucket-martin-test-drift")},
 					{Name: awssdk.String("bucket-martin-test-drift2")},
 					{Name: awssdk.String("bucket-martin-test-drift3")},
-					{Name: awssdk.String("bucket-martin-test-drift4")},
 				}, nil)
 
 				repository.On(
@@ -53,7 +52,7 @@ func TestS3BucketSupplier_Resources(t *testing.T) {
 
 				repository.On(
 					"GetBucketLocation",
-					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift4")},
+					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift2")},
 				).Return(
 					"eu-west-3",
 					nil,
@@ -64,14 +63,6 @@ func TestS3BucketSupplier_Resources(t *testing.T) {
 					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift3")},
 				).Return(
 					"ap-northeast-1",
-					nil,
-				)
-
-				repository.On(
-					"GetBucketLocation",
-					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift2")},
-				).Return(
-					"eu-west-1",
 					nil,
 				)
 			},
@@ -113,7 +104,7 @@ func TestS3BucketSupplier_Resources(t *testing.T) {
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 				tf.TerraformProviderConfig{
 					Name:         "test",
-					DefaultAlias: "eu-west-1",
+					DefaultAlias: "eu-west-3",
 				},
 			}
 			got, err := s.Resources()
