@@ -11,6 +11,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
@@ -121,14 +122,14 @@ func TestS3BucketMetricSupplier_Resources(t *testing.T) {
 					"GetBucketLocation",
 					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift")},
 				).Return(
-					"eu-west-1",
+					"eu-west-3",
 					nil,
 				)
 
 				repository.On(
 					"ListBucketMetricsConfigurations",
 					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift")},
-					"eu-west-1",
+					"eu-west-3",
 				).Return(
 					nil,
 					awserr.NewRequestFailure(nil, 403, ""),
@@ -165,6 +166,10 @@ func TestS3BucketMetricSupplier_Resources(t *testing.T) {
 				deserializer,
 				&mock,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
+				tf.TerraformProviderConfig{
+					Name:         "test",
+					DefaultAlias: "eu-west-3",
+				},
 			}
 			got, err := s.Resources()
 			assert.Equal(t, err, tt.wantErr)
