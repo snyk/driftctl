@@ -155,6 +155,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "vainkop",
+      "name": "vainkop",
+      "avatar_url": "https://avatars.githubusercontent.com/u/28118190?v=4",
+      "profile": "https://github.com/vainkop",
+      "contributions": [
+        "bug"
+      ]
     }
   ]
 }
