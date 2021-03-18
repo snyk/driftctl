@@ -146,6 +146,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "sundowndev",
+      "name": "Raphaël",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16480203?v=4",
+      "profile": "https://crvx.fr/",
+      "contributions": [
+        "code"
+      ]
     }
   ]
 }
