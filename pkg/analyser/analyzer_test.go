@@ -3,13 +3,15 @@ package analyser
 import (
 	"encoding/json"
 	"io/ioutil"
+	"testing"
 
 	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/mocks"
 
-	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/stretchr/testify/assert"
+
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 
@@ -18,8 +20,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 
 	"github.com/r3labs/diff/v2"
-
-	"testing"
 )
 
 func TestAnalyze(t *testing.T) {
@@ -898,6 +898,56 @@ func TestAnalyze(t *testing.T) {
 			},
 			hasDrifted: true,
 		},
+		{
+			name: "Test sorted unmanaged & deleted resources",
+			iac: []resource.Resource{
+				&aws.AwsSecurityGroup{
+					Id: "managed security group 22",
+				},
+				&aws.AwsSecurityGroup{
+					Id: "managed security group 20",
+				},
+			},
+			cloud: []resource.Resource{
+				&aws.AwsSecurityGroupRule{
+					Id: "unmanaged rule 12",
+				},
+				&aws.AwsSecurityGroupRule{
+					Id: "unmanaged rule 10",
+				},
+			},
+			expected: Analysis{
+				managed: []resource.Resource{},
+				unmanaged: []resource.Resource{
+					&aws.AwsSecurityGroupRule{
+						Id: "unmanaged rule 10",
+					},
+					&aws.AwsSecurityGroupRule{
+						Id: "unmanaged rule 12",
+					},
+				},
+				deleted: []resource.Resource{
+					&aws.AwsSecurityGroup{
+						Id: "managed security group 20",
+					},
+					&aws.AwsSecurityGroup{
+						Id: "managed security group 22",
+					},
+				},
+				summary: Summary{
+					TotalResources: 4,
+					TotalManaged:   0,
+					TotalUnmanaged: 2,
+					TotalDeleted:   2,
+				},
+				alerts: alerter.Alerts{
+					"": {
+						newUnmanagedSecurityGroupRulesAlert(),
+					},
+				},
+			},
+			hasDrifted: true,
+		},
 	}
 
 	for _, c := range cases {
@@ -940,23 +990,31 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			unmanagedChanges, err := diff.Diff(result.Unmanaged(), c.expected.Unmanaged())
-			if err != nil {
-				t.Fatalf("Unable to compare %+v", err)
-			}
-			if len(unmanagedChanges) > 0 {
-				for _, change := range unmanagedChanges {
-					t.Errorf("%+v", change)
+			for i, expected := range c.expected.Unmanaged() {
+				actual := result.Unmanaged()[i]
+
+				unmanagedChanges, err := diff.Diff(actual, expected)
+				if err != nil {
+					t.Errorf("Unable to compare %+v", err)
+				}
+				if len(unmanagedChanges) > 0 {
+					for _, change := range unmanagedChanges {
+						t.Errorf("%+v", change)
+					}
 				}
 			}
 
-			deletedChanges, err := diff.Diff(result.Deleted(), c.expected.Deleted())
-			if err != nil {
-				t.Fatalf("Unable to compare %+v", err)
-			}
-			if len(deletedChanges) > 0 {
-				for _, change := range deletedChanges {
-					t.Errorf("%+v", change)
+			for i, expected := range c.expected.Deleted() {
+				actual := result.Deleted()[i]
+
+				deletedChanges, err := diff.Diff(actual, expected)
+				if err != nil {
+					t.Errorf("Unable to compare %+v", err)
+				}
+				if len(deletedChanges) > 0 {
+					for _, change := range deletedChanges {
+						t.Errorf("%+v", change)
+					}
 				}
 			}
 
@@ -1148,4 +1206,59 @@ func TestAnalysis_UnmarshalJSON(t *testing.T) {
 	assert.Equal(t, 1, got.Summary().TotalDrifted)
 	assert.Len(t, got.alerts, 1)
 	assert.Equal(t, got.alerts["aws_iam_access_key"][0].Message(), "This is an alert")
+}
+
+func TestAnalysis_Sort(t *testing.T) {
+	cases := []struct {
+		name     string
+		iac      []resource.Resource
+		cloud    []resource.Resource
+		expected Analysis
+	}{
+		{
+			name: "unmanaged resources are sorted",
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			filter := &mocks.Filter{}
+			filter.On("IsResourceIgnored", mock.Anything).Return(false)
+			filter.On("IsFieldIgnored", mock.Anything, mock.Anything).Return(false)
+
+			al := alerter.NewAlerter()
+
+			analyzer := NewAnalyzer(al)
+			result, err := analyzer.Analyze(c.cloud, c.iac, filter)
+
+			if err != nil {
+				t.Error(err)
+				return
+			}
+
+			for i, expected := range c.expected.Unmanaged() {
+				actual := result.Unmanaged()[i]
+
+				unmanagedChanges, err := diff.Diff(actual, expected)
+				if err != nil {
+					t.Fatalf("Unable to compare %+v", err)
+				}
+				if len(unmanagedChanges) > 0 {
+					for _, change := range unmanagedChanges {
+						t.Errorf("%+v", change)
+					}
+				}
+			}
+
+			deletedChanges, err := diff.Diff(result.Deleted(), c.expected.Deleted())
+			if err != nil {
+				t.Fatalf("Unable to compare %+v", err)
+			}
+			if len(deletedChanges) > 0 {
+				for _, change := range deletedChanges {
+					t.Errorf("%+v", change)
+				}
+			}
+		})
+	}
 }

@@ -6,9 +6,10 @@ import (
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
+	"github.com/r3labs/diff/v2"
+
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/r3labs/diff/v2"
 )
 
 type UnmanagedSecurityGroupRulesAlert struct{}
@@ -117,6 +118,10 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 
 	// Add remaining unmanaged resources
 	analysis.AddUnmanaged(filteredRemoteResource...)
+
+	// Sort resources by Terraform Id
+	// The purpose is to have a predictable output
+	analysis.SortResources()
 
 	analysis.SetAlerts(a.alerter.Retrieve())
 
