@@ -51,6 +51,16 @@ func IsSameResource(rRs, lRs Resource) bool {
 }
 
 func Sort(res []Resource) []Resource {
-	sort.SliceStable(res, func(i, j int) bool { return res[i].TerraformId() < res[j].TerraformId() })
+	sort.SliceStable(res, func(i, j int) bool {
+		if res[i].TerraformType() < res[j].TerraformType() {
+			return true
+		}
+
+		if res[i].TerraformType() > res[j].TerraformType() {
+			return false
+		}
+
+		return res[i].TerraformId() < res[j].TerraformId()
+	})
 	return res
 }

@@ -950,6 +950,12 @@ func TestAnalyze(t *testing.T) {
 		},
 	}
 
+	differ, err := diff.NewDiffer(diff.SliceOrdering(true))
+	if err != nil {
+		panic(err)
+	}
+	assert.NoError(t, err)
+
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			filter := &mocks.Filter{}
@@ -980,7 +986,7 @@ func TestAnalyze(t *testing.T) {
 				t.Errorf("Drifted state does not match, got %t expected %t", result.IsSync(), !c.hasDrifted)
 			}
 
-			managedChanges, err := diff.Diff(result.Managed(), c.expected.Managed())
+			managedChanges, err := differ.Diff(result.Managed(), c.expected.Managed())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -990,31 +996,23 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			for i, expected := range c.expected.Unmanaged() {
-				actual := result.Unmanaged()[i]
-
-				unmanagedChanges, err := diff.Diff(actual, expected)
-				if err != nil {
-					t.Errorf("Unable to compare %+v", err)
-				}
-				if len(unmanagedChanges) > 0 {
-					for _, change := range unmanagedChanges {
-						t.Errorf("%+v", change)
-					}
+			unmanagedChanges, err := differ.Diff(result.Unmanaged(), c.expected.Unmanaged())
+			if err != nil {
+				t.Fatalf("Unable to compare %+v", err)
+			}
+			if len(unmanagedChanges) > 0 {
+				for _, change := range unmanagedChanges {
+					t.Errorf("%+v", change)
 				}
 			}
 
-			for i, expected := range c.expected.Deleted() {
-				actual := result.Deleted()[i]
-
-				deletedChanges, err := diff.Diff(actual, expected)
-				if err != nil {
-					t.Errorf("Unable to compare %+v", err)
-				}
-				if len(deletedChanges) > 0 {
-					for _, change := range deletedChanges {
-						t.Errorf("%+v", change)
-					}
+			deletedChanges, err := differ.Diff(result.Deleted(), c.expected.Deleted())
+			if err != nil {
+				t.Fatalf("Unable to compare %+v", err)
+			}
+			if len(deletedChanges) > 0 {
+				for _, change := range deletedChanges {
+					t.Errorf("%+v", change)
 				}
 			}
 
@@ -1028,7 +1026,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			summaryChanges, err := diff.Diff(c.expected.Summary(), result.Summary())
+			summaryChanges, err := differ.Diff(c.expected.Summary(), result.Summary())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -1038,7 +1036,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			alertsChanges, err := diff.Diff(result.Alerts(), c.expected.Alerts())
+			alertsChanges, err := differ.Diff(result.Alerts(), c.expected.Alerts())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
