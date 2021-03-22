@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/cloudskiff/driftctl/build"
+	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
 	"github.com/cloudskiff/driftctl/sentry"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -35,6 +36,8 @@ type DriftctlCmd struct {
 }
 
 func NewDriftctlCmd(build build.BuildInterface) *DriftctlCmd {
+	scanCmd := NewScanCmd()
+
 	cmd := &DriftctlCmd{
 		cobra.Command{
 			Use:   "driftctl <command> [flags]",
@@ -49,9 +52,13 @@ func NewDriftctlCmd(build build.BuildInterface) *DriftctlCmd {
 			Long:          "Detect, track and alert on infrastructure drift.",
 			SilenceErrors: true,
 			SilenceUsage:  true,
+			PreRunE:       scanCmd.PreRunE,
+			RunE:          scanCmd.RunE,
 		},
 		build,
 	}
+
+	RegisterScanFlags(&cmd.Command, &ScanOptions{BackendOptions: &backend.Options{}})
 
 	cmd.SetVersionTemplate(versionTemplate)
 	cmd.AddCommand(NewVersionCmd())

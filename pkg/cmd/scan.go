@@ -37,6 +37,56 @@ type ScanOptions struct {
 	BackendOptions *backend.Options
 }
 
+func RegisterScanFlags(cmd *cobra.Command, opts *ScanOptions) {
+	fl := cmd.Flags()
+	fl.BoolP(
+		"quiet",
+		"",
+		false,
+		"Do not display anything but scan results",
+	)
+	fl.StringP(
+		"filter",
+		"",
+		"",
+		"JMESPath expression to filter on\n"+
+			"Examples : \n"+
+			"  - Type == 'aws_s3_bucket' (will filter only s3 buckets)\n"+
+			"  - Type =='aws_s3_bucket && Id != 'my_bucket' (excludes s3 bucket 'my_bucket')\n"+
+			"  - Attr.Tags.Terraform == 'true' (include only resources that have Tag Terraform equal to 'true')\n",
+	)
+	fl.StringP(
+		"output",
+		"o",
+		output.Example(output.ConsoleOutputType),
+		"Output format, by default it will write to the console\n"+
+			"Accepted formats are: "+strings.Join(output.SupportedOutputsExample(), ",")+"\n",
+	)
+	fl.StringSliceP(
+		"from",
+		"f",
+		[]string{"tfstate://terraform.tfstate"},
+		"IaC sources, by default try to find local terraform.tfstate file\n"+
+			"Accepted schemes are: "+strings.Join(supplier.GetSupportedSchemes(), ",")+"\n",
+	)
+	supportedRemotes := remote.GetSupportedRemotes()
+	fl.StringVarP(
+		&opts.To,
+		"to",
+		"t",
+		supportedRemotes[0],
+		"Cloud provider source\n"+
+			"Accepted values are: "+strings.Join(supportedRemotes, ",")+"\n",
+	)
+	fl.StringToStringVarP(&opts.BackendOptions.Headers,
+		"headers",
+		"H",
+		map[string]string{},
+		"Use those HTTP headers to query the provided URL.\n"+
+			"Only used with tfstate+http(s) backend for now.\n",
+	)
+}
+
 func NewScanCmd() *cobra.Command {
 	opts := &ScanOptions{}
 	opts.BackendOptions = &backend.Options{}
@@ -90,53 +140,7 @@ func NewScanCmd() *cobra.Command {
 		},
 	}
 
-	fl := cmd.Flags()
-	fl.BoolP(
-		"quiet",
-		"",
-		false,
-		"Do not display anything but scan results",
-	)
-	fl.StringP(
-		"filter",
-		"",
-		"",
-		"JMESPath expression to filter on\n"+
-			"Examples : \n"+
-			"  - Type == 'aws_s3_bucket' (will filter only s3 buckets)\n"+
-			"  - Type =='aws_s3_bucket && Id != 'my_bucket' (excludes s3 bucket 'my_bucket')\n"+
-			"  - Attr.Tags.Terraform == 'true' (include only resources that have Tag Terraform equal to 'true')\n",
-	)
-	fl.StringP(
-		"output",
-		"o",
-		output.Example(output.ConsoleOutputType),
-		"Output format, by default it will write to the console\n"+
-			"Accepted formats are: "+strings.Join(output.SupportedOutputsExample(), ",")+"\n",
-	)
-	fl.StringSliceP(
-		"from",
-		"f",
-		[]string{"tfstate://terraform.tfstate"},
-		"IaC sources, by default try to find local terraform.tfstate file\n"+
-			"Accepted schemes are: "+strings.Join(supplier.GetSupportedSchemes(), ",")+"\n",
-	)
-	supportedRemotes := remote.GetSupportedRemotes()
-	fl.StringVarP(
-		&opts.To,
-		"to",
-		"t",
-		supportedRemotes[0],
-		"Cloud provider source\n"+
-			"Accepted values are: "+strings.Join(supportedRemotes, ",")+"\n",
-	)
-	fl.StringToStringVarP(&opts.BackendOptions.Headers,
-		"headers",
-		"H",
-		map[string]string{},
-		"Use those HTTP headers to query the provided URL.\n"+
-			"Only used with tfstate+http(s) backend for now.\n",
-	)
+	RegisterScanFlags(cmd, opts)
 
 	return cmd
 }
