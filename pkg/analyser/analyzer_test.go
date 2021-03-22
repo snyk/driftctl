@@ -972,9 +972,8 @@ func TestAnalyze(t *testing.T) {
 
 	differ, err := diff.NewDiffer(diff.SliceOrdering(true))
 	if err != nil {
-		panic(err)
+		t.Fatalf("Error creating new differ: %e", err)
 	}
-	assert.NoError(t, err)
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
