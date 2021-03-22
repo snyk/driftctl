@@ -163,6 +163,7 @@ func TestDriftctlCmd_Invalid(t *testing.T) {
 		args     []string
 		expected string
 	}{
+		{args: []string{}, expected: `Invalid AWS Region: `},
 		{args: []string{"test"}, expected: `unknown command "test" for "driftctl"`},
 		{args: []string{"-w"}, expected: `unknown shorthand flag: 'w' in -w`},
 		{args: []string{"--test"}, expected: `unknown flag: --test`},
