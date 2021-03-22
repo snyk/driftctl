@@ -166,29 +166,10 @@ func TestDriftctlCmd_Invalid(t *testing.T) {
 		{args: []string{"test"}, expected: `unknown command "test" for "driftctl"`},
 		{args: []string{"-w"}, expected: `unknown shorthand flag: 'w' in -w`},
 		{args: []string{"--test"}, expected: `unknown flag: --test`},
-	}
-
-	for _, tt := range cases {
-		_, err := test.Execute(&cmd.Command, tt.args...)
-		if err == nil {
-			t.Errorf("Invalid arg should generate error")
-		}
-		if err.Error() != tt.expected {
-			t.Errorf("Expected %v, got %v", tt.expected, err)
-		}
-	}
-}
-
-func TestDriftctlCmd_Valid(t *testing.T) {
-	cmd := NewDriftctlCmd(mocks.MockBuild{})
-
-	cases := []struct {
-		args     []string
-		expected string
-	}{
 		{args: []string{"--headers"}, expected: `flag needs an argument: --headers`},
 		{args: []string{"-t"}, expected: `flag needs an argument: 't' in -t`},
 		{args: []string{"--from"}, expected: `flag needs an argument: --from`},
+		{args: []string{"--filter"}, expected: `flag needs an argument: --filter`},
 	}
 
 	for _, tt := range cases {
