@@ -615,13 +615,12 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "foo",
-									To:   "oof",
+									From: "one",
+									To:   "two",
 									Path: []string{
 										"StructSlice",
 										"0",
-										"Array",
-										"0",
+										"String",
 									},
 								},
 								Computed: true,
@@ -629,12 +628,13 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "one",
-									To:   "two",
+									From: "foo",
+									To:   "oof",
 									Path: []string{
 										"StructSlice",
 										"0",
-										"String",
+										"Array",
+										"0",
 									},
 								},
 								Computed: true,
@@ -1035,7 +1035,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			diffChanges, err := diff.Diff(result.Differences(), c.expected.Differences())
+			diffChanges, err := differ.Diff(result.Differences(), c.expected.Differences())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
