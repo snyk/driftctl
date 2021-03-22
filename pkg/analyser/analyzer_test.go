@@ -901,50 +901,70 @@ func TestAnalyze(t *testing.T) {
 		{
 			name: "Test sorted unmanaged & deleted resources",
 			iac: []resource.Resource{
-				&aws.AwsSecurityGroup{
-					Id: "managed security group 22",
+				&testresource.FakeResource{
+					Id:   "deleted resource 22",
+					Type: "aws_s3_bucket",
 				},
-				&aws.AwsSecurityGroup{
-					Id: "managed security group 20",
+				&testresource.FakeResource{
+					Id:   "deleted resource 20",
+					Type: "aws_ebs_volume",
+				},
+				&testresource.FakeResource{
+					Id:   "deleted resource 20",
+					Type: "aws_s3_bucket",
 				},
 			},
 			cloud: []resource.Resource{
-				&aws.AwsSecurityGroupRule{
-					Id: "unmanaged rule 12",
+				&testresource.FakeResource{
+					Id:   "unmanaged resource 12",
+					Type: "aws_s3_bucket",
 				},
-				&aws.AwsSecurityGroupRule{
-					Id: "unmanaged rule 10",
+				&testresource.FakeResource{
+					Id:   "unmanaged resource 10",
+					Type: "aws_s3_bucket",
+				},
+				&testresource.FakeResource{
+					Id:   "unmanaged resource 11",
+					Type: "aws_ebs_volume",
 				},
 			},
 			expected: Analysis{
 				managed: []resource.Resource{},
 				unmanaged: []resource.Resource{
-					&aws.AwsSecurityGroupRule{
-						Id: "unmanaged rule 10",
+					&testresource.FakeResource{
+						Id:   "unmanaged resource 11",
+						Type: "aws_ebs_volume",
 					},
-					&aws.AwsSecurityGroupRule{
-						Id: "unmanaged rule 12",
+					&testresource.FakeResource{
+						Id:   "unmanaged resource 10",
+						Type: "aws_s3_bucket",
+					},
+					&testresource.FakeResource{
+						Id:   "unmanaged resource 12",
+						Type: "aws_s3_bucket",
 					},
 				},
 				deleted: []resource.Resource{
-					&aws.AwsSecurityGroup{
-						Id: "managed security group 20",
+					&testresource.FakeResource{
+						Id:   "deleted resource 20",
+						Type: "aws_ebs_volume",
 					},
-					&aws.AwsSecurityGroup{
-						Id: "managed security group 22",
+					&testresource.FakeResource{
+						Id:   "deleted resource 20",
+						Type: "aws_s3_bucket",
+					},
+					&testresource.FakeResource{
+						Id:   "deleted resource 22",
+						Type: "aws_s3_bucket",
 					},
 				},
 				summary: Summary{
-					TotalResources: 4,
+					TotalResources: 6,
 					TotalManaged:   0,
-					TotalUnmanaged: 2,
-					TotalDeleted:   2,
+					TotalUnmanaged: 3,
+					TotalDeleted:   3,
 				},
-				alerts: alerter.Alerts{
-					"": {
-						newUnmanagedSecurityGroupRulesAlert(),
-					},
-				},
+				alerts: alerter.Alerts{},
 			},
 			hasDrifted: true,
 		},
