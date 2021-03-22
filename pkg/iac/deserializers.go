@@ -60,6 +60,7 @@ func Deserializers() []deserializer.CTYDeserializer {
 		awsdeserializer.NewKMSKeyDeserializer(),
 		awsdeserializer.NewKMSAliasDeserializer(),
 		awsdeserializer.NewLambdaEventSourceMappingDeserializer(),
+		awsdeserializer.NewEKSClusterDeserializer(),
 
 		ghdeserializer.NewGithubRepositoryDeserializer(),
 		ghdeserializer.NewGithubTeamDeserializer(),

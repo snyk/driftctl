@@ -76,6 +76,7 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	supplierLibrary.AddSupplier(NewKMSKeySupplier(provider))
 	supplierLibrary.AddSupplier(NewKMSAliasSupplier(provider))
 	supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider))
+	supplierLibrary.AddSupplier(NewEKSClusterSupplier(provider))
 
 	return nil
 }
