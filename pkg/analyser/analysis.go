@@ -189,3 +189,8 @@ func (a *Analysis) Summary() Summary {
 func (a *Analysis) Alerts() alerter.Alerts {
 	return a.alerts
 }
+
+func (a *Analysis) SortResources() {
+	a.unmanaged = resource.Sort(a.unmanaged)
+	a.deleted = resource.Sort(a.deleted)
+}
