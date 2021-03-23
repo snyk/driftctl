@@ -2,6 +2,7 @@ package resource
 
 import (
 	"encoding/json"
+	"sort"
 )
 
 type Resource interface {
@@ -47,4 +48,14 @@ type NormalizedResource interface {
 
 func IsSameResource(rRs, lRs Resource) bool {
 	return rRs.TerraformType() == lRs.TerraformType() && rRs.TerraformId() == lRs.TerraformId()
+}
+
+func Sort(res []Resource) []Resource {
+	sort.SliceStable(res, func(i, j int) bool {
+		if res[i].TerraformType() != res[j].TerraformType() {
+			return res[i].TerraformType() < res[j].TerraformType()
+		}
+		return res[i].TerraformId() < res[j].TerraformId()
+	})
+	return res
 }

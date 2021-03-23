@@ -3,13 +3,15 @@ package analyser
 import (
 	"encoding/json"
 	"io/ioutil"
+	"testing"
 
 	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/mocks"
 
-	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/stretchr/testify/assert"
+
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 
@@ -18,8 +20,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 
 	"github.com/r3labs/diff/v2"
-
-	"testing"
 )
 
 func TestAnalyze(t *testing.T) {
@@ -615,13 +615,12 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "foo",
-									To:   "oof",
+									From: "one",
+									To:   "two",
 									Path: []string{
 										"StructSlice",
 										"0",
-										"Array",
-										"0",
+										"String",
 									},
 								},
 								Computed: true,
@@ -629,12 +628,13 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "one",
-									To:   "two",
+									From: "foo",
+									To:   "oof",
 									Path: []string{
 										"StructSlice",
 										"0",
-										"String",
+										"Array",
+										"0",
 									},
 								},
 								Computed: true,
@@ -898,6 +898,81 @@ func TestAnalyze(t *testing.T) {
 			},
 			hasDrifted: true,
 		},
+		{
+			name: "Test sorted unmanaged & deleted resources",
+			iac: []resource.Resource{
+				&testresource.FakeResource{
+					Id:   "deleted resource 22",
+					Type: "aws_s3_bucket",
+				},
+				&testresource.FakeResource{
+					Id:   "deleted resource 20",
+					Type: "aws_ebs_volume",
+				},
+				&testresource.FakeResource{
+					Id:   "deleted resource 20",
+					Type: "aws_s3_bucket",
+				},
+			},
+			cloud: []resource.Resource{
+				&testresource.FakeResource{
+					Id:   "unmanaged resource 12",
+					Type: "aws_s3_bucket",
+				},
+				&testresource.FakeResource{
+					Id:   "unmanaged resource 10",
+					Type: "aws_s3_bucket",
+				},
+				&testresource.FakeResource{
+					Id:   "unmanaged resource 11",
+					Type: "aws_ebs_volume",
+				},
+			},
+			expected: Analysis{
+				managed: []resource.Resource{},
+				unmanaged: []resource.Resource{
+					&testresource.FakeResource{
+						Id:   "unmanaged resource 11",
+						Type: "aws_ebs_volume",
+					},
+					&testresource.FakeResource{
+						Id:   "unmanaged resource 10",
+						Type: "aws_s3_bucket",
+					},
+					&testresource.FakeResource{
+						Id:   "unmanaged resource 12",
+						Type: "aws_s3_bucket",
+					},
+				},
+				deleted: []resource.Resource{
+					&testresource.FakeResource{
+						Id:   "deleted resource 20",
+						Type: "aws_ebs_volume",
+					},
+					&testresource.FakeResource{
+						Id:   "deleted resource 20",
+						Type: "aws_s3_bucket",
+					},
+					&testresource.FakeResource{
+						Id:   "deleted resource 22",
+						Type: "aws_s3_bucket",
+					},
+				},
+				summary: Summary{
+					TotalResources: 6,
+					TotalManaged:   0,
+					TotalUnmanaged: 3,
+					TotalDeleted:   3,
+				},
+				alerts: alerter.Alerts{},
+			},
+			hasDrifted: true,
+		},
+	}
+
+	differ, err := diff.NewDiffer(diff.SliceOrdering(true))
+	if err != nil {
+		t.Fatalf("Error creating new differ: %e", err)
 	}
 
 	for _, c := range cases {
@@ -930,7 +1005,7 @@ func TestAnalyze(t *testing.T) {
 				t.Errorf("Drifted state does not match, got %t expected %t", result.IsSync(), !c.hasDrifted)
 			}
 
-			managedChanges, err := diff.Diff(result.Managed(), c.expected.Managed())
+			managedChanges, err := differ.Diff(result.Managed(), c.expected.Managed())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -940,7 +1015,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			unmanagedChanges, err := diff.Diff(result.Unmanaged(), c.expected.Unmanaged())
+			unmanagedChanges, err := differ.Diff(result.Unmanaged(), c.expected.Unmanaged())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -950,7 +1025,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			deletedChanges, err := diff.Diff(result.Deleted(), c.expected.Deleted())
+			deletedChanges, err := differ.Diff(result.Deleted(), c.expected.Deleted())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -960,7 +1035,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			diffChanges, err := diff.Diff(result.Differences(), c.expected.Differences())
+			diffChanges, err := differ.Diff(result.Differences(), c.expected.Differences())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -970,7 +1045,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			summaryChanges, err := diff.Diff(c.expected.Summary(), result.Summary())
+			summaryChanges, err := differ.Diff(c.expected.Summary(), result.Summary())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -980,7 +1055,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			alertsChanges, err := diff.Diff(result.Alerts(), c.expected.Alerts())
+			alertsChanges, err := differ.Diff(result.Alerts(), c.expected.Alerts())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
