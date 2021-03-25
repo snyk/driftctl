@@ -14,6 +14,10 @@ resource "aws_dynamodb_table" "simple-dynamo-test" {
   hash_key       = "UserId"
   range_key      = "GameTitle"
 
+  timeouts {
+    create = "20m"
+  }
+
   attribute {
     name = "UserId"
     type = "S"
@@ -56,6 +60,10 @@ resource "aws_dynamodb_table" "global-dynamo-test" {
   billing_mode = "PAY_PER_REQUEST"
   stream_enabled = true
   stream_view_type = "NEW_AND_OLD_IMAGES"
+
+  timeouts {
+    create = "20m"
+  }
 
   attribute {
     name = "TestTableHashKey"
