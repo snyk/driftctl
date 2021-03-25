@@ -69,8 +69,4 @@ resource "aws_dynamodb_table" "global-dynamo-test" {
     name = "TestTableHashKey"
     type = "S"
   }
-
-  replica {
-    region_name = "us-east-2"
-  }
 }
