@@ -38,23 +38,23 @@ type NormalizedResource interface {
 For example S3Bucket policy is encoded in json but the formatting (newline and tabs) differs when read using the state reader. S3Bucket implements `resource.NormalizedResource`:
 
 ```go
-func (s S3Bucket) NormalizeForState() (resource.Resource, error) {
-	err := normalizePolicy(&s)
-	return &s, err
+func (r *AwsS3Bucket) NormalizeForState() (resource.Resource, error) {
+	err := r.normalizePolicy()
+	return r, err
 }
 
-func (s S3Bucket) NormalizeForProvider() (resource.Resource, error) {
-	err := normalizePolicy(&s)
-	return &s, err
+func (r *AwsS3Bucket) NormalizeForProvider() (resource.Resource, error) {
+	err := r.normalizePolicy()
+	return r, err
 }
 
-func normalizePolicy(s *S3Bucket) error {
-	if s.Policy.Policy != nil {
-		jsonString, err := structure.NormalizeJsonString(*s.Policy.Policy)
+func (r *AwsS3Bucket) normalizePolicy() error {
+	if r.Policy != nil {
+		jsonString, err := structure.NormalizeJsonString(*r.Policy)
 		if err != nil {
 			return err
 		}
-		s.Policy.Policy = &jsonString
+		r.Policy = &jsonString
 	}
 	return nil
 }
