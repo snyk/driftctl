@@ -27,6 +27,7 @@ func (s IamUserPolicyAttachmentDeserializer) HandledType() resource.ResourceType
 func (s IamUserPolicyAttachmentDeserializer) Deserialize(rawList []cty.Value) ([]resource.Resource, error) {
 	resources := make([]resource.Resource, 0)
 	for _, raw := range rawList {
+		raw := raw
 		userPolicyAttachment, err := decodeIamUserPolicyAttachment(raw)
 		if err != nil {
 			logrus.Warnf("error when deserializing iam user policy attachment %s : %+v", rawList, err)
@@ -40,6 +41,7 @@ func (s IamUserPolicyAttachmentDeserializer) Deserialize(rawList []cty.Value) ([
 			Groups:    &[]string{},
 			Roles:     &[]string{},
 		}
+		policyAttachment.CtyVal = &raw
 		resources = append(resources, &policyAttachment)
 	}
 	return resources, nil

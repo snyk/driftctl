@@ -9,7 +9,8 @@
       "subnet-63c5f90a",
       "subnet-d81e8695"
     ],
-    "Tags": null
+    "Tags": null,
+    "CtyVal": {}
   },
   {
     "Arn": "arn:aws:rds:eu-west-3:929327065333:subgrp:foo",
@@ -21,6 +22,7 @@
       "subnet-49f9ae32",
       "subnet-63c5f90a"
     ],
-    "Tags": null
+    "Tags": null,
+    "CtyVal": {}
   }
 ]

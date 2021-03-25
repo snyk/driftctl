@@ -13,7 +13,8 @@
   ],
   "Tags": null,
   "ZoneId": "Z09368953G729AFEX5048",
-  "Vpc": []
+  "Vpc": [],
+  "CtyVal": {}
  },
  {
   "AllowOverwrite": true,
@@ -36,7 +37,8 @@
   "FailoverRoutingPolicy": [],
   "GeolocationRoutingPolicy": [],
   "LatencyRoutingPolicy": [],
-  "WeightedRoutingPolicy": []
+  "WeightedRoutingPolicy": [],
+  "CtyVal": {}
  },
  {
   "AllowOverwrite": null,
@@ -56,6 +58,7 @@
   "FailoverRoutingPolicy": [],
   "GeolocationRoutingPolicy": [],
   "LatencyRoutingPolicy": [],
-  "WeightedRoutingPolicy": []
+  "WeightedRoutingPolicy": [],
+  "CtyVal": {}
  }
 ]

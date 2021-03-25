@@ -38,5 +38,6 @@ func decodeEC2KeyPair(rawKeyPair cty.Value) (resource.Resource, error) {
 	if err := gocty.FromCtyValue(rawKeyPair, &decodedKp); err != nil {
 		return nil, err
 	}
+	decodedKp.CtyVal = &rawKeyPair
 	return &decodedKp, nil
 }

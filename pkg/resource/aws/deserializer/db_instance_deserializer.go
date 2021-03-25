@@ -49,5 +49,7 @@ func decodeDBInstance(res *cty.Value) (resource.Resource, error) {
 		decoded.EnabledCloudwatchLogsExports = nil
 	}
 
+	decoded.CtyVal = res
+
 	return &decoded, nil
 }

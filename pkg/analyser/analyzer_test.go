@@ -178,8 +178,8 @@ func TestAnalyze(t *testing.T) {
 					FooBar: "foobar",
 					BarFoo: "barfoo",
 					Struct: struct {
-						Baz string `computed:"true"`
-						Bar string
+						Baz string `cty:"baz" computed:"true"`
+						Bar string `cty:"bar"`
 					}{"baz", "bar"},
 				},
 			},
@@ -189,8 +189,8 @@ func TestAnalyze(t *testing.T) {
 					FooBar: "barfoo",
 					BarFoo: "foobar",
 					Struct: struct {
-						Baz string `computed:"true"`
-						Bar string
+						Baz string `cty:"baz" computed:"true"`
+						Bar string `cty:"bar"`
 					}{"bar", "baz"},
 				},
 			},
@@ -201,8 +201,8 @@ func TestAnalyze(t *testing.T) {
 						FooBar: "foobar",
 						BarFoo: "barfoo",
 						Struct: struct {
-							Baz string `computed:"true"`
-							Bar string
+							Baz string `cty:"baz" computed:"true"`
+							Bar string `cty:"bar"`
 						}{"baz", "bar"},
 					},
 				},
@@ -218,8 +218,8 @@ func TestAnalyze(t *testing.T) {
 							FooBar: "foobar",
 							BarFoo: "barfoo",
 							Struct: struct {
-								Baz string `computed:"true"`
-								Bar string
+								Baz string `cty:"baz" computed:"true"`
+								Bar string `cty:"bar"`
 							}{"baz", "bar"},
 						},
 						Changelog: Changelog{
@@ -425,8 +425,8 @@ func TestAnalyze(t *testing.T) {
 					FooBar: "foobar",
 					BarFoo: "barfoo",
 					Struct: struct {
-						Baz string `computed:"true"`
-						Bar string
+						Baz string `cty:"baz" computed:"true"`
+						Bar string `cty:"bar"`
 					}{"baz", "bar"},
 				},
 				&testresource.FakeResource{
@@ -435,8 +435,8 @@ func TestAnalyze(t *testing.T) {
 					FooBar: "foobar",
 					BarFoo: "barfoo",
 					Struct: struct {
-						Baz string `computed:"true"`
-						Bar string
+						Baz string `cty:"baz" computed:"true"`
+						Bar string `cty:"bar"`
 					}{"baz", "bar"},
 				},
 				&testresource.FakeResource{
@@ -445,8 +445,8 @@ func TestAnalyze(t *testing.T) {
 					FooBar: "foobar",
 					BarFoo: "barfoo",
 					Struct: struct {
-						Baz string `computed:"true"`
-						Bar string
+						Baz string `cty:"baz" computed:"true"`
+						Bar string `cty:"bar"`
 					}{"baz", "bar"},
 				},
 				&testresource.FakeResource{
@@ -455,12 +455,12 @@ func TestAnalyze(t *testing.T) {
 					FooBar: "foobar",
 					BarFoo: "barfoo",
 					Struct: struct {
-						Baz string `computed:"true"`
-						Bar string
+						Baz string `cty:"baz" computed:"true"`
+						Bar string `cty:"bar"`
 					}{"baz", "bar"},
 					StructSlice: []struct {
-						String string   `computed:"true"`
-						Array  []string `computed:"true"`
+						String string   `cty:"string" computed:"true"`
+						Array  []string `cty:"array" computed:"true"`
 					}{
 						{"one", []string{"foo"}},
 					},
@@ -473,8 +473,8 @@ func TestAnalyze(t *testing.T) {
 					FooBar: "barfoo",
 					BarFoo: "foobar",
 					Struct: struct {
-						Baz string `computed:"true"`
-						Bar string
+						Baz string `cty:"baz" computed:"true"`
+						Bar string `cty:"bar"`
 					}{"bar", "baz"},
 				},
 				&testresource.FakeResource{
@@ -483,8 +483,8 @@ func TestAnalyze(t *testing.T) {
 					FooBar: "barfoo",
 					BarFoo: "foobar",
 					Struct: struct {
-						Baz string `computed:"true"`
-						Bar string
+						Baz string `cty:"baz" computed:"true"`
+						Bar string `cty:"bar"`
 					}{"bar", "baz"},
 				},
 				&testresource.FakeResource{
@@ -493,8 +493,8 @@ func TestAnalyze(t *testing.T) {
 					FooBar: "barfoo",
 					BarFoo: "foobar",
 					Struct: struct {
-						Baz string `computed:"true"`
-						Bar string
+						Baz string `cty:"baz" computed:"true"`
+						Bar string `cty:"bar"`
 					}{"bar", "baz"},
 				},
 				&testresource.FakeResource{
@@ -503,12 +503,12 @@ func TestAnalyze(t *testing.T) {
 					FooBar: "barfoo",
 					BarFoo: "foobar",
 					Struct: struct {
-						Baz string `computed:"true"`
-						Bar string
+						Baz string `cty:"baz" computed:"true"`
+						Bar string `cty:"bar"`
 					}{"bar", "baz"},
 					StructSlice: []struct {
-						String string   `computed:"true"`
-						Array  []string `computed:"true"`
+						String string   `cty:"string" computed:"true"`
+						Array  []string `cty:"array" computed:"true"`
 					}{
 						{"two", []string{"oof"}},
 					},
@@ -533,12 +533,12 @@ func TestAnalyze(t *testing.T) {
 						FooBar: "foobar",
 						BarFoo: "barfoo",
 						Struct: struct {
-							Baz string `computed:"true"`
-							Bar string
+							Baz string `cty:"baz" computed:"true"`
+							Bar string `cty:"bar"`
 						}{"baz", "bar"},
 						StructSlice: []struct {
-							String string   `computed:"true"`
-							Array  []string `computed:"true"`
+							String string   `cty:"string" computed:"true"`
+							Array  []string `cty:"array" computed:"true"`
 						}{
 							{"one", []string{"foo"}},
 						},
@@ -557,12 +557,12 @@ func TestAnalyze(t *testing.T) {
 							FooBar: "foobar",
 							BarFoo: "barfoo",
 							Struct: struct {
-								Baz string `computed:"true"`
-								Bar string
+								Baz string `cty:"baz" computed:"true"`
+								Bar string `cty:"bar"`
 							}{"baz", "bar"},
 							StructSlice: []struct {
-								String string   `computed:"true"`
-								Array  []string `computed:"true"`
+								String string   `cty:"string" computed:"true"`
+								Array  []string `cty:"array" computed:"true"`
 							}{
 								{"one", []string{"foo"}},
 							},
@@ -668,8 +668,8 @@ func TestAnalyze(t *testing.T) {
 					FooBar: "foobar",
 					BarFoo: "barfoo",
 					Struct: struct {
-						Baz string `computed:"true"`
-						Bar string
+						Baz string `cty:"baz" computed:"true"`
+						Bar string `cty:"bar"`
 					}{"baz", "bar"},
 				},
 				&testresource.FakeResource{
@@ -678,12 +678,12 @@ func TestAnalyze(t *testing.T) {
 					FooBar: "foobar",
 					BarFoo: "barfoo",
 					Struct: struct {
-						Baz string `computed:"true"`
-						Bar string
+						Baz string `cty:"baz" computed:"true"`
+						Bar string `cty:"bar"`
 					}{"baz", "bar"},
 					StructSlice: []struct {
-						String string   `computed:"true"`
-						Array  []string `computed:"true"`
+						String string   `cty:"string" computed:"true"`
+						Array  []string `cty:"array" computed:"true"`
 					}{
 						{"one", []string{"foo"}},
 					},
@@ -696,8 +696,8 @@ func TestAnalyze(t *testing.T) {
 					FooBar: "foobar",
 					BarFoo: "barfoo",
 					Struct: struct {
-						Baz string `computed:"true"`
-						Bar string
+						Baz string `cty:"baz" computed:"true"`
+						Bar string `cty:"bar"`
 					}{"bazdiff", "bardiff"},
 				},
 				&testresource.FakeResource{
@@ -706,12 +706,12 @@ func TestAnalyze(t *testing.T) {
 					FooBar: "foobar",
 					BarFoo: "barfoo",
 					Struct: struct {
-						Baz string `computed:"true"`
-						Bar string
+						Baz string `cty:"baz" computed:"true"`
+						Bar string `cty:"bar"`
 					}{"bazdiff", "bar"},
 					StructSlice: []struct {
-						String string   `computed:"true"`
-						Array  []string `computed:"true"`
+						String string   `cty:"string" computed:"true"`
+						Array  []string `cty:"array" computed:"true"`
 					}{
 						{"onediff", []string{"foo", "diff"}},
 					},
@@ -726,8 +726,8 @@ func TestAnalyze(t *testing.T) {
 						FooBar: "foobar",
 						BarFoo: "barfoo",
 						Struct: struct {
-							Baz string `computed:"true"`
-							Bar string
+							Baz string `cty:"baz" computed:"true"`
+							Bar string `cty:"bar"`
 						}{"baz", "bar"},
 					},
 					&testresource.FakeResource{
@@ -736,12 +736,12 @@ func TestAnalyze(t *testing.T) {
 						FooBar: "foobar",
 						BarFoo: "barfoo",
 						Struct: struct {
-							Baz string `computed:"true"`
-							Bar string
+							Baz string `cty:"baz" computed:"true"`
+							Bar string `cty:"bar"`
 						}{"baz", "bar"},
 						StructSlice: []struct {
-							String string   `computed:"true"`
-							Array  []string `computed:"true"`
+							String string   `cty:"string" computed:"true"`
+							Array  []string `cty:"array" computed:"true"`
 						}{
 							{"one", []string{"foo"}},
 						},
@@ -760,8 +760,8 @@ func TestAnalyze(t *testing.T) {
 							FooBar: "foobar",
 							BarFoo: "barfoo",
 							Struct: struct {
-								Baz string `computed:"true"`
-								Bar string
+								Baz string `cty:"baz" computed:"true"`
+								Bar string `cty:"bar"`
 							}{"baz", "bar"},
 						},
 						Changelog: Changelog{
@@ -798,12 +798,12 @@ func TestAnalyze(t *testing.T) {
 							FooBar: "foobar",
 							BarFoo: "barfoo",
 							Struct: struct {
-								Baz string `computed:"true"`
-								Bar string
+								Baz string `cty:"baz" computed:"true"`
+								Bar string `cty:"bar"`
 							}{"baz", "bar"},
 							StructSlice: []struct {
-								String string   `computed:"true"`
-								Array  []string `computed:"true"`
+								String string   `cty:"string" computed:"true"`
+								Array  []string `cty:"array" computed:"true"`
 							}{
 								{"one", []string{"foo"}},
 							},

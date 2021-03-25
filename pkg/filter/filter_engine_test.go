@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/zclconf/go-cty/cty"
+
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -93,130 +95,238 @@ func TestFilterEngine_Run(t *testing.T) {
 		},
 		{
 			name: "filter on resource field",
-			expr: "Attr.BarFoo=='filtered'",
+			expr: "Attr.bar_foo=='filtered'",
 			resources: []resource.Resource{
 				&testresource.FakeResource{},
 				&testresource.FakeResource{
-					BarFoo: "filtered",
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"bar_foo": cty.StringVal("filtered"),
+						})
+						return &v
+					}(),
 				},
 			},
 			want: []resource.Resource{
 				&testresource.FakeResource{
-					BarFoo: "filtered",
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"bar_foo": cty.StringVal("filtered"),
+						})
+						return &v
+					}(),
 				},
 			},
 		},
 		{
 			name: "filter on resource type and field",
-			expr: "Type=='filtered_resource' && Attr.BarFoo=='filtered'",
+			expr: "Type=='filtered_resource' && Attr.bar_foo=='filtered'",
 			resources: []resource.Resource{
 				&testresource.FakeResource{},
 				&testresource.FakeResource{
-					Type:   "filtered_resource",
-					BarFoo: "filtered",
+					Type: "filtered_resource",
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"bar_foo": cty.StringVal("filtered"),
+						})
+						return &v
+					}(),
 				},
 			},
 			want: []resource.Resource{
 				&testresource.FakeResource{
-					Type:   "filtered_resource",
-					BarFoo: "filtered",
+					Type: "filtered_resource",
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"bar_foo": cty.StringVal("filtered"),
+						})
+						return &v
+					}(),
 				},
 			},
 		},
 		{
 			name: "filter on resource map of native type field",
-			expr: "Attr.Tags.foo=='foo'",
+			expr: "Attr.tags.foo=='foo'",
 			resources: []resource.Resource{
 				&testresource.FakeResource{
-					Tags: map[string]string{
-						"foo": "bar",
-						"bar": "foo",
-					},
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"tags": cty.MapVal(map[string]cty.Value{
+								"foo": cty.StringVal("bar"),
+								"bar": cty.StringVal("foo"),
+							}),
+						})
+						return &v
+					}(),
 				},
 				&testresource.FakeResource{
-					Tags: map[string]string{
-						"foo": "foo",
-						"bar": "bar",
-					},
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"tags": cty.MapVal(map[string]cty.Value{
+								"foo": cty.StringVal("foo"),
+								"bar": cty.StringVal("bar"),
+							}),
+						})
+						return &v
+					}(),
 				},
 				&testresource.FakeResource{
-					Tags: map[string]string{
-						"foo": "foo",
-						"bar": "foo",
-					},
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"tags": cty.MapVal(map[string]cty.Value{
+								"foo": cty.StringVal("foo"),
+								"bar": cty.StringVal("foo"),
+							}),
+						})
+						return &v
+					}(),
 				},
 			},
 			want: []resource.Resource{
 				&testresource.FakeResource{
-					Tags: map[string]string{
-						"foo": "foo",
-						"bar": "bar",
-					},
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"tags": cty.MapVal(map[string]cty.Value{
+								"foo": cty.StringVal("foo"),
+								"bar": cty.StringVal("bar"),
+							}),
+						})
+						return &v
+					}(),
 				},
 				&testresource.FakeResource{
-					Tags: map[string]string{
-						"foo": "foo",
-						"bar": "foo",
-					},
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"tags": cty.MapVal(map[string]cty.Value{
+								"foo": cty.StringVal("foo"),
+								"bar": cty.StringVal("foo"),
+							}),
+						})
+						return &v
+					}(),
 				},
 			},
 		},
 		{
 			name: "filter on resource map of custom type field",
-			expr: "Attr.CustomMap.test.Tag=='foo'",
+			expr: "Attr.custom_map.test.tag=='foo'",
 			resources: []resource.Resource{
 				&testresource.FakeResource{
-					CustomMap: map[string]struct{ Tag string }{
-						"test": {
-							Tag: "foo",
-						},
-					},
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"custom_map": cty.MapVal(map[string]cty.Value{
+								"test": cty.ObjectVal(map[string]cty.Value{
+									"tag": cty.StringVal("foo"),
+								}),
+							}),
+						})
+						return &v
+					}(),
 				},
 				&testresource.FakeResource{
-					CustomMap: map[string]struct{ Tag string }{
-						"test": {
-							Tag: "bar",
-						},
-					},
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"custom_map": cty.MapVal(map[string]cty.Value{
+								"test": cty.ObjectVal(map[string]cty.Value{
+									"tag": cty.StringVal("bar"),
+								}),
+							}),
+						})
+						return &v
+					}(),
 				},
 				&testresource.FakeResource{
-					CustomMap: map[string]struct{ Tag string }{
-						"bar": {
-							Tag: "foo",
-						},
-					},
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"custom_map": cty.MapVal(map[string]cty.Value{
+								"bar": cty.ObjectVal(map[string]cty.Value{
+									"tag": cty.StringVal("foo"),
+								}),
+							}),
+						})
+						return &v
+					}(),
 				},
 			},
 			want: []resource.Resource{
 				&testresource.FakeResource{
-					CustomMap: map[string]struct{ Tag string }{
-						"test": {
-							Tag: "foo",
-						},
-					},
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"custom_map": cty.MapVal(map[string]cty.Value{
+								"test": cty.ObjectVal(map[string]cty.Value{
+									"tag": cty.StringVal("foo"),
+								}),
+							}),
+						})
+						return &v
+					}(),
 				},
 			},
 		},
 		{
 			name: "filter on resource field array contains",
-			expr: "Attr.Slice[?contains(@, 'd')]",
+			expr: "Attr.slice[?contains(@, 'd')]",
 			resources: []resource.Resource{
 				&testresource.FakeResource{
-					Slice: []string{"a", "b", "c"},
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"slice": cty.SetVal([]cty.Value{
+								cty.StringVal("a"),
+								cty.StringVal("b"),
+								cty.StringVal("c"),
+							}),
+						})
+						return &v
+					}(),
 				},
 				&testresource.FakeResource{
-					Slice: []string{"a", "b", "c", "d"},
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"slice": cty.SetVal([]cty.Value{
+								cty.StringVal("a"),
+								cty.StringVal("b"),
+								cty.StringVal("c"),
+								cty.StringVal("d"),
+							}),
+						})
+						return &v
+					}(),
 				},
 				&testresource.FakeResource{
-					Slice: []string{"d"},
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"slice": cty.SetVal([]cty.Value{
+								cty.StringVal("d"),
+							}),
+						})
+						return &v
+					}(),
 				},
 			},
 			want: []resource.Resource{
 				&testresource.FakeResource{
-					Slice: []string{"a", "b", "c", "d"},
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"slice": cty.SetVal([]cty.Value{
+								cty.StringVal("a"),
+								cty.StringVal("b"),
+								cty.StringVal("c"),
+								cty.StringVal("d"),
+							}),
+						})
+						return &v
+					}(),
 				},
 				&testresource.FakeResource{
-					Slice: []string{"d"},
+					CtyVal: func() *cty.Value {
+						v := cty.ObjectVal(map[string]cty.Value{
+							"slice": cty.SetVal([]cty.Value{
+								cty.StringVal("d"),
+							}),
+						})
+						return &v
+					}(),
 				},
 			},
 		},

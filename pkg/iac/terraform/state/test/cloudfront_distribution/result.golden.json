@@ -167,6 +167,7 @@
     "MinimumProtocolVersion": "TLSv1",
     "SslSupportMethod": ""
    }
-  ]
+  ],
+  "CtyVal": {}
  }
 ]

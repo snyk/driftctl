@@ -38,5 +38,6 @@ func decodeEC2EbsVolume(rawVolume cty.Value) (resource.Resource, error) {
 	if err := gocty.FromCtyValue(rawVolume, &decodedVolume); err != nil {
 		return nil, err
 	}
+	decodedVolume.CtyVal = &rawVolume
 	return &decodedVolume, nil
 }

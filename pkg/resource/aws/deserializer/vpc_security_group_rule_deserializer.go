@@ -38,5 +38,6 @@ func decodeVPCSecurityGroupRule(rawSecurityGroupRule cty.Value) (resource.Resour
 	if err := gocty.FromCtyValue(rawSecurityGroupRule, &decodedSgRule); err != nil {
 		return nil, err
 	}
+	decodedSgRule.CtyVal = &rawSecurityGroupRule
 	return &decodedSgRule, nil
 }

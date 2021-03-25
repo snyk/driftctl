@@ -17,7 +17,8 @@
   "TransitGatewayId": null,
   "VpcEndpointId": null,
   "VpcPeeringConnectionId": null,
-  "Timeouts": null
+  "Timeouts": null,
+  "CtyVal": {}
  },
  {
   "DestinationCidrBlock": null,
@@ -37,6 +38,7 @@
   "TransitGatewayId": null,
   "VpcEndpointId": null,
   "VpcPeeringConnectionId": null,
-  "Timeouts": null
+  "Timeouts": null,
+  "CtyVal": {}
  }
 ]

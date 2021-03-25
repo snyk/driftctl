@@ -38,5 +38,6 @@ func decodeVPCSecurityGroup(rawSecurityGroup cty.Value) (resource.Resource, erro
 	if err := gocty.FromCtyValue(rawSecurityGroup, &decodedSg); err != nil {
 		return nil, err
 	}
+	decodedSg.CtyVal = &rawSecurityGroup
 	return &decodedSg, nil
 }

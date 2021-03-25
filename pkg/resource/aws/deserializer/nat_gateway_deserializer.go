@@ -40,5 +40,6 @@ func decodeNatGateway(raw *cty.Value) (*resourceaws.AwsNatGateway, error) {
 	if err := gocty.FromCtyValue(*raw, &decoded); err != nil {
 		return nil, err
 	}
+	decoded.CtyVal = raw
 	return &decoded, nil
 }

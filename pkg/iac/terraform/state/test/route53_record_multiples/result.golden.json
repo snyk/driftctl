@@ -13,7 +13,8 @@
   ],
   "Tags": {},
   "ZoneId": "Z1035360GLIB82T1EH2G",
-  "Vpc": []
+  "Vpc": [],
+  "CtyVal": {}
  },
  {
   "Comment": "Managed by Terraform",
@@ -29,7 +30,8 @@
   ],
   "Tags": {},
   "ZoneId": "Z10347383HV75H96J919W",
-  "Vpc": []
+  "Vpc": [],
+  "CtyVal": {}
  },
  {
   "AllowOverwrite": true,
@@ -52,7 +54,8 @@
   "FailoverRoutingPolicy": [],
   "GeolocationRoutingPolicy": [],
   "LatencyRoutingPolicy": [],
-  "WeightedRoutingPolicy": []
+  "WeightedRoutingPolicy": [],
+  "CtyVal": {}
  },
  {
   "AllowOverwrite": null,
@@ -72,7 +75,8 @@
   "FailoverRoutingPolicy": [],
   "GeolocationRoutingPolicy": [],
   "LatencyRoutingPolicy": [],
-  "WeightedRoutingPolicy": []
+  "WeightedRoutingPolicy": [],
+  "CtyVal": {}
  },
  {
   "AllowOverwrite": null,
@@ -92,7 +96,8 @@
   "FailoverRoutingPolicy": [],
   "GeolocationRoutingPolicy": [],
   "LatencyRoutingPolicy": [],
-  "WeightedRoutingPolicy": []
+  "WeightedRoutingPolicy": [],
+  "CtyVal": {}
  },
  {
   "AllowOverwrite": null,
@@ -112,7 +117,8 @@
   "FailoverRoutingPolicy": [],
   "GeolocationRoutingPolicy": [],
   "LatencyRoutingPolicy": [],
-  "WeightedRoutingPolicy": []
+  "WeightedRoutingPolicy": [],
+  "CtyVal": {}
  },
  {
   "AllowOverwrite": null,
@@ -132,7 +138,8 @@
   "FailoverRoutingPolicy": [],
   "GeolocationRoutingPolicy": [],
   "LatencyRoutingPolicy": [],
-  "WeightedRoutingPolicy": []
+  "WeightedRoutingPolicy": [],
+  "CtyVal": {}
  },
  {
   "AllowOverwrite": null,
@@ -152,7 +159,8 @@
   "FailoverRoutingPolicy": [],
   "GeolocationRoutingPolicy": [],
   "LatencyRoutingPolicy": [],
-  "WeightedRoutingPolicy": []
+  "WeightedRoutingPolicy": [],
+  "CtyVal": {}
  },
  {
   "AllowOverwrite": null,
@@ -172,7 +180,8 @@
   "FailoverRoutingPolicy": [],
   "GeolocationRoutingPolicy": [],
   "LatencyRoutingPolicy": [],
-  "WeightedRoutingPolicy": []
+  "WeightedRoutingPolicy": [],
+  "CtyVal": {}
  },
  {
   "AllowOverwrite": null,
@@ -192,7 +201,8 @@
   "FailoverRoutingPolicy": [],
   "GeolocationRoutingPolicy": [],
   "LatencyRoutingPolicy": [],
-  "WeightedRoutingPolicy": []
+  "WeightedRoutingPolicy": [],
+  "CtyVal": {}
  },
  {
   "AllowOverwrite": null,
@@ -212,6 +222,7 @@
   "FailoverRoutingPolicy": [],
   "GeolocationRoutingPolicy": [],
   "LatencyRoutingPolicy": [],
-  "WeightedRoutingPolicy": []
+  "WeightedRoutingPolicy": [],
+  "CtyVal": {}
  }
 ]

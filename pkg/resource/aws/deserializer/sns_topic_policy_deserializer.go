@@ -36,5 +36,6 @@ func (s SNSTopicPolicyDeserializer) Deserialize(topicList []cty.Value) ([]resour
 func decodeSNSTopicPolicy(value cty.Value) (resource.Resource, error) {
 	var topicPolicy aws.AwsSnsTopicPolicy
 	err := gocty.FromCtyValue(value, &topicPolicy)
+	topicPolicy.CtyVal = &value
 	return &topicPolicy, err
 }

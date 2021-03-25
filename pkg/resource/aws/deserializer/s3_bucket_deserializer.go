@@ -35,5 +35,6 @@ func (s S3BucketDeserializer) Deserialize(bucketList []cty.Value) ([]resource.Re
 func decodeS3Bucket(rawBucket cty.Value) (resource.Resource, error) {
 	var inBucket aws.AwsS3Bucket
 	err := gocty.FromCtyValue(rawBucket, &inBucket)
+	inBucket.CtyVal = &rawBucket
 	return &inBucket, err
 }

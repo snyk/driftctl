@@ -15,7 +15,8 @@
   "Self": false,
   "SourceSecurityGroupId": null,
   "ToPort": 0,
-  "Type": "egress"
+  "Type": "egress",
+  "CtyVal": {}
  },
  {
   "CidrBlocks": [
@@ -33,7 +34,8 @@
   "Self": false,
   "SourceSecurityGroupId": null,
   "ToPort": 0,
-  "Type": "egress"
+  "Type": "egress",
+  "CtyVal": {}
  },
  {
   "CidrBlocks": [],
@@ -49,7 +51,8 @@
   "Self": false,
   "SourceSecurityGroupId": null,
   "ToPort": 0,
-  "Type": "ingress"
+  "Type": "ingress",
+  "CtyVal": {}
  },
  {
   "CidrBlocks": [],
@@ -65,7 +68,8 @@
   "Self": false,
   "SourceSecurityGroupId": null,
   "ToPort": 0,
-  "Type": "ingress"
+  "Type": "ingress",
+  "CtyVal": {}
  },
  {
   "CidrBlocks": [
@@ -81,7 +85,8 @@
   "Self": false,
   "SourceSecurityGroupId": null,
   "ToPort": 0,
-  "Type": "egress"
+  "Type": "egress",
+  "CtyVal": {}
  },
  {
   "CidrBlocks": [],
@@ -95,7 +100,8 @@
   "Self": true,
   "SourceSecurityGroupId": "sg-0254c038e32f25530",
   "ToPort": 65535,
-  "Type": "ingress"
+  "Type": "ingress",
+  "CtyVal": {}
  },
  {
   "CidrBlocks": [],
@@ -109,7 +115,8 @@
   "Self": true,
   "SourceSecurityGroupId": "sg-0254c038e32f25530",
   "ToPort": 0,
-  "Type": "ingress"
+  "Type": "ingress",
+  "CtyVal": {}
  },
  {
   "CidrBlocks": [
@@ -127,7 +134,8 @@
   "Self": false,
   "SourceSecurityGroupId": null,
   "ToPort": 0,
-  "Type": "egress"
+  "Type": "egress",
+  "CtyVal": {}
  },
  {
   "CidrBlocks": [
@@ -144,7 +152,8 @@
   "Self": false,
   "SourceSecurityGroupId": null,
   "ToPort": 0,
-  "Type": "ingress"
+  "Type": "ingress",
+  "CtyVal": {}
  },
  {
   "CidrBlocks": [
@@ -160,7 +169,8 @@
   "Self": false,
   "SourceSecurityGroupId": null,
   "ToPort": 0,
-  "Type": "ingress"
+  "Type": "ingress",
+  "CtyVal": {}
  },
  {
   "CidrBlocks": [
@@ -176,6 +186,7 @@
   "Self": false,
   "SourceSecurityGroupId": null,
   "ToPort": 0,
-  "Type": "egress"
+  "Type": "egress",
+  "CtyVal": {}
  }
 ]

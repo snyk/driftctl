@@ -17,7 +17,8 @@
   "PublicIpv4Pool": "amazon",
   "Tags": {},
   "Vpc": true,
-  "Timeouts": null
+  "Timeouts": null,
+  "CtyVal": {}
  },
  {
   "AllocationId": "eipalloc-017d5267e4dda73f1",
@@ -26,6 +27,7 @@
   "InstanceId": "i-0d3650a23f4e45dc0",
   "NetworkInterfaceId": "eni-0f35ce5577bbab251",
   "PrivateIpAddress": "172.31.22.12",
-  "PublicIp": "35.180.239.105"
+  "PublicIp": "35.180.239.105",
+  "CtyVal": {}
  }
 ]

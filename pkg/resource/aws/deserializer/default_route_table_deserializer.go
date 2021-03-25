@@ -40,5 +40,6 @@ func decodeDefaultRouteTable(raw *cty.Value) (*resourceaws.AwsDefaultRouteTable,
 	if err := gocty.FromCtyValue(*raw, &decoded); err != nil {
 		return nil, err
 	}
+	decoded.CtyVal = raw
 	return &decoded, nil
 }

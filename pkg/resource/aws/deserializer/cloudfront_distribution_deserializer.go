@@ -40,5 +40,6 @@ func decodeCloudfrontDistribution(raw *cty.Value) (*resourceaws.AwsCloudfrontDis
 	if err := gocty.FromCtyValue(*raw, &decoded); err != nil {
 		return nil, err
 	}
+	decoded.CtyVal = raw
 	return &decoded, nil
 }

@@ -40,5 +40,6 @@ func decodeRoute53HealthCheck(raw *cty.Value) (*resourceaws.AwsRoute53HealthChec
 	if err := gocty.FromCtyValue(*raw, &decoded); err != nil {
 		return nil, err
 	}
+	decoded.CtyVal = raw
 	return &decoded, nil
 }

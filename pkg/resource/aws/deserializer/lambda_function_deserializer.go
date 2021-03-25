@@ -38,5 +38,6 @@ func decodeLambdaFunction(rawFunction cty.Value) (resource.Resource, error) {
 	if err := gocty.FromCtyValue(rawFunction, &decodedFunction); err != nil {
 		return nil, err
 	}
+	decodedFunction.CtyVal = &rawFunction
 	return &decodedFunction, nil
 }

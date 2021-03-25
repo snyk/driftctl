@@ -38,5 +38,6 @@ func decodeEC2Eip(rawAddress cty.Value) (resource.Resource, error) {
 	if err := gocty.FromCtyValue(rawAddress, &decodedAddress); err != nil {
 		return nil, err
 	}
+	decodedAddress.CtyVal = &rawAddress
 	return &decodedAddress, nil
 }

@@ -22,7 +22,8 @@
   "Tags": {
    "Name": "tf-test-health-check"
   },
-  "Type": "HTTP"
+  "Type": "HTTP",
+  "CtyVal": {}
  },
  {
   "ChildHealthThreshold": 0,
@@ -45,6 +46,7 @@
   "ResourcePath": "/",
   "SearchString": "MoAdiB",
   "Tags": null,
-  "Type": "HTTPS_STR_MATCH"
+  "Type": "HTTPS_STR_MATCH",
+  "CtyVal": {}
  }
 ]

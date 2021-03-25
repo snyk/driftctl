@@ -5,7 +5,8 @@
   "Name": "alias/bar",
   "NamePrefix": null,
   "TargetKeyArn": "arn:aws:kms:eu-west-3:047081014315:key/341b2d76-feab-4911-b5de-fbdd92b21aa7",
-  "TargetKeyId": "341b2d76-feab-4911-b5de-fbdd92b21aa7"
+  "TargetKeyId": "341b2d76-feab-4911-b5de-fbdd92b21aa7",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:kms:eu-west-3:047081014315:alias/baz20210225124429210500000001",
@@ -13,7 +14,8 @@
   "Name": null,
   "NamePrefix": "alias/baz",
   "TargetKeyArn": "arn:aws:kms:eu-west-3:047081014315:key/341b2d76-feab-4911-b5de-fbdd92b21aa7",
-  "TargetKeyId": "341b2d76-feab-4911-b5de-fbdd92b21aa7"
+  "TargetKeyId": "341b2d76-feab-4911-b5de-fbdd92b21aa7",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:kms:eu-west-3:047081014315:alias/foo",
@@ -21,6 +23,7 @@
   "Name": "alias/foo",
   "NamePrefix": null,
   "TargetKeyArn": "arn:aws:kms:eu-west-3:047081014315:key/341b2d76-feab-4911-b5de-fbdd92b21aa7",
-  "TargetKeyId": "341b2d76-feab-4911-b5de-fbdd92b21aa7"
+  "TargetKeyId": "341b2d76-feab-4911-b5de-fbdd92b21aa7",
+  "CtyVal": {}
  }
 ]

@@ -17,6 +17,7 @@
   "PublicIpv4Pool": "amazon",
   "Tags": null,
   "Vpc": true,
-  "Timeouts": null
+  "Timeouts": null,
+  "CtyVal": {}
  }
 ]

@@ -7,7 +7,8 @@
   "Path": "/system/",
   "PermissionsBoundary": null,
   "Tags": {},
-  "UniqueId": "AIDAXVMHWD4B7BHWL7YKF"
+  "UniqueId": "AIDAXVMHWD4B7BHWL7YKF",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:iam::526954929923:user/system/loadbalancer3",
@@ -17,7 +18,8 @@
   "Path": "/system/",
   "PermissionsBoundary": null,
   "Tags": {},
-  "UniqueId": "AIDAXVMHWD4BUICVKAIIT"
+  "UniqueId": "AIDAXVMHWD4BUICVKAIIT",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:iam::526954929923:user/system/loadbalancer2",
@@ -27,7 +29,8 @@
   "Path": "/system/",
   "PermissionsBoundary": null,
   "Tags": {},
-  "UniqueId": "AIDAXVMHWD4BTVLVQM236"
+  "UniqueId": "AIDAXVMHWD4BTVLVQM236",
+  "CtyVal": {}
  },
  {
   "Groups": [],
@@ -37,7 +40,8 @@
   "Roles": [],
   "Users": [
    "loadbalancer"
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Groups": [],
@@ -47,7 +51,8 @@
   "Roles": [],
   "Users": [
    "loadbalancer3"
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Groups": [],
@@ -57,7 +62,8 @@
   "Roles": [],
   "Users": [
    "loadbalancer3"
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Groups": [],
@@ -67,7 +73,8 @@
   "Roles": [],
   "Users": [
    "loadbalancer"
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Groups": [],
@@ -77,7 +84,8 @@
   "Roles": [],
   "Users": [
    "loadbalancer3"
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Groups": [],
@@ -87,7 +95,8 @@
   "Roles": [],
   "Users": [
    "loadbalancer"
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Groups": [],
@@ -97,7 +106,8 @@
   "Roles": [],
   "Users": [
    "loadbalancer2"
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Groups": [],
@@ -107,7 +117,8 @@
   "Roles": [],
   "Users": [
    "loadbalancer2"
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Groups": [],
@@ -117,7 +128,8 @@
   "Roles": [],
   "Users": [
    "loadbalancer2"
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "EncryptedSecret": null,
@@ -127,7 +139,8 @@
   "Secret": null,
   "SesSmtpPasswordV4": null,
   "Status": "Active",
-  "User": "loadbalancer2"
+  "User": "loadbalancer2",
+  "CtyVal": {}
  },
  {
   "EncryptedSecret": null,
@@ -137,7 +150,8 @@
   "Secret": null,
   "SesSmtpPasswordV4": null,
   "Status": "Active",
-  "User": "loadbalancer"
+  "User": "loadbalancer",
+  "CtyVal": {}
  },
  {
   "EncryptedSecret": null,
@@ -147,7 +161,8 @@
   "Secret": null,
   "SesSmtpPasswordV4": null,
   "Status": "Active",
-  "User": "loadbalancer3"
+  "User": "loadbalancer3",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:iam::526954929923:policy/test3",
@@ -156,7 +171,8 @@
   "Name": "test3",
   "NamePrefix": null,
   "Path": "/",
-  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}"
+  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:iam::526954929923:policy/test",
@@ -165,7 +181,8 @@
   "Name": "test",
   "NamePrefix": null,
   "Path": "/",
-  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}"
+  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:iam::526954929923:policy/test2",
@@ -174,7 +191,8 @@
   "Name": "test2",
   "NamePrefix": null,
   "Path": "/",
-  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}"
+  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:iam::526954929923:policy/test4",
@@ -183,7 +201,8 @@
   "Name": "test4",
   "NamePrefix": null,
   "Path": "/",
-  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}"
+  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}",
+  "CtyVal": {}
  },
  {
   "Groups": [],
@@ -194,6 +213,7 @@
   "Users": [
    "loadbalancer",
    "loadbalancer2"
-  ]
+  ],
+  "CtyVal": {}
  }
 ]
