@@ -5,14 +5,14 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
-func (r AwsS3BucketPolicy) NormalizeForState() (resource.Resource, error) {
+func (r *AwsS3BucketPolicy) NormalizeForState() (resource.Resource, error) {
 	err := r.normalizePolicy()
-	return &r, err
+	return r, err
 }
 
-func (r AwsS3BucketPolicy) NormalizeForProvider() (resource.Resource, error) {
+func (r *AwsS3BucketPolicy) NormalizeForProvider() (resource.Resource, error) {
 	err := r.normalizePolicy()
-	return &r, err
+	return r, err
 }
 
 func (r *AwsS3BucketPolicy) normalizePolicy() error {

@@ -5,14 +5,14 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
-func (r AwsKmsKey) NormalizeForState() (resource.Resource, error) {
+func (r *AwsKmsKey) NormalizeForState() (resource.Resource, error) {
 	err := r.normalizePolicy()
-	return &r, err
+	return r, err
 }
 
-func (r AwsKmsKey) NormalizeForProvider() (resource.Resource, error) {
+func (r *AwsKmsKey) NormalizeForProvider() (resource.Resource, error) {
 	err := r.normalizePolicy()
-	return &r, err
+	return r, err
 }
 
 func (r *AwsKmsKey) normalizePolicy() error {

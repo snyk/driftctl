@@ -5,14 +5,14 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
-func (r AwsSqsQueuePolicy) NormalizeForState() (resource.Resource, error) {
+func (r *AwsSqsQueuePolicy) NormalizeForState() (resource.Resource, error) {
 	err := r.normalizePolicy()
-	return &r, err
+	return r, err
 }
 
-func (r AwsSqsQueuePolicy) NormalizeForProvider() (resource.Resource, error) {
+func (r *AwsSqsQueuePolicy) NormalizeForProvider() (resource.Resource, error) {
 	err := r.normalizePolicy()
-	return &r, err
+	return r, err
 }
 
 func (r *AwsSqsQueuePolicy) normalizePolicy() error {
