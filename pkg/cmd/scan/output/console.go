@@ -31,7 +31,7 @@ func NewConsole() *Console {
 
 func (c *Console) Write(analysis *analyser.Analysis) error {
 	if analysis.Summary().TotalDeleted > 0 {
-		fmt.Printf("Found deleted resources:\n")
+		fmt.Printf("Found missing resources:\n")
 		deletedByType := groupByType(analysis.Deleted())
 		for ty, resources := range deletedByType {
 			fmt.Printf("  %s:\n", ty)
@@ -147,13 +147,13 @@ func (c Console) writeSummary(analysis *analyser.Analysis) {
 		if analysis.Summary().TotalDeleted > 0 {
 			deleted = errorWriter.Sprintf("%d", analysis.Summary().TotalDeleted)
 		}
-		fmt.Printf(" - %s deleted on cloud provider\n", deleted)
+		fmt.Printf(" - %s missing on cloud provider\n", deleted)
 
 		drifted := successWriter.Sprintf("0")
 		if analysis.Summary().TotalDrifted > 0 {
 			drifted = errorWriter.Sprintf("%d", analysis.Summary().TotalDrifted)
 		}
-		fmt.Printf(" - %s drifted from IaC\n", boldWriter.Sprintf("%s/%d", drifted, analysis.Summary().TotalManaged))
+		fmt.Printf(" - %s has differences with IaC\n", boldWriter.Sprintf("%s/%d", drifted, analysis.Summary().TotalManaged))
 	}
 	if analysis.IsSync() {
 		fmt.Println(color.GreenString("Congrats! Your infrastructure is fully in sync."))
