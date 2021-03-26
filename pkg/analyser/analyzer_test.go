@@ -811,20 +811,6 @@ func TestAnalyze(t *testing.T) {
 						Changelog: Changelog{
 							{
 								Change: diff.Change{
-									Type: "create",
-									From: nil,
-									To:   "diff",
-									Path: []string{
-										"StructSlice",
-										"0",
-										"Array",
-										"1",
-									},
-								},
-								Computed: true,
-							},
-							{
-								Change: diff.Change{
 									Type: "update",
 									From: "baz",
 									To:   "bazdiff",
@@ -844,6 +830,20 @@ func TestAnalyze(t *testing.T) {
 										"StructSlice",
 										"0",
 										"String",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "create",
+									From: nil,
+									To:   "diff",
+									Path: []string{
+										"StructSlice",
+										"0",
+										"Array",
+										"1",
 									},
 								},
 								Computed: true,
