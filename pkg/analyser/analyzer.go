@@ -83,28 +83,31 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 		analysis.AddManaged(stateRes)
 
 		delta, _ := diff.Diff(stateRes, remoteRes)
-		if len(delta) > 0 {
-			sort.Slice(delta, func(i, j int) bool {
-				return delta[i].Type < delta[j].Type
+
+		if len(delta) == 0 {
+			continue
+		}
+
+		sort.Slice(delta, func(i, j int) bool {
+			return delta[i].Type < delta[j].Type
+		})
+		changelog := make([]Change, 0, len(delta))
+		for _, change := range delta {
+			if filter.IsFieldIgnored(stateRes, change.Path) {
+				continue
+			}
+			c := Change{Change: change}
+			c.Computed = a.isComputedField(stateRes, c)
+			if c.Computed {
+				haveComputedDiff = true
+			}
+			changelog = append(changelog, c)
+		}
+		if len(changelog) > 0 {
+			analysis.AddDifference(Difference{
+				Res:       stateRes,
+				Changelog: changelog,
 			})
-			changelog := make([]Change, 0, len(delta))
-			for _, change := range delta {
-				if filter.IsFieldIgnored(stateRes, change.Path) {
-					continue
-				}
-				c := Change{Change: change}
-				c.Computed = a.isComputedField(stateRes, c)
-				if c.Computed {
-					haveComputedDiff = true
-				}
-				changelog = append(changelog, c)
-			}
-			if len(changelog) > 0 {
-				analysis.AddDifference(Difference{
-					Res:       stateRes,
-					Changelog: changelog,
-				})
-			}
 		}
 	}
 
