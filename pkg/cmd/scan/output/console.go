@@ -31,7 +31,7 @@ func NewConsole() *Console {
 
 func (c *Console) Write(analysis *analyser.Analysis) error {
 	if analysis.Summary().TotalDeleted > 0 {
-		fmt.Printf("Found deleted resources:\n")
+		fmt.Printf("Found missing resources:\n")
 		deletedByType := groupByType(analysis.Deleted())
 		for ty, resources := range deletedByType {
 			fmt.Printf("  %s:\n", ty)
@@ -46,7 +46,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 	}
 
 	if analysis.Summary().TotalUnmanaged > 0 {
-		fmt.Printf("Found unmanaged resources:\n")
+		fmt.Printf("Found resources not covered by IaC:\n")
 		unmanagedByType := groupByType(analysis.Unmanaged())
 		for ty, resource := range unmanagedByType {
 			fmt.Printf("  %s:\n", ty)
@@ -61,7 +61,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 	}
 
 	if analysis.Summary().TotalDrifted > 0 {
-		fmt.Printf("Found drifted resources:\n")
+		fmt.Printf("Found changed resources:\n")
 		for _, difference := range analysis.Differences() {
 			humanString := difference.Res.TerraformId()
 			if stringer, ok := difference.Res.(fmt.Stringer); ok {
@@ -147,13 +147,13 @@ func (c Console) writeSummary(analysis *analyser.Analysis) {
 		if analysis.Summary().TotalDeleted > 0 {
 			deleted = errorWriter.Sprintf("%d", analysis.Summary().TotalDeleted)
 		}
-		fmt.Printf(" - %s deleted on cloud provider\n", deleted)
+		fmt.Printf(" - %s missing on cloud provider\n", deleted)
 
 		drifted := successWriter.Sprintf("0")
 		if analysis.Summary().TotalDrifted > 0 {
 			drifted = errorWriter.Sprintf("%d", analysis.Summary().TotalDrifted)
 		}
-		fmt.Printf(" - %s drifted from IaC\n", boldWriter.Sprintf("%s/%d", drifted, analysis.Summary().TotalManaged))
+		fmt.Printf(" - %s changed outside of IaC\n", boldWriter.Sprintf("%s/%d", drifted, analysis.Summary().TotalManaged))
 	}
 	if analysis.IsSync() {
 		fmt.Println(color.GreenString("Congrats! Your infrastructure is fully in sync."))
