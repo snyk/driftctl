@@ -61,7 +61,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 	}
 
 	if analysis.Summary().TotalDrifted > 0 {
-		fmt.Printf("Found drifted resources:\n")
+		fmt.Printf("Found changed resources:\n")
 		for _, difference := range analysis.Differences() {
 			humanString := difference.Res.TerraformId()
 			if stringer, ok := difference.Res.(fmt.Stringer); ok {
@@ -153,7 +153,7 @@ func (c Console) writeSummary(analysis *analyser.Analysis) {
 		if analysis.Summary().TotalDrifted > 0 {
 			drifted = errorWriter.Sprintf("%d", analysis.Summary().TotalDrifted)
 		}
-		fmt.Printf(" - %s has differences with IaC\n", boldWriter.Sprintf("%s/%d", drifted, analysis.Summary().TotalManaged))
+		fmt.Printf(" - %s changed outside of IaC\n", boldWriter.Sprintf("%s/%d", drifted, analysis.Summary().TotalManaged))
 	}
 	if analysis.IsSync() {
 		fmt.Println(color.GreenString("Congrats! Your infrastructure is fully in sync."))
