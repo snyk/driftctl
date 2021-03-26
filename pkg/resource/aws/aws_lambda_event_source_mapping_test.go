@@ -6,8 +6,7 @@ import (
 	"github.com/cloudskiff/driftctl/test/acceptance"
 )
 
-// Skipped as it seems to be unstable in CI
-func TestAcc_Skipped_AwsLambdaEventSourceMapping(t *testing.T) {
+func TestAcc_AwsLambdaEventSourceMapping(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		Paths: []string{"./testdata/acc/aws_lambda_event_source_mapping"},
 		Args:  []string{"scan", "--filter", "Type=='aws_lambda_event_source_mapping'"},
