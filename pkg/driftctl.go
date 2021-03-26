@@ -38,12 +38,12 @@ type DriftCTL struct {
 	strictMode      bool
 }
 
-func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, alerter *alerter.Alerter, resFactory resource.ResourceFactory, opts *ScanOptions) *DriftCTL {
+func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, alerter *alerter.Alerter, resFactory resource.ResourceFactory, opts *ScanOptions, resourceSchemaRepository resource.SchemaRepositoryInterface) *DriftCTL {
 	return &DriftCTL{
 		remoteSupplier,
 		iacSupplier,
 		alerter,
-		analyser.NewAnalyzer(alerter),
+		analyser.NewAnalyzer(alerter, resourceSchemaRepository),
 		opts.Filter,
 		resFactory,
 		opts.StrictMode,

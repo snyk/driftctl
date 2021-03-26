@@ -3,27 +3,27 @@ package pkg
 import (
 	"context"
 
-	"github.com/cloudskiff/driftctl/pkg/remote"
-	"github.com/pkg/errors"
-
-	"github.com/cloudskiff/driftctl/pkg/parallel"
-	"github.com/sirupsen/logrus"
-
 	"github.com/cloudskiff/driftctl/pkg/alerter"
+	"github.com/cloudskiff/driftctl/pkg/parallel"
+	"github.com/cloudskiff/driftctl/pkg/remote"
 	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type Scanner struct {
-	resourceSuppliers []resource.Supplier
-	runner            *parallel.ParallelRunner
-	alerter           *alerter.Alerter
+	resourceSuppliers        []resource.Supplier
+	runner                   *parallel.ParallelRunner
+	alerter                  *alerter.Alerter
+	resourceSchemaRepository *resource.SchemaRepository
 }
 
-func NewScanner(resourceSuppliers []resource.Supplier, alerter *alerter.Alerter) *Scanner {
+func NewScanner(resourceSuppliers []resource.Supplier, alerter *alerter.Alerter, resourceSchemaRepository *resource.SchemaRepository) *Scanner {
 	return &Scanner{
-		resourceSuppliers: resourceSuppliers,
-		runner:            parallel.NewParallelRunner(context.TODO(), 10),
-		alerter:           alerter,
+		resourceSuppliers:        resourceSuppliers,
+		runner:                   parallel.NewParallelRunner(context.TODO(), 10),
+		alerter:                  alerter,
+		resourceSchemaRepository: resourceSchemaRepository,
 	}
 }
 
@@ -58,6 +58,24 @@ loop:
 				break loop
 			}
 			for _, res := range resources.([]resource.Resource) {
+
+				if resource.IsRefactoredResource(res.TerraformType()) {
+					schema, exist := s.resourceSchemaRepository.GetSchema(res.TerraformType())
+					ctyAttr := resource.ToResourceAttributes(res.CtyValue())
+					ctyAttr.SanitizeDefaultsV3()
+					if exist && schema.NormalizeFunc != nil {
+						schema.NormalizeFunc(ctyAttr)
+					}
+
+					newRes := &resource.AbstractResource{
+						Id:    res.TerraformId(),
+						Type:  res.TerraformType(),
+						Attrs: ctyAttr,
+					}
+					results = append(results, newRes)
+					continue
+				}
+
 				normalisable, ok := res.(resource.NormalizedResource)
 				if ok {
 					normalizedRes, err := normalisable.NormalizeForProvider()
