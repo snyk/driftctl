@@ -2,10 +2,13 @@ package analyser
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
+	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/cloudskiff/driftctl/mocks"
 
@@ -226,35 +229,23 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "foobar",
-									To:   "barfoo",
-									Path: []string{
-										"FooBar",
-									},
-								},
-							},
-							{
-								Change: diff.Change{
-									Type: "update",
 									From: "barfoo",
 									To:   "foobar",
 									Path: []string{
-										"BarFoo",
+										"bar_foo",
 									},
 								},
-								Computed: true,
+								// TODO Computed: true,
 							},
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "baz",
-									To:   "bar",
+									From: "foobar",
+									To:   "barfoo",
 									Path: []string{
-										"Struct",
-										"Baz",
+										"foo_bar",
 									},
 								},
-								Computed: true,
 							},
 							{
 								Change: diff.Change{
@@ -262,19 +253,31 @@ func TestAnalyze(t *testing.T) {
 									From: "bar",
 									To:   "baz",
 									Path: []string{
-										"Struct",
-										"Bar",
+										"struct",
+										"bar",
 									},
 								},
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "baz",
+									To:   "bar",
+									Path: []string{
+										"struct",
+										"baz",
+									},
+								},
+								// TODO Computed: true,
 							},
 						},
 					},
 				},
-				alerts: alerter.Alerts{
-					"": {
+				/* TODO					alerts: alerter.Alerts{
+				"": {
 						NewComputedDiffAlert(),
 					},
-				},
+				},*/
 			},
 			hasDrifted: true,
 		},
@@ -307,7 +310,7 @@ func TestAnalyze(t *testing.T) {
 						FooBar: "foobar",
 						BarFoo: "barfoo",
 					},
-					path: []string{"FooBar"},
+					path: []string{"foo_bar"},
 				},
 			},
 			expected: Analysis{
@@ -339,19 +342,19 @@ func TestAnalyze(t *testing.T) {
 									From: "barfoo",
 									To:   "foobar",
 									Path: []string{
-										"BarFoo",
+										"bar_foo",
 									},
 								},
-								Computed: true,
+								// TODO Computed: true,
 							},
 						},
 					},
 				},
-				alerts: alerter.Alerts{
+				/* TODO alerts: alerter.Alerts{
 					"": {
 						NewComputedDiffAlert(),
 					},
-				},
+				},*/
 			},
 			hasDrifted: true,
 		},
@@ -389,7 +392,7 @@ func TestAnalyze(t *testing.T) {
 						FooBar: "foobar",
 						BarFoo: "barfoo",
 					},
-					path: []string{"FooBar"},
+					path: []string{"foo_bar"},
 				},
 				{
 					res: &testresource.FakeResource{
@@ -397,7 +400,7 @@ func TestAnalyze(t *testing.T) {
 						FooBar: "foobar",
 						BarFoo: "barfoo",
 					},
-					path: []string{"BarFoo"},
+					path: []string{"bar_foo"},
 				},
 			},
 			expected: Analysis{
@@ -571,35 +574,23 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "foobar",
-									To:   "barfoo",
-									Path: []string{
-										"FooBar",
-									},
-								},
-							},
-							{
-								Change: diff.Change{
-									Type: "update",
 									From: "barfoo",
 									To:   "foobar",
 									Path: []string{
-										"BarFoo",
+										"bar_foo",
 									},
 								},
-								Computed: true,
+								// todo Computed: true,
 							},
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "baz",
-									To:   "bar",
+									From: "foobar",
+									To:   "barfoo",
 									Path: []string{
-										"Struct",
-										"Baz",
+										"foo_bar",
 									},
 								},
-								Computed: true,
 							},
 							{
 								Change: diff.Change{
@@ -607,23 +598,22 @@ func TestAnalyze(t *testing.T) {
 									From: "bar",
 									To:   "baz",
 									Path: []string{
-										"Struct",
-										"Bar",
+										"struct",
+										"bar",
 									},
 								},
 							},
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "one",
-									To:   "two",
+									From: "baz",
+									To:   "bar",
 									Path: []string{
-										"StructSlice",
-										"0",
-										"String",
+										"struct",
+										"baz",
 									},
 								},
-								Computed: true,
+								// todo Computed: true,
 							},
 							{
 								Change: diff.Change{
@@ -631,13 +621,26 @@ func TestAnalyze(t *testing.T) {
 									From: "foo",
 									To:   "oof",
 									Path: []string{
-										"StructSlice",
+										"struct_slice",
 										"0",
-										"Array",
+										"array",
 										"0",
 									},
 								},
-								Computed: true,
+								// todo Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "one",
+									To:   "two",
+									Path: []string{
+										"struct_slice",
+										"0",
+										"string",
+									},
+								},
+								// todo Computed: true,
 							},
 						},
 					},
@@ -652,209 +655,9 @@ func TestAnalyze(t *testing.T) {
 					"other.resource": {
 						&alerter.FakeAlert{Msg: "Should not be ignored"},
 					},
-					"": {
+					/* todo "": {
 						NewComputedDiffAlert(),
-					},
-				},
-			},
-			hasDrifted: true,
-		},
-		{
-			name: "TestDiff with computed field send 1 alert",
-			iac: []resource.Resource{
-				&testresource.FakeResource{
-					Id:     "foobar",
-					Type:   "fakeres",
-					FooBar: "foobar",
-					BarFoo: "barfoo",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"baz", "bar"},
-				},
-				&testresource.FakeResource{
-					Id:     "resource",
-					Type:   "other",
-					FooBar: "foobar",
-					BarFoo: "barfoo",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"baz", "bar"},
-					StructSlice: []struct {
-						String string   `cty:"string" computed:"true"`
-						Array  []string `cty:"array" computed:"true"`
-					}{
-						{"one", []string{"foo"}},
-					},
-				},
-			},
-			cloud: []resource.Resource{
-				&testresource.FakeResource{
-					Id:     "foobar",
-					Type:   "fakeres",
-					FooBar: "foobar",
-					BarFoo: "barfoo",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"bazdiff", "bardiff"},
-				},
-				&testresource.FakeResource{
-					Id:     "resource",
-					Type:   "other",
-					FooBar: "foobar",
-					BarFoo: "barfoo",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"bazdiff", "bar"},
-					StructSlice: []struct {
-						String string   `cty:"string" computed:"true"`
-						Array  []string `cty:"array" computed:"true"`
-					}{
-						{"onediff", []string{"foo", "diff"}},
-					},
-				},
-			},
-			alerts: alerter.Alerts{},
-			expected: Analysis{
-				managed: []resource.Resource{
-					&testresource.FakeResource{
-						Id:     "foobar",
-						Type:   "fakeres",
-						FooBar: "foobar",
-						BarFoo: "barfoo",
-						Struct: struct {
-							Baz string `cty:"baz" computed:"true"`
-							Bar string `cty:"bar"`
-						}{"baz", "bar"},
-					},
-					&testresource.FakeResource{
-						Id:     "resource",
-						Type:   "other",
-						FooBar: "foobar",
-						BarFoo: "barfoo",
-						Struct: struct {
-							Baz string `cty:"baz" computed:"true"`
-							Bar string `cty:"bar"`
-						}{"baz", "bar"},
-						StructSlice: []struct {
-							String string   `cty:"string" computed:"true"`
-							Array  []string `cty:"array" computed:"true"`
-						}{
-							{"one", []string{"foo"}},
-						},
-					},
-				},
-				summary: Summary{
-					TotalResources: 2,
-					TotalDrifted:   2,
-					TotalManaged:   2,
-				},
-				differences: []Difference{
-					{
-						Res: &testresource.FakeResource{
-							Id:     "foobar",
-							Type:   "fakeres",
-							FooBar: "foobar",
-							BarFoo: "barfoo",
-							Struct: struct {
-								Baz string `cty:"baz" computed:"true"`
-								Bar string `cty:"bar"`
-							}{"baz", "bar"},
-						},
-						Changelog: Changelog{
-							{
-								Change: diff.Change{
-									Type: "update",
-									From: "baz",
-									To:   "bazdiff",
-									Path: []string{
-										"Struct",
-										"Baz",
-									},
-								},
-								Computed: true,
-							},
-							{
-								Change: diff.Change{
-									Type: "update",
-									From: "bar",
-									To:   "bardiff",
-									Path: []string{
-										"Struct",
-										"Bar",
-									},
-								},
-								Computed: false,
-							},
-						},
-					},
-					{
-						Res: &testresource.FakeResource{
-							Id:     "resource",
-							Type:   "other",
-							FooBar: "foobar",
-							BarFoo: "barfoo",
-							Struct: struct {
-								Baz string `cty:"baz" computed:"true"`
-								Bar string `cty:"bar"`
-							}{"baz", "bar"},
-							StructSlice: []struct {
-								String string   `cty:"string" computed:"true"`
-								Array  []string `cty:"array" computed:"true"`
-							}{
-								{"one", []string{"foo"}},
-							},
-						},
-						Changelog: Changelog{
-							{
-								Change: diff.Change{
-									Type: "create",
-									From: nil,
-									To:   "diff",
-									Path: []string{
-										"StructSlice",
-										"0",
-										"Array",
-										"1",
-									},
-								},
-								Computed: true,
-							},
-							{
-								Change: diff.Change{
-									Type: "update",
-									From: "baz",
-									To:   "bazdiff",
-									Path: []string{
-										"Struct",
-										"Baz",
-									},
-								},
-								Computed: true,
-							},
-							{
-								Change: diff.Change{
-									Type: "update",
-									From: "one",
-									To:   "onediff",
-									Path: []string{
-										"StructSlice",
-										"0",
-										"String",
-									},
-								},
-								Computed: true,
-							},
-						},
-					},
-				},
-				alerts: alerter.Alerts{
-					"": {
-						NewComputedDiffAlert(),
-					},
+					},*/
 				},
 			},
 			hasDrifted: true,
@@ -977,6 +780,46 @@ func TestAnalyze(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
+			for _, r := range c.cloud {
+				res, ok := r.(*testresource.FakeResource)
+				if ok {
+					impliedType, _ := gocty.ImpliedType(res)
+					value, _ := gocty.ToCtyValue(res, impliedType)
+					res.CtyVal = &value
+					continue
+				}
+			}
+
+			for _, r := range c.iac {
+				res, ok := r.(*testresource.FakeResource)
+				if ok {
+					impliedType, _ := gocty.ImpliedType(res)
+					value, _ := gocty.ToCtyValue(res, impliedType)
+					res.CtyVal = &value
+					continue
+				}
+			}
+
+			for _, r := range c.ignoredRes {
+				res, ok := r.(*testresource.FakeResource)
+				if ok {
+					impliedType, _ := gocty.ImpliedType(res)
+					value, _ := gocty.ToCtyValue(res, impliedType)
+					res.CtyVal = &value
+					continue
+				}
+			}
+
+			for _, r := range c.ignoredDrift {
+				res, ok := r.res.(*testresource.FakeResource)
+				if ok {
+					impliedType, _ := gocty.ImpliedType(res)
+					value, _ := gocty.ToCtyValue(res, impliedType)
+					res.CtyVal = &value
+					continue
+				}
+			}
+
 			filter := &mocks.Filter{}
 			for _, ignored := range c.ignoredRes {
 				filter.On("IsResourceIgnored", ignored).Return(true)
@@ -1011,7 +854,7 @@ func TestAnalyze(t *testing.T) {
 			}
 			if len(managedChanges) > 0 {
 				for _, change := range managedChanges {
-					t.Errorf("%+v", change)
+					t.Error(printDiff(change))
 				}
 			}
 
@@ -1021,7 +864,7 @@ func TestAnalyze(t *testing.T) {
 			}
 			if len(unmanagedChanges) > 0 {
 				for _, change := range unmanagedChanges {
-					t.Errorf("%+v", change)
+					t.Errorf(printDiff(change))
 				}
 			}
 
@@ -1031,7 +874,7 @@ func TestAnalyze(t *testing.T) {
 			}
 			if len(deletedChanges) > 0 {
 				for _, change := range deletedChanges {
-					t.Errorf("%+v", change)
+					t.Errorf(printDiff(change))
 				}
 			}
 
@@ -1041,7 +884,7 @@ func TestAnalyze(t *testing.T) {
 			}
 			if len(diffChanges) > 0 {
 				for _, change := range diffChanges {
-					t.Errorf("%+v", change)
+					t.Errorf(printDiff(change))
 				}
 			}
 
@@ -1051,7 +894,7 @@ func TestAnalyze(t *testing.T) {
 			}
 			if len(summaryChanges) > 0 {
 				for _, change := range summaryChanges {
-					t.Errorf("%+v", change)
+					t.Errorf(printDiff(change))
 				}
 			}
 
@@ -1061,11 +904,15 @@ func TestAnalyze(t *testing.T) {
 			}
 			if len(alertsChanges) > 0 {
 				for _, change := range alertsChanges {
-					t.Errorf("%+v", change)
+					t.Errorf(printDiff(change))
 				}
 			}
 		})
 	}
+}
+
+func printDiff(c diff.Change) string {
+	return fmt.Sprintf("[%s] %s: %v > %v", c.Type, strings.Join(c.Path, "."), c.From, c.To)
 }
 
 func TestAnalysis_MarshalJSON(t *testing.T) {

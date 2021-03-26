@@ -1,8 +1,13 @@
 package analyser
 
 import (
+	"encoding/json"
 	"reflect"
 	"sort"
+	"strings"
+
+	"github.com/zclconf/go-cty/cty"
+	ctyjson "github.com/zclconf/go-cty/cty/json"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
@@ -65,6 +70,7 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 		filteredRemoteResource = append(filteredRemoteResource, remoteRes)
 	}
 
+	normalizers := resource.Normalizers()
 	haveComputedDiff := false
 	for _, stateRes := range resourcesFromState {
 		i, remoteRes, found := findCorrespondingRes(filteredRemoteResource, stateRes)
@@ -82,10 +88,19 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 		filteredRemoteResource = removeResourceByIndex(i, filteredRemoteResource)
 		analysis.AddManaged(stateRes)
 
-		delta, _ := diff.Diff(stateRes, remoteRes)
+		state := a.getAsAttrs(stateRes.CtyValue())
+		rem := a.getAsAttrs(remoteRes.CtyValue())
+
+		normalize, exists := normalizers[stateRes.TerraformType()]
+		if exists {
+			normalize(&state)
+			normalize(&rem)
+		}
+
+		delta, _ := diff.Diff(state, rem)
 		if len(delta) > 0 {
 			sort.Slice(delta, func(i, j int) bool {
-				return delta[i].Type < delta[j].Type
+				return strings.Join(delta[i].Path, ".") < strings.Join(delta[j].Path, ".") || delta[i].Type < delta[j].Type
 			})
 			changelog := make([]Change, 0, len(delta))
 			for _, change := range delta {
@@ -194,4 +209,17 @@ func (a Analyzer) hasUnmanagedSecurityGroupRules(unmanagedResources []resource.R
 		}
 	}
 	return false
+}
+
+func (a *Analyzer) getAsAttrs(val *cty.Value) map[string]interface{} {
+	if val == nil {
+		return nil
+	}
+	bytes, _ := ctyjson.Marshal(*val, val.Type())
+	var attrs map[string]interface{}
+	err := json.Unmarshal(bytes, &attrs)
+	if err != nil {
+		panic(err)
+	}
+	return attrs
 }

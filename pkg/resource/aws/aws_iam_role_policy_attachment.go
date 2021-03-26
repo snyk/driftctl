@@ -23,3 +23,6 @@ func (r *AwsIamRolePolicyAttachment) TerraformType() string {
 func (r *AwsIamRolePolicyAttachment) CtyValue() *cty.Value {
 	return r.CtyVal
 }
+
+func awsIamRolePolicyAttachmentNormalizer(val *map[string]interface{}) {
+}

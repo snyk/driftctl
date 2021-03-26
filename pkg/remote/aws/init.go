@@ -6,6 +6,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
@@ -76,6 +77,8 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	supplierLibrary.AddSupplier(NewKMSKeySupplier(provider))
 	supplierLibrary.AddSupplier(NewKMSAliasSupplier(provider))
 	supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider))
+
+	aws.InitNormalizers()
 
 	return nil
 }

@@ -23,3 +23,6 @@ func (r *AwsSqsQueuePolicy) TerraformType() string {
 func (r *AwsSqsQueuePolicy) CtyValue() *cty.Value {
 	return r.CtyVal
 }
+
+func awsSqsQueuePolicyNormalizer(val *map[string]interface{}) {
+}

@@ -30,3 +30,6 @@ func (r *AwsSnsTopicSubscription) TerraformType() string {
 func (r *AwsSnsTopicSubscription) CtyValue() *cty.Value {
 	return r.CtyVal
 }
+
+func awsSnsTopicSubscriptionNormalizer(val *map[string]interface{}) {
+}
