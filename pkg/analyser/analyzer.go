@@ -2,7 +2,6 @@ package analyser
 
 import (
 	"reflect"
-	"sort"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
@@ -88,9 +87,6 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 			continue
 		}
 
-		sort.Slice(delta, func(i, j int) bool {
-			return delta[i].Type < delta[j].Type
-		})
 		changelog := make([]Change, 0, len(delta))
 		for _, change := range delta {
 			if filter.IsFieldIgnored(stateRes, change.Path) {

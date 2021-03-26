@@ -2,10 +2,12 @@ package analyser
 
 import (
 	"encoding/json"
+	"sort"
+
+	"github.com/r3labs/diff/v2"
 
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/r3labs/diff/v2"
 )
 
 type Change struct {
@@ -193,4 +195,15 @@ func (a *Analysis) Alerts() alerter.Alerts {
 func (a *Analysis) SortResources() {
 	a.unmanaged = resource.Sort(a.unmanaged)
 	a.deleted = resource.Sort(a.deleted)
+	a.differences = SortDifferences(a.differences)
+}
+
+func SortDifferences(diffs []Difference) []Difference {
+	sort.SliceStable(diffs, func(i, j int) bool {
+		if diffs[i].Res.TerraformType() != diffs[j].Res.TerraformType() {
+			return diffs[i].Res.TerraformType() < diffs[j].Res.TerraformType()
+		}
+		return diffs[i].Res.TerraformId() < diffs[j].Res.TerraformId()
+	})
+	return diffs
 }
