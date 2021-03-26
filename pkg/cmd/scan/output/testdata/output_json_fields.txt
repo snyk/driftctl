@@ -1,4 +1,4 @@
-Found drifted resources:
+Found changed resources:
   - diff-id-1 (aws_diff_resource):
     ~ Json:
         {
@@ -27,5 +27,5 @@ Found 2 resource(s)
  - 100% coverage
  - 2 covered by IaC
  - 0 not covered by IaC
- - 0 deleted on cloud provider
- - 2/2 drifted from IaC
+ - 0 missing on cloud provider
+ - 2/2 changed outside of IaC
