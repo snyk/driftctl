@@ -3,6 +3,7 @@ package analyser
 import (
 	"encoding/json"
 	"sort"
+	"strings"
 
 	"github.com/r3labs/diff/v2"
 
@@ -203,5 +204,17 @@ func SortDifferences(diffs []Difference) []Difference {
 		}
 		return diffs[i].Res.TerraformId() < diffs[j].Res.TerraformId()
 	})
+
+	for _, d := range diffs {
+		SortChanges(d.Changelog)
+	}
+
 	return diffs
+}
+
+func SortChanges(changes []Change) []Change {
+	sort.SliceStable(changes, func(i, j int) bool {
+		return strings.Join(changes[i].Path, ".") < strings.Join(changes[j].Path, ".")
+	})
+	return changes
 }
