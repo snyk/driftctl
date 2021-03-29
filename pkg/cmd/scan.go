@@ -177,7 +177,7 @@ func scanRun(opts *ScanOptions) error {
 	if err != nil {
 		return err
 	}
-	ctl := pkg.NewDriftCTL(scanner, iacSupplier, opts.Filter, alerter)
+	ctl := pkg.NewDriftCTL(scanner, iacSupplier, opts.Filter, alerter, opts.Strict)
 
 	go func() {
 		<-c
