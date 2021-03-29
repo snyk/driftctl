@@ -3,7 +3,7 @@
 		"total_resources": 6,
 		"total_drifted": 1,
 		"total_unmanaged": 2,
-		"total_deleted": 2,
+		"total_missing": 2,
 		"total_managed": 2
 	},
 	"managed": [
@@ -26,7 +26,7 @@
 			"type": "aws_unmanaged_resource"
 		}
 	],
-	"deleted": [
+	"missing": [
 		{
 			"id": "deleted-id-1",
 			"type": "aws_deleted_resource"

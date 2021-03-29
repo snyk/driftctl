@@ -24,7 +24,7 @@ type Summary struct {
 	TotalResources int `json:"total_resources"`
 	TotalDrifted   int `json:"total_drifted"`
 	TotalUnmanaged int `json:"total_unmanaged"`
-	TotalDeleted   int `json:"total_deleted"`
+	TotalDeleted   int `json:"total_missing"`
 	TotalManaged   int `json:"total_managed"`
 }
 
@@ -46,7 +46,7 @@ type serializableAnalysis struct {
 	Summary     Summary                                `json:"summary"`
 	Managed     []resource.SerializableResource        `json:"managed"`
 	Unmanaged   []resource.SerializableResource        `json:"unmanaged"`
-	Deleted     []resource.SerializableResource        `json:"deleted"`
+	Deleted     []resource.SerializableResource        `json:"missing"`
 	Differences []serializableDifference               `json:"differences"`
 	Coverage    int                                    `json:"coverage"`
 	Alerts      map[string][]alerter.SerializableAlert `json:"alerts"`
