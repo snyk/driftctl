@@ -18,7 +18,7 @@ func newUnmanagedSecurityGroupRulesAlert() *UnmanagedSecurityGroupRulesAlert {
 }
 
 func (u *UnmanagedSecurityGroupRulesAlert) Message() string {
-	return "You have unmanaged security group rules that could be false positives, find out more at https://github.com/cloudskiff/driftctl/blob/main/doc/LIMITATIONS.md#terraform-resources"
+	return "You have unmanaged security group rules that could be false positives, find out more at https://docs.driftctl.com/0.7.0/limitations#terraform-resources"
 }
 
 func (u *UnmanagedSecurityGroupRulesAlert) ShouldIgnoreResource() bool {
