@@ -9,20 +9,21 @@ import (
 
 // When scanning a brand new AWS account, some users may see irrelevant results about default AWS role policies.
 // We ignore these resources by default when strict mode is disabled.
-type AwsIamRolePolicyDefaults struct{}
+type AwsIamRoleDefaults struct{}
 
-var ignoredIamRolePolicyIds = []string{
-	"OrganizationAccountAccessRole:AdministratorAccess",
+var ignoredIamRoleIds = []string{
+	"AWSServiceRoleForSSO",
+	"OrganizationAccountAccessRole",
 }
 
-func NewAwsIamRolePolicyDefaults() AwsIamRolePolicyDefaults {
-	return AwsIamRolePolicyDefaults{}
+func NewAwsIamRoleDefaults() AwsIamRoleDefaults {
+	return AwsIamRoleDefaults{}
 }
 
-func (m AwsIamRolePolicyDefaults) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+func (m AwsIamRoleDefaults) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
 	for _, remoteResource := range *remoteResources {
 		// Ignore all resources other than role policy
-		if remoteResource.TerraformType() != aws.AwsIamRolePolicyResourceType {
+		if remoteResource.TerraformType() != aws.AwsIamRoleResourceType {
 			continue
 		}
 
@@ -38,14 +39,14 @@ func (m AwsIamRolePolicyDefaults) Execute(remoteResources, resourcesFromState *[
 			continue
 		}
 
-		for _, id := range ignoredIamRolePolicyIds {
+		for _, id := range ignoredIamRoleIds {
 			if remoteResource.TerraformId() == id {
 				*resourcesFromState = append(*resourcesFromState, remoteResource)
 
 				logrus.WithFields(logrus.Fields{
 					"id":   remoteResource.TerraformId(),
 					"type": remoteResource.TerraformType(),
-				}).Debug("Ignoring default iam role policy as it is not managed by IaC")
+				}).Debug("Ignoring default iam role as it is not managed by IaC")
 			}
 		}
 	}

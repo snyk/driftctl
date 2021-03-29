@@ -11,7 +11,7 @@ import (
 	"github.com/r3labs/diff/v2"
 )
 
-func TestAwsIamRolePolicyDefaults_Execute(t *testing.T) {
+func TestAwsIamRoleDefaults_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
 		remoteResources    []resource.Resource
@@ -19,9 +19,9 @@ func TestAwsIamRolePolicyDefaults_Execute(t *testing.T) {
 		expected           []resource.Resource
 	}{
 		{
-			"ignore default iam role policies when they're managed by IaC",
+			"ignore default iam roles when they're managed by IaC",
 			[]resource.Resource{
-				&aws.AwsIamRolePolicy{
+				&aws.AwsIamRole{
 					Id: "OrganizationAccountAccessRole:AdministratorAccess",
 				},
 				&aws.AwsRoute{
@@ -38,7 +38,7 @@ func TestAwsIamRolePolicyDefaults_Execute(t *testing.T) {
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsIamRolePolicy{
+				&aws.AwsIamRole{
 					Id: "OrganizationAccountAccessRole:AdministratorAccess",
 				},
 				&aws.AwsRoute{
@@ -49,12 +49,12 @@ func TestAwsIamRolePolicyDefaults_Execute(t *testing.T) {
 			},
 		},
 		{
-			"iam role policies when they're managed by IaC",
+			"iam roles when they're managed by IaC",
 			[]resource.Resource{
-				&aws.AwsIamRolePolicy{
+				&aws.AwsIamRole{
 					Id: "OrganizationAccountAccessRole:AdministratorAccess",
 				},
-				&aws.AwsIamRolePolicy{
+				&aws.AwsIamRole{
 					Id: "driftctl_assume_role:driftctl_policy.10",
 				},
 				&aws.AwsRoute{
@@ -64,10 +64,10 @@ func TestAwsIamRolePolicyDefaults_Execute(t *testing.T) {
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsIamRolePolicy{
+				&aws.AwsIamRole{
 					Id: "OrganizationAccountAccessRole:AdministratorAccess",
 				},
-				&aws.AwsIamRolePolicy{
+				&aws.AwsIamRole{
 					Id: "driftctl_assume_role:driftctl_policy.10",
 				},
 				&aws.AwsRoute{
@@ -77,10 +77,10 @@ func TestAwsIamRolePolicyDefaults_Execute(t *testing.T) {
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsIamRolePolicy{
+				&aws.AwsIamRole{
 					Id: "OrganizationAccountAccessRole:AdministratorAccess",
 				},
-				&aws.AwsIamRolePolicy{
+				&aws.AwsIamRole{
 					Id: "driftctl_assume_role:driftctl_policy.10",
 				},
 				&aws.AwsRoute{
@@ -99,7 +99,7 @@ func TestAwsIamRolePolicyDefaults_Execute(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := NewAwsIamRolePolicyDefaults()
+			m := NewAwsIamRoleDefaults()
 			err := m.Execute(&tt.remoteResources, &tt.resourcesFromState)
 			if err != nil {
 				t.Fatal(err)
