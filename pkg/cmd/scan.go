@@ -180,7 +180,7 @@ func scanRun(opts *ScanOptions) error {
 
 	resFactory := terraform.NewTerraformResourceFactory(providerLibrary)
 
-	ctl := pkg.NewDriftCTL(scanner, iacSupplier, opts.Filter, alerter, resFactory)
+	ctl := pkg.NewDriftCTL(scanner, iacSupplier, opts.Filter, alerter, resFactory, opts.Strict)
 
 	go func() {
 		<-c
