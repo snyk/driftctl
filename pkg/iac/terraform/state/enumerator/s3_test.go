@@ -80,9 +80,9 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 			},
 		},
 		{
-			name: "test that directories objects are filtered",
+			name: "test results with glob",
 			config: config.SupplierConfig{
-				Path: "bucket-name/a/nested/prefix",
+				Path: "bucket-name/a/nested/prefix/**/*.tfstate",
 			},
 			mocks: func(client *mocks.FakeS3) {
 				input := &s3.ListObjectsV2Input{
@@ -96,20 +96,26 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 						callback(&s3.ListObjectsV2Output{
 							Contents: []*s3.Object{
 								{
-									Key:  awssdk.String("a/nested/prefix/state1"),
-									Size: awssdk.Int64(0),
+									Key: awssdk.String("a/nested/prefix/1/state1.tfstate"),
 								},
 								{
-									Key:  awssdk.String("a/nested/prefix/state2"),
-									Size: nil,
+									Key: awssdk.String("a/nested/prefix/2/state2.tfstate"),
 								},
 								{
-									Key:  awssdk.String("a/nested/prefix/state3"),
-									Size: awssdk.Int64(-1),
+									Key: awssdk.String("a/nested/prefix/state3.tfstate"),
+								},
+							},
+						}, false)
+						callback(&s3.ListObjectsV2Output{
+							Contents: []*s3.Object{
+								{
+									Key: awssdk.String("a/nested/prefix/4/4/state4.tfstate"),
 								},
 								{
-									Key:  awssdk.String("a/nested/prefix/state4"),
-									Size: awssdk.Int64(1),
+									Key: awssdk.String("a/nested/prefix/state5.state"),
+								},
+								{
+									Key: awssdk.String("a/nested/prefix/state6.tfstate.backup"),
 								},
 							},
 						}, true)
@@ -117,9 +123,8 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 					}),
 				).Return(nil)
 			},
-			want: []string{
-				"bucket-name/a/nested/prefix/state4",
-			},
+			want: []string{},
+			err:  "** not supported for S3 pattern",
 		},
 		{
 			name: "test when invalid config used",

@@ -20,9 +20,37 @@ func TestFileEnumerator_Enumerate(t *testing.T) {
 				Path: "testdata/states",
 			},
 			want: []string{
-				"testdata/states/route53/directory/route53.state",
-				"testdata/states/s3/terraform.tfstate",
+				"testdata/states/symlink.tfstate",
 				"testdata/states/terraform.tfstate",
+				"testdata/states/lambda/lambda.tfstate",
+				"testdata/states/s3/terraform.tfstate",
+				"testdata/states/symlink-to-s3-folder/terraform.tfstate",
+			},
+		},
+		{
+			name: "subfolder nesting glob",
+			config: config.SupplierConfig{
+				Path: "testdata/states/**/*.tfstate",
+			},
+			want: []string{
+				"testdata/states/symlink.tfstate",
+				"testdata/states/terraform.tfstate",
+				"testdata/states/lambda/lambda.tfstate",
+				"testdata/states/s3/terraform.tfstate",
+				"testdata/states/symlink-to-s3-folder/terraform.tfstate",
+			},
+		},
+		{
+			name: "subfolder nesting glob upper directory",
+			config: config.SupplierConfig{
+				Path: "testdata/states/s3/../**/*.tfstate",
+			},
+			want: []string{
+				"testdata/states/symlink.tfstate",
+				"testdata/states/terraform.tfstate",
+				"testdata/states/lambda/lambda.tfstate",
+				"testdata/states/s3/terraform.tfstate",
+				"testdata/states/symlink-to-s3-folder/terraform.tfstate",
 			},
 		},
 		{
@@ -31,9 +59,11 @@ func TestFileEnumerator_Enumerate(t *testing.T) {
 				Path: "testdata/symlink",
 			},
 			want: []string{
-				"testdata/states/route53/directory/route53.state",
-				"testdata/states/s3/terraform.tfstate",
+				"testdata/states/symlink.tfstate",
 				"testdata/states/terraform.tfstate",
+				"testdata/states/lambda/lambda.tfstate",
+				"testdata/states/s3/terraform.tfstate",
+				"testdata/states/symlink-to-s3-folder/terraform.tfstate",
 			},
 		},
 		{

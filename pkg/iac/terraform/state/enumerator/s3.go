@@ -1,14 +1,16 @@
 package enumerator
 
 import (
+	"path/filepath"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
-	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/pkg/errors"
+
+	"github.com/cloudskiff/driftctl/pkg/iac/config"
 )
 
 type S3EnumeratorConfig struct {
@@ -39,15 +41,32 @@ func (s *S3Enumerator) Enumerate() ([]string, error) {
 	bucket := bucketPath[0]
 	prefix := strings.Join(bucketPath[1:], "/")
 
-	keys := make([]string, 0)
+	if !HasMeta(prefix) {
+		prefix = filepath.Join(prefix, "*")
+	}
+
+	prefix, pattern, err := GlobS3(prefix)
+	if err != nil {
+		return nil, err
+	}
+
+	// filpath match does not compile so we try to match to be able to report the pattern error
+	if _, err := filepath.Match(pattern, ""); err != nil {
+		return nil, err
+	}
+
+	files := make([]string, 0)
 	input := &s3.ListObjectsV2Input{
 		Bucket: &bucket,
 		Prefix: &prefix,
 	}
-	err := s.client.ListObjectsV2Pages(input, func(output *s3.ListObjectsV2Output, lastPage bool) bool {
+	err = s.client.ListObjectsV2Pages(input, func(output *s3.ListObjectsV2Output, lastPage bool) bool {
 		for _, metadata := range output.Contents {
 			if aws.Int64Value(metadata.Size) > 0 {
-				keys = append(keys, strings.Join([]string{bucket, *metadata.Key}, "/"))
+				key := *metadata.Key
+				if match, _ := filepath.Match(filepath.Join(prefix, pattern), key); match {
+					files = append(files, filepath.Join(bucket, key))
+				}
 			}
 		}
 		return !lastPage
@@ -57,5 +76,5 @@ func (s *S3Enumerator) Enumerate() ([]string, error) {
 		return nil, err
 	}
 
-	return keys, nil
+	return files, nil
 }
