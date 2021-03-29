@@ -12,6 +12,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	filter2 "github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 )
@@ -21,6 +22,7 @@ type TestCase struct {
 	stateResources  []resource.Resource
 	remoteResources []resource.Resource
 	filter          string
+	mocks           func(factory resource.ResourceFactory)
 	assert          func(result *test.ScanResult, err error)
 }
 
@@ -52,7 +54,13 @@ func runTest(t *testing.T, cases TestCases) {
 				filter = f
 			}
 
-			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, filter, testAlerter)
+			resourceFactory := &terraform.MockResourceFactory{}
+
+			if c.mocks != nil {
+				c.mocks(resourceFactory)
+			}
+
+			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, filter, testAlerter, resourceFactory)
 
 			analysis, err := driftctl.Run()
 

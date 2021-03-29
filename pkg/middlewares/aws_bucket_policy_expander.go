@@ -1,16 +1,21 @@
 package middlewares
 
 import (
+	"github.com/sirupsen/logrus"
+
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	"github.com/sirupsen/logrus"
 )
 
 // Explodes policy found in aws_s3_bucket.policy from state resources to dedicated resources
-type AwsBucketPolicyExpander struct{}
+type AwsBucketPolicyExpander struct {
+	resourceFactory resource.ResourceFactory
+}
 
-func NewAwsBucketPolicyExpander() AwsBucketPolicyExpander {
-	return AwsBucketPolicyExpander{}
+func NewAwsBucketPolicyExpander(resourceFactory resource.ResourceFactory) AwsBucketPolicyExpander {
+	return AwsBucketPolicyExpander{
+		resourceFactory: resourceFactory,
+	}
 }
 
 func (m AwsBucketPolicyExpander) Execute(_, resourcesFromState *[]resource.Resource) error {
@@ -44,10 +49,21 @@ func (m *AwsBucketPolicyExpander) handlePolicy(bucket *aws.AwsS3Bucket, results 
 		return nil
 	}
 
+	data := map[string]interface{}{
+		"id":     bucket.Id,
+		"bucket": bucket.Bucket,
+		"policy": bucket.Policy,
+	}
+	ctyVal, err := m.resourceFactory.CreateResource(data, "aws_s3_bucket_policy")
+	if err != nil {
+		return err
+	}
+
 	newPolicy := &aws.AwsS3BucketPolicy{
 		Id:     bucket.Id,
 		Bucket: bucket.Bucket,
 		Policy: bucket.Policy,
+		CtyVal: ctyVal,
 	}
 	normalizedRes, err := newPolicy.NormalizeForState()
 	if err != nil {

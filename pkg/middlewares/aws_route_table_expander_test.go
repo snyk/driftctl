@@ -6,11 +6,14 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
+	"github.com/r3labs/diff/v2"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/cloudskiff/driftctl/pkg/terraform"
 	resource2 "github.com/cloudskiff/driftctl/test/resource"
-	"github.com/r3labs/diff/v2"
 )
 
 func TestAwsRouteTableExpander_Execute(t *testing.T) {
@@ -18,17 +21,17 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 		name     string
 		input    []resource.Resource
 		expected []resource.Resource
+		mock     func(factory *terraform.MockResourceFactory)
 	}{
 		{
-			"test with nil route attributes",
-			[]resource.Resource{
+			name: "test with nil route attributes",
+			input: []resource.Resource{
 				&aws.AwsRouteTable{
 					Id:    "table_from_state",
 					Route: nil,
 				},
 			},
-
-			[]resource.Resource{
+			expected: []resource.Resource{
 				&aws.AwsRouteTable{
 					Id:    "table_from_state",
 					Route: nil,
@@ -36,8 +39,8 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 			},
 		},
 		{
-			"test with empty route attributes",
-			[]resource.Resource{
+			name: "test with empty route attributes",
+			input: []resource.Resource{
 				&aws.AwsRouteTable{
 					Id: "table_from_state",
 					Route: &[]struct {
@@ -55,7 +58,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 					}{},
 				},
 			},
-			[]resource.Resource{
+			expected: []resource.Resource{
 				&aws.AwsRouteTable{
 					Id:    "table_from_state",
 					Route: nil,
@@ -63,8 +66,8 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 			},
 		},
 		{
-			"test route are expanded",
-			[]resource.Resource{
+			name: "test route are expanded",
+			input: []resource.Resource{
 				&resource2.FakeResource{
 					Id: "fake_resource",
 				},
@@ -95,7 +98,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{
+			expected: []resource.Resource{
 				&resource2.FakeResource{
 					Id: "fake_resource",
 				},
@@ -124,10 +127,13 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 					InstanceOwnerId:          awssdk.String(""),
 				},
 			},
+			mock: func(factory *terraform.MockResourceFactory) {
+				factory.On("CreateResource", mock.Anything, "aws_route").Times(2).Return(nil, nil)
+			},
 		},
 		{
-			"test route are expanded on default route tables",
-			[]resource.Resource{
+			name: "test route are expanded on default route tables",
+			input: []resource.Resource{
 				&resource2.FakeResource{
 					Id: "fake_resource",
 				},
@@ -157,7 +163,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{
+			expected: []resource.Resource{
 				&resource2.FakeResource{
 					Id: "fake_resource",
 				},
@@ -186,12 +192,21 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 					InstanceOwnerId:          awssdk.String(""),
 				},
 			},
+			mock: func(factory *terraform.MockResourceFactory) {
+				factory.On("CreateResource", mock.Anything, "aws_route").Times(2).Return(nil, nil)
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockedAlerter := &mocks.AlerterInterface{}
-			m := NewAwsRouteTableExpander(mockedAlerter)
+
+			factory := &terraform.MockResourceFactory{}
+			if tt.mock != nil {
+				tt.mock(factory)
+			}
+
+			m := NewAwsRouteTableExpander(mockedAlerter, factory)
 			err := m.Execute(nil, &tt.input)
 			if err != nil {
 				t.Fatal(err)
@@ -274,7 +289,9 @@ func TestAwsRouteTableExpander_ExecuteWithInvalidRoutes(t *testing.T) {
 		},
 	}
 
-	m := NewAwsRouteTableExpander(mockedAlerter)
+	factory := &terraform.MockResourceFactory{}
+
+	m := NewAwsRouteTableExpander(mockedAlerter, factory)
 	err := m.Execute(nil, &input)
 	if err != nil {
 		t.Fatal(err)

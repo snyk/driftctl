@@ -3,26 +3,28 @@ package pkg
 import (
 	"fmt"
 
+	"github.com/jmespath/go-jmespath"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/middlewares"
 	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/jmespath/go-jmespath"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type DriftCTL struct {
-	remoteSupplier resource.Supplier
-	iacSupplier    resource.Supplier
-	alerter        alerter.AlerterInterface
-	analyzer       analyser.Analyzer
-	filter         *jmespath.JMESPath
+	remoteSupplier  resource.Supplier
+	iacSupplier     resource.Supplier
+	alerter         alerter.AlerterInterface
+	analyzer        analyser.Analyzer
+	filter          *jmespath.JMESPath
+	resourceFactory resource.ResourceFactory
 }
 
-func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, filter *jmespath.JMESPath, alerter *alerter.Alerter) *DriftCTL {
-	return &DriftCTL{remoteSupplier, iacSupplier, alerter, analyser.NewAnalyzer(alerter), filter}
+func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, filter *jmespath.JMESPath, alerter *alerter.Alerter, resFactory resource.ResourceFactory) *DriftCTL {
+	return &DriftCTL{remoteSupplier, iacSupplier, alerter, analyser.NewAnalyzer(alerter), filter, resFactory}
 }
 
 func (d DriftCTL) Run() (*analyser.Analysis, error) {
@@ -34,23 +36,23 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	middleware := middlewares.NewChain(
 		middlewares.NewRoute53DefaultZoneRecordSanitizer(),
 		middlewares.NewS3BucketAcl(),
-		middlewares.NewAwsInstanceBlockDeviceResourceMapper(),
+		middlewares.NewAwsInstanceBlockDeviceResourceMapper(d.resourceFactory),
 		middlewares.NewVPCDefaultSecurityGroupSanitizer(),
-		middlewares.NewVPCSecurityGroupRuleSanitizer(),
+		middlewares.NewVPCSecurityGroupRuleSanitizer(d.resourceFactory),
 		middlewares.NewIamPolicyAttachmentSanitizer(),
 		middlewares.AwsInstanceEIP{},
 		middlewares.NewAwsDefaultInternetGatewayRoute(),
 		middlewares.NewAwsDefaultInternetGateway(),
 		middlewares.NewAwsDefaultVPC(),
 		middlewares.NewAwsDefaultSubnet(),
-		middlewares.NewAwsRouteTableExpander(d.alerter),
+		middlewares.NewAwsRouteTableExpander(d.alerter, d.resourceFactory),
 		middlewares.NewAwsDefaultRouteTable(),
 		middlewares.NewAwsDefaultRoute(),
 		middlewares.NewAwsNatGatewayEipAssoc(),
-		middlewares.NewAwsBucketPolicyExpander(),
-		middlewares.NewAwsSqsQueuePolicyExpander(),
+		middlewares.NewAwsBucketPolicyExpander(d.resourceFactory),
+		middlewares.NewAwsSqsQueuePolicyExpander(d.resourceFactory),
 		middlewares.NewAwsDefaultSqsQueuePolicy(),
-		middlewares.NewAwsSNSTopicPolicyExpander(),
+		middlewares.NewAwsSNSTopicPolicyExpander(d.resourceFactory),
 	)
 
 	logrus.Debug("Ready to run middlewares")

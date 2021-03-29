@@ -5,8 +5,10 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/stretchr/testify/mock"
 
 	awsresource "github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
@@ -19,6 +21,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 		name               string
 		resourcesFromState *[]resource.Resource
 		expected           *[]resource.Resource
+		mock               func(factory *terraform.MockResourceFactory)
 		wantErr            bool
 	}{
 		{
@@ -41,6 +44,9 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 					Policy: aws.String("{\"policy\":\"coucou\"}"),
 					Id:     "ID",
 				},
+			},
+			mock: func(factory *terraform.MockResourceFactory) {
+				factory.On("CreateResource", mock.Anything, "aws_sns_topic_policy").Once().Return(nil, nil)
 			},
 			wantErr: false,
 		},
@@ -103,7 +109,13 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := AwsSNSTopicPolicyExpander{}
+
+			factory := &terraform.MockResourceFactory{}
+			if tt.mock != nil {
+				tt.mock(factory)
+			}
+
+			m := NewAwsSNSTopicPolicyExpander(factory)
 			if err := m.Execute(&[]resource.Resource{}, tt.resourcesFromState); (err != nil) != tt.wantErr {
 				t.Errorf("Execute() error = %v, wantErr %v", err, tt.wantErr)
 			}

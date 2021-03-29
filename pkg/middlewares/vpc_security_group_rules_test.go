@@ -4,13 +4,19 @@ import (
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
 func TestVPCSecurityGroupRuleSanitizer(t *testing.T) {
-	middleware := NewVPCSecurityGroupRuleSanitizer()
+
+	factory := &terraform.MockResourceFactory{}
+	factory.On("CreateResource", mock.Anything, "aws_security_group_rule").Times(8).Return(nil, nil)
+
+	middleware := NewVPCSecurityGroupRuleSanitizer(factory)
 	var remoteResources []resource.Resource
 	stateResources := []resource.Resource{
 		&aws.AwsSecurityGroup{
