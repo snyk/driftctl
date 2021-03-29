@@ -3,7 +3,7 @@
 		"total_resources": 1,
 		"total_drifted": 1,
 		"total_unmanaged": 0,
-		"total_deleted": 0,
+		"total_missing": 0,
 		"total_managed": 1
 	},
 	"managed": [
@@ -13,7 +13,7 @@
 		}
 	],
 	"unmanaged": null,
-	"deleted": null,
+	"missing": null,
 	"differences": [
 		{
 			"res": {
