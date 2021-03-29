@@ -19,10 +19,11 @@ type DriftCTL struct {
 	alerter        *alerter.Alerter
 	analyzer       analyser.Analyzer
 	filter         *jmespath.JMESPath
+	strictMode     bool
 }
 
-func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, filter *jmespath.JMESPath, alerter *alerter.Alerter) *DriftCTL {
-	return &DriftCTL{remoteSupplier, iacSupplier, alerter, analyser.NewAnalyzer(alerter), filter}
+func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, filter *jmespath.JMESPath, alerter *alerter.Alerter, strictMode bool) *DriftCTL {
+	return &DriftCTL{remoteSupplier, iacSupplier, alerter, analyser.NewAnalyzer(alerter), filter, strictMode}
 }
 
 func (d DriftCTL) Run() (*analyser.Analysis, error) {
@@ -51,9 +52,14 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		middlewares.NewAwsSqsQueuePolicyExpander(),
 		middlewares.NewAwsDefaultSqsQueuePolicy(),
 		middlewares.NewAwsSNSTopicPolicyExpander(),
-		middlewares.NewAwsIamRolePolicyDefaults(),
-		middlewares.NewAwsIamRoleDefaults(),
 	)
+
+	if !d.strictMode {
+		middleware = append(middleware,
+			middlewares.NewAwsIamRolePolicyDefaults(),
+			middlewares.NewAwsIamRoleDefaults(),
+		)
+	}
 
 	logrus.Debug("Ready to run middlewares")
 	err = middleware.Execute(&remoteResources, &resourcesFromState)
