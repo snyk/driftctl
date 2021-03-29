@@ -14,7 +14,8 @@
   "Tags": {
    "foo": "bar0"
   },
-  "UniqueId": "AROA5QYBVVD24YSTJXHHO"
+  "UniqueId": "AROA5QYBVVD24YSTJXHHO",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:iam::929327065333:role/test/test_role_1",
@@ -31,7 +32,8 @@
   "Tags": {
    "foo": "bar1"
   },
-  "UniqueId": "AROA5QYBVVD2UGXJCEDXF"
+  "UniqueId": "AROA5QYBVVD2UGXJCEDXF",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:iam::929327065333:role/test/test_role_2",
@@ -48,6 +50,7 @@
   "Tags": {
    "foo": "bar2"
   },
-  "UniqueId": "AROA5QYBVVD2WGP2ZEG73"
+  "UniqueId": "AROA5QYBVVD2WGP2ZEG73",
+  "CtyVal": {}
  }
 ]

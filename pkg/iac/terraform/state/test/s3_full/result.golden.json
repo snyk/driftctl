@@ -29,7 +29,8 @@
     "MfaDelete": false
    }
   ],
-  "Website": []
+  "Website": [],
+  "CtyVal": {}
  },
  {
   "AccelerationStatus": "",
@@ -61,7 +62,8 @@
     "MfaDelete": false
    }
   ],
-  "Website": []
+  "Website": [],
+  "CtyVal": {}
  },
  {
   "AccelerationStatus": "",
@@ -93,7 +95,8 @@
     "MfaDelete": false
    }
   ],
-  "Website": []
+  "Website": [],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift",
@@ -120,7 +123,8 @@
      }
     ]
    }
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift",
@@ -147,7 +151,8 @@
      }
     ]
    }
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift2",
@@ -174,7 +179,8 @@
      }
     ]
    }
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift2",
@@ -201,7 +207,8 @@
      }
     ]
    }
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift3",
@@ -228,7 +235,8 @@
      }
     ]
    }
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift3",
@@ -255,7 +263,8 @@
      }
     ]
    }
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift",
@@ -282,7 +291,8 @@
    {
     "Frequency": "Daily"
    }
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift3",
@@ -309,7 +319,8 @@
    {
     "Frequency": "Daily"
    }
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift2",
@@ -336,7 +347,8 @@
    {
     "Frequency": "Daily"
    }
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift",
@@ -363,7 +375,8 @@
    {
     "Frequency": "Daily"
    }
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift3",
@@ -390,7 +403,8 @@
    {
     "Frequency": "Daily"
    }
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift2",
@@ -417,43 +431,50 @@
    {
     "Frequency": "Daily"
    }
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift",
   "Id": "bucket-martin-test-drift:Metrics2_Bucket1",
   "Name": "Metrics2_Bucket1",
-  "Filter": []
+  "Filter": [],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift3",
   "Id": "bucket-martin-test-drift3:Metrics2_Bucket3",
   "Name": "Metrics2_Bucket3",
-  "Filter": []
+  "Filter": [],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift2",
   "Id": "bucket-martin-test-drift2:Metrics_Bucket2",
   "Name": "Metrics_Bucket2",
-  "Filter": []
+  "Filter": [],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift",
   "Id": "bucket-martin-test-drift:Metrics_Bucket1",
   "Name": "Metrics_Bucket1",
-  "Filter": []
+  "Filter": [],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift2",
   "Id": "bucket-martin-test-drift2:Metrics2_Bucket2",
   "Name": "Metrics2_Bucket2",
-  "Filter": []
+  "Filter": [],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift3",
   "Id": "bucket-martin-test-drift3:Metrics_Bucket3",
   "Name": "Metrics_Bucket3",
-  "Filter": []
+  "Filter": [],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift",
@@ -479,7 +500,8 @@
    }
   ],
   "Queue": [],
-  "Topic": []
+  "Topic": [],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift3",
@@ -505,21 +527,25 @@
    }
   ],
   "Queue": [],
-  "Topic": []
+  "Topic": [],
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift3",
   "Id": "bucket-martin-test-drift3",
-  "Policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift3/*\",\"Sid\":\"PublicReadGetObject\"}],\"Version\":\"2012-10-17\"}"
+  "Policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift3/*\",\"Sid\":\"PublicReadGetObject\"}],\"Version\":\"2012-10-17\"}",
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift",
   "Id": "bucket-martin-test-drift",
-  "Policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift/*\",\"Sid\":\"PublicReadGetObject\"}],\"Version\":\"2012-10-17\"}"
+  "Policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift/*\",\"Sid\":\"PublicReadGetObject\"}],\"Version\":\"2012-10-17\"}",
+  "CtyVal": {}
  },
  {
   "Bucket": "bucket-martin-test-drift2",
   "Id": "bucket-martin-test-drift2",
-  "Policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift2/*\",\"Sid\":\"PublicReadGetObject\"}],\"Version\":\"2012-10-17\"}"
+  "Policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift2/*\",\"Sid\":\"PublicReadGetObject\"}],\"Version\":\"2012-10-17\"}",
+  "CtyVal": {}
  }
 ]

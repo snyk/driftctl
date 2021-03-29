@@ -9,7 +9,8 @@
   "Tags": {
    "foo": "bar"
   },
-  "UniqueId": "AIDA5QYBVVD2ZWIW56NWS"
+  "UniqueId": "AIDA5QYBVVD2ZWIW56NWS",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:iam::929327065333:user/test/test-driftctl-1",
@@ -21,7 +22,8 @@
   "Tags": {
    "foo": "bar"
   },
-  "UniqueId": "AIDA5QYBVVD2UMP6CZEGZ"
+  "UniqueId": "AIDA5QYBVVD2UMP6CZEGZ",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:iam::929327065333:user/test/test-driftctl-2",
@@ -33,6 +35,7 @@
   "Tags": {
    "foo": "bar"
   },
-  "UniqueId": "AIDA5QYBVVD23ZWIILRUW"
+  "UniqueId": "AIDA5QYBVVD23ZWIILRUW",
+  "CtyVal": {}
  }
 ]

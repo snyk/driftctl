@@ -23,8 +23,10 @@ func (s S3BucketPolicyDeserializer) HandledType() resource.ResourceType {
 func (s S3BucketPolicyDeserializer) Deserialize(rawPolicy []cty.Value) ([]resource.Resource, error) {
 	var inventories []resource.Resource
 	for _, policy := range rawPolicy {
+		policy := policy
 		var pol aws.AwsS3BucketPolicy
 		if err := gocty.FromCtyValue(policy, &pol); err == nil {
+			pol.CtyVal = &policy
 			inventories = append(inventories, &pol)
 		} else {
 			logrus.Warnf("Cannot read s3 bucket policy %s: %+v", policy.GoString(), err)

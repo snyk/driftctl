@@ -34,5 +34,6 @@ func (s LambdaEventSourceMappingTopicDeserializer) Deserialize(values []cty.Valu
 func decodeLambdaEventSourceMapping(value cty.Value) (resource.Resource, error) {
 	var eventSourceMapping aws.AwsLambdaEventSourceMapping
 	err := gocty.FromCtyValue(value, &eventSourceMapping)
+	eventSourceMapping.CtyVal = &value
 	return &eventSourceMapping, err
 }

@@ -1,5 +1,7 @@
 package github
 
+import "github.com/zclconf/go-cty/cty"
+
 const GithubRepositoryResourceType = "github_repository"
 
 type GithubRepository struct {
@@ -50,6 +52,7 @@ type GithubRepository struct {
 		Owner      *string `cty:"owner"`
 		Repository *string `cty:"repository"`
 	} `cty:"template"`
+	CtyVal *cty.Value `diff:"-"`
 }
 
 func (r *GithubRepository) TerraformId() string {
@@ -58,4 +61,8 @@ func (r *GithubRepository) TerraformId() string {
 
 func (r *GithubRepository) TerraformType() string {
 	return GithubRepositoryResourceType
+}
+
+func (r *GithubRepository) CtyValue() *cty.Value {
+	return r.CtyVal
 }

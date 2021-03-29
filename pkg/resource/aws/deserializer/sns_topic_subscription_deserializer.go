@@ -37,5 +37,6 @@ func (s SNSTopicSubscriptionDeserializer) Deserialize(subscriptionsList []cty.Va
 func decodeSNSTopicSubscription(value cty.Value) (resource.Resource, error) {
 	var subscription aws.AwsSnsTopicSubscription
 	err := gocty.FromCtyValue(value, &subscription)
+	subscription.CtyVal = &value
 	return &subscription, err
 }

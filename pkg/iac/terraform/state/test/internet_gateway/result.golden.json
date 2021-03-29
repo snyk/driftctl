@@ -6,6 +6,7 @@
   "Tags": {
    "Name": "main"
   },
-  "VpcId": "vpc-0f3ac2b7909b6bedd"
+  "VpcId": "vpc-0f3ac2b7909b6bedd",
+  "CtyVal": {}
  }
 ]

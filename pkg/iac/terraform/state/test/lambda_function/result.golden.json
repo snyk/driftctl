@@ -39,7 +39,8 @@
     "Mode": "PassThrough"
    }
   ],
-  "VpcConfig": []
+  "VpcConfig": [],
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:lambda:eu-west-3:047081014315:function:foo",
@@ -81,6 +82,7 @@
     "Mode": "PassThrough"
    }
   ],
-  "VpcConfig": []
+  "VpcConfig": [],
+  "CtyVal": {}
  }
 ]

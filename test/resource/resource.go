@@ -1,26 +1,31 @@
 package resource
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/zclconf/go-cty/cty"
+)
 
 type FakeResource struct {
-	Id        string
-	FooBar    string
-	BarFoo    string `computed:"true"`
-	Json      string `jsonstring:"true"`
+	Id        string `cty:"id"`
+	FooBar    string `cty:"foo_bar"`
+	BarFoo    string `cty:"bar_foo" computed:"true"`
+	Json      string `cty:"json" jsonstring:"true"`
 	Type      string
-	Tags      map[string]string
+	Tags      map[string]string `cty:"tags"`
 	CustomMap map[string]struct {
-		Tag string
-	}
-	Slice  []string
+		Tag string `cty:"tag"`
+	} `cty:"custom_map"`
+	Slice  []string `cty:"slice"`
 	Struct struct {
-		Baz string `computed:"true"`
-		Bar string
-	}
+		Baz string `cty:"baz" computed:"true"`
+		Bar string `cty:"bar"`
+	} `cty:"struct"`
 	StructSlice []struct {
-		String string   `computed:"true"`
-		Array  []string `computed:"true"`
-	}
+		String string   `cty:"string" computed:"true"`
+		Array  []string `cty:"array" computed:"true"`
+	} `cty:"struct_slice"`
+	CtyVal *cty.Value `diff:"-"`
 }
 
 func (d FakeResource) TerraformId() string {
@@ -34,9 +39,14 @@ func (d FakeResource) TerraformType() string {
 	return "FakeResource"
 }
 
+func (r FakeResource) CtyValue() *cty.Value {
+	return r.CtyVal
+}
+
 type FakeResourceStringer struct {
-	Id   string
-	Name string
+	Id     string
+	Name   string
+	CtyVal *cty.Value `diff:"-"`
 }
 
 func (d *FakeResourceStringer) TerraformId() string {
@@ -45,6 +55,10 @@ func (d *FakeResourceStringer) TerraformId() string {
 
 func (d *FakeResourceStringer) TerraformType() string {
 	return "FakeResourceStringer"
+}
+
+func (r *FakeResourceStringer) CtyValue() *cty.Value {
+	return r.CtyVal
 }
 
 func (d *FakeResourceStringer) String() string {

@@ -40,5 +40,6 @@ func decodeRoute53Record(raw *cty.Value) (*resourceaws.AwsRoute53Record, error) 
 	if err := gocty.FromCtyValue(*raw, &decoded); err != nil {
 		return nil, err
 	}
+	decoded.CtyVal = raw
 	return &decoded, nil
 }

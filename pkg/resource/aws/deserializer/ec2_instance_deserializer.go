@@ -38,5 +38,6 @@ func decodeEC2Instance(rawInstance cty.Value) (resource.Resource, error) {
 	if err := gocty.FromCtyValue(rawInstance, &decodedInstance); err != nil {
 		return nil, err
 	}
+	decodedInstance.CtyVal = &rawInstance
 	return &decodedInstance, nil
 }

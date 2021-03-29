@@ -15,7 +15,8 @@
   "ReceiveWaitTimeSeconds": 0,
   "RedrivePolicy": "",
   "Tags": {},
-  "VisibilityTimeoutSeconds": 30
+  "VisibilityTimeoutSeconds": 30,
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:sqs:eu-west-3:047081014315:foo",
@@ -33,6 +34,7 @@
   "ReceiveWaitTimeSeconds": 0,
   "RedrivePolicy": "",
   "Tags": {},
-  "VisibilityTimeoutSeconds": 30
+  "VisibilityTimeoutSeconds": 30,
+  "CtyVal": {}
  }
 ]

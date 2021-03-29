@@ -37,5 +37,6 @@ func decodeTeam(res *cty.Value) (resource.Resource, error) {
 	if err := gocty.FromCtyValue(*res, &decoded); err != nil {
 		return nil, err
 	}
+	decoded.CtyVal = res
 	return &decoded, nil
 }

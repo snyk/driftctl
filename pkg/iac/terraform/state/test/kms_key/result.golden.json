@@ -10,7 +10,8 @@
   "KeyId": "8ee21d91-c000-428c-8032-235aac55da36",
   "KeyUsage": "SIGN_VERIFY",
   "Policy": "{\"Id\":\"key-consolepolicy-3\",\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::047081014315:root\"},\"Resource\":\"*\",\"Sid\":\"Enable IAM User Permissions\"},{\"Action\":[\"kms:DescribeKey\",\"kms:GetPublicKey\",\"kms:Sign\",\"kms:Verify\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::047081014315:user/admin\"},\"Resource\":\"*\",\"Sid\":\"Allow use of the key\"},{\"Action\":[\"kms:CreateGrant\",\"kms:ListGrants\",\"kms:RevokeGrant\"],\"Condition\":{\"Bool\":{\"kms:GrantIsForAWSResource\":\"true\"}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::047081014315:user/admin\"},\"Resource\":\"*\",\"Sid\":\"Allow attachment of persistent resources\"}],\"Version\":\"2012-10-17\"}",
-  "Tags": {}
+  "Tags": {},
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:kms:eu-west-3:047081014315:key/5d765f32-bfdc-4610-b6ab-f82db5d0601b",
@@ -25,7 +26,8 @@
   "Policy": "{\"Id\":\"key-default-1\",\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::047081014315:root\"},\"Resource\":\"*\",\"Sid\":\"Enable IAM User Permissions\"}],\"Version\":\"2012-10-17\"}",
   "Tags": {
    "Foo": "true"
-  }
+  },
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:kms:eu-west-3:047081014315:key/89d2c023-ea53-40a5-b20a-d84905c622d7",
@@ -38,6 +40,7 @@
   "KeyId": "89d2c023-ea53-40a5-b20a-d84905c622d7",
   "KeyUsage": "ENCRYPT_DECRYPT",
   "Policy": "{\"Id\":\"key-default-1\",\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::047081014315:root\"},\"Resource\":\"*\",\"Sid\":\"Enable IAM User Permissions\"}],\"Version\":\"2012-10-17\"}",
-  "Tags": {}
+  "Tags": {},
+  "CtyVal": {}
  }
 ]

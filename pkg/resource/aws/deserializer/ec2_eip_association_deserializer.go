@@ -38,5 +38,6 @@ func decodeEC2EipAssociation(rawAssoc cty.Value) (resource.Resource, error) {
 	if err := gocty.FromCtyValue(rawAssoc, &decodedAssoc); err != nil {
 		return nil, err
 	}
+	decodedAssoc.CtyVal = &rawAssoc
 	return &decodedAssoc, nil
 }

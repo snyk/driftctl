@@ -17,7 +17,8 @@
   "Ipv6CidrBlock": "",
   "MainRouteTableId": "rtb-9642cde8",
   "OwnerId": "929327065333",
-  "Tags": null
+  "Tags": null,
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:ec2:us-east-1:929327065333:vpc/vpc-0a5666c0cfc366714",
@@ -37,7 +38,8 @@
   "Ipv6CidrBlock": "",
   "MainRouteTableId": "rtb-0aa0a93a2960854a1",
   "OwnerId": "929327065333",
-  "Tags": {}
+  "Tags": {},
+  "CtyVal": {}
  },
  {
   "DefaultRouteTableId": "rtb-9642cde8",
@@ -46,7 +48,8 @@
   "PropagatingVgws": null,
   "Route": null,
   "Tags": null,
-  "VpcId": "vpc-41d1d13b"
+  "VpcId": "vpc-41d1d13b",
+  "CtyVal": {}
  },
  {
   "Id": "rtb-0232602f0f07748fc",
@@ -83,6 +86,7 @@
   "Tags": {
    "Name": "rr"
   },
-  "VpcId": "vpc-0a5666c0cfc366714"
+  "VpcId": "vpc-0a5666c0cfc366714",
+  "CtyVal": {}
  }
 ]

@@ -38,5 +38,6 @@ func decodeEC2EbsSnapshot(rawSnapshot cty.Value) (resource.Resource, error) {
 	if err := gocty.FromCtyValue(rawSnapshot, &decodedSnapshot); err != nil {
 		return nil, err
 	}
+	decodedSnapshot.CtyVal = &rawSnapshot
 	return &decodedSnapshot, nil
 }

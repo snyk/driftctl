@@ -39,6 +39,6 @@ func decodeRoute53Zone(zone *cty.Value) (resource.Resource, error) {
 	if err := gocty.FromCtyValue(*zone, &decodedZone); err != nil {
 		return nil, err
 	}
-
+	decodedZone.CtyVal = zone
 	return &decodedZone, nil
 }

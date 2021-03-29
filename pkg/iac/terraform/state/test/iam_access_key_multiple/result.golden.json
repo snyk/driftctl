@@ -7,7 +7,8 @@
   "Path": "/",
   "PermissionsBoundary": null,
   "Tags": {},
-  "UniqueId": "AIDA5QYBVVD27TBHIJVSL"
+  "UniqueId": "AIDA5QYBVVD27TBHIJVSL",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:iam::929327065333:user/test-driftctl2",
@@ -17,7 +18,8 @@
   "Path": "/",
   "PermissionsBoundary": null,
   "Tags": {},
-  "UniqueId": "AIDA5QYBVVD2RVTK3ODPO"
+  "UniqueId": "AIDA5QYBVVD2RVTK3ODPO",
+  "CtyVal": {}
  },
  {
   "EncryptedSecret": null,
@@ -27,7 +29,8 @@
   "Secret": null,
   "SesSmtpPasswordV4": null,
   "Status": "Active",
-  "User": "test-driftctl"
+  "User": "test-driftctl",
+  "CtyVal": {}
  },
  {
   "EncryptedSecret": null,
@@ -37,7 +40,8 @@
   "Secret": null,
   "SesSmtpPasswordV4": null,
   "Status": "Active",
-  "User": "test-driftctl"
+  "User": "test-driftctl",
+  "CtyVal": {}
  },
  {
   "EncryptedSecret": null,
@@ -47,7 +51,8 @@
   "Secret": null,
   "SesSmtpPasswordV4": null,
   "Status": "Active",
-  "User": "test-driftctl2"
+  "User": "test-driftctl2",
+  "CtyVal": {}
  },
  {
   "EncryptedSecret": null,
@@ -57,6 +62,7 @@
   "Secret": null,
   "SesSmtpPasswordV4": null,
   "Status": "Active",
-  "User": "test-driftctl2"
+  "User": "test-driftctl2",
+  "CtyVal": {}
  }
 ]

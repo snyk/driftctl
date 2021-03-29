@@ -18,7 +18,8 @@
   "State": "Enabled",
   "StateTransitionReason": "USER_INITIATED",
   "Uuid": "13ff66f8-37eb-4ad6-a0a8-594fea72df4f",
-  "DestinationConfig": []
+  "DestinationConfig": [],
+  "CtyVal":{}
  },
  {
   "BatchSize": 1,
@@ -39,6 +40,7 @@
   "State": "Enabled",
   "StateTransitionReason": "USER_INITIATED",
   "Uuid": "4ad7e2b3-79e9-4713-9d9d-5af2c01d9058",
-  "DestinationConfig": []
+  "DestinationConfig": [],
+  "CtyVal":{}
  }
 ]

@@ -10,7 +10,8 @@
   "NodeId": "MDQ6VGVhbTQ1NTY3MTU=",
   "ParentTeamId": null,
   "Privacy": "closed",
-  "Slug": "team1"
+  "Slug": "team1",
+  "CtyVal": {}
  },
  {
   "CreateDefaultMaintainer": false,
@@ -23,7 +24,8 @@
   "NodeId": "MDQ6VGVhbTQ1NTY3MTk=",
   "ParentTeamId": null,
   "Privacy": "secret",
-  "Slug": "team2"
+  "Slug": "team2",
+  "CtyVal": {}
  },
  {
   "CreateDefaultMaintainer": false,
@@ -36,6 +38,7 @@
   "NodeId": "MDQ6VGVhbTQ1NTY3NDc=",
   "ParentTeamId": 4556715,
   "Privacy": "closed",
-  "Slug": "new-team-with-parent"
+  "Slug": "new-team-with-parent",
+  "CtyVal": {}
  }
 ]

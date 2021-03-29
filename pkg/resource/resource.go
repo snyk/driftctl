@@ -3,11 +3,14 @@ package resource
 import (
 	"encoding/json"
 	"sort"
+
+	"github.com/zclconf/go-cty/cty"
 )
 
 type Resource interface {
 	TerraformId() string
 	TerraformType() string
+	CtyValue() *cty.Value
 }
 
 type SerializableResource struct {
@@ -25,6 +28,10 @@ func (u SerializedResource) TerraformId() string {
 
 func (u SerializedResource) TerraformType() string {
 	return u.Type
+}
+
+func (u SerializedResource) CtyValue() *cty.Value {
+	return &cty.NilVal
 }
 
 func (s *SerializableResource) UnmarshalJSON(bytes []byte) error {

@@ -38,5 +38,6 @@ func decodeEC2Ami(rawAmi cty.Value) (resource.Resource, error) {
 	if err := gocty.FromCtyValue(rawAmi, &decodedImage); err != nil {
 		return nil, err
 	}
+	decodedImage.CtyVal = &rawAmi
 	return &decodedImage, nil
 }

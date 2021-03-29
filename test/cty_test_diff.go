@@ -9,8 +9,9 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/zclconf/go-cty/cty/json"
+
+	"github.com/cloudskiff/driftctl/pkg/resource"
 
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
@@ -60,7 +61,15 @@ func doTestDiff(got []resource.Resource, dirName string, provider terraform.Terr
 		expectedResources = append(expectedResources, decodedResources...)
 	}
 
-	return diff.Diff(got, expectedResources)
+	differ, err := diff.NewDiffer(diff.SliceOrdering(true))
+	if err != nil {
+		panic(err)
+	}
+
+	got = resource.Sort(got)
+	expectedResources = resource.Sort(expectedResources)
+
+	return differ.Diff(got, expectedResources)
 }
 
 func CtyTestDiff(got []resource.Resource, dirName string, provider terraform.TerraformProvider, d deserializer.CTYDeserializer, shouldUpdate bool, t *testing.T) {

@@ -23,8 +23,10 @@ func (s S3BucketNotificationDeserializer) HandledType() resource.ResourceType {
 func (s S3BucketNotificationDeserializer) Deserialize(rawNotification []cty.Value) ([]resource.Resource, error) {
 	var inventories []resource.Resource
 	for _, notification := range rawNotification {
+		notification := notification
 		var inv aws.AwsS3BucketNotification
 		if err := gocty.FromCtyValue(notification, &inv); err == nil {
+			inv.CtyVal = &notification
 			inventories = append(inventories, &inv)
 		} else {
 			logrus.Warnf("Cannot read s3 bucket notification %s: %+v", notification.GoString(), err)

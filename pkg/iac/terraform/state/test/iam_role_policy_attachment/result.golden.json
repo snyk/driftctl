@@ -12,7 +12,8 @@
   "Path": "/",
   "PermissionsBoundary": null,
   "Tags": {},
-  "UniqueId": "AROAXVMHWD4BXFUYMSDRB"
+  "UniqueId": "AROAXVMHWD4BXFUYMSDRB",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:iam::526954929923:role/test-role",
@@ -27,7 +28,8 @@
   "Path": "/",
   "PermissionsBoundary": null,
   "Tags": {},
-  "UniqueId": "AROAXVMHWD4BRFKSROAS3"
+  "UniqueId": "AROAXVMHWD4BRFKSROAS3",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:iam::526954929923:policy/test-policy",
@@ -36,7 +38,8 @@
   "Name": "test-policy",
   "NamePrefix": null,
   "Path": "/",
-  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}"
+  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:iam::526954929923:policy/test-policy3",
@@ -45,7 +48,8 @@
   "Name": "test-policy3",
   "NamePrefix": null,
   "Path": "/",
-  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}"
+  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}",
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:iam::526954929923:policy/test-policy2",
@@ -54,7 +58,8 @@
   "Name": "test-policy2",
   "NamePrefix": null,
   "Path": "/",
-  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}"
+  "Policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}",
+  "CtyVal": {}
  },
  {
   "Groups": [],
@@ -65,7 +70,8 @@
    "test-role",
    "test-role2"
   ],
-  "Users": []
+  "Users": [],
+  "CtyVal": {}
  },
  {
   "Groups": [],
@@ -75,7 +81,8 @@
   "Roles": [
    "test-role"
   ],
-  "Users": []
+  "Users": [],
+  "CtyVal": {}
  },
  {
   "Groups": [],
@@ -85,7 +92,8 @@
   "Roles": [
    "test-role"
   ],
-  "Users": []
+  "Users": [],
+  "CtyVal": {}
  },
  {
   "Groups": [],
@@ -95,7 +103,8 @@
   "Roles": [
    "test-role2"
   ],
-  "Users": []
+  "Users": [],
+  "CtyVal": {}
  },
  {
   "Groups": [],
@@ -105,6 +114,7 @@
   "Roles": [
    "test-role2"
   ],
-  "Users": []
+  "Users": [],
+  "CtyVal": {}
  }
 ]

@@ -57,7 +57,8 @@
     "AttributeName": "",
     "Enabled": false
    }
-  ]
+  ],
+  "CtyVal": {}
  },
  {
   "Arn": "arn:aws:dynamodb:us-east-1:526954929923:table/example",
@@ -101,6 +102,7 @@
     "AttributeName": "",
     "Enabled": false
    }
-  ]
+  ],
+  "CtyVal": {}
  }
 ]

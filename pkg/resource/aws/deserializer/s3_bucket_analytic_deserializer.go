@@ -23,8 +23,10 @@ func (s S3BucketAnalyticDeserializer) HandledType() resource.ResourceType {
 func (s S3BucketAnalyticDeserializer) Deserialize(rawAnalytic []cty.Value) ([]resource.Resource, error) {
 	var inventories []resource.Resource
 	for _, analytic := range rawAnalytic {
+		analytic := analytic
 		var inv aws.AwsS3BucketAnalyticsConfiguration
 		if err := gocty.FromCtyValue(analytic, &inv); err == nil {
+			inv.CtyVal = &analytic
 			inventories = append(inventories, &inv)
 		} else {
 			logrus.Warnf("Cannot read s3 bucket analytic %s: %+v", analytic.GoString(), err)
