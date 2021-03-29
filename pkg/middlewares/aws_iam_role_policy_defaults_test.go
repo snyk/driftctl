@@ -16,7 +16,7 @@ func TestAwsIamRolePolicyDefaults_Execute(t *testing.T) {
 		name               string
 		remoteResources    []resource.Resource
 		resourcesFromState []resource.Resource
-		expected           []resource.Resource
+		expected           diff.Changelog
 	}{
 		{
 			"ignore default iam role policies when they're managed by IaC",
@@ -37,16 +37,7 @@ func TestAwsIamRolePolicyDefaults_Execute(t *testing.T) {
 					GatewayId:    awssdk.String("local"),
 				},
 			},
-			[]resource.Resource{
-				&aws.AwsIamRolePolicy{
-					Id: "OrganizationAccountAccessRole:AdministratorAccess",
-				},
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
-				},
-			},
+			diff.Changelog{},
 		},
 		{
 			"iam role policies when they're managed by IaC",
@@ -67,34 +58,23 @@ func TestAwsIamRolePolicyDefaults_Execute(t *testing.T) {
 				&aws.AwsIamRolePolicy{
 					Id: "OrganizationAccountAccessRole:AdministratorAccess",
 				},
-				&aws.AwsIamRolePolicy{
-					Id: "driftctl_assume_role:driftctl_policy.10",
-				},
 				&aws.AwsRoute{
 					Id:           "dummy-route",
 					RouteTableId: awssdk.String("default-route-table"),
 					GatewayId:    awssdk.String("local"),
 				},
 			},
-			[]resource.Resource{
-				&aws.AwsIamRolePolicy{
-					Id: "OrganizationAccountAccessRole:AdministratorAccess",
-				},
-				&aws.AwsIamRolePolicy{
-					Id: "driftctl_assume_role:driftctl_policy.10",
-				},
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
+			diff.Changelog{
+				{
+					Type: "delete",
+					Path: []string{"1"},
+					From: &aws.AwsIamRolePolicy{
+						Id: "driftctl_assume_role:driftctl_policy.10",
+					},
+					To: nil,
 				},
 			},
 		},
-	}
-
-	differ, err := diff.NewDiffer(diff.SliceOrdering(true))
-	if err != nil {
-		t.Fatal(err)
 	}
 
 	for _, tt := range tests {
@@ -104,14 +84,22 @@ func TestAwsIamRolePolicyDefaults_Execute(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			changelog, err := differ.Diff(tt.expected, tt.remoteResources)
+
+			changelog, err := diff.Diff(tt.remoteResources, tt.resourcesFromState)
 			if err != nil {
 				t.Fatal(err)
 			}
-			if len(changelog) > 0 {
-				for _, change := range changelog {
-					t.Errorf("%s got = %v, want %v", strings.Join(change.Path, "."), awsutil.Prettify(change.From), awsutil.Prettify(change.To))
-				}
+
+			diffs, err := diff.Diff(tt.expected, changelog)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(diffs) == 0 {
+				return
+			}
+
+			for _, change := range diffs {
+				t.Errorf("%s got = %v, want %v", strings.Join(change.Path, "."), awsutil.Prettify(change.From), awsutil.Prettify(change.To))
 			}
 		})
 	}

@@ -6,9 +6,10 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
+	"github.com/r3labs/diff/v2"
+
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	"github.com/r3labs/diff/v2"
 )
 
 func TestAwsIamRoleDefaults_Execute(t *testing.T) {
@@ -16,30 +17,16 @@ func TestAwsIamRoleDefaults_Execute(t *testing.T) {
 		name               string
 		remoteResources    []resource.Resource
 		resourcesFromState []resource.Resource
-		expected           []resource.Resource
+		expected           diff.Changelog
 	}{
 		{
-			"ignore default iam roles when they're managed by IaC",
+			"default iam roles when they're not managed by IaC",
 			[]resource.Resource{
 				&aws.AwsIamRole{
-					Id: "OrganizationAccountAccessRole:AdministratorAccess",
+					Id: "AWSServiceRoleForSSO",
 				},
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
-				},
-			},
-			[]resource.Resource{
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
-				},
-			},
-			[]resource.Resource{
 				&aws.AwsIamRole{
-					Id: "OrganizationAccountAccessRole:AdministratorAccess",
+					Id: "OrganizationAccountAccessRole",
 				},
 				&aws.AwsRoute{
 					Id:           "dummy-route",
@@ -47,54 +34,52 @@ func TestAwsIamRoleDefaults_Execute(t *testing.T) {
 					GatewayId:    awssdk.String("local"),
 				},
 			},
+			[]resource.Resource{
+				&aws.AwsRoute{
+					Id:           "dummy-route",
+					RouteTableId: awssdk.String("default-route-table"),
+					GatewayId:    awssdk.String("local"),
+				},
+			},
+			diff.Changelog{},
 		},
 		{
-			"iam roles when they're managed by IaC",
+			"default iam roles when they're managed by IaC",
 			[]resource.Resource{
 				&aws.AwsIamRole{
-					Id: "OrganizationAccountAccessRole:AdministratorAccess",
+					Id: "AWSServiceRoleForSSO",
+				},
+				&aws.AwsIamRole{
+					Id: "OrganizationAccountAccessRole",
 				},
 				&aws.AwsIamRole{
 					Id: "driftctl_assume_role:driftctl_policy.10",
-				},
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
+					Tags: map[string]string{
+						"test": "value",
+					},
 				},
 			},
 			[]resource.Resource{
 				&aws.AwsIamRole{
-					Id: "OrganizationAccountAccessRole:AdministratorAccess",
+					Id: "AWSServiceRoleForSSO",
 				},
 				&aws.AwsIamRole{
-					Id: "driftctl_assume_role:driftctl_policy.10",
+					Id: "OrganizationAccountAccessRole",
 				},
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
+				&aws.AwsIamRole{
+					Id:   "driftctl_assume_role:driftctl_policy.10",
+					Tags: map[string]string{},
 				},
 			},
-			[]resource.Resource{
-				&aws.AwsIamRole{
-					Id: "OrganizationAccountAccessRole:AdministratorAccess",
-				},
-				&aws.AwsIamRole{
-					Id: "driftctl_assume_role:driftctl_policy.10",
-				},
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
+			diff.Changelog{
+				{
+					Type: "delete",
+					Path: []string{"Tags", "2", "test"},
+					From: "value",
+					To:   nil,
 				},
 			},
 		},
-	}
-
-	differ, err := diff.NewDiffer(diff.SliceOrdering(true))
-	if err != nil {
-		t.Fatal(err)
 	}
 
 	for _, tt := range tests {
@@ -104,14 +89,22 @@ func TestAwsIamRoleDefaults_Execute(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			changelog, err := differ.Diff(tt.expected, tt.remoteResources)
+
+			changelog, err := diff.Diff(tt.remoteResources, tt.resourcesFromState)
 			if err != nil {
 				t.Fatal(err)
 			}
-			if len(changelog) > 0 {
-				for _, change := range changelog {
-					t.Errorf("%s got = %v, want %v", strings.Join(change.Path, "."), awsutil.Prettify(change.From), awsutil.Prettify(change.To))
-				}
+
+			diffs, err := diff.Diff(tt.expected, changelog)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(diffs) == 0 {
+				return
+			}
+
+			for _, change := range diffs {
+				t.Errorf("%s got = %v, want %v", strings.Join(change.Path, "."), awsutil.Prettify(change.From), awsutil.Prettify(change.To))
 			}
 		})
 	}

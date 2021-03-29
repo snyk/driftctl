@@ -22,7 +22,7 @@ func NewAwsIamRoleDefaults() AwsIamRoleDefaults {
 
 func (m AwsIamRoleDefaults) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
 	for _, remoteResource := range *remoteResources {
-		// Ignore all resources other than role policy
+		// Ignore all resources other than iam role
 		if remoteResource.TerraformType() != aws.AwsIamRoleResourceType {
 			continue
 		}
