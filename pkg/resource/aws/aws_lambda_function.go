@@ -14,7 +14,7 @@ type AwsLambdaFunction struct {
 	ImageUri                     *string           `cty:"image_uri"`
 	InvokeArn                    *string           `cty:"invoke_arn" computed:"true"`
 	KmsKeyArn                    *string           `cty:"kms_key_arn"`
-	LastModified                 *string           `cty:"last_modified" computed:"true"`
+	LastModified                 *string           `cty:"last_modified" computed:"true" diff:"-"`
 	Layers                       []string          `cty:"layers"`
 	MemorySize                   *int              `cty:"memory_size"`
 	PackageType                  *string           `cty:"package_type"`
