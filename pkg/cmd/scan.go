@@ -35,6 +35,7 @@ type ScanOptions struct {
 	Filter         *jmespath.JMESPath
 	Quiet          bool
 	BackendOptions *backend.Options
+	Strict         bool
 }
 
 func NewScanCmd() *cobra.Command {
@@ -136,6 +137,11 @@ func NewScanCmd() *cobra.Command {
 		map[string]string{},
 		"Use those HTTP headers to query the provided URL.\n"+
 			"Only used with tfstate+http(s) backend for now.\n",
+	)
+	fl.BoolVar(&opts.Strict,
+		"strict",
+		false,
+		"Don't ignore default resources",
 	)
 
 	return cmd
