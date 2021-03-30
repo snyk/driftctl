@@ -12,10 +12,15 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 )
 
-func TestAwsSecurityGroupDefaults_Execute(t *testing.T) {
+func TestAwsSecurityGroupRuleDefaults_Execute(t *testing.T) {
 	defaultSecurityGroupName := "default"
-	dummySecurityGroupName := "test-group"
-	dummySecurityGroupDescription := "test-desc"
+	defaultSecurityGroupId := "sg-test1"
+	defaultSecurityGroupRuleProtocol := "All"
+	defaultSecurityGroupRuleType := "ingress"
+	defaultSecurityGroupRuleDescription := "test desc"
+
+	dummySecurityGroupName := "sg-test2"
+	dummySecurityGroupId := "sg-test2"
 
 	tests := []struct {
 		name               string
@@ -27,12 +32,14 @@ func TestAwsSecurityGroupDefaults_Execute(t *testing.T) {
 			"default security group when they're not managed by IaC",
 			[]resource.Resource{
 				&aws.AwsSecurityGroup{
-					Id:   "sg-51530134",
+					Id:   defaultSecurityGroupId,
 					Name: &defaultSecurityGroupName,
 				},
-				&aws.AwsSecurityGroup{
-					Id:   "test",
-					Name: &dummySecurityGroupName,
+				&aws.AwsSecurityGroupRule{
+					Id:              "test-1",
+					SecurityGroupId: &defaultSecurityGroupId,
+					Type:            &defaultSecurityGroupRuleType,
+					Protocol:        &defaultSecurityGroupRuleProtocol,
 				},
 				&aws.AwsRoute{
 					Id:           "dummy-route",
@@ -47,52 +54,55 @@ func TestAwsSecurityGroupDefaults_Execute(t *testing.T) {
 					GatewayId:    awssdk.String("local"),
 				},
 			},
-			diff.Changelog{
-				{
-					Type: "delete",
-					Path: []string{"1"},
-					From: &aws.AwsSecurityGroup{
-						Id:   "test",
-						Name: &dummySecurityGroupName,
-					},
-					To: nil,
-				},
-			},
+			diff.Changelog{},
 		},
 		{
 			"default security group when they're managed by IaC",
 			[]resource.Resource{
 				&aws.AwsSecurityGroup{
-					Id:   "sg-51530134",
+					Id:   defaultSecurityGroupId,
 					Name: &defaultSecurityGroupName,
 				},
+				&aws.AwsSecurityGroupRule{
+					Id:              "test-1",
+					SecurityGroupId: &defaultSecurityGroupId,
+					Type:            &defaultSecurityGroupRuleType,
+					Protocol:        &defaultSecurityGroupRuleProtocol,
+					Description:     nil,
+				},
 				&aws.AwsSecurityGroup{
-					Id:   "test",
+					Id:   dummySecurityGroupId,
 					Name: &dummySecurityGroupName,
 				},
 			},
 			[]resource.Resource{
 				&aws.AwsSecurityGroup{
-					Id:          "sg-51530134",
-					Name:        &defaultSecurityGroupName,
-					Description: &dummySecurityGroupDescription,
+					Id:   defaultSecurityGroupId,
+					Name: &defaultSecurityGroupName,
+				},
+				&aws.AwsSecurityGroupRule{
+					Id:              "test-1",
+					SecurityGroupId: &defaultSecurityGroupId,
+					Type:            &defaultSecurityGroupRuleType,
+					Protocol:        &defaultSecurityGroupRuleProtocol,
+					Description:     &defaultSecurityGroupRuleDescription,
 				},
 			},
 			diff.Changelog{
 				{
-					Type: "update",
-					Path: []string{"0", "Description"},
-					From: nil,
-					To:   &dummySecurityGroupDescription,
-				},
-				{
 					Type: "delete",
-					Path: []string{"1"},
+					Path: []string{"2"},
 					From: &aws.AwsSecurityGroup{
-						Id:   "test",
+						Id:   dummySecurityGroupId,
 						Name: &dummySecurityGroupName,
 					},
 					To: nil,
+				},
+				{
+					Type: "update",
+					Path: []string{"1", "Description"},
+					From: nil,
+					To:   &defaultSecurityGroupRuleDescription,
 				},
 			},
 		},
@@ -100,7 +110,10 @@ func TestAwsSecurityGroupDefaults_Execute(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := NewAwsSecurityGroupDefaults()
+			m := NewChain(
+				NewAwsSecurityGroupDefaults(),
+				NewAwsSecurityGroupRuleDefaults(),
+			)
 			err := m.Execute(&tt.remoteResources, &tt.resourcesFromState)
 			if err != nil {
 				t.Fatal(err)
@@ -114,9 +127,6 @@ func TestAwsSecurityGroupDefaults_Execute(t *testing.T) {
 			diffs, err := diff.Diff(tt.expected, changelog)
 			if err != nil {
 				t.Fatal(err)
-			}
-			if len(diffs) == 0 {
-				return
 			}
 
 			for _, change := range diffs {
