@@ -18,7 +18,7 @@ func TestAwsDefaultRouteTable_Execute(t *testing.T) {
 		expected           []resource.Resource
 	}{
 		{
-			"test that default route tables are not exluded when managed by IaC",
+			"test that default route tables are not excluded when managed by IaC",
 			[]resource.Resource{
 				&aws.AwsRouteTable{
 					Id: "non-default-route-table",
@@ -45,7 +45,7 @@ func TestAwsDefaultRouteTable_Execute(t *testing.T) {
 			},
 		},
 		{
-			"test that default route tables are exluded when not managed by IaC",
+			"test that default route tables are excluded when not managed by IaC",
 			[]resource.Resource{
 				&aws.AwsRouteTable{
 					Id: "non-default-route-table",
