@@ -21,9 +21,12 @@ func NewAwsIamRoleDefaults() AwsIamRoleDefaults {
 }
 
 func (m AwsIamRoleDefaults) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+	newRemoteResources := make([]resource.Resource, 0)
+
 	for _, remoteResource := range *remoteResources {
 		// Ignore all resources other than iam role
 		if remoteResource.TerraformType() != aws.AwsIamRoleResourceType {
+			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
 
@@ -36,20 +39,29 @@ func (m AwsIamRoleDefaults) Execute(remoteResources, resourcesFromState *[]resou
 		}
 
 		if existInState {
+			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
 
+		isIgnored := false
 		for _, id := range ignoredIamRoleIds {
 			if remoteResource.TerraformId() == id {
-				*resourcesFromState = append(*resourcesFromState, remoteResource)
-
-				logrus.WithFields(logrus.Fields{
-					"id":   remoteResource.TerraformId(),
-					"type": remoteResource.TerraformType(),
-				}).Debug("Ignoring default iam role as it is not managed by IaC")
+				isIgnored = true
 			}
 		}
+
+		if !isIgnored {
+			newRemoteResources = append(newRemoteResources, remoteResource)
+			continue
+		}
+
+		logrus.WithFields(logrus.Fields{
+			"id":   remoteResource.TerraformId(),
+			"type": remoteResource.TerraformType(),
+		}).Debug("Ignoring default iam policy attachment as it is not managed by IaC")
 	}
+
+	*remoteResources = newRemoteResources
 
 	return nil
 }

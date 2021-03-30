@@ -16,9 +16,12 @@ func NewAwsSecurityGroupDefaults() AwsSecurityGroupDefaults {
 }
 
 func (m AwsSecurityGroupDefaults) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+	newRemoteResources := make([]resource.Resource, 0)
+
 	for _, remoteResource := range *remoteResources {
 		// Ignore all resources other than iam role
 		if remoteResource.TerraformType() != aws.AwsSecurityGroupResourceType {
+			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
 
@@ -31,16 +34,17 @@ func (m AwsSecurityGroupDefaults) Execute(remoteResources, resourcesFromState *[
 		}
 
 		if existInState || *remoteResource.(*aws.AwsSecurityGroup).Name != "default" {
+			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
-
-		*resourcesFromState = append(*resourcesFromState, remoteResource)
 
 		logrus.WithFields(logrus.Fields{
 			"id":   remoteResource.TerraformId(),
 			"type": remoteResource.TerraformType(),
 		}).Debug("Ignoring default aws security group as it is not managed by IaC")
 	}
+
+	*remoteResources = newRemoteResources
 
 	return nil
 }
