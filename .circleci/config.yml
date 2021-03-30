@@ -70,6 +70,7 @@ jobs:
               exit 1
             fi
       - run: make install-tools
+      - run: make deps
       - run: make lint
   test:
     docker:
@@ -77,6 +78,7 @@ jobs:
     steps:
       - checkout
       - run: make install-tools
+      - run: make deps
       - run: make test
       - run:
           name: Codecov upload
