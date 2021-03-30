@@ -16,7 +16,7 @@ func TestAwsIamPolicyAttachmentDefaults_Execute(t *testing.T) {
 		name               string
 		remoteResources    []resource.Resource
 		resourcesFromState []resource.Resource
-		expected           []resource.Resource
+		expected           diff.Changelog
 	}{
 		{
 			"test that default iam policy attachment are excluded when not managed by IaC",
@@ -33,11 +33,7 @@ func TestAwsIamPolicyAttachmentDefaults_Execute(t *testing.T) {
 					Id: "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
 				},
 			},
-			[]resource.Resource{
-				&aws.AwsIamPolicyAttachment{
-					Id: "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
-				},
-			},
+			diff.Changelog{},
 		},
 		{
 			"test that default iam policy attachment are not excluded when managed by IaC",
@@ -53,16 +49,15 @@ func TestAwsIamPolicyAttachmentDefaults_Execute(t *testing.T) {
 				&aws.AwsIamPolicyAttachment{
 					Id: "AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/AWSSSOServiceRolePolicy",
 				},
-				&aws.AwsIamPolicyAttachment{
-					Id: "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
-				},
 			},
-			[]resource.Resource{
-				&aws.AwsIamPolicyAttachment{
-					Id: "AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/AWSSSOServiceRolePolicy",
-				},
-				&aws.AwsIamPolicyAttachment{
-					Id: "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
+			diff.Changelog{
+				{
+					Type: "delete",
+					Path: []string{"1"},
+					From: &aws.AwsIamPolicyAttachment{
+						Id: "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
+					},
+					To: nil,
 				},
 			},
 		},
@@ -80,12 +75,18 @@ func TestAwsIamPolicyAttachmentDefaults_Execute(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if len(changelog) > 0 {
-				for _, change := range changelog {
-					t.Errorf("%s got = %v, want %v", strings.Join(change.Path, "."), awsutil.Prettify(change.From), awsutil.Prettify(change.To))
-				}
+
+			diffs, err := diff.Diff(tt.expected, changelog)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(diffs) == 0 {
+				return
 			}
 
+			for _, change := range diffs {
+				t.Errorf("%s got = %v, want %v", strings.Join(change.Path, "."), awsutil.Prettify(change.From), awsutil.Prettify(change.To))
+			}
 		})
 	}
 }
