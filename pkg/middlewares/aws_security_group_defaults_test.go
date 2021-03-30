@@ -50,7 +50,7 @@ func TestAwsSecurityGroupDefaults_Execute(t *testing.T) {
 			diff.Changelog{
 				{
 					Type: "delete",
-					Path: []string{"1"},
+					Path: []string{"0"},
 					From: &aws.AwsSecurityGroup{
 						Id:   "test",
 						Name: &dummySecurityGroupName,

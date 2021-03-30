@@ -19,9 +19,12 @@ func NewAwsIamPolicyAttachmentDefaults() AwsIamPolicyAttachmentDefaults {
 }
 
 func (m AwsIamPolicyAttachmentDefaults) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+	newRemoteResources := make([]resource.Resource, 0)
+
 	for _, remoteResource := range *remoteResources {
 		// Ignore all resources other than iam policy attachment
 		if remoteResource.TerraformType() != aws.AwsIamPolicyAttachmentResourceType {
+			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
 
@@ -34,20 +37,29 @@ func (m AwsIamPolicyAttachmentDefaults) Execute(remoteResources, resourcesFromSt
 		}
 
 		if existInState {
+			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
 
+		isIgnored := false
 		for _, id := range ignoredIamPolicyAttachmentIds {
 			if remoteResource.TerraformId() == id {
-				*resourcesFromState = append(*resourcesFromState, remoteResource)
-
-				logrus.WithFields(logrus.Fields{
-					"id":   remoteResource.TerraformId(),
-					"type": remoteResource.TerraformType(),
-				}).Debug("Ignoring default iam policy attachment as it is not managed by IaC")
+				isIgnored = true
 			}
 		}
+
+		if !isIgnored {
+			newRemoteResources = append(newRemoteResources, remoteResource)
+			continue
+		}
+
+		logrus.WithFields(logrus.Fields{
+			"id":   remoteResource.TerraformId(),
+			"type": remoteResource.TerraformType(),
+		}).Debug("Ignoring default iam policy attachment as it is not managed by IaC")
 	}
+
+	*remoteResources = newRemoteResources
 
 	return nil
 }
