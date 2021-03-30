@@ -78,7 +78,6 @@ jobs:
     steps:
       - checkout
       - run: make install-tools
-      - run: make deps
       - run: make test
       - run:
           name: Codecov upload
