@@ -9,13 +9,13 @@ import (
 
 // When scanning a brand new AWS account, some users may see irrelevant results about default AWS role policies.
 // We ignore these resources by default when strict mode is disabled.
-type AwsSecurityGroupRuleDefaults struct{}
+type AwsSecurityGroupDefaults struct{}
 
-func NewAwsSecurityGroupRuleDefaults() AwsSecurityGroupRuleDefaults {
-	return AwsSecurityGroupRuleDefaults{}
+func NewAwsSecurityGroupDefaults() AwsSecurityGroupDefaults {
+	return AwsSecurityGroupDefaults{}
 }
 
-func (m AwsSecurityGroupRuleDefaults) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+func (m AwsSecurityGroupDefaults) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
 	for _, remoteResource := range *remoteResources {
 		// Ignore all resources other than iam role
 		if remoteResource.TerraformType() != aws.AwsSecurityGroupResourceType {
