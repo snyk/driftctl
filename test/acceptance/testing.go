@@ -34,6 +34,7 @@ type AccCheck struct {
 	PreExec  func()
 	PostExec func()
 	Env      map[string]string
+	Args     func() []string
 	Check    func(result *ScanResult, stdout string, err error)
 }
 
@@ -349,7 +350,6 @@ func Run(t *testing.T, c AccTestCase) {
 			"--output", fmt.Sprintf("json://%s", c.getResultFilePath()),
 		)
 	}
-	os.Args = c.Args
 
 	for _, check := range c.Checks {
 		driftctlCmd := cmd.NewDriftctlCmd(test.Build{})
@@ -365,6 +365,10 @@ func Run(t *testing.T, c AccTestCase) {
 			c.useTerraformEnv()
 			check.PreExec()
 			c.restoreEnv()
+		}
+		os.Args = c.Args
+		if check.Args != nil {
+			os.Args = append(os.Args, check.Args()...)
 		}
 		_, out, cmdErr := runDriftCtlCmd(driftctlCmd)
 		if len(check.Env) > 0 {
