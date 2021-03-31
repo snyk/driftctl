@@ -21,7 +21,7 @@ func NewJSON(path string) *JSON {
 func (c *JSON) Write(analysis *analyser.Analysis) error {
 	file := os.Stdout
 	if !isStdOut(c.path) {
-		f, err := os.OpenFile(c.path, os.O_CREATE|os.O_RDWR, 0600)
+		f, err := os.OpenFile(c.path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
 		if err != nil {
 			return err
 		}
