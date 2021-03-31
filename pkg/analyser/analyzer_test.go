@@ -226,6 +226,17 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
+									From: "barfoo",
+									To:   "foobar",
+									Path: []string{
+										"BarFoo",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
 									From: "foobar",
 									To:   "barfoo",
 									Path: []string{
@@ -236,13 +247,13 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "barfoo",
-									To:   "foobar",
+									From: "bar",
+									To:   "baz",
 									Path: []string{
-										"BarFoo",
+										"Struct",
+										"Bar",
 									},
 								},
-								Computed: true,
 							},
 							{
 								Change: diff.Change{
@@ -255,17 +266,6 @@ func TestAnalyze(t *testing.T) {
 									},
 								},
 								Computed: true,
-							},
-							{
-								Change: diff.Change{
-									Type: "update",
-									From: "bar",
-									To:   "baz",
-									Path: []string{
-										"Struct",
-										"Bar",
-									},
-								},
 							},
 						},
 					},
@@ -571,6 +571,17 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
+									From: "barfoo",
+									To:   "foobar",
+									Path: []string{
+										"BarFoo",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
 									From: "foobar",
 									To:   "barfoo",
 									Path: []string{
@@ -581,13 +592,13 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "barfoo",
-									To:   "foobar",
+									From: "bar",
+									To:   "baz",
 									Path: []string{
-										"BarFoo",
+										"Struct",
+										"Bar",
 									},
 								},
-								Computed: true,
 							},
 							{
 								Change: diff.Change{
@@ -600,17 +611,6 @@ func TestAnalyze(t *testing.T) {
 									},
 								},
 								Computed: true,
-							},
-							{
-								Change: diff.Change{
-									Type: "update",
-									From: "bar",
-									To:   "baz",
-									Path: []string{
-										"Struct",
-										"Bar",
-									},
-								},
 							},
 							{
 								Change: diff.Change{
@@ -768,18 +768,6 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "baz",
-									To:   "bazdiff",
-									Path: []string{
-										"Struct",
-										"Baz",
-									},
-								},
-								Computed: true,
-							},
-							{
-								Change: diff.Change{
-									Type: "update",
 									From: "bar",
 									To:   "bardiff",
 									Path: []string{
@@ -788,6 +776,18 @@ func TestAnalyze(t *testing.T) {
 									},
 								},
 								Computed: false,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "baz",
+									To:   "bazdiff",
+									Path: []string{
+										"Struct",
+										"Baz",
+									},
+								},
+								Computed: true,
 							},
 						},
 					},
@@ -811,6 +811,18 @@ func TestAnalyze(t *testing.T) {
 						Changelog: Changelog{
 							{
 								Change: diff.Change{
+									Type: "update",
+									From: "baz",
+									To:   "bazdiff",
+									Path: []string{
+										"Struct",
+										"Baz",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
 									Type: "create",
 									From: nil,
 									To:   "diff",
@@ -819,18 +831,6 @@ func TestAnalyze(t *testing.T) {
 										"0",
 										"Array",
 										"1",
-									},
-								},
-								Computed: true,
-							},
-							{
-								Change: diff.Change{
-									Type: "update",
-									From: "baz",
-									To:   "bazdiff",
-									Path: []string{
-										"Struct",
-										"Baz",
 									},
 								},
 								Computed: true,
@@ -900,6 +900,11 @@ func TestAnalyze(t *testing.T) {
 		},
 	}
 
+	differ, err := diff.NewDiffer(diff.SliceOrdering(true))
+	if err != nil {
+		t.Fatalf("Error creating new differ: %e", err)
+	}
+
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			filter := &mocks.Filter{}
@@ -930,7 +935,7 @@ func TestAnalyze(t *testing.T) {
 				t.Errorf("Drifted state does not match, got %t expected %t", result.IsSync(), !c.hasDrifted)
 			}
 
-			managedChanges, err := diff.Diff(result.Managed(), c.expected.Managed())
+			managedChanges, err := differ.Diff(result.Managed(), c.expected.Managed())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -940,7 +945,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			unmanagedChanges, err := diff.Diff(result.Unmanaged(), c.expected.Unmanaged())
+			unmanagedChanges, err := differ.Diff(result.Unmanaged(), c.expected.Unmanaged())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -950,7 +955,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			deletedChanges, err := diff.Diff(result.Deleted(), c.expected.Deleted())
+			deletedChanges, err := differ.Diff(result.Deleted(), c.expected.Deleted())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -960,7 +965,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			diffChanges, err := diff.Diff(result.Differences(), c.expected.Differences())
+			diffChanges, err := differ.Diff(result.Differences(), c.expected.Differences())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -970,7 +975,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			summaryChanges, err := diff.Diff(c.expected.Summary(), result.Summary())
+			summaryChanges, err := differ.Diff(c.expected.Summary(), result.Summary())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -980,7 +985,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			alertsChanges, err := diff.Diff(result.Alerts(), c.expected.Alerts())
+			alertsChanges, err := differ.Diff(result.Alerts(), c.expected.Alerts())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
