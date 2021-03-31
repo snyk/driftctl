@@ -9,6 +9,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	awsresources "github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/cloudskiff/driftctl/test"
 	"github.com/cloudskiff/driftctl/test/acceptance"
 	"github.com/cloudskiff/driftctl/test/acceptance/awsutils"
 	"github.com/r3labs/diff/v2"
@@ -24,7 +25,7 @@ func TestAcc_AwsECRRepository(t *testing.T) {
 				Env: map[string]string{
 					"AWS_REGION": "us-east-1",
 				},
-				Check: func(result *acceptance.ScanResult, stdout string, err error) {
+				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -48,7 +49,7 @@ func TestAcc_AwsECRRepository(t *testing.T) {
 						t.Fatal(err)
 					}
 				},
-				Check: func(result *acceptance.ScanResult, stdout string, err error) {
+				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
 					}

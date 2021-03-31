@@ -16,7 +16,7 @@ import (
 type DriftCTL struct {
 	remoteSupplier resource.Supplier
 	iacSupplier    resource.Supplier
-	alerter        *alerter.Alerter
+	alerter        alerter.AlerterInterface
 	analyzer       analyser.Analyzer
 	filter         *jmespath.JMESPath
 }

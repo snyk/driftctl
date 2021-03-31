@@ -35,7 +35,7 @@ type AccCheck struct {
 	PostExec func()
 	Env      map[string]string
 	Args     func() []string
-	Check    func(result *ScanResult, stdout string, err error)
+	Check    func(result *test.ScanResult, stdout string, err error)
 }
 
 type AccTestCase struct {
@@ -102,18 +102,18 @@ func (c *AccTestCase) getResultFilePath() string {
 	return c.tmpResultFilePath
 }
 
-func (c *AccTestCase) getResult(t *testing.T) *ScanResult {
-	analysis := analyser.Analysis{}
+func (c *AccTestCase) getResult(t *testing.T) *test.ScanResult {
+	analysis := &analyser.Analysis{}
 	result, err := ioutil.ReadFile(c.getResultFilePath())
 	if err != nil {
 		return nil
 	}
 
-	if err := json.Unmarshal(result, &analysis); err != nil {
+	if err := json.Unmarshal(result, analysis); err != nil {
 		return nil
 	}
 
-	return NewScanResult(t, analysis)
+	return test.NewScanResult(t, analysis)
 }
 
 /**

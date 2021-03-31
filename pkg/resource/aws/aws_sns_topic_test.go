@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/test"
 
 	"github.com/aws/aws-sdk-go/service/sns"
 
@@ -46,7 +47,7 @@ func TestAcc_AwsSNSTopic(t *testing.T) {
 						t.Fatal("Timeout while fetching SNS TOPIC")
 					}
 				},
-				Check: func(result *acceptance.ScanResult, stdout string, err error) {
+				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -76,7 +77,7 @@ func TestAcc_AwsSNSTopic(t *testing.T) {
 						t.Fatal(err)
 					}
 				},
-				Check: func(result *acceptance.ScanResult, stdout string, err error) {
+				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
 					}

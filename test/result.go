@@ -1,4 +1,4 @@
-package acceptance
+package test
 
 import (
 	"encoding/json"
@@ -12,10 +12,10 @@ import (
 
 type ScanResult struct {
 	*require.Assertions
-	analyser.Analysis
+	*analyser.Analysis
 }
 
-func NewScanResult(t *testing.T, analysis analyser.Analysis) *ScanResult {
+func NewScanResult(t *testing.T, analysis *analyser.Analysis) *ScanResult {
 	return &ScanResult{
 		Assertions: require.New(t),
 		Analysis:   analysis,

@@ -8,6 +8,8 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	awsresources "github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/cloudskiff/driftctl/test"
+
 	"github.com/r3labs/diff/v2"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -43,7 +45,7 @@ func TestAcc_AwsSqsQueue(t *testing.T) {
 						t.Fatal("Timeout while fetching SQS queues")
 					}
 				},
-				Check: func(result *acceptance.ScanResult, stdout string, err error) {
+				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -68,7 +70,7 @@ func TestAcc_AwsSqsQueue(t *testing.T) {
 						t.Fatal(err)
 					}
 				},
-				Check: func(result *acceptance.ScanResult, stdout string, err error) {
+				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
 					}

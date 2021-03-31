@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/cloudskiff/driftctl/test"
 	"github.com/cloudskiff/driftctl/test/acceptance"
 	"github.com/cloudskiff/driftctl/test/acceptance/awsutils"
 )
@@ -22,7 +23,7 @@ func TestAcc_StateReader_WithMultipleStatesInDirectory(t *testing.T) {
 		},
 		Checks: []acceptance.AccCheck{
 			{
-				Check: func(result *acceptance.ScanResult, stdout string, err error) {
+				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -53,7 +54,7 @@ func TestAcc_StateReader_WithMultiplesStatesInS3(t *testing.T) {
 		},
 		Checks: []acceptance.AccCheck{
 			{
-				Check: func(result *acceptance.ScanResult, stdout string, err error) {
+				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
 					}
