@@ -54,7 +54,17 @@ func TestAwsSecurityGroupRuleDefaults_Execute(t *testing.T) {
 					GatewayId:    awssdk.String("local"),
 				},
 			},
-			diff.Changelog{},
+			diff.Changelog{
+				{
+					Type: "delete",
+					Path: []string{"0"},
+					From: &aws.AwsSecurityGroup{
+						Id:   defaultSecurityGroupId,
+						Name: &defaultSecurityGroupName,
+					},
+					To: nil,
+				},
+			},
 		},
 		{
 			"default security group when they're managed by IaC",
@@ -110,10 +120,7 @@ func TestAwsSecurityGroupRuleDefaults_Execute(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := NewChain(
-				NewAwsSecurityGroupDefaults(),
-				NewAwsSecurityGroupRuleDefaults(),
-			)
+			m := NewAwsSecurityGroupRuleDefaults()
 			err := m.Execute(&tt.remoteResources, &tt.resourcesFromState)
 			if err != nil {
 				t.Fatal(err)
