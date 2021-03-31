@@ -58,7 +58,7 @@ func (m AwsIamRoleDefaults) Execute(remoteResources, resourcesFromState *[]resou
 		logrus.WithFields(logrus.Fields{
 			"id":   remoteResource.TerraformId(),
 			"type": remoteResource.TerraformType(),
-		}).Debug("Ignoring default iam policy attachment as it is not managed by IaC")
+		}).Debug("Ignoring default iam role as it is not managed by IaC")
 	}
 
 	*remoteResources = newRemoteResources
