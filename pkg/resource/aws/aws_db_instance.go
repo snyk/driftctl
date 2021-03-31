@@ -25,7 +25,7 @@ type AwsDbInstance struct {
 	Endpoint                           *string            `cty:"endpoint" computed:"true"`
 	Engine                             *string            `cty:"engine" computed:"true"`
 	EngineVersion                      *string            `cty:"engine_version" computed:"true"`
-	FinalSnapshotIdentifier            *string            `cty:"final_snapshot_identifier"`
+	FinalSnapshotIdentifier            *string            `cty:"final_snapshot_identifier" diff:"-"`
 	HostedZoneId                       *string            `cty:"hosted_zone_id" computed:"true"`
 	IamDatabaseAuthenticationEnabled   *bool              `cty:"iam_database_authentication_enabled"`
 	Id                                 string             `cty:"id" computed:"true"`
