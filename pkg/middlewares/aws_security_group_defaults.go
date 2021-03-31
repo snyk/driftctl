@@ -7,6 +7,8 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 )
 
+const defaultAwsSecurityGroupName = "default"
+
 // When scanning a brand new AWS account, some users may see irrelevant results about default AWS role policies.
 // We ignore these resources by default when strict mode is disabled.
 type AwsSecurityGroupDefaults struct{}
@@ -33,7 +35,7 @@ func (m AwsSecurityGroupDefaults) Execute(remoteResources, resourcesFromState *[
 			}
 		}
 
-		if existInState || *remoteResource.(*aws.AwsSecurityGroup).Name != "default" {
+		if existInState || *remoteResource.(*aws.AwsSecurityGroup).Name != defaultAwsSecurityGroupName {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
