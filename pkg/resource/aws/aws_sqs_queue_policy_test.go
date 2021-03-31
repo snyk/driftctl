@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/cloudskiff/driftctl/test"
 	"github.com/cloudskiff/driftctl/test/acceptance/awsutils"
 	"github.com/sirupsen/logrus"
 
@@ -36,7 +37,7 @@ func TestAcc_AwsSqsQueuePolicy(t *testing.T) {
 						t.Fatal("Timeout while fetching SQS queues")
 					}
 				},
-				Check: func(result *acceptance.ScanResult, stdout string, err error) {
+				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
 					}
