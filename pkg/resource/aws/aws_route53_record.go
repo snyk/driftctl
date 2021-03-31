@@ -6,17 +6,17 @@ import "github.com/zclconf/go-cty/cty"
 const AwsRoute53RecordResourceType = "aws_route53_record"
 
 type AwsRoute53Record struct {
-	AllowOverwrite                *bool    `cty:"allow_overwrite" diff:"-" computed:"true"`
-	Fqdn                          *string  `cty:"fqdn" computed:"true"`
-	HealthCheckId                 *string  `cty:"health_check_id"`
-	Id                            string   `cty:"id" computed:"true"`
-	MultivalueAnswerRoutingPolicy *bool    `cty:"multivalue_answer_routing_policy"`
-	Name                          *string  `cty:"name" diff:"-"`
-	Records                       []string `cty:"records"`
-	SetIdentifier                 *string  `cty:"set_identifier"`
-	Ttl                           *int     `cty:"ttl"`
-	Type                          *string  `cty:"type"`
-	ZoneId                        *string  `cty:"zone_id"`
+	AllowOverwrite                *bool     `cty:"allow_overwrite" diff:"-" computed:"true"`
+	Fqdn                          *string   `cty:"fqdn" computed:"true"`
+	HealthCheckId                 *string   `cty:"health_check_id"`
+	Id                            string    `cty:"id" computed:"true"`
+	MultivalueAnswerRoutingPolicy *bool     `cty:"multivalue_answer_routing_policy"`
+	Name                          *string   `cty:"name" diff:"-"`
+	Records                       *[]string `cty:"records"`
+	SetIdentifier                 *string   `cty:"set_identifier"`
+	Ttl                           *int      `cty:"ttl"`
+	Type                          *string   `cty:"type"`
+	ZoneId                        *string   `cty:"zone_id"`
 	Alias                         *[]struct {
 		EvaluateTargetHealth *bool   `cty:"evaluate_target_health"`
 		Name                 *string `cty:"name"`
