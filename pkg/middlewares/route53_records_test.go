@@ -82,7 +82,7 @@ func TestDefaultRoute53RecordShouldNotBeIgnoredWhenManaged(t *testing.T) {
 	}
 	managedDefaultRecord := remoteResources[1].(*aws.AwsRoute53Record)
 	if *managedDefaultRecord.Type != "NS" {
-		t.Error("Default record is ignored but sholuld not be")
+		t.Error("Default record is ignored but should not be")
 	}
 
 	ignoredRecord := remoteResources[2].(*aws.AwsRoute53Record)

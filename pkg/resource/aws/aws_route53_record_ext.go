@@ -16,15 +16,25 @@ func (r *AwsRoute53Record) NormalizeForState() (resource.Resource, error) {
 	}
 
 	// On first run, this field is set to null in state file and to "" after one refresh or apply
-	// This ensure that if we find a nil value we dont drift
+	// This ensures that if we find a nil value we don't drift
 	if r.HealthCheckId == nil {
 		r.HealthCheckId = aws.String("")
 	}
 
 	// On first run, this field is set to null in state file and to "" after one refresh or apply
-	// This ensure that if we find a nil value we dont drift
+	// This ensures that if we find a nil value we don't drift
 	if r.SetIdentifier == nil {
 		r.SetIdentifier = aws.String("")
+	}
+
+	// This ensures that if we find an empty records value we don't drift
+	if r.Records != nil && len(*r.Records) == 0 {
+		r.Records = nil
+	}
+
+	// This ensures that if we find a nil value we don't drift
+	if r.Ttl == nil {
+		r.Ttl = aws.Int(0)
 	}
 
 	// Since AWS returns the FQDN as the name of the remote record, we must change the Id of the
@@ -46,6 +56,12 @@ func (r *AwsRoute53Record) NormalizeForState() (resource.Resource, error) {
 }
 
 func (r *AwsRoute53Record) NormalizeForProvider() (resource.Resource, error) {
+
+	// This ensures that if we find a nil value we don't drift
+	if r.Records != nil && len(*r.Records) == 0 {
+		r.Records = nil
+	}
+
 	return r, nil
 }
 
