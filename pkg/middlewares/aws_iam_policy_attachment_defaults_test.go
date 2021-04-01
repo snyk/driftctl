@@ -193,8 +193,7 @@ func TestAwsIamPolicyAttachmentDefaults_Execute(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := NewAwsIamPolicyAttachmentDefaults()
-			err := m.Execute(&tt.remoteResources, &tt.resourcesFromState)
+			err := awsIamPolicyAttachmentDefaults(&tt.remoteResources, &tt.resourcesFromState)
 			if err != nil {
 				t.Fatal(err)
 			}

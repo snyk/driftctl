@@ -58,9 +58,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 
 	if !d.strictMode {
 		middleware = append(middleware,
-			middlewares.NewAwsIamPolicyAttachmentDefaults(),
-			middlewares.NewAwsIamRolePolicyDefaults(),
-			middlewares.NewAwsIamRoleDefaults(),
+			middlewares.NewAwsDefaults(),
 		)
 	}
 
