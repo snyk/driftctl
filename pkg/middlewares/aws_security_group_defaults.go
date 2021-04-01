@@ -9,7 +9,7 @@ import (
 
 const defaultAwsSecurityGroupName = "default"
 
-// When scanning a brand new AWS account, some users may see irrelevant results about default AWS role policies.
+// When scanning a brand new AWS account, some users may see irrelevant results about default AWS security group.
 // We ignore these resources by default when strict mode is disabled.
 type AwsSecurityGroupDefaults struct{}
 
@@ -21,7 +21,7 @@ func (m AwsSecurityGroupDefaults) Execute(remoteResources, resourcesFromState *[
 	newRemoteResources := make([]resource.Resource, 0)
 
 	for _, remoteResource := range *remoteResources {
-		// Ignore all resources other than iam role
+		// Ignore all resources other than security group
 		if remoteResource.TerraformType() != aws.AwsSecurityGroupResourceType {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue

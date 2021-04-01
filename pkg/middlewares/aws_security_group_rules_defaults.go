@@ -7,7 +7,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 )
 
-// When scanning a brand new AWS account, some users may see irrelevant results about default AWS role policies.
+// When scanning a brand new AWS account, some users may see irrelevant results about default AWS security group rules.
 // We ignore these resources by default when strict mode is disabled.
 type AwsSecurityGroupRuleDefaults struct{}
 
