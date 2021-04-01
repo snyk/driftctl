@@ -136,6 +136,53 @@ func TestAwsIamRolePolicyDefaults_Execute(t *testing.T) {
 				},
 			},
 		},
+		{
+			"do not ignore default iam role policies when role cannot be found",
+			[]resource.Resource{
+				&aws.AwsIamRole{
+					Id:   "OrganizationAccountAccessRole",
+					Path: func(p string) *string { return &p }("/not-aws-service-role/sso.amazonaws.com"),
+				},
+				&aws.AwsIamRolePolicy{
+					Id:   "AWSServiceRoleForSSO:AdministratorAccess",
+					Role: func(p string) *string { return &p }("AWSServiceRoleForSSO"),
+				},
+				&aws.AwsIamRolePolicy{
+					Id:   "OrganizationAccountAccessRole:AdministratorAccess",
+					Role: func(p string) *string { return &p }("OrganizationAccountAccessRole"),
+				},
+			},
+			[]resource.Resource{},
+			diff.Changelog{
+				{
+					Type: diff.DELETE,
+					Path: []string{"0"},
+					From: &aws.AwsIamRole{
+						Id:   "OrganizationAccountAccessRole",
+						Path: func(p string) *string { return &p }("/not-aws-service-role/sso.amazonaws.com"),
+					},
+					To: nil,
+				},
+				{
+					Type: diff.DELETE,
+					Path: []string{"1"},
+					From: &aws.AwsIamRolePolicy{
+						Id:   "AWSServiceRoleForSSO:AdministratorAccess",
+						Role: func(p string) *string { return &p }("AWSServiceRoleForSSO"),
+					},
+					To: nil,
+				},
+				{
+					Type: diff.DELETE,
+					Path: []string{"2"},
+					From: &aws.AwsIamRolePolicy{
+						Id:   "OrganizationAccountAccessRole:AdministratorAccess",
+						Role: func(p string) *string { return &p }("OrganizationAccountAccessRole"),
+					},
+					To: nil,
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {
