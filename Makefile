@@ -8,6 +8,7 @@ GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=gotestsum
 GOGET=$(GOCMD) get
+GOINSTALL=$(GOCMD) install
 GOTOOL=$(GOCMD) tool
 GOFMT=$(GOCMD) fmt
 # ACC tests params
@@ -65,8 +66,8 @@ deps:
 
 .PHONY: install-tools
 install-tools:
-	$(GOGET) gotest.tools/gotestsum
-	$(GOGET) github.com/vektra/mockery/v2/.../
+	$(GOINSTALL) gotest.tools/gotestsum@v1.6.3
+	$(GOINSTALL) github.com/vektra/mockery/v2@latest
 
 
 go.mod: FORCE
