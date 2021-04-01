@@ -21,8 +21,21 @@ func TestAwsIamRolePolicyDefaults_Execute(t *testing.T) {
 		{
 			"ignore default iam role policies when they're managed by IaC",
 			[]resource.Resource{
+				&aws.AwsIamRole{
+					Id:   "AWSServiceRoleForSSO",
+					Path: func(p string) *string { return &p }("/aws-service-role/sso.amazonaws.com"),
+				},
+				&aws.AwsIamRole{
+					Id:   "OrganizationAccountAccessRole",
+					Path: func(p string) *string { return &p }("/not-aws-service-role/sso.amazonaws.com"),
+				},
 				&aws.AwsIamRolePolicy{
-					Id: "OrganizationAccountAccessRole:AdministratorAccess",
+					Id:   "AWSServiceRoleForSSO:AdministratorAccess",
+					Role: func(p string) *string { return &p }("AWSServiceRoleForSSO"),
+				},
+				&aws.AwsIamRolePolicy{
+					Id:   "OrganizationAccountAccessRole:AdministratorAccess",
+					Role: func(p string) *string { return &p }("OrganizationAccountAccessRole"),
 				},
 				&aws.AwsRoute{
 					Id:           "dummy-route",
@@ -31,33 +44,6 @@ func TestAwsIamRolePolicyDefaults_Execute(t *testing.T) {
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
-				},
-			},
-			diff.Changelog{},
-		},
-		{
-			"iam role policies when they're managed by IaC",
-			[]resource.Resource{
-				&aws.AwsIamRolePolicy{
-					Id: "OrganizationAccountAccessRole:AdministratorAccess",
-				},
-				&aws.AwsIamRolePolicy{
-					Id: "driftctl_assume_role:driftctl_policy.10",
-				},
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
-				},
-			},
-			[]resource.Resource{
-				&aws.AwsIamRolePolicy{
-					Id: "OrganizationAccountAccessRole:AdministratorAccess",
-				},
 				&aws.AwsRoute{
 					Id:           "dummy-route",
 					RouteTableId: awssdk.String("default-route-table"),
@@ -66,10 +52,85 @@ func TestAwsIamRolePolicyDefaults_Execute(t *testing.T) {
 			},
 			diff.Changelog{
 				{
-					Type: "delete",
+					Type: diff.DELETE,
+					Path: []string{"0"},
+					From: &aws.AwsIamRole{
+						Id:   "AWSServiceRoleForSSO",
+						Path: func(p string) *string { return &p }("/aws-service-role/sso.amazonaws.com"),
+					},
+					To: nil,
+				},
+				{
+					Type: diff.DELETE,
 					Path: []string{"1"},
+					From: &aws.AwsIamRole{
+						Id:   "OrganizationAccountAccessRole",
+						Path: func(p string) *string { return &p }("/not-aws-service-role/sso.amazonaws.com"),
+					},
+					To: nil,
+				},
+				{
+					Type: diff.DELETE,
+					Path: []string{"2"},
 					From: &aws.AwsIamRolePolicy{
-						Id: "driftctl_assume_role:driftctl_policy.10",
+						Id:   "OrganizationAccountAccessRole:AdministratorAccess",
+						Role: func(p string) *string { return &p }("OrganizationAccountAccessRole"),
+					},
+					To: nil,
+				},
+			},
+		},
+		{
+			"iam role policies when they're managed by IaC",
+			[]resource.Resource{
+				&aws.AwsIamRole{
+					Id:   "custom-role",
+					Path: func(p string) *string { return &p }("/not-aws-service-role/sso.amazonaws.com"),
+				},
+				&aws.AwsIamRole{
+					Id:   "OrganizationAccountAccessRole",
+					Path: func(p string) *string { return &p }("/aws-service-role/sso.amazonaws.com"),
+				},
+				&aws.AwsIamRolePolicy{
+					Id:   "driftctl_assume_role:driftctl_policy.10",
+					Role: func(p string) *string { return &p }("custom-role"),
+				},
+				&aws.AwsIamRolePolicy{
+					Id:   "OrganizationAccountAccessRole:AdministratorAccess",
+					Role: func(p string) *string { return &p }("OrganizationAccountAccessRole"),
+				},
+			},
+			[]resource.Resource{
+				&aws.AwsIamRolePolicy{
+					Id:   "OrganizationAccountAccessRole:AdministratorAccess",
+					Role: func(p string) *string { return &p }("OrganizationAccountAccessRole"),
+				},
+			},
+			diff.Changelog{
+				{
+					Type: diff.DELETE,
+					Path: []string{"0"},
+					From: &aws.AwsIamRole{
+						Id:   "custom-role",
+						Path: func(p string) *string { return &p }("/not-aws-service-role/sso.amazonaws.com"),
+					},
+					To: nil,
+				},
+				{
+					Type: diff.DELETE,
+					Path: []string{"1"},
+					From: &aws.AwsIamRole{
+						Id:   "OrganizationAccountAccessRole",
+						Path: func(p string) *string { return &p }("/aws-service-role/sso.amazonaws.com"),
+					},
+					To: nil,
+				},
+				{
+					Type: diff.DELETE,
+					Path: []string{"2"},
+					From: &aws.AwsIamRolePolicy{
+						Id:   "driftctl_assume_role:driftctl_policy.10",
+						Role: func(p string) *string { return &p }("custom-role"),
 					},
 					To: nil,
 				},

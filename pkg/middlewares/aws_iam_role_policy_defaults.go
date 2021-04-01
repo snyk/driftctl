@@ -1,6 +1,8 @@
 package middlewares
 
 import (
+	"path/filepath"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -10,10 +12,6 @@ import (
 // When scanning a brand new AWS account, some users may see irrelevant results about default AWS role policies.
 // We ignore these resources by default when strict mode is disabled.
 type AwsIamRolePolicyDefaults struct{}
-
-var ignoredIamRolePolicyIds = []string{
-	"OrganizationAccountAccessRole:AdministratorAccess",
-}
 
 func NewAwsIamRolePolicyDefaults() AwsIamRolePolicyDefaults {
 	return AwsIamRolePolicyDefaults{}
@@ -42,16 +40,24 @@ func (m AwsIamRolePolicyDefaults) Execute(remoteResources, resourcesFromState *[
 			continue
 		}
 
-		isIgnored := false
-		for _, id := range ignoredIamRolePolicyIds {
-			if remoteResource.TerraformId() == id {
-				isIgnored = true
+		for _, res := range *remoteResources {
+			if res.TerraformType() != aws.AwsIamRoleResourceType {
+				continue
 			}
-		}
 
-		if !isIgnored {
-			newRemoteResources = append(newRemoteResources, remoteResource)
-			continue
+			if res.(*aws.AwsIamRole).Id != *remoteResource.(*aws.AwsIamRolePolicy).Role {
+				continue
+			}
+
+			match, err := filepath.Match(ignoredIamRolePathGlob, *res.(*aws.AwsIamRole).Path)
+			if err != nil {
+				return err
+			}
+
+			if !match {
+				newRemoteResources = append(newRemoteResources, remoteResource)
+				continue
+			}
 		}
 
 		logrus.WithFields(logrus.Fields{

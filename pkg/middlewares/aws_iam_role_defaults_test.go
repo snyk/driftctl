@@ -23,10 +23,12 @@ func TestAwsIamRoleDefaults_Execute(t *testing.T) {
 			"default iam roles when they're not managed by IaC",
 			[]resource.Resource{
 				&aws.AwsIamRole{
-					Id: "AWSServiceRoleForSSO",
+					Id:   "AWSServiceRoleForSSO",
+					Path: func(path string) *string { return &path }("/aws-service-role/sso.amazonaws.com"),
 				},
 				&aws.AwsIamRole{
-					Id: "OrganizationAccountAccessRole",
+					Id:   "OrganizationAccountAccessRole",
+					Path: func(path string) *string { return &path }("/not-aws-service-role/sso.amazonaws.com/"),
 				},
 				&aws.AwsRoute{
 					Id:           "dummy-route",
@@ -41,16 +43,29 @@ func TestAwsIamRoleDefaults_Execute(t *testing.T) {
 					GatewayId:    awssdk.String("local"),
 				},
 			},
-			diff.Changelog{},
+			diff.Changelog{
+				{
+					Type: "delete",
+					Path: []string{"0"},
+					From: &aws.AwsIamRole{
+						Id:   "OrganizationAccountAccessRole",
+						Path: func(path string) *string { return &path }("/not-aws-service-role/sso.amazonaws.com/"),
+					},
+					To: nil,
+				},
+			},
 		},
 		{
 			"default iam roles when they're managed by IaC",
 			[]resource.Resource{
 				&aws.AwsIamRole{
-					Id: "AWSServiceRoleForSSO",
+					Id:          "AWSServiceRoleForSSO",
+					Path:        func(path string) *string { return &path }("/aws-service-role/sso.amazonaws.com/"),
+					Description: func(path string) *string { return &path }("test"),
 				},
 				&aws.AwsIamRole{
-					Id: "OrganizationAccountAccessRole",
+					Id:   "OrganizationAccountAccessRole",
+					Path: func(path string) *string { return &path }("/not-aws-service-role/sso.amazonaws.com/"),
 				},
 				&aws.AwsIamRole{
 					Id: "driftctl_assume_role:driftctl_policy.10",
@@ -61,10 +76,12 @@ func TestAwsIamRoleDefaults_Execute(t *testing.T) {
 			},
 			[]resource.Resource{
 				&aws.AwsIamRole{
-					Id: "AWSServiceRoleForSSO",
+					Id:   "AWSServiceRoleForSSO",
+					Path: func(path string) *string { return &path }("/aws-service-role/sso.amazonaws.com/"),
 				},
 				&aws.AwsIamRole{
-					Id: "OrganizationAccountAccessRole",
+					Id:   "OrganizationAccountAccessRole",
+					Path: func(path string) *string { return &path }("/not-aws-service-role/sso.amazonaws.com/"),
 				},
 				&aws.AwsIamRole{
 					Id:   "driftctl_assume_role:driftctl_policy.10",
@@ -73,8 +90,14 @@ func TestAwsIamRoleDefaults_Execute(t *testing.T) {
 			},
 			diff.Changelog{
 				{
-					Type: "delete",
-					Path: []string{"Tags", "2", "test"},
+					Type: diff.UPDATE,
+					Path: []string{"0", "Description"},
+					From: func(path string) *string { return &path }("test"),
+					To:   nil,
+				},
+				{
+					Type: diff.DELETE,
+					Path: []string{"2", "Tags", "test"},
 					From: "value",
 					To:   nil,
 				},
