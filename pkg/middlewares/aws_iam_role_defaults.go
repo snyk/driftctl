@@ -1,20 +1,19 @@
 package middlewares
 
 import (
+	"path/filepath"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 )
 
+const ignoredIamRolePathGlob = "/aws-service-role/*"
+
 // When scanning a brand new AWS account, some users may see irrelevant results about default AWS role policies.
 // We ignore these resources by default when strict mode is disabled.
 type AwsIamRoleDefaults struct{}
-
-var ignoredIamRoleIds = []string{
-	"AWSServiceRoleForSSO",
-	"OrganizationAccountAccessRole",
-}
 
 func NewAwsIamRoleDefaults() AwsIamRoleDefaults {
 	return AwsIamRoleDefaults{}
@@ -43,14 +42,12 @@ func (m AwsIamRoleDefaults) Execute(remoteResources, resourcesFromState *[]resou
 			continue
 		}
 
-		isIgnored := false
-		for _, id := range ignoredIamRoleIds {
-			if remoteResource.TerraformId() == id {
-				isIgnored = true
-			}
+		match, err := filepath.Match(ignoredIamRolePathGlob, *remoteResource.(*aws.AwsIamRole).Path)
+		if err != nil {
+			return err
 		}
 
-		if !isIgnored {
+		if !match {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
