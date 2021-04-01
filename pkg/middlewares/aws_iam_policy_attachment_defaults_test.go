@@ -21,41 +21,122 @@ func TestAwsIamPolicyAttachmentDefaults_Execute(t *testing.T) {
 		{
 			"test that default iam policy attachment are excluded when not managed by IaC",
 			[]resource.Resource{
-				&aws.AwsIamPolicyAttachment{
-					Id: "AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/AWSSSOServiceRolePolicy",
+				&aws.AwsIamRole{
+					Id:   "custom-role",
+					Path: func(p string) *string { return &p }("/not-aws-service-role/sso.amazonaws.com"),
+				},
+				&aws.AwsIamRole{
+					Id:   "AWSServiceRoleForSSO",
+					Path: func(p string) *string { return &p }("/aws-service-role/sso.amazonaws.com"),
 				},
 				&aws.AwsIamPolicyAttachment{
-					Id: "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
+					Id:    "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
+					Roles: &[]string{"custom-role"},
+				},
+				&aws.AwsIamPolicyAttachment{
+					Id:    "AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/AWSSSOServiceRolePolicy",
+					Roles: &[]string{"AWSServiceRoleForSSO"},
+				},
+				&aws.AwsIamPolicyAttachment{
+					Id:    "AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/whatever",
+					Roles: &[]string{"AWSServiceRoleForSSO"},
 				},
 			},
-			[]resource.Resource{
-				&aws.AwsIamPolicyAttachment{
-					Id: "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
+			[]resource.Resource{},
+			diff.Changelog{
+				{
+					Type: diff.DELETE,
+					Path: []string{"0"},
+					From: &aws.AwsIamRole{
+						Id:   "custom-role",
+						Path: func(p string) *string { return &p }("/not-aws-service-role/sso.amazonaws.com"),
+					},
+					To: nil,
+				},
+				{
+					Type: diff.DELETE,
+					Path: []string{"1"},
+					From: &aws.AwsIamRole{
+						Id:   "AWSServiceRoleForSSO",
+						Path: func(p string) *string { return &p }("/aws-service-role/sso.amazonaws.com"),
+					},
+					To: nil,
+				},
+				{
+					Type: diff.DELETE,
+					Path: []string{"2"},
+					From: &aws.AwsIamPolicyAttachment{
+						Id:    "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
+						Roles: &[]string{"custom-role"},
+					},
+					To: nil,
 				},
 			},
-			diff.Changelog{},
 		},
 		{
-			"test that default iam policy attachment are not excluded when managed by IaC",
+			"test that default iam policy attachment are excluded when not managed by IaC",
 			[]resource.Resource{
-				&aws.AwsIamPolicyAttachment{
-					Id: "AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/AWSSSOServiceRolePolicy",
+				&aws.AwsIamRole{
+					Id:   "custom-role",
+					Path: func(p string) *string { return &p }("/not-aws-service-role/sso.amazonaws.com"),
+				},
+				&aws.AwsIamRole{
+					Id:   "AWSServiceRoleForSSO",
+					Path: func(p string) *string { return &p }("/aws-service-role/sso.amazonaws.com"),
 				},
 				&aws.AwsIamPolicyAttachment{
-					Id: "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
+					Id:    "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
+					Roles: &[]string{"custom-role"},
+				},
+				&aws.AwsIamPolicyAttachment{
+					Id:    "AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/AWSSSOServiceRolePolicy",
+					Roles: &[]string{"AWSServiceRoleForSSO"},
+				},
+				&aws.AwsIamPolicyAttachment{
+					Id:    "AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/whatever",
+					Roles: &[]string{"AWSServiceRoleForSSO", "custom-role"},
 				},
 			},
 			[]resource.Resource{
 				&aws.AwsIamPolicyAttachment{
-					Id: "AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/AWSSSOServiceRolePolicy",
+					Id:    "AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/AWSSSOServiceRolePolicy",
+					Roles: &[]string{"AWSServiceRoleForSSO"},
 				},
 			},
 			diff.Changelog{
 				{
-					Type: "delete",
+					Type: diff.DELETE,
+					Path: []string{"0"},
+					From: &aws.AwsIamRole{
+						Id:   "custom-role",
+						Path: func(p string) *string { return &p }("/not-aws-service-role/sso.amazonaws.com"),
+					},
+					To: nil,
+				},
+				{
+					Type: diff.DELETE,
 					Path: []string{"1"},
+					From: &aws.AwsIamRole{
+						Id:   "AWSServiceRoleForSSO",
+						Path: func(p string) *string { return &p }("/aws-service-role/sso.amazonaws.com"),
+					},
+					To: nil,
+				},
+				{
+					Type: diff.DELETE,
+					Path: []string{"2"},
 					From: &aws.AwsIamPolicyAttachment{
-						Id: "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
+						Id:    "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
+						Roles: &[]string{"custom-role"},
+					},
+					To: nil,
+				},
+				{
+					Type: diff.DELETE,
+					Path: []string{"4"},
+					From: &aws.AwsIamPolicyAttachment{
+						Id:    "AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/whatever",
+						Roles: &[]string{"AWSServiceRoleForSSO", "custom-role"},
 					},
 					To: nil,
 				},
