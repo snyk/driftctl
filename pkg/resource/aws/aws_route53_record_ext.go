@@ -27,7 +27,7 @@ func (r *AwsRoute53Record) NormalizeForState() (resource.Resource, error) {
 		r.SetIdentifier = aws.String("")
 	}
 
-	// This ensures that if we find a nil value we don't drift
+	// This ensures that if we find an empty records value we don't drift
 	if r.Records != nil && len(*r.Records) == 0 {
 		r.Records = nil
 	}
