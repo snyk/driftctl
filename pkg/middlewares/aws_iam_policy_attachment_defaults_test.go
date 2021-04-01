@@ -142,6 +142,53 @@ func TestAwsIamPolicyAttachmentDefaults_Execute(t *testing.T) {
 				},
 			},
 		},
+		{
+			"do not ignore default iam policy attachment when role cannot be found",
+			[]resource.Resource{
+				&aws.AwsIamRole{
+					Id:   "custom-role",
+					Path: func(p string) *string { return &p }("/not-aws-service-role/sso.amazonaws.com"),
+				},
+				&aws.AwsIamPolicyAttachment{
+					Id:    "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
+					Roles: &[]string{"custom-role"},
+				},
+				&aws.AwsIamPolicyAttachment{
+					Id:    "AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/AWSSSOServiceRolePolicy",
+					Roles: &[]string{"AWSServiceRoleForSSO"},
+				},
+			},
+			[]resource.Resource{},
+			diff.Changelog{
+				{
+					Type: diff.DELETE,
+					Path: []string{"0"},
+					From: &aws.AwsIamRole{
+						Id:   "custom-role",
+						Path: func(p string) *string { return &p }("/not-aws-service-role/sso.amazonaws.com"),
+					},
+					To: nil,
+				},
+				{
+					Type: diff.DELETE,
+					Path: []string{"1"},
+					From: &aws.AwsIamPolicyAttachment{
+						Id:    "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
+						Roles: &[]string{"custom-role"},
+					},
+					To: nil,
+				},
+				{
+					Type: diff.DELETE,
+					Path: []string{"2"},
+					From: &aws.AwsIamPolicyAttachment{
+						Id:    "AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/AWSSSOServiceRolePolicy",
+						Roles: &[]string{"AWSServiceRoleForSSO"},
+					},
+					To: nil,
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {

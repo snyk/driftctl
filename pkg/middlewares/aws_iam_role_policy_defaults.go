@@ -40,24 +40,31 @@ func (m AwsIamRolePolicyDefaults) Execute(remoteResources, resourcesFromState *[
 			continue
 		}
 
+		var role *aws.AwsIamRole
 		for _, res := range *remoteResources {
 			if res.TerraformType() != aws.AwsIamRoleResourceType {
 				continue
 			}
 
-			if res.(*aws.AwsIamRole).Id != *remoteResource.(*aws.AwsIamRolePolicy).Role {
-				continue
+			if res.(*aws.AwsIamRole).Id == *remoteResource.(*aws.AwsIamRolePolicy).Role {
+				role = res.(*aws.AwsIamRole)
 			}
+		}
 
-			match, err := filepath.Match(ignoredIamRolePathGlob, *res.(*aws.AwsIamRole).Path)
-			if err != nil {
-				return err
-			}
+		// If we couldn't find the linked role, don't ignore the resource
+		if role == nil {
+			newRemoteResources = append(newRemoteResources, remoteResource)
+			continue
+		}
 
-			if !match {
-				newRemoteResources = append(newRemoteResources, remoteResource)
-				continue
-			}
+		match, err := filepath.Match(ignoredIamRolePathGlob, *role.Path)
+		if err != nil {
+			return err
+		}
+
+		if !match {
+			newRemoteResources = append(newRemoteResources, remoteResource)
+			continue
 		}
 
 		logrus.WithFields(logrus.Fields{
