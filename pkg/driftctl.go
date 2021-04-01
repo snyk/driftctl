@@ -61,7 +61,6 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 			middlewares.NewAwsIamPolicyAttachmentDefaults(),
 			middlewares.NewAwsIamRolePolicyDefaults(),
 			middlewares.NewAwsIamRoleDefaults(),
-			middlewares.NewAwsSecurityGroupRuleDefaults(),
 		)
 	}
 
