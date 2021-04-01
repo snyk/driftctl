@@ -30,7 +30,7 @@ func (m Route53DefaultZoneRecordSanitizer) Execute(remoteResources, resourcesFro
 
 		record, _ := remoteResource.(*aws.AwsRoute53Record)
 
-		if !isDefaultRoute53Record(record) {
+		if !isDefaultRecord(record) {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
@@ -61,6 +61,6 @@ func (m Route53DefaultZoneRecordSanitizer) Execute(remoteResources, resourcesFro
 }
 
 // Return true if the record is considered as default one added by aws
-func isDefaultRoute53Record(record *aws.AwsRoute53Record) bool {
+func isDefaultRecord(record *aws.AwsRoute53Record) bool {
 	return *record.Type == "NS" || *record.Type == "SOA"
 }
