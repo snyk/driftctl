@@ -3,16 +3,15 @@ package middlewares
 import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
+
+	"path/filepath"
+
 	"github.com/sirupsen/logrus"
 )
 
 // Default iam policy attachment should not be shown as unmanaged as they are present by default
 // This middleware ignores default iam policy attachment from unmanaged resources if they are not managed by IaC
 type AwsIamPolicyAttachmentDefaults struct{}
-
-var ignoredIamPolicyAttachmentIds = []string{
-	"AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/AWSSSOServiceRolePolicy",
-}
 
 func NewAwsIamPolicyAttachmentDefaults() AwsIamPolicyAttachmentDefaults {
 	return AwsIamPolicyAttachmentDefaults{}
@@ -41,16 +40,26 @@ func (m AwsIamPolicyAttachmentDefaults) Execute(remoteResources, resourcesFromSt
 			continue
 		}
 
-		isIgnored := false
-		for _, id := range ignoredIamPolicyAttachmentIds {
-			if remoteResource.TerraformId() == id {
-				isIgnored = true
-			}
-		}
+		for _, roleId := range *remoteResource.(*aws.AwsIamPolicyAttachment).Roles {
+			for _, res := range *remoteResources {
+				if res.TerraformType() != aws.AwsIamRoleResourceType {
+					continue
+				}
 
-		if !isIgnored {
-			newRemoteResources = append(newRemoteResources, remoteResource)
-			continue
+				if res.(*aws.AwsIamRole).Id != roleId {
+					continue
+				}
+
+				match, err := filepath.Match(ignoredIamRolePathGlob, *res.(*aws.AwsIamRole).Path)
+				if err != nil {
+					return err
+				}
+
+				if !match {
+					newRemoteResources = append(newRemoteResources, remoteResource)
+					continue
+				}
+			}
 		}
 
 		logrus.WithFields(logrus.Fields{
