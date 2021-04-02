@@ -1,18 +1,3 @@
-resource "aws_lambda_function" "yadda" {
-    function_name = "lambda-demo"
-    role          = aws_iam_role.yaddi.arn
-    filename      = "lambda_function_payload.zip"
-    handler       = "main"
-    timeout       = 15
-    runtime       = "go1.x"
-
-    lifecycle {
-        ignore_changes = [
-            environment,
-        ]
-    }
-}
-
 resource "aws_iam_role" "yaddi" {
     name               = "driftctl-lambda-role2"
     path               = "/service-role/"
