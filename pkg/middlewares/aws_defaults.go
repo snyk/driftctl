@@ -9,7 +9,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 )
 
-const ignoredIamRolePathGlob = "/aws-service-role/*"
+const defaultIamRolePathGlob = "/aws-service-role/*"
 
 // When scanning a brand new AWS account, some users may see irrelevant results about default AWS role policies.
 // We ignore these resources by default when strict mode is disabled.
@@ -42,7 +42,7 @@ func awsIamRoleDefaults(remoteResources, resourcesFromState *[]resource.Resource
 			continue
 		}
 
-		match, err := filepath.Match(ignoredIamRolePathGlob, *remoteResource.(*aws.AwsIamRole).Path)
+		match, err := filepath.Match(defaultIamRolePathGlob, *remoteResource.(*aws.AwsIamRole).Path)
 		if err != nil {
 			return err
 		}
@@ -104,7 +104,7 @@ func awsIamPolicyAttachmentDefaults(remoteResources, resourcesFromState *[]resou
 				continue
 			}
 
-			match, err := filepath.Match(ignoredIamRolePathGlob, *role.Path)
+			match, err := filepath.Match(defaultIamRolePathGlob, *role.Path)
 			if err != nil {
 				return err
 			}
@@ -166,7 +166,7 @@ func awsIamRolePolicyDefaults(remoteResources, resourcesFromState *[]resource.Re
 			continue
 		}
 
-		match, err := filepath.Match(ignoredIamRolePathGlob, *role.Path)
+		match, err := filepath.Match(defaultIamRolePathGlob, *role.Path)
 		if err != nil {
 			return err
 		}
