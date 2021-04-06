@@ -2,7 +2,6 @@ package backend
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -40,7 +39,7 @@ func NewHTTPReader(rawURL string, opts *Options) (*HTTPBackend, error) {
 	}
 
 	if res.StatusCode < 200 || res.StatusCode >= 400 {
-		return nil, fmt.Errorf("error in backend HTTP(s): non-200 OK status code: %s body: \"%s\"", res.Status, buf.String())
+		return nil, errors.Errorf("error in backend HTTP(s): non-200 OK status code: %s body: \"%s\"", res.Status, buf.String())
 	}
 
 	return &HTTPBackend{rawURL, res.Body}, nil
