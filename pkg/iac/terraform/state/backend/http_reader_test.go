@@ -18,7 +18,7 @@ func TestNewHTTPReader(t *testing.T) {
 		name    string
 		args    args
 		wantURL string
-		wantErr bool
+		wantErr error
 	}{
 		{
 			name: "Should fail with wrong URL",
@@ -29,7 +29,7 @@ func TestNewHTTPReader(t *testing.T) {
 				},
 			},
 			wantURL: "",
-			wantErr: true,
+			wantErr: errors.New("Get \"wrong_url\": unsupported protocol scheme \"\""),
 		},
 		{
 			name: "Should fetch URL with auth header",
@@ -42,14 +42,25 @@ func TestNewHTTPReader(t *testing.T) {
 				},
 			},
 			wantURL: "https://raw.githubusercontent.com/cloudskiff/driftctl/main/.dockerignore",
-			wantErr: false,
+			wantErr: nil,
+		},
+		{
+			name: "Should fail with bad status code",
+			args: args{
+				url: "https://raw.githubusercontent.com/cloudskiff/driftctl-test/main/.dockerignore",
+				options: &Options{
+					Headers: map[string]string{},
+				},
+			},
+			wantURL: "https://raw.githubusercontent.com/cloudskiff/driftctl-badprojecturl",
+			wantErr: errors.New("error in backend HTTP(s): non-200 OK status code: 404 Not Found body: \"404: Not Found\""),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := NewHTTPReader(tt.args.url, tt.args.options)
-			if tt.wantErr {
-				assert.Error(t, err)
+			if tt.wantErr != nil {
+				assert.EqualError(t, err, tt.wantErr.Error())
 				return
 			} else {
 				assert.NoError(t, err)
