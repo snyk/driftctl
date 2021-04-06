@@ -108,6 +108,11 @@ func (m *AwsRouteTableExpander) handleTable(table *aws.AwsRouteTable, results *[
 			return err
 		}
 
+		// Don't expand if the route already exists as a dedicated resource
+		if m.routeExists(routeId, resourcesFromState) {
+			continue
+		}
+
 		newRouteFromTable := &aws.AwsRoute{
 			DestinationCidrBlock:     route.CidrBlock,
 			DestinationIpv6CidrBlock: route.Ipv6CidrBlock,
@@ -178,6 +183,11 @@ func (m *AwsRouteTableExpander) handleDefaultTable(table *aws.AwsDefaultRouteTab
 			return err
 		}
 
+		// Don't expand if the route already exists as a dedicated resource
+		if m.routeExists(routeId, resourcesFromState) {
+			continue
+		}
+
 		newRouteFromTable := &aws.AwsRoute{
 			DestinationCidrBlock:     route.CidrBlock,
 			DestinationIpv6CidrBlock: route.Ipv6CidrBlock,
@@ -210,4 +220,20 @@ func (m *AwsRouteTableExpander) handleDefaultTable(table *aws.AwsDefaultRouteTab
 	table.Route = nil
 
 	return nil
+}
+
+func (m *AwsRouteTableExpander) routeExists(routeId string, resourcesFromState []resource.Resource) bool {
+	for _, res := range resourcesFromState {
+		if res.TerraformType() != aws.AwsRouteResourceType {
+			continue
+		}
+
+		if res.TerraformId() != routeId {
+			continue
+		}
+
+		return true
+	}
+
+	return false
 }
