@@ -56,9 +56,9 @@ func (m AwsRouteTableExpander) Execute(remoteResources, resourcesFromState *[]re
 
 		var err error
 		if isDefault {
-			err = m.handleDefaultTable(defaultTable, &newList)
+			err = m.handleDefaultTable(defaultTable, &newList, *resourcesFromState)
 		} else {
-			err = m.handleTable(table, &newList)
+			err = m.handleTable(table, &newList, *resourcesFromState)
 		}
 
 		if err != nil {
@@ -69,7 +69,7 @@ func (m AwsRouteTableExpander) Execute(remoteResources, resourcesFromState *[]re
 	return nil
 }
 
-func (m *AwsRouteTableExpander) handleTable(table *aws.AwsRouteTable, results *[]resource.Resource) error {
+func (m *AwsRouteTableExpander) handleTable(table *aws.AwsRouteTable, results *[]resource.Resource, resourcesFromState []resource.Resource) error {
 	if table.Route == nil ||
 		len(*table.Route) < 1 {
 		return nil
@@ -80,6 +80,25 @@ func (m *AwsRouteTableExpander) handleTable(table *aws.AwsRouteTable, results *[
 			m.alerter.SendAlert(aws.AwsRouteTableResourceType, newInvalidRouteAlert(aws.AwsRouteTableResourceType, table.Id))
 			continue
 		}
+
+		routeAlreadyExists := false
+		for _, res := range resourcesFromState {
+			if res.TerraformType() != aws.AwsRouteResourceType {
+				continue
+			}
+
+			if res.TerraformId() != routeId {
+				continue
+			}
+
+			// Don't expand if the route already exists as a dedicated resource
+			routeAlreadyExists = true
+		}
+
+		if routeAlreadyExists {
+			continue
+		}
+
 		newRouteFromTable := &aws.AwsRoute{
 			DestinationCidrBlock:     route.CidrBlock,
 			DestinationIpv6CidrBlock: route.Ipv6CidrBlock,
@@ -114,7 +133,7 @@ func (m *AwsRouteTableExpander) handleTable(table *aws.AwsRouteTable, results *[
 	return nil
 }
 
-func (m *AwsRouteTableExpander) handleDefaultTable(table *aws.AwsDefaultRouteTable, results *[]resource.Resource) error {
+func (m *AwsRouteTableExpander) handleDefaultTable(table *aws.AwsDefaultRouteTable, results *[]resource.Resource, resourcesFromState []resource.Resource) error {
 	if table.Route == nil ||
 		len(*table.Route) < 1 {
 		return nil
@@ -125,6 +144,25 @@ func (m *AwsRouteTableExpander) handleDefaultTable(table *aws.AwsDefaultRouteTab
 			m.alerter.SendAlert(aws.AwsDefaultRouteTableResourceType, newInvalidRouteAlert(aws.AwsDefaultRouteTableResourceType, table.Id))
 			continue
 		}
+
+		routeAlreadyExists := false
+		for _, res := range resourcesFromState {
+			if res.TerraformType() != aws.AwsRouteResourceType {
+				continue
+			}
+
+			if res.TerraformId() != routeId {
+				continue
+			}
+
+			// Don't expand if the route already exists as a dedicated resource
+			routeAlreadyExists = true
+		}
+
+		if routeAlreadyExists {
+			continue
+		}
+
 		newRouteFromTable := &aws.AwsRoute{
 			DestinationCidrBlock:     route.CidrBlock,
 			DestinationIpv6CidrBlock: route.Ipv6CidrBlock,

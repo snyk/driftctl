@@ -187,6 +187,151 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 				},
 			},
 		},
+		{
+			"test routes are expanded from default route tables except when they already exist",
+			[]resource.Resource{
+				&resource2.FakeResource{
+					Id: "fake_resource",
+				},
+				&aws.AwsRoute{
+					Id:                       "r-default_route_table_from_state2750132062",
+					RouteTableId:             awssdk.String("default_route_table_from_state"),
+					DestinationIpv6CidrBlock: awssdk.String("::/0"),
+					GatewayId:                awssdk.String("igw-07b7844a8fd17a638"),
+					Origin:                   awssdk.String("CreateRoute"),
+					State:                    awssdk.String("active"),
+					DestinationPrefixListId:  awssdk.String(""),
+					InstanceOwnerId:          awssdk.String(""),
+				},
+				&aws.AwsDefaultRouteTable{
+					Id: "default_route_table_from_state",
+					Route: &[]struct {
+						CidrBlock              *string `cty:"cidr_block"`
+						EgressOnlyGatewayId    *string `cty:"egress_only_gateway_id"`
+						GatewayId              *string `cty:"gateway_id"`
+						InstanceId             *string `cty:"instance_id"`
+						Ipv6CidrBlock          *string `cty:"ipv6_cidr_block"`
+						NatGatewayId           *string `cty:"nat_gateway_id"`
+						NetworkInterfaceId     *string `cty:"network_interface_id"`
+						TransitGatewayId       *string `cty:"transit_gateway_id"`
+						VpcEndpointId          *string `cty:"vpc_endpoint_id"`
+						VpcPeeringConnectionId *string `cty:"vpc_peering_connection_id"`
+					}{
+						{
+							CidrBlock:     awssdk.String("0.0.0.0/0"),
+							GatewayId:     awssdk.String("igw-07b7844a8fd17a638"),
+							VpcEndpointId: awssdk.String(""),
+						},
+						{
+							GatewayId:     awssdk.String("igw-07b7844a8fd17a638"),
+							Ipv6CidrBlock: awssdk.String("::/0"),
+						},
+					},
+				},
+			},
+			[]resource.Resource{
+				&resource2.FakeResource{
+					Id: "fake_resource",
+				},
+				&aws.AwsDefaultRouteTable{
+					Id:    "default_route_table_from_state",
+					Route: nil,
+				},
+				&aws.AwsRoute{
+					Id:                      "r-default_route_table_from_state1080289494",
+					RouteTableId:            awssdk.String("default_route_table_from_state"),
+					DestinationCidrBlock:    awssdk.String("0.0.0.0/0"),
+					GatewayId:               awssdk.String("igw-07b7844a8fd17a638"),
+					Origin:                  awssdk.String("CreateRoute"),
+					State:                   awssdk.String("active"),
+					DestinationPrefixListId: awssdk.String(""),
+					InstanceOwnerId:         awssdk.String(""),
+				},
+				&aws.AwsRoute{
+					Id:                       "r-default_route_table_from_state2750132062",
+					RouteTableId:             awssdk.String("default_route_table_from_state"),
+					DestinationIpv6CidrBlock: awssdk.String("::/0"),
+					GatewayId:                awssdk.String("igw-07b7844a8fd17a638"),
+					Origin:                   awssdk.String("CreateRoute"),
+					State:                    awssdk.String("active"),
+					DestinationPrefixListId:  awssdk.String(""),
+					InstanceOwnerId:          awssdk.String(""),
+				},
+			},
+		},
+		{
+			"test routes are expanded except when they already exist",
+			[]resource.Resource{
+				&resource2.FakeResource{
+					Id: "fake_resource",
+				},
+				&aws.AwsRoute{
+					Id:                      "r-table_from_state1080289494",
+					RouteTableId:            awssdk.String("table_from_state"),
+					DestinationCidrBlock:    awssdk.String("0.0.0.0/0"),
+					GatewayId:               awssdk.String("igw-07b7844a8fd17a638"),
+					Origin:                  awssdk.String("CreateRoute"),
+					State:                   awssdk.String("active"),
+					DestinationPrefixListId: awssdk.String(""),
+					InstanceOwnerId:         awssdk.String(""),
+				},
+				&aws.AwsRouteTable{
+					Id: "table_from_state",
+					Route: &[]struct {
+						CidrBlock              *string `cty:"cidr_block"`
+						EgressOnlyGatewayId    *string `cty:"egress_only_gateway_id"`
+						GatewayId              *string `cty:"gateway_id"`
+						InstanceId             *string `cty:"instance_id"`
+						Ipv6CidrBlock          *string `cty:"ipv6_cidr_block"`
+						LocalGatewayId         *string `cty:"local_gateway_id"`
+						NatGatewayId           *string `cty:"nat_gateway_id"`
+						NetworkInterfaceId     *string `cty:"network_interface_id"`
+						TransitGatewayId       *string `cty:"transit_gateway_id"`
+						VpcEndpointId          *string `cty:"vpc_endpoint_id"`
+						VpcPeeringConnectionId *string `cty:"vpc_peering_connection_id"`
+					}{
+						{
+							CidrBlock:     awssdk.String("0.0.0.0/0"),
+							GatewayId:     awssdk.String("igw-07b7844a8fd17a638"),
+							VpcEndpointId: awssdk.String(""),
+						},
+						{
+							GatewayId:     awssdk.String("igw-07b7844a8fd17a638"),
+							Ipv6CidrBlock: awssdk.String("::/0"),
+						},
+					},
+				},
+			},
+			[]resource.Resource{
+				&resource2.FakeResource{
+					Id: "fake_resource",
+				},
+				&aws.AwsRouteTable{
+					Id:    "table_from_state",
+					Route: nil,
+				},
+				&aws.AwsRoute{
+					Id:                      "r-table_from_state1080289494",
+					RouteTableId:            awssdk.String("table_from_state"),
+					DestinationCidrBlock:    awssdk.String("0.0.0.0/0"),
+					GatewayId:               awssdk.String("igw-07b7844a8fd17a638"),
+					Origin:                  awssdk.String("CreateRoute"),
+					State:                   awssdk.String("active"),
+					DestinationPrefixListId: awssdk.String(""),
+					InstanceOwnerId:         awssdk.String(""),
+				},
+				&aws.AwsRoute{
+					Id:                       "r-table_from_state2750132062",
+					RouteTableId:             awssdk.String("table_from_state"),
+					DestinationIpv6CidrBlock: awssdk.String("::/0"),
+					GatewayId:                awssdk.String("igw-07b7844a8fd17a638"),
+					Origin:                   awssdk.String("CreateRoute"),
+					State:                    awssdk.String("active"),
+					DestinationPrefixListId:  awssdk.String(""),
+					InstanceOwnerId:          awssdk.String(""),
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
