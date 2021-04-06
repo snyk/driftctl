@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsLambdaFunctionResourceType = "aws_lambda_function"
@@ -80,9 +80,9 @@ func (r *AwsLambdaFunction) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsLambdaFunctionNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"filename"})
-	helpers.SafeDelete(val, []string{"publish"})
-	helpers.SafeDelete(val, []string{"timeouts"})
-	helpers.SafeDelete(val, []string{"last_modified"})
+func awsLambdaFunctionNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"filename"})
+	val.SafeDelete([]string{"publish"})
+	val.SafeDelete([]string{"timeouts"})
+	val.SafeDelete([]string{"last_modified"})
 }

@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsIamUserResourceType = "aws_iam_user"
@@ -33,6 +33,6 @@ func (r *AwsIamUser) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsIamUserNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"force_destroy"})
+func awsIamUserNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"force_destroy"})
 }

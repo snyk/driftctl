@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsIamRoleResourceType = "aws_iam_role"
@@ -38,6 +38,6 @@ func (r *AwsIamRole) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsIamRoleNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"force_detach_policies"})
+func awsIamRoleNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"force_detach_policies"})
 }

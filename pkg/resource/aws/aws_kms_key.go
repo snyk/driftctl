@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsKmsKeyResourceType = "aws_kms_key"
@@ -36,6 +36,6 @@ func (r *AwsKmsKey) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsKmsKeyNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"deletion_window_in_days"})
+func awsKmsKeyNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"deletion_window_in_days"})
 }

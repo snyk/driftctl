@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsInstanceResourceType = "aws_instance"
@@ -107,7 +107,7 @@ func (r *AwsInstance) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsInstanceNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"volume_tags"})
-	helpers.SafeDelete(val, []string{"timeouts"})
+func awsInstanceNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"volume_tags"})
+	val.SafeDelete([]string{"timeouts"})
 }

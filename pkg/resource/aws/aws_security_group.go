@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsSecurityGroupResourceType = "aws_security_group"
@@ -60,7 +60,7 @@ func (r *AwsSecurityGroup) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsSecurityGroupNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"revoke_rules_on_delete"})
-	helpers.SafeDelete(val, []string{"timeouts"})
+func awsSecurityGroupNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"revoke_rules_on_delete"})
+	val.SafeDelete([]string{"timeouts"})
 }

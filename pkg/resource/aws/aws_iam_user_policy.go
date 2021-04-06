@@ -3,6 +3,8 @@ package aws
 
 import (
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsIamUserPolicyResourceType = "aws_iam_user_policy"
@@ -28,5 +30,5 @@ func (r *AwsIamUserPolicy) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsIamUserPolicyNormalizer(val *map[string]interface{}) {
+func awsIamUserPolicyNormalizer(val *dctlcty.CtyAttributes) {
 }

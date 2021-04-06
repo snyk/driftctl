@@ -1,11 +1,13 @@
 package resource
 
-var normalizers = map[string]func(val *map[string]interface{}){}
+import "github.com/cloudskiff/driftctl/pkg/dctlcty"
 
-func AddNormalizer(key string, f func(val *map[string]interface{})) {
+var normalizers = map[string]func(val *dctlcty.CtyAttributes){}
+
+func AddNormalizer(key string, f func(val *dctlcty.CtyAttributes)) {
 	normalizers[key] = f
 }
 
-func Normalizers() map[string]func(val *map[string]interface{}) {
+func Normalizers() map[string]func(val *dctlcty.CtyAttributes) {
 	return normalizers
 }

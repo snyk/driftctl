@@ -3,6 +3,8 @@ package aws
 
 import (
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsIamAccessKeyResourceType = "aws_iam_access_key"
@@ -31,5 +33,5 @@ func (r *AwsIamAccessKey) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsIamAccessKeyNormalizer(val *map[string]interface{}) {
+func awsIamAccessKeyNormalizer(val *dctlcty.CtyAttributes) {
 }

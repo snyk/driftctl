@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsEcrRepositoryResourceType = "aws_ecr_repository"
@@ -42,6 +42,6 @@ func (r *AwsEcrRepository) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsEcrRepositoryNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"timeouts"})
+func awsEcrRepositoryNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"timeouts"})
 }

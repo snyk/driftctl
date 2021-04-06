@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsEbsSnapshotResourceType = "aws_ebs_snapshot"
@@ -40,6 +40,6 @@ func (r *AwsEbsSnapshot) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsEbsSnapshotNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"timeouts"})
+func awsEbsSnapshotNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"timeouts"})
 }

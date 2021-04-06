@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsEbsVolumeResourceType = "aws_ebs_volume"
@@ -37,8 +37,8 @@ func (r *AwsEbsVolume) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsEbsVolumeNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"arn"})
-	helpers.SafeDelete(val, []string{"outpost_arn"})
-	helpers.SafeDelete(val, []string{"snapshot_id"})
+func awsEbsVolumeNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"arn"})
+	val.SafeDelete([]string{"outpost_arn"})
+	val.SafeDelete([]string{"snapshot_id"})
 }

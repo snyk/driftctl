@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsS3BucketPolicyResourceType = "aws_s3_bucket_policy"
@@ -28,7 +28,7 @@ func (r *AwsS3BucketPolicy) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsS3BucketPolicyNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"bucket"})
-	helpers.SafeDelete(val, []string{"id"})
+func awsS3BucketPolicyNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"bucket"})
+	val.SafeDelete([]string{"id"})
 }

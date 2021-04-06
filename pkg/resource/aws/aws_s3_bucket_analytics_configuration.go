@@ -3,6 +3,8 @@ package aws
 
 import (
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsS3BucketAnalyticsConfigurationResourceType = "aws_s3_bucket_analytics_configuration"
@@ -43,5 +45,5 @@ func (r *AwsS3BucketAnalyticsConfiguration) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsS3BucketAnalyticsConfigurationNormalizer(val *map[string]interface{}) {
+func awsS3BucketAnalyticsConfigurationNormalizer(val *dctlcty.CtyAttributes) {
 }

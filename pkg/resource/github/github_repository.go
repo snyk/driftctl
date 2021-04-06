@@ -1,6 +1,10 @@
 package github
 
-import "github.com/zclconf/go-cty/cty"
+import (
+	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
+)
 
 const GithubRepositoryResourceType = "github_repository"
 
@@ -65,4 +69,9 @@ func (r *GithubRepository) TerraformType() string {
 
 func (r *GithubRepository) CtyValue() *cty.Value {
 	return r.CtyVal
+}
+
+func githubRepositoryNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"etag"})
+	val.SafeDelete([]string{"auto_init"})
 }

@@ -3,6 +3,8 @@ package aws
 
 import (
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsRoute53HealthCheckResourceType = "aws_route53_health_check"
@@ -44,5 +46,5 @@ func (r *AwsRoute53HealthCheck) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsRoute53HealthCheckNormalizer(val *map[string]interface{}) {
+func awsRoute53HealthCheckNormalizer(val *dctlcty.CtyAttributes) {
 }

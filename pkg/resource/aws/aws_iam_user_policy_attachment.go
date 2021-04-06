@@ -3,6 +3,8 @@ package aws
 
 import (
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsIamUserPolicyAttachmentResourceType = "aws_iam_user_policy_attachment"
@@ -26,5 +28,5 @@ func (r *AwsIamUserPolicyAttachment) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsIamUserPolicyAttachmentNormalizer(val *map[string]interface{}) {
+func awsIamUserPolicyAttachmentNormalizer(val *dctlcty.CtyAttributes) {
 }

@@ -3,6 +3,8 @@ package aws
 
 import (
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsSnsTopicPolicyResourceType = "aws_sns_topic_policy"
@@ -26,5 +28,5 @@ func (r *AwsSnsTopicPolicy) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsSnsTopicPolicyNormalizer(val *map[string]interface{}) {
+func awsSnsTopicPolicyNormalizer(val *dctlcty.CtyAttributes) {
 }

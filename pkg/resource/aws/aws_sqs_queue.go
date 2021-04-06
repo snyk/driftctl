@@ -3,6 +3,8 @@ package aws
 
 import (
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsSqsQueueResourceType = "aws_sqs_queue"
@@ -39,5 +41,5 @@ func (r *AwsSqsQueue) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsSqsQueueNormalizer(val *map[string]interface{}) {
+func awsSqsQueueNormalizer(val *dctlcty.CtyAttributes) {
 }

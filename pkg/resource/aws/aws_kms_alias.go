@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsKmsAliasResourceType = "aws_kms_alias"
@@ -31,7 +31,7 @@ func (r *AwsKmsAlias) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsKmsAliasNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"name"})
-	helpers.SafeDelete(val, []string{"name_prefix"})
+func awsKmsAliasNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"name"})
+	val.SafeDelete([]string{"name_prefix"})
 }

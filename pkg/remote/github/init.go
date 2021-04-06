@@ -4,6 +4,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/cloudskiff/driftctl/pkg/resource/github"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
@@ -32,6 +33,8 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	supplierLibrary.AddSupplier(NewGithubMembershipSupplier(provider, repository))
 	supplierLibrary.AddSupplier(NewGithubTeamMembershipSupplier(provider, repository))
 	supplierLibrary.AddSupplier(NewGithubBranchProtectionSupplier(provider, repository))
+
+	github.InitNormalizers()
 
 	return nil
 }

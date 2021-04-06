@@ -3,6 +3,8 @@ package aws
 
 import (
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsDefaultVpcResourceType = "aws_default_vpc"
@@ -41,5 +43,5 @@ func (r *AwsDefaultVpc) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsDefaultVpcNormalizer(val *map[string]interface{}) {
+func awsDefaultVpcNormalizer(val *dctlcty.CtyAttributes) {
 }

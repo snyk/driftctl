@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsDynamodbTableResourceType = "aws_dynamodb_table"
@@ -76,6 +76,6 @@ func (r *AwsDynamodbTable) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsDynamodbTableNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"timeouts"})
+func awsDynamodbTableNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"timeouts"})
 }

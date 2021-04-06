@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsRoute53ZoneResourceType = "aws_route53_zone"
@@ -37,6 +37,6 @@ func (r *AwsRoute53Zone) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsRoute53ZoneNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"force_destroy"})
+func awsRoute53ZoneNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"force_destroy"})
 }

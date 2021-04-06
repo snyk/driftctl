@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsDbInstanceResourceType = "aws_db_instance"
@@ -102,11 +102,11 @@ func (r *AwsDbInstance) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsDbInstanceDistributionNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"delete_automated_backups"})
-	helpers.SafeDelete(val, []string{"latest_restorable_time"})
-	helpers.SafeDelete(val, []string{"password"})
-	helpers.SafeDelete(val, []string{"skip_final_snapshot"})
-	helpers.SafeDelete(val, []string{"s3_import"})
-	helpers.SafeDelete(val, []string{"timeouts"})
+func awsDbInstanceDistributionNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"delete_automated_backups"})
+	val.SafeDelete([]string{"latest_restorable_time"})
+	val.SafeDelete([]string{"password"})
+	val.SafeDelete([]string{"skip_final_snapshot"})
+	val.SafeDelete([]string{"s3_import"})
+	val.SafeDelete([]string{"timeouts"})
 }

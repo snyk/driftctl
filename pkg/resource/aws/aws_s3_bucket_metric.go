@@ -3,6 +3,8 @@ package aws
 
 import (
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsS3BucketMetricResourceType = "aws_s3_bucket_metric"
@@ -30,5 +32,5 @@ func (r *AwsS3BucketMetric) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsS3BucketMetricNormalizer(val *map[string]interface{}) {
+func awsS3BucketMetricNormalizer(val *dctlcty.CtyAttributes) {
 }

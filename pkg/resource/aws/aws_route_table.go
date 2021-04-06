@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsRouteTableResourceType = "aws_route_table"
@@ -43,6 +43,6 @@ func (r *AwsRouteTable) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsRouteTableNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"route"})
+func awsRouteTableNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"route"})
 }

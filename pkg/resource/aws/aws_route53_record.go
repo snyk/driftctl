@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsRoute53RecordResourceType = "aws_route53_record"
@@ -55,7 +55,7 @@ func (r *AwsRoute53Record) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsRoute53RecordNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"allow_overwrite"})
-	helpers.SafeDelete(val, []string{"name"})
+func awsRoute53RecordNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"allow_overwrite"})
+	val.SafeDelete([]string{"name"})
 }

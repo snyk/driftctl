@@ -3,6 +3,8 @@ package aws
 
 import (
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsIamRolePolicyResourceType = "aws_iam_role_policy"
@@ -28,5 +30,5 @@ func (r *AwsIamRolePolicy) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsIamRolePolicyNormalizer(val *map[string]interface{}) {
+func awsIamRolePolicyNormalizer(val *dctlcty.CtyAttributes) {
 }

@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsIamPolicyAttachmentResourceType = "aws_iam_policy_attachment"
@@ -31,6 +31,6 @@ func (r *AwsIamPolicyAttachment) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsIamPolicyAttachmentNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"name"})
+func awsIamPolicyAttachmentNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"name"})
 }

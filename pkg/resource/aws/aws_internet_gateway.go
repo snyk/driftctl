@@ -3,6 +3,8 @@ package aws
 
 import (
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsInternetGatewayResourceType = "aws_internet_gateway"
@@ -28,5 +30,5 @@ func (r *AwsInternetGateway) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsInternetGatewayNormalizer(val *map[string]interface{}) {
+func awsInternetGatewayNormalizer(val *dctlcty.CtyAttributes) {
 }

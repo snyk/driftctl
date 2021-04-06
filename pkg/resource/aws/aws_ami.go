@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsAmiResourceType = "aws_ami"
@@ -58,6 +58,6 @@ func (r *AwsAmi) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsAmiNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"timeouts"})
+func awsAmiNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"timeouts"})
 }

@@ -3,6 +3,8 @@ package aws
 
 import (
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsDefaultRouteTableResourceType = "aws_default_route_table"
@@ -41,5 +43,5 @@ func (r *AwsDefaultRouteTable) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsDefaultRouteTableNormalizer(val *map[string]interface{}) {
+func awsDefaultRouteTableNormalizer(val *dctlcty.CtyAttributes) {
 }

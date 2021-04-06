@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsDefaultSecurityGroupResourceType = "aws_default_security_group"
@@ -55,6 +55,6 @@ func (r *AwsDefaultSecurityGroup) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsDefaultSecurityGroupNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"revoke_rules_on_delete"})
+func awsDefaultSecurityGroupNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"revoke_rules_on_delete"})
 }

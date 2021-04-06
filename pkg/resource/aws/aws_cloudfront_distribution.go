@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsCloudfrontDistributionResourceType = "aws_cloudfront_distribution"
@@ -160,10 +160,10 @@ func (r *AwsCloudfrontDistribution) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsCloudfrontDistributionNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"etag"})
-	helpers.SafeDelete(val, []string{"last_modified_time"})
-	helpers.SafeDelete(val, []string{"retain_on_delete"})
-	helpers.SafeDelete(val, []string{"status"})
-	helpers.SafeDelete(val, []string{"wait_for_deployment"})
+func awsCloudfrontDistributionNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"etag"})
+	val.SafeDelete([]string{"last_modified_time"})
+	val.SafeDelete([]string{"retain_on_delete"})
+	val.SafeDelete([]string{"status"})
+	val.SafeDelete([]string{"wait_for_deployment"})
 }

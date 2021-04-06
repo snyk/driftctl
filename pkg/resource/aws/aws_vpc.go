@@ -3,6 +3,8 @@ package aws
 
 import (
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsVpcResourceType = "aws_vpc"
@@ -41,5 +43,5 @@ func (r *AwsVpc) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsVpcNormalizer(val *map[string]interface{}) {
+func awsVpcNormalizer(val *dctlcty.CtyAttributes) {
 }

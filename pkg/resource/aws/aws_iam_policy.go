@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsIamPolicyResourceType = "aws_iam_policy"
@@ -32,6 +32,6 @@ func (r *AwsIamPolicy) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsIamPolicyNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"name_prefix"})
+func awsIamPolicyNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"name_prefix"})
 }

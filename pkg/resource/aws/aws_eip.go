@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsEipResourceType = "aws_eip"
@@ -47,6 +47,6 @@ func (r *AwsEip) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsEipNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"timeouts"})
+func awsEipNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"timeouts"})
 }

@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsS3BucketNotificationResourceType = "aws_s3_bucket_notification"
@@ -48,7 +48,7 @@ func (r *AwsS3BucketNotification) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsS3BucketNotificationNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"id"})
-	helpers.SafeDelete(val, []string{"bucket"})
+func awsS3BucketNotificationNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"id"})
+	val.SafeDelete([]string{"bucket"})
 }

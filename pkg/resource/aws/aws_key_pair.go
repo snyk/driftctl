@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsKeyPairResourceType = "aws_key_pair"
@@ -33,7 +33,7 @@ func (r *AwsKeyPair) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsKeyPairNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"key_name_prefix"})
-	helpers.SafeDelete(val, []string{"public_key"})
+func awsKeyPairNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"key_name_prefix"})
+	val.SafeDelete([]string{"public_key"})
 }

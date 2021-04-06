@@ -1,14 +1,11 @@
 package analyser
 
 import (
-	"encoding/json"
 	"reflect"
 	"sort"
 	"strings"
 
-	"github.com/zclconf/go-cty/cty"
-	ctyjson "github.com/zclconf/go-cty/cty/json"
-
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
 	"github.com/r3labs/diff/v2"
@@ -88,8 +85,8 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 		filteredRemoteResource = removeResourceByIndex(i, filteredRemoteResource)
 		analysis.AddManaged(stateRes)
 
-		state := a.getAsAttrs(stateRes.CtyValue())
-		rem := a.getAsAttrs(remoteRes.CtyValue())
+		state := dctlcty.AsAttrs(stateRes.CtyValue())
+		rem := dctlcty.AsAttrs(remoteRes.CtyValue())
 
 		normalize, exists := normalizers[stateRes.TerraformType()]
 		if exists {
@@ -209,17 +206,4 @@ func (a Analyzer) hasUnmanagedSecurityGroupRules(unmanagedResources []resource.R
 		}
 	}
 	return false
-}
-
-func (a *Analyzer) getAsAttrs(val *cty.Value) map[string]interface{} {
-	if val == nil {
-		return nil
-	}
-	bytes, _ := ctyjson.Marshal(*val, val.Type())
-	var attrs map[string]interface{}
-	err := json.Unmarshal(bytes, &attrs)
-	if err != nil {
-		panic(err)
-	}
-	return attrs
 }

@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsLambdaEventSourceMappingResourceType = "aws_lambda_event_source_mapping"
@@ -48,11 +48,11 @@ func (r *AwsLambdaEventSourceMapping) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsLambdaEventSourceMappingNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"last_modified"})
-	helpers.SafeDelete(val, []string{"last_processing_result"})
-	helpers.SafeDelete(val, []string{"starting_position"})
-	helpers.SafeDelete(val, []string{"starting_position_timestamp"})
-	helpers.SafeDelete(val, []string{"state"})
-	helpers.SafeDelete(val, []string{"state_transition_reason"})
+func awsLambdaEventSourceMappingNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"last_modified"})
+	val.SafeDelete([]string{"last_processing_result"})
+	val.SafeDelete([]string{"starting_position"})
+	val.SafeDelete([]string{"starting_position_timestamp"})
+	val.SafeDelete([]string{"state"})
+	val.SafeDelete([]string{"state_transition_reason"})
 }

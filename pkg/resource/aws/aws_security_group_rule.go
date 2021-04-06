@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsSecurityGroupRuleResourceType = "aws_security_group_rule"
@@ -37,6 +37,6 @@ func (r *AwsSecurityGroupRule) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsSecurityGroupRuleNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"self"})
+func awsSecurityGroupRuleNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"self"})
 }

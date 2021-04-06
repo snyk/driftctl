@@ -3,6 +3,8 @@ package aws
 
 import (
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsS3BucketInventoryResourceType = "aws_s3_bucket_inventory"
@@ -50,5 +52,5 @@ func (r *AwsS3BucketInventory) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsS3BucketInventoryNormalizer(val *map[string]interface{}) {
+func awsS3BucketInventoryNormalizer(val *dctlcty.CtyAttributes) {
 }

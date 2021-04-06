@@ -3,6 +3,8 @@ package aws
 
 import (
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsNatGatewayResourceType = "aws_nat_gateway"
@@ -30,5 +32,5 @@ func (r *AwsNatGateway) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsNatGatewayNormalizer(val *map[string]interface{}) {
+func awsNatGatewayNormalizer(val *dctlcty.CtyAttributes) {
 }

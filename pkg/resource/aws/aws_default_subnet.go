@@ -4,7 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 const AwsDefaultSubnetResourceType = "aws_default_subnet"
@@ -42,6 +42,6 @@ func (r *AwsDefaultSubnet) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func awsDefaultSubnetNormalizer(val *map[string]interface{}) {
-	helpers.SafeDelete(val, []string{"timeouts"})
+func awsDefaultSubnetNormalizer(val *dctlcty.CtyAttributes) {
+	val.SafeDelete([]string{"timeouts"})
 }
