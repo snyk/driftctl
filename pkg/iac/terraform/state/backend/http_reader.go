@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 const BackendKeyHTTP = "http"
@@ -38,8 +39,10 @@ func NewHTTPReader(rawURL string, opts *Options) (*HTTPBackend, error) {
 		return nil, err
 	}
 
+	logrus.WithFields(logrus.Fields{"body": buf.String()}).Trace("HTTP(s) backend response")
+
 	if res.StatusCode < 200 || res.StatusCode >= 400 {
-		return nil, errors.Errorf("error in backend HTTP(s): non-200 OK status code: %s body: \"%s\"", res.Status, buf.String())
+		return nil, errors.Errorf("error requesting HTTP(s) backend state: status code: %d", res.StatusCode)
 	}
 
 	return &HTTPBackend{rawURL, res.Body}, nil

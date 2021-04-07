@@ -53,7 +53,7 @@ func TestNewHTTPReader(t *testing.T) {
 				},
 			},
 			wantURL: "https://raw.githubusercontent.com/cloudskiff/driftctl-badprojecturl",
-			wantErr: errors.New("error in backend HTTP(s): non-200 OK status code: 404 Not Found body: \"404: Not Found\""),
+			wantErr: errors.New("error requesting HTTP(s) backend state: status code: 404"),
 		},
 	}
 	for _, tt := range tests {
