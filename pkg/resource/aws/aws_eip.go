@@ -47,6 +47,8 @@ func (r *AwsEip) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsEipTags = map[string]string{}
+
 func awsEipNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"timeouts"})
 }

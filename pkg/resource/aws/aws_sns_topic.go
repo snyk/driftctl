@@ -46,5 +46,7 @@ func (r *AwsSnsTopic) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsSnsTopicTags = map[string]string{}
+
 func awsSnsTopicNormalizer(val *dctlcty.CtyAttributes) {
 }

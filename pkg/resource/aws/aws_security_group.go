@@ -60,6 +60,8 @@ func (r *AwsSecurityGroup) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsSecurityGroupTags = map[string]string{}
+
 func awsSecurityGroupNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"revoke_rules_on_delete"})
 	val.SafeDelete([]string{"timeouts"})

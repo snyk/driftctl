@@ -30,5 +30,7 @@ func (r *AwsIamUserPolicy) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsIamUserPolicyTags = map[string]string{}
+
 func awsIamUserPolicyNormalizer(val *dctlcty.CtyAttributes) {
 }

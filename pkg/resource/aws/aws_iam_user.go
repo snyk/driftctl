@@ -33,6 +33,8 @@ func (r *AwsIamUser) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsIamUserTags = map[string]string{}
+
 func awsIamUserNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"force_destroy"})
 }

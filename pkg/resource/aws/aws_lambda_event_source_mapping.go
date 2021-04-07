@@ -48,6 +48,8 @@ func (r *AwsLambdaEventSourceMapping) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsLambdaEventSourceMappingTags = map[string]string{}
+
 func awsLambdaEventSourceMappingNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"last_modified"})
 	val.SafeDelete([]string{"last_processing_result"})

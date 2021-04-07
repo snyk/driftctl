@@ -37,6 +37,8 @@ func (r *AwsEbsVolume) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsEbsVolumeTags = map[string]string{}
+
 func awsEbsVolumeNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"arn"})
 	val.SafeDelete([]string{"outpost_arn"})

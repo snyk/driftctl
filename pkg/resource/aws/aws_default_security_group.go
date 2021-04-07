@@ -55,6 +55,8 @@ func (r *AwsDefaultSecurityGroup) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsDefaultSecurityGroupTags = map[string]string{}
+
 func awsDefaultSecurityGroupNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"revoke_rules_on_delete"})
 }

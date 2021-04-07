@@ -42,6 +42,8 @@ func (r *AwsDefaultSubnet) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsDefaultSubnetTags = map[string]string{}
+
 func awsDefaultSubnetNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"timeouts"})
 }

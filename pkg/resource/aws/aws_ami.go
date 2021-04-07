@@ -58,6 +58,8 @@ func (r *AwsAmi) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsAmiTags = map[string]string{}
+
 func awsAmiNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"timeouts"})
 }

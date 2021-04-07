@@ -1,6 +1,7 @@
 package dctlcty
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/pkg/errors"
@@ -10,9 +11,9 @@ import (
 func TestCtyAttributes_SafeDelete(t *testing.T) {
 	tests := []struct {
 		name     string
-		attr     CtyAttributes
+		attr     map[string]interface{}
 		path     []string
-		expected CtyAttributes
+		expected map[string]interface{}
 	}{
 		{
 			name: "Delete existing",
@@ -95,7 +96,10 @@ func TestCtyAttributes_SafeDelete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.attr.SafeDelete(tt.path)
+			attr := CtyAttributes{
+				Attrs: tt.attr,
+			}
+			attr.SafeDelete(tt.path)
 			assert.Equal(t, tt.expected, tt.attr)
 		})
 	}
@@ -104,10 +108,10 @@ func TestCtyAttributes_SafeDelete(t *testing.T) {
 func TestCtyAttributes_SafeSet(t *testing.T) {
 	tests := []struct {
 		name     string
-		attr     CtyAttributes
+		attr     map[string]interface{}
 		path     []string
 		value    interface{}
-		expected CtyAttributes
+		expected map[string]interface{}
 		error    error
 	}{
 		{
@@ -201,7 +205,10 @@ func TestCtyAttributes_SafeSet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.attr.SafeSet(tt.path, tt.value)
+			attr := CtyAttributes{
+				Attrs: tt.attr,
+			}
+			err := attr.SafeSet(tt.path, tt.value)
 			if tt.error != nil {
 				assert.NotNil(t, err)
 				assert.Equal(t, tt.error.Error(), err.Error())
@@ -209,6 +216,98 @@ func TestCtyAttributes_SafeSet(t *testing.T) {
 				assert.Nil(t, err)
 			}
 			assert.Equal(t, tt.expected, tt.attr)
+		})
+	}
+}
+
+func TestCtyAttributes_Tags(t *testing.T) {
+	tests := []struct {
+		name     string
+		metadata *Metadata
+		path     []string
+		want     reflect.StructTag
+	}{
+		{
+			"Found tags",
+			&Metadata{
+				tags: map[string]string{
+					"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+				},
+			},
+			[]string{"test", "has", "tags"},
+			reflect.StructTag("cty:\"instance_tenancy\" computed:\"true\""),
+		},
+		{
+			"No tags found",
+			&Metadata{
+				tags: map[string]string{
+					"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+				},
+			},
+			[]string{"test", "has", "no", "tags"},
+			reflect.StructTag(""),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a := &CtyAttributes{
+				Attrs:    nil,
+				metadata: tt.metadata,
+			}
+			if got := a.Tags(tt.path); got != tt.want {
+				t.Errorf("Tags() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCtyAttributes_IsComputedField(t *testing.T) {
+	tests := []struct {
+		name     string
+		metadata *Metadata
+		path     []string
+		want     bool
+	}{
+		{
+			"Is computed",
+			&Metadata{
+				tags: map[string]string{
+					"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+				},
+			},
+			[]string{"test", "has", "tags"},
+			true,
+		},
+		{
+			"Not computed",
+			&Metadata{
+				tags: map[string]string{
+					"test.has.tags": "cty:\"instance_tenancy\"",
+				},
+			},
+			[]string{"test", "has", "tags"},
+			false,
+		},
+		{
+			"No tags",
+			&Metadata{
+				tags: map[string]string{
+					"test.has.tags": "cty:\"instance_tenancy\"",
+				},
+			},
+			[]string{"test", "has", "no", "tags"},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a := &CtyAttributes{
+				Attrs:    nil,
+				metadata: tt.metadata,
+			}
+			if got := a.IsComputedField(tt.path); got != tt.want {
+				t.Errorf("IsComputedField() = %v, want %v", got, tt.want)
+			}
 		})
 	}
 }

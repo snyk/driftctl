@@ -160,6 +160,8 @@ func (r *AwsCloudfrontDistribution) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsCloudfrontDistributionTags = map[string]string{}
+
 func awsCloudfrontDistributionNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"etag"})
 	val.SafeDelete([]string{"last_modified_time"})

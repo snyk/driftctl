@@ -37,6 +37,8 @@ func (r *AwsRoute53Zone) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsRoute53ZoneTags = map[string]string{}
+
 func awsRoute53ZoneNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"force_destroy"})
 }

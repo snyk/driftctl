@@ -43,5 +43,7 @@ func (r *AwsVpc) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsVpcTags = map[string]string{}
+
 func awsVpcNormalizer(val *dctlcty.CtyAttributes) {
 }

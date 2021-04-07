@@ -137,6 +137,8 @@ func (r *AwsS3Bucket) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsS3BucketTags = map[string]string{}
+
 func awsS3BucketNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"acl"})
 	val.SafeDelete([]string{"force_destroy"})

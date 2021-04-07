@@ -31,5 +31,8 @@ func (r *AwsEipAssociation) TerraformType() string {
 func (r *AwsEipAssociation) CtyValue() *cty.Value {
 	return r.CtyVal
 }
+
+var awsEipAssociationTags = map[string]string{}
+
 func awsEipAssociationNormalizer(val *dctlcty.CtyAttributes) {
 }

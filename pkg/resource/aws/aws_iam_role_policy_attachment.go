@@ -28,5 +28,7 @@ func (r *AwsIamRolePolicyAttachment) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsIamRolePolicyAttachmentTags = map[string]string{}
+
 func awsIamRolePolicyAttachmentNormalizer(val *dctlcty.CtyAttributes) {
 }

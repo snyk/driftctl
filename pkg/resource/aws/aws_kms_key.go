@@ -36,6 +36,8 @@ func (r *AwsKmsKey) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsKmsKeyTags = map[string]string{}
+
 func awsKmsKeyNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"deletion_window_in_days"})
 }

@@ -55,6 +55,8 @@ func (r *AwsRoute53Record) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsRoute53RecordTags = map[string]string{}
+
 func awsRoute53RecordNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"allow_overwrite"})
 	val.SafeDelete([]string{"name"})

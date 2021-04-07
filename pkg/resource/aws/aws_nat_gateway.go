@@ -32,5 +32,7 @@ func (r *AwsNatGateway) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsNatGatewayTags = map[string]string{}
+
 func awsNatGatewayNormalizer(val *dctlcty.CtyAttributes) {
 }

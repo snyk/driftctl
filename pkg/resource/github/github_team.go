@@ -36,6 +36,8 @@ func (r *GithubTeam) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var githubTeamTags = map[string]string{}
+
 func githubTeamNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"etag"})
 }

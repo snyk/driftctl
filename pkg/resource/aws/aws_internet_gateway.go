@@ -30,5 +30,7 @@ func (r *AwsInternetGateway) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsInternetGatewayTags = map[string]string{}
+
 func awsInternetGatewayNormalizer(val *dctlcty.CtyAttributes) {
 }

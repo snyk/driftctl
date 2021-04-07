@@ -35,5 +35,7 @@ func (r *AwsSnsTopicSubscription) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsSnsTopicSubscriptionTags = map[string]string{}
+
 func awsSnsTopicSubscriptionNormalizer(val *dctlcty.CtyAttributes) {
 }

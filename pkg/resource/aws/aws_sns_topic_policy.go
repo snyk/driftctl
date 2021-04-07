@@ -28,5 +28,7 @@ func (r *AwsSnsTopicPolicy) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsSnsTopicPolicyTags = map[string]string{}
+
 func awsSnsTopicPolicyNormalizer(val *dctlcty.CtyAttributes) {
 }

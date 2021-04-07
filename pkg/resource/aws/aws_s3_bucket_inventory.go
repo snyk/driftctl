@@ -52,5 +52,7 @@ func (r *AwsS3BucketInventory) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsS3BucketInventoryTags = map[string]string{}
+
 func awsS3BucketInventoryNormalizer(val *dctlcty.CtyAttributes) {
 }

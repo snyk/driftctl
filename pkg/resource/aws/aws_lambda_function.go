@@ -80,6 +80,8 @@ func (r *AwsLambdaFunction) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsLambdaFunctionTags = map[string]string{}
+
 func awsLambdaFunctionNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"filename"})
 	val.SafeDelete([]string{"publish"})

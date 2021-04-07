@@ -28,6 +28,8 @@ func (r *AwsS3BucketPolicy) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsS3BucketPolicyTags = map[string]string{}
+
 func awsS3BucketPolicyNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"bucket"})
 	val.SafeDelete([]string{"id"})

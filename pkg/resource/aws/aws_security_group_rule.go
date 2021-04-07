@@ -37,6 +37,8 @@ func (r *AwsSecurityGroupRule) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsSecurityGroupRuleTags = map[string]string{}
+
 func awsSecurityGroupRuleNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"self"})
 }

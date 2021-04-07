@@ -102,6 +102,8 @@ func (r *AwsDbInstance) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsDbInstanceDistributionTags = map[string]string{}
+
 func awsDbInstanceDistributionNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"delete_automated_backups"})
 	val.SafeDelete([]string{"latest_restorable_time"})

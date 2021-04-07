@@ -781,11 +781,18 @@ func TestAnalyze(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			for _, r := range c.cloud {
-				res, ok := r.(*testresource.FakeResource)
+				fres, ok := r.(*testresource.FakeResource)
 				if ok {
-					impliedType, _ := gocty.ImpliedType(res)
-					value, _ := gocty.ToCtyValue(res, impliedType)
-					res.CtyVal = &value
+					impliedType, _ := gocty.ImpliedType(fres)
+					value, _ := gocty.ToCtyValue(fres, impliedType)
+					fres.CtyVal = &value
+					continue
+				}
+				sgres, ok := r.(*aws.AwsSecurityGroup)
+				if ok {
+					impliedType, _ := gocty.ImpliedType(sgres)
+					value, _ := gocty.ToCtyValue(sgres, impliedType)
+					sgres.CtyVal = &value
 					continue
 				}
 			}
@@ -798,6 +805,13 @@ func TestAnalyze(t *testing.T) {
 					res.CtyVal = &value
 					continue
 				}
+				sgres, ok := r.(*aws.AwsSecurityGroup)
+				if ok {
+					impliedType, _ := gocty.ImpliedType(sgres)
+					value, _ := gocty.ToCtyValue(sgres, impliedType)
+					sgres.CtyVal = &value
+					continue
+				}
 			}
 
 			for _, r := range c.ignoredRes {
@@ -808,6 +822,13 @@ func TestAnalyze(t *testing.T) {
 					res.CtyVal = &value
 					continue
 				}
+				sgres, ok := r.(*aws.AwsSecurityGroup)
+				if ok {
+					impliedType, _ := gocty.ImpliedType(sgres)
+					value, _ := gocty.ToCtyValue(sgres, impliedType)
+					sgres.CtyVal = &value
+					continue
+				}
 			}
 
 			for _, r := range c.ignoredDrift {
@@ -816,6 +837,13 @@ func TestAnalyze(t *testing.T) {
 					impliedType, _ := gocty.ImpliedType(res)
 					value, _ := gocty.ToCtyValue(res, impliedType)
 					res.CtyVal = &value
+					continue
+				}
+				sgres, ok := r.res.(*aws.AwsSecurityGroup)
+				if ok {
+					impliedType, _ := gocty.ImpliedType(sgres)
+					value, _ := gocty.ToCtyValue(sgres, impliedType)
+					sgres.CtyVal = &value
 					continue
 				}
 			}

@@ -46,6 +46,8 @@ func (r *AwsRoute) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsRouteTags = map[string]string{}
+
 func awsRouteNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"timeouts"})
 }

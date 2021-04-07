@@ -32,5 +32,7 @@ func (r *AwsS3BucketMetric) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsS3BucketMetricTags = map[string]string{}
+
 func awsS3BucketMetricNormalizer(val *dctlcty.CtyAttributes) {
 }

@@ -38,6 +38,8 @@ func (r *AwsIamRole) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsIamRoleTags = map[string]string{}
+
 func awsIamRoleNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"force_detach_policies"})
 }

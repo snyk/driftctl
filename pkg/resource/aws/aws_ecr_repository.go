@@ -42,6 +42,8 @@ func (r *AwsEcrRepository) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsEcrRepositoryTags = map[string]string{}
+
 func awsEcrRepositoryNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"timeouts"})
 }

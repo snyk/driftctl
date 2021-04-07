@@ -43,6 +43,8 @@ func (r *AwsRouteTable) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsRouteTableTags = map[string]string{}
+
 func awsRouteTableNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"route"})
 }

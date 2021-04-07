@@ -46,5 +46,7 @@ func (r *AwsRoute53HealthCheck) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsRoute53HealthCheckTags = map[string]string{}
+
 func awsRoute53HealthCheckNormalizer(val *dctlcty.CtyAttributes) {
 }

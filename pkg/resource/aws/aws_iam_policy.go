@@ -32,6 +32,8 @@ func (r *AwsIamPolicy) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsIamPolicyTags = map[string]string{}
+
 func awsIamPolicyNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"name_prefix"})
 }

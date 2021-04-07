@@ -31,6 +31,8 @@ func (r *AwsKmsAlias) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsKmsAliasTags = map[string]string{}
+
 func awsKmsAliasNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"name"})
 	val.SafeDelete([]string{"name_prefix"})

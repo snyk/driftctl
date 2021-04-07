@@ -32,6 +32,8 @@ func (r *AwsDbSubnetGroup) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsDbSubnetGroupTags = map[string]string{}
+
 func awsDbSubnetGroupNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"name_prefix"})
 }

@@ -76,6 +76,8 @@ func (r *AwsDynamodbTable) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsDynamodbTableTags = map[string]string{}
+
 func awsDynamodbTableNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"timeouts"})
 }

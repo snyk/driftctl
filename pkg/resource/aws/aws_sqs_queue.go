@@ -41,5 +41,7 @@ func (r *AwsSqsQueue) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsSqsQueueTags = map[string]string{}
+
 func awsSqsQueueNormalizer(val *dctlcty.CtyAttributes) {
 }

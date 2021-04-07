@@ -33,6 +33,8 @@ func (r *AwsKeyPair) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsKeyPairTags = map[string]string{}
+
 func awsKeyPairNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"key_name_prefix"})
 	val.SafeDelete([]string{"public_key"})

@@ -48,6 +48,8 @@ func (r *AwsS3BucketNotification) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsS3BucketNotificationTags = map[string]string{}
+
 func awsS3BucketNotificationNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"id"})
 	val.SafeDelete([]string{"bucket"})

@@ -43,6 +43,8 @@ func (r *GithubBranchProtection) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var githubBranchProtectionTags = map[string]string{}
+
 func githubBranchProtectionNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"repository_id"})
 }

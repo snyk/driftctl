@@ -1,7 +1,6 @@
 package analyser
 
 import (
-	"reflect"
 	"sort"
 	"strings"
 
@@ -67,7 +66,6 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 		filteredRemoteResource = append(filteredRemoteResource, remoteRes)
 	}
 
-	normalizers := resource.Normalizers()
 	haveComputedDiff := false
 	for _, stateRes := range resourcesFromState {
 		i, remoteRes, found := findCorrespondingRes(filteredRemoteResource, stateRes)
@@ -85,16 +83,10 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 		filteredRemoteResource = removeResourceByIndex(i, filteredRemoteResource)
 		analysis.AddManaged(stateRes)
 
-		state := dctlcty.AsAttrs(stateRes.CtyValue())
-		rem := dctlcty.AsAttrs(remoteRes.CtyValue())
+		state := dctlcty.AsAttrs(stateRes.CtyValue(), stateRes.TerraformType())
+		rem := dctlcty.AsAttrs(remoteRes.CtyValue(), remoteRes.TerraformType())
 
-		normalize, exists := normalizers[stateRes.TerraformType()]
-		if exists {
-			normalize(&state)
-			normalize(&rem)
-		}
-
-		delta, _ := diff.Diff(state, rem)
+		delta, _ := diff.Diff(state.Attrs, rem.Attrs)
 		if len(delta) > 0 {
 			sort.Slice(delta, func(i, j int) bool {
 				return strings.Join(delta[i].Path, ".") < strings.Join(delta[j].Path, ".") || delta[i].Type < delta[j].Type
@@ -105,7 +97,7 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 					continue
 				}
 				c := Change{Change: change}
-				c.Computed = a.isComputedField(stateRes, c)
+				c.Computed = state.IsComputedField(c.Path)
 				if c.Computed {
 					haveComputedDiff = true
 				}
@@ -154,47 +146,6 @@ func removeResourceByIndex(i int, resources []resource.Resource) []resource.Reso
 		return resources[:len(resources)-1]
 	}
 	return append(resources[:i], resources[i+1:]...)
-}
-
-// isComputedField returns true if the field that generated the diff of a resource
-// has a computed tag
-func (a Analyzer) isComputedField(stateRes resource.Resource, change Change) bool {
-	if field, ok := a.getField(reflect.TypeOf(stateRes), change.Path); ok {
-		return field.Tag.Get("computed") == "true"
-	}
-	return false
-}
-
-// getField recursively finds the deepest field inside a resource depending on
-// its path and its type
-func (a Analyzer) getField(t reflect.Type, path []string) (reflect.StructField, bool) {
-	switch t.Kind() {
-	case reflect.Ptr:
-		return a.getField(t.Elem(), path)
-	case reflect.Slice:
-		return a.getField(t.Elem(), path[1:])
-	default:
-		{
-			if field, ok := t.FieldByName(path[0]); ok && a.hasNestedFields(field.Type) && len(path) > 1 {
-				return a.getField(field.Type, path[1:])
-			} else {
-				return field, ok
-			}
-		}
-	}
-}
-
-// hasNestedFields will return true if the current field is either a struct
-// or a slice of struct
-func (a Analyzer) hasNestedFields(t reflect.Type) bool {
-	switch t.Kind() {
-	case reflect.Ptr:
-		return a.hasNestedFields(t.Elem())
-	case reflect.Slice:
-		return t.Elem().Kind() == reflect.Struct
-	default:
-		return t.Kind() == reflect.Struct
-	}
 }
 
 // hasUnmanagedSecurityGroupRules returns true if we find at least one unmanaged

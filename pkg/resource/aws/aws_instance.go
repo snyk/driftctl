@@ -107,6 +107,8 @@ func (r *AwsInstance) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsInstanceTags = map[string]string{}
+
 func awsInstanceNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"volume_tags"})
 	val.SafeDelete([]string{"timeouts"})

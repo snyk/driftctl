@@ -33,5 +33,7 @@ func (r *AwsIamAccessKey) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsIamAccessKeyTags = map[string]string{}
+
 func awsIamAccessKeyNormalizer(val *dctlcty.CtyAttributes) {
 }

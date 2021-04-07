@@ -40,6 +40,8 @@ func (r *AwsEbsSnapshot) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsEbsSnapshotTags = map[string]string{}
+
 func awsEbsSnapshotNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"timeouts"})
 }

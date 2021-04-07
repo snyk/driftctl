@@ -78,7 +78,7 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	supplierLibrary.AddSupplier(NewKMSAliasSupplier(provider))
 	supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider))
 
-	aws.InitNormalizers()
+	aws.InitResourcesMetadata()
 
 	return nil
 }

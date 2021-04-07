@@ -71,6 +71,8 @@ func (r *GithubRepository) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var githubRepositoryTags = map[string]string{}
+
 func githubRepositoryNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"etag"})
 	val.SafeDelete([]string{"auto_init"})

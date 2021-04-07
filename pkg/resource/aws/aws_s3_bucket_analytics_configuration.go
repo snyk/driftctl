@@ -45,5 +45,7 @@ func (r *AwsS3BucketAnalyticsConfiguration) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
+var awsS3BucketAnalyticsConfigurationTags = map[string]string{}
+
 func awsS3BucketAnalyticsConfigurationNormalizer(val *dctlcty.CtyAttributes) {
 }
