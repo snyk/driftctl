@@ -37,26 +37,32 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 						callback(&s3.ListObjectsV2Output{
 							Contents: []*s3.Object{
 								{
-									Key: awssdk.String("a/nested/prefix/state1"),
+									Key:  awssdk.String("a/nested/prefix/state1"),
+									Size: awssdk.Int64(5),
 								},
 								{
-									Key: awssdk.String("a/nested/prefix/state2"),
+									Key:  awssdk.String("a/nested/prefix/state2"),
+									Size: awssdk.Int64(2),
 								},
 								{
-									Key: awssdk.String("a/nested/prefix/state3"),
+									Key:  awssdk.String("a/nested/prefix/state3"),
+									Size: awssdk.Int64(1),
 								},
 							},
 						}, false)
 						callback(&s3.ListObjectsV2Output{
 							Contents: []*s3.Object{
 								{
-									Key: awssdk.String("a/nested/prefix/state4"),
+									Key:  awssdk.String("a/nested/prefix/state4"),
+									Size: awssdk.Int64(5),
 								},
 								{
-									Key: awssdk.String("a/nested/prefix/state5"),
+									Key:  awssdk.String("a/nested/prefix/state5"),
+									Size: awssdk.Int64(5),
 								},
 								{
-									Key: awssdk.String("a/nested/prefix/state6"),
+									Key:  awssdk.String("a/nested/prefix/state6"),
+									Size: awssdk.Int64(5),
 								},
 							},
 						}, true)
@@ -71,6 +77,48 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 				"bucket-name/a/nested/prefix/state4",
 				"bucket-name/a/nested/prefix/state5",
 				"bucket-name/a/nested/prefix/state6",
+			},
+		},
+		{
+			name: "test that directories objects are filtered",
+			config: config.SupplierConfig{
+				Path: "bucket-name/a/nested/prefix",
+			},
+			mocks: func(client *mocks.FakeS3) {
+				input := &s3.ListObjectsV2Input{
+					Bucket: awssdk.String("bucket-name"),
+					Prefix: awssdk.String("a/nested/prefix"),
+				}
+				client.On(
+					"ListObjectsV2Pages",
+					input,
+					mock.MatchedBy(func(callback func(res *s3.ListObjectsV2Output, lastPage bool) bool) bool {
+						callback(&s3.ListObjectsV2Output{
+							Contents: []*s3.Object{
+								{
+									Key:  awssdk.String("a/nested/prefix/state1"),
+									Size: awssdk.Int64(0),
+								},
+								{
+									Key:  awssdk.String("a/nested/prefix/state2"),
+									Size: nil,
+								},
+								{
+									Key:  awssdk.String("a/nested/prefix/state3"),
+									Size: awssdk.Int64(-1),
+								},
+								{
+									Key:  awssdk.String("a/nested/prefix/state4"),
+									Size: awssdk.Int64(1),
+								},
+							},
+						}, true)
+						return true
+					}),
+				).Return(nil)
+			},
+			want: []string{
+				"bucket-name/a/nested/prefix/state4",
 			},
 		},
 		{
