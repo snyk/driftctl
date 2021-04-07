@@ -6,8 +6,12 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/cloudskiff/driftctl/pkg/terraform"
+
 	"github.com/r3labs/diff/v2"
 )
 
@@ -96,7 +100,11 @@ func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := NewAwsBucketPolicyExpander()
+
+			factory := &terraform.MockResourceFactory{}
+			factory.On("CreateResource", mock.Anything, "aws_s3_bucket_policy").Once().Return(nil, nil)
+
+			m := NewAwsBucketPolicyExpander(factory)
 			err := m.Execute(&[]resource.Resource{}, &tt.resourcesFromState)
 			if err != nil {
 				t.Fatal(err)

@@ -1,16 +1,21 @@
 package middlewares
 
 import (
+	"github.com/sirupsen/logrus"
+
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	"github.com/sirupsen/logrus"
 )
 
 // Explodes policy found in aws_sns_topic from state resources to aws_sns_topic_policy resources
-type AwsSNSTopicPolicyExpander struct{}
+type AwsSNSTopicPolicyExpander struct {
+	resourceFactory resource.ResourceFactory
+}
 
-func NewAwsSNSTopicPolicyExpander() AwsSNSTopicPolicyExpander {
-	return AwsSNSTopicPolicyExpander{}
+func NewAwsSNSTopicPolicyExpander(resourceFactory resource.ResourceFactory) AwsSNSTopicPolicyExpander {
+	return AwsSNSTopicPolicyExpander{
+		resourceFactory,
+	}
 }
 
 func (m AwsSNSTopicPolicyExpander) Execute(_, resourcesFromState *[]resource.Resource) error {
@@ -44,10 +49,21 @@ func (m *AwsSNSTopicPolicyExpander) splitPolicy(topic *aws.AwsSnsTopic, results 
 		return nil
 	}
 
+	data := map[string]interface{}{
+		"arn":    topic.Arn,
+		"id":     topic.Id,
+		"policy": topic.Policy,
+	}
+	ctyVal, err := m.resourceFactory.CreateResource(data, "aws_sns_topic_policy")
+	if err != nil {
+		return err
+	}
+
 	newPolicy := &aws.AwsSnsTopicPolicy{
 		Id:     topic.Id,
 		Arn:    topic.Arn,
 		Policy: topic.Policy,
+		CtyVal: ctyVal,
 	}
 
 	normalized, err := newPolicy.NormalizeForState()

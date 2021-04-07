@@ -1,6 +1,9 @@
 package terraform
 
 import (
+	"strings"
+
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -36,4 +39,23 @@ func (p *ProviderLibrary) Cleanup() {
 		}).Debug("Closing provider")
 		provider.Cleanup()
 	}
+}
+
+func (p *ProviderLibrary) GetProviderForResourceType(resType string) (TerraformProvider, error) {
+
+	var name string
+
+	if strings.HasPrefix(resType, AWS) {
+		name = AWS
+	}
+
+	if strings.HasPrefix(resType, GITHUB) {
+		name = GITHUB
+	}
+
+	if name != "" {
+		return p.Provider(name), nil
+	}
+
+	return nil, errors.New("Unable to resolve provider for resource")
 }

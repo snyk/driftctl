@@ -6,8 +6,12 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/cloudskiff/driftctl/pkg/terraform"
+
 	"github.com/r3labs/diff/v2"
 )
 
@@ -19,6 +23,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
+		mocks   func(factory *terraform.MockResourceFactory)
 		wantErr bool
 	}{
 		{
@@ -118,12 +123,21 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 					},
 				},
 			},
+			func(factory *terraform.MockResourceFactory) {
+				factory.On("CreateResource", mock.Anything, "aws_ebs_volume").Times(2).Return(nil, nil)
+			},
 			false,
 		},
 	}
 	for _, c := range tests {
 		t.Run(c.name, func(tt *testing.T) {
-			a := AwsInstanceBlockDeviceResourceMapper{}
+
+			factory := &terraform.MockResourceFactory{}
+			if c.mocks != nil {
+				c.mocks(factory)
+			}
+
+			a := NewAwsInstanceBlockDeviceResourceMapper(factory)
 			if err := a.Execute(&[]resource.Resource{}, c.args.resourcesFromState); (err != nil) != c.wantErr {
 				t.Errorf("Execute() error = %v, wantErr %v", err, c.wantErr)
 			}

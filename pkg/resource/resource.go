@@ -13,6 +13,10 @@ type Resource interface {
 	CtyValue() *cty.Value
 }
 
+type ResourceFactory interface {
+	CreateResource(data interface{}, ty string) (*cty.Value, error)
+}
+
 type SerializableResource struct {
 	Resource
 }

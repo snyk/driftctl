@@ -4,10 +4,11 @@ import (
 	"fmt"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
+	"github.com/sirupsen/logrus"
+
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	"github.com/sirupsen/logrus"
 )
 
 type invalidRouteAlert struct {
@@ -29,12 +30,14 @@ func (i *invalidRouteAlert) ShouldIgnoreResource() bool {
 
 // Explodes routes found in aws_default_route_table.route and aws_route_table.route to dedicated resources
 type AwsRouteTableExpander struct {
-	alerter alerter.AlerterInterface
+	alerter         alerter.AlerterInterface
+	resourceFactory resource.ResourceFactory
 }
 
-func NewAwsRouteTableExpander(alerter alerter.AlerterInterface) AwsRouteTableExpander {
+func NewAwsRouteTableExpander(alerter alerter.AlerterInterface, resourceFactory resource.ResourceFactory) AwsRouteTableExpander {
 	return AwsRouteTableExpander{
 		alerter,
+		resourceFactory,
 	}
 }
 
@@ -80,6 +83,29 @@ func (m *AwsRouteTableExpander) handleTable(table *aws.AwsRouteTable, results *[
 			m.alerter.SendAlert(aws.AwsRouteTableResourceType, newInvalidRouteAlert(aws.AwsRouteTableResourceType, table.Id))
 			continue
 		}
+		data := map[string]interface{}{
+			"destination_cidr_block":      route.CidrBlock,
+			"destination_ipv6_cidr_block": route.Ipv6CidrBlock,
+			"destination_prefix_list_id":  "",
+			"egress_only_gateway_id":      route.EgressOnlyGatewayId,
+			"gateway_id":                  route.GatewayId,
+			"id":                          routeId,
+			"instance_id":                 route.InstanceId,
+			"instance_owner_id":           "",
+			"local_gateway_id":            route.LocalGatewayId,
+			"nat_gateway_id":              route.NatGatewayId,
+			"network_interface_id":        route.NetworkInterfaceId,
+			"origin":                      "CreateRoute",
+			"route_table_id":              table.Id,
+			"state":                       "active",
+			"transit_gateway_id":          route.TransitGatewayId,
+			"vpc_endpoint_id":             route.VpcEndpointId,
+			"vpc_peering_connection_id":   route.VpcPeeringConnectionId,
+		}
+		ctyVal, err := m.resourceFactory.CreateResource(data, "aws_route")
+		if err != nil {
+			return err
+		}
 		newRouteFromTable := &aws.AwsRoute{
 			DestinationCidrBlock:     route.CidrBlock,
 			DestinationIpv6CidrBlock: route.Ipv6CidrBlock,
@@ -98,6 +124,7 @@ func (m *AwsRouteTableExpander) handleTable(table *aws.AwsRouteTable, results *[
 			TransitGatewayId:         route.TransitGatewayId,
 			VpcEndpointId:            route.VpcEndpointId,
 			VpcPeeringConnectionId:   route.VpcPeeringConnectionId,
+			CtyVal:                   ctyVal,
 		}
 		normalizedRes, err := newRouteFromTable.NormalizeForState()
 		if err != nil {
@@ -125,6 +152,28 @@ func (m *AwsRouteTableExpander) handleDefaultTable(table *aws.AwsDefaultRouteTab
 			m.alerter.SendAlert(aws.AwsDefaultRouteTableResourceType, newInvalidRouteAlert(aws.AwsDefaultRouteTableResourceType, table.Id))
 			continue
 		}
+		data := map[string]interface{}{
+			"destination_cidr_block":      route.CidrBlock,
+			"destination_ipv6_cidr_block": route.Ipv6CidrBlock,
+			"destination_prefix_list_id":  "",
+			"egress_only_gateway_id":      route.EgressOnlyGatewayId,
+			"gateway_id":                  route.GatewayId,
+			"id":                          routeId,
+			"instance_id":                 route.InstanceId,
+			"instance_owner_id":           "",
+			"nat_gateway_id":              route.NatGatewayId,
+			"network_interface_id":        route.NetworkInterfaceId,
+			"origin":                      "CreateRoute",
+			"route_table_id":              table.Id,
+			"state":                       "active",
+			"transit_gateway_id":          route.TransitGatewayId,
+			"vpc_endpoint_id":             route.VpcEndpointId,
+			"vpc_peering_connection_id":   route.VpcPeeringConnectionId,
+		}
+		ctyVal, err := m.resourceFactory.CreateResource(data, "aws_route")
+		if err != nil {
+			return err
+		}
 		newRouteFromTable := &aws.AwsRoute{
 			DestinationCidrBlock:     route.CidrBlock,
 			DestinationIpv6CidrBlock: route.Ipv6CidrBlock,
@@ -142,6 +191,7 @@ func (m *AwsRouteTableExpander) handleDefaultTable(table *aws.AwsDefaultRouteTab
 			TransitGatewayId:         route.TransitGatewayId,
 			VpcEndpointId:            route.VpcEndpointId,
 			VpcPeeringConnectionId:   route.VpcPeeringConnectionId,
+			CtyVal:                   ctyVal,
 		}
 		normalizedRes, err := newRouteFromTable.NormalizeForState()
 		if err != nil {

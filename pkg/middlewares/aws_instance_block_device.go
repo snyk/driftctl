@@ -2,16 +2,19 @@ package middlewares
 
 import (
 	awssdk "github.com/aws/aws-sdk-go/aws"
+	"github.com/sirupsen/logrus"
+
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	"github.com/sirupsen/logrus"
 )
 
 // Remove root_block_device from aws_instance resources and create dedicated aws_ebs_volume resources
-type AwsInstanceBlockDeviceResourceMapper struct{}
+type AwsInstanceBlockDeviceResourceMapper struct {
+	resourceFactory resource.ResourceFactory
+}
 
-func NewAwsInstanceBlockDeviceResourceMapper() AwsInstanceBlockDeviceResourceMapper {
-	return AwsInstanceBlockDeviceResourceMapper{}
+func NewAwsInstanceBlockDeviceResourceMapper(resourceFactory resource.ResourceFactory) AwsInstanceBlockDeviceResourceMapper {
+	return AwsInstanceBlockDeviceResourceMapper{resourceFactory: resourceFactory}
 }
 
 func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
@@ -32,6 +35,21 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 					"volume":   *rootBlock.VolumeId,
 					"instance": instance.TerraformId(),
 				}).Debug("Creating aws_ebs_volume from aws_instance.root_block_device")
+				data := map[string]interface{}{
+					"availability_zone":    instance.AvailabilityZone,
+					"encrypted":            rootBlock.Encrypted,
+					"id":                   *rootBlock.VolumeId,
+					"iops":                 rootBlock.Iops,
+					"kms_key_id":           rootBlock.KmsKeyId,
+					"size":                 rootBlock.VolumeSize,
+					"type":                 rootBlock.VolumeType,
+					"multi_attach_enabled": false,
+					"tags":                 instance.VolumeTags,
+				}
+				ctyVal, err := a.resourceFactory.CreateResource(data, "aws_ebs_volume")
+				if err != nil {
+					return err
+				}
 				ebsVolume := aws.AwsEbsVolume{
 					AvailabilityZone:   instance.AvailabilityZone,
 					Encrypted:          rootBlock.Encrypted,
@@ -42,6 +60,7 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 					Type:               rootBlock.VolumeType,
 					MultiAttachEnabled: awssdk.Bool(false),
 					Tags:               instance.VolumeTags,
+					CtyVal:             ctyVal,
 				}
 				newStateResources = append(newStateResources, &ebsVolume)
 			}
@@ -53,6 +72,21 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 					"volume":   *blockDevice.VolumeId,
 					"instance": instance.TerraformId(),
 				}).Debug("Creating aws_ebs_volume from aws_instance.ebs_block_device")
+				data := map[string]interface{}{
+					"availability_zone":    instance.AvailabilityZone,
+					"encrypted":            blockDevice.Encrypted,
+					"id":                   *blockDevice.VolumeId,
+					"iops":                 blockDevice.Iops,
+					"kms_key_id":           blockDevice.KmsKeyId,
+					"size":                 blockDevice.VolumeSize,
+					"type":                 blockDevice.VolumeType,
+					"multi_attach_enabled": false,
+					"tags":                 instance.VolumeTags,
+				}
+				ctyVal, err := a.resourceFactory.CreateResource(data, "aws_ebs_volume")
+				if err != nil {
+					return err
+				}
 				ebsVolume := aws.AwsEbsVolume{
 					AvailabilityZone:   instance.AvailabilityZone,
 					Encrypted:          blockDevice.Encrypted,
@@ -63,6 +97,7 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 					Type:               blockDevice.VolumeType,
 					MultiAttachEnabled: awssdk.Bool(false),
 					Tags:               instance.VolumeTags,
+					CtyVal:             ctyVal,
 				}
 				newStateResources = append(newStateResources, &ebsVolume)
 			}

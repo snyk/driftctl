@@ -8,10 +8,14 @@ import (
 )
 
 // Split security group rule if it needs to given its attributes
-type VPCSecurityGroupRuleSanitizer struct{}
+type VPCSecurityGroupRuleSanitizer struct {
+	resourceFactory resource.ResourceFactory
+}
 
-func NewVPCSecurityGroupRuleSanitizer() VPCSecurityGroupRuleSanitizer {
-	return VPCSecurityGroupRuleSanitizer{}
+func NewVPCSecurityGroupRuleSanitizer(resourceFactory resource.ResourceFactory) VPCSecurityGroupRuleSanitizer {
+	return VPCSecurityGroupRuleSanitizer{
+		resourceFactory,
+	}
 }
 
 func (m VPCSecurityGroupRuleSanitizer) Execute(_, resourcesFromState *[]resource.Resource) error {
@@ -33,94 +37,101 @@ func (m VPCSecurityGroupRuleSanitizer) Execute(_, resourcesFromState *[]resource
 
 		if securityGroupRule.CidrBlocks != nil && len(*securityGroupRule.CidrBlocks) > 0 {
 			for _, ipRange := range *securityGroupRule.CidrBlocks {
-				rule := resourceaws.AwsSecurityGroupRule{
-					Type:            securityGroupRule.Type,
-					Description:     securityGroupRule.Description,
-					SecurityGroupId: securityGroupRule.SecurityGroupId,
-					Protocol:        securityGroupRule.Protocol,
-					FromPort:        securityGroupRule.FromPort,
-					ToPort:          securityGroupRule.ToPort,
-					CidrBlocks:      &[]string{ipRange},
-					Ipv6CidrBlocks:  &[]string{},
-					PrefixListIds:   &[]string{},
+				rule := *securityGroupRule
+				rule.CidrBlocks = &[]string{ipRange}
+				rule.Ipv6CidrBlocks = &[]string{}
+				rule.PrefixListIds = &[]string{}
+				res, err := m.createRule(&rule)
+				if err != nil {
+					return err
 				}
-				rule.Id = rule.CreateIdHash()
 				logrus.WithFields(logrus.Fields{
 					"formerRuleId": securityGroupRule.TerraformId(),
 					"newRuleId":    rule.TerraformId(),
 				}).Debug("Splitting aws_security_group_rule")
-				newStateResources = append(newStateResources, &rule)
+				newStateResources = append(newStateResources, res)
 			}
 		}
 		if securityGroupRule.Ipv6CidrBlocks != nil && len(*securityGroupRule.Ipv6CidrBlocks) > 0 {
 			for _, ipRange := range *securityGroupRule.Ipv6CidrBlocks {
-				rule := resourceaws.AwsSecurityGroupRule{
-					Type:            securityGroupRule.Type,
-					Description:     securityGroupRule.Description,
-					SecurityGroupId: securityGroupRule.SecurityGroupId,
-					Protocol:        securityGroupRule.Protocol,
-					FromPort:        securityGroupRule.FromPort,
-					ToPort:          securityGroupRule.ToPort,
-					CidrBlocks:      &[]string{},
-					Ipv6CidrBlocks:  &[]string{ipRange},
-					PrefixListIds:   &[]string{},
+				rule := *securityGroupRule
+				rule.CidrBlocks = &[]string{}
+				rule.Ipv6CidrBlocks = &[]string{ipRange}
+				rule.PrefixListIds = &[]string{}
+				res, err := m.createRule(&rule)
+				if err != nil {
+					return err
 				}
-				rule.Id = rule.CreateIdHash()
 				logrus.WithFields(logrus.Fields{
 					"formerRuleId": securityGroupRule.TerraformId(),
 					"newRuleId":    rule.TerraformId(),
 				}).Debug("Splitting aws_security_group_rule")
-				newStateResources = append(newStateResources, &rule)
+				newStateResources = append(newStateResources, res)
 			}
 		}
 		if securityGroupRule.PrefixListIds != nil && len(*securityGroupRule.PrefixListIds) > 0 {
 			for _, listId := range *securityGroupRule.PrefixListIds {
-				rule := resourceaws.AwsSecurityGroupRule{
-					Type:            securityGroupRule.Type,
-					Description:     securityGroupRule.Description,
-					SecurityGroupId: securityGroupRule.SecurityGroupId,
-					Protocol:        securityGroupRule.Protocol,
-					FromPort:        securityGroupRule.FromPort,
-					ToPort:          securityGroupRule.ToPort,
-					CidrBlocks:      &[]string{},
-					Ipv6CidrBlocks:  &[]string{},
-					PrefixListIds:   &[]string{listId},
+				rule := *securityGroupRule
+				rule.CidrBlocks = &[]string{}
+				rule.Ipv6CidrBlocks = &[]string{}
+				rule.PrefixListIds = &[]string{listId}
+				res, err := m.createRule(&rule)
+				if err != nil {
+					return err
 				}
-				rule.Id = rule.CreateIdHash()
 				logrus.WithFields(logrus.Fields{
 					"formerRuleId": securityGroupRule.TerraformId(),
 					"newRuleId":    rule.TerraformId(),
 				}).Debug("Splitting aws_security_group_rule")
-				newStateResources = append(newStateResources, &rule)
+				newStateResources = append(newStateResources, res)
 			}
 		}
 		if (securityGroupRule.Self != nil && *securityGroupRule.Self) ||
 			(securityGroupRule.SourceSecurityGroupId != nil && *securityGroupRule.SourceSecurityGroupId != "") {
-			rule := resourceaws.AwsSecurityGroupRule{
-				Type:                  securityGroupRule.Type,
-				Description:           securityGroupRule.Description,
-				SecurityGroupId:       securityGroupRule.SecurityGroupId,
-				Protocol:              securityGroupRule.Protocol,
-				FromPort:              securityGroupRule.FromPort,
-				ToPort:                securityGroupRule.ToPort,
-				CidrBlocks:            &[]string{},
-				Ipv6CidrBlocks:        &[]string{},
-				PrefixListIds:         &[]string{},
-				Self:                  securityGroupRule.Self,
-				SourceSecurityGroupId: securityGroupRule.SourceSecurityGroupId,
+			rule := *securityGroupRule
+			rule.CidrBlocks = &[]string{}
+			rule.Ipv6CidrBlocks = &[]string{}
+			rule.PrefixListIds = &[]string{}
+			res, err := m.createRule(&rule)
+			if err != nil {
+				return err
 			}
 			rule.Id = rule.CreateIdHash()
 			logrus.WithFields(logrus.Fields{
 				"formerRuleId": securityGroupRule.TerraformId(),
 				"newRuleId":    rule.TerraformId(),
 			}).Debug("Splitting aws_security_group_rule")
-			newStateResources = append(newStateResources, &rule)
+			newStateResources = append(newStateResources, res)
 		}
 	}
 
 	*resourcesFromState = newStateResources
 
 	return nil
+}
+
+func (m *VPCSecurityGroupRuleSanitizer) createRule(res *resourceaws.AwsSecurityGroupRule) (*resourceaws.AwsSecurityGroupRule, error) {
+	res.Id = res.CreateIdHash()
+	data := map[string]interface{}{
+		"id":                       res.Id,
+		"cidr_blocks":              res.CidrBlocks,
+		"description":              res.Description,
+		"from_port":                res.FromPort,
+		"ipv6_cidr_blocks":         res.Ipv6CidrBlocks,
+		"prefix_list_ids":          res.PrefixListIds,
+		"protocol":                 res.Protocol,
+		"security_group_id":        res.SecurityGroupId,
+		"self":                     res.Self,
+		"source_security_group_id": res.SourceSecurityGroupId,
+		"to_port":                  res.ToPort,
+		"type":                     res.Type,
+	}
+	ctyVal, err := m.resourceFactory.CreateResource(data, "aws_security_group_rule")
+	if err != nil {
+		return nil, err
+	}
+	res.CtyVal = ctyVal
+	return res, err
 }
 
 func shouldBeSplit(rule *resourceaws.AwsSecurityGroupRule) bool {

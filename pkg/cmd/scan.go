@@ -171,7 +171,10 @@ func scanRun(opts *ScanOptions) error {
 	if err != nil {
 		return err
 	}
-	ctl := pkg.NewDriftCTL(scanner, iacSupplier, opts.Filter, alerter)
+
+	resFactory := terraform.NewTerraformResourceFactory(providerLibrary)
+
+	ctl := pkg.NewDriftCTL(scanner, iacSupplier, opts.Filter, alerter, resFactory)
 
 	go func() {
 		<-c

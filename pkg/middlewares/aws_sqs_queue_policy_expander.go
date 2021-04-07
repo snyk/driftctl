@@ -2,16 +2,21 @@ package middlewares
 
 import (
 	awssdk "github.com/aws/aws-sdk-go/aws"
+	"github.com/sirupsen/logrus"
+
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	"github.com/sirupsen/logrus"
 )
 
 // Explodes policy found in aws_sqs_queue.policy from state resources to dedicated resources
-type AwsSqsQueuePolicyExpander struct{}
+type AwsSqsQueuePolicyExpander struct {
+	resourceFactory resource.ResourceFactory
+}
 
-func NewAwsSqsQueuePolicyExpander() AwsSqsQueuePolicyExpander {
-	return AwsSqsQueuePolicyExpander{}
+func NewAwsSqsQueuePolicyExpander(resourceFactory resource.ResourceFactory) AwsSqsQueuePolicyExpander {
+	return AwsSqsQueuePolicyExpander{
+		resourceFactory,
+	}
 }
 
 func (m AwsSqsQueuePolicyExpander) Execute(_, resourcesFromState *[]resource.Resource) error {
@@ -45,10 +50,20 @@ func (m AwsSqsQueuePolicyExpander) Execute(_, resourcesFromState *[]resource.Res
 }
 
 func (m *AwsSqsQueuePolicyExpander) handlePolicy(queue *aws.AwsSqsQueue, results *[]resource.Resource) error {
+	data := map[string]interface{}{
+		"queue_url": queue.Id,
+		"id":        queue.Id,
+		"policy":    queue.Policy,
+	}
+	ctyVal, err := m.resourceFactory.CreateResource(data, "aws_sqs_queue_policy")
+	if err != nil {
+		return err
+	}
 	newPolicy := &aws.AwsSqsQueuePolicy{
 		Id:       queue.Id,
 		QueueUrl: awssdk.String(queue.Id),
 		Policy:   queue.Policy,
+		CtyVal:   ctyVal,
 	}
 	normalizedRes, err := newPolicy.NormalizeForState()
 	if err != nil {
