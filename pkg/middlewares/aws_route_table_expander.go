@@ -224,15 +224,9 @@ func (m *AwsRouteTableExpander) handleDefaultTable(table *aws.AwsDefaultRouteTab
 
 func (m *AwsRouteTableExpander) routeExists(routeId string, resourcesFromState []resource.Resource) bool {
 	for _, res := range resourcesFromState {
-		if res.TerraformType() != aws.AwsRouteResourceType {
-			continue
+		if res.TerraformType() == aws.AwsRouteResourceType && res.TerraformId() == routeId {
+			return true
 		}
-
-		if res.TerraformId() != routeId {
-			continue
-		}
-
-		return true
 	}
 
 	return false
