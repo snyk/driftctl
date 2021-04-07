@@ -1,10 +1,12 @@
 package backend
 
 import (
+	"bytes"
 	"io"
 	"net/http"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 const BackendKeyHTTP = "http"
@@ -29,6 +31,18 @@ func NewHTTPReader(rawURL string, opts *Options) (*HTTPBackend, error) {
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
+	}
+
+	buf := new(bytes.Buffer)
+	_, err = buf.ReadFrom(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	logrus.WithFields(logrus.Fields{"body": buf.String()}).Trace("HTTP(s) backend response")
+
+	if res.StatusCode < 200 || res.StatusCode >= 400 {
+		return nil, errors.Errorf("error requesting HTTP(s) backend state: status code: %d", res.StatusCode)
 	}
 
 	return &HTTPBackend{rawURL, res.Body}, nil
