@@ -5,7 +5,7 @@ orbs:
 jobs:
   build:
     docker:
-      - image: golang:1.16
+      - image: golang:1.16.2
     steps:
       - checkout
       - run: make release

@@ -44,7 +44,7 @@ if [ $ENV != "release" ]; then
     VERSION="${GIT_COMMIT}${GIT_DIRTY}"
 fi
 
-echo "ARCH: $os_archs"
+echo "ARCH: ${os_archs[*]}"
 
 # In release mode we don't want debug information in the binary
 # We also set the build env to release
