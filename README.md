@@ -26,6 +26,13 @@
   :warning: <strong>This tool is still in beta state and will evolve in the future with potential breaking changes</strong> :warning:
 </p>
 
+<details>
+  <summary>Packaging status</summary>
+  <a href="https://repology.org/project/driftctl/versions">
+    <img src="https://repology.org/badge/vertical-allrepos/driftctl.svg" alt="Packaging status">
+  </a>
+</details>
+
 ## Why driftctl ?
 
 Infrastructure as code is awesome, but there are too many moving parts: codebase, state file, actual cloud state. Things tend to drift.
