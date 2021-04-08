@@ -17,7 +17,7 @@ type AwsInstance struct {
 	HostId                            *string           `cty:"host_id" computed:"true"`
 	IamInstanceProfile                *string           `cty:"iam_instance_profile"`
 	Id                                string            `cty:"id" computed:"true"`
-	InstanceInitiatedShutdownBehavior *string           `cty:"instance_initiated_shutdown_behavior"`
+	InstanceInitiatedShutdownBehavior *string           `cty:"instance_initiated_shutdown_behavior" diff:"-"`
 	InstanceState                     *string           `cty:"instance_state" computed:"true"`
 	InstanceType                      *string           `cty:"instance_type"`
 	Ipv6AddressCount                  *int              `cty:"ipv6_address_count" computed:"true"`
