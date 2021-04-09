@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"path/filepath"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 
@@ -9,9 +9,10 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 )
 
-const defaultIamRolePathGlob = "/aws-service-role/*"
+const defaultIamRolePathPrefix = "/aws-service-role/"
 
-// When scanning a brand new AWS account, some users may see irrelevant results about default AWS role policies.
+// AwsDefaults represents service-linked AWS resources
+// When scanning a AWS account, some users may see irrelevant results about default AWS roles or role policies.
 // We ignore these resources by default when strict mode is disabled.
 type AwsDefaults struct{}
 
@@ -19,189 +20,109 @@ func NewAwsDefaults() AwsDefaults {
 	return AwsDefaults{}
 }
 
-func awsIamRoleDefaults(remoteResources, resourcesFromState *[]resource.Resource) error {
-	newRemoteResources := make([]resource.Resource, 0)
+func (m AwsDefaults) awsIamRoleDefaults(remoteResources []resource.Resource) []resource.Resource {
+	resourcesToIgnore := make([]resource.Resource, 0)
 
-	for _, remoteResource := range *remoteResources {
+	for _, remoteResource := range remoteResources {
 		// Ignore all resources other than iam role
 		if remoteResource.TerraformType() != aws.AwsIamRoleResourceType {
-			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
 
-		existInState := false
-		for _, stateResource := range *resourcesFromState {
-			if resource.IsSameResource(remoteResource, stateResource) {
-				existInState = true
-				break
-			}
+		if match := strings.HasPrefix(*remoteResource.(*aws.AwsIamRole).Path, defaultIamRolePathPrefix); match {
+			resourcesToIgnore = append(resourcesToIgnore, remoteResource)
 		}
-
-		if existInState {
-			newRemoteResources = append(newRemoteResources, remoteResource)
-			continue
-		}
-
-		match, err := filepath.Match(defaultIamRolePathGlob, *remoteResource.(*aws.AwsIamRole).Path)
-		if err != nil {
-			return err
-		}
-
-		if !match {
-			newRemoteResources = append(newRemoteResources, remoteResource)
-			continue
-		}
-
-		logrus.WithFields(logrus.Fields{
-			"id":   remoteResource.TerraformId(),
-			"type": remoteResource.TerraformType(),
-		}).Debug("Ignoring default iam role as it is not managed by IaC")
 	}
 
-	*remoteResources = newRemoteResources
-
-	return nil
+	return resourcesToIgnore
 }
 
-func awsIamPolicyAttachmentDefaults(remoteResources, resourcesFromState *[]resource.Resource) error {
-	newRemoteResources := make([]resource.Resource, 0)
+func (m AwsDefaults) awsIamPolicyAttachmentDefaults(remoteResources []resource.Resource) []resource.Resource {
+	resourcesToIgnore := make([]resource.Resource, 0)
 
-	for _, remoteResource := range *remoteResources {
+	for _, remoteResource := range remoteResources {
 		// Ignore all resources other than iam policy attachment
 		if remoteResource.TerraformType() != aws.AwsIamPolicyAttachmentResourceType {
-			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
 
-		existInState := false
-		for _, stateResource := range *resourcesFromState {
-			if resource.IsSameResource(remoteResource, stateResource) {
-				existInState = true
-				break
-			}
-		}
-
-		if existInState {
-			newRemoteResources = append(newRemoteResources, remoteResource)
-			continue
-		}
-
+		defaultRolesCount := 0
 		for _, roleId := range *remoteResource.(*aws.AwsIamPolicyAttachment).Roles {
 			var role *aws.AwsIamRole
-			for _, res := range *remoteResources {
-				if res.TerraformType() != aws.AwsIamRoleResourceType {
-					continue
-				}
-
-				if res.(*aws.AwsIamRole).Id == roleId {
+			for _, res := range remoteResources {
+				if res.TerraformType() == aws.AwsIamRoleResourceType && res.TerraformId() == roleId {
 					role = res.(*aws.AwsIamRole)
+					break
 				}
 			}
 
-			// If we couldn't find the linked role, don't ignore the resource
-			if role == nil {
-				newRemoteResources = append(newRemoteResources, remoteResource)
-				continue
-			}
-
-			match, err := filepath.Match(defaultIamRolePathGlob, *role.Path)
-			if err != nil {
-				return err
-			}
-
-			if !match {
-				newRemoteResources = append(newRemoteResources, remoteResource)
-				continue
+			if match := strings.HasPrefix(*role.Path, defaultIamRolePathPrefix); match {
+				defaultRolesCount++
 			}
 		}
 
-		logrus.WithFields(logrus.Fields{
-			"id":   remoteResource.TerraformId(),
-			"type": remoteResource.TerraformType(),
-		}).Debug("Ignoring default iam policy attachment as it is not managed by IaC")
+		// Check if all of the policy's roles are default AWS roles
+		if defaultRolesCount == len(*remoteResource.(*aws.AwsIamPolicyAttachment).Roles) {
+			resourcesToIgnore = append(resourcesToIgnore, remoteResource)
+		}
 	}
 
-	*remoteResources = newRemoteResources
-
-	return nil
+	return resourcesToIgnore
 }
 
-func awsIamRolePolicyDefaults(remoteResources, resourcesFromState *[]resource.Resource) error {
-	newRemoteResources := make([]resource.Resource, 0)
+func (m AwsDefaults) awsIamRolePolicyDefaults(remoteResources []resource.Resource) []resource.Resource {
+	resourcesToIgnore := make([]resource.Resource, 0)
 
-	for _, remoteResource := range *remoteResources {
+	for _, remoteResource := range remoteResources {
 		// Ignore all resources other than role policy
 		if remoteResource.TerraformType() != aws.AwsIamRolePolicyResourceType {
-			newRemoteResources = append(newRemoteResources, remoteResource)
-			continue
-		}
-
-		existInState := false
-		for _, stateResource := range *resourcesFromState {
-			if resource.IsSameResource(remoteResource, stateResource) {
-				existInState = true
-				break
-			}
-		}
-
-		if existInState {
-			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
 
 		var role *aws.AwsIamRole
-		for _, res := range *remoteResources {
-			if res.TerraformType() != aws.AwsIamRoleResourceType {
-				continue
-			}
-
-			if res.(*aws.AwsIamRole).Id == *remoteResource.(*aws.AwsIamRolePolicy).Role {
+		for _, res := range remoteResources {
+			if res.TerraformType() == aws.AwsIamRoleResourceType && res.TerraformId() == *remoteResource.(*aws.AwsIamRolePolicy).Role {
 				role = res.(*aws.AwsIamRole)
+				break
 			}
 		}
 
-		// If we couldn't find the linked role, don't ignore the resource
-		if role == nil {
-			newRemoteResources = append(newRemoteResources, remoteResource)
-			continue
+		if match := strings.HasPrefix(*role.Path, defaultIamRolePathPrefix); match {
+			resourcesToIgnore = append(resourcesToIgnore, remoteResource)
 		}
-
-		match, err := filepath.Match(defaultIamRolePathGlob, *role.Path)
-		if err != nil {
-			return err
-		}
-
-		if !match {
-			newRemoteResources = append(newRemoteResources, remoteResource)
-			continue
-		}
-
-		logrus.WithFields(logrus.Fields{
-			"id":   remoteResource.TerraformId(),
-			"type": remoteResource.TerraformType(),
-		}).Debug("Ignoring default iam role policy as it is not managed by IaC")
 	}
 
-	*remoteResources = newRemoteResources
-
-	return nil
+	return resourcesToIgnore
 }
 
 func (m AwsDefaults) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
-	err := awsIamRoleDefaults(remoteResources, resourcesFromState)
-	if err != nil {
-		return err
+	newRemoteResources := append([]resource.Resource{}, *remoteResources...)
+	newResourcesFromState := append([]resource.Resource{}, *resourcesFromState...)
+	resourcesToIgnore := make([]resource.Resource, 0)
+
+	resourcesToIgnore = append(resourcesToIgnore, m.awsIamRoleDefaults(*remoteResources)...)
+	resourcesToIgnore = append(resourcesToIgnore, m.awsIamPolicyAttachmentDefaults(*remoteResources)...)
+	resourcesToIgnore = append(resourcesToIgnore, m.awsIamRolePolicyDefaults(*remoteResources)...)
+
+	for _, resourceToIgnore := range resourcesToIgnore {
+		for i, res := range newRemoteResources {
+			if resource.IsSameResource(res, resourceToIgnore) {
+				newRemoteResources[i] = newRemoteResources[len(newRemoteResources)-1]
+				newRemoteResources = newRemoteResources[:len(newRemoteResources)-1]
+			}
+		}
+		for i, res := range newResourcesFromState {
+			if resource.IsSameResource(res, resourceToIgnore) {
+				newResourcesFromState[i] = newResourcesFromState[len(newResourcesFromState)-1]
+				newResourcesFromState = newResourcesFromState[:len(newResourcesFromState)-1]
+			}
+		}
 	}
 
-	err = awsIamPolicyAttachmentDefaults(remoteResources, resourcesFromState)
-	if err != nil {
-		return err
-	}
+	*remoteResources = newRemoteResources
+	*resourcesFromState = newResourcesFromState
 
-	err = awsIamRolePolicyDefaults(remoteResources, resourcesFromState)
-	if err != nil {
-		return err
-	}
+	logrus.Debug("Ignoring default AWS resources")
 
 	return nil
 }
