@@ -141,7 +141,7 @@ func NewScanCmd() *cobra.Command {
 	fl.BoolVar(&opts.Strict,
 		"strict",
 		false,
-		"Don't ignore default resources",
+		"Includes cloud provider service-linked roles (disabled by default)",
 	)
 
 	return cmd
