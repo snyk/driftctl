@@ -7,7 +7,6 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/jmespath/go-jmespath"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -26,20 +25,8 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
-type ScanOptions struct {
-	Coverage       bool
-	Detect         bool
-	From           []config.SupplierConfig
-	To             string
-	Output         output.OutputConfig
-	Filter         *jmespath.JMESPath
-	Quiet          bool
-	BackendOptions *backend.Options
-	Strict         bool
-}
-
 func NewScanCmd() *cobra.Command {
-	opts := &ScanOptions{}
+	opts := &pkg.ScanOptions{}
 	opts.BackendOptions = &backend.Options{}
 
 	cmd := &cobra.Command{
@@ -138,7 +125,7 @@ func NewScanCmd() *cobra.Command {
 		"Use those HTTP headers to query the provided URL.\n"+
 			"Only used with tfstate+http(s) backend for now.\n",
 	)
-	fl.BoolVar(&opts.Strict,
+	fl.BoolVar(&opts.StrictMode,
 		"strict",
 		false,
 		"Includes cloud provider service-linked roles (disabled by default)",
@@ -147,7 +134,7 @@ func NewScanCmd() *cobra.Command {
 	return cmd
 }
 
-func scanRun(opts *ScanOptions) error {
+func scanRun(opts *pkg.ScanOptions) error {
 	selectedOutput := output.GetOutput(opts.Output, opts.Quiet)
 
 	c := make(chan os.Signal)
@@ -177,7 +164,7 @@ func scanRun(opts *ScanOptions) error {
 	if err != nil {
 		return err
 	}
-	ctl := pkg.NewDriftCTL(scanner, iacSupplier, opts.Filter, alerter, opts.Strict)
+	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, opts)
 
 	go func() {
 		<-c
