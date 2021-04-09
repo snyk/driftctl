@@ -22,8 +22,9 @@ import (
 func TestAcc_AwsSqsQueue(t *testing.T) {
 	var mutatedQueue string
 	acceptance.Run(t, acceptance.AccTestCase{
-		Paths: []string{"./testdata/acc/aws_sqs_queue"},
-		Args:  []string{"scan", "--filter", "Type=='aws_sqs_queue'"},
+		TerraformVersion: "0.14.9",
+		Paths:            []string{"./testdata/acc/aws_sqs_queue"},
+		Args:             []string{"scan", "--filter", "Type=='aws_sqs_queue'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

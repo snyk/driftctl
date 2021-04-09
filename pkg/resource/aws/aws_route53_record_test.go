@@ -9,8 +9,9 @@ import (
 
 func TestAcc_AwsRoute53Record_WithFQDNAsId(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Paths: []string{"./testdata/acc/aws_route53_record"},
-		Args:  []string{"scan", "--filter", "Type=='aws_route53_record'"},
+		TerraformVersion: "0.14.9",
+		Paths:            []string{"./testdata/acc/aws_route53_record"},
+		Args:             []string{"scan", "--filter", "Type=='aws_route53_record'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

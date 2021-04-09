@@ -13,8 +13,9 @@ import (
 
 func TestAcc_AwsSNSTopicSubscription(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Paths: []string{"./testdata/acc/aws_sns_topic_subscription"},
-		Args:  []string{"scan", "--filter", "Type=='aws_sns_topic_subscription'"},
+		TerraformVersion: "0.14.9",
+		Paths:            []string{"./testdata/acc/aws_sns_topic_subscription"},
+		Args:             []string{"scan", "--filter", "Type=='aws_sns_topic_subscription'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

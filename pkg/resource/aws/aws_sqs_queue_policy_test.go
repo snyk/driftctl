@@ -14,8 +14,9 @@ import (
 
 func TestAcc_AwsSqsQueuePolicy(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Paths: []string{"./testdata/acc/aws_sqs_queue_policy"},
-		Args:  []string{"scan", "--filter", "Type=='aws_sqs_queue_policy'"},
+		TerraformVersion: "0.14.9",
+		Paths:            []string{"./testdata/acc/aws_sqs_queue_policy"},
+		Args:             []string{"scan", "--filter", "Type=='aws_sqs_queue_policy'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
