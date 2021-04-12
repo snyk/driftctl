@@ -54,7 +54,7 @@ func TestAwsDefaults_Execute(t *testing.T) {
 			diff.Changelog{
 				{
 					Type: "delete",
-					Path: []string{"1"},
+					Path: []string{"0"},
 					From: &aws.AwsIamRole{
 						Id:   "OrganizationAccountAccessRole",
 						Path: func(path string) *string { return &path }("/not-aws-service-role/sso.amazonaws.com/"),
@@ -101,7 +101,7 @@ func TestAwsDefaults_Execute(t *testing.T) {
 			diff.Changelog{
 				{
 					Type: diff.DELETE,
-					Path: []string{"0", "Tags", "test"},
+					Path: []string{"1", "Tags", "test"},
 					From: "value",
 					To:   nil,
 				},
@@ -194,8 +194,8 @@ func TestAwsDefaults_Execute(t *testing.T) {
 					Type: diff.DELETE,
 					Path: []string{"1"},
 					From: &aws.AwsIamPolicyAttachment{
-						Id:    "AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/whatever",
-						Roles: &[]string{"AWSServiceRoleForSSO", "custom-role"},
+						Id:    "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
+						Roles: &[]string{"custom-role"},
 					},
 					To: nil,
 				},
@@ -203,8 +203,8 @@ func TestAwsDefaults_Execute(t *testing.T) {
 					Type: diff.DELETE,
 					Path: []string{"2"},
 					From: &aws.AwsIamPolicyAttachment{
-						Id:    "driftctl_test-arn:aws:iam::0123456789:policy/driftctl",
-						Roles: &[]string{"custom-role"},
+						Id:    "AWSServiceRoleForSSO-arn:aws:iam::aws:policy/aws-service-role/whatever",
+						Roles: &[]string{"AWSServiceRoleForSSO", "custom-role"},
 					},
 					To: nil,
 				},
@@ -245,7 +245,7 @@ func TestAwsDefaults_Execute(t *testing.T) {
 			diff.Changelog{
 				{
 					Type: diff.DELETE,
-					Path: []string{"1"},
+					Path: []string{"0"},
 					From: &aws.AwsIamRole{
 						Id:   "OrganizationAccountAccessRole",
 						Path: func(p string) *string { return &p }("/not-aws-service-role/sso.amazonaws.com"),
@@ -254,7 +254,7 @@ func TestAwsDefaults_Execute(t *testing.T) {
 				},
 				{
 					Type: diff.DELETE,
-					Path: []string{"2"},
+					Path: []string{"1"},
 					From: &aws.AwsIamRolePolicy{
 						Id:   "OrganizationAccountAccessRole:AdministratorAccess",
 						Role: func(p string) *string { return &p }("OrganizationAccountAccessRole"),
