@@ -3,10 +3,9 @@ package middlewares
 import (
 	"strings"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/sirupsen/logrus"
 )
 
 const defaultIamRolePathPrefix = "/aws-service-role/"
@@ -96,33 +95,58 @@ func (m AwsDefaults) awsIamRolePolicyDefaults(remoteResources []resource.Resourc
 }
 
 func (m AwsDefaults) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
-	newRemoteResources := append([]resource.Resource{}, *remoteResources...)
-	newResourcesFromState := append([]resource.Resource{}, *resourcesFromState...)
+	newRemoteResources := make([]resource.Resource, 0)
+	newResourcesFromState := make([]resource.Resource, 0)
 	resourcesToIgnore := make([]resource.Resource, 0)
 
 	resourcesToIgnore = append(resourcesToIgnore, m.awsIamRoleDefaults(*remoteResources)...)
 	resourcesToIgnore = append(resourcesToIgnore, m.awsIamPolicyAttachmentDefaults(*remoteResources)...)
 	resourcesToIgnore = append(resourcesToIgnore, m.awsIamRolePolicyDefaults(*remoteResources)...)
 
-	for _, resourceToIgnore := range resourcesToIgnore {
-		for i, res := range newRemoteResources {
+	for _, res := range *remoteResources {
+		ignored := false
+
+		for _, resourceToIgnore := range resourcesToIgnore {
 			if resource.IsSameResource(res, resourceToIgnore) {
-				newRemoteResources[i] = newRemoteResources[len(newRemoteResources)-1]
-				newRemoteResources = newRemoteResources[:len(newRemoteResources)-1]
+				ignored = true
+				break
 			}
 		}
-		for i, res := range newResourcesFromState {
+
+		if !ignored {
+			newRemoteResources = append(newRemoteResources, res)
+			continue
+		}
+
+		logrus.WithFields(logrus.Fields{
+			"id":   res.TerraformId(),
+			"type": res.TerraformType(),
+		}).Debug("Ignoring default AWS resource")
+	}
+
+	for _, res := range *resourcesFromState {
+		ignored := false
+
+		for _, resourceToIgnore := range resourcesToIgnore {
 			if resource.IsSameResource(res, resourceToIgnore) {
-				newResourcesFromState[i] = newResourcesFromState[len(newResourcesFromState)-1]
-				newResourcesFromState = newResourcesFromState[:len(newResourcesFromState)-1]
+				ignored = true
+				break
 			}
 		}
+
+		if !ignored {
+			newResourcesFromState = append(newResourcesFromState, res)
+			continue
+		}
+
+		logrus.WithFields(logrus.Fields{
+			"id":   res.TerraformId(),
+			"type": res.TerraformType(),
+		}).Debug("Ignoring default AWS resource")
 	}
 
 	*remoteResources = newRemoteResources
 	*resourcesFromState = newResourcesFromState
-
-	logrus.Debug("Ignoring default AWS resources")
 
 	return nil
 }
