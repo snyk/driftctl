@@ -25,7 +25,7 @@ type Difference struct {
 
 type Summary struct {
 	TotalResources int `json:"total_resources"`
-	TotalDrifted   int `json:"total_drifted"`
+	TotalDrifted   int `json:"total_changed"`
 	TotalUnmanaged int `json:"total_unmanaged"`
 	TotalDeleted   int `json:"total_missing"`
 	TotalManaged   int `json:"total_managed"`

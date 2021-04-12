@@ -1,7 +1,7 @@
 {
 	"summary": {
 		"total_resources": 0,
-		"total_drifted": 0,
+		"total_changed": 0,
 		"total_unmanaged": 0,
 		"total_missing": 0,
 		"total_managed": 0
