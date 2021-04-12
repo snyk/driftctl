@@ -5,7 +5,10 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
+	"github.com/cloudskiff/driftctl/pkg/cmd/scan/output"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/iac/config"
+	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
 	"github.com/cloudskiff/driftctl/pkg/middlewares"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/jmespath/go-jmespath"
@@ -13,16 +16,36 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type ScanOptions struct {
+	Coverage       bool
+	Detect         bool
+	From           []config.SupplierConfig
+	To             string
+	Output         output.OutputConfig
+	Filter         *jmespath.JMESPath
+	Quiet          bool
+	BackendOptions *backend.Options
+	StrictMode     bool
+}
+
 type DriftCTL struct {
 	remoteSupplier resource.Supplier
 	iacSupplier    resource.Supplier
 	alerter        *alerter.Alerter
 	analyzer       analyser.Analyzer
 	filter         *jmespath.JMESPath
+	strictMode     bool
 }
 
-func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, filter *jmespath.JMESPath, alerter *alerter.Alerter) *DriftCTL {
-	return &DriftCTL{remoteSupplier, iacSupplier, alerter, analyser.NewAnalyzer(alerter), filter}
+func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, alerter *alerter.Alerter, opts *ScanOptions) *DriftCTL {
+	return &DriftCTL{
+		remoteSupplier,
+		iacSupplier,
+		alerter,
+		analyser.NewAnalyzer(alerter),
+		opts.Filter,
+		opts.StrictMode,
+	}
 }
 
 func (d DriftCTL) Run() (*analyser.Analysis, error) {
@@ -52,6 +75,12 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		middlewares.NewAwsDefaultSqsQueuePolicy(),
 		middlewares.NewAwsSNSTopicPolicyExpander(),
 	)
+
+	if !d.strictMode {
+		middleware = append(middleware,
+			middlewares.NewAwsDefaults(),
+		)
+	}
 
 	logrus.Debug("Ready to run middlewares")
 	err = middleware.Execute(&remoteResources, &resourcesFromState)
