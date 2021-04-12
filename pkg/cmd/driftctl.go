@@ -88,7 +88,7 @@ func (driftctlCmd DriftctlCmd) ShouldCheckVersion() bool {
 }
 
 func IsReportingEnabled(cmd *cobra.Command) bool {
-	enableReporting, err := cmd.Flags().GetBool("error-reporting")
+	enableReporting, err := cmd.Flags().GetBool("send-crash-report")
 	if err != nil {
 		return false
 	}
