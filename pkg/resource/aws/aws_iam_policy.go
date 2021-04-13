@@ -32,8 +32,17 @@ func (r *AwsIamPolicy) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsIamPolicyTags = map[string]string{}
+func initAwsIamPolicyMetaData() {
+	dctlcty.SetMetadata(AwsIamPolicyResourceType, AwsIamPolicyTags, AwsIamPolicyNormalizer)
+}
 
-func awsIamPolicyNormalizer(val *dctlcty.CtyAttributes) {
+var AwsIamPolicyTags = map[string]string{
+	"arn":    `computed:"true"`,
+	"id":     `computed:"true"`,
+	"name":   `computed:"true"`,
+	"policy": `jsonstring:"true"`,
+}
+
+func AwsIamPolicyNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"name_prefix"})
 }

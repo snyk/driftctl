@@ -55,9 +55,17 @@ func (r *AwsRoute53Record) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsRoute53RecordTags = map[string]string{}
+func initAwsRoute53RecordMetaData() {
+	dctlcty.SetMetadata(AwsRoute53RecordResourceType, AwsRoute53RecordTags, AwsRoute53RecordNormalizer)
+}
 
-func awsRoute53RecordNormalizer(val *dctlcty.CtyAttributes) {
+var AwsRoute53RecordTags = map[string]string{
+	"allow_overwrite": `computed:"true"`,
+	"fqdn":            `computed:"true"`,
+	"id":              `computed:"true"`,
+}
+
+func AwsRoute53RecordNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"allow_overwrite"})
 	val.SafeDelete([]string{"name"})
 }

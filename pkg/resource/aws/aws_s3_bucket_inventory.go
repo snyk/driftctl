@@ -52,7 +52,13 @@ func (r *AwsS3BucketInventory) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsS3BucketInventoryTags = map[string]string{}
+func initAwsS3BucketInventoryMetaData() {
+	dctlcty.SetMetadata(AwsS3BucketInventoryResourceType, AwsS3BucketInventoryTags, AwsS3BucketInventoryNormalizer)
+}
 
-func awsS3BucketInventoryNormalizer(val *dctlcty.CtyAttributes) {
+var AwsS3BucketInventoryTags = map[string]string{
+	"id": `computed:"true"`,
+}
+
+func AwsS3BucketInventoryNormalizer(val *dctlcty.CtyAttributes) {
 }

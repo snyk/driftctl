@@ -33,7 +33,18 @@ func (r *AwsIamAccessKey) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsIamAccessKeyTags = map[string]string{}
+func initAwsIamAccessKeyMetaData() {
+	dctlcty.SetMetadata(AwsIamAccessKeyResourceType, AwsIamAccessKeyTags, AwsIamAccessKeyNormalizer)
+}
 
-func awsIamAccessKeyNormalizer(val *dctlcty.CtyAttributes) {
+var AwsIamAccessKeyTags = map[string]string{
+	"encrypted_secret":     `computed:"true"`,
+	"id":                   `computed:"true"`,
+	"key_fingerprint":      `computed:"true"`,
+	"secret":               `computed:"true"`,
+	"ses_smtp_password_v4": `computed:"true"`,
+	"status":               `computed:"true"`,
+}
+
+func AwsIamAccessKeyNormalizer(val *dctlcty.CtyAttributes) {
 }

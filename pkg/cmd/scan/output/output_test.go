@@ -110,7 +110,7 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 		{
 			Change: diff.Change{
 				Type: diff.UPDATE,
-				Path: []string{"Json"},
+				Path: []string{"json"},
 				From: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Removed\":\"Added\",\"Changed\":[\"ec2:DescribeInstances\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
 				To:   "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Changed\":[\"ec2:*\"],\"NewField\":[\"foobar\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
 			},
@@ -123,7 +123,7 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 		{
 			Change: diff.Change{
 				Type: diff.UPDATE,
-				Path: []string{"Json"},
+				Path: []string{"json"},
 				From: "{\"foo\":\"bar\"}",
 				To:   "{\"bar\":\"foo\"}",
 			},
@@ -176,7 +176,7 @@ func fakeAnalysisWithComputedFields() *analyser.Analysis {
 			Type: "aws_diff_resource",
 		},
 	)
-	a.AddDifference(analyser.Difference{Res: testresource.FakeResource{
+	a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
 		Id:   "diff-id-1",
 		Type: "aws_diff_resource",
 	}, Changelog: []analyser.Change{

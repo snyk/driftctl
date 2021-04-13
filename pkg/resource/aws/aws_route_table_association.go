@@ -29,7 +29,13 @@ func (r *AwsRouteTableAssociation) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsRouteTableAssociationTags = map[string]string{}
+func initAwsRouteTableAssociationMetaData() {
+	dctlcty.SetMetadata(AwsRouteTableAssociationResourceType, AwsRouteTableAssociationTags, AwsRouteTableAssociationNormalizer)
+}
 
-func awsRouteTableAssociationNormalizer(val *dctlcty.CtyAttributes) {
+var AwsRouteTableAssociationTags = map[string]string{
+	"id": `computed:"true"`,
+}
+
+func AwsRouteTableAssociationNormalizer(val *dctlcty.CtyAttributes) {
 }

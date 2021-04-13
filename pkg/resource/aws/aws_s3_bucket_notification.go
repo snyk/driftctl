@@ -48,9 +48,18 @@ func (r *AwsS3BucketNotification) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsS3BucketNotificationTags = map[string]string{}
+func initAwsS3BucketNotificationMetaData() {
+	dctlcty.SetMetadata(AwsS3BucketNotificationResourceType, AwsS3BucketNotificationTags, AwsS3BucketNotificationNormalizer)
+}
 
-func awsS3BucketNotificationNormalizer(val *dctlcty.CtyAttributes) {
+var AwsS3BucketNotificationTags = map[string]string{
+	"id":                 `computed:"true"`,
+	"lambda_function.id": `computed:"true"`,
+	"queue.id":           `computed:"true"`,
+	"topic.id":           `computed:"true"`,
+}
+
+func AwsS3BucketNotificationNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"id"})
 	val.SafeDelete([]string{"bucket"})
 }

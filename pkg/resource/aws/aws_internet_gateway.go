@@ -30,7 +30,15 @@ func (r *AwsInternetGateway) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsInternetGatewayTags = map[string]string{}
+func initAwsInternetGatewayMetaData() {
+	dctlcty.SetMetadata(AwsInternetGatewayResourceType, AwsInternetGatewayTags, AwsInternetGatewayNormalizer)
+}
 
-func awsInternetGatewayNormalizer(val *dctlcty.CtyAttributes) {
+var AwsInternetGatewayTags = map[string]string{
+	"arn":      `computed:"true"`,
+	"id":       `computed:"true"`,
+	"owner_id": `computed:"true"`,
+}
+
+func AwsInternetGatewayNormalizer(val *dctlcty.CtyAttributes) {
 }

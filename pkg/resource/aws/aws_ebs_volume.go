@@ -37,9 +37,22 @@ func (r *AwsEbsVolume) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsEbsVolumeTags = map[string]string{}
+func initAwsEbsVolumeMetaData() {
+	dctlcty.SetMetadata(AwsEbsVolumeResourceType, AwsEbsVolumeTags, AwsEbsVolumeNormalizer)
+}
 
-func awsEbsVolumeNormalizer(val *dctlcty.CtyAttributes) {
+var AwsEbsVolumeTags = map[string]string{
+	"arn":         `diff:"-" computed:"true"`,
+	"encrypted":   `computed:"true"`,
+	"id":          `computed:"true"`,
+	"iops":        `computed:"true"`,
+	"kms_key_id":  `computed:"true"`,
+	"size":        `computed:"true"`,
+	"snapshot_id": `computed:"true"`,
+	"type":        `computed:"true"`,
+}
+
+func AwsEbsVolumeNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"arn"})
 	val.SafeDelete([]string{"outpost_arn"})
 	val.SafeDelete([]string{"snapshot_id"})

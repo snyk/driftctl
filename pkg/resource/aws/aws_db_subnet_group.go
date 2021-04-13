@@ -32,8 +32,17 @@ func (r *AwsDbSubnetGroup) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsDbSubnetGroupTags = map[string]string{}
+func initAwsDbSubnetGroupMetaData() {
+	dctlcty.SetMetadata(AwsDbSubnetGroupResourceType, AwsDbSubnetGroupTags, AwsDbSubnetGroupNormalizer)
+}
 
-func awsDbSubnetGroupNormalizer(val *dctlcty.CtyAttributes) {
+var AwsDbSubnetGroupTags = map[string]string{
+	"arn":         `computed:"true"`,
+	"id":          `computed:"true"`,
+	"name":        `computed:"true"`,
+	"name_prefix": `computed:"true"`,
+}
+
+func AwsDbSubnetGroupNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"name_prefix"})
 }

@@ -40,8 +40,21 @@ func (r *AwsEbsSnapshot) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsEbsSnapshotTags = map[string]string{}
+func initAwsEbsSnapshotMetaData() {
+	dctlcty.SetMetadata(AwsEbsSnapshotResourceType, AwsEbsSnapshotTags, AwsEbsSnapshotNormalizer)
+}
 
-func awsEbsSnapshotNormalizer(val *dctlcty.CtyAttributes) {
+var AwsEbsSnapshotTags = map[string]string{
+	"arn":                    `computed:"true"`,
+	"data_encryption_key_id": `computed:"true"`,
+	"encrypted":              `computed:"true"`,
+	"id":                     `computed:"true"`,
+	"kms_key_id":             `computed:"true"`,
+	"owner_alias":            `computed:"true"`,
+	"owner_id":               `computed:"true"`,
+	"volume_size":            `computed:"true"`,
+}
+
+func AwsEbsSnapshotNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"timeouts"})
 }

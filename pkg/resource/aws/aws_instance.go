@@ -107,9 +107,56 @@ func (r *AwsInstance) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsInstanceTags = map[string]string{}
+func initAwsInstanceMetaData() {
+	dctlcty.SetMetadata(AwsInstanceResourceType, AwsInstanceTags, AwsInstanceNormalizer)
+}
 
-func awsInstanceNormalizer(val *dctlcty.CtyAttributes) {
+var AwsInstanceTags = map[string]string{
+	"arn":                            `computed:"true"`,
+	"associate_public_ip_address":    `computed:"true"`,
+	"availability_zone":              `computed:"true"`,
+	"cpu_core_count":                 `computed:"true"`,
+	"cpu_threads_per_core":           `computed:"true"`,
+	"host_id":                        `computed:"true"`,
+	"id":                             `computed:"true"`,
+	"instance_state":                 `computed:"true"`,
+	"ipv6_address_count":             `computed:"true"`,
+	"ipv6_addresses":                 `computed:"true"`,
+	"key_name":                       `computed:"true"`,
+	"outpost_arn":                    `computed:"true"`,
+	"password_data":                  `computed:"true"`,
+	"placement_group":                `computed:"true"`,
+	"primary_network_interface_id":   `computed:"true"`,
+	"private_dns":                    `computed:"true"`,
+	"private_ip":                     `computed:"true"`,
+	"public_dns":                     `computed:"true"`,
+	"public_ip":                      `computed:"true"`,
+	"secondary_private_ips":          `computed:"true"`,
+	"security_groups":                `computed:"true"`,
+	"subnet_id":                      `computed:"true"`,
+	"tenancy":                        `computed:"true"`,
+	"volume_tags":                    `computed:"true"`,
+	"vpc_security_group_ids":         `computed:"true"`,
+	"ebs_block_device.encrypted":     `computed:"true"`,
+	"ebs_block_device.iops":          `computed:"true"`,
+	"ebs_block_device.kms_key_id":    `computed:"true"`,
+	"ebs_block_device.snapshot_id":   `computed:"true"`,
+	"ebs_block_device.volume_id":     `computed:"true"`,
+	"ebs_block_device.volume_size":   `computed:"true"`,
+	"ebs_block_device.volume_type":   `computed:"true"`,
+	"metadata_options.http_endpoint": `computed:"true"`,
+	"metadata_options.http_put_response_hop_limit": `computed:"true"`,
+	"metadata_options.http_tokens":                 `computed:"true"`,
+	"root_block_device.device_name":                `computed:"true"`,
+	"root_block_device.encrypted":                  `computed:"true"`,
+	"root_block_device.iops":                       `computed:"true"`,
+	"root_block_device.kms_key_id":                 `computed:"true"`,
+	"root_block_device.volume_id":                  `computed:"true"`,
+	"root_block_device.volume_size":                `computed:"true"`,
+	"root_block_device.volume_type":                `computed:"true"`,
+}
+
+func AwsInstanceNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"volume_tags"})
 	val.SafeDelete([]string{"timeouts"})
 }

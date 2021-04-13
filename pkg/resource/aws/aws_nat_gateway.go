@@ -32,7 +32,16 @@ func (r *AwsNatGateway) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsNatGatewayTags = map[string]string{}
+func initAwsNatGatewayMetaData() {
+	dctlcty.SetMetadata(AwsNatGatewayResourceType, AwsNatGatewayTags, AwsNatGatewayNormalizer)
+}
 
-func awsNatGatewayNormalizer(val *dctlcty.CtyAttributes) {
+var AwsNatGatewayTags = map[string]string{
+	"id":                   `computed:"true"`,
+	"network_interface_id": `computed:"true"`,
+	"private_ip":           `computed:"true"`,
+	"public_ip":            `computed:"true"`,
+}
+
+func AwsNatGatewayNormalizer(val *dctlcty.CtyAttributes) {
 }

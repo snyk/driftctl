@@ -28,7 +28,14 @@ func (r *AwsSnsTopicPolicy) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsSnsTopicPolicyTags = map[string]string{}
+func initAwsSnsTopicPolicyMetaData() {
+	dctlcty.SetMetadata(AwsSnsTopicPolicyResourceType, AwsSnsTopicPolicyTags, AwsSnsTopicPolicyNormalizer)
+}
 
-func awsSnsTopicPolicyNormalizer(val *dctlcty.CtyAttributes) {
+var AwsSnsTopicPolicyTags = map[string]string{
+	"id":     `computed:"true"`,
+	"policy": `jsonstring:"true"`,
+}
+
+func AwsSnsTopicPolicyNormalizer(val *dctlcty.CtyAttributes) {
 }

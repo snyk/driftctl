@@ -17,6 +17,7 @@ import (
 	filter2 "github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/cloudskiff/driftctl/pkg/resource/github"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
@@ -34,6 +35,9 @@ type TestCase struct {
 type TestCases []TestCase
 
 func runTest(t *testing.T, cases TestCases) {
+	testresource.InitFakeResourceMetadata()
+	aws.InitResourcesMetadata()
+	github.InitMetadatas()
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			testAlerter := alerter.NewAlerter()
@@ -188,7 +192,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 						From: "barfoo",
 						To:   "foobar",
 					},
-					// TODO Computed: true,
+					Computed: true,
 				})
 			},
 		},
@@ -491,7 +495,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						From: "gp2",
 						To:   "gp3",
 					},
-					// TODO Computed: true,
+					Computed: true,
 				})
 				result.AssertResourceHasDrift("vol-018c5ae89895aca4c", "aws_ebs_volume", analyser.Change{
 					Change: diff.Change{
@@ -500,7 +504,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						From: true,
 						To:   false,
 					},
-					// TODO Computed: true,
+					Computed: true,
 				})
 			},
 		},

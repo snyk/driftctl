@@ -2,10 +2,13 @@ package dctlcty
 
 import (
 	"encoding/json"
+	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 )
@@ -85,11 +88,43 @@ func (a *CtyAttributes) SafeSet(path []string, value interface{}) error {
 }
 
 func (a *CtyAttributes) Tags(path []string) reflect.StructTag {
-	if a.metadata == nil {
+	if a.metadata == nil || a.Attrs == nil {
 		return ""
 	}
 
-	fieldTags, exists := a.metadata.tags[strings.Join(path, ".")]
+	var current interface{} = a.Attrs
+	realPath := ""
+	for _, part := range path {
+		if current == nil {
+			logrus.Debugf("Failed to find tag for path %+v", path)
+			return ""
+		}
+		kind := reflect.TypeOf(current).Kind()
+		switch kind {
+		case reflect.Array:
+			fallthrough
+		case reflect.Slice:
+			index, err := strconv.ParseUint(part, 10, 64)
+			if err != nil {
+				logrus.Debugf("Failed to find tag for path %+v", path)
+				return ""
+			}
+			current = current.([]interface{})[index]
+			continue
+		case reflect.Map:
+			current = current.(map[string]interface{})[part]
+		default:
+			logrus.Debugf("Failed to find tag for path %+v", path)
+			return ""
+		}
+		if realPath != "" {
+			realPath = fmt.Sprintf("%s.%s", realPath, part)
+			continue
+		}
+		realPath = part
+	}
+
+	fieldTags, exists := a.metadata.tags[realPath]
 	if !exists {
 		return ""
 	}
@@ -100,4 +135,9 @@ func (a *CtyAttributes) Tags(path []string) reflect.StructTag {
 func (a *CtyAttributes) IsComputedField(path []string) bool {
 	tags := a.Tags(path)
 	return tags.Get("computed") == "true"
+}
+
+func (a *CtyAttributes) IsJsonStringField(path []string) bool {
+	tags := a.Tags(path)
+	return tags.Get("jsonstring") == "true"
 }

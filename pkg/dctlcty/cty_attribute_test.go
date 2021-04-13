@@ -222,16 +222,25 @@ func TestCtyAttributes_SafeSet(t *testing.T) {
 
 func TestCtyAttributes_Tags(t *testing.T) {
 	tests := []struct {
-		name     string
-		metadata *Metadata
-		path     []string
-		want     reflect.StructTag
+		name string
+		attr *CtyAttributes
+		path []string
+		want reflect.StructTag
 	}{
 		{
 			"Found tags",
-			&Metadata{
-				tags: map[string]string{
-					"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+			&CtyAttributes{
+				map[string]interface{}{
+					"test": map[string]interface{}{
+						"has": map[string]interface{}{
+							"tags": "string",
+						},
+					},
+				},
+				&Metadata{
+					tags: map[string]string{
+						"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+					},
 				},
 			},
 			[]string{"test", "has", "tags"},
@@ -239,9 +248,21 @@ func TestCtyAttributes_Tags(t *testing.T) {
 		},
 		{
 			"No tags found",
-			&Metadata{
-				tags: map[string]string{
-					"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+			&CtyAttributes{
+				map[string]interface{}{
+					"test": map[string]interface{}{
+						"has": map[string]interface{}{
+							"no": map[string]interface{}{
+								"tags": "string",
+							},
+							"tags": "string",
+						},
+					},
+				},
+				&Metadata{
+					tags: map[string]string{
+						"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+					},
 				},
 			},
 			[]string{"test", "has", "no", "tags"},
@@ -250,11 +271,7 @@ func TestCtyAttributes_Tags(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			a := &CtyAttributes{
-				Attrs:    nil,
-				metadata: tt.metadata,
-			}
-			if got := a.Tags(tt.path); got != tt.want {
+			if got := tt.attr.Tags(tt.path); got != tt.want {
 				t.Errorf("Tags() = %v, want %v", got, tt.want)
 			}
 		})
@@ -263,16 +280,28 @@ func TestCtyAttributes_Tags(t *testing.T) {
 
 func TestCtyAttributes_IsComputedField(t *testing.T) {
 	tests := []struct {
-		name     string
-		metadata *Metadata
-		path     []string
-		want     bool
+		name string
+		attr *CtyAttributes
+		path []string
+		want bool
 	}{
 		{
 			"Is computed",
-			&Metadata{
-				tags: map[string]string{
-					"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+			&CtyAttributes{
+				map[string]interface{}{
+					"test": map[string]interface{}{
+						"has": map[string]interface{}{
+							"no": map[string]interface{}{
+								"tags": "string",
+							},
+							"tags": "string",
+						},
+					},
+				},
+				&Metadata{
+					tags: map[string]string{
+						"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+					},
 				},
 			},
 			[]string{"test", "has", "tags"},
@@ -280,9 +309,21 @@ func TestCtyAttributes_IsComputedField(t *testing.T) {
 		},
 		{
 			"Not computed",
-			&Metadata{
-				tags: map[string]string{
-					"test.has.tags": "cty:\"instance_tenancy\"",
+			&CtyAttributes{
+				map[string]interface{}{
+					"test": map[string]interface{}{
+						"has": map[string]interface{}{
+							"no": map[string]interface{}{
+								"tags": "string",
+							},
+							"tags": "string",
+						},
+					},
+				},
+				&Metadata{
+					tags: map[string]string{
+						"test.has.tags": "cty:\"instance_tenancy\"",
+					},
 				},
 			},
 			[]string{"test", "has", "tags"},
@@ -290,9 +331,21 @@ func TestCtyAttributes_IsComputedField(t *testing.T) {
 		},
 		{
 			"No tags",
-			&Metadata{
-				tags: map[string]string{
-					"test.has.tags": "cty:\"instance_tenancy\"",
+			&CtyAttributes{
+				map[string]interface{}{
+					"test": map[string]interface{}{
+						"has": map[string]interface{}{
+							"no": map[string]interface{}{
+								"tags": "string",
+							},
+							"tags": "string",
+						},
+					},
+				},
+				&Metadata{
+					tags: map[string]string{
+						"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+					},
 				},
 			},
 			[]string{"test", "has", "no", "tags"},
@@ -301,11 +354,90 @@ func TestCtyAttributes_IsComputedField(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			a := &CtyAttributes{
-				Attrs:    nil,
-				metadata: tt.metadata,
+			if got := tt.attr.IsComputedField(tt.path); got != tt.want {
+				t.Errorf("IsComputedField() = %v, want %v", got, tt.want)
 			}
-			if got := a.IsComputedField(tt.path); got != tt.want {
+		})
+	}
+}
+
+func TestCtyAttributes_IsJsonStringField(t *testing.T) {
+	tests := []struct {
+		name string
+		attr *CtyAttributes
+		path []string
+		want bool
+	}{
+		{
+			"Is json",
+			&CtyAttributes{
+				map[string]interface{}{
+					"test": map[string]interface{}{
+						"has": map[string]interface{}{
+							"no": map[string]interface{}{
+								"tags": "string",
+							},
+							"tags": "string",
+						},
+					},
+				},
+				&Metadata{
+					tags: map[string]string{
+						"test.has.tags": "cty:\"instance_tenancy\" jsonstring:\"true\"",
+					},
+				},
+			},
+			[]string{"test", "has", "tags"},
+			true,
+		},
+		{
+			"Not json",
+			&CtyAttributes{
+				map[string]interface{}{
+					"test": map[string]interface{}{
+						"has": map[string]interface{}{
+							"no": map[string]interface{}{
+								"tags": "string",
+							},
+							"tags": "string",
+						},
+					},
+				},
+				&Metadata{
+					tags: map[string]string{
+						"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+					},
+				},
+			},
+			[]string{"test", "has", "tags"},
+			false,
+		},
+		{
+			"No tags",
+			&CtyAttributes{
+				map[string]interface{}{
+					"test": map[string]interface{}{
+						"has": map[string]interface{}{
+							"no": map[string]interface{}{
+								"tags": "string",
+							},
+							"tags": "string",
+						},
+					},
+				},
+				&Metadata{
+					tags: map[string]string{
+						"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+					},
+				},
+			},
+			[]string{"test", "has", "no", "tags"},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.attr.IsJsonStringField(tt.path); got != tt.want {
 				t.Errorf("IsComputedField() = %v, want %v", got, tt.want)
 			}
 		})

@@ -31,9 +31,17 @@ func (r *AwsKmsAlias) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsKmsAliasTags = map[string]string{}
+func initAwsKmsAliasMetaData() {
+	dctlcty.SetMetadata(AwsKmsAliasResourceType, AwsKmsAliasTags, AwsKmsAliasNormalizer)
+}
 
-func awsKmsAliasNormalizer(val *dctlcty.CtyAttributes) {
+var AwsKmsAliasTags = map[string]string{
+	"arn":            `computed:"true"`,
+	"id":             `computed:"true"`,
+	"target_key_arn": `computed:"true"`,
+}
+
+func AwsKmsAliasNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"name"})
 	val.SafeDelete([]string{"name_prefix"})
 }

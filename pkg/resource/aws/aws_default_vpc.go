@@ -43,7 +43,28 @@ func (r *AwsDefaultVpc) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsDefaultVpcTags = map[string]string{}
+func initAwsDefaultVpcMetaData() {
+	dctlcty.SetMetadata(AwsDefaultVpcResourceType, AwsDefaultVpcTags, AwsDefaultVpcNormalizer)
+}
 
-func awsDefaultVpcNormalizer(val *dctlcty.CtyAttributes) {
+var AwsDefaultVpcTags = map[string]string{
+	"arn":                              `computed:"true"`,
+	"assign_generated_ipv6_cidr_block": `computed:"true"`,
+	"cidr_block":                       `computed:"true"`,
+	"default_network_acl_id":           `computed:"true"`,
+	"default_route_table_id":           `computed:"true"`,
+	"default_security_group_id":        `computed:"true"`,
+	"dhcp_options_id":                  `computed:"true"`,
+	"enable_classiclink":               `computed:"true"`,
+	"enable_classiclink_dns_support":   `computed:"true"`,
+	"enable_dns_hostnames":             `computed:"true"`,
+	"id":                               `computed:"true"`,
+	"instance_tenancy":                 `computed:"true"`,
+	"ipv6_association_id":              `computed:"true"`,
+	"ipv6_cidr_block":                  `computed:"true"`,
+	"main_route_table_id":              `computed:"true"`,
+	"owner_id":                         `computed:"true"`,
+}
+
+func AwsDefaultVpcNormalizer(val *dctlcty.CtyAttributes) {
 }

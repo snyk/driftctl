@@ -45,7 +45,13 @@ func (r *AwsS3BucketAnalyticsConfiguration) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsS3BucketAnalyticsConfigurationTags = map[string]string{}
+func initAwsS3BucketAnalyticsConfigurationMetaData() {
+	dctlcty.SetMetadata(AwsS3BucketAnalyticsConfigurationResourceType, AwsS3BucketAnalyticsConfigurationTags, AwsS3BucketAnalyticsConfigurationNormalizer)
+}
 
-func awsS3BucketAnalyticsConfigurationNormalizer(val *dctlcty.CtyAttributes) {
+var AwsS3BucketAnalyticsConfigurationTags = map[string]string{
+	"id": `computed:"true"`,
+}
+
+func AwsS3BucketAnalyticsConfigurationNormalizer(val *dctlcty.CtyAttributes) {
 }

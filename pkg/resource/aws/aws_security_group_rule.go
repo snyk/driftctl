@@ -37,8 +37,15 @@ func (r *AwsSecurityGroupRule) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsSecurityGroupRuleTags = map[string]string{}
+func initAwsSecurityGroupRuleMetaData() {
+	dctlcty.SetMetadata(AwsSecurityGroupRuleResourceType, AwsSecurityGroupRuleTags, AwsSecurityGroupRuleNormalizer)
+}
 
-func awsSecurityGroupRuleNormalizer(val *dctlcty.CtyAttributes) {
+var AwsSecurityGroupRuleTags = map[string]string{
+	"id":                       `computed:"true"`,
+	"source_security_group_id": `computed:"true"`,
+}
+
+func AwsSecurityGroupRuleNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"self"})
 }

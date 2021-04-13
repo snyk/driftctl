@@ -36,8 +36,18 @@ func (r *AwsKmsKey) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsKmsKeyTags = map[string]string{}
+func initAwsKmsKeyMetaData() {
+	dctlcty.SetMetadata(AwsKmsKeyResourceType, AwsKmsKeyTags, AwsKmsKeyNormalizer)
+}
 
-func awsKmsKeyNormalizer(val *dctlcty.CtyAttributes) {
+var AwsKmsKeyTags = map[string]string{
+	"arn":         `computed:"true"`,
+	"description": `computed:"true"`,
+	"id":          `computed:"true"`,
+	"key_id":      `computed:"true"`,
+	"policy":      `jsonstring:"true" computed:"true"`,
+}
+
+func AwsKmsKeyNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"deletion_window_in_days"})
 }

@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/dctlcty"
 )
 
 type FakeResource struct {
@@ -34,6 +36,7 @@ func (d FakeResource) TerraformId() string {
 
 func (d FakeResource) TerraformType() string {
 	if d.Type != "" {
+		dctlcty.SetMetadata(d.Type, FakeResourceTags, FakeResourceNormalizer)
 		return d.Type
 	}
 	return "FakeResource"
@@ -44,8 +47,8 @@ func (r FakeResource) CtyValue() *cty.Value {
 }
 
 type FakeResourceStringer struct {
-	Id     string
-	Name   string
+	Id     string     `cty:"id"`
+	Name   string     `cty:"name"`
 	CtyVal *cty.Value `diff:"-"`
 }
 
@@ -63,4 +66,19 @@ func (r *FakeResourceStringer) CtyValue() *cty.Value {
 
 func (d *FakeResourceStringer) String() string {
 	return fmt.Sprintf("Name: '%s'", d.Name)
+}
+
+func InitFakeResourceMetadata() {
+	dctlcty.SetMetadata("FakeResource", FakeResourceTags, FakeResourceNormalizer)
+}
+
+var FakeResourceTags = map[string]string{
+	"bar_foo":             `computed:"true"`,
+	"json":                `jsonstring:"true"`,
+	"struct.baz":          `computed:"true"`,
+	"struct_slice.string": `computed:"true"`,
+	"struct_slice.array":  `computed:"true"`,
+}
+
+func FakeResourceNormalizer(val *dctlcty.CtyAttributes) {
 }

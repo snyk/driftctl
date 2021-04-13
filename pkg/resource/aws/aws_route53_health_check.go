@@ -46,7 +46,14 @@ func (r *AwsRoute53HealthCheck) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsRoute53HealthCheckTags = map[string]string{}
+func initAwsRoute53HealthCheckMetaData() {
+	dctlcty.SetMetadata(AwsRoute53HealthCheckResourceType, AwsRoute53HealthCheckTags, AwsRoute53HealthCheckNormalizer)
+}
 
-func awsRoute53HealthCheckNormalizer(val *dctlcty.CtyAttributes) {
+var AwsRoute53HealthCheckTags = map[string]string{
+	"enable_sni": `computed:"true"`,
+	"id":         `computed:"true"`,
+}
+
+func AwsRoute53HealthCheckNormalizer(val *dctlcty.CtyAttributes) {
 }

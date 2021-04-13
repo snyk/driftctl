@@ -42,8 +42,19 @@ func (r *AwsSubnet) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsSubnetTags = map[string]string{}
+func initAwsSubnetMetaData() {
+	dctlcty.SetMetadata(AwsSubnetResourceType, AwsSubnetTags, AwsSubnetNormalizer)
+}
 
-func awsSubnetNormalizer(val *dctlcty.CtyAttributes) {
+var AwsSubnetTags = map[string]string{
+	"arn":                            `computed:"true"`,
+	"availability_zone":              `computed:"true"`,
+	"availability_zone_id":           `computed:"true"`,
+	"id":                             `computed:"true"`,
+	"ipv6_cidr_block_association_id": `computed:"true"`,
+	"owner_id":                       `computed:"true"`,
+}
+
+func AwsSubnetNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"timeouts"})
 }

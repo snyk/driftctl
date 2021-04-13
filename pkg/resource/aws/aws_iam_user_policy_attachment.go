@@ -28,7 +28,13 @@ func (r *AwsIamUserPolicyAttachment) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsIamUserPolicyAttachmentTags = map[string]string{}
+func initAwsIamUserPolicyAttachmentMetaData() {
+	dctlcty.SetMetadata(AwsIamUserPolicyAttachmentResourceType, AwsIamUserPolicyAttachmentTags, AwsIamUserPolicyAttachmentNormalizer)
+}
 
-func awsIamUserPolicyAttachmentNormalizer(val *dctlcty.CtyAttributes) {
+var AwsIamUserPolicyAttachmentTags = map[string]string{
+	"id": `computed:"true"`,
+}
+
+func AwsIamUserPolicyAttachmentNormalizer(val *dctlcty.CtyAttributes) {
 }

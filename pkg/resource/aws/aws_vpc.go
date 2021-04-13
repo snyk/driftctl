@@ -43,7 +43,25 @@ func (r *AwsVpc) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsVpcTags = map[string]string{}
+func initAwsVpcMetaData() {
+	dctlcty.SetMetadata(AwsVpcResourceType, AwsVpcTags, AwsVpcNormalizer)
+}
 
-func awsVpcNormalizer(val *dctlcty.CtyAttributes) {
+var AwsVpcTags = map[string]string{
+	"arn":                            `computed:"true"`,
+	"default_network_acl_id":         `computed:"true"`,
+	"default_route_table_id":         `computed:"true"`,
+	"default_security_group_id":      `computed:"true"`,
+	"dhcp_options_id":                `computed:"true"`,
+	"enable_classiclink":             `computed:"true"`,
+	"enable_classiclink_dns_support": `computed:"true"`,
+	"enable_dns_hostnames":           `computed:"true"`,
+	"id":                             `computed:"true"`,
+	"ipv6_association_id":            `computed:"true"`,
+	"ipv6_cidr_block":                `computed:"true"`,
+	"main_route_table_id":            `computed:"true"`,
+	"owner_id":                       `computed:"true"`,
+}
+
+func AwsVpcNormalizer(val *dctlcty.CtyAttributes) {
 }

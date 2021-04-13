@@ -42,8 +42,18 @@ func (r *AwsEcrRepository) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsEcrRepositoryTags = map[string]string{}
+func initAwsEcrRepositoryMetaData() {
+	dctlcty.SetMetadata(AwsEcrRepositoryResourceType, AwsEcrRepositoryTags, AwsEcrRepositoryNormalizer)
+}
 
-func awsEcrRepositoryNormalizer(val *dctlcty.CtyAttributes) {
+var AwsEcrRepositoryTags = map[string]string{
+	"arn":                              `computed:"true"`,
+	"id":                               `computed:"true"`,
+	"registry_id":                      `computed:"true"`,
+	"repository_url":                   `computed:"true"`,
+	"encryption_configuration.kms_key": `computed:"true"`,
+}
+
+func AwsEcrRepositoryNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"timeouts"})
 }

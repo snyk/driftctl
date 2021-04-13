@@ -33,8 +33,16 @@ func (r *AwsIamUser) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsIamUserTags = map[string]string{}
+func initAwsIamUserMetaData() {
+	dctlcty.SetMetadata(AwsIamUserResourceType, AwsIamUserTags, AwsIamUserNormalizer)
+}
 
-func awsIamUserNormalizer(val *dctlcty.CtyAttributes) {
+var AwsIamUserTags = map[string]string{
+	"arn":       `computed:"true"`,
+	"id":        `computed:"true"`,
+	"unique_id": `computed:"true"`,
+}
+
+func AwsIamUserNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"force_destroy"})
 }

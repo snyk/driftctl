@@ -60,9 +60,17 @@ func (r *AwsSecurityGroup) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsSecurityGroupTags = map[string]string{}
+func initAwsSecurityGroupMetaData() {
+	dctlcty.SetMetadata(AwsSecurityGroupResourceType, AwsSecurityGroupTags, AwsSecurityGroupNormalizer)
+}
 
-func awsSecurityGroupNormalizer(val *dctlcty.CtyAttributes) {
+var AwsSecurityGroupTags = map[string]string{
+	"arn":      `computed:"true"`,
+	"owner_id": `computed:"true"`,
+	"vpc_id":   `computed:"true"`,
+}
+
+func AwsSecurityGroupNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"revoke_rules_on_delete"})
 	val.SafeDelete([]string{"timeouts"})
 }

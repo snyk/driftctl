@@ -71,9 +71,13 @@ func (r *GithubRepository) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var githubRepositoryTags = map[string]string{}
+func initGithubRepositoryMetadata() {
+	dctlcty.SetMetadata(GithubRepositoryResourceType, GithubRepositoryTags, GithubRepositoryNormalizer)
+}
 
-func githubRepositoryNormalizer(val *dctlcty.CtyAttributes) {
+var GithubRepositoryTags = map[string]string{}
+
+func GithubRepositoryNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"etag"})
 	val.SafeDelete([]string{"auto_init"})
 }

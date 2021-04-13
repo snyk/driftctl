@@ -137,9 +137,27 @@ func (r *AwsS3Bucket) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsS3BucketTags = map[string]string{}
+func initAwsS3BucketMetaData() {
+	dctlcty.SetMetadata(AwsS3BucketResourceType, AwsS3BucketTags, AwsS3BucketNormalizer)
+}
 
-func awsS3BucketNormalizer(val *dctlcty.CtyAttributes) {
+var AwsS3BucketTags = map[string]string{
+	"acceleration_status":         `computed:"true"`,
+	"arn":                         `computed:"true"`,
+	"bucket":                      `computed:"true"`,
+	"bucket_domain_name":          `computed:"true"`,
+	"bucket_regional_domain_name": `computed:"true"`,
+	"hosted_zone_id":              `computed:"true"`,
+	"id":                          `computed:"true"`,
+	"policy":                      `jsonstring:"true"`,
+	"region":                      `computed:"true"`,
+	"request_payer":               `computed:"true"`,
+	"website_domain":              `computed:"true"`,
+	"website_endpoint":            `computed:"true"`,
+	"lifecycle_rule.id":           `computed:"true"`,
+}
+
+func AwsS3BucketNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"acl"})
 	val.SafeDelete([]string{"force_destroy"})
 }

@@ -47,8 +47,27 @@ func (r *AwsEip) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsEipTags = map[string]string{}
+func initAwsEipMetaData() {
+	dctlcty.SetMetadata(AwsEipResourceType, AwsEipTags, AwsEipNormalizer)
+}
 
-func awsEipNormalizer(val *dctlcty.CtyAttributes) {
+var AwsEipTags = map[string]string{
+	"allocation_id":        `computed:"true"`,
+	"association_id":       `computed:"true"`,
+	"customer_owned_ip":    `computed:"true"`,
+	"domain":               `computed:"true"`,
+	"id":                   `computed:"true"`,
+	"instance":             `computed:"true"`,
+	"network_border_group": `computed:"true"`,
+	"network_interface":    `computed:"true"`,
+	"private_dns":          `computed:"true"`,
+	"private_ip":           `computed:"true"`,
+	"public_dns":           `computed:"true"`,
+	"public_ip":            `computed:"true"`,
+	"public_ipv4_pool":     `computed:"true"`,
+	"vpc":                  `computed:"true"`,
+}
+
+func AwsEipNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"timeouts"})
 }

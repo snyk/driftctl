@@ -32,7 +32,18 @@ func (r *AwsEipAssociation) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsEipAssociationTags = map[string]string{}
+func initAwsEipAssociationMetaData() {
+	dctlcty.SetMetadata(AwsEipAssociationResourceType, AwsEipAssociationTags, AwsEipAssociationNormalizer)
+}
 
-func awsEipAssociationNormalizer(val *dctlcty.CtyAttributes) {
+var AwsEipAssociationTags = map[string]string{
+	"allocation_id":        `computed:"true"`,
+	"id":                   `computed:"true"`,
+	"instance_id":          `computed:"true"`,
+	"network_interface_id": `computed:"true"`,
+	"private_ip_address":   `computed:"true"`,
+	"public_ip":            `computed:"true"`,
+}
+
+func AwsEipAssociationNormalizer(val *dctlcty.CtyAttributes) {
 }

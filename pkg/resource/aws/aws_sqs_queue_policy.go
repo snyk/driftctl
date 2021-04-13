@@ -28,7 +28,14 @@ func (r *AwsSqsQueuePolicy) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsSqsQueuePolicyTags = map[string]string{}
+func initAwsSqsQueuePolicyMetaData() {
+	dctlcty.SetMetadata(AwsSqsQueuePolicyResourceType, AwsSqsQueuePolicyTags, AwsSqsQueuePolicyNormalizer)
+}
 
-func awsSqsQueuePolicyNormalizer(val *dctlcty.CtyAttributes) {
+var AwsSqsQueuePolicyTags = map[string]string{
+	"id":     `computed:"true"`,
+	"policy": `jsonstring:"true"`,
+}
+
+func AwsSqsQueuePolicyNormalizer(val *dctlcty.CtyAttributes) {
 }

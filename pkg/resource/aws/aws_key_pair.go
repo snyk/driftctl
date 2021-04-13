@@ -33,9 +33,19 @@ func (r *AwsKeyPair) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsKeyPairTags = map[string]string{}
+func initAwsKeyPairMetaData() {
+	dctlcty.SetMetadata(AwsKeyPairResourceType, AwsKeyPairTags, AwsKeyPairNormalizer)
+}
 
-func awsKeyPairNormalizer(val *dctlcty.CtyAttributes) {
+var AwsKeyPairTags = map[string]string{
+	"arn":         `computed:"true"`,
+	"fingerprint": `computed:"true"`,
+	"id":          `computed:"true"`,
+	"key_name":    `computed:"true"`,
+	"key_pair_id": `computed:"true"`,
+}
+
+func AwsKeyPairNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"key_name_prefix"})
 	val.SafeDelete([]string{"public_key"})
 }

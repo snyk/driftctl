@@ -46,8 +46,24 @@ func (r *AwsRoute) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsRouteTags = map[string]string{}
+func initAwsRouteMetaData() {
+	dctlcty.SetMetadata(AwsRouteResourceType, AwsRouteTags, AwsRouteNormalizer)
+}
 
-func awsRouteNormalizer(val *dctlcty.CtyAttributes) {
+var AwsRouteTags = map[string]string{
+	"destination_prefix_list_id": `computed:"true"`,
+	"egress_only_gateway_id":     `computed:"true"`,
+	"gateway_id":                 `computed:"true"`,
+	"id":                         `computed:"true"`,
+	"instance_id":                `computed:"true"`,
+	"instance_owner_id":          `computed:"true"`,
+	"local_gateway_id":           `computed:"true"`,
+	"nat_gateway_id":             `computed:"true"`,
+	"network_interface_id":       `computed:"true"`,
+	"origin":                     `computed:"true"`,
+	"state":                      `computed:"true"`,
+}
+
+func AwsRouteNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"timeouts"})
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/cloudskiff/driftctl/mocks"
+	"github.com/cloudskiff/driftctl/pkg/resource/github"
 
 	"github.com/stretchr/testify/assert"
 
@@ -235,7 +236,7 @@ func TestAnalyze(t *testing.T) {
 										"bar_foo",
 									},
 								},
-								// TODO Computed: true,
+								Computed: true,
 							},
 							{
 								Change: diff.Change{
@@ -268,16 +269,16 @@ func TestAnalyze(t *testing.T) {
 										"baz",
 									},
 								},
-								// TODO Computed: true,
+								Computed: true,
 							},
 						},
 					},
 				},
-				/* TODO					alerts: alerter.Alerts{
-				"": {
+				alerts: alerter.Alerts{
+					"": {
 						NewComputedDiffAlert(),
 					},
-				},*/
+				},
 			},
 			hasDrifted: true,
 		},
@@ -345,16 +346,16 @@ func TestAnalyze(t *testing.T) {
 										"bar_foo",
 									},
 								},
-								// TODO Computed: true,
+								Computed: true,
 							},
 						},
 					},
 				},
-				/* TODO alerts: alerter.Alerts{
+				alerts: alerter.Alerts{
 					"": {
 						NewComputedDiffAlert(),
 					},
-				},*/
+				},
 			},
 			hasDrifted: true,
 		},
@@ -580,7 +581,7 @@ func TestAnalyze(t *testing.T) {
 										"bar_foo",
 									},
 								},
-								// todo Computed: true,
+								Computed: true,
 							},
 							{
 								Change: diff.Change{
@@ -613,7 +614,7 @@ func TestAnalyze(t *testing.T) {
 										"baz",
 									},
 								},
-								// todo Computed: true,
+								Computed: true,
 							},
 							{
 								Change: diff.Change{
@@ -627,7 +628,7 @@ func TestAnalyze(t *testing.T) {
 										"0",
 									},
 								},
-								// todo Computed: true,
+								Computed: true,
 							},
 							{
 								Change: diff.Change{
@@ -640,7 +641,7 @@ func TestAnalyze(t *testing.T) {
 										"string",
 									},
 								},
-								// todo Computed: true,
+								Computed: true,
 							},
 						},
 					},
@@ -655,9 +656,9 @@ func TestAnalyze(t *testing.T) {
 					"other.resource": {
 						&alerter.FakeAlert{Msg: "Should not be ignored"},
 					},
-					/* todo "": {
+					"": {
 						NewComputedDiffAlert(),
-					},*/
+					},
 				},
 			},
 			hasDrifted: true,
@@ -780,6 +781,9 @@ func TestAnalyze(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
+			testresource.InitFakeResourceMetadata()
+			aws.InitResourcesMetadata()
+			github.InitMetadatas()
 			for _, r := range c.cloud {
 				fres, ok := r.(*testresource.FakeResource)
 				if ok {

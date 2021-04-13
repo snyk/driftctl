@@ -28,9 +28,16 @@ func (r *AwsS3BucketPolicy) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsS3BucketPolicyTags = map[string]string{}
+func initAwsS3BucketPolicyMetaData() {
+	dctlcty.SetMetadata(AwsS3BucketPolicyResourceType, AwsS3BucketPolicyTags, AwsS3BucketPolicyNormalizer)
+}
 
-func awsS3BucketPolicyNormalizer(val *dctlcty.CtyAttributes) {
+var AwsS3BucketPolicyTags = map[string]string{
+	"id":     `computed:"true"`,
+	"policy": `jsonstring:"true"`,
+}
+
+func AwsS3BucketPolicyNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"bucket"})
 	val.SafeDelete([]string{"id"})
 }

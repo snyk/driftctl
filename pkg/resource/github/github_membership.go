@@ -29,8 +29,12 @@ func (r *GithubMembership) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var githubMembershipTags = map[string]string{}
+func initGithubMembershipMetadata() {
+	dctlcty.SetMetadata(GithubMembershipResourceType, GithubMembershipTags, GithubMembershipNormalizer)
+}
 
-func githubMembershipNormalizer(val *dctlcty.CtyAttributes) {
+var GithubMembershipTags = map[string]string{}
+
+func GithubMembershipNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"etag"})
 }

@@ -37,8 +37,17 @@ func (r *AwsRoute53Zone) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsRoute53ZoneTags = map[string]string{}
+func initAwsRoute53ZoneMetaData() {
+	dctlcty.SetMetadata(AwsRoute53ZoneResourceType, AwsRoute53ZoneTags, AwsRoute53ZoneNormalizer)
+}
 
-func awsRoute53ZoneNormalizer(val *dctlcty.CtyAttributes) {
+var AwsRoute53ZoneTags = map[string]string{
+	"id":             `computed:"true"`,
+	"name_servers":   `computed:"true"`,
+	"zone_id":        `computed:"true"`,
+	"vpc.vpc_region": `computed:"true"`,
+}
+
+func AwsRoute53ZoneNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"force_destroy"})
 }

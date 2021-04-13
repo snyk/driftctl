@@ -48,9 +48,23 @@ func (r *AwsLambdaEventSourceMapping) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsLambdaEventSourceMappingTags = map[string]string{}
+func initAwsLambdaEventSourceMappingMetaData() {
+	dctlcty.SetMetadata(AwsLambdaEventSourceMappingResourceType, AwsLambdaEventSourceMappingTags, AwsLambdaEventSourceMappingNormalizer)
+}
 
-func awsLambdaEventSourceMappingNormalizer(val *dctlcty.CtyAttributes) {
+var AwsLambdaEventSourceMappingTags = map[string]string{
+	"function_arn":                  `computed:"true"`,
+	"id":                            `computed:"true"`,
+	"last_modified":                 `computed:"true"`,
+	"last_processing_result":        `computed:"true"`,
+	"maximum_record_age_in_seconds": `computed:"true"`,
+	"maximum_retry_attempts":        `computed:"true"`,
+	"parallelization_factor":        `computed:"true"`,
+	"state_transition_reason":       `computed:"true"`,
+	"uuid":                          `computed:"true"`,
+}
+
+func AwsLambdaEventSourceMappingNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"last_modified"})
 	val.SafeDelete([]string{"last_processing_result"})
 	val.SafeDelete([]string{"starting_position"})

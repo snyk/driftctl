@@ -76,8 +76,19 @@ func (r *AwsDynamodbTable) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsDynamodbTableTags = map[string]string{}
+func initAwsDynamodbTableMetaData() {
+	dctlcty.SetMetadata(AwsDynamodbTableResourceType, AwsDynamodbTableTags, AwsDynamodbTableNormalizer)
+}
 
-func awsDynamodbTableNormalizer(val *dctlcty.CtyAttributes) {
+var AwsDynamodbTableTags = map[string]string{
+	"arn":                                `computed:"true"`,
+	"id":                                 `computed:"true"`,
+	"stream_arn":                         `computed:"true"`,
+	"stream_label":                       `computed:"true"`,
+	"stream_view_type":                   `computed:"true"`,
+	"server_side_encryption.kms_key_arn": `computed:"true"`,
+}
+
+func AwsDynamodbTableNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"timeouts"})
 }

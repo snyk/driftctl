@@ -32,7 +32,13 @@ func (r *AwsS3BucketMetric) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsS3BucketMetricTags = map[string]string{}
+func initAwsS3BucketMetricMetaData() {
+	dctlcty.SetMetadata(AwsS3BucketMetricResourceType, AwsS3BucketMetricTags, AwsS3BucketMetricNormalizer)
+}
 
-func awsS3BucketMetricNormalizer(val *dctlcty.CtyAttributes) {
+var AwsS3BucketMetricTags = map[string]string{
+	"id": `computed:"true"`,
+}
+
+func AwsS3BucketMetricNormalizer(val *dctlcty.CtyAttributes) {
 }

@@ -41,7 +41,17 @@ func (r *AwsSqsQueue) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsSqsQueueTags = map[string]string{}
+func initAwsSqsQueueMetaData() {
+	dctlcty.SetMetadata(AwsSqsQueueResourceType, AwsSqsQueueTags, AwsSqsQueueNormalizer)
+}
 
-func awsSqsQueueNormalizer(val *dctlcty.CtyAttributes) {
+var AwsSqsQueueTags = map[string]string{
+	"arn":                               `computed:"true"`,
+	"id":                                `computed:"true"`,
+	"kms_data_key_reuse_period_seconds": `computed:"true"`,
+	"name":                              `computed:"true"`,
+	"policy":                            `computed:"true"`,
+}
+
+func AwsSqsQueueNormalizer(val *dctlcty.CtyAttributes) {
 }

@@ -38,8 +38,19 @@ func (r *AwsIamRole) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsIamRoleTags = map[string]string{}
+func initAwsIamRoleMetaData() {
+	dctlcty.SetMetadata(AwsIamRoleResourceType, AwsIamRoleTags, AwsIamRoleNormalizer)
+}
 
-func awsIamRoleNormalizer(val *dctlcty.CtyAttributes) {
+var AwsIamRoleTags = map[string]string{
+	"arn":                `computed:"true"`,
+	"assume_role_policy": `jsonstring:"true"`,
+	"create_date":        `computed:"true"`,
+	"id":                 `computed:"true"`,
+	"name":               `computed:"true"`,
+	"unique_id":          `computed:"true"`,
+}
+
+func AwsIamRoleNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"force_detach_policies"})
 }

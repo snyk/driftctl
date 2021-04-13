@@ -36,8 +36,12 @@ func (r *GithubTeam) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var githubTeamTags = map[string]string{}
+func initGithubTeamMetadata() {
+	dctlcty.SetMetadata(GithubTeamResourceType, GithubTeamTags, GithubTeamNormalizer)
+}
 
-func githubTeamNormalizer(val *dctlcty.CtyAttributes) {
+var GithubTeamTags = map[string]string{}
+
+func GithubTeamNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"etag"})
 }

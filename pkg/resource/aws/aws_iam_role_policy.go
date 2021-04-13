@@ -30,7 +30,15 @@ func (r *AwsIamRolePolicy) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsIamRolePolicyTags = map[string]string{}
+func initAwsIamRolePolicyMetaData() {
+	dctlcty.SetMetadata(AwsIamRolePolicyResourceType, AwsIamRolePolicyTags, AwsIamRolePolicyNormalizer)
+}
 
-func awsIamRolePolicyNormalizer(val *dctlcty.CtyAttributes) {
+var AwsIamRolePolicyTags = map[string]string{
+	"id":     `computed:"true"`,
+	"name":   `computed:"true"`,
+	"policy": `jsonstring:"true"`,
+}
+
+func AwsIamRolePolicyNormalizer(val *dctlcty.CtyAttributes) {
 }

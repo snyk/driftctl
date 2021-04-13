@@ -1,6 +1,6 @@
 Found drifted resources:
   - diff-id-1 (aws_diff_resource):
-    ~ Json:
+    ~ json:
         {
           "Statement": [
             {
@@ -18,7 +18,7 @@ Found drifted resources:
           "Version": "2012-10-17"
         }
   - diff-id-2 (aws_diff_resource):
-    ~ Json:
+    ~ json:
         {
           + "bar": "foo",
           - "foo": "bar"

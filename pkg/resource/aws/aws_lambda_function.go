@@ -80,9 +80,25 @@ func (r *AwsLambdaFunction) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsLambdaFunctionTags = map[string]string{}
+func initAwsLambdaFunctionMetaData() {
+	dctlcty.SetMetadata(AwsLambdaFunctionResourceType, AwsLambdaFunctionTags, AwsLambdaFunctionNormalizer)
+}
 
-func awsLambdaFunctionNormalizer(val *dctlcty.CtyAttributes) {
+var AwsLambdaFunctionTags = map[string]string{
+	"arn":                         `computed:"true"`,
+	"id":                          `computed:"true"`,
+	"invoke_arn":                  `computed:"true"`,
+	"last_modified":               `computed:"true"`,
+	"qualified_arn":               `computed:"true"`,
+	"signing_job_arn":             `computed:"true"`,
+	"signing_profile_version_arn": `computed:"true"`,
+	"source_code_hash":            `computed:"true"`,
+	"source_code_size":            `computed:"true"`,
+	"version":                     `computed:"true"`,
+	"vpc_config.vpc_id":           `computed:"true"`,
+}
+
+func AwsLambdaFunctionNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"filename"})
 	val.SafeDelete([]string{"publish"})
 	val.SafeDelete([]string{"timeouts"})

@@ -46,7 +46,17 @@ func (r *AwsSnsTopic) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsSnsTopicTags = map[string]string{}
+func initAwsSnsTopicMetaData() {
+	dctlcty.SetMetadata(AwsSnsTopicResourceType, AwsSnsTopicTags, AwsSnsTopicNormalizer)
+}
 
-func awsSnsTopicNormalizer(val *dctlcty.CtyAttributes) {
+var AwsSnsTopicTags = map[string]string{
+	"arn":             `computed:"true"`,
+	"delivery_policy": `jsonstring:"true"`,
+	"id":              `computed:"true"`,
+	"name":            `computed:"true"`,
+	"policy":          `computed:"true" jsonstring:"true"`,
+}
+
+func AwsSnsTopicNormalizer(val *dctlcty.CtyAttributes) {
 }

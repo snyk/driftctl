@@ -43,8 +43,14 @@ func (r *GithubBranchProtection) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var githubBranchProtectionTags = map[string]string{}
+func initGithubBranchProtectionMetadata() {
+	dctlcty.SetMetadata(GithubBranchProtectionResourceType, GithubBranchProtectionTags, GithubBranchProtectionNormalizer)
+}
 
-func githubBranchProtectionNormalizer(val *dctlcty.CtyAttributes) {
+var GithubBranchProtectionTags = map[string]string{
+	"id": `computed:"true"`,
+}
+
+func GithubBranchProtectionNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"repository_id"})
 }

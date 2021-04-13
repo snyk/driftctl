@@ -43,7 +43,16 @@ func (r *AwsDefaultRouteTable) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsDefaultRouteTableTags = map[string]string{}
+func initAwsDefaultRouteTableMetaData() {
+	dctlcty.SetMetadata(AwsDefaultRouteTableResourceType, AwsDefaultRouteTableTags, AwsDefaultRouteTableNormalizer)
+}
 
-func awsDefaultRouteTableNormalizer(val *dctlcty.CtyAttributes) {
+var AwsDefaultRouteTableTags = map[string]string{
+	"id":       "computed:\"true\"",
+	"owner_id": "computed:\"true\"",
+	"route":    "computed:\"true\"",
+	"vpc_id":   "computed:\"true\"",
+}
+
+func AwsDefaultRouteTableNormalizer(val *dctlcty.CtyAttributes) {
 }

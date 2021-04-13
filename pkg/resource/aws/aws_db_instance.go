@@ -102,9 +102,50 @@ func (r *AwsDbInstance) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-var awsDbInstanceDistributionTags = map[string]string{}
+func initAwsDbInstanceMetaData() {
+	dctlcty.SetMetadata(AwsDbInstanceResourceType, AwsDbInstanceTags, AwsDbInstanceNormalizer)
+}
 
-func awsDbInstanceDistributionNormalizer(val *dctlcty.CtyAttributes) {
+var AwsDbInstanceTags = map[string]string{
+	"address":                               `computed:"true"`,
+	"allocated_storage":                     `computed:"true"`,
+	"apply_immediately":                     `computed:"true"`,
+	"arn":                                   `computed:"true"`,
+	"availability_zone":                     `computed:"true"`,
+	"backup_retention_period":               `computed:"true"`,
+	"backup_window":                         `computed:"true"`,
+	"ca_cert_identifier":                    `computed:"true"`,
+	"character_set_name":                    `computed:"true"`,
+	"db_subnet_group_name":                  `computed:"true"`,
+	"endpoint":                              `computed:"true"`,
+	"engine":                                `computed:"true"`,
+	"engine_version":                        `computed:"true"`,
+	"hosted_zone_id":                        `computed:"true"`,
+	"id":                                    `computed:"true"`,
+	"identifier":                            `computed:"true"`,
+	"identifier_prefix":                     `computed:"true"`,
+	"kms_key_id":                            `computed:"true"`,
+	"latest_restorable_time":                `computed:"true"`,
+	"license_model":                         `computed:"true"`,
+	"maintenance_window":                    `computed:"true"`,
+	"monitoring_role_arn":                   `computed:"true"`,
+	"multi_az":                              `computed:"true"`,
+	"name":                                  `computed:"true"`,
+	"option_group_name":                     `computed:"true"`,
+	"parameter_group_name":                  `computed:"true"`,
+	"performance_insights_kms_key_id":       `computed:"true"`,
+	"performance_insights_retention_period": `computed:"true"`,
+	"port":                                  `computed:"true"`,
+	"replicas":                              `computed:"true"`,
+	"resource_id":                           `computed:"true"`,
+	"status":                                `computed:"true"`,
+	"storage_type":                          `computed:"true"`,
+	"timezone":                              `computed:"true"`,
+	"username":                              `computed:"true"`,
+	"vpc_security_group_ids":                `computed:"true"`,
+}
+
+func AwsDbInstanceNormalizer(val *dctlcty.CtyAttributes) {
 	val.SafeDelete([]string{"delete_automated_backups"})
 	val.SafeDelete([]string{"latest_restorable_time"})
 	val.SafeDelete([]string{"password"})
