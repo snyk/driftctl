@@ -15,6 +15,7 @@
   "FailoverRoutingPolicy": [],
   "GeolocationRoutingPolicy": [],
   "LatencyRoutingPolicy": [],
-  "WeightedRoutingPolicy": []
+  "WeightedRoutingPolicy": [],
+  "CtyVal": {}
  }
 ]

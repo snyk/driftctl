@@ -975,11 +975,6 @@ func TestAnalyze(t *testing.T) {
 		t.Fatalf("Error creating new differ: %e", err)
 	}
 
-	differ, err := diff.NewDiffer(diff.SliceOrdering(true))
-	if err != nil {
-		t.Fatalf("Error creating new differ: %e", err)
-	}
-
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			filter := &mocks.Filter{}

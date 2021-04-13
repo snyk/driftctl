@@ -35,7 +35,7 @@ func TestAcc_AwsRoute53Record_WithAlias(t *testing.T) {
 		Args:  []string{"scan", "--filter", "Type=='aws_route53_record'"},
 		Checks: []acceptance.AccCheck{
 			{
-				Check: func(result *acceptance.ScanResult, stdout string, err error) {
+				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
 					}
