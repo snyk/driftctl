@@ -47,8 +47,8 @@ func (p *progress) Start() {
 
 func (p *progress) Stop() {
 	if p.started.Swap(false) {
+		Printf("Scanned resources:    (%d)\n", p.count.Load())
 		close(p.endChan)
-		Printf("\n")
 	}
 }
 

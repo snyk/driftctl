@@ -2,10 +2,13 @@ package analyser
 
 import (
 	"encoding/json"
+	"sort"
+	"strings"
+
+	"github.com/r3labs/diff/v2"
 
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/r3labs/diff/v2"
 )
 
 type Change struct {
@@ -22,9 +25,9 @@ type Difference struct {
 
 type Summary struct {
 	TotalResources int `json:"total_resources"`
-	TotalDrifted   int `json:"total_drifted"`
+	TotalDrifted   int `json:"total_changed"`
 	TotalUnmanaged int `json:"total_unmanaged"`
-	TotalDeleted   int `json:"total_deleted"`
+	TotalDeleted   int `json:"total_missing"`
 	TotalManaged   int `json:"total_managed"`
 }
 
@@ -46,7 +49,7 @@ type serializableAnalysis struct {
 	Summary     Summary                                `json:"summary"`
 	Managed     []resource.SerializableResource        `json:"managed"`
 	Unmanaged   []resource.SerializableResource        `json:"unmanaged"`
-	Deleted     []resource.SerializableResource        `json:"deleted"`
+	Deleted     []resource.SerializableResource        `json:"missing"`
 	Differences []serializableDifference               `json:"differences"`
 	Coverage    int                                    `json:"coverage"`
 	Alerts      map[string][]alerter.SerializableAlert `json:"alerts"`
@@ -193,4 +196,27 @@ func (a *Analysis) Alerts() alerter.Alerts {
 func (a *Analysis) SortResources() {
 	a.unmanaged = resource.Sort(a.unmanaged)
 	a.deleted = resource.Sort(a.deleted)
+	a.differences = SortDifferences(a.differences)
+}
+
+func SortDifferences(diffs []Difference) []Difference {
+	sort.SliceStable(diffs, func(i, j int) bool {
+		if diffs[i].Res.TerraformType() != diffs[j].Res.TerraformType() {
+			return diffs[i].Res.TerraformType() < diffs[j].Res.TerraformType()
+		}
+		return diffs[i].Res.TerraformId() < diffs[j].Res.TerraformId()
+	})
+
+	for _, d := range diffs {
+		SortChanges(d.Changelog)
+	}
+
+	return diffs
+}
+
+func SortChanges(changes []Change) []Change {
+	sort.SliceStable(changes, func(i, j int) bool {
+		return strings.Join(changes[i].Path, ".") < strings.Join(changes[j].Path, ".")
+	})
+	return changes
 }

@@ -7,7 +7,7 @@ import (
 )
 
 // Each region has a default vpc which has an internet gateway attached and thus the route table of this
-// same vpc has a specific default route that should not be seen as unmanaged if not managed by IaC
+// same vpc has a default route (0.0.0.0/0) that should not be seen as unmanaged if not managed by IaC
 // This middleware ignores the above route from unmanaged resources if not managed by IaC
 type AwsDefaultInternetGatewayRoute struct{}
 
@@ -65,7 +65,9 @@ func isDefaultInternetGatewayRoute(route *aws.AwsRoute, remoteResources *[]resou
 	for _, remoteResource := range *remoteResources {
 		if remoteResource.TerraformType() == aws.AwsInternetGatewayResourceType &&
 			isDefaultInternetGateway(remoteResource.(*aws.AwsInternetGateway), remoteResources) {
-			return route.GatewayId != nil && *route.GatewayId == remoteResource.TerraformId()
+			return route.GatewayId != nil &&
+				*route.GatewayId == remoteResource.TerraformId() &&
+				route.DestinationCidrBlock != nil && *route.DestinationCidrBlock == "0.0.0.0/0"
 		}
 	}
 	return false

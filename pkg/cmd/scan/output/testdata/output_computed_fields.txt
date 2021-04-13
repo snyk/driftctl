@@ -1,4 +1,4 @@
-Found drifted resources:
+Found changed resources:
   - diff-id-1 (aws_diff_resource):
     ~ updated.field: "foobar" => "barfoo" (computed)
     + new.field: <nil> => "newValue"
@@ -9,6 +9,6 @@ Found 1 resource(s)
  - 100% coverage
  - 1 covered by IaC
  - 0 not covered by IaC
- - 0 deleted on cloud provider
- - 1/1 drifted from IaC
+ - 0 missing on cloud provider
+ - 1/1 changed outside of IaC
 You have diffs on computed fields, check the documentation for potential false positive drifts
