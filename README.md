@@ -29,7 +29,9 @@
 ## Why driftctl ?
 
 Infrastructure drift is a blind spot and a source of potential security issues.
-Drift can have multiple causes: from team members creating or updating infrastructure through the web console without backporting changes to Terraform, to unexpected actions from authenticated apps and services.
+Drift can have multiple causes: from team members creating or updating infrastructure through the web console without backporting changes to Terraform, to unexpected actions from authenticated apps and services. 
+
+You can't efficiently improve what you don't track. We track coverage for unit tests, why not infrastructure as code coverage?
 
 Spot discrepancies as they happen : driftctl is a free and open-source CLI that warns of infrastructure drift and fills in the missing piece in your DevSecOps toolbox.
 
@@ -67,6 +69,6 @@ Build with ❤️️ from 🇫🇷 🇯🇵 🇬🇷 🇸🇪 🇺🇸
 
 We have 30 min slots for 1:1 [tech discussions and overviews](https://calendly.com/stephanejourdan/30min) twice a day to help you get started and collect users feedback.
 
-:warning: ** No sales involved ** You will deal with a technical team member of the project. 
+:warning: ** No sales involved **: You will deal with a technical team member of the project. 
 
 Feel free to book a slot.
