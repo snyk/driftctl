@@ -89,9 +89,22 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 					VpcId: awssdk.String("default-vpc"),
 				},
 				&aws.AwsRoute{
-					Id:           "default-igw-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("default-igw"),
+					Id:                   "default-igw-route",
+					DestinationCidrBlock: awssdk.String("0.0.0.0/0"),
+					RouteTableId:         awssdk.String("default-route-table"),
+					GatewayId:            awssdk.String("default-igw"),
+				},
+				&aws.AwsRoute{
+					Id:                   "default-igw-non-default-route",
+					DestinationCidrBlock: awssdk.String("10.0.1.0/24"),
+					RouteTableId:         awssdk.String("default-route-table"),
+					GatewayId:            awssdk.String("default-igw"),
+				},
+				&aws.AwsRoute{
+					Id:                       "default-igw-default-ipv6-route",
+					DestinationIpv6CidrBlock: awssdk.String("::/0"),
+					RouteTableId:             awssdk.String("default-route-table"),
+					GatewayId:                awssdk.String("default-igw"),
 				},
 				&aws.AwsRoute{
 					Id:           "dummy-route",
@@ -111,6 +124,18 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 				&aws.AwsDefaultRouteTable{
 					Id:    "default-route-table",
 					VpcId: awssdk.String("default-vpc"),
+				},
+				&aws.AwsRoute{
+					Id:                   "default-igw-non-default-route",
+					DestinationCidrBlock: awssdk.String("10.0.1.0/24"),
+					RouteTableId:         awssdk.String("default-route-table"),
+					GatewayId:            awssdk.String("default-igw"),
+				},
+				&aws.AwsRoute{
+					Id:                       "default-igw-default-ipv6-route",
+					DestinationIpv6CidrBlock: awssdk.String("::/0"),
+					RouteTableId:             awssdk.String("default-route-table"),
+					GatewayId:                awssdk.String("default-igw"),
 				},
 				&aws.AwsRoute{
 					Id:           "dummy-route",
