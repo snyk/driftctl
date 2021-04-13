@@ -28,13 +28,11 @@
 
 ## Why driftctl ?
 
-Infrastructure as code is awesome, but there are too many moving parts: codebase, state file, actual cloud state. Things tend to drift.
+Infrastructure drift is a blind spot and a source of potential security issues.
+Drift can have multiple causes: from team members creating or updating infrastructure through the web console without backporting changes to Terraform, to unexpected actions from authenticated apps and services.
 
-Drift can have multiple causes: from developers creating or updating infrastructure through the web console without telling anyone, to uncontrolled updates on the cloud provider side. Handling infrastructure drift vs the codebase can be challenging.
+Spot discrepancies as they happen : driftctl is a free and open-source CLI that warns of infrastructure drift and fills in the missing piece in your DevSecOps toolbox.
 
-You can't efficiently improve what you don't track. We track coverage for unit tests, why not infrastructure as code coverage?
-
-driftctl tracks how well your IaC codebase covers your cloud configuration. driftctl warns you about drift.
 
 ## Features
 
@@ -65,8 +63,10 @@ Build with ❤️️ from 🇫🇷 🇯🇵 🇬🇷 🇸🇪 🇺🇸
 
 ---
 
-## Collecting users feedback
+## Helping you get started
 
-Have you launched driftctl ? Please take a moment to answer the [following questions](https://driftctl.typeform.com/to/fYUOOMj3) and help us improve the tool. 
+We have 30 min slots for 1:1 [tech discussions and overviews](https://calendly.com/stephanejourdan/30min) twice a day to help you get started and collect users feedback.
 
-3 minutes, tops!
+:warning: ** No sales involved ** You will deal with a technical team member of the project. 
+
+Feel free to book a slot.
