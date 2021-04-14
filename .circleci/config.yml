@@ -125,6 +125,40 @@ jobs:
           command: |
             VERSION=$(./bin/driftctl_linux_amd64 version)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -n ${VERSION} ${VERSION} ./bin/
+  publish-aur:
+    environment:
+        AUR_GIT: ssh://aur@aur.archlinux.org/driftctl-bin.git
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/project
+      # Add ssh private key to allow access to AUR repository
+      # This key is bound to user cloudskiff on AUR
+      - add_ssh_keys:
+            fingerprints:
+                - "ba:05:09:d6:a6:2a:45:34:89:c4:5e:22:23:22:e8:9f"
+      - run:
+          name: Bump package version
+          command: |
+            mkdir -p ~/.ssh
+            echo 'aur.archlinux.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEuBKrPzbawxA/k2g6NcyV5jmqwJ2s+zpgZGZ7tpLIcN' >> ~/.ssh/known_hosts
+            # Ensure ssh is properly configured
+            ssh aur@aur.archlinux.org list-repos
+            git clone "${AUR_GIT}" driftctl-bin
+            cd driftctl-bin
+            git config user.name "cloudskiff"
+            git config user.email tech@cloudskiff.com
+            cp ~/project/bin/driftctl_SHA256SUMS .
+            ./bump.sh "${CIRCLE_TAG}"
+            echo "--- PKGBUILD ---"
+            cat PKGBUILD
+            echo "--- .SRCINFO ---"
+            cat .SRCINFO
+            git add PKGBUILD .SRCINFO
+            git commit -m "Updated to version ${CIRCLE_TAG}"
+            git push
   update-lambda:
     executor: aws-cli/default
     environment:
@@ -212,6 +246,14 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
+      - publish-aur:
+          requires:
+            - release
+          filters:
+              tags:
+                only: /^v.*/
+              branches:
+                ignore: /.*/
       - update-lambda:
           context: driftctl-version-lambda
           requires:
