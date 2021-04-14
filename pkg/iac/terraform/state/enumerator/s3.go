@@ -3,6 +3,7 @@ package enumerator
 import (
 	"strings"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
@@ -45,7 +46,9 @@ func (s *S3Enumerator) Enumerate() ([]string, error) {
 	}
 	err := s.client.ListObjectsV2Pages(input, func(output *s3.ListObjectsV2Output, lastPage bool) bool {
 		for _, metadata := range output.Contents {
-			keys = append(keys, strings.Join([]string{bucket, *metadata.Key}, "/"))
+			if aws.Int64Value(metadata.Size) > 0 {
+				keys = append(keys, strings.Join([]string{bucket, *metadata.Key}, "/"))
+			}
 		}
 		return !lastPage
 	})

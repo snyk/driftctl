@@ -62,7 +62,7 @@
   "CtyVal": {}
  },
  {
-  "Groups": [],
+  "Groups": null,
   "Id": "test-attachment5",
   "Name": "test-attachment5",
   "PolicyArn": "arn:aws:iam::526954929923:policy/test-policy3",
@@ -70,51 +70,51 @@
    "test-role",
    "test-role2"
   ],
-  "Users": [],
+  "Users": null,
   "CtyVal": {}
  },
  {
-  "Groups": [],
+  "Groups": null,
   "Id": "test-role-arn:aws:iam::526954929923:policy/test-policy",
   "Name": "test-role-20201118162849968800000001",
   "PolicyArn": "arn:aws:iam::526954929923:policy/test-policy",
   "Roles": [
    "test-role"
   ],
-  "Users": [],
+  "Users": null,
   "CtyVal": {}
  },
  {
-  "Groups": [],
+  "Groups": null,
   "Id": "test-role-arn:aws:iam::526954929923:policy/test-policy2",
   "Name": "test-role-20201118162849994600000002",
   "PolicyArn": "arn:aws:iam::526954929923:policy/test-policy2",
   "Roles": [
    "test-role"
   ],
-  "Users": [],
+  "Users": null,
   "CtyVal": {}
  },
  {
-  "Groups": [],
+  "Groups": null,
   "Id": "test-role2-arn:aws:iam::526954929923:policy/test-policy",
   "Name": "test-role2-20201118162908999800000001",
   "PolicyArn": "arn:aws:iam::526954929923:policy/test-policy",
   "Roles": [
    "test-role2"
   ],
-  "Users": [],
+  "Users": null,
   "CtyVal": {}
  },
  {
-  "Groups": [],
+  "Groups": null,
   "Id": "test-role2-arn:aws:iam::526954929923:policy/test-policy2",
   "Name": "test-role2-20201118162909011200000002",
   "PolicyArn": "arn:aws:iam::526954929923:policy/test-policy2",
   "Roles": [
    "test-role2"
   ],
-  "Users": [],
+  "Users": null,
   "CtyVal": {}
  }
 ]

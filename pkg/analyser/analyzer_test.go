@@ -226,6 +226,17 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
+									From: "barfoo",
+									To:   "foobar",
+									Path: []string{
+										"BarFoo",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
 									From: "foobar",
 									To:   "barfoo",
 									Path: []string{
@@ -236,13 +247,13 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "barfoo",
-									To:   "foobar",
+									From: "bar",
+									To:   "baz",
 									Path: []string{
-										"BarFoo",
+										"Struct",
+										"Bar",
 									},
 								},
-								Computed: true,
 							},
 							{
 								Change: diff.Change{
@@ -255,17 +266,6 @@ func TestAnalyze(t *testing.T) {
 									},
 								},
 								Computed: true,
-							},
-							{
-								Change: diff.Change{
-									Type: "update",
-									From: "bar",
-									To:   "baz",
-									Path: []string{
-										"Struct",
-										"Bar",
-									},
-								},
 							},
 						},
 					},
@@ -571,6 +571,17 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
+									From: "barfoo",
+									To:   "foobar",
+									Path: []string{
+										"BarFoo",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
 									From: "foobar",
 									To:   "barfoo",
 									Path: []string{
@@ -581,13 +592,13 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "barfoo",
-									To:   "foobar",
+									From: "bar",
+									To:   "baz",
 									Path: []string{
-										"BarFoo",
+										"Struct",
+										"Bar",
 									},
 								},
-								Computed: true,
 							},
 							{
 								Change: diff.Change{
@@ -604,13 +615,16 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "bar",
-									To:   "baz",
+									From: "foo",
+									To:   "oof",
 									Path: []string{
-										"Struct",
-										"Bar",
+										"StructSlice",
+										"0",
+										"Array",
+										"0",
 									},
 								},
+								Computed: true,
 							},
 							{
 								Change: diff.Change{
@@ -621,20 +635,6 @@ func TestAnalyze(t *testing.T) {
 										"StructSlice",
 										"0",
 										"String",
-									},
-								},
-								Computed: true,
-							},
-							{
-								Change: diff.Change{
-									Type: "update",
-									From: "foo",
-									To:   "oof",
-									Path: []string{
-										"StructSlice",
-										"0",
-										"Array",
-										"0",
 									},
 								},
 								Computed: true,
@@ -768,18 +768,6 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "baz",
-									To:   "bazdiff",
-									Path: []string{
-										"Struct",
-										"Baz",
-									},
-								},
-								Computed: true,
-							},
-							{
-								Change: diff.Change{
-									Type: "update",
 									From: "bar",
 									To:   "bardiff",
 									Path: []string{
@@ -788,6 +776,18 @@ func TestAnalyze(t *testing.T) {
 									},
 								},
 								Computed: false,
+							},
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "baz",
+									To:   "bazdiff",
+									Path: []string{
+										"Struct",
+										"Baz",
+									},
+								},
+								Computed: true,
 							},
 						},
 					},
@@ -811,6 +811,18 @@ func TestAnalyze(t *testing.T) {
 						Changelog: Changelog{
 							{
 								Change: diff.Change{
+									Type: "update",
+									From: "baz",
+									To:   "bazdiff",
+									Path: []string{
+										"Struct",
+										"Baz",
+									},
+								},
+								Computed: true,
+							},
+							{
+								Change: diff.Change{
 									Type: "create",
 									From: nil,
 									To:   "diff",
@@ -819,18 +831,6 @@ func TestAnalyze(t *testing.T) {
 										"0",
 										"Array",
 										"1",
-									},
-								},
-								Computed: true,
-							},
-							{
-								Change: diff.Change{
-									Type: "update",
-									From: "baz",
-									To:   "bazdiff",
-									Path: []string{
-										"Struct",
-										"Baz",
 									},
 								},
 								Computed: true,

@@ -49,6 +49,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "Route 53 zone", dirName: "route53_zone", wantErr: false},
 		{name: "Route 53 record - single record", dirName: "route53_record", wantErr: false},
 		{name: "Route 53 record - multiples zones, multiples records", dirName: "route53_record_multiples", wantErr: false},
+		{name: "Route 53 record - empty records", dirName: "route53_record_null_records", wantErr: false},
 		{name: "s3 full", dirName: "s3_full", wantErr: false},
 		{name: "RDS DB instance", dirName: "db_instance", wantErr: false},
 		{name: "RDS DB Subnet group", dirName: "db_subnet_group", wantErr: false},

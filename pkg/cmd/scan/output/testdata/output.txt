@@ -1,12 +1,12 @@
-Found deleted resources:
+Found missing resources:
   aws_deleted_resource:
     - deleted-id-1
     - deleted-id-2
-Found unmanaged resources:
+Found resources not covered by IaC:
   aws_unmanaged_resource:
     - unmanaged-id-1
     - unmanaged-id-2
-Found drifted resources:
+Found changed resources:
   - diff-id-1 (aws_diff_resource):
     ~ updated.field: "foobar" => "barfoo"
     + new.field: <nil> => "newValue"
@@ -15,5 +15,5 @@ Found 6 resource(s)
  - 33% coverage
  - 2 covered by IaC
  - 2 not covered by IaC
- - 2 deleted on cloud provider
- - 1/2 drifted from IaC
+ - 2 missing on cloud provider
+ - 1/2 changed outside of IaC

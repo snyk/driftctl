@@ -64,7 +64,9 @@ func runTest(t *testing.T, cases TestCases) {
 				c.mocks(resourceFactory)
 			}
 
-			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, filter, testAlerter, resourceFactory)
+			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, &pkg.ScanOptions{
+				Filter: filter,
+			})
 
 			analysis, err := driftctl.Run()
 
