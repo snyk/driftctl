@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/jmespath/go-jmespath"
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/mock"
 	"github.com/zclconf/go-cty/cty"
@@ -13,7 +12,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg"
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
-	filter2 "github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -25,9 +24,9 @@ type TestCase struct {
 	name            string
 	stateResources  []resource.Resource
 	remoteResources []resource.Resource
-	filter          string
 	mocks           func(factory resource.ResourceFactory)
 	assert          func(result *test.ScanResult, err error)
+	options         func(t *testing.T) *pkg.ScanOptions
 }
 
 type TestCases []TestCase
@@ -49,24 +48,13 @@ func runTest(t *testing.T, cases TestCases) {
 			remoteSupplier := &resource.MockSupplier{}
 			remoteSupplier.On("Resources").Return(c.remoteResources, nil)
 
-			var filter *jmespath.JMESPath
-			if c.filter != "" {
-				f, err := filter2.BuildExpression(c.filter)
-				if err != nil {
-					t.Fatalf("Unable to build filter expression: %s\n%s", c.filter, err)
-				}
-				filter = f
-			}
-
 			resourceFactory := &terraform.MockResourceFactory{}
 
 			if c.mocks != nil {
 				c.mocks(resourceFactory)
 			}
 
-			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, &pkg.ScanOptions{
-				Filter: filter,
-			})
+			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, c.options(t))
 
 			analysis, err := driftctl.Run()
 
@@ -98,6 +86,9 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertInfrastructureIsInSync()
 			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				return &pkg.ScanOptions{}
+			},
 		},
 		{
 			name: "we should have deleted resource",
@@ -108,6 +99,9 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertDeletedCount(1)
 			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				return &pkg.ScanOptions{}
+			},
 		},
 		{
 			name:           "we should have unmanaged resource",
@@ -117,6 +111,9 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			},
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertUnmanagedCount(1)
+			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				return &pkg.ScanOptions{}
 			},
 		},
 		{
@@ -145,6 +142,9 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Computed: false,
 				})
 			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				return &pkg.ScanOptions{}
+			},
 		},
 		{
 			name: "we should have changes on computed field",
@@ -171,6 +171,9 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 					Computed: true,
 				})
+			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				return &pkg.ScanOptions{}
 			},
 		},
 		{
@@ -200,6 +203,9 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Computed: false,
 				})
 			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				return &pkg.ScanOptions{}
+			},
 		},
 		{
 			name: "we should have changes of added field",
@@ -228,6 +234,109 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Computed: false,
 				})
 			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				return &pkg.ScanOptions{}
+			},
+		},
+		{
+			name: "we should ignore default AWS IAM role when strict mode is disabled",
+			stateResources: []resource.Resource{
+				testresource.FakeResource{
+					Id: "fake",
+				},
+				&aws.AwsIamPolicy{
+					Id:  "role-policy-test-1",
+					Arn: func(p string) *string { return &p }("policy-test-1"),
+				},
+			},
+			remoteResources: []resource.Resource{
+				testresource.FakeResource{
+					Id: "fake",
+				},
+				&aws.AwsIamRole{
+					Id:   "role-test-1",
+					Path: func(p string) *string { return &p }("/aws-service-role/test"),
+				},
+				&aws.AwsIamRolePolicy{
+					Id:   "role-policy-test-1",
+					Role: func(p string) *string { return &p }("role-test-1"),
+				},
+				&aws.AwsIamPolicy{
+					Id:  "role-policy-test-1",
+					Arn: func(p string) *string { return &p }("policy-test-1"),
+				},
+				&aws.AwsIamPolicyAttachment{
+					Id:        "policy-attachment-test-1",
+					PolicyArn: func(p string) *string { return &p }("policy-test-1"),
+					Users:     func(p []string) *[]string { return &p }([]string{}),
+					Roles:     func(p []string) *[]string { return &p }([]string{"role-test-1"}),
+				},
+				&aws.AwsIamRole{
+					Id:   "role-test-2",
+					Path: func(p string) *string { return &p }("/not-aws-service-role/test"),
+				},
+			},
+			assert: func(result *test.ScanResult, err error) {
+				result.AssertManagedCount(2)
+				result.AssertUnmanagedCount(1)
+				result.AssertDeletedCount(0)
+				result.AssertDriftCountTotal(0)
+			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				return &pkg.ScanOptions{
+					StrictMode: false,
+				}
+			},
+		},
+		{
+			name: "we should not ignore default AWS IAM role when strict mode is enabled",
+			stateResources: []resource.Resource{
+				testresource.FakeResource{
+					Id: "fake",
+				},
+				&aws.AwsIamPolicy{
+					Id:  "role-policy-test-1",
+					Arn: func(p string) *string { return &p }("policy-test-1"),
+				},
+			},
+			remoteResources: []resource.Resource{
+				testresource.FakeResource{
+					Id: "fake",
+				},
+				&aws.AwsIamRole{
+					Id:   "role-test-1",
+					Path: func(p string) *string { return &p }("/aws-service-role/test"),
+				},
+				&aws.AwsIamRolePolicy{
+					Id:   "role-policy-test-1",
+					Role: func(p string) *string { return &p }("role-test-1"),
+				},
+				&aws.AwsIamPolicy{
+					Id:  "role-policy-test-1",
+					Arn: func(p string) *string { return &p }("policy-test-1"),
+				},
+				&aws.AwsIamPolicyAttachment{
+					Id:        "policy-attachment-test-1",
+					PolicyArn: func(p string) *string { return &p }("policy-test-1"),
+					Users:     func(p []string) *[]string { return &p }([]string{}),
+					Roles:     func(p []string) *[]string { return &p }([]string{"role-test-1"}),
+				},
+				&aws.AwsIamRole{
+					Id:   "role-test-2",
+					Path: func(p string) *string { return &p }("/not-aws-service-role/test"),
+				},
+			},
+			assert: func(result *test.ScanResult, err error) {
+				result.AssertManagedCount(2)
+				result.AssertUnmanagedCount(4)
+				result.AssertDeletedCount(0)
+				result.AssertDriftCountTotal(0)
+			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				return &pkg.ScanOptions{
+					StrictMode: true,
+				}
+			},
 		},
 	}
 
@@ -249,10 +358,18 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 					Type: "filtered",
 				},
 			},
-			filter: "Type=='filtered'",
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertUnmanagedCount(1)
 				result.AssertResourceUnmanaged("res2", "filtered")
+			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				filterStr := "Type=='filtered'"
+				f, err := filter.BuildExpression(filterStr)
+				if err != nil {
+					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
+				}
+
+				return &pkg.ScanOptions{Filter: f}
 			},
 		},
 		{
@@ -268,10 +385,18 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 					Type: "filtered",
 				},
 			},
-			filter: "Id=='res2'",
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertUnmanagedCount(1)
 				result.AssertResourceUnmanaged("res2", "filtered")
+			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				filterStr := "Id=='res2'"
+				f, err := filter.BuildExpression(filterStr)
+				if err != nil {
+					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
+				}
+
+				return &pkg.ScanOptions{Filter: f}
 			},
 		},
 		{
@@ -293,10 +418,18 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 					Type: "not-filtered",
 				},
 			},
-			filter: "Attr.test_field=='value to filter on'",
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertUnmanagedCount(1)
 				result.AssertResourceUnmanaged("res1", "filtered")
+			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				filterStr := "Attr.test_field=='value to filter on'"
+				f, err := filter.BuildExpression(filterStr)
+				if err != nil {
+					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
+				}
+
+				return &pkg.ScanOptions{Filter: f}
 			},
 		},
 	}
@@ -344,7 +477,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					})
 				}), "aws_s3_bucket_policy").Times(1).Return(&foo, nil)
 			},
-			filter: "Type=='aws_s3_bucket_policy' && Attr.bucket=='foo'",
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
 				result.AssertResourceHasDrift("foo", "aws_s3_bucket_policy", analyser.Change{
@@ -356,6 +488,15 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 					Computed: false,
 				})
+			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				filterStr := "Type=='aws_s3_bucket_policy' && Attr.bucket=='foo'"
+				f, err := filter.BuildExpression(filterStr)
+				if err != nil {
+					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
+				}
+
+				return &pkg.ScanOptions{Filter: f}
 			},
 		},
 		{
@@ -460,7 +601,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					})
 				}), "aws_ebs_volume").Times(1).Return(&bar, nil)
 			},
-			filter: "Type=='aws_ebs_volume' && Attr.availability_zone=='us-east-1'",
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertManagedCount(2)
 				result.AssertResourceHasDrift("vol-02862d9b39045a3a4", "aws_ebs_volume", analyser.Change{
@@ -481,6 +621,15 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 					Computed: true,
 				})
+			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				filterStr := "Type=='aws_ebs_volume' && Attr.availability_zone=='us-east-1'"
+				f, err := filter.BuildExpression(filterStr)
+				if err != nil {
+					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
+				}
+
+				return &pkg.ScanOptions{Filter: f}
 			},
 		},
 		{
@@ -595,10 +744,18 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					})
 				}), "aws_route").Times(1).Return(&bar, nil)
 			},
-			filter: "Type=='aws_route' && Attr.gateway_id=='igw-07b7844a8fd17a638'",
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertManagedCount(2)
 				result.AssertInfrastructureIsInSync()
+			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				filterStr := "Type=='aws_route' && Attr.gateway_id=='igw-07b7844a8fd17a638'"
+				f, err := filter.BuildExpression(filterStr)
+				if err != nil {
+					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
+				}
+
+				return &pkg.ScanOptions{Filter: f}
 			},
 		},
 		{
@@ -639,7 +796,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					})
 				}), "aws_sns_topic_policy").Times(1).Return(&foo, nil)
 			},
-			filter: "Type=='aws_sns_topic_policy' && Attr.arn=='arn'",
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
 				result.AssertResourceHasDrift("foo", "aws_sns_topic_policy", analyser.Change{
@@ -651,6 +807,15 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 					Computed: false,
 				})
+			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				filterStr := "Type=='aws_sns_topic_policy' && Attr.arn=='arn'"
+				f, err := filter.BuildExpression(filterStr)
+				if err != nil {
+					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
+				}
+
+				return &pkg.ScanOptions{Filter: f}
 			},
 		},
 		{
@@ -690,7 +855,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					})
 				}), "aws_sqs_queue_policy").Times(1).Return(&foo, nil)
 			},
-			filter: "Type=='aws_sqs_queue_policy' && Attr.queue_url=='foo'",
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
 				result.AssertResourceHasDrift("foo", "aws_sqs_queue_policy", analyser.Change{
@@ -702,6 +866,15 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 					Computed: false,
 				})
+			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				filterStr := "Type=='aws_sqs_queue_policy' && Attr.queue_url=='foo'"
+				f, err := filter.BuildExpression(filterStr)
+				if err != nil {
+					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
+				}
+
+				return &pkg.ScanOptions{Filter: f}
 			},
 		},
 		{
@@ -1080,10 +1253,18 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					})
 				}), "aws_security_group_rule").Times(1).Return(&rule4, nil)
 			},
-			filter: "Type=='aws_security_group_rule' && Attr.security_group_id=='sg-0254c038e32f25530'",
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertManagedCount(7)
 				result.AssertInfrastructureIsInSync()
+			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				filterStr := "Type=='aws_security_group_rule' && Attr.security_group_id=='sg-0254c038e32f25530'"
+				f, err := filter.BuildExpression(filterStr)
+				if err != nil {
+					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
+				}
+
+				return &pkg.ScanOptions{Filter: f}
 			},
 		},
 	}
