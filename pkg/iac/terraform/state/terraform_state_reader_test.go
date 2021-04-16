@@ -7,6 +7,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/cloudskiff/driftctl/pkg/output"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	resourcegithub "github.com/cloudskiff/driftctl/pkg/resource/github"
@@ -26,7 +29,7 @@ import (
 
 func TestReadStateValid(t *testing.T) {
 	reader, _ := os.Open("testdata/v4/valid.tfstate")
-	_, err := readState(reader)
+	_, err := readState("terraform.tfstate", reader)
 	if err != nil {
 		t.Errorf("Unable to read state, %s", err)
 		return
@@ -35,7 +38,7 @@ func TestReadStateValid(t *testing.T) {
 
 func TestReadStateInvalid(t *testing.T) {
 	reader, _ := os.Open("testdata/v4/invalid.tfstate")
-	state, err := readState(reader)
+	state, err := readState("terraform.tfstate", reader)
 	if err == nil || state != nil {
 		t.Errorf("ReadFile invalid state should return error")
 	}
@@ -254,4 +257,42 @@ func convert(got []resource.Resource) []interface{} {
 		panic(err)
 	}
 	return want
+}
+
+func TestTerraformStateReader_VersionSupported(t *testing.T) {
+	tests := []struct {
+		name      string
+		statePath string
+		err       error
+	}{
+		{
+			name:      "should detect unsupported version",
+			statePath: "testdata/v4/unsupported_version.tfstate",
+			err:       errors.New("terraform.tfstate was generated using Terraform 0.10.26 which is currently not supported by driftctl\nPlease read documentation at https://docs.driftctl.com/limitations"),
+		},
+		{
+			name:      "should detect supported version",
+			statePath: "testdata/v4/supported_version.tfstate",
+			err:       nil,
+		},
+		{
+			name:      "should return invalid version error",
+			statePath: "testdata/v4/invalid_version.tfstate",
+			err:       errors.New("Invalid Terraform version string: State file claims to have been written by Terraform version \"invalid\", which is not a valid version string."),
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			reader, err := os.Open(test.statePath)
+			assert.NoError(t, err)
+
+			_, err = readState("terraform.tfstate", reader)
+			if test.err != nil {
+				assert.EqualError(t, err, test.err.Error())
+			} else {
+				assert.Equal(t, test.err, err)
+			}
+		})
+	}
 }
