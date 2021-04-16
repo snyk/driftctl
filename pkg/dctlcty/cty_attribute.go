@@ -2,13 +2,10 @@ package dctlcty
 
 import (
 	"encoding/json"
-	"fmt"
 	"reflect"
-	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 )
@@ -29,6 +26,7 @@ func AsAttrs(val *cty.Value, terraformType string) *CtyAttributes {
 
 	attributes := &CtyAttributes{
 		attrs,
+		val,
 		&metadata,
 	}
 
@@ -41,6 +39,7 @@ func AsAttrs(val *cty.Value, terraformType string) *CtyAttributes {
 
 type CtyAttributes struct {
 	Attrs    map[string]interface{}
+	value    *cty.Value
 	metadata *Metadata
 }
 
@@ -88,43 +87,39 @@ func (a *CtyAttributes) SafeSet(path []string, value interface{}) error {
 }
 
 func (a *CtyAttributes) Tags(path []string) reflect.StructTag {
-	if a.metadata == nil || a.Attrs == nil {
+	if a.metadata == nil || a.value == nil {
 		return ""
 	}
 
-	var current interface{} = a.Attrs
-	realPath := ""
-	for _, part := range path {
-		if current == nil {
-			logrus.Debugf("Failed to find tag for path %+v", path)
-			return ""
+	currentType := a.value.Type()
+	var realPath []string
+	for i, part := range path {
+
+		if currentType.IsListType() || currentType.IsSetType() || currentType.IsTupleType() {
+			currentType = currentType.ElementType()
+			continue
 		}
-		kind := reflect.TypeOf(current).Kind()
-		switch kind {
-		case reflect.Array:
-			fallthrough
-		case reflect.Slice:
-			index, err := strconv.ParseUint(part, 10, 64)
-			if err != nil {
-				logrus.Debugf("Failed to find tag for path %+v", path)
-				return ""
+
+		if currentType.IsCollectionType() {
+			currentType = currentType.ElementType()
+		}
+
+		if currentType.IsObjectType() {
+			if !currentType.HasAttribute(part) {
+				return "" // path doest not match this object
 			}
-			current = current.([]interface{})[index]
-			continue
-		case reflect.Map:
-			current = current.(map[string]interface{})[part]
-		default:
-			logrus.Debugf("Failed to find tag for path %+v", path)
-			return ""
+			currentType = currentType.AttributeType(part)
 		}
-		if realPath != "" {
-			realPath = fmt.Sprintf("%s.%s", realPath, part)
-			continue
+
+		if currentType.IsPrimitiveType() {
+			if i < len(path)-1 {
+				return "" // path leads to a non existing field
+			}
 		}
-		realPath = part
+		realPath = append(realPath, part)
 	}
 
-	fieldTags, exists := a.metadata.tags[realPath]
+	fieldTags, exists := a.metadata.tags[strings.Join(realPath, ".")]
 	if !exists {
 		return ""
 	}

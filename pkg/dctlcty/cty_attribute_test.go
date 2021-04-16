@@ -6,6 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/zclconf/go-cty/cty/gocty"
 )
 
 func TestCtyAttributes_SafeDelete(t *testing.T) {
@@ -220,16 +221,21 @@ func TestCtyAttributes_SafeSet(t *testing.T) {
 	}
 }
 
+type args struct {
+	Attrs    map[string]interface{}
+	metadata *Metadata
+}
+
 func TestCtyAttributes_Tags(t *testing.T) {
 	tests := []struct {
 		name string
-		attr *CtyAttributes
+		args *args
 		path []string
 		want reflect.StructTag
 	}{
 		{
 			"Found tags",
-			&CtyAttributes{
+			&args{
 				map[string]interface{}{
 					"test": map[string]interface{}{
 						"has": map[string]interface{}{
@@ -248,7 +254,7 @@ func TestCtyAttributes_Tags(t *testing.T) {
 		},
 		{
 			"No tags found",
-			&CtyAttributes{
+			&args{
 				map[string]interface{}{
 					"test": map[string]interface{}{
 						"has": map[string]interface{}{
@@ -271,7 +277,15 @@ func TestCtyAttributes_Tags(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.attr.Tags(tt.path); got != tt.want {
+			typ, _ := gocty.ImpliedType(tt.args.Attrs)
+			ctyVal, _ := gocty.ToCtyValue(tt.args.Attrs, typ)
+
+			attrs := CtyAttributes{
+				Attrs:    tt.args.Attrs,
+				value:    &ctyVal,
+				metadata: tt.args.metadata,
+			}
+			if got := attrs.Tags(tt.path); got != tt.want {
 				t.Errorf("Tags() = %v, want %v", got, tt.want)
 			}
 		})
@@ -281,13 +295,13 @@ func TestCtyAttributes_Tags(t *testing.T) {
 func TestCtyAttributes_IsComputedField(t *testing.T) {
 	tests := []struct {
 		name string
-		attr *CtyAttributes
+		args *args
 		path []string
 		want bool
 	}{
 		{
 			"Is computed",
-			&CtyAttributes{
+			&args{
 				map[string]interface{}{
 					"test": map[string]interface{}{
 						"has": map[string]interface{}{
@@ -309,7 +323,7 @@ func TestCtyAttributes_IsComputedField(t *testing.T) {
 		},
 		{
 			"Not computed",
-			&CtyAttributes{
+			&args{
 				map[string]interface{}{
 					"test": map[string]interface{}{
 						"has": map[string]interface{}{
@@ -331,7 +345,7 @@ func TestCtyAttributes_IsComputedField(t *testing.T) {
 		},
 		{
 			"No tags",
-			&CtyAttributes{
+			&args{
 				map[string]interface{}{
 					"test": map[string]interface{}{
 						"has": map[string]interface{}{
@@ -354,7 +368,15 @@ func TestCtyAttributes_IsComputedField(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.attr.IsComputedField(tt.path); got != tt.want {
+			typ, _ := gocty.ImpliedType(tt.args.Attrs)
+			ctyVal, _ := gocty.ToCtyValue(tt.args.Attrs, typ)
+
+			attrs := CtyAttributes{
+				Attrs:    tt.args.Attrs,
+				value:    &ctyVal,
+				metadata: tt.args.metadata,
+			}
+			if got := attrs.IsComputedField(tt.path); got != tt.want {
 				t.Errorf("IsComputedField() = %v, want %v", got, tt.want)
 			}
 		})
@@ -364,13 +386,13 @@ func TestCtyAttributes_IsComputedField(t *testing.T) {
 func TestCtyAttributes_IsJsonStringField(t *testing.T) {
 	tests := []struct {
 		name string
-		attr *CtyAttributes
+		args *args
 		path []string
 		want bool
 	}{
 		{
 			"Is json",
-			&CtyAttributes{
+			&args{
 				map[string]interface{}{
 					"test": map[string]interface{}{
 						"has": map[string]interface{}{
@@ -392,7 +414,7 @@ func TestCtyAttributes_IsJsonStringField(t *testing.T) {
 		},
 		{
 			"Not json",
-			&CtyAttributes{
+			&args{
 				map[string]interface{}{
 					"test": map[string]interface{}{
 						"has": map[string]interface{}{
@@ -414,7 +436,7 @@ func TestCtyAttributes_IsJsonStringField(t *testing.T) {
 		},
 		{
 			"No tags",
-			&CtyAttributes{
+			&args{
 				map[string]interface{}{
 					"test": map[string]interface{}{
 						"has": map[string]interface{}{
@@ -437,7 +459,15 @@ func TestCtyAttributes_IsJsonStringField(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.attr.IsJsonStringField(tt.path); got != tt.want {
+			typ, _ := gocty.ImpliedType(tt.args.Attrs)
+			ctyVal, _ := gocty.ToCtyValue(tt.args.Attrs, typ)
+
+			attrs := CtyAttributes{
+				Attrs:    tt.args.Attrs,
+				value:    &ctyVal,
+				metadata: tt.args.metadata,
+			}
+			if got := attrs.IsJsonStringField(tt.path); got != tt.want {
 				t.Errorf("IsComputedField() = %v, want %v", got, tt.want)
 			}
 		})
