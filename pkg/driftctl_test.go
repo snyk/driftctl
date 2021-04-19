@@ -295,7 +295,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Id: "fake",
 				},
 				&aws.AwsIamPolicy{
-					Id:  "role-policy-test-1",
+					Id:  "policy-test-1",
 					Arn: func(p string) *string { return &p }("policy-test-1"),
 				},
 			},
@@ -312,7 +312,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Role: func(p string) *string { return &p }("role-test-1"),
 				},
 				&aws.AwsIamPolicy{
-					Id:  "role-policy-test-1",
+					Id:  "policy-test-1",
 					Arn: func(p string) *string { return &p }("policy-test-1"),
 				},
 				&aws.AwsIamPolicyAttachment{
@@ -334,6 +334,65 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{
+					StrictMode: true,
+				}
+			},
+		},
+		{
+			name: "we should not ignore default AWS IAM role when strict mode is enabled and a filter is specified",
+			stateResources: []resource.Resource{
+				testresource.FakeResource{
+					Id: "fake",
+				},
+				&aws.AwsIamPolicy{
+					Id:  "policy-test-1",
+					Arn: func(p string) *string { return &p }("policy-test-1"),
+				},
+			},
+			remoteResources: []resource.Resource{
+				testresource.FakeResource{
+					Id: "fake",
+				},
+				&aws.AwsIamRole{
+					Id:   "role-test-1",
+					Path: func(p string) *string { return &p }("/aws-service-role/test"),
+				},
+				&aws.AwsIamRolePolicy{
+					Id:   "role-policy-test-1",
+					Role: func(p string) *string { return &p }("role-test-1"),
+				},
+				&aws.AwsIamPolicy{
+					Id:  "policy-test-1",
+					Arn: func(p string) *string { return &p }("policy-test-1"),
+				},
+				&aws.AwsIamPolicyAttachment{
+					Id:        "policy-attachment-test-1",
+					PolicyArn: func(p string) *string { return &p }("policy-test-1"),
+					Users:     func(p []string) *[]string { return &p }([]string{}),
+					Roles:     func(p []string) *[]string { return &p }([]string{"role-test-1"}),
+				},
+				&aws.AwsIamRole{
+					Id:   "role-test-2",
+					Path: func(p string) *string { return &p }("/not-aws-service-role/test"),
+				},
+			},
+			assert: func(result *test.ScanResult, err error) {
+				result.AssertCoverage(0)
+				result.AssertInfrastructureIsNotSync()
+				result.AssertManagedCount(0)
+				result.AssertUnmanagedCount(1)
+				result.AssertDeletedCount(0)
+				result.AssertDriftCountTotal(0)
+			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				filterStr := "Id=='role-test-1'"
+				f, err := filter.BuildExpression(filterStr)
+				if err != nil {
+					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
+				}
+
+				return &pkg.ScanOptions{
+					Filter:     f,
 					StrictMode: true,
 				}
 			},
