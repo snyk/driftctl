@@ -80,9 +80,16 @@ jobs:
       - run: make install-tools
       - run: make test
       - run:
+          name: Check Codecov
+          command: |
+            curl -s -o codecov https://codecov.io/bash \
+              && VERSION=$(grep 'VERSION=\".*\"' codecov | cut -d'"' -f2) \
+              && shasum -a 512 -c <(curl -s https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA512SUM)
+      - run:
           name: Codecov upload
           command: |
-            bash <(curl -s https://codecov.io/bash)
+            chmod +x codecov
+            ./codecov
       - store_test_results:
           path: ./
   sign_release:
