@@ -78,6 +78,7 @@ func TestScanCmd_Invalid(t *testing.T) {
 		{args: []string{"scan", "--from", "tfstate+foobar://test"}, expected: "Unsupported IaC backend 'foobar': \nAccepted values are: s3,http,https"},
 		{args: []string{"scan", "--from", "tfstate:///tmp/test", "--from", "tfstate+toto://test"}, expected: "Unsupported IaC backend 'toto': \nAccepted values are: s3,http,https"},
 		{args: []string{"scan", "--filter", "Type='test'"}, expected: "unable to parse filter expression: SyntaxError: Expected tRbracket, received: tUnknown"},
+		{args: []string{"scan", "--filter", "Type='test'", "--filter", "Type='test2'"}, expected: "Filter flag should be specified only once"},
 	}
 
 	for _, tt := range cases {
