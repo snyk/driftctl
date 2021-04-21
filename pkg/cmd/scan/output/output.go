@@ -14,11 +14,13 @@ type Output interface {
 var supportedOutputTypes = []string{
 	ConsoleOutputType,
 	JSONOutputType,
+	HTMLOutputType,
 }
 
 var supportedOutputExample = map[string]string{
 	ConsoleOutputType: ConsoleOutputExample,
 	JSONOutputType:    JSONOutputExample,
+	HTMLOutputType:    HTMLOutputExample,
 }
 
 func SupportedOutputs() []string {
@@ -55,6 +57,8 @@ func GetOutput(config OutputConfig, quiet bool) Output {
 		return NewJSON(config.Options["path"])
 	case ConsoleOutputType:
 		fallthrough
+	case HTMLOutputType:
+		return NewHTML(config.Options["path"])
 	default:
 		return NewConsole()
 	}

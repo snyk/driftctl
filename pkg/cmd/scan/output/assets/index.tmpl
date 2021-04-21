@@ -1,0 +1,101 @@
+<html>
+<head>
+    <title>Driftctl scan report</title>
+    <meta charset="utf-8">
+    <style>{{.Stylesheet}}</style>
+</head>
+<body>
+<h1 class="heading title">Driftctl scan report</h1>
+<span class="heading subtitle">Coverage {{.Coverage}}%</span>
+<span class="heading date">{{.ScanDate}}</span>
+<form action="#">
+    <input type="text">
+</form>
+<h2>Managed resources ({{ len .Managed }})</h2>
+{{ if (eq (len .Managed) 0) }}
+    <p>There's nothing to see there...</p>
+{{end}}
+{{range $val := .Managed}}
+    <div>
+        <p class="list-item resource-id">{{$val.TerraformId}}</p>
+        <span class="list-item resource-type">{{$val.TerraformType}}</span>
+    </div>
+{{end}}
+
+<h2>Unmanaged resources ({{ len .Unmanaged }})</h2>
+{{ if (eq (len .Unmanaged) 0) }}
+    <p>There's nothing to see there...</p>
+{{end}}
+{{range $val := .Unmanaged}}
+    <div>
+        <p class="list-item resource-id">{{$val.TerraformId}}</p>
+        <span class="list-item resource-type">{{$val.TerraformType}}</span>
+    </div>
+{{end}}
+
+<h2>Changed resources ({{ len .Differences }})</h2>
+{{ if (eq (len .Differences) 0) }}
+    <p>There's nothing to see there...</p>
+{{end}}
+{{range $diff := .Differences}}
+    <div>
+        <p class="list-item resource-id">{{$diff.Res.TerraformId}}</p>
+        <span class="list-item resource-type">{{$diff.Res.TerraformType}}</span>
+        <div>
+            {{range $change := $diff.Changelog}}
+                <div>{{ formatChange $change }}</div>
+            {{end}}
+        </div>
+    </div>
+{{end}}
+
+<h2>Missing resources ({{ len .Deleted }})</h2>
+{{ if (eq (len .Deleted) 0) }}
+    <p>There's nothing to see there...</p>
+{{end}}
+{{range $val := .Deleted}}
+    <div>
+        <p class="list-item resource-id">{{$val.TerraformId}}</p>
+        <span class="list-item resource-type">{{$val.TerraformType}}</span>
+    </div>
+{{end}}
+
+<h2>Alerts ({{ len .Alerts }})</h2>
+{{ if (eq (len .Alerts) 0) }}
+    <p>There's nothing to see there...</p>
+{{end}}
+{{range $key, $val := .Alerts}}
+    <div>
+        <p class="list-item resource-id">{{$key}}</p>
+        <span class="list-item resource-type">{{$val}}</span>
+    </div>
+{{end}}
+</body>
+<script>
+    const managed = {{if .Managed}} {{.Managed}} {{else}} [] {{end}}
+    const unmanaged = {{if .Unmanaged}} {{.Unmanaged}} {{else}} [] {{end}}
+    const deleted = {{if .Deleted}} {{.Deleted}} {{else}} [] {{end}}
+    const allResources = [
+        ...managed,
+        ...unmanaged,
+        ...deleted,
+    ]
+    const resourceTypes = [
+        {{range $val := .Managed}}
+        '{{$val.TerraformType}}',
+        {{end}}
+        {{range $val := .Unmanaged}}
+        '{{$val.TerraformType}}',
+        {{end}}
+        {{range $val := .Deleted}}
+        '{{$val.TerraformType}}',
+        {{end}}
+        {{range $val := .Differences}}
+        '{{$val.Res.TerraformType}}',
+        {{end}}
+    ].filter((value, index, self) => self.indexOf(value) === index)
+
+    function search() {
+    }
+</script>
+</html>
