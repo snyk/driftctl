@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/hashicorp/terraform/configs/configschema"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/zclconf/go-cty/cty/gocty"
@@ -223,7 +224,7 @@ func TestCtyAttributes_SafeSet(t *testing.T) {
 
 type args struct {
 	Attrs    map[string]interface{}
-	metadata *Metadata
+	metadata *ResourceMetadata
 }
 
 func TestCtyAttributes_Tags(t *testing.T) {
@@ -231,7 +232,7 @@ func TestCtyAttributes_Tags(t *testing.T) {
 		name string
 		args *args
 		path []string
-		want reflect.StructTag
+		want *AttributeMetadata
 	}{
 		{
 			"Found tags",
@@ -243,14 +244,18 @@ func TestCtyAttributes_Tags(t *testing.T) {
 						},
 					},
 				},
-				&Metadata{
-					tags: map[string]string{
-						"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+				&ResourceMetadata{
+					AttributeMetadata: map[string]AttributeMetadata{
+						"test.has.tags": {Configshema: configschema.Attribute{
+							Computed: true,
+						}},
 					},
 				},
 			},
 			[]string{"test", "has", "tags"},
-			reflect.StructTag("cty:\"instance_tenancy\" computed:\"true\""),
+			&AttributeMetadata{Configshema: configschema.Attribute{
+				Computed: true,
+			}},
 		},
 		{
 			"No tags found",
@@ -265,14 +270,16 @@ func TestCtyAttributes_Tags(t *testing.T) {
 						},
 					},
 				},
-				&Metadata{
-					tags: map[string]string{
-						"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+				&ResourceMetadata{
+					AttributeMetadata: map[string]AttributeMetadata{
+						"test.has.tags": {Configshema: configschema.Attribute{
+							Computed: true,
+						}},
 					},
 				},
 			},
 			[]string{"test", "has", "no", "tags"},
-			reflect.StructTag(""),
+			nil,
 		},
 	}
 	for _, tt := range tests {
@@ -285,8 +292,8 @@ func TestCtyAttributes_Tags(t *testing.T) {
 				value:    &ctyVal,
 				metadata: tt.args.metadata,
 			}
-			if got := attrs.Tags(tt.path); got != tt.want {
-				t.Errorf("Tags() = %v, want %v", got, tt.want)
+			if got := attrs.AttributeMetadata(tt.path); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("AttributeMetadata() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -312,9 +319,13 @@ func TestCtyAttributes_IsComputedField(t *testing.T) {
 						},
 					},
 				},
-				&Metadata{
-					tags: map[string]string{
-						"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+				&ResourceMetadata{
+					AttributeMetadata: map[string]AttributeMetadata{
+						"test.has.tags": {
+							Configshema: configschema.Attribute{
+								Computed: true,
+							},
+						},
 					},
 				},
 			},
@@ -334,9 +345,11 @@ func TestCtyAttributes_IsComputedField(t *testing.T) {
 						},
 					},
 				},
-				&Metadata{
-					tags: map[string]string{
-						"test.has.tags": "cty:\"instance_tenancy\"",
+				&ResourceMetadata{
+					AttributeMetadata: map[string]AttributeMetadata{
+						"test.has.tags": {Configshema: configschema.Attribute{
+							Computed: false,
+						}},
 					},
 				},
 			},
@@ -356,9 +369,11 @@ func TestCtyAttributes_IsComputedField(t *testing.T) {
 						},
 					},
 				},
-				&Metadata{
-					tags: map[string]string{
-						"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+				&ResourceMetadata{
+					AttributeMetadata: map[string]AttributeMetadata{
+						"test.has.tags": {Configshema: configschema.Attribute{
+							Computed: true,
+						}},
 					},
 				},
 			},
@@ -376,7 +391,7 @@ func TestCtyAttributes_IsComputedField(t *testing.T) {
 				value:    &ctyVal,
 				metadata: tt.args.metadata,
 			}
-			if got := attrs.IsComputedField(tt.path); got != tt.want {
+			if got := attrs.IsComputedField(tt.path); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("IsComputedField() = %v, want %v", got, tt.want)
 			}
 		})
@@ -403,9 +418,9 @@ func TestCtyAttributes_IsJsonStringField(t *testing.T) {
 						},
 					},
 				},
-				&Metadata{
-					tags: map[string]string{
-						"test.has.tags": "cty:\"instance_tenancy\" jsonstring:\"true\"",
+				&ResourceMetadata{
+					AttributeMetadata: map[string]AttributeMetadata{
+						"test.has.tags": {JsonString: true},
 					},
 				},
 			},
@@ -425,9 +440,11 @@ func TestCtyAttributes_IsJsonStringField(t *testing.T) {
 						},
 					},
 				},
-				&Metadata{
-					tags: map[string]string{
-						"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+				&ResourceMetadata{
+					AttributeMetadata: map[string]AttributeMetadata{
+						"test.has.tags": {Configshema: configschema.Attribute{
+							Computed: true,
+						}},
 					},
 				},
 			},
@@ -447,9 +464,11 @@ func TestCtyAttributes_IsJsonStringField(t *testing.T) {
 						},
 					},
 				},
-				&Metadata{
-					tags: map[string]string{
-						"test.has.tags": "cty:\"instance_tenancy\" computed:\"true\"",
+				&ResourceMetadata{
+					AttributeMetadata: map[string]AttributeMetadata{
+						"test.has.tags": {Configshema: configschema.Attribute{
+							Computed: true,
+						}},
 					},
 				},
 			},
@@ -467,7 +486,7 @@ func TestCtyAttributes_IsJsonStringField(t *testing.T) {
 				value:    &ctyVal,
 				metadata: tt.args.metadata,
 			}
-			if got := attrs.IsJsonStringField(tt.path); got != tt.want {
+			if got := attrs.IsJsonStringField(tt.path); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("IsComputedField() = %v, want %v", got, tt.want)
 			}
 		})

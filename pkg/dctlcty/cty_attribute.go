@@ -2,7 +2,6 @@ package dctlcty
 
 import (
 	"encoding/json"
-	"reflect"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -27,11 +26,11 @@ func AsAttrs(val *cty.Value, terraformType string) *CtyAttributes {
 	attributes := &CtyAttributes{
 		attrs,
 		val,
-		&metadata,
+		metadata,
 	}
 
-	if metadata.normalizer != nil {
-		metadata.normalizer(attributes)
+	if metadata != nil && metadata.Normalizer != nil {
+		metadata.Normalizer(attributes)
 	}
 
 	return attributes
@@ -40,7 +39,7 @@ func AsAttrs(val *cty.Value, terraformType string) *CtyAttributes {
 type CtyAttributes struct {
 	Attrs    map[string]interface{}
 	value    *cty.Value
-	metadata *Metadata
+	metadata *ResourceMetadata
 }
 
 func (a *CtyAttributes) SafeDelete(path []string) {
@@ -86,9 +85,9 @@ func (a *CtyAttributes) SafeSet(path []string, value interface{}) error {
 	return errors.New("Error setting value") // should not happen ?
 }
 
-func (a *CtyAttributes) Tags(path []string) reflect.StructTag {
+func (a *CtyAttributes) AttributeMetadata(path []string) *AttributeMetadata {
 	if a.metadata == nil || a.value == nil {
-		return ""
+		return nil
 	}
 
 	currentType := a.value.Type()
@@ -106,33 +105,39 @@ func (a *CtyAttributes) Tags(path []string) reflect.StructTag {
 
 		if currentType.IsObjectType() {
 			if !currentType.HasAttribute(part) {
-				return "" // path doest not match this object
+				return nil // path doest not match this object
 			}
 			currentType = currentType.AttributeType(part)
 		}
 
 		if currentType.IsPrimitiveType() {
 			if i < len(path)-1 {
-				return "" // path leads to a non existing field
+				return nil // path leads to a non existing field
 			}
 		}
 		realPath = append(realPath, part)
 	}
 
-	fieldTags, exists := a.metadata.tags[strings.Join(realPath, ".")]
+	attributeMetadata, exists := a.metadata.AttributeMetadata[strings.Join(realPath, ".")]
 	if !exists {
-		return ""
+		return nil
 	}
 
-	return reflect.StructTag(fieldTags)
+	return &attributeMetadata
 }
 
 func (a *CtyAttributes) IsComputedField(path []string) bool {
-	tags := a.Tags(path)
-	return tags.Get("computed") == "true"
+	metadata := a.AttributeMetadata(path)
+	if metadata == nil {
+		return false
+	}
+	return metadata.Configshema.Computed
 }
 
 func (a *CtyAttributes) IsJsonStringField(path []string) bool {
-	tags := a.Tags(path)
-	return tags.Get("jsonstring") == "true"
+	metadata := a.AttributeMetadata(path)
+	if metadata == nil {
+		return false
+	}
+	return metadata.JsonString
 }

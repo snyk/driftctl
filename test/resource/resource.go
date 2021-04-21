@@ -3,6 +3,7 @@ package resource
 import (
 	"fmt"
 
+	"github.com/hashicorp/terraform/configs/configschema"
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/cloudskiff/driftctl/pkg/dctlcty"
@@ -36,7 +37,9 @@ func (d FakeResource) TerraformId() string {
 
 func (d FakeResource) TerraformType() string {
 	if d.Type != "" {
-		dctlcty.SetMetadata(d.Type, FakeResourceTags, FakeResourceNormalizer)
+		dctlcty.AddMetadata(d.Type, &dctlcty.ResourceMetadata{
+			AttributeMetadata: AttributeMetadata,
+		})
 		return d.Type
 	}
 	return "FakeResource"
@@ -69,16 +72,15 @@ func (d *FakeResourceStringer) String() string {
 }
 
 func InitFakeResourceMetadata() {
-	dctlcty.SetMetadata("FakeResource", FakeResourceTags, FakeResourceNormalizer)
+	dctlcty.AddMetadata("FakeResource", &dctlcty.ResourceMetadata{
+		AttributeMetadata: AttributeMetadata,
+	})
 }
 
-var FakeResourceTags = map[string]string{
-	"bar_foo":             `computed:"true"`,
-	"json":                `jsonstring:"true"`,
-	"struct.baz":          `computed:"true"`,
-	"struct_slice.string": `computed:"true"`,
-	"struct_slice.array":  `computed:"true"`,
-}
-
-func FakeResourceNormalizer(val *dctlcty.CtyAttributes) {
+var AttributeMetadata = map[string]dctlcty.AttributeMetadata{
+	"bar_foo":             {Configshema: configschema.Attribute{Computed: true}},
+	"json":                {JsonString: true},
+	"struct.baz":          {Configshema: configschema.Attribute{Computed: true}},
+	"struct_slice.string": {Configshema: configschema.Attribute{Computed: true}},
+	"struct_slice.array":  {Configshema: configschema.Attribute{Computed: true}},
 }

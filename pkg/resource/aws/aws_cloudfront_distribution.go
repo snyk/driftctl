@@ -161,30 +161,11 @@ func (r *AwsCloudfrontDistribution) CtyValue() *cty.Value {
 }
 
 func initAwsCloudfrontDistributionMetaData() {
-	dctlcty.SetMetadata(AwsCloudfrontDistributionResourceType, AwsCloudfrontDistributionTags, AwsCloudfrontDistributionNormalizer)
-}
-
-var AwsCloudfrontDistributionTags = map[string]string{
-	"arn":                            "computed:\"true\"",
-	"caller_reference":               "computed:\"true\"",
-	"domain_name":                    "computed:\"true\"",
-	"etag":                           "computed:\"true\"",
-	"hosted_zone_id":                 "computed:\"true\"",
-	"id":                             "computed:\"true\"",
-	"in_progress_validation_batches": "computed:\"true\"",
-	"last_modified_time":             "computed:\"true\"",
-	"status":                         "computed:\"true\"",
-	"trusted_signers":                "computed:\"true\"",
-	"trusted_signers.enabled":        "computed:\"true\"",
-	"trusted_signers.items":          "computed:\"true\"",
-	"trusted_signers.items.aws_account_number": "computed:\"true\"",
-	"trusted_signers.items.key_pair_ids":       "computed:\"true\"",
-}
-
-func AwsCloudfrontDistributionNormalizer(val *dctlcty.CtyAttributes) {
-	val.SafeDelete([]string{"etag"})
-	val.SafeDelete([]string{"last_modified_time"})
-	val.SafeDelete([]string{"retain_on_delete"})
-	val.SafeDelete([]string{"status"})
-	val.SafeDelete([]string{"wait_for_deployment"})
+	dctlcty.SetNormalizer(AwsCloudfrontDistributionResourceType, func(val *dctlcty.CtyAttributes) {
+		val.SafeDelete([]string{"etag"})
+		val.SafeDelete([]string{"last_modified_time"})
+		val.SafeDelete([]string{"retain_on_delete"})
+		val.SafeDelete([]string{"status"})
+		val.SafeDelete([]string{"wait_for_deployment"})
+	})
 }

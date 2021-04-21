@@ -495,7 +495,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						From: "gp2",
 						To:   "gp3",
 					},
-					Computed: true,
 				})
 				result.AssertResourceHasDrift("vol-018c5ae89895aca4c", "aws_ebs_volume", analyser.Change{
 					Change: diff.Change{
@@ -504,7 +503,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						From: true,
 						To:   false,
 					},
-					Computed: true,
 				})
 			},
 		},

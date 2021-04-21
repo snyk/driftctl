@@ -59,18 +59,7 @@ func (r *AwsAmi) CtyValue() *cty.Value {
 }
 
 func initAwsAmiMetaData() {
-	dctlcty.SetMetadata(AwsAmiResourceType, AwsAmiTags, AwsAmiNormalizer)
-}
-
-var AwsAmiTags = map[string]string{
-	"arn":                  "computed:\"true\"",
-	"id":                   "computed:\"true\"",
-	"image_location":       "computed:\"true\"",
-	"manage_ebs_snapshots": "computed:\"true\"",
-	"root_snapshot_id":     "computed:\"true\"",
-	"volume_size":          "computed:\"true\"",
-}
-
-func AwsAmiNormalizer(val *dctlcty.CtyAttributes) {
-	val.SafeDelete([]string{"timeouts"})
+	dctlcty.SetNormalizer(AwsAmiResourceType, func(val *dctlcty.CtyAttributes) {
+		val.SafeDelete([]string{"timeouts"})
+	})
 }
