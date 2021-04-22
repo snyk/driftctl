@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Driftctl scan report</title>
+    <meta charset="utf-8">
+    <style>body {
+        font-family: sans-serif;
+    }
+
+    div {
+        display: block;
+    }</style>
+</head>
+<body>
+
+<div id="app">
+    <h1 class="heading title">Driftctl scan report ❌</h1>
+    <span class="heading subtitle">Coverage 8%</span>
+    <span class="heading date">Apr 21, 2021</span>
+    <hr>
+    <form id="filter-form" action="#">
+        <input type="text" name="resource-id-filter" placeholder="Search resources..." onkeyup="refreshState()">
+        <select name="resource-type-filter" onchange="refreshState()">
+            <option value="">Resource type</option>
+
+            <option value="aws_unmanaged_resource">aws_unmanaged_resource</option>
+
+        </select>
+    </form>
+
+    <h2>Managed resources <span class="resource-count-managed">(2)</span></h2>
+
+
+
+    <div class="resource-item">
+        <span class="resource-item-id">diff-id-1</span>
+        <span class="resource-item-type">aws_diff_resource</span>
+    </div>
+
+    <div class="resource-item">
+        <span class="resource-item-id">no-diff-id-1</span>
+        <span class="resource-item-type">aws_no_diff_resource</span>
+    </div>
+
+
+    <h2>Unmanaged resources <span class="resource-count-unmanaged">(2)</span></h2>
+
+
+
+    <div class="resource-item">
+        <span class="resource-item-id">unmanaged-id-1</span>
+        <span class="resource-item-type">aws_unmanaged_resource</span>
+    </div>
+
+    <div class="resource-item">
+        <span class="resource-item-id">unmanaged-id-2</span>
+        <span class="resource-item-type">aws_unmanaged_resource</span>
+    </div>
+
+
+    <h2>Changed resources <span class="resource-count-changed">(1)</span></h2>
+
+
+
+    <div class="resource-item">
+        <span class="resource-item-id">diff-id-1</span>
+        <span class="resource-item-type">aws_diff_resource</span>
+        <div>
+
+            <div>~ updated.field: &#34;foobar&#34; =&gt; &#34;barfoo&#34; </div>
+
+            <div>&#43; new.field: &lt;nil&gt; =&gt; &#34;newValue&#34; </div>
+
+            <div>- a: &#34;oldValue&#34; =&gt; &lt;nil&gt; </div>
+
+        </div>
+    </div>
+
+
+    <h2>Missing resources <span class="resource-count-deleted">(2)</span></h2>
+
+
+
+    <div class="resource-item">
+        <span class="resource-item-id">deleted-id-1</span>
+        <span class="resource-item-type">aws_deleted_resource</span>
+    </div>
+
+    <div class="resource-item">
+        <span class="resource-item-id">deleted-id-2</span>
+        <span class="resource-item-type">aws_deleted_resource</span>
+    </div>
+
+
+    <h2>Alerts <span class="resource-count-alerts">(1)</span></h2>
+
+
+
+    <div class="resource-item">
+        <span class="resource-item-type"></span>
+        <div>
+
+            <div>- {Ignoring aws_vpc from drift calculation: Listing aws_vpc is forbidden. aws&#43;tf}</div>
+
+            <div>- {Ignoring aws_sqs from drift calculation: Listing aws_sqs is forbidden. aws&#43;tf}</div>
+
+            <div>- {Ignoring aws_sns from drift calculation: Listing aws_sns is forbidden. aws&#43;tf}</div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+<script lang="js">
+    const resources = document.querySelectorAll('.resource-item')
+
+    function hideResource(res) {
+        res.setAttribute('style', 'display:none;')
+    }
+
+    function displayResource(res) {
+        res.setAttribute('style', '')
+    }
+
+    function resourceIdContains(res, query) {
+        const el = res.querySelector('.resource-item-id')
+        if (!el) {
+            return
+        }
+        return el.innerText.toLowerCase().includes(query.toLowerCase())
+    }
+
+    function resourceTypeEqual(res, type) {
+        const el = res.querySelector('.resource-item-type')
+        if (!el) {
+            return
+        }
+        return el.innerText === type
+    }
+
+    function refreshState() {
+        const queryFilterInput = document.querySelector('input[name=resource-id-filter]').value
+        const typeFilterInput = document.querySelector('select[name=resource-type-filter]').value
+
+        for (const res of resources) {
+            const matchId = !queryFilterInput.length || resourceIdContains(res, queryFilterInput)
+            const matchType = !typeFilterInput.length || resourceTypeEqual(res, typeFilterInput)
+
+            if (matchId && matchType) {
+                displayResource(res)
+                continue
+            }
+
+            hideResource(res)
+        }
+    }
+
+    refreshState()
+</script>
+</html>

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
     <title>Driftctl scan report</title>
@@ -5,97 +6,136 @@
     <style>{{.Stylesheet}}</style>
 </head>
 <body>
-<h1 class="heading title">Driftctl scan report</h1>
-<span class="heading subtitle">Coverage {{.Coverage}}%</span>
-<span class="heading date">{{.ScanDate}}</span>
-<form action="#">
-    <input type="text">
-</form>
-<h2>Managed resources ({{ len .Managed }})</h2>
-{{ if (eq (len .Managed) 0) }}
-    <p>There's nothing to see there...</p>
-{{end}}
-{{range $val := .Managed}}
-    <div>
-        <p class="list-item resource-id">{{$val.TerraformId}}</p>
-        <span class="list-item resource-type">{{$val.TerraformType}}</span>
-    </div>
-{{end}}
 
-<h2>Unmanaged resources ({{ len .Unmanaged }})</h2>
-{{ if (eq (len .Unmanaged) 0) }}
-    <p>There's nothing to see there...</p>
-{{end}}
-{{range $val := .Unmanaged}}
-    <div>
-        <p class="list-item resource-id">{{$val.TerraformId}}</p>
-        <span class="list-item resource-type">{{$val.TerraformType}}</span>
-    </div>
-{{end}}
+<div id="app">
+    <h1 class="heading title">Driftctl scan report {{ if (eq .Coverage 100) }}✅{{else}}❌{{end}}</h1>
+    <span class="heading subtitle">Coverage 8%</span>
+    <span class="heading date">Apr 21, 2021</span>
+    <hr>
+    <form id="filter-form" action="#">
+        <input type="text" name="resource-id-filter" placeholder="Search resources..." onkeyup="refreshState()">
+        <select name="resource-type-filter" onchange="refreshState()">
+            <option value="">Resource type</option>
+            {{ range $type := getResourceTypes }}
+            <option value="{{$type}}">{{ $type }}</option>
+            {{end}}
+        </select>
+    </form>
 
-<h2>Changed resources ({{ len .Differences }})</h2>
-{{ if (eq (len .Differences) 0) }}
+    <h2>Managed resources <span class="resource-count-managed">({{len .Managed}})</span></h2>
+
+    {{ if (eq (len .Managed) 0) }}
     <p>There's nothing to see there...</p>
-{{end}}
-{{range $diff := .Differences}}
-    <div>
-        <p class="list-item resource-id">{{$diff.Res.TerraformId}}</p>
-        <span class="list-item resource-type">{{$diff.Res.TerraformType}}</span>
+    {{end}}
+    {{range $res := .Managed}}
+    <div class="resource-item">
+        <span class="resource-item-id">{{$res.TerraformId}}</span>
+        <span class="resource-item-type">{{$res.TerraformType}}</span>
+    </div>
+    {{end}}
+
+    <h2>Unmanaged resources <span class="resource-count-unmanaged">({{len .Unmanaged}})</span></h2>
+
+    {{ if (eq (len .Unmanaged) 0) }}
+    <p>There's nothing to see there...</p>
+    {{end}}
+    {{range $res := .Unmanaged}}
+    <div class="resource-item">
+        <span class="resource-item-id">{{$res.TerraformId}}</span>
+        <span class="resource-item-type">{{$res.TerraformType}}</span>
+    </div>
+    {{end}}
+
+    <h2>Changed resources <span class="resource-count-changed">({{len .Differences}})</span></h2>
+
+    {{ if (eq (len .Differences) 0) }}
+    <p>There's nothing to see there...</p>
+    {{end}}
+    {{range $diff := .Differences}}
+    <div class="resource-item">
+        <span class="resource-item-id">{{$diff.Res.TerraformId}}</span>
+        <span class="resource-item-type">{{$diff.Res.TerraformType}}</span>
         <div>
             {{range $change := $diff.Changelog}}
-                <div>{{ formatChange $change }}</div>
+            <div>{{ formatChange $change }}</div>
             {{end}}
         </div>
     </div>
-{{end}}
+    {{end}}
 
-<h2>Missing resources ({{ len .Deleted }})</h2>
-{{ if (eq (len .Deleted) 0) }}
-    <p>There's nothing to see there...</p>
-{{end}}
-{{range $val := .Deleted}}
-    <div>
-        <p class="list-item resource-id">{{$val.TerraformId}}</p>
-        <span class="list-item resource-type">{{$val.TerraformType}}</span>
-    </div>
-{{end}}
+    <h2>Missing resources <span class="resource-count-deleted">({{len .Deleted}})</span></h2>
 
-<h2>Alerts ({{ len .Alerts }})</h2>
-{{ if (eq (len .Alerts) 0) }}
+    {{ if (eq (len .Deleted) 0) }}
     <p>There's nothing to see there...</p>
-{{end}}
-{{range $key, $val := .Alerts}}
-    <div>
-        <p class="list-item resource-id">{{$key}}</p>
-        <span class="list-item resource-type">{{$val}}</span>
+    {{end}}
+    {{range $res := .Deleted}}
+    <div class="resource-item">
+        <span class="resource-item-id">{{$res.TerraformId}}</span>
+        <span class="resource-item-type">{{$res.TerraformType}}</span>
     </div>
-{{end}}
+    {{end}}
+
+    <h2>Alerts <span class="resource-count-alerts">({{len .Alerts}})</span></h2>
+
+    {{ if (eq (len .Alerts) 0) }}
+    <p>There's nothing to see there...</p>
+    {{end}}
+    {{range $type, $messages := .Alerts}}
+    <div class="resource-item">
+        <span class="resource-item-type">{{ $type }}</span>
+        <div>
+            {{range $msg := $messages}}
+            <div>- {{ $msg }}</div>
+            {{end}}
+        </div>
+    </div>
+    {{end}}
+</div>
 </body>
-<script>
-    const managed = {{if .Managed}} {{.Managed}} {{else}} [] {{end}}
-    const unmanaged = {{if .Unmanaged}} {{.Unmanaged}} {{else}} [] {{end}}
-    const deleted = {{if .Deleted}} {{.Deleted}} {{else}} [] {{end}}
-    const allResources = [
-        ...managed,
-        ...unmanaged,
-        ...deleted,
-    ]
-    const resourceTypes = [
-        {{range $val := .Managed}}
-        '{{$val.TerraformType}}',
-        {{end}}
-        {{range $val := .Unmanaged}}
-        '{{$val.TerraformType}}',
-        {{end}}
-        {{range $val := .Deleted}}
-        '{{$val.TerraformType}}',
-        {{end}}
-        {{range $val := .Differences}}
-        '{{$val.Res.TerraformType}}',
-        {{end}}
-    ].filter((value, index, self) => self.indexOf(value) === index)
+<script lang="js">
+    const resources = document.querySelectorAll('.resource-item')
 
-    function search() {
+    function hideResource(res) {
+        res.classList.add('hide')
     }
+
+    function displayResource(res) {
+        res.classList.remove('hide')
+    }
+
+    function resourceIdContains(res, query) {
+        const el = res.querySelector('.resource-item-id')
+        if (!el) {
+            return
+        }
+        return el.innerText.toLowerCase().includes(query.toLowerCase())
+    }
+
+    function resourceTypeEqual(res, type) {
+        const el = res.querySelector('.resource-item-type')
+        if (!el) {
+            return
+        }
+        return el.innerText === type
+    }
+
+    function refreshState() {
+        const queryFilterInput = document.querySelector('input[name=resource-id-filter]').value
+        const typeFilterInput = document.querySelector('select[name=resource-type-filter]').value
+
+        for (const res of resources) {
+            const matchId = !queryFilterInput.length || resourceIdContains(res, queryFilterInput)
+            const matchType = !typeFilterInput.length || resourceTypeEqual(res, typeFilterInput)
+
+            if (matchId && matchType) {
+                displayResource(res)
+                continue
+            }
+
+            hideResource(res)
+        }
+    }
+
+    refreshState()
 </script>
 </html>

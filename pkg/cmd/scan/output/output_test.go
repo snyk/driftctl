@@ -79,6 +79,18 @@ func fakeAnalysis() *analyser.Analysis {
 	return &a
 }
 
+func fakeAnalysisWithAlerts() *analyser.Analysis {
+	a := fakeAnalysis()
+	a.SetAlerts(alerter.Alerts{
+		"": []alerter.Alert{
+			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_vpc", "aws_vpc"),
+			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sqs", "aws_sqs"),
+			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sns", "aws_sns"),
+		},
+	})
+	return a
+}
+
 func fakeAnalysisNoDrift() *analyser.Analysis {
 	a := analyser.Analysis{}
 	for i := 0; i < 5; i++ {
