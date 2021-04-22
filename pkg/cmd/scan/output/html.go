@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -63,6 +64,35 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 	}
 
 	funcMap := template.FuncMap{
+		"getResourceTypes": func() []string {
+			resources := []resource.Resource{}
+			list := []string{}
+
+			resources = append(resources, analysis.Unmanaged()...)
+			resources = append(resources, analysis.Managed()...)
+			resources = append(resources, analysis.Deleted()...)
+
+			for _, res := range resources {
+				if i := sort.SearchStrings(list, res.TerraformType()); i <= len(list)-1 {
+					continue
+				}
+				list = append(list, res.TerraformType())
+			}
+			for _, d := range analysis.Differences() {
+				if i := sort.SearchStrings(list, d.Res.TerraformType()); i <= len(list)-1 {
+					continue
+				}
+				list = append(list, d.Res.TerraformType())
+			}
+			for kind := range analysis.Alerts() {
+				if i := sort.SearchStrings(list, kind); i <= len(list)-1 {
+					continue
+				}
+				list = append(list, kind)
+			}
+
+			return list
+		},
 		"formatChange": func(ch analyser.Change) string {
 			prefix := ""
 			suffix := ""

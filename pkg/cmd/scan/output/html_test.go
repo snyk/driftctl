@@ -3,6 +3,7 @@ package output
 import (
 	"io/ioutil"
 	"path"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -25,7 +26,7 @@ func TestHTML_Write(t *testing.T) {
 			name:       "test html output",
 			goldenfile: "output.html",
 			args: args{
-				analysis: fakeAnalysis(),
+				analysis: fakeAnalysisWithAlerts(),
 			},
 			err: nil,
 		},
@@ -47,14 +48,14 @@ func TestHTML_Write(t *testing.T) {
 				assert.NoError(t, err)
 			}
 
-			result, err := ioutil.ReadFile(tempFile.Name())
+			got, err := ioutil.ReadFile(tempFile.Name())
 			if err != nil {
 				t.Fatal(err)
 			}
 
 			expectedFilePath := path.Join("./testdata/", tt.goldenfile)
 			if *goldenfile.Update == tt.goldenfile {
-				if err := ioutil.WriteFile(expectedFilePath, result, 0600); err != nil {
+				if err := ioutil.WriteFile(expectedFilePath, got, 0600); err != nil {
 					t.Fatal(err)
 				}
 			}
@@ -64,7 +65,10 @@ func TestHTML_Write(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, string(expected), string(result))
+			prettifiedExpected := strings.ReplaceAll(string(expected), " ", "")
+			prettifiedGot := strings.ReplaceAll(string(got), " ", "")
+
+			assert.Equal(t, prettifiedExpected, prettifiedGot)
 		})
 	}
 }
