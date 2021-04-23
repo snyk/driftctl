@@ -123,6 +123,163 @@ func Test_IAMRepository_ListAllAccessKeys(t *testing.T) {
 	}
 }
 
+func Test_IAMRepository_ListAllUserPolicyAttachments(t *testing.T) {
+	tests := []struct {
+		name    string
+		users   []*iam.User
+		mocks   func(client *mocks.FakeIAM)
+		want    []*AttachedUserPolicy
+		wantErr error
+	}{
+		{
+			name: "List only user policy attachments with multiple pages",
+			users: []*iam.User{
+				{
+					UserName: aws.String("loadbalancer"),
+				},
+				{
+					UserName: aws.String("loadbalancer2"),
+				},
+			},
+			mocks: func(client *mocks.FakeIAM) {
+
+				client.On("ListAttachedUserPoliciesPages",
+					&iam.ListAttachedUserPoliciesInput{
+						UserName: aws.String("loadbalancer"),
+					},
+					mock.MatchedBy(func(callback func(res *iam.ListAttachedUserPoliciesOutput, lastPage bool) bool) bool {
+						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
+							&iam.AttachedPolicy{
+								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test"),
+								PolicyName: aws.String("test-attach"),
+							},
+							&iam.AttachedPolicy{
+								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test2"),
+								PolicyName: aws.String("test-attach2"),
+							},
+						}}, false)
+						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
+							&iam.AttachedPolicy{
+								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test3"),
+								PolicyName: aws.String("test-attach3"),
+							},
+						}}, true)
+						return true
+					})).Return(nil).Once()
+
+				client.On("ListAttachedUserPoliciesPages",
+					&iam.ListAttachedUserPoliciesInput{
+						UserName: aws.String("loadbalancer2"),
+					},
+					mock.MatchedBy(func(callback func(res *iam.ListAttachedUserPoliciesOutput, lastPage bool) bool) bool {
+						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
+							&iam.AttachedPolicy{
+								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test"),
+								PolicyName: aws.String("test-attach"),
+							},
+							&iam.AttachedPolicy{
+								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test2"),
+								PolicyName: aws.String("test-attach2"),
+							},
+						}}, false)
+						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
+							&iam.AttachedPolicy{
+								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test3"),
+								PolicyName: aws.String("test-attach3"),
+							},
+						}}, true)
+						return true
+					})).Return(nil).Once()
+			},
+
+			want: []*AttachedUserPolicy{
+				{
+					iam.AttachedPolicy{
+						PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test"),
+						PolicyName: aws.String("test-attach"),
+					},
+					*aws.String("loadbalancer"),
+				},
+				{
+					iam.AttachedPolicy{
+						PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test2"),
+						PolicyName: aws.String("test-attach2"),
+					},
+					*aws.String("loadbalancer"),
+				},
+				{
+					iam.AttachedPolicy{
+						PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test3"),
+						PolicyName: aws.String("test-attach3"),
+					},
+					*aws.String("loadbalancer"),
+				},
+				{
+					iam.AttachedPolicy{
+						PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test"),
+						PolicyName: aws.String("test-attach"),
+					},
+					*aws.String("loadbalancer2"),
+				},
+				{
+					iam.AttachedPolicy{
+						PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test2"),
+						PolicyName: aws.String("test-attach2"),
+					},
+					*aws.String("loadbalancer2"),
+				},
+				{
+					iam.AttachedPolicy{
+						PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test3"),
+						PolicyName: aws.String("test-attach3"),
+					},
+					*aws.String("loadbalancer2"),
+				},
+				{
+					iam.AttachedPolicy{
+						PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test"),
+						PolicyName: aws.String("test-attach"),
+					},
+					*aws.String("loadbalancer2"),
+				},
+				{
+					iam.AttachedPolicy{
+						PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test2"),
+						PolicyName: aws.String("test-attach2"),
+					},
+					*aws.String("loadbalancer2"),
+				},
+				{
+					iam.AttachedPolicy{
+						PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test3"),
+						PolicyName: aws.String("test-attach3"),
+					},
+					*aws.String("loadbalancer2"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := &mocks.FakeIAM{}
+			tt.mocks(client)
+			r := &iamRepository{
+				client: client,
+			}
+			got, err := r.ListAllUserPolicyAttachments(tt.users)
+			assert.Equal(t, tt.wantErr, err)
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %v -> %v", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}
+
 func Test_IAMRepository_ListAllUserPolicies(t *testing.T) {
 	tests := []struct {
 		name    string
