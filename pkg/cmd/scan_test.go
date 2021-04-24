@@ -39,6 +39,7 @@ func TestScanCmd_Valid(t *testing.T) {
 		{args: []string{"scan", "-t", "aws+tf", "-f", "tfstate://test"}},
 		{args: []string{"scan", "--to", "aws+tf", "--from", "tfstate://test"}},
 		{args: []string{"scan", "--to", "aws+tf", "--from", "tfstate+https://github.com/state.tfstate"}},
+		{args: []string{"scan", "--to", "aws+tf", "--from", "tfstate+tfcloud://workspace_id"}},
 		{args: []string{"scan", "--filter", "Type=='aws_s3_bucket'"}},
 		{args: []string{"scan", "--strict"}},
 	}
