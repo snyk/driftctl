@@ -14,6 +14,7 @@ var supportedBackends = []string{
 	BackendKeyS3,
 	BackendKeyHTTP,
 	BackendKeyHTTPS,
+	BackendKeyCloud,
 }
 
 type Backend io.ReadCloser
@@ -48,6 +49,8 @@ func GetBackend(config config.SupplierConfig, opts *Options) (Backend, error) {
 		fallthrough
 	case BackendKeyHTTPS:
 		return NewHTTPReader(&http.Client{}, fmt.Sprintf("%s://%s", config.Backend, config.Path), opts)
+	case BackendKeyCloud:
+		return NewCloudReader(config.Path, opts)
 	default:
 		return nil, errors.Errorf("Unsupported backend '%s'", backend)
 	}
