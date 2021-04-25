@@ -25,7 +25,8 @@ type Body struct {
 }
 
 func NewCloudReader(workspaceId string, opts *Options) (*HTTPBackend, error) {
-	req, err := http.NewRequest(http.MethodGet, TerraformCloudAPI+"/workspaces/"+workspaceId+"/current-state-version", nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/workspaces/%s/current-state-version", TerraformCloudAPI, workspaceId), nil)
+
 	req.Header.Add("Content-Type", "application/vnd.api+json")
 	req.Header.Add("Authorization", opts.Headers["Authorization"])
 
@@ -35,9 +36,6 @@ func NewCloudReader(workspaceId string, opts *Options) (*HTTPBackend, error) {
 
 	client := &http.Client{}
 	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
 
 	if res.StatusCode == 404 {
 		return nil, errors.Errorf("Error reading state from Terraform Cloud/Enterprise workspace: wrong workspace id")
@@ -45,6 +43,10 @@ func NewCloudReader(workspaceId string, opts *Options) (*HTTPBackend, error) {
 
 	if res.StatusCode == 401 {
 		return nil, errors.Errorf("Error reading state from Terraform Cloud/Enterprise workspace: bad authentication token")
+	}
+
+	if err != nil {
+		return nil, err
 	}
 
 	bodyBytes, _ := ioutil.ReadAll(res.Body)

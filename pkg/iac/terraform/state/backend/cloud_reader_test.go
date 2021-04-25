@@ -37,7 +37,7 @@ func TestNewCloudReader(t *testing.T) {
 			url:       "https://app.terraform.io/api/v2/workspaces/workspaceId/current-state-version",
 			wantURL:   "https://archivist.terraform.io/v1/object/test",
 			wantErr:   nil,
-			responder: httpmock.NewBytesResponder(http.StatusOK, []byte(`{"data":{"attributes":{"hosted-state-download-url":"URL"}}}`)),
+			responder: httpmock.NewBytesResponder(http.StatusOK, []byte(`{"data":{"attributes":{"hosted-state-download-url":"https://archivist.terraform.io/v1/object/test"}}}`)),
 		},
 		{
 			name: "Should fail with wrong workspaceId",
@@ -74,7 +74,10 @@ func TestNewCloudReader(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			httpmock.Reset()
 			httpmock.RegisterResponder("GET", tt.url, tt.responder)
-			got, err := NewHTTPReader(tt.args.workspaceId, tt.args.options)
+			if tt.name == "Should fetch URL with auth header" {
+				httpmock.RegisterResponder("GET", "https://archivist.terraform.io/v1/object/test", httpmock.NewBytesResponder(http.StatusOK, []byte(`{}`)))
+			}
+			got, err := NewCloudReader(tt.args.workspaceId, tt.args.options)
 			if tt.wantErr != nil {
 				assert.EqualError(t, err, tt.wantErr.Error())
 				return
