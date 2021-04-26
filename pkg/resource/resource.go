@@ -25,6 +25,7 @@ var refactoredResources = []string{
 	"aws_db_subnet_group",
 	"aws_default_route_table",
 	"aws_default_security_group",
+	"aws_default_subnet",
 }
 
 func IsRefactoredResource(typ string) bool {

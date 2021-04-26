@@ -8,4 +8,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsDbInstanceMetaData(resourceSchemaRepository)
 	initAwsDbSubnetGroupMetaData(resourceSchemaRepository)
 	initAwsDefaultSecurityGroupMetaData(resourceSchemaRepository)
+	initAwsDefaultSubnetMetaData(resourceSchemaRepository)
 }
