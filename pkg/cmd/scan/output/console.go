@@ -77,8 +77,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 					pref = fmt.Sprintf("%s %s:", color.RedString("-"), path)
 				}
 				if change.Type == diff.UPDATE {
-					isJsonString := isFieldJsonString(difference.Res, path)
-					if isJsonString {
+					if change.JsonString {
 						prefix := "        "
 						fmt.Printf("    %s\n%s%s\n", pref, prefix, jsonDiff(change.From, change.To, prefix))
 						continue
@@ -179,23 +178,6 @@ func groupByType(resources []resource.Resource) map[string][]resource.Resource {
 		result[res.TerraformType()] = append(result[res.TerraformType()], res)
 	}
 	return result
-}
-
-func isFieldJsonString(res resource.Resource, fieldName string) bool {
-	t := reflect.TypeOf(res)
-	var field reflect.StructField
-	var ok bool
-	if t.Kind() == reflect.Ptr {
-		field, ok = t.Elem().FieldByName(fieldName)
-	}
-	if t.Kind() != reflect.Ptr {
-		field, ok = t.FieldByName(fieldName)
-	}
-	if !ok {
-		return false
-	}
-
-	return field.Tag.Get("jsonstring") == "true"
 }
 
 func jsonDiff(a, b interface{}, prefix string) string {
