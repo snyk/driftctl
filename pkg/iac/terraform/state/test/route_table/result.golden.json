@@ -42,14 +42,14 @@
   "CtyVal": {}
  },
  {
-  "DefaultRouteTableId": "rtb-9642cde8",
   "Id": "rtb-9642cde8",
-  "OwnerId": "929327065333",
-  "PropagatingVgws": null,
-  "Route": null,
-  "Tags": null,
-  "VpcId": "vpc-41d1d13b",
-  "CtyVal": {}
+  "Type": "aws_default_route_table",
+  "Attrs": {
+   "default_route_table_id": "rtb-9642cde8",
+   "id": "rtb-9642cde8",
+   "owner_id": "929327065333",
+   "vpc_id": "vpc-41d1d13b"
+  }
  },
  {
   "Id": "rtb-0232602f0f07748fc",
