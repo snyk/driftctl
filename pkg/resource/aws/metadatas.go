@@ -6,4 +6,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsAmiMetaData(resourceSchemaRepository)
 	initAwsCloudfrontDistributionMetaData(resourceSchemaRepository)
 	initAwsDbInstanceMetaData(resourceSchemaRepository)
+	initAwsDbSubnetGroupMetaData(resourceSchemaRepository)
 }

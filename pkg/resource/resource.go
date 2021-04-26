@@ -22,6 +22,7 @@ var refactoredResources = []string{
 	"aws_ami",
 	"aws_cloudfront_distribution",
 	"aws_db_instance",
+	"aws_db_subnet_group",
 }
 
 func IsRefactoredResource(typ string) bool {
