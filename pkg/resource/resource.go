@@ -19,6 +19,7 @@ type Resource interface {
 }
 
 var refactoredResources = []string{
+	"aws_ami",
 	"aws_cloudfront_distribution",
 }
 

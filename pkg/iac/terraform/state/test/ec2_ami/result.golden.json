@@ -1,1 +1,33 @@
-[{"Architecture":"x86_64","Arn":"arn:aws:ec2:eu-west-3::image/ami-06668cf793e254604","Description":"","EnaSupport":true,"Id":"ami-06668cf793e254604","ImageLocation":"047081014315/Test","KernelId":"","ManageEbsSnapshots":null,"Name":"Test","RamdiskId":"","RootDeviceName":"/dev/xvda","RootSnapshotId":"snap-00672558cecd93a61","SriovNetSupport":"simple","Tags":{},"VirtualizationType":"hvm","EbsBlockDevice":[{"DeleteOnTermination":true,"DeviceName":"/dev/xvda","Encrypted":false,"Iops":0,"SnapshotId":"snap-00672558cecd93a61","VolumeSize":8,"VolumeType":"gp2"}],"EphemeralBlockDevice":[],"Timeouts":{"Create":null,"Delete":null,"Update":null},"CtyVal":{}}]
+[
+ {
+  "Id": "ami-06668cf793e254604",
+  "Type": "aws_ami",
+  "Attrs": {
+   "architecture": "x86_64",
+   "arn": "arn:aws:ec2:eu-west-3::image/ami-06668cf793e254604",
+   "description": "",
+   "ebs_block_device": [
+    {
+     "delete_on_termination": true,
+     "device_name": "/dev/xvda",
+     "encrypted": false,
+     "iops": 0,
+     "snapshot_id": "snap-00672558cecd93a61",
+     "volume_size": 8,
+     "volume_type": "gp2"
+    }
+   ],
+   "ena_support": true,
+   "id": "ami-06668cf793e254604",
+   "image_location": "047081014315/Test",
+   "kernel_id": "",
+   "name": "Test",
+   "ramdisk_id": "",
+   "root_device_name": "/dev/xvda",
+   "root_snapshot_id": "snap-00672558cecd93a61",
+   "sriov_net_support": "simple",
+   "timeouts": {},
+   "virtualization_type": "hvm"
+  }
+ }
+]
