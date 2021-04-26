@@ -4,7 +4,6 @@ import (
 	"reflect"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-
 	"github.com/r3labs/diff/v2"
 
 	"github.com/cloudskiff/driftctl/pkg/alerter"
@@ -40,7 +39,8 @@ func (c *ComputedDiffAlert) ShouldIgnoreResource() bool {
 }
 
 type Analyzer struct {
-	alerter *alerter.Alerter
+	alerter                  *alerter.Alerter
+	resourceSchemaRepository resource.SchemaRepositoryInterface
 }
 
 type Filter interface {
@@ -48,8 +48,8 @@ type Filter interface {
 	IsFieldIgnored(res resource.Resource, path []string) bool
 }
 
-func NewAnalyzer(alerter *alerter.Alerter) Analyzer {
-	return Analyzer{alerter}
+func NewAnalyzer(alerter *alerter.Alerter, resourceSchemaRepository resource.SchemaRepositoryInterface) Analyzer {
+	return Analyzer{alerter, resourceSchemaRepository}
 }
 
 func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resource, filter Filter) (Analysis, error) {
@@ -81,7 +81,14 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 		filteredRemoteResource = removeResourceByIndex(i, filteredRemoteResource)
 		analysis.AddManaged(stateRes)
 
-		delta, _ := diff.Diff(stateRes, remoteRes)
+		var delta diff.Changelog
+		if resource.IsRefactoredResource(stateRes.TerraformType()) {
+			stateRes, _ := stateRes.(*resource.AbstractResource)
+			remoteRes, _ := remoteRes.(*resource.AbstractResource)
+			delta, _ = diff.Diff(stateRes.Attrs, remoteRes.Attrs)
+		} else {
+			delta, _ = diff.Diff(stateRes, remoteRes)
+		}
 
 		if len(delta) == 0 {
 			continue
@@ -93,7 +100,16 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 				continue
 			}
 			c := Change{Change: change}
-			c.Computed = a.isComputedField(stateRes, c)
+			if resource.IsRefactoredResource(stateRes.TerraformType()) {
+				resSchema, exist := a.resourceSchemaRepository.GetSchema(stateRes.TerraformType())
+				if exist {
+					c.Computed = resSchema.IsComputedField(c.Path)
+					c.JsonString = resSchema.IsJsonStringField(c.Path)
+				}
+			} else {
+				c.Computed = a.isComputedField(stateRes, c)
+				c.JsonString = a.isJsonStringField(stateRes, c)
+			}
 			if c.Computed {
 				haveComputedDiff = true
 			}
@@ -148,6 +164,15 @@ func removeResourceByIndex(i int, resources []resource.Resource) []resource.Reso
 func (a Analyzer) isComputedField(stateRes resource.Resource, change Change) bool {
 	if field, ok := a.getField(reflect.TypeOf(stateRes), change.Path); ok {
 		return field.Tag.Get("computed") == "true"
+	}
+	return false
+}
+
+// isJsonStringField returns true if the field that generated the diff of a resource
+// has a jsonfield tag
+func (a Analyzer) isJsonStringField(stateRes resource.Resource, change Change) bool {
+	if field, ok := a.getField(reflect.TypeOf(stateRes), change.Path); ok {
+		return field.Tag.Get("jsonfield") == "true"
 	}
 	return false
 }
