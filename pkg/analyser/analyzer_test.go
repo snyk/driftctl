@@ -993,7 +993,10 @@ func TestAnalyze(t *testing.T) {
 				al.SetAlerts(c.alerts)
 			}
 
-			analyzer := NewAnalyzer(al)
+			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+			aws.InitResourcesMetadata(repo)
+
+			analyzer := NewAnalyzer(al, repo)
 			result, err := analyzer.Analyze(c.cloud, c.iac, filter)
 
 			if err != nil {
