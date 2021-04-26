@@ -21,6 +21,7 @@ type Resource interface {
 var refactoredResources = []string{
 	"aws_ami",
 	"aws_cloudfront_distribution",
+	"aws_db_instance",
 }
 
 func IsRefactoredResource(typ string) bool {
