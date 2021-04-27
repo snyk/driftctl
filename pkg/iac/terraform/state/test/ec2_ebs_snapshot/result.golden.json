@@ -1,1 +1,21 @@
-[{"Arn":"arn:aws:ec2:eu-west-3:047081014315:volume/vol-01ddc91d3d9d1318b","AvailabilityZone":"eu-west-3a","Encrypted":false,"Id":"vol-01ddc91d3d9d1318b","Iops":100,"KmsKeyId":"","MultiAttachEnabled":false,"OutpostArn":"","Size":8,"SnapshotId":"","Tags":{"Name":"HelloWorld"},"Type":"gp2","CtyVal":{}},{"Arn":"arn:aws:ec2:eu-west-3::snapshot/snap-071ccff0167f3e841","DataEncryptionKeyId":"","Description":"","Encrypted":false,"Id":"snap-071ccff0167f3e841","KmsKeyId":"","OwnerAlias":"","OwnerId":"047081014315","Tags":{"Name":"HelloWorld_snap"},"VolumeId":"vol-01ddc91d3d9d1318b","VolumeSize":10,"Timeouts":null,"CtyVal":{}}]
+[
+ {
+  "Id": "snap-071ccff0167f3e841",
+  "Type": "aws_ebs_snapshot",
+  "Attrs": {
+   "arn": "arn:aws:ec2:eu-west-3::snapshot/snap-071ccff0167f3e841",
+   "data_encryption_key_id": "",
+   "description": "",
+   "encrypted": false,
+   "id": "snap-071ccff0167f3e841",
+   "kms_key_id": "",
+   "owner_alias": "",
+   "owner_id": "047081014315",
+   "tags": {
+    "Name": "HelloWorld_snap"
+   },
+   "volume_id": "vol-01ddc91d3d9d1318b",
+   "volume_size": 10
+  }
+ }
+]

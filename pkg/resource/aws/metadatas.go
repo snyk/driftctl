@@ -10,4 +10,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsDefaultSecurityGroupMetaData(resourceSchemaRepository)
 	initAwsDefaultSubnetMetaData(resourceSchemaRepository)
 	initAwsDynamodbTableMetaData(resourceSchemaRepository)
+	initAwsEbsSnapshotMetaData(resourceSchemaRepository)
 }

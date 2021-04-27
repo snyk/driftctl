@@ -28,6 +28,7 @@ var refactoredResources = []string{
 	"aws_default_subnet",
 	"aws_default_vpc",
 	"aws_dynamodb_table",
+	"aws_ebs_snapshot",
 }
 
 func IsRefactoredResource(typ string) bool {
