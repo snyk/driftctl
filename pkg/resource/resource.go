@@ -27,6 +27,7 @@ var refactoredResources = []string{
 	"aws_default_security_group",
 	"aws_default_subnet",
 	"aws_default_vpc",
+	"aws_dynamodb_table",
 }
 
 func IsRefactoredResource(typ string) bool {
