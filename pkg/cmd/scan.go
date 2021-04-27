@@ -130,6 +130,13 @@ func NewScanCmd() *cobra.Command {
 		"Use those HTTP headers to query the provided URL.\n"+
 			"Only used with tfstate+http(s) backend for now.\n",
 	)
+	fl.StringVarP(&opts.BackendOptions.TerraformCloudToken,
+		"terraform-cloud-token",
+		"",
+		"",
+		"Terraform Cloud / Enterprise API token.\n"+
+			"Only used with tfstate+tfcloud backend.\n",
+	)
 	fl.BoolVar(&opts.StrictMode,
 		"strict",
 		false,
