@@ -1,6 +1,5 @@
 version: 2.1
 orbs:
-  aws-cli: circleci/aws-cli@1.3.0
   go: circleci/go@1.5.0
 jobs:
   build:
@@ -126,15 +125,18 @@ jobs:
             VERSION=$(./bin/driftctl_linux_amd64 version)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -n ${VERSION} ${VERSION} ./bin/
   update-lambda:
-    executor: aws-cli/default
     environment:
         FUNCTION_NAME: driftctl-version
+    docker:
+        - image: cimg/base:2021.04
     steps:
-      - aws-cli/install
       - run:
           name: "Update Lambda version"
           command: |
-            aws lambda update-function-configuration --function-name $FUNCTION_NAME --environment "{\"Variables\":{\"LATEST_VERSION\":\"$CIRCLE_TAG\"}}"
+              wget "https://github.com/cloudskiff/lambda-env-updater/releases/download/v1.0.0/lambda-env-updater_linux_amd64" && chmod +x lambda-env-updater_linux_amd64
+              ./lambda-env-updater_linux_amd64\
+                -name ${FUNCTION_NAME}\
+                -env "LATEST_VERSION=${CIRCLE_TAG}"
 workflows:
   nightly:
     jobs:
