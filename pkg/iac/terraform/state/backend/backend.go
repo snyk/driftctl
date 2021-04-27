@@ -14,7 +14,7 @@ var supportedBackends = []string{
 	BackendKeyS3,
 	BackendKeyHTTP,
 	BackendKeyHTTPS,
-	BackendKeyCloud,
+	BackendKeyTFCloud,
 }
 
 type Backend io.ReadCloser
