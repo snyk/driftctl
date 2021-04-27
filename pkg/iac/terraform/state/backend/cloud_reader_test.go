@@ -67,7 +67,7 @@ func TestNewCloudReader(t *testing.T) {
 					httpmock.NewBytesResponder(http.StatusNotFound, []byte{}),
 				)
 			},
-			wantErr: errors.New("error requesting Cloud backend state: status code: 404"),
+			wantErr: errors.New("error requesting terraform cloud backend state: status code: 404"),
 		},
 		{
 			name: "Should fail with bad authentication token",
@@ -87,7 +87,7 @@ func TestNewCloudReader(t *testing.T) {
 					httpmock.NewBytesResponder(http.StatusUnauthorized, []byte{}),
 				)
 			},
-			wantErr: errors.New("error requesting Cloud backend state: status code: 401"),
+			wantErr: errors.New("error requesting terraform cloud backend state: status code: 401"),
 		},
 	}
 	for _, tt := range tests {
