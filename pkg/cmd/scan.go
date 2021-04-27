@@ -7,6 +7,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/cloudskiff/driftctl/pkg/telemetry"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -75,6 +76,7 @@ func NewScanCmd() *cobra.Command {
 			}
 
 			opts.Quiet, _ = cmd.Flags().GetBool("quiet")
+			opts.DisableTelemetry, _ = cmd.Flags().GetBool("disable-telemetry")
 
 			return nil
 		},
@@ -189,6 +191,10 @@ func scanRun(opts *pkg.ScanOptions) error {
 	err = selectedOutput.Write(analysis)
 	if err != nil {
 		return err
+	}
+
+	if !opts.DisableTelemetry {
+		telemetry.SendTelemetry(analysis)
 	}
 
 	if !analysis.IsSync() {
