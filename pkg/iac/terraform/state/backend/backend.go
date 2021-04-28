@@ -3,6 +3,7 @@ package backend
 import (
 	"fmt"
 	"io"
+	"net/http"
 
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/pkg/errors"
@@ -46,7 +47,7 @@ func GetBackend(config config.SupplierConfig, opts *Options) (Backend, error) {
 	case BackendKeyHTTP:
 		fallthrough
 	case BackendKeyHTTPS:
-		return NewHTTPReader(fmt.Sprintf("%s://%s", config.Backend, config.Path), opts)
+		return NewHTTPReader(&http.Client{}, fmt.Sprintf("%s://%s", config.Backend, config.Path), opts)
 	default:
 		return nil, errors.Errorf("Unsupported backend '%s'", backend)
 	}

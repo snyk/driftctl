@@ -17,7 +17,11 @@ type HTTPBackend struct {
 	reader io.ReadCloser
 }
 
-func NewHTTPReader(rawURL string, opts *Options) (*HTTPBackend, error) {
+type HttpClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+func NewHTTPReader(client HttpClient, rawURL string, opts *Options) (*HTTPBackend, error) {
 	req, err := http.NewRequest(http.MethodGet, rawURL, nil)
 	if err != nil {
 		return nil, err
@@ -27,7 +31,6 @@ func NewHTTPReader(rawURL string, opts *Options) (*HTTPBackend, error) {
 		req.Header.Add(key, value)
 	}
 
-	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
