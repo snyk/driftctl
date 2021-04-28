@@ -23,6 +23,7 @@ func TestNewHTTPReader(t *testing.T) {
 		args       args
 		wantErr    error
 		httpClient func() HttpClient
+		expected   string
 	}{
 		{
 			name: "Should fail with wrong URL",
@@ -36,6 +37,7 @@ func TestNewHTTPReader(t *testing.T) {
 			httpClient: func() HttpClient {
 				return &http.Client{}
 			},
+			expected: "",
 		},
 		{
 			name: "Should fetch URL with auth header",
@@ -55,7 +57,7 @@ func TestNewHTTPReader(t *testing.T) {
 
 				req.Header.Add("Authorization", "Basic Test")
 
-				bodyReader := strings.NewReader("test")
+				bodyReader := strings.NewReader("{}")
 				bodyReadCloser := io.NopCloser(bodyReader)
 
 				m.On("Do", req).Return(&http.Response{
@@ -65,6 +67,7 @@ func TestNewHTTPReader(t *testing.T) {
 
 				return m
 			},
+			expected: "{}",
 		},
 		{
 			name: "Should fail with bad status code",
@@ -90,6 +93,7 @@ func TestNewHTTPReader(t *testing.T) {
 
 				return m
 			},
+			expected: "test",
 		},
 	}
 	for _, tt := range tests {
@@ -102,6 +106,9 @@ func TestNewHTTPReader(t *testing.T) {
 				assert.NoError(t, err)
 			}
 			assert.NotNil(t, got)
+			gotBytes, err := io.ReadAll(got)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expected, string(gotBytes))
 		})
 	}
 }
