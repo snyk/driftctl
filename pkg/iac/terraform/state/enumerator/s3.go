@@ -40,10 +40,7 @@ func (s *S3Enumerator) Enumerate() ([]string, error) {
 	}
 	bucket := bucketPath[0]
 	prefix := strings.Join(bucketPath[1:], "/")
-
-	if !HasMeta(prefix) {
-		prefix = filepath.Join(prefix, "*")
-	}
+	hasGlob := HasMeta(prefix)
 
 	prefix, pattern, err := GlobS3(prefix)
 	if err != nil {
@@ -64,7 +61,7 @@ func (s *S3Enumerator) Enumerate() ([]string, error) {
 		for _, metadata := range output.Contents {
 			if aws.Int64Value(metadata.Size) > 0 {
 				key := *metadata.Key
-				if match, _ := filepath.Match(filepath.Join(prefix, pattern), key); match {
+				if match, _ := filepath.Match(filepath.Join(prefix, pattern), key); !hasGlob || match {
 					files = append(files, filepath.Join(bucket, key))
 				}
 			}
