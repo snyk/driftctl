@@ -28,6 +28,11 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsIAMUserMetaData(resourceSchemaRepository)
 	initAwsIAMUserPolicyMetaData(resourceSchemaRepository)
 	initAwsKeyPairMetaData(resourceSchemaRepository)
+<<<<<<< HEAD
 	initAwsKmsKeyMetaData(resourceSchemaRepository)
 	initAwsKmsAliasMetaData(resourceSchemaRepository)
+=======
+	initAwsSubnetMetaData(resourceSchemaRepository)
+	initAwsDefaultSubnetMetaData(resourceSchemaRepository)
+>>>>>>> migrate subnet and default subnet
 }

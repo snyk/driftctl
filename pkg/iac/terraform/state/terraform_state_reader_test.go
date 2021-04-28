@@ -97,6 +97,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "KMS alias", dirName: "kms_alias", wantErr: false},
 		{name: "lambda event source mapping", dirName: "aws_lambda_event_source_mapping", wantErr: false},
 		{name: "VPC", dirName: "vpc", wantErr: false},
+		{name: "Subnet", dirName: "subnet", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
