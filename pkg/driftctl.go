@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/jmespath/go-jmespath"
 	"github.com/pkg/errors"
@@ -53,6 +54,7 @@ func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier
 }
 
 func (d DriftCTL) Run() (*analyser.Analysis, error) {
+	start := time.Now()
 	remoteResources, resourcesFromState, err := d.scan()
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -108,6 +110,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	driftIgnore := filter.NewDriftIgnore()
 
 	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState, driftIgnore)
+	analysis.Duration = time.Since(start)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to perform resources analysis")

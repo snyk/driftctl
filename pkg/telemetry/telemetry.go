@@ -17,6 +17,7 @@ type telemetry struct {
 	Arch           string `json:"arch"`
 	TotalResources int    `json:"total_resources"`
 	TotalManaged   int    `json:"total_managed"`
+	Duration       uint   `json:"duration"`
 }
 
 func SendTelemetry(analysis *analyser.Analysis) {
@@ -31,6 +32,7 @@ func SendTelemetry(analysis *analyser.Analysis) {
 		Arch:           runtime.GOARCH,
 		TotalResources: analysis.Summary().TotalResources,
 		TotalManaged:   analysis.Summary().TotalManaged,
+		Duration:       uint(analysis.Duration.Seconds() + 0.5),
 	}
 
 	body, err := json.Marshal(t)
