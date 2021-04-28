@@ -31,6 +31,7 @@ func TestSendTelemetry(t *testing.T) {
 				a := &analyser.Analysis{}
 				a.AddManaged(&resource.FakeResource{})
 				a.AddUnmanaged(&resource.FakeResource{})
+				a.Duration = 123.4 * 1e9 // 123.4 seconds
 				return a
 			}(),
 			expectedBody: &telemetry{
@@ -39,6 +40,21 @@ func TestSendTelemetry(t *testing.T) {
 				Arch:           runtime.GOARCH,
 				TotalResources: 2,
 				TotalManaged:   1,
+				Duration:       123,
+			},
+		},
+		{
+			name: "valid analysis with round up",
+			analysis: func() *analyser.Analysis {
+				a := &analyser.Analysis{}
+				a.Duration = 123.5 * 1e9 // 123.5 seconds
+				return a
+			}(),
+			expectedBody: &telemetry{
+				Version:  version.Current(),
+				Os:       runtime.GOOS,
+				Arch:     runtime.GOARCH,
+				Duration: 124,
 			},
 		},
 		{

@@ -104,6 +104,14 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 
 	cases := TestCases{
 		{
+			name:            "analysis duration is set",
+			stateResources:  []resource.Resource{},
+			remoteResources: []resource.Resource{},
+			assert: func(result *test.ScanResult, err error) {
+				result.NotZero(result.Duration)
+			},
+		},
+		{
 			name: "infrastructure should be in sync",
 			stateResources: []resource.Resource{
 				&testresource.FakeResource{},
