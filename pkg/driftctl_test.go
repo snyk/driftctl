@@ -600,74 +600,68 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				},
 			},
 			remoteResources: []resource.Resource{
-				&aws.AwsEbsVolume{
-					Id:                 "vol-018c5ae89895aca4c",
-					Encrypted:          awssdk.Bool(false),
-					MultiAttachEnabled: awssdk.Bool(false),
-					AvailabilityZone:   awssdk.String("us-east-1"),
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"id":                   cty.StringVal("vol-018c5ae89895aca4c"),
-							"availability_zone":    cty.StringVal("us-east-1"),
-							"encrypted":            cty.BoolVal(false),
-							"multi_attach_enabled": cty.BoolVal(false),
-						})
-						return &v
-					}(),
+				&resource.AbstractResource{
+					Id:   "vol-018c5ae89895aca4c",
+					Type: "aws_ebs_volume",
+					Attrs: &resource.Attributes{
+						"encrypted":            false,
+						"multi_attach_enabled": false,
+						"availability_zone":    "us-east-1",
+					},
 				},
-				&aws.AwsEbsVolume{
-					Id:                 "vol-02862d9b39045a3a4",
-					Type:               awssdk.String("gp3"),
-					MultiAttachEnabled: awssdk.Bool(false),
-					AvailabilityZone:   awssdk.String("us-east-1"),
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"id":                   cty.StringVal("vol-02862d9b39045a3a4"),
-							"availability_zone":    cty.StringVal("us-east-1"),
-							"type":                 cty.StringVal("gp3"),
-							"multi_attach_enabled": cty.BoolVal(false),
-						})
-						return &v
-					}(),
+				&resource.AbstractResource{
+					Id:   "vol-02862d9b39045a3a4",
+					Type: "aws_ebs_volume",
+					Attrs: &resource.Attributes{
+						"type":                 "gp3",
+						"multi_attach_enabled": false,
+						"availability_zone":    "us-east-1",
+					},
 				},
 			},
 			mocks: func(factory resource.ResourceFactory) {
-				foo := cty.ObjectVal(map[string]cty.Value{
-					"id":                   cty.StringVal("vol-018c5ae89895aca4c"),
-					"availability_zone":    cty.StringVal("us-east-1"),
-					"encrypted":            cty.BoolVal(true),
-					"multi_attach_enabled": cty.BoolVal(false),
-				})
-				factory.(*terraform.MockResourceFactory).On("CreateResource", mock.MatchedBy(func(input map[string]interface{}) bool {
+				foo := resource.AbstractResource{
+					Id:   "vol-018c5ae89895aca4c",
+					Type: "aws_ebs_volume",
+					Attrs: &resource.Attributes{
+						"encrypted":            true,
+						"multi_attach_enabled": false,
+						"availability_zone":    "us-east-1",
+					},
+				}
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", mock.MatchedBy(func(input map[string]interface{}) bool {
 					return matchByAttributes(input, map[string]interface{}{
 						"id":                   "vol-018c5ae89895aca4c",
 						"availability_zone":    "us-east-1",
 						"encrypted":            true,
 						"multi_attach_enabled": false,
 					})
-				}), "aws_ebs_volume").Times(1).Return(&foo, nil)
+				}), mock.Anything, "aws_ebs_volume").Times(1).Return(foo, nil)
 
-				bar := cty.ObjectVal(map[string]cty.Value{
-					"id":                   cty.StringVal("vol-02862d9b39045a3a4"),
-					"availability_zone":    cty.StringVal("us-east-1"),
-					"type":                 cty.StringVal("gp2"),
-					"multi_attach_enabled": cty.BoolVal(false),
-				})
-				factory.(*terraform.MockResourceFactory).On("CreateResource", mock.MatchedBy(func(input map[string]interface{}) bool {
+				bar := resource.AbstractResource{
+					Id:   "vol-02862d9b39045a3a4",
+					Type: "aws_ebs_volume",
+					Attrs: &resource.Attributes{
+						"type":                 "gp2",
+						"multi_attach_enabled": false,
+						"availability_zone":    "us-east-1",
+					},
+				}
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", mock.MatchedBy(func(input map[string]interface{}) bool {
 					return matchByAttributes(input, map[string]interface{}{
 						"id":                   "vol-02862d9b39045a3a4",
 						"availability_zone":    "us-east-1",
 						"type":                 "gp2",
 						"multi_attach_enabled": false,
 					})
-				}), "aws_ebs_volume").Times(1).Return(&bar, nil)
+				}), mock.Anything, "aws_ebs_volume").Times(1).Return(bar, nil)
 			},
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertManagedCount(2)
 				result.AssertResourceHasDrift("vol-02862d9b39045a3a4", "aws_ebs_volume", analyser.Change{
 					Change: diff.Change{
 						Type: diff.UPDATE,
-						Path: []string{"Type"},
+						Path: []string{"type"},
 						From: "gp2",
 						To:   "gp3",
 					},
@@ -676,7 +670,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				result.AssertResourceHasDrift("vol-018c5ae89895aca4c", "aws_ebs_volume", analyser.Change{
 					Change: diff.Change{
 						Type: diff.UPDATE,
-						Path: []string{"Encrypted"},
+						Path: []string{"encrypted"},
 						From: true,
 						To:   false,
 					},

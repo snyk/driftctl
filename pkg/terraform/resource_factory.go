@@ -1,6 +1,7 @@
 package terraform
 
 import (
+	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -8,11 +9,15 @@ import (
 )
 
 type TerraformResourceFactory struct {
-	providerLibrary *ProviderLibrary
+	providerLibrary          *ProviderLibrary
+	resourceSchemaRepository *resource.SchemaRepository
 }
 
-func NewTerraformResourceFactory(providerLibrary *ProviderLibrary) *TerraformResourceFactory {
-	return &TerraformResourceFactory{providerLibrary: providerLibrary}
+func NewTerraformResourceFactory(providerLibrary *ProviderLibrary, resourceSchemaRepository *resource.SchemaRepository) *TerraformResourceFactory {
+	return &TerraformResourceFactory{
+		providerLibrary:          providerLibrary,
+		resourceSchemaRepository: resourceSchemaRepository,
+	}
 }
 
 func (r *TerraformResourceFactory) resolveType(ty string) (cty.Type, error) {
@@ -43,4 +48,20 @@ func (r *TerraformResourceFactory) CreateResource(data interface{}, ty string) (
 	}
 
 	return &val, nil
+}
+
+func (r *TerraformResourceFactory) CreateAbstractResource(data map[string]interface{}, id, ty string) resource.AbstractResource {
+	ctyAttr := resource.Attributes(data)
+	ctyAttr.SanitizeDefaultsV3()
+
+	schema, exist := r.resourceSchemaRepository.GetSchema(ty)
+	if exist && schema.NormalizeFunc != nil {
+		schema.NormalizeFunc(&ctyAttr)
+	}
+
+	return resource.AbstractResource{
+		Id:    id,
+		Type:  ty,
+		Attrs: &ctyAttr,
+	}
 }

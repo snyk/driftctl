@@ -4,16 +4,11 @@ import (
 	"strings"
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
-	testresource "github.com/cloudskiff/driftctl/test/resource"
-	"github.com/stretchr/testify/mock"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
-
 	"github.com/r3labs/diff/v2"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
@@ -44,37 +39,49 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 							},
 						},
 					},
-					&aws.AwsEbsVolume{
-						AvailabilityZone:   awssdk.String("eu-west-3"),
-						Encrypted:          awssdk.Bool(true),
-						Id:                 "vol-02862d9b39045a3a4",
-						Iops:               awssdk.Int(1234),
-						KmsKeyId:           awssdk.String("kms"),
-						Size:               awssdk.Int(8),
-						Type:               awssdk.String("gp2"),
-						MultiAttachEnabled: awssdk.Bool(false),
-						Tags: map[string]string{
-							"Name": "rootVol",
+					&resource.AbstractResource{
+						Id:   "vol-02862d9b39045a3a4",
+						Type: "aws_ebs_volume",
+						Attrs: &resource.Attributes{
+							"id":                   "vol-02862d9b39045a3a4",
+							"encrypted":            true,
+							"multi_attach_enabled": false,
+							"availability_zone":    "eu-west-3",
+							"iops":                 1234,
+							"kms_key_id":           "kms",
+							"size":                 8,
+							"type":                 "gp2",
+							"tags": map[string]interface{}{
+								"Name": "rootVol",
+							},
 						},
 					},
-					&aws.AwsEbsVolume{
-						AvailabilityZone:   awssdk.String("eu-west-3"),
-						Type:               awssdk.String("gp2"),
-						Id:                 "vol-018c5ae89895aca4c",
-						Size:               awssdk.Int(23),
-						Encrypted:          awssdk.Bool(true),
-						MultiAttachEnabled: awssdk.Bool(false),
-						Tags: map[string]string{
-							"Name": "rootVol",
+					&resource.AbstractResource{
+						Id:   "vol-018c5ae89895aca4c",
+						Type: "aws_ebs_volume",
+						Attrs: &resource.Attributes{
+							"id":                   "vol-018c5ae89895aca4c",
+							"encrypted":            true,
+							"multi_attach_enabled": false,
+							"availability_zone":    "eu-west-3",
+							"size":                 23,
+							"type":                 "gp2",
+							"tags": map[string]interface{}{
+								"Name": "rootVol",
+							},
 						},
 					},
-					&aws.AwsEbsVolume{
-						Id: "vol-foobar",
+					&resource.AbstractResource{
+						Id:    "vol-foobar",
+						Type:  "aws_ebs_volume",
+						Attrs: &resource.Attributes{},
 					},
 				},
 				resourcesFromState: &[]resource.Resource{
-					&aws.AwsEbsVolume{
-						Id: "vol-foobar",
+					&resource.AbstractResource{
+						Id:    "vol-foobar",
+						Type:  "aws_ebs_volume",
+						Attrs: &resource.Attributes{},
 					},
 					&resource.AbstractResource{
 						Id:   "dummy-instance",
@@ -91,8 +98,8 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 									"device_name": "/dev/sda1",
 									"encrypted":   true,
 									"kms_key_id":  "kms",
-									"volume_size": float64(8),
-									"iops":        float64(1234),
+									"volume_size": 8,
+									"iops":        1234,
 								},
 							},
 							"ebs_block_device": []interface{}{
@@ -102,7 +109,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 									"device_name":           "/dev/sdb",
 									"encrypted":             true,
 									"delete_on_termination": true,
-									"volume_size":           float64(23),
+									"volume_size":           23,
 								},
 							},
 						},
@@ -110,7 +117,45 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 				},
 			},
 			func(factory *terraform.MockResourceFactory) {
-				factory.On("CreateResource", mock.Anything, "aws_ebs_volume").Times(2).Return(nil, nil)
+				foo := resource.AbstractResource{
+					Id:   "vol-02862d9b39045a3a4",
+					Type: "aws_ebs_volume",
+					Attrs: &resource.Attributes{
+						"id":                   "vol-02862d9b39045a3a4",
+						"encrypted":            true,
+						"multi_attach_enabled": false,
+						"availability_zone":    "eu-west-3",
+						"iops":                 1234,
+						"kms_key_id":           "kms",
+						"size":                 8,
+						"type":                 "gp2",
+						"tags": map[string]interface{}{
+							"Name": "rootVol",
+						},
+					},
+				}
+				factory.On("CreateAbstractResource", mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "vol-02862d9b39045a3a4"
+				}), mock.Anything, "aws_ebs_volume").Times(1).Return(foo, nil)
+
+				bar := resource.AbstractResource{
+					Id:   "vol-018c5ae89895aca4c",
+					Type: "aws_ebs_volume",
+					Attrs: &resource.Attributes{
+						"id":                   "vol-018c5ae89895aca4c",
+						"encrypted":            true,
+						"multi_attach_enabled": false,
+						"availability_zone":    "eu-west-3",
+						"size":                 23,
+						"type":                 "gp2",
+						"tags": map[string]interface{}{
+							"Name": "rootVol",
+						},
+					},
+				}
+				factory.On("CreateAbstractResource", mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "vol-018c5ae89895aca4c"
+				}), mock.Anything, "aws_ebs_volume").Times(1).Return(bar, nil)
 			},
 			false,
 		},
@@ -123,10 +168,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 				c.mocks(factory)
 			}
 
-			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
-			aws.InitResourcesMetadata(repo)
-
-			a := NewAwsInstanceBlockDeviceResourceMapper(factory, repo)
+			a := NewAwsInstanceBlockDeviceResourceMapper(factory)
 			if err := a.Execute(&[]resource.Resource{}, c.args.resourcesFromState); (err != nil) != c.wantErr {
 				t.Errorf("Execute() error = %v, wantErr %v", err, c.wantErr)
 			}

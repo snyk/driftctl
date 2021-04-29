@@ -30,6 +30,7 @@ var refactoredResources = []string{
 	"aws_dynamodb_table",
 	"aws_ebs_snapshot",
 	"aws_instance",
+	"aws_ebs_volume",
 }
 
 func IsRefactoredResource(typ string) bool {
@@ -61,6 +62,7 @@ func (a *AbstractResource) CtyValue() *cty.Value {
 
 type ResourceFactory interface {
 	CreateResource(data interface{}, ty string) (*cty.Value, error)
+	CreateAbstractResource(data map[string]interface{}, id, ty string) AbstractResource
 }
 
 type SerializableResource struct {

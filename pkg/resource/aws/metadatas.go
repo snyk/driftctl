@@ -12,4 +12,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsDynamodbTableMetaData(resourceSchemaRepository)
 	initAwsEbsSnapshotMetaData(resourceSchemaRepository)
 	initAwsInstanceMetaData(resourceSchemaRepository)
+	initAwsEbsVolumeMetaData(resourceSchemaRepository)
 }
