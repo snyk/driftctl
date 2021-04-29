@@ -27,11 +27,11 @@ func (m AwsBucketPolicyExpander) Execute(_, resourcesFromState *[]resource.Resou
 			continue
 		}
 
-		bucket, _ := res.(*aws.AwsS3Bucket)
+		bucket, _ := res.(*resource.AbstractResource)
 		newList = append(newList, res)
 
-		if hasPolicyAttached(bucket, resourcesFromState) {
-			bucket.Policy = nil
+		if hasPolicyAttached(res.TerraformId(), resourcesFromState) {
+			bucket.Attrs.SafeDelete([]string{"policy"})
 			continue
 		}
 
@@ -44,15 +44,19 @@ func (m AwsBucketPolicyExpander) Execute(_, resourcesFromState *[]resource.Resou
 	return nil
 }
 
-func (m *AwsBucketPolicyExpander) handlePolicy(bucket *aws.AwsS3Bucket, results *[]resource.Resource) error {
-	if bucket.Policy == nil || *bucket.Policy == "" {
+func (m *AwsBucketPolicyExpander) handlePolicy(bucket *resource.AbstractResource, results *[]resource.Resource) error {
+	policyAttr, exist := bucket.Attrs.Get("policy")
+	if !exist || policyAttr == nil || policyAttr == "" {
 		return nil
 	}
+	policy := policyAttr.(string)
 
+	bucketAttr, _ := bucket.Attrs.Get("bucket")
+	bucketName := bucketAttr.(string)
 	data := map[string]interface{}{
-		"id":     bucket.Id,
-		"bucket": bucket.Bucket,
-		"policy": bucket.Policy,
+		"id":     bucket.TerraformId(),
+		"bucket": (*bucket.Attrs)["bucket"],
+		"policy": (*bucket.Attrs)["policy"],
 	}
 	ctyVal, err := m.resourceFactory.CreateResource(data, "aws_s3_bucket_policy")
 	if err != nil {
@@ -60,9 +64,9 @@ func (m *AwsBucketPolicyExpander) handlePolicy(bucket *aws.AwsS3Bucket, results 
 	}
 
 	newPolicy := &aws.AwsS3BucketPolicy{
-		Id:     bucket.Id,
-		Bucket: bucket.Bucket,
-		Policy: bucket.Policy,
+		Id:     bucket.TerraformId(),
+		Bucket: &bucketName,
+		Policy: &policy,
 		CtyVal: ctyVal,
 	}
 	normalizedRes, err := newPolicy.NormalizeForState()
@@ -74,7 +78,7 @@ func (m *AwsBucketPolicyExpander) handlePolicy(bucket *aws.AwsS3Bucket, results 
 		"id": newPolicy.TerraformId(),
 	}).Debug("Created new policy from bucket")
 
-	bucket.Policy = nil
+	bucket.Attrs.SafeDelete([]string{"policy"})
 	return nil
 }
 
@@ -82,10 +86,10 @@ func (m *AwsBucketPolicyExpander) handlePolicy(bucket *aws.AwsS3Bucket, results 
 // It is mandatory since it's possible to have a aws_bucket with an inline policy
 // AND a aws_bucket_policy resource at the same time. At the end, on the AWS console,
 // the aws_bucket_policy will be used.
-func hasPolicyAttached(bucket *aws.AwsS3Bucket, resourcesFromState *[]resource.Resource) bool {
+func hasPolicyAttached(bucket string, resourcesFromState *[]resource.Resource) bool {
 	for _, res := range *resourcesFromState {
 		if res.TerraformType() == aws.AwsS3BucketPolicyResourceType &&
-			res.TerraformId() == bucket.Id {
+			res.TerraformId() == bucket {
 			return true
 		}
 	}

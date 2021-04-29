@@ -519,10 +519,13 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 		{
 			name: "test bucket policy expander middleware",
 			stateResources: []resource.Resource{
-				&aws.AwsS3Bucket{
-					Id:     "foo",
-					Bucket: awssdk.String("foo"),
-					Policy: awssdk.String("{\"Id\":\"foo\"}"),
+				&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{
+						"bucket": "foo",
+						"policy": "{\"Id\":\"foo\"}",
+					},
 				},
 			},
 			remoteResources: []resource.Resource{
@@ -546,13 +549,11 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					"bucket": cty.StringVal("foo"),
 					"policy": cty.StringVal("{\"Id\":\"foo\"}"),
 				})
-				factory.(*terraform.MockResourceFactory).On("CreateResource", mock.MatchedBy(func(input map[string]interface{}) bool {
-					return matchByAttributes(input, map[string]interface{}{
-						"id":     "foo",
-						"bucket": awssdk.String("foo"),
-						"policy": awssdk.String("{\"Id\":\"foo\"}"),
-					})
-				}), "aws_s3_bucket_policy").Times(1).Return(&foo, nil)
+				factory.(*terraform.MockResourceFactory).On("CreateResource", map[string]interface{}{
+					"id":     "foo",
+					"bucket": "foo",
+					"policy": "{\"Id\":\"foo\"}",
+				}, "aws_s3_bucket_policy").Times(1).Return(&foo, nil)
 			},
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
