@@ -579,38 +579,22 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 		{
 			name: "test instance block device middleware",
 			stateResources: []resource.Resource{
-				&aws.AwsInstance{
-					Id:               "dummy-instance",
-					AvailabilityZone: awssdk.String("us-east-1"),
-					EbsBlockDevice: &[]struct {
-						DeleteOnTermination *bool   `cty:"delete_on_termination"`
-						DeviceName          *string `cty:"device_name"`
-						Encrypted           *bool   `cty:"encrypted" computed:"true"`
-						Iops                *int    `cty:"iops" computed:"true"`
-						KmsKeyId            *string `cty:"kms_key_id" computed:"true"`
-						SnapshotId          *string `cty:"snapshot_id" computed:"true"`
-						VolumeId            *string `cty:"volume_id" computed:"true"`
-						VolumeSize          *int    `cty:"volume_size" computed:"true"`
-						VolumeType          *string `cty:"volume_type" computed:"true"`
-					}{
-						{
-							VolumeId:  awssdk.String("vol-018c5ae89895aca4c"),
-							Encrypted: awssdk.Bool(true),
+				&resource.AbstractResource{
+					Id:   "dummy-instance",
+					Type: "aws_instance",
+					Attrs: &resource.Attributes{
+						"availability_zone": "us-east-1",
+						"root_block_device": []interface{}{
+							map[string]interface{}{
+								"volume_id":   "vol-02862d9b39045a3a4",
+								"volume_type": "gp2",
+							},
 						},
-					},
-					RootBlockDevice: &[]struct {
-						DeleteOnTermination *bool   `cty:"delete_on_termination"`
-						DeviceName          *string `cty:"device_name" computed:"true"`
-						Encrypted           *bool   `cty:"encrypted" computed:"true"`
-						Iops                *int    `cty:"iops" computed:"true"`
-						KmsKeyId            *string `cty:"kms_key_id" computed:"true"`
-						VolumeId            *string `cty:"volume_id" computed:"true"`
-						VolumeSize          *int    `cty:"volume_size" computed:"true"`
-						VolumeType          *string `cty:"volume_type" computed:"true"`
-					}{
-						{
-							VolumeId:   awssdk.String("vol-02862d9b39045a3a4"),
-							VolumeType: awssdk.String("gp2"),
+						"ebs_block_device": []interface{}{
+							map[string]interface{}{
+								"volume_id": "vol-018c5ae89895aca4c",
+								"encrypted": true,
+							},
 						},
 					},
 				},
@@ -657,8 +641,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				factory.(*terraform.MockResourceFactory).On("CreateResource", mock.MatchedBy(func(input map[string]interface{}) bool {
 					return matchByAttributes(input, map[string]interface{}{
 						"id":                   "vol-018c5ae89895aca4c",
-						"availability_zone":    awssdk.String("us-east-1"),
-						"encrypted":            awssdk.Bool(true),
+						"availability_zone":    "us-east-1",
+						"encrypted":            true,
 						"multi_attach_enabled": false,
 					})
 				}), "aws_ebs_volume").Times(1).Return(&foo, nil)
@@ -672,8 +656,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				factory.(*terraform.MockResourceFactory).On("CreateResource", mock.MatchedBy(func(input map[string]interface{}) bool {
 					return matchByAttributes(input, map[string]interface{}{
 						"id":                   "vol-02862d9b39045a3a4",
-						"availability_zone":    awssdk.String("us-east-1"),
-						"type":                 awssdk.String("gp2"),
+						"availability_zone":    "us-east-1",
+						"type":                 "gp2",
 						"multi_attach_enabled": false,
 					})
 				}), "aws_ebs_volume").Times(1).Return(&bar, nil)

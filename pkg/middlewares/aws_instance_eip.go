@@ -15,6 +15,19 @@ func (a AwsInstanceEIP) Execute(remoteResources, resourcesFromState *[]resource.
 			continue
 		}
 
+		if resource.IsRefactoredResource("aws_instance") {
+			instance, _ := remoteResource.(*resource.AbstractResource)
+
+			if a.hasEIPV2(instance, resourcesFromState) {
+				logrus.WithFields(logrus.Fields{
+					"instance": instance.TerraformId(),
+				}).Debug("Ignore instance public ip and dns as it has an eip attached")
+				a.ignorePublicIpAndDnsV2(instance, remoteResources, resourcesFromState)
+			}
+
+			continue
+		}
+
 		instance, _ := remoteResource.(*aws.AwsInstance)
 
 		if a.hasEIP(instance, resourcesFromState) {
@@ -55,6 +68,38 @@ func (a AwsInstanceEIP) ignorePublicIpAndDns(instance *aws.AwsInstance, resource
 				instance, _ := res.(*aws.AwsInstance)
 				instance.PublicDns = nil
 				instance.PublicIp = nil
+			}
+		}
+	}
+}
+
+func (a AwsInstanceEIP) hasEIPV2(instance *resource.AbstractResource, resources *[]resource.Resource) bool {
+	for _, res := range *resources {
+		if res.TerraformType() == aws.AwsEipResourceType {
+			eip, _ := res.(*aws.AwsEip)
+			if *eip.Instance == instance.TerraformId() {
+				return true
+			}
+		}
+		if res.TerraformType() == aws.AwsEipAssociationResourceType {
+			eip, _ := res.(*aws.AwsEipAssociation)
+			if *eip.InstanceId == instance.TerraformId() {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func (a AwsInstanceEIP) ignorePublicIpAndDnsV2(instance *resource.AbstractResource, resourcesSet ...*[]resource.Resource) {
+	for _, resources := range resourcesSet {
+		for _, res := range *resources {
+			if res.TerraformType() == instance.TerraformType() &&
+				res.TerraformId() == instance.TerraformId() {
+				instance, _ := res.(*resource.AbstractResource)
+				instance.Attrs.SafeDelete([]string{"public_dns"})
+				instance.Attrs.SafeDelete([]string{"public_ip"})
 			}
 		}
 	}

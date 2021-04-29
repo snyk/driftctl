@@ -6,6 +6,7 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -33,13 +34,14 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 				resourcesFromState *[]resource.Resource
 			}{
 				expectedResource: &[]resource.Resource{
-					&aws.AwsInstance{
-						Id:               "dummy-instance",
-						RootBlockDevice:  nil,
-						EbsBlockDevice:   nil,
-						AvailabilityZone: awssdk.String("eu-west-3"),
-						VolumeTags: map[string]string{
-							"Name": "rootVol",
+					&resource.AbstractResource{
+						Id:   "dummy-instance",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"availability_zone": "eu-west-3",
+							"volume_tags": map[string]string{
+								"Name": "rootVol",
+							},
 						},
 					},
 					&aws.AwsEbsVolume{
@@ -74,50 +76,34 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 					&aws.AwsEbsVolume{
 						Id: "vol-foobar",
 					},
-					&aws.AwsInstance{
-						Id:               "dummy-instance",
-						AvailabilityZone: awssdk.String("eu-west-3"),
-						VolumeTags: map[string]string{
-							"Name": "rootVol",
-						},
-						EbsBlockDevice: &[]struct {
-							DeleteOnTermination *bool   `cty:"delete_on_termination"`
-							DeviceName          *string `cty:"device_name"`
-							Encrypted           *bool   `cty:"encrypted" computed:"true"`
-							Iops                *int    `cty:"iops" computed:"true"`
-							KmsKeyId            *string `cty:"kms_key_id" computed:"true"`
-							SnapshotId          *string `cty:"snapshot_id" computed:"true"`
-							VolumeId            *string `cty:"volume_id" computed:"true"`
-							VolumeSize          *int    `cty:"volume_size" computed:"true"`
-							VolumeType          *string `cty:"volume_type" computed:"true"`
-						}{
-							{
-								DeviceName:          awssdk.String("/dev/sdb"),
-								VolumeType:          awssdk.String("gp2"),
-								VolumeId:            awssdk.String("vol-018c5ae89895aca4c"),
-								VolumeSize:          awssdk.Int(23),
-								Encrypted:           awssdk.Bool(true),
-								DeleteOnTermination: awssdk.Bool(true),
+					&resource.AbstractResource{
+						Id:   "dummy-instance",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"availability_zone": "eu-west-3",
+							"volume_tags": map[string]string{
+								"Name": "rootVol",
 							},
-						},
-						RootBlockDevice: &[]struct {
-							DeleteOnTermination *bool   `cty:"delete_on_termination"`
-							DeviceName          *string `cty:"device_name" computed:"true"`
-							Encrypted           *bool   `cty:"encrypted" computed:"true"`
-							Iops                *int    `cty:"iops" computed:"true"`
-							KmsKeyId            *string `cty:"kms_key_id" computed:"true"`
-							VolumeId            *string `cty:"volume_id" computed:"true"`
-							VolumeSize          *int    `cty:"volume_size" computed:"true"`
-							VolumeType          *string `cty:"volume_type" computed:"true"`
-						}{
-							{
-								DeviceName: awssdk.String("/dev/sda1"),
-								Encrypted:  awssdk.Bool(true),
-								Iops:       awssdk.Int(1234),
-								KmsKeyId:   awssdk.String("kms"),
-								VolumeId:   awssdk.String("vol-02862d9b39045a3a4"),
-								VolumeSize: awssdk.Int(8),
-								VolumeType: awssdk.String("gp2"),
+							"root_block_device": []interface{}{
+								map[string]interface{}{
+									"volume_id":   "vol-02862d9b39045a3a4",
+									"volume_type": "gp2",
+									"device_name": "/dev/sda1",
+									"encrypted":   true,
+									"kms_key_id":  "kms",
+									"volume_size": float64(8),
+									"iops":        float64(1234),
+								},
+							},
+							"ebs_block_device": []interface{}{
+								map[string]interface{}{
+									"volume_id":             "vol-018c5ae89895aca4c",
+									"volume_type":           "gp2",
+									"device_name":           "/dev/sdb",
+									"encrypted":             true,
+									"delete_on_termination": true,
+									"volume_size":           float64(23),
+								},
 							},
 						},
 					},
@@ -137,7 +123,10 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 				c.mocks(factory)
 			}
 
-			a := NewAwsInstanceBlockDeviceResourceMapper(factory)
+			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+			aws.InitResourcesMetadata(repo)
+
+			a := NewAwsInstanceBlockDeviceResourceMapper(factory, repo)
 			if err := a.Execute(&[]resource.Resource{}, c.args.resourcesFromState); (err != nil) != c.wantErr {
 				t.Errorf("Execute() error = %v, wantErr %v", err, c.wantErr)
 			}

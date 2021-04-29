@@ -29,6 +29,7 @@ var refactoredResources = []string{
 	"aws_default_vpc",
 	"aws_dynamodb_table",
 	"aws_ebs_snapshot",
+	"aws_instance",
 }
 
 func IsRefactoredResource(typ string) bool {
