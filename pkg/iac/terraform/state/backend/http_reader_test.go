@@ -8,12 +8,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/mocks"
 )
 
-func TestNewHTTPReader(t *testing.T) {
+func TestHTTPBackend_Read(t *testing.T) {
 	type args struct {
 		url     string
 		options *Options
@@ -22,7 +21,7 @@ func TestNewHTTPReader(t *testing.T) {
 		name       string
 		args       args
 		wantErr    error
-		httpClient func() HttpClient
+		httpClient HttpClient
 		expected   string
 	}{
 		{
@@ -36,7 +35,7 @@ func TestNewHTTPReader(t *testing.T) {
 			wantErr: errors.New("Get \"wrong_url\": unsupported protocol scheme \"\""),
 			httpClient: func() HttpClient {
 				return &http.Client{}
-			},
+			}(),
 			expected: "",
 		},
 		{
@@ -66,7 +65,7 @@ func TestNewHTTPReader(t *testing.T) {
 				}, nil)
 
 				return m
-			},
+			}(),
 			expected: "{}",
 		},
 		{
@@ -92,13 +91,17 @@ func TestNewHTTPReader(t *testing.T) {
 				}, nil)
 
 				return m
-			},
+			}(),
 			expected: "test",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewHTTPReader(tt.httpClient(), tt.args.url, tt.args.options)
+			reader, err := NewHTTPReader(tt.httpClient, tt.args.url, tt.args.options)
+			assert.NoError(t, err)
+
+			got := make([]byte, len(tt.expected))
+			_, err = reader.Read(got)
 			if tt.wantErr != nil {
 				assert.EqualError(t, err, tt.wantErr.Error())
 				return
@@ -106,16 +109,14 @@ func TestNewHTTPReader(t *testing.T) {
 				assert.NoError(t, err)
 			}
 			assert.NotNil(t, got)
-			gotBytes, err := io.ReadAll(got)
-			assert.NoError(t, err)
-			assert.Equal(t, tt.expected, string(gotBytes))
+			assert.Equal(t, tt.expected, string(got))
 		})
 	}
 }
 
 func TestHTTPBackend_Close(t *testing.T) {
 	type fields struct {
-		url    string
+		req    *http.Request
 		reader func() io.ReadCloser
 	}
 	tests := []struct {
@@ -126,7 +127,7 @@ func TestHTTPBackend_Close(t *testing.T) {
 		{
 			name: "should fail to close reader",
 			fields: fields{
-				url: "",
+				req: &http.Request{},
 				reader: func() io.ReadCloser {
 					return nil
 				},
@@ -136,7 +137,7 @@ func TestHTTPBackend_Close(t *testing.T) {
 		{
 			name: "should close reader",
 			fields: fields{
-				url: "",
+				req: &http.Request{},
 				reader: func() io.ReadCloser {
 					m := &MockReaderMock{}
 					m.On("Close").Return(nil)
@@ -149,81 +150,11 @@ func TestHTTPBackend_Close(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := &HTTPBackend{
-				url:    tt.fields.url,
-				reader: tt.fields.reader(),
+				request: tt.fields.req,
+				reader:  tt.fields.reader(),
 			}
 			if err := h.Close(); (err != nil) != tt.wantErr {
 				t.Errorf("Close() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestHTTPBackend_Read(t *testing.T) {
-	type fields struct {
-		url    string
-		reader func() io.ReadCloser
-	}
-	type args struct {
-		p []byte
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantN   int
-		wantErr error
-	}{
-		{
-			name: "should fail to read because of nil reader",
-			fields: fields{
-				url: "",
-				reader: func() io.ReadCloser {
-					return nil
-				},
-			},
-			wantErr: errors.New("Reader not initialized"),
-		},
-		{
-			name: "should fail to read",
-			fields: fields{
-				url: "",
-				reader: func() io.ReadCloser {
-					m := &MockReaderMock{}
-					m.On("Read", mock.Anything).Return(0, errors.New("test"))
-					return m
-				},
-			},
-			wantErr: errors.New("test"),
-		},
-		{
-			name: "should read",
-			fields: fields{
-				url: "",
-				reader: func() io.ReadCloser {
-					m := &MockReaderMock{}
-					m.On("Read", mock.Anything).Return(0, nil)
-					return m
-				},
-			},
-			wantErr: nil,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			h := &HTTPBackend{
-				url:    tt.fields.url,
-				reader: tt.fields.reader(),
-			}
-			gotN, err := h.Read(tt.args.p)
-
-			if tt.wantErr != nil {
-				assert.EqualError(t, err, tt.wantErr.Error())
-			} else {
-				assert.NoError(t, err)
-			}
-			if gotN != tt.wantN {
-				t.Errorf("Read() gotN = %v, want %v", gotN, tt.wantN)
 			}
 		})
 	}

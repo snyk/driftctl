@@ -1,11 +1,10 @@
 package backend
 
 import (
-	"bytes"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
 	"io"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -13,8 +12,9 @@ const BackendKeyHTTP = "http"
 const BackendKeyHTTPS = "https"
 
 type HTTPBackend struct {
-	url    string
-	reader io.ReadCloser
+	request *http.Request
+	client  HttpClient
+	reader  io.ReadCloser
 }
 
 type HttpClient interface {
@@ -31,28 +31,23 @@ func NewHTTPReader(client HttpClient, rawURL string, opts *Options) (*HTTPBacken
 		req.Header.Add(key, value)
 	}
 
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	logrus.WithFields(logrus.Fields{"body": string(body)}).Trace("HTTP(s) backend response")
-
-	if res.StatusCode < 200 || res.StatusCode >= 400 {
-		return nil, errors.Errorf("error requesting HTTP(s) backend state: status code: %d", res.StatusCode)
-	}
-
-	return &HTTPBackend{rawURL, ioutil.NopCloser(bytes.NewBuffer(body))}, nil
+	return &HTTPBackend{req, client, nil}, nil
 }
 
 func (h *HTTPBackend) Read(p []byte) (n int, err error) {
 	if h.reader == nil {
-		return 0, errors.New("Reader not initialized")
+		res, err := h.client.Do(h.request)
+		if err != nil {
+			return 0, err
+		}
+		h.reader = res.Body
+
+		if res.StatusCode < 200 || res.StatusCode >= 400 {
+			body, _ := io.ReadAll(h.reader)
+			logrus.WithFields(logrus.Fields{"body": string(body)}).Trace("HTTP(s) backend response")
+
+			return 0, errors.Errorf("error requesting HTTP(s) backend state: status code: %d", res.StatusCode)
+		}
 	}
 	return h.reader.Read(p)
 }
