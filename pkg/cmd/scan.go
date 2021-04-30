@@ -60,9 +60,14 @@ func NewScanCmd() *cobra.Command {
 			}
 			opts.Output = *out
 
-			filterFlag, _ := cmd.Flags().GetString("filter")
-			if filterFlag != "" {
-				expr, err := filter.BuildExpression(filterFlag)
+			filterFlag, _ := cmd.Flags().GetStringArray("filter")
+
+			if len(filterFlag) > 1 {
+				return errors.New("Filter flag should be specified only once")
+			}
+
+			if len(filterFlag) == 1 && filterFlag[0] != "" {
+				expr, err := filter.BuildExpression(filterFlag[0])
 				if err != nil {
 					return errors.Wrap(err, "unable to parse filter expression")
 				}
@@ -79,16 +84,14 @@ func NewScanCmd() *cobra.Command {
 	}
 
 	fl := cmd.Flags()
-	fl.BoolP(
+	fl.Bool(
 		"quiet",
-		"",
 		false,
 		"Do not display anything but scan results",
 	)
-	fl.StringP(
+	fl.StringArray(
 		"filter",
-		"",
-		"",
+		[]string{},
 		"JMESPath expression to filter on\n"+
 			"Examples : \n"+
 			"  - Type == 'aws_s3_bucket' (will filter only s3 buckets)\n"+
@@ -146,7 +149,9 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	progress := globaloutput.NewProgress()
 
-	err := remote.Activate(opts.To, alerter, providerLibrary, supplierLibrary, progress)
+	resourceSchemaRepository := resource.NewSchemaRepository()
+
+	err := remote.Activate(opts.To, alerter, providerLibrary, supplierLibrary, progress, resourceSchemaRepository)
 	if err != nil {
 		return err
 	}
@@ -158,16 +163,16 @@ func scanRun(opts *pkg.ScanOptions) error {
 		logrus.Trace("Exited")
 	}()
 
-	scanner := pkg.NewScanner(supplierLibrary.Suppliers(), alerter)
+	scanner := pkg.NewScanner(supplierLibrary.Suppliers(), alerter, resourceSchemaRepository)
 
-	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions)
+	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, resourceSchemaRepository)
 	if err != nil {
 		return err
 	}
 
 	resFactory := terraform.NewTerraformResourceFactory(providerLibrary)
 
-	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, resFactory, opts)
+	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, resFactory, opts, resourceSchemaRepository)
 
 	go func() {
 		<-c

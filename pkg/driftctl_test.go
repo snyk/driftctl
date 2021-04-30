@@ -15,13 +15,20 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/cloudskiff/driftctl/pkg/resource/github"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 )
 
+type TestProvider struct {
+	Name    string
+	Version string
+}
+
 type TestCase struct {
 	name            string
+	provider        *TestProvider
 	stateResources  []resource.Resource
 	remoteResources []resource.Resource
 	mocks           func(factory resource.ResourceFactory)
@@ -33,18 +40,29 @@ type TestCases []TestCase
 
 func runTest(t *testing.T, cases TestCases) {
 	for _, c := range cases {
+		if c.provider == nil {
+			c.provider = &TestProvider{
+				Name:    "aws",
+				Version: "3.19.0",
+			}
+		}
+		repo := testresource.InitFakeSchemaRepository(c.provider.Name, c.provider.Version)
+		aws.InitResourcesMetadata(repo)
+		github.InitMetadatas(repo)
 		t.Run(c.name, func(t *testing.T) {
 			testAlerter := alerter.NewAlerter()
 
 			if c.stateResources == nil {
 				c.stateResources = []resource.Resource{}
 			}
+
 			stateSupplier := &resource.MockSupplier{}
 			stateSupplier.On("Resources").Return(c.stateResources, nil)
 
 			if c.remoteResources == nil {
 				c.remoteResources = []resource.Resource{}
 			}
+
 			remoteSupplier := &resource.MockSupplier{}
 			remoteSupplier.On("Resources").Return(c.remoteResources, nil)
 
@@ -54,7 +72,7 @@ func runTest(t *testing.T, cases TestCases) {
 				c.mocks(resourceFactory)
 			}
 
-			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, c.options(t))
+			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, c.options(t), repo)
 
 			analysis, err := driftctl.Run()
 
@@ -78,10 +96,10 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		{
 			name: "infrastructure should be in sync",
 			stateResources: []resource.Resource{
-				testresource.FakeResource{},
+				&testresource.FakeResource{},
 			},
 			remoteResources: []resource.Resource{
-				testresource.FakeResource{},
+				&testresource.FakeResource{},
 			},
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertInfrastructureIsInSync()
@@ -93,7 +111,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		{
 			name: "we should have deleted resource",
 			stateResources: []resource.Resource{
-				testresource.FakeResource{},
+				&testresource.FakeResource{},
 			},
 			remoteResources: []resource.Resource{},
 			assert: func(result *test.ScanResult, err error) {
@@ -107,7 +125,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			name:           "we should have unmanaged resource",
 			stateResources: []resource.Resource{},
 			remoteResources: []resource.Resource{
-				testresource.FakeResource{},
+				&testresource.FakeResource{},
 			},
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertUnmanagedCount(1)
@@ -119,13 +137,13 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		{
 			name: "we should have changes of field update",
 			stateResources: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id:     "fake",
 					FooBar: "barfoo",
 				},
 			},
 			remoteResources: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id:     "fake",
 					FooBar: "foobar",
 				},
@@ -149,13 +167,13 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		{
 			name: "we should have changes on computed field",
 			stateResources: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id:     "fake",
 					BarFoo: "barfoo",
 				},
 			},
 			remoteResources: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id:     "fake",
 					BarFoo: "foobar",
 				},
@@ -179,7 +197,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		{
 			name: "we should have changes of deleted field",
 			stateResources: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id: "fake",
 					Tags: map[string]string{
 						"tag1": "deleted",
@@ -187,7 +205,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				},
 			},
 			remoteResources: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id: "fake",
 				},
 			},
@@ -210,12 +228,12 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		{
 			name: "we should have changes of added field",
 			stateResources: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id: "fake",
 				},
 			},
 			remoteResources: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id: "fake",
 					Tags: map[string]string{
 						"tag1": "added",

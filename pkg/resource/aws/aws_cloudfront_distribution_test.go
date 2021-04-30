@@ -70,7 +70,7 @@ func TestAcc_Aws_CloudfrontDistribution(t *testing.T) {
 						analyser.Change{
 							Change: diff.Change{
 								Type: diff.UPDATE,
-								Path: []string{"IsIpv6Enabled"},
+								Path: []string{"is_ipv6_enabled"},
 								From: false,
 								To:   true,
 							},

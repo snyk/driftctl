@@ -6,6 +6,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
@@ -15,7 +16,7 @@ const RemoteAWSTerraform = "aws+tf"
  * Initialize remote (configure credentials, launch tf providers and start gRPC clients)
  * Required to use Scanner
  */
-func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, supplierLibrary *resource.SupplierLibrary, progress output.Progress) error {
+func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, supplierLibrary *resource.SupplierLibrary, progress output.Progress, resourceSchemaRepository *resource.SchemaRepository) error {
 	provider, err := NewAWSTerraformProvider(progress)
 	if err != nil {
 		return err
@@ -76,6 +77,9 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	supplierLibrary.AddSupplier(NewKMSKeySupplier(provider))
 	supplierLibrary.AddSupplier(NewKMSAliasSupplier(provider))
 	supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider))
+
+	resourceSchemaRepository.Init(provider.Schema())
+	aws.InitResourcesMetadata(resourceSchemaRepository)
 
 	return nil
 }

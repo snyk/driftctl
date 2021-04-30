@@ -8,6 +8,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/cloudskiff/driftctl/test/resource"
 )
 
 func TestGetIACSupplier(t *testing.T) {
@@ -82,7 +83,8 @@ func TestGetIACSupplier(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := GetIACSupplier(tt.args.config, terraform.NewProviderLibrary(), tt.args.options)
+			repo := resource.InitFakeSchemaRepository("aws", "3.19.0")
+			_, err := GetIACSupplier(tt.args.config, terraform.NewProviderLibrary(), tt.args.options, repo)
 			if tt.wantErr != nil && err.Error() != tt.wantErr.Error() {
 				t.Errorf("GetIACSupplier() error = %v, wantErr %v", err, tt.wantErr)
 				return
