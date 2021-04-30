@@ -61,9 +61,14 @@ func NewScanCmd() *cobra.Command {
 			}
 			opts.Output = *out
 
-			filterFlag, _ := cmd.Flags().GetString("filter")
-			if filterFlag != "" {
-				expr, err := filter.BuildExpression(filterFlag)
+			filterFlag, _ := cmd.Flags().GetStringArray("filter")
+
+			if len(filterFlag) > 1 {
+				return errors.New("Filter flag should be specified only once")
+			}
+
+			if len(filterFlag) == 1 && filterFlag[0] != "" {
+				expr, err := filter.BuildExpression(filterFlag[0])
 				if err != nil {
 					return errors.Wrap(err, "unable to parse filter expression")
 				}
@@ -81,16 +86,14 @@ func NewScanCmd() *cobra.Command {
 	}
 
 	fl := cmd.Flags()
-	fl.BoolP(
+	fl.Bool(
 		"quiet",
-		"",
 		false,
 		"Do not display anything but scan results",
 	)
-	fl.StringP(
+	fl.StringArray(
 		"filter",
-		"",
-		"",
+		[]string{},
 		"JMESPath expression to filter on\n"+
 			"Examples : \n"+
 			"  - Type == 'aws_s3_bucket' (will filter only s3 buckets)\n"+
