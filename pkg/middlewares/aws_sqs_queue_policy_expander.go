@@ -29,15 +29,16 @@ func (m AwsSqsQueuePolicyExpander) Execute(_, resourcesFromState *[]resource.Res
 			continue
 		}
 
-		queue, _ := res.(*aws.AwsSqsQueue)
+		queue, _ := res.(*resource.AbstractResource)
 		newList = append(newList, res)
 
-		if queue.Policy == nil {
+		policy, exist := queue.Attrs.Get("policy")
+		if !exist || policy == nil {
 			continue
 		}
 
 		if m.hasPolicyAttached(queue, resourcesFromState) {
-			queue.Policy = nil
+			queue.Attrs.SafeDelete([]string{"policy"})
 			continue
 		}
 
@@ -50,36 +51,22 @@ func (m AwsSqsQueuePolicyExpander) Execute(_, resourcesFromState *[]resource.Res
 	return nil
 }
 
-func (m *AwsSqsQueuePolicyExpander) handlePolicy(queue *aws.AwsSqsQueue, results *[]resource.Resource) error {
+func (m *AwsSqsQueuePolicyExpander) handlePolicy(queue *resource.AbstractResource, results *[]resource.Resource) error {
+	policy, _ := queue.Attrs.Get("policy")
+
 	data := map[string]interface{}{
 		"queue_url": queue.Id,
 		"id":        queue.Id,
-		"policy":    queue.Policy,
-	}
-	ctyVal, err := m.resourceFactory.CreateResource(data, "aws_sqs_queue_policy")
-	if err != nil {
-		return err
+		"policy":    policy,
 	}
 
-	schema, exist := m.resourceSchemaRepository.GetSchema("aws_ebs_volume")
-	ctyAttr := resource.ToResourceAttributes(ctyVal)
-	ctyAttr.SanitizeDefaultsV3()
-	if exist && schema.NormalizeFunc != nil {
-		schema.NormalizeFunc(ctyAttr)
-	}
-
-	newPolicy := &resource.AbstractResource{
-		Id:    queue.Id,
-		Type:  aws.AwsSqsQueuePolicyResourceType,
-		Attrs: ctyAttr,
-	}
-
+	newPolicy := m.resourceFactory.CreateAbstractResource("aws_sqs_queue_policy", queue.Id, data)
 	*results = append(*results, newPolicy)
 	logrus.WithFields(logrus.Fields{
 		"id": newPolicy.TerraformId(),
 	}).Debug("Created new policy from sqs queue")
 
-	queue.Policy = nil
+	queue.Attrs.SafeDelete([]string{"policy"})
 	return nil
 }
 
@@ -87,7 +74,7 @@ func (m *AwsSqsQueuePolicyExpander) handlePolicy(queue *aws.AwsSqsQueue, results
 // It is mandatory since it's possible to have a aws_sqs_queue with an inline policy
 // AND a aws_sqs_queue_policy resource at the same time. At the end, on the AWS console,
 // the aws_sqs_queue_policy will be used.
-func (m *AwsSqsQueuePolicyExpander) hasPolicyAttached(queue *aws.AwsSqsQueue, resourcesFromState *[]resource.Resource) bool {
+func (m *AwsSqsQueuePolicyExpander) hasPolicyAttached(queue *resource.AbstractResource, resourcesFromState *[]resource.Resource) bool {
 	for _, res := range *resourcesFromState {
 		if res.TerraformType() == aws.AwsSqsQueuePolicyResourceType &&
 			res.TerraformId() == queue.Id {

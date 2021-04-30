@@ -981,9 +981,13 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 		{
 			name: "test sqs queue policy expander middleware",
 			stateResources: []resource.Resource{
-				&aws.AwsSqsQueue{
-					Id:     "foo",
-					Policy: awssdk.String("{\"policy\":\"bar\"}"),
+				&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsSqsQueueResourceType,
+					Attrs: &resource.Attributes{
+						"id":     "foo",
+						"policy": "{\"policy\":\"bar\"}",
+					},
 				},
 			},
 			remoteResources: []resource.Resource{
@@ -998,18 +1002,21 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				},
 			},
 			mocks: func(factory resource.ResourceFactory) {
-				foo := cty.ObjectVal(map[string]cty.Value{
-					"id":        cty.StringVal("foo"),
-					"queue_url": cty.StringVal("foo"),
-					"policy":    cty.StringVal("{\"policy\":\"bar\"}"),
-				})
-				factory.(*terraform.MockResourceFactory).On("CreateResource", mock.MatchedBy(func(input map[string]interface{}) bool {
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_sqs_queue_policy", "foo", mock.MatchedBy(func(input map[string]interface{}) bool {
 					return matchByAttributes(input, map[string]interface{}{
 						"id":        "foo",
 						"queue_url": "foo",
-						"policy":    awssdk.String("{\"policy\":\"bar\"}"),
+						"policy":    "{\"policy\":\"bar\"}",
 					})
-				}), "aws_sqs_queue_policy").Times(1).Return(&foo, nil)
+				})).Times(1).Return(&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsSqsQueuePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"id":        "foo",
+						"queue_url": "foo",
+						"policy":    "{\"policy\":\"bar\"}",
+					},
+				}, nil)
 			},
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)

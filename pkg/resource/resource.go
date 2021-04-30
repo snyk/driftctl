@@ -67,7 +67,7 @@ var refactoredResources = []string{
 	"aws_sns_topic",
 	"aws_sns_topic_policy",
 	"aws_sns_topic_subscription",
-	// "aws_sqs_queue",
+	"aws_sqs_queue",
 	"aws_sqs_queue_policy",
 	"aws_subnet",
 	"aws_vpc",
