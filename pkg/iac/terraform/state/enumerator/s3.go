@@ -47,7 +47,7 @@ func (s *S3Enumerator) Enumerate() ([]string, error) {
 		return nil, err
 	}
 
-	// filpath match does not compile so we try to match to be able to report the pattern error
+	// filepath match does not compile so we use the match method to report the pattern error
 	if _, err := filepath.Match(pattern, ""); err != nil {
 		return nil, err
 	}
