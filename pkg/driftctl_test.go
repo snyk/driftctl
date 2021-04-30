@@ -33,7 +33,7 @@ type TestCase struct {
 	remoteResources []resource.Resource
 	mocks           func(factory resource.ResourceFactory)
 	assert          func(result *test.ScanResult, err error)
-	options         func(t *testing.T) *pkg.ScanOptions
+	options         *pkg.ScanOptions
 }
 
 type TestCases []TestCase
@@ -72,7 +72,7 @@ func runTest(t *testing.T, cases TestCases) {
 				c.mocks(resourceFactory)
 			}
 
-			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, c.options(t), repo)
+			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, c.options, repo)
 
 			analysis, err := driftctl.Run()
 
@@ -106,7 +106,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{}
-			},
+			}(t),
 		},
 		{
 			name: "we should have deleted resource",
@@ -119,7 +119,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{}
-			},
+			}(t),
 		},
 		{
 			name:           "we should have unmanaged resource",
@@ -132,7 +132,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{}
-			},
+			}(t),
 		},
 		{
 			name: "we should have changes of field update",
@@ -162,7 +162,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{}
-			},
+			}(t),
 		},
 		{
 			name: "we should have changes on computed field",
@@ -192,7 +192,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{}
-			},
+			}(t),
 		},
 		{
 			name: "we should have changes of deleted field",
@@ -223,7 +223,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{}
-			},
+			}(t),
 		},
 		{
 			name: "we should have changes of added field",
@@ -254,7 +254,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{}
-			},
+			}(t),
 		},
 		{
 			name: "we should ignore default AWS IAM role when strict mode is disabled",
@@ -304,7 +304,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				return &pkg.ScanOptions{
 					StrictMode: false,
 				}
-			},
+			}(t),
 		},
 		{
 			name: "we should not ignore default AWS IAM role when strict mode is enabled",
@@ -354,7 +354,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				return &pkg.ScanOptions{
 					StrictMode: true,
 				}
-			},
+			}(t),
 		},
 		{
 			name: "we should not ignore default AWS IAM role when strict mode is enabled and a filter is specified",
@@ -413,7 +413,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Filter:     f,
 					StrictMode: true,
 				}
-			},
+			}(t),
 		},
 	}
 
@@ -447,7 +447,7 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 				}
 
 				return &pkg.ScanOptions{Filter: f}
-			},
+			}(t),
 		},
 		{
 			name:           "test filtering on Id",
@@ -474,7 +474,7 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 				}
 
 				return &pkg.ScanOptions{Filter: f}
-			},
+			}(t),
 		},
 		{
 			name:           "test filtering on attribute",
@@ -507,7 +507,7 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 				}
 
 				return &pkg.ScanOptions{Filter: f}
-			},
+			}(t),
 		},
 	}
 
@@ -574,7 +574,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				}
 
 				return &pkg.ScanOptions{Filter: f}
-			},
+			}(t),
 		},
 		{
 			name: "test instance block device middleware",
@@ -707,7 +707,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				}
 
 				return &pkg.ScanOptions{Filter: f}
-			},
+			}(t),
 		},
 		{
 			name: "test route table expander middleware",
@@ -833,7 +833,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				}
 
 				return &pkg.ScanOptions{Filter: f}
-			},
+			}(t),
 		},
 		{
 			name: "test sns topic policy expander middleware",
@@ -893,7 +893,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				}
 
 				return &pkg.ScanOptions{Filter: f}
-			},
+			}(t),
 		},
 		{
 			name: "test sqs queue policy expander middleware",
@@ -952,7 +952,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				}
 
 				return &pkg.ScanOptions{Filter: f}
-			},
+			}(t),
 		},
 		{
 			name: "test security group rule sanitizer middleware",
@@ -1342,7 +1342,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				}
 
 				return &pkg.ScanOptions{Filter: f}
-			},
+			}(t),
 		},
 	}
 
