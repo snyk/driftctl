@@ -131,7 +131,7 @@ func NewScanCmd() *cobra.Command {
 			"Only used with tfstate+http(s) backend for now.\n",
 	)
 	fl.StringVar(&opts.BackendOptions.TerraformCloudToken,
-		"tfcloud-token",
+		"tfc-token",
 		"",
 		"Terraform Cloud / Enterprise API token.\n"+
 			"Only used with tfstate+tfcloud backend.\n",
