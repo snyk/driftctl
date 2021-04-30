@@ -53,9 +53,12 @@ func (p *progress) Stop() {
 }
 
 func (p *progress) Inc() {
-	if p.started.Load() {
-		p.count.Inc()
+	if lastVal := p.count.Load(); !p.started.Load() {
+		logrus.Debug("Progress received a tic after stopping. Restarting...")
+		p.Start()
+		p.count.Store(lastVal)
 	}
+	p.count.Inc()
 }
 
 func (p *progress) Val() uint64 {

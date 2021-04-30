@@ -18,15 +18,16 @@ import (
 )
 
 type ScanOptions struct {
-	Coverage       bool
-	Detect         bool
-	From           []config.SupplierConfig
-	To             string
-	Output         output.OutputConfig
-	Filter         *jmespath.JMESPath
-	Quiet          bool
-	BackendOptions *backend.Options
-	StrictMode     bool
+	Coverage         bool
+	Detect           bool
+	From             []config.SupplierConfig
+	To               string
+	Output           output.OutputConfig
+	Filter           *jmespath.JMESPath
+	Quiet            bool
+	BackendOptions   *backend.Options
+	StrictMode       bool
+	DisableTelemetry bool
 }
 
 type DriftCTL struct {
