@@ -74,7 +74,7 @@ func (r *ScanResult) AssertResourceHasNoDrift(id, ty string) {
 }
 
 func (r *ScanResult) AssertCoverage(expected int) {
-	r.Equal(expected, r.Coverage)
+	r.Equal(expected, r.Coverage())
 }
 
 func (r *ScanResult) AssertDriftCountTotal(count int) {
@@ -103,6 +103,20 @@ func (r ScanResult) AssertInfrastructureIsInSync() {
 		r.Analysis.IsSync(),
 		fmt.Sprintf(
 			"Infrastructure is not in sync: %+v\nUnmanaged:\n%+v\nDeleted:\n%+v\nDifferences:\n%+v\n",
+			r.Analysis.Summary(),
+			r.Analysis.Unmanaged(),
+			r.Analysis.Deleted(),
+			r.Analysis.Differences(),
+		),
+	)
+}
+
+func (r ScanResult) AssertInfrastructureIsNotSync() {
+	r.Equal(
+		false,
+		r.Analysis.IsSync(),
+		fmt.Sprintf(
+			"Infrastructure is in sync: %+v\nUnmanaged:\n%+v\nDeleted:\n%+v\nDifferences:\n%+v\n",
 			r.Analysis.Summary(),
 			r.Analysis.Unmanaged(),
 			r.Analysis.Deleted(),
