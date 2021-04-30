@@ -1,6 +1,7 @@
 package backend
 
 import (
+	pkghttp "github.com/cloudskiff/driftctl/pkg/http"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -13,15 +14,11 @@ const BackendKeyHTTPS = "https"
 
 type HTTPBackend struct {
 	request *http.Request
-	client  HttpClient
+	client  pkghttp.HTTPClient
 	reader  io.ReadCloser
 }
 
-type HttpClient interface {
-	Do(req *http.Request) (*http.Response, error)
-}
-
-func NewHTTPReader(client HttpClient, rawURL string, opts *Options) (*HTTPBackend, error) {
+func NewHTTPReader(client pkghttp.HTTPClient, rawURL string, opts *Options) (*HTTPBackend, error) {
 	req, err := http.NewRequest(http.MethodGet, rawURL, nil)
 	if err != nil {
 		return nil, err

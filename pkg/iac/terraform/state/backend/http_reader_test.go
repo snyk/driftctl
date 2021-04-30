@@ -7,9 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	pkghttp "github.com/cloudskiff/driftctl/pkg/http"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/cloudskiff/driftctl/mocks"
 )
 
 func TestHTTPBackend_Read(t *testing.T) {
@@ -21,7 +20,7 @@ func TestHTTPBackend_Read(t *testing.T) {
 		name       string
 		args       args
 		wantErr    error
-		httpClient HttpClient
+		httpClient pkghttp.HTTPClient
 		expected   string
 	}{
 		{
@@ -33,7 +32,7 @@ func TestHTTPBackend_Read(t *testing.T) {
 				},
 			},
 			wantErr: errors.New("Get \"wrong_url\": unsupported protocol scheme \"\""),
-			httpClient: func() HttpClient {
+			httpClient: func() pkghttp.HTTPClient {
 				return &http.Client{}
 			}(),
 			expected: "",
@@ -41,7 +40,7 @@ func TestHTTPBackend_Read(t *testing.T) {
 		{
 			name: "Should fetch URL with auth header",
 			args: args{
-				url: "https://wrong.url/cloudskiff/driftctl/main/terraform.tfstate",
+				url: "https://example.com/cloudskiff/driftctl/main/terraform.tfstate",
 				options: &Options{
 					Headers: map[string]string{
 						"Authorization": "Basic Test",
@@ -49,10 +48,10 @@ func TestHTTPBackend_Read(t *testing.T) {
 				},
 			},
 			wantErr: nil,
-			httpClient: func() HttpClient {
-				m := &mocks.HttpClient{}
+			httpClient: func() pkghttp.HTTPClient {
+				m := &pkghttp.MockHTTPClient{}
 
-				req, _ := http.NewRequest(http.MethodGet, "https://wrong.url/cloudskiff/driftctl/main/terraform.tfstate", nil)
+				req, _ := http.NewRequest(http.MethodGet, "https://example.com/cloudskiff/driftctl/main/terraform.tfstate", nil)
 
 				req.Header.Add("Authorization", "Basic Test")
 
@@ -71,16 +70,16 @@ func TestHTTPBackend_Read(t *testing.T) {
 		{
 			name: "Should fail with bad status code",
 			args: args{
-				url: "https://wrong.url/cloudskiff/driftctl/main/terraform.tfstate",
+				url: "https://example.com/cloudskiff/driftctl/main/terraform.tfstate",
 				options: &Options{
 					Headers: map[string]string{},
 				},
 			},
 			wantErr: errors.New("error requesting HTTP(s) backend state: status code: 404"),
-			httpClient: func() HttpClient {
-				m := &mocks.HttpClient{}
+			httpClient: func() pkghttp.HTTPClient {
+				m := &pkghttp.MockHTTPClient{}
 
-				req, _ := http.NewRequest(http.MethodGet, "https://wrong.url/cloudskiff/driftctl/main/terraform.tfstate", nil)
+				req, _ := http.NewRequest(http.MethodGet, "https://example.com/cloudskiff/driftctl/main/terraform.tfstate", nil)
 
 				bodyReader := strings.NewReader("test")
 				bodyReadCloser := io.NopCloser(bodyReader)
@@ -117,7 +116,7 @@ func TestHTTPBackend_Read(t *testing.T) {
 func TestHTTPBackend_Close(t *testing.T) {
 	type fields struct {
 		req    *http.Request
-		reader func() io.ReadCloser
+		reader io.ReadCloser
 	}
 	tests := []struct {
 		name    string
@@ -130,7 +129,7 @@ func TestHTTPBackend_Close(t *testing.T) {
 				req: &http.Request{},
 				reader: func() io.ReadCloser {
 					return nil
-				},
+				}(),
 			},
 			wantErr: true,
 		},
@@ -142,7 +141,7 @@ func TestHTTPBackend_Close(t *testing.T) {
 					m := &MockReaderMock{}
 					m.On("Close").Return(nil)
 					return m
-				},
+				}(),
 			},
 			wantErr: false,
 		},
@@ -151,7 +150,7 @@ func TestHTTPBackend_Close(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			h := &HTTPBackend{
 				request: tt.fields.req,
-				reader:  tt.fields.reader(),
+				reader:  tt.fields.reader,
 			}
 			if err := h.Close(); (err != nil) != tt.wantErr {
 				t.Errorf("Close() error = %v, wantErr %v", err, tt.wantErr)
