@@ -45,6 +45,7 @@ ij_go_wrap_func_result_newline_before_rparen = true
 
 [*.json]
 insert_final_newline = false
+indent_size = 2
 
 [Makefile]
 indent_style = tab
