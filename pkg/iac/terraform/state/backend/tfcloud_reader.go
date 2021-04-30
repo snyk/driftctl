@@ -25,7 +25,7 @@ type TFCloudBody struct {
 	Data TFCloudData `json:"data"`
 }
 
-func NewCloudReader(workspaceId string, opts *Options) (*HTTPBackend, error) {
+func NewTFCloudReader(workspaceId string, opts *Options) (*HTTPBackend, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/workspaces/%s/current-state-version", TerraformCloudAPI, workspaceId), nil)
 
 	if err != nil {

@@ -50,8 +50,8 @@ func GetBackend(config config.SupplierConfig, opts *Options) (Backend, error) {
 		fallthrough
 	case BackendKeyHTTPS:
 		return NewHTTPReader(&http.Client{}, fmt.Sprintf("%s://%s", config.Backend, config.Path), opts)
-	case BackendKeyCloud:
-		return NewCloudReader(config.Path, opts)
+	case BackendKeyTFCloud:
+		return NewTFCloudReader(config.Path, opts)
 	default:
 		return nil, errors.Errorf("Unsupported backend '%s'", backend)
 	}
