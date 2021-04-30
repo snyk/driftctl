@@ -27,11 +27,13 @@ func (m AwsDefaultSqsQueuePolicy) Execute(remoteResources, resourcesFromState *[
 			continue
 		}
 
-		policy, _ := res.(*aws.AwsSqsQueuePolicy)
+		policyRes, _ := res.(*resource.AbstractResource)
 
 		// Ignore all non-default queue policy
-		if policy.Policy != nil && *policy.Policy != "" {
-			newRemoteResources = append(newRemoteResources, policy)
+		pol, exists := policyRes.Attrs.Get("policy")
+		policy := pol.(string)
+		if exists && policy != "" {
+			newRemoteResources = append(newRemoteResources, policyRes)
 			continue
 		}
 

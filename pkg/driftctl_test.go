@@ -987,18 +987,14 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				},
 			},
 			remoteResources: []resource.Resource{
-				&aws.AwsSqsQueuePolicy{
-					Id:       "foo",
-					QueueUrl: awssdk.String("foo"),
-					Policy:   awssdk.String("{\"policy\":\"baz\"}"),
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"id":        cty.StringVal("foo"),
-							"queue_url": cty.StringVal("foo"),
-							"policy":    cty.StringVal("{\"policy\":\"baz\"}"),
-						})
-						return &v
-					}(),
+				&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsSqsQueuePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"id":        "foo",
+						"queue_url": "foo",
+						"policy":    "{\"policy\":\"baz\"}",
+					},
 				},
 			},
 			mocks: func(factory resource.ResourceFactory) {
@@ -1020,11 +1016,12 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				result.AssertResourceHasDrift("foo", "aws_sqs_queue_policy", analyser.Change{
 					Change: diff.Change{
 						Type: diff.UPDATE,
-						Path: []string{"Policy"},
+						Path: []string{"policy"},
 						From: "{\"policy\":\"bar\"}",
 						To:   "{\"policy\":\"baz\"}",
 					},
-					Computed: false,
+					Computed:   false,
+					JsonString: true,
 				})
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {

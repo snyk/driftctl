@@ -44,7 +44,14 @@ type DriftCTL struct {
 	resourceSchemaRepository resource.SchemaRepositoryInterface
 }
 
-func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, alerter *alerter.Alerter, resFactory resource.ResourceFactory, opts *ScanOptions, scanProgress globaloutput.Progress, iacProgress globaloutput.Progress, resourceSchemaRepository resource.SchemaRepositoryInterface) *DriftCTL {
+func NewDriftCTL(remoteSupplier resource.Supplier,
+	iacSupplier resource.Supplier,
+	alerter *alerter.Alerter,
+	resFactory resource.ResourceFactory,
+	opts *ScanOptions,
+	scanProgress globaloutput.Progress,
+	iacProgress globaloutput.Progress,
+	resourceSchemaRepository resource.SchemaRepositoryInterface) *DriftCTL {
 	return &DriftCTL{
 		remoteSupplier,
 		iacSupplier,
@@ -83,7 +90,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		middlewares.NewAwsDefaultRoute(),
 		middlewares.NewAwsNatGatewayEipAssoc(),
 		middlewares.NewAwsBucketPolicyExpander(d.resourceFactory),
-		middlewares.NewAwsSqsQueuePolicyExpander(d.resourceFactory),
+		middlewares.NewAwsSqsQueuePolicyExpander(d.resourceFactory, d.resourceSchemaRepository),
 		middlewares.NewAwsDefaultSqsQueuePolicy(),
 		middlewares.NewAwsSNSTopicPolicyExpander(d.resourceFactory, d.resourceSchemaRepository),
 	)

@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/sirupsen/logrus"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -10,12 +9,14 @@ import (
 
 // Explodes policy found in aws_sqs_queue.policy from state resources to dedicated resources
 type AwsSqsQueuePolicyExpander struct {
-	resourceFactory resource.ResourceFactory
+	resourceFactory          resource.ResourceFactory
+	resourceSchemaRepository resource.SchemaRepositoryInterface
 }
 
-func NewAwsSqsQueuePolicyExpander(resourceFactory resource.ResourceFactory) AwsSqsQueuePolicyExpander {
+func NewAwsSqsQueuePolicyExpander(resourceFactory resource.ResourceFactory, resourceSchemaRepository resource.SchemaRepositoryInterface) AwsSqsQueuePolicyExpander {
 	return AwsSqsQueuePolicyExpander{
 		resourceFactory,
+		resourceSchemaRepository,
 	}
 }
 
@@ -59,17 +60,21 @@ func (m *AwsSqsQueuePolicyExpander) handlePolicy(queue *aws.AwsSqsQueue, results
 	if err != nil {
 		return err
 	}
-	newPolicy := &aws.AwsSqsQueuePolicy{
-		Id:       queue.Id,
-		QueueUrl: awssdk.String(queue.Id),
-		Policy:   queue.Policy,
-		CtyVal:   ctyVal,
+
+	schema, exist := m.resourceSchemaRepository.GetSchema("aws_ebs_volume")
+	ctyAttr := resource.ToResourceAttributes(ctyVal)
+	ctyAttr.SanitizeDefaultsV3()
+	if exist && schema.NormalizeFunc != nil {
+		schema.NormalizeFunc(ctyAttr)
 	}
-	normalizedRes, err := newPolicy.NormalizeForState()
-	if err != nil {
-		return err
+
+	newPolicy := &resource.AbstractResource{
+		Id:    queue.Id,
+		Type:  aws.AwsSqsQueuePolicyResourceType,
+		Attrs: ctyAttr,
 	}
-	*results = append(*results, normalizedRes)
+
+	*results = append(*results, newPolicy)
 	logrus.WithFields(logrus.Fields{
 		"id": newPolicy.TerraformId(),
 	}).Debug("Created new policy from sqs queue")

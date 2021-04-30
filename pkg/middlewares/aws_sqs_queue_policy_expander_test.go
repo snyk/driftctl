@@ -7,10 +7,12 @@ import (
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/stretchr/testify/mock"
+	"github.com/zclconf/go-cty/cty"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/r3labs/diff/v2"
 )
@@ -20,6 +22,7 @@ func TestAwsSqsQueuePolicyExpander_Execute(t *testing.T) {
 		name               string
 		resourcesFromState []resource.Resource
 		expected           []resource.Resource
+		mocks              func(factory *terraform.MockResourceFactory)
 	}{
 		{
 			"Inline policy, no aws_sqs_queue_policy attached",
@@ -34,11 +37,28 @@ func TestAwsSqsQueuePolicyExpander_Execute(t *testing.T) {
 					Id:     "foo",
 					Policy: nil,
 				},
-				&aws.AwsSqsQueuePolicy{
-					Id:       "foo",
-					QueueUrl: awssdk.String("foo"),
-					Policy:   awssdk.String("{\"Id\":\"MYINLINESQSPOLICY\",\"Statement\":[{\"Action\":\"sqs:SendMessage\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:sqs:eu-west-3:047081014315:foo\",\"Sid\":\"Stmt1611769527792\"}],\"Version\":\"2012-10-17\"}"),
+				&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsSqsQueuePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"queue_url": "foo",
+						"id":        "foo",
+						"policy":    "{\"Id\":\"MYINLINESQSPOLICY\",\"Statement\":[{\"Action\":\"sqs:SendMessage\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:sqs:eu-west-3:047081014315:foo\",\"Sid\":\"Stmt1611769527792\"}],\"Version\":\"2012-10-17\"}",
+					},
 				},
+			},
+			func(factory *terraform.MockResourceFactory) {
+
+				foo := cty.ObjectVal(map[string]cty.Value{
+					"queue_url": cty.StringVal("foo"),
+					"id":        cty.StringVal("foo"),
+					"policy":    cty.StringVal("{\"Id\":\"MYINLINESQSPOLICY\",\"Statement\":[{\"Action\":\"sqs:SendMessage\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:sqs:eu-west-3:047081014315:foo\",\"Sid\":\"Stmt1611769527792\"}],\"Version\":\"2012-10-17\"}"),
+				})
+
+				factory.On("CreateResource", mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "foo"
+				}), "aws_sqs_queue_policy").Once().Return(&foo, nil)
+
 			},
 		},
 		{
@@ -64,6 +84,8 @@ func TestAwsSqsQueuePolicyExpander_Execute(t *testing.T) {
 					QueueUrl: awssdk.String("foo"),
 					Policy:   awssdk.String("{\"Id\":\"MYSQSPOLICY\",\"Statement\":[{\"Action\":\"sqs:SendMessage\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:sqs:eu-west-3:047081014315:foo\",\"Sid\":\"Stmt1611769527792\"}],\"Version\":\"2012-10-17\"}"),
 				},
+			}, func(factory *terraform.MockResourceFactory) {
+				factory.On("CreateResource", mock.Anything, "aws_sqs_queue_policy").Once().Return(nil, nil)
 			},
 		},
 		{
@@ -90,15 +112,23 @@ func TestAwsSqsQueuePolicyExpander_Execute(t *testing.T) {
 					Policy:   awssdk.String("{\"Id\":\"MYSQSPOLICY\",\"Statement\":[{\"Action\":\"sqs:SendMessage\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:sqs:eu-west-3:047081014315:foo\",\"Sid\":\"Stmt1611769527792\"}],\"Version\":\"2012-10-17\"}"),
 				},
 			},
+			func(factory *terraform.MockResourceFactory) {
+				factory.On("CreateResource", mock.Anything, "aws_sqs_queue_policy").Once().Return(nil, nil)
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
 			factory := &terraform.MockResourceFactory{}
-			factory.On("CreateResource", mock.Anything, "aws_sqs_queue_policy").Once().Return(nil, nil)
+			if tt.mocks != nil {
+				tt.mocks(factory)
+			}
 
-			m := NewAwsSqsQueuePolicyExpander(factory)
+			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+			aws.InitResourcesMetadata(repo)
+
+			m := NewAwsSqsQueuePolicyExpander(factory, repo)
 			err := m.Execute(&[]resource.Resource{}, &tt.resourcesFromState)
 			if err != nil {
 				t.Fatal(err)
