@@ -1,28 +1,32 @@
 Found changed resources:
   - diff-id-1 (aws_diff_resource):
     ~ Json:
-        {
-          "Statement": [
-            {
-              "Changed": [
-                ~ "ec2:DescribeInstances" => "ec2:*"
-              ],
-              "Effect": "Allow",
-              + "NewField": [
-                + "foobar"
-              + ],
-              - "Removed": "Added",
-              "Resource": "*"
-            }
-          ],
-          "Version": "2012-10-17"
-        }
+         {
+   "Statement": [
+     {
+-      "Changed": [
+-        "oldValue1",
+-        "oldValue2"
+-      ],
++      "Changed": "newValue",
+       "Effect": "Allow",
+-      "Removed": "Added",
+       "Resource": "*"
++      "NewField": [
++        "foobar"
++      ]
+     }
+   ],
+   "Version": "2012-10-17"
+ }
+
   - diff-id-2 (aws_diff_resource):
     ~ Json:
-        {
-          + "bar": "foo",
-          - "foo": "bar"
-        }
+         {
+-  "foo": "bar"
++  "bar": "foo"
+ }
+
 Found 2 resource(s)
  - 100% coverage
  - 2 covered by IaC
