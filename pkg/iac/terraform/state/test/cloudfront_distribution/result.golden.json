@@ -1,173 +1,151 @@
 [
  {
-  "Aliases": null,
-  "Arn": "arn:aws:cloudfront::047081014315:distribution/E1M9CNS0XSHI19",
-  "CallerReference": "terraform-20210216101734792900000001",
-  "Comment": null,
-  "DefaultRootObject": "",
-  "DomainName": "d1g0dw0i1wvlgd.cloudfront.net",
-  "Enabled": false,
-  "Etag": "E2CKBANLXUPWGQ",
-  "HostedZoneId": "Z2FDTNDATAQYW2",
-  "HttpVersion": "http2",
   "Id": "E1M9CNS0XSHI19",
-  "InProgressValidationBatches": 0,
-  "IsIpv6Enabled": false,
-  "LastModifiedTime": "2021-02-16 10:17:35.404 +0000 UTC",
-  "PriceClass": "PriceClass_All",
-  "RetainOnDelete": false,
-  "Status": "Deployed",
-  "Tags": {},
-  "TrustedSigners": [
-   {
-    "Enabled": false,
-    "Items": []
-   }
-  ],
-  "WaitForDeployment": true,
-  "WebAclId": "",
-  "CustomErrorResponse": [],
-  "DefaultCacheBehavior": [
-   {
-    "AllowedMethods": [
-     "GET",
-     "HEAD"
-    ],
-    "CachedMethods": [
-     "GET",
-     "HEAD"
-    ],
-    "Compress": false,
-    "DefaultTtl": 86400,
-    "FieldLevelEncryptionId": "",
-    "MaxTtl": 31536000,
-    "MinTtl": 0,
-    "SmoothStreaming": false,
-    "TargetOriginId": "S3-foo-cloudfront",
-    "TrustedSigners": [],
-    "ViewerProtocolPolicy": "allow-all",
-    "ForwardedValues": [
-     {
-      "Headers": null,
-      "QueryString": false,
-      "QueryStringCacheKeys": [],
-      "Cookies": [
-       {
-        "Forward": "none",
-        "WhitelistedNames": null
-       }
-      ]
-     }
-    ],
-    "LambdaFunctionAssociation": []
-   }
-  ],
-  "LoggingConfig": [],
-  "OrderedCacheBehavior": [
-   {
-    "AllowedMethods": [
-     "GET",
-     "HEAD",
-     "OPTIONS"
-    ],
-    "CachedMethods": [
-     "GET",
-     "HEAD",
-     "OPTIONS"
-    ],
-    "Compress": true,
-    "DefaultTtl": 86400,
-    "FieldLevelEncryptionId": null,
-    "MaxTtl": 31536000,
-    "MinTtl": 0,
-    "PathPattern": "/content/immutable/*",
-    "SmoothStreaming": false,
-    "TargetOriginId": "S3-foo-cloudfront",
-    "TrustedSigners": null,
-    "ViewerProtocolPolicy": "redirect-to-https",
-    "ForwardedValues": [
-     {
-      "Headers": [
-       "Origin"
-      ],
-      "QueryString": false,
-      "QueryStringCacheKeys": null,
-      "Cookies": [
-       {
-        "Forward": "none",
-        "WhitelistedNames": null
-       }
-      ]
-     }
-    ],
-    "LambdaFunctionAssociation": null
-   },
-   {
-    "AllowedMethods": [
-     "GET",
-     "HEAD",
-     "OPTIONS"
-    ],
-    "CachedMethods": [
-     "GET",
-     "HEAD"
-    ],
-    "Compress": true,
-    "DefaultTtl": 3600,
-    "FieldLevelEncryptionId": null,
-    "MaxTtl": 86400,
-    "MinTtl": 0,
-    "PathPattern": "/content/*",
-    "SmoothStreaming": false,
-    "TargetOriginId": "S3-foo-cloudfront",
-    "TrustedSigners": null,
-    "ViewerProtocolPolicy": "redirect-to-https",
-    "ForwardedValues": [
-     {
-      "Headers": null,
-      "QueryString": false,
-      "QueryStringCacheKeys": null,
-      "Cookies": [
-       {
-        "Forward": "none",
-        "WhitelistedNames": null
-       }
-      ]
-     }
-    ],
-    "LambdaFunctionAssociation": null
-   }
-  ],
-  "Origin": [
-   {
-    "DomainName": "foo-cloudfront.s3.eu-west-3.amazonaws.com",
-    "OriginId": "S3-foo-cloudfront",
-    "OriginPath": "",
-    "CustomHeader": [],
-    "CustomOriginConfig": [],
-    "S3OriginConfig": []
-   }
-  ],
-  "OriginGroup": null,
-  "Restrictions": [
-   {
-    "GeoRestriction": [
-     {
-      "Locations": null,
-      "RestrictionType": "none"
-     }
-    ]
-   }
-  ],
-  "ViewerCertificate": [
-   {
-    "AcmCertificateArn": "",
-    "CloudfrontDefaultCertificate": true,
-    "IamCertificateId": "",
-    "MinimumProtocolVersion": "TLSv1",
-    "SslSupportMethod": ""
-   }
-  ],
-  "CtyVal": {}
+  "Type": "aws_cloudfront_distribution",
+  "Attrs": {
+   "arn": "arn:aws:cloudfront::047081014315:distribution/E1M9CNS0XSHI19",
+   "caller_reference": "terraform-20210216101734792900000001",
+   "default_cache_behavior": [
+    {
+     "allowed_methods": [
+      "GET",
+      "HEAD"
+     ],
+     "cached_methods": [
+      "GET",
+      "HEAD"
+     ],
+     "compress": false,
+     "default_ttl": 86400,
+     "field_level_encryption_id": "",
+     "forwarded_values": [
+      {
+       "cookies": [
+        {
+         "forward": "none"
+        }
+       ],
+       "query_string": false
+      }
+     ],
+     "max_ttl": 31536000,
+     "min_ttl": 0,
+     "smooth_streaming": false,
+     "target_origin_id": "S3-foo-cloudfront",
+     "viewer_protocol_policy": "allow-all"
+    }
+   ],
+   "default_root_object": "",
+   "domain_name": "d1g0dw0i1wvlgd.cloudfront.net",
+   "enabled": false,
+   "etag": "E2CKBANLXUPWGQ",
+   "hosted_zone_id": "Z2FDTNDATAQYW2",
+   "http_version": "http2",
+   "id": "E1M9CNS0XSHI19",
+   "in_progress_validation_batches": 0,
+   "is_ipv6_enabled": false,
+   "last_modified_time": "2021-02-16 10:17:35.404 +0000 UTC",
+   "ordered_cache_behavior": [
+    {
+     "allowed_methods": [
+      "GET",
+      "HEAD",
+      "OPTIONS"
+     ],
+     "cached_methods": [
+      "GET",
+      "HEAD",
+      "OPTIONS"
+     ],
+     "compress": true,
+     "default_ttl": 86400,
+     "field_level_encryption_id": "",
+     "forwarded_values": [
+      {
+       "cookies": [
+        {
+         "forward": "none"
+        }
+       ],
+       "headers": [
+        "Origin"
+       ],
+       "query_string": false
+      }
+     ],
+     "max_ttl": 31536000,
+     "min_ttl": 0,
+     "path_pattern": "/content/immutable/*",
+     "smooth_streaming": false,
+     "target_origin_id": "S3-foo-cloudfront",
+     "viewer_protocol_policy": "redirect-to-https"
+    },
+    {
+     "allowed_methods": [
+      "GET",
+      "HEAD",
+      "OPTIONS"
+     ],
+     "cached_methods": [
+      "GET",
+      "HEAD"
+     ],
+     "compress": true,
+     "default_ttl": 3600,
+     "field_level_encryption_id": "",
+     "forwarded_values": [
+      {
+       "cookies": [
+        {
+         "forward": "none"
+        }
+       ],
+       "query_string": false
+      }
+     ],
+     "max_ttl": 86400,
+     "min_ttl": 0,
+     "path_pattern": "/content/*",
+     "smooth_streaming": false,
+     "target_origin_id": "S3-foo-cloudfront",
+     "viewer_protocol_policy": "redirect-to-https"
+    }
+   ],
+   "origin": [
+    {
+     "domain_name": "foo-cloudfront.s3.eu-west-3.amazonaws.com",
+     "origin_id": "S3-foo-cloudfront",
+     "origin_path": ""
+    }
+   ],
+   "price_class": "PriceClass_All",
+   "restrictions": [
+    {
+     "geo_restriction": [
+      {
+       "restriction_type": "none"
+      }
+     ]
+    }
+   ],
+   "retain_on_delete": false,
+   "status": "Deployed",
+   "trusted_signers": [
+    {
+     "enabled": false
+    }
+   ],
+   "viewer_certificate": [
+    {
+     "acm_certificate_arn": "",
+     "cloudfront_default_certificate": true,
+     "iam_certificate_id": "",
+     "minimum_protocol_version": "TLSv1",
+     "ssl_support_method": ""
+    }
+   ],
+   "wait_for_deployment": true,
+   "web_acl_id": ""
+  }
  }
 ]

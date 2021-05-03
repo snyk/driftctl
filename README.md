@@ -26,6 +26,13 @@
   :warning: <strong>This tool is still in beta state and will evolve in the future with potential breaking changes</strong> :warning:
 </p>
 
+<details>
+  <summary>Packaging status</summary>
+  <a href="https://repology.org/project/driftctl/versions">
+    <img src="https://repology.org/badge/vertical-allrepos/driftctl.svg" alt="Packaging status">
+  </a>
+</details>
+
 ## Why driftctl ?
 
 Infrastructure drift is a blind spot and a source of potential security issues.
@@ -61,7 +68,7 @@ To learn more about compiling driftctl and contributing, please refer to the [co
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification and is brought to you by these [awesome contributors](CONTRIBUTORS.md).
 
-Build with ❤️️ from 🇫🇷 🇯🇵 🇬🇷 🇸🇪 🇺🇸
+Build with ❤️️ from 🇫🇷 🇯🇵 🇬🇷 🇸🇪 🇺🇸 🇷🇪 
 
 ---
 

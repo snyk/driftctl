@@ -108,6 +108,7 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 		Type: "aws_diff_resource",
 	}, Changelog: []analyser.Change{
 		{
+			JsonString: true,
 			Change: diff.Change{
 				Type: diff.UPDATE,
 				Path: []string{"Json"},
@@ -121,6 +122,7 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 		Type: "aws_diff_resource",
 	}, Changelog: []analyser.Change{
 		{
+			JsonString: true,
 			Change: diff.Change{
 				Type: diff.UPDATE,
 				Path: []string{"Json"},
@@ -176,7 +178,7 @@ func fakeAnalysisWithComputedFields() *analyser.Analysis {
 			Type: "aws_diff_resource",
 		},
 	)
-	a.AddDifference(analyser.Difference{Res: testresource.FakeResource{
+	a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
 		Id:   "diff-id-1",
 		Type: "aws_diff_resource",
 	}, Changelog: []analyser.Change{

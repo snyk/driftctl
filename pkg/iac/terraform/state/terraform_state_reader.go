@@ -9,6 +9,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/enumerator"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/hashicorp/terraform/addrs"
 	"github.com/hashicorp/terraform/states"
@@ -22,12 +23,13 @@ import (
 const TerraformStateReaderSupplier = "tfstate"
 
 type TerraformStateReader struct {
-	library        *terraform.ProviderLibrary
-	config         config.SupplierConfig
-	backend        backend.Backend
-	enumerator     enumerator.StateEnumerator
-	deserializers  []deserializer.CTYDeserializer
-	backendOptions *backend.Options
+	library                  *terraform.ProviderLibrary
+	config                   config.SupplierConfig
+	backend                  backend.Backend
+	enumerator               enumerator.StateEnumerator
+	deserializers            []deserializer.CTYDeserializer
+	backendOptions           *backend.Options
+	resourceSchemaRepository resource.SchemaRepositoryInterface
 }
 
 func (r *TerraformStateReader) initReader() error {
@@ -35,8 +37,8 @@ func (r *TerraformStateReader) initReader() error {
 	return nil
 }
 
-func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options) (*TerraformStateReader, error) {
-	reader := TerraformStateReader{library: library, config: config, deserializers: iac.Deserializers(), backendOptions: backendOpts}
+func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options, resourceSchemaRepository resource.SchemaRepositoryInterface) (*TerraformStateReader, error) {
+	reader := TerraformStateReader{library: library, config: config, deserializers: iac.Deserializers(), backendOptions: backendOpts, resourceSchemaRepository: resourceSchemaRepository}
 	err := reader.initReader()
 	if err != nil {
 		return nil, err
@@ -173,6 +175,22 @@ func (r *TerraformStateReader) decode(values map[string][]cty.Value) ([]resource
 				"id":      res.TerraformId(),
 				"type":    res.TerraformType(),
 			}).Debug("Found IAC resource")
+			if resource.IsRefactoredResource(res.TerraformType()) {
+				schema, exist := r.resourceSchemaRepository.GetSchema(res.TerraformType())
+				ctyAttr := resource.ToResourceAttributes(res.CtyValue())
+				ctyAttr.SanitizeDefaultsV3()
+				if exist && schema.NormalizeFunc != nil {
+					schema.NormalizeFunc(ctyAttr)
+				}
+
+				newRes := &resource.AbstractResource{
+					Id:    res.TerraformId(),
+					Type:  res.TerraformType(),
+					Attrs: ctyAttr,
+				}
+				results = append(results, newRes)
+				continue
+			}
 			normalisable, ok := res.(resource.NormalizedResource)
 			if ok {
 				normalizedRes, err := normalisable.NormalizeForState()

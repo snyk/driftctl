@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/jmespath/go-jmespath"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/cloudskiff/driftctl/pkg/alerter"
@@ -39,12 +38,12 @@ type DriftCTL struct {
 	strictMode      bool
 }
 
-func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, alerter *alerter.Alerter, resFactory resource.ResourceFactory, opts *ScanOptions) *DriftCTL {
+func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, alerter *alerter.Alerter, resFactory resource.ResourceFactory, opts *ScanOptions, resourceSchemaRepository resource.SchemaRepositoryInterface) *DriftCTL {
 	return &DriftCTL{
 		remoteSupplier,
 		iacSupplier,
 		alerter,
-		analyser.NewAnalyzer(alerter),
+		analyser.NewAnalyzer(alerter, resourceSchemaRepository),
 		opts.Filter,
 		resFactory,
 		opts.StrictMode,
@@ -54,7 +53,7 @@ func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier
 func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	remoteResources, resourcesFromState, err := d.scan()
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	middleware := middlewares.NewChain(
@@ -88,18 +87,18 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	logrus.Debug("Ready to run middlewares")
 	err = middleware.Execute(&remoteResources, &resourcesFromState)
 	if err != nil {
-		return nil, errors.Wrap(err, "Unable to run middlewares")
+		return nil, err
 	}
 
 	if d.filter != nil {
 		engine := filter.NewFilterEngine(d.filter)
 		remoteResources, err = engine.Run(remoteResources)
 		if err != nil {
-			return nil, errors.Wrap(err, "Unable to filter remote resources")
+			return nil, err
 		}
 		resourcesFromState, err = engine.Run(resourcesFromState)
 		if err != nil {
-			return nil, errors.Wrap(err, "Unable to filter state resources")
+			return nil, err
 		}
 	}
 
@@ -109,7 +108,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState, driftIgnore)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "Unable to perform resources analysis")
+		return nil, err
 	}
 
 	return &analysis, nil
