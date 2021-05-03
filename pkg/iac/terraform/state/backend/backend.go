@@ -20,8 +20,8 @@ var supportedBackends = []string{
 type Backend io.ReadCloser
 
 type Options struct {
-	Headers             map[string]string
-	TerraformCloudToken string
+	Headers      map[string]string
+	TFCloudToken string
 }
 
 func IsSupported(backend string) bool {

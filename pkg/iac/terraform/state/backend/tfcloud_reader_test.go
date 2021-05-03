@@ -29,7 +29,7 @@ func TestNewTFCloudReader(t *testing.T) {
 			args: args{
 				workspaceId: "workspaceId",
 				options: &Options{
-					TerraformCloudToken: "TOKEN",
+					TFCloudToken: "TOKEN",
 				},
 			},
 			url:     "https://app.terraform.io/api/v2/workspaces/workspaceId/current-state-version",
@@ -54,7 +54,7 @@ func TestNewTFCloudReader(t *testing.T) {
 			args: args{
 				workspaceId: "wrong_workspaceId",
 				options: &Options{
-					TerraformCloudToken: "TOKEN",
+					TFCloudToken: "TOKEN",
 				},
 			},
 			url:     "https://app.terraform.io/api/v2/workspaces/wrong_workspaceId/current-state-version",
@@ -74,7 +74,7 @@ func TestNewTFCloudReader(t *testing.T) {
 			args: args{
 				workspaceId: "workspaceId",
 				options: &Options{
-					TerraformCloudToken: "TOKEN",
+					TFCloudToken: "TOKEN",
 				},
 			},
 			url:     "https://app.terraform.io/api/v2/workspaces/workspaceId/current-state-version",

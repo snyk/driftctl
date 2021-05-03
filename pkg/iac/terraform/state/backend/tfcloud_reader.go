@@ -11,7 +11,7 @@ import (
 )
 
 const BackendKeyTFCloud = "tfcloud"
-const TerraformCloudAPI = "https://app.terraform.io/api/v2"
+const TFCloudAPI = "https://app.terraform.io/api/v2"
 
 type TFCloudAttributes struct {
 	HostedStateDownloadUrl string `json:"hosted-state-download-url"`
@@ -26,14 +26,14 @@ type TFCloudBody struct {
 }
 
 func NewTFCloudReader(workspaceId string, opts *Options) (*HTTPBackend, error) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/workspaces/%s/current-state-version", TerraformCloudAPI, workspaceId), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/workspaces/%s/current-state-version", TFCloudAPI, workspaceId), nil)
 
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Add("Content-Type", "application/vnd.api+json")
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", opts.TerraformCloudToken))
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", opts.TFCloudToken))
 
 	client := &http.Client{}
 	res, err := client.Do(req)
