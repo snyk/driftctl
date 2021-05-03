@@ -34,6 +34,7 @@ func (r *AwsSnsTopicSubscription) TerraformType() string {
 func (r *AwsSnsTopicSubscription) CtyValue() *cty.Value {
 	return r.CtyVal
 }
+
 func initSnsTopicSubscriptionMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.UpdateSchema(AwsSnsTopicSubscriptionResourceType, map[string]func(attributeSchema *resource.AttributeSchema){
 		"delivery_policy": func(attributeSchema *resource.AttributeSchema) {
