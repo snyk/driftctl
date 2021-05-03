@@ -6,9 +6,11 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/stretchr/testify/mock"
+	"github.com/zclconf/go-cty/cty"
 
 	awsresource "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
@@ -39,14 +41,26 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 					Policy: nil,
 					Id:     "ID",
 				},
-				&awsresource.AwsSnsTopicPolicy{
-					Arn:    aws.String("arn"),
-					Policy: aws.String("{\"policy\":\"coucou\"}"),
-					Id:     "ID",
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn":    "arn",
+						"id":     "ID",
+						"policy": "{\"policy\":\"coucou\"}",
+					},
 				},
 			},
 			mock: func(factory *terraform.MockResourceFactory) {
-				factory.On("CreateResource", mock.Anything, "aws_sns_topic_policy").Once().Return(nil, nil)
+				foo := cty.ObjectVal(map[string]cty.Value{
+					"arn":    cty.StringVal("arn"),
+					"id":     cty.StringVal("ID"),
+					"policy": cty.StringVal("{\"policy\":\"coucou\"}"),
+				})
+
+				factory.On("CreateResource", mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "ID"
+				}), awsresource.AwsSnsTopicPolicyResourceType).Once().Return(&foo, nil)
 			},
 			wantErr: false,
 		},
@@ -58,10 +72,14 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 					Policy: nil,
 					Id:     "ID",
 				},
-				&awsresource.AwsSnsTopicPolicy{
-					Arn:    aws.String("arn"),
-					Policy: aws.String("{\"policy\": \"coucou\"}"),
-					Id:     "ID",
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn":    "arn",
+						"id":     "ID",
+						"policy": "{\"policy\":\"coucou\"}",
+					},
 				},
 			},
 			expected: &[]resource.Resource{
@@ -70,10 +88,14 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 					Policy: nil,
 					Id:     "ID",
 				},
-				&awsresource.AwsSnsTopicPolicy{
-					Arn:    aws.String("arn"),
-					Policy: aws.String("{\"policy\": \"coucou\"}"),
-					Id:     "ID",
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn":    "arn",
+						"id":     "ID",
+						"policy": "{\"policy\":\"coucou\"}",
+					},
 				},
 			},
 			wantErr: false,
@@ -115,7 +137,10 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 				tt.mock(factory)
 			}
 
-			m := NewAwsSNSTopicPolicyExpander(factory)
+			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+			awsresource.InitResourcesMetadata(repo)
+
+			m := NewAwsSNSTopicPolicyExpander(factory, repo)
 			if err := m.Execute(&[]resource.Resource{}, tt.resourcesFromState); (err != nil) != tt.wantErr {
 				t.Errorf("Execute() error = %v, wantErr %v", err, tt.wantErr)
 			}

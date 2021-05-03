@@ -9,12 +9,14 @@ import (
 
 // Explodes policy found in aws_sns_topic from state resources to aws_sns_topic_policy resources
 type AwsSNSTopicPolicyExpander struct {
-	resourceFactory resource.ResourceFactory
+	resourceFactory          resource.ResourceFactory
+	resourceSchemaRepository resource.SchemaRepositoryInterface
 }
 
-func NewAwsSNSTopicPolicyExpander(resourceFactory resource.ResourceFactory) AwsSNSTopicPolicyExpander {
+func NewAwsSNSTopicPolicyExpander(resourceFactory resource.ResourceFactory, resourceSchemaRepository resource.SchemaRepositoryInterface) AwsSNSTopicPolicyExpander {
 	return AwsSNSTopicPolicyExpander{
 		resourceFactory,
+		resourceSchemaRepository,
 	}
 }
 
@@ -59,19 +61,20 @@ func (m *AwsSNSTopicPolicyExpander) splitPolicy(topic *aws.AwsSnsTopic, results 
 		return err
 	}
 
-	newPolicy := &aws.AwsSnsTopicPolicy{
-		Id:     topic.Id,
-		Arn:    topic.Arn,
-		Policy: topic.Policy,
-		CtyVal: ctyVal,
+	schema, exist := m.resourceSchemaRepository.GetSchema("aws_sns_topic_policy")
+	ctyAttr := resource.ToResourceAttributes(ctyVal)
+	ctyAttr.SanitizeDefaultsV3()
+	if exist && schema.NormalizeFunc != nil {
+		schema.NormalizeFunc(ctyAttr)
 	}
 
-	normalized, err := newPolicy.NormalizeForState()
-	if err != nil {
-		return err
+	newPolicy := &resource.AbstractResource{
+		Id:    topic.Id,
+		Type:  aws.AwsSnsTopicPolicyResourceType,
+		Attrs: ctyAttr,
 	}
 
-	*results = append(*results, normalized)
+	*results = append(*results, newPolicy)
 	logrus.WithFields(logrus.Fields{
 		"id": newPolicy.TerraformId(),
 	}).Debug("Created new policy from sns_topic")
