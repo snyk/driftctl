@@ -3,6 +3,7 @@ package pkg
 import (
 	"fmt"
 
+	globaloutput "github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/jmespath/go-jmespath"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -37,9 +38,11 @@ type DriftCTL struct {
 	filter          *jmespath.JMESPath
 	resourceFactory resource.ResourceFactory
 	strictMode      bool
+	scanProgress    globaloutput.Progress
+	iacProgress     globaloutput.Progress
 }
 
-func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, alerter *alerter.Alerter, resFactory resource.ResourceFactory, opts *ScanOptions) *DriftCTL {
+func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, alerter *alerter.Alerter, resFactory resource.ResourceFactory, opts *ScanOptions, scanProgress globaloutput.Progress, iacProgress globaloutput.Progress) *DriftCTL {
 	return &DriftCTL{
 		remoteSupplier,
 		iacSupplier,
@@ -48,6 +51,8 @@ func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier
 		opts.Filter,
 		resFactory,
 		opts.StrictMode,
+		scanProgress,
+		iacProgress,
 	}
 }
 
@@ -132,12 +137,16 @@ func (d DriftCTL) Stop() {
 
 func (d DriftCTL) scan() (remoteResources []resource.Resource, resourcesFromState []resource.Resource, err error) {
 	logrus.Info("Start reading IaC")
+	d.iacProgress.Start()
 	resourcesFromState, err = d.iacSupplier.Resources()
 	if err != nil {
 		return nil, nil, err
 	}
+	d.iacProgress.Stop()
 
 	logrus.Info("Start scanning cloud provider")
+	d.scanProgress.Start()
+	defer d.scanProgress.Stop()
 	remoteResources, err = d.remoteSupplier.Resources()
 	if err != nil {
 		return nil, nil, err

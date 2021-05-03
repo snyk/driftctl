@@ -7,7 +7,9 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
+	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetIACSupplier(t *testing.T) {
@@ -82,10 +84,14 @@ func TestGetIACSupplier(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := GetIACSupplier(tt.args.config, terraform.NewProviderLibrary(), tt.args.options)
-			if tt.wantErr != nil && err.Error() != tt.wantErr.Error() {
-				t.Errorf("GetIACSupplier() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			progress := &output.MockProgress{}
+			progress.On("Start").Return().Times(1)
+
+			_, err := GetIACSupplier(tt.args.config, terraform.NewProviderLibrary(), tt.args.options, progress)
+			if tt.wantErr != nil {
+				assert.EqualError(t, err, tt.wantErr.Error())
+			} else {
+				assert.NoError(t, err)
 			}
 		})
 	}

@@ -1,6 +1,7 @@
 package output
 
 import (
+	"fmt"
 	"time"
 
 	"go.uber.org/atomic"
@@ -22,17 +23,31 @@ type Progress interface {
 	Val() uint64
 }
 
-type progress struct {
-	endChan chan struct{}
-	started *atomic.Bool
-	count   *atomic.Uint64
+type ProgressOptions struct {
+	LoadingText  string
+	FinishedText string
+	ShowCount    bool
 }
 
-func NewProgress() *progress {
+type progress struct {
+	endChan           chan struct{}
+	started           *atomic.Bool
+	count             *atomic.Uint64
+	loadingText       string
+	finishedText      string
+	showCount         bool
+	highestLineLength int
+}
+
+func NewProgress(loadingText, finishedText string, showCount bool) *progress {
 	return &progress{
 		nil,
 		atomic.NewBool(false),
 		atomic.NewUint64(0),
+		loadingText,
+		finishedText,
+		showCount,
+		0,
 	}
 }
 
@@ -47,7 +62,11 @@ func (p *progress) Start() {
 
 func (p *progress) Stop() {
 	if p.started.Swap(false) {
-		Printf("Scanned resources:    (%d)\n", p.count.Load())
+		if p.showCount {
+			p.printf("%s (%d)\n", p.finishedText, p.count.Load())
+		} else {
+			p.printf("%s\r", p.finishedText)
+		}
 		close(p.endChan)
 	}
 }
@@ -64,7 +83,7 @@ func (p *progress) Val() uint64 {
 
 func (p *progress) render() {
 	i := -1
-	Printf("Scanning resources:\r")
+	p.printf("%s\r", p.loadingText)
 	for {
 		select {
 		case <-p.endChan:
@@ -74,7 +93,11 @@ func (p *progress) render() {
 			if i >= len(spinner) {
 				i = 0
 			}
-			Printf("Scanning resources: %s (%d)\r", spinner[i], p.count.Load())
+			if p.showCount {
+				p.printf("%s %s (%d)\r", p.loadingText, spinner[i], p.count.Load())
+			} else {
+				p.printf("%s %s\r", p.loadingText, spinner[i])
+			}
 		}
 	}
 }
@@ -97,4 +120,21 @@ Loop:
 		}
 	}
 	logrus.Debug("Progress did not receive any tic. Stopping...")
+}
+
+func (p *progress) flush() {
+	for i := 0; i < p.highestLineLength; i++ {
+		Printf(" ")
+	}
+	Printf("\r")
+}
+
+func (p *progress) printf(format string, args ...interface{}) {
+	txt := fmt.Sprintf(format, args...)
+	length := len(txt)
+	if length > p.highestLineLength {
+		p.highestLineLength = length
+	}
+	p.flush()
+	Printf(txt)
 }

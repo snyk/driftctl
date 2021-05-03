@@ -96,14 +96,16 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			progress := &output.MockProgress{}
+			progress.On("Inc").Return().Times(1)
+			progress.On("Stop").Return().Times(1)
+
 			shouldUpdate := tt.dirName == *goldenfile.Update
 
 			var realProvider *aws.AWSTerraformProvider
 
 			if shouldUpdate {
 				var err error
-				progress := &output.MockProgress{}
-				progress.On("Inc").Return()
 				realProvider, err = aws.NewAWSTerraformProvider(progress)
 				if err != nil {
 					t.Fatal(err)
@@ -124,6 +126,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 				},
 				library:       library,
 				deserializers: iac.Deserializers(),
+				progress:      progress,
 			}
 
 			got, err := r.Resources()
@@ -173,14 +176,16 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			progress := &output.MockProgress{}
+			progress.On("Inc").Return().Times(1)
+			progress.On("Stop").Return().Times(1)
+
 			shouldUpdate := tt.dirName == *goldenfile.Update
 
 			var realProvider *github.GithubTerraformProvider
 
 			if shouldUpdate {
 				var err error
-				progress := &output.MockProgress{}
-				progress.On("Inc").Return()
 				realProvider, err = github.NewGithubTerraformProvider(progress)
 				if err != nil {
 					t.Fatal(err)
@@ -201,6 +206,7 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 				},
 				library:       library,
 				deserializers: iac.Deserializers(),
+				progress:      progress,
 			}
 
 			got, err := r.Resources()
