@@ -23,6 +23,7 @@ Thank you to all the people who have already contributed to driftctl.
     <td align="center"><a href="https://dev.to/psedge"><img src="https://avatars.githubusercontent.com/u/5781397?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Peter Sedgewick</b></sub></a><br /><a href="https://github.com/cloudskiff/driftctl/commits?author=psedge" title="Documentation">📖</a></td>
     <td align="center"><a href="https://crvx.fr/"><img src="https://avatars.githubusercontent.com/u/16480203?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Raphaël</b></sub></a><br /><a href="https://github.com/cloudskiff/driftctl/commits?author=sundowndev" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/vainkop"><img src="https://avatars.githubusercontent.com/u/28118190?v=4?s=80" width="80px;" alt=""/><br /><sub><b>vainkop</b></sub></a><br /><a href="https://github.com/cloudskiff/driftctl/issues?q=author%3Avainkop" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://remidoreau.com"><img src="https://avatars.githubusercontent.com/u/32459935?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Rémi Doreau</b></sub></a><br /><a href="https://github.com/cloudskiff/driftctl/commits?author=ayshiff" title="Code">💻</a></td>
   </tr>
 </table>
 
