@@ -93,7 +93,7 @@ func TestNewTFCloudReader(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mock()
-			got, err := NewTFCloudReader(tt.args.workspaceId, tt.args.options)
+			got, err := NewTFCloudReader(&http.Client{}, tt.args.workspaceId, tt.args.options)
 			if tt.wantErr != nil {
 				assert.EqualError(t, err, tt.wantErr.Error())
 				return
@@ -101,7 +101,7 @@ func TestNewTFCloudReader(t *testing.T) {
 				assert.NoError(t, err)
 			}
 			assert.NotNil(t, got)
-			assert.Equal(t, tt.wantURL, got.url)
+			assert.Equal(t, tt.wantURL, got.request.URL.String())
 		})
 	}
 }

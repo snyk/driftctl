@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	pkghttp "github.com/cloudskiff/driftctl/pkg/http"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -25,7 +26,7 @@ type TFCloudBody struct {
 	Data TFCloudData `json:"data"`
 }
 
-func NewTFCloudReader(workspaceId string, opts *Options) (*HTTPBackend, error) {
+func NewTFCloudReader(client pkghttp.HTTPClient, workspaceId string, opts *Options) (*HTTPBackend, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/workspaces/%s/current-state-version", TFCloudAPI, workspaceId), nil)
 
 	if err != nil {
@@ -35,7 +36,6 @@ func NewTFCloudReader(workspaceId string, opts *Options) (*HTTPBackend, error) {
 	req.Header.Add("Content-Type", "application/vnd.api+json")
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", opts.TFCloudToken))
 
-	client := &http.Client{}
 	res, err := client.Do(req)
 
 	if err != nil {
@@ -59,5 +59,5 @@ func NewTFCloudReader(workspaceId string, opts *Options) (*HTTPBackend, error) {
 	logrus.WithFields(logrus.Fields{"hosted-state-download-url": rawURL}).Trace("Terraform Cloud backend response")
 
 	opt := Options{}
-	return NewHTTPReader(rawURL, &opt)
+	return NewHTTPReader(client, rawURL, &opt)
 }
