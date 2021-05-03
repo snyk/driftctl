@@ -4,9 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/stretchr/testify/mock"
-	"github.com/zclconf/go-cty/cty"
 
 	awsresource "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -29,17 +27,24 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 		{
 			name: "Inline policy no attached policy",
 			resourcesFromState: &[]resource.Resource{
-				&awsresource.AwsSnsTopic{
-					Arn:    aws.String("arn"),
-					Policy: aws.String("{\"policy\": \"coucou\"}"),
-					Id:     "ID",
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicResourceType,
+					Attrs: &resource.Attributes{
+						"arn":    "arn",
+						"id":     "ID",
+						"policy": "{\"policy\":\"coucou\"}",
+					},
 				},
 			},
 			expected: &[]resource.Resource{
-				&awsresource.AwsSnsTopic{
-					Arn:    aws.String("arn"),
-					Policy: nil,
-					Id:     "ID",
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicResourceType,
+					Attrs: &resource.Attributes{
+						"arn": "arn",
+						"id":  "ID",
+					},
 				},
 				&resource.AbstractResource{
 					Id:   "ID",
@@ -52,25 +57,30 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 				},
 			},
 			mock: func(factory *terraform.MockResourceFactory) {
-				foo := cty.ObjectVal(map[string]cty.Value{
-					"arn":    cty.StringVal("arn"),
-					"id":     cty.StringVal("ID"),
-					"policy": cty.StringVal("{\"policy\":\"coucou\"}"),
-				})
-
-				factory.On("CreateResource", mock.MatchedBy(func(input map[string]interface{}) bool {
+				factory.On("CreateAbstractResource", "ID", awsresource.AwsSnsTopicPolicyResourceType, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "ID"
-				}), awsresource.AwsSnsTopicPolicyResourceType).Once().Return(&foo, nil)
+				})).Once().Return(&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn":    "arn",
+						"id":     "ID",
+						"policy": "{\"policy\":\"coucou\"}",
+					},
+				}, nil)
 			},
 			wantErr: false,
 		},
 		{
 			name: "No inline policy, attached policy",
 			resourcesFromState: &[]resource.Resource{
-				&awsresource.AwsSnsTopic{
-					Arn:    aws.String("arn"),
-					Policy: nil,
-					Id:     "ID",
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicResourceType,
+					Attrs: &resource.Attributes{
+						"arn": "arn",
+						"id":  "ID",
+					},
 				},
 				&resource.AbstractResource{
 					Id:   "ID",
@@ -83,10 +93,56 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 				},
 			},
 			expected: &[]resource.Resource{
-				&awsresource.AwsSnsTopic{
-					Arn:    aws.String("arn"),
-					Policy: nil,
-					Id:     "ID",
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicResourceType,
+					Attrs: &resource.Attributes{
+						"arn": "arn",
+						"id":  "ID",
+					},
+				},
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn":    "arn",
+						"id":     "ID",
+						"policy": "{\"policy\":\"coucou\"}",
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "inline policy and dup attached policy",
+			resourcesFromState: &[]resource.Resource{
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicResourceType,
+					Attrs: &resource.Attributes{
+						"arn":    "arn",
+						"id":     "ID",
+						"policy": "{\"policy\":\"coucou\"}",
+					},
+				},
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn":    "arn",
+						"id":     "ID",
+						"policy": "{\"policy\":\"coucou\"}",
+					},
+				},
+			},
+			expected: &[]resource.Resource{
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicResourceType,
+					Attrs: &resource.Attributes{
+						"arn": "arn",
+						"id":  "ID",
+					},
 				},
 				&resource.AbstractResource{
 					Id:   "ID",
@@ -103,28 +159,65 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 		{
 			name: "inline policy and attached policy",
 			resourcesFromState: &[]resource.Resource{
-				&awsresource.AwsSnsTopic{
-					Arn:    aws.String("arn"),
-					Policy: aws.String("{\"policy\": \"coucou\"}"),
-					Id:     "ID",
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicResourceType,
+					Attrs: &resource.Attributes{
+						"arn":    "arn",
+						"id":     "ID",
+						"policy": "{\"policy\":\"coucou\"}",
+					},
 				},
-				&awsresource.AwsSnsTopicPolicy{
-					Arn:    aws.String("arn"),
-					Policy: aws.String("{\"policy\": \"coucou\"}"),
-					Id:     "ID",
+				&resource.AbstractResource{
+					Id:   "ID2",
+					Type: awsresource.AwsSnsTopicPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn":    "arn2",
+						"id":     "ID2",
+						"policy": "{\"policy\":\"coucou2\"}",
+					},
 				},
 			},
 			expected: &[]resource.Resource{
-				&awsresource.AwsSnsTopic{
-					Arn:    aws.String("arn"),
-					Policy: nil,
-					Id:     "ID",
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicResourceType,
+					Attrs: &resource.Attributes{
+						"arn": "arn",
+						"id":  "ID",
+					},
 				},
-				&awsresource.AwsSnsTopicPolicy{
-					Arn:    aws.String("arn"),
-					Policy: aws.String("{\"policy\": \"coucou\"}"),
-					Id:     "ID",
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn":    "arn",
+						"id":     "ID",
+						"policy": "{\"policy\":\"coucou\"}",
+					},
 				},
+				&resource.AbstractResource{
+					Id:   "ID2",
+					Type: awsresource.AwsSnsTopicPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn":    "arn2",
+						"id":     "ID2",
+						"policy": "{\"policy\":\"coucou2\"}",
+					},
+				},
+			},
+			mock: func(factory *terraform.MockResourceFactory) {
+				factory.On("CreateAbstractResource", "ID", awsresource.AwsSnsTopicPolicyResourceType, mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "ID"
+				})).Once().Return(&resource.AbstractResource{
+					Id:   "ID",
+					Type: awsresource.AwsSnsTopicPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn":    "arn",
+						"id":     "ID",
+						"policy": "{\"policy\":\"coucou\"}",
+					},
+				}, nil)
 			},
 			wantErr: false,
 		},
