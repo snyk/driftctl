@@ -9,8 +9,9 @@ import (
 
 func TestAcc_AwsRouteTableAssociation(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Paths: []string{"./testdata/acc/aws_route_table_association"},
-		Args:  []string{"scan", "--filter", "Type=='aws_route_table_association'"},
+		TerraformVersion: "0.14.9",
+		Paths:            []string{"./testdata/acc/aws_route_table_association"},
+		Args:             []string{"scan", "--filter", "Type=='aws_route_table_association'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

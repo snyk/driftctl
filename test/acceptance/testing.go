@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path"
@@ -39,6 +40,7 @@ type AccCheck struct {
 }
 
 type AccTestCase struct {
+	TerraformVersion           string
 	Paths                      []string
 	Args                       []string
 	OnStart                    func()
@@ -51,18 +53,35 @@ type AccTestCase struct {
 }
 
 func (c *AccTestCase) initTerraformExecutor() error {
+	installPath := path.Join(os.TempDir(), "terraform-bin", c.TerraformVersion)
+	binPath := path.Join(installPath, "terraform")
+	execPathFinderOptions := make([]tfinstall.ExecPathFinder, 0)
+
+	err := os.MkdirAll(installPath, fs.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	_, err = os.Stat(binPath)
+	if os.IsNotExist(err) {
+		execPathFinderOptions = append(execPathFinderOptions, tfinstall.ExactVersion(c.TerraformVersion, installPath))
+	} else {
+		execPathFinderOptions = append(execPathFinderOptions, tfinstall.ExactPath(binPath))
+	}
+
+	execPath, err := tfinstall.Find(context.Background(), execPathFinderOptions...)
+	if err != nil {
+		return err
+	}
+
 	c.tf = make(map[string]*tfexec.Terraform, 1)
-	for _, path := range c.Paths {
-		execPath, err := tfinstall.LookPath().ExecPath(context.Background())
-		if err != nil {
-			return err
-		}
-		c.tf[path], err = tfexec.NewTerraform(path, execPath)
+	for _, p := range c.Paths {
+		c.tf[p], err = tfexec.NewTerraform(p, execPath)
 		if err != nil {
 			return err
 		}
 		env := c.resolveTerraformEnv()
-		if err := c.tf[path].SetEnv(env); err != nil {
+		if err := c.tf[p].SetEnv(env); err != nil {
 			return err
 		}
 	}

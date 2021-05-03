@@ -12,6 +12,7 @@ import (
 
 func TestAcc_StateReader_WithMultipleStatesInDirectory(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
+		TerraformVersion: "0.14.9",
 		Paths: []string{
 			"./testdata/acc/multiple_states_local/s3",
 			"./testdata/acc/multiple_states_local/route53",
@@ -40,6 +41,7 @@ func TestAcc_StateReader_WithMultipleStatesInDirectory(t *testing.T) {
 func TestAcc_StateReader_WithMultiplesStatesInS3(t *testing.T) {
 	stateBucketName := "driftctl-acc-test-only"
 	acceptance.Run(t, acceptance.AccTestCase{
+		TerraformVersion: "0.14.9",
 		OnStart: func() {
 			err := createBucket(stateBucketName)
 			if err != nil {
