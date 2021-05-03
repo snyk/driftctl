@@ -13,6 +13,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/resource/github"
@@ -72,11 +73,20 @@ func runTest(t *testing.T, cases TestCases) {
 				c.mocks(resourceFactory)
 			}
 
-			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, c.options, repo)
+			scanProgress := &output.MockProgress{}
+			scanProgress.On("Start").Return().Once()
+			scanProgress.On("Stop").Return().Once()
+
+			iacProgress := &output.MockProgress{}
+			iacProgress.On("Start").Return().Once()
+			iacProgress.On("Stop").Return().Once()
+
+			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, c.options, scanProgress, iacProgress, repo)
 
 			analysis, err := driftctl.Run()
 
 			c.assert(test.NewScanResult(t, analysis), err)
+			scanProgress.AssertExpectations(t)
 		})
 	}
 }
