@@ -164,6 +164,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "ayshiff",
+      "name": "Rémi Doreau",
+      "avatar_url": "https://avatars.githubusercontent.com/u/32459935?v=4",
+      "profile": "https://remidoreau.com",
+      "contributions": [
+        "code"
+      ]
     }
   ]
 }
