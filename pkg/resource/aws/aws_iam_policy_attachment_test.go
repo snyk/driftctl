@@ -9,8 +9,9 @@ import (
 
 func TestAcc_AwsIamPolicyAttachment_WithGroupsUsers(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Paths: []string{"./testdata/acc/aws_iam_policy_attachment"},
-		Args:  []string{"scan", "--filter", "Type=='aws_iam_policy_attachment'"},
+		TerraformVersion: "0.14.9",
+		Paths:            []string{"./testdata/acc/aws_iam_policy_attachment"},
+		Args:             []string{"scan", "--filter", "Type=='aws_iam_policy_attachment'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Check: func(result *test.ScanResult, stdout string, err error) {
