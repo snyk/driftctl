@@ -8,12 +8,11 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/aws/aws-sdk-go/service/s3"
 
 	"github.com/stretchr/testify/mock"
-
-	"github.com/cloudskiff/driftctl/mocks"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -70,8 +69,8 @@ func TestNewS3Reader(t *testing.T) {
 
 func TestS3Backend_ReadWithError(t *testing.T) {
 	assert := assert.New(t)
-	fakeS3 := &mocks.FakeS3{}
-	fakeErr := &mocks.FakeRequestFailure{}
+	fakeS3 := &awstest.MockFakeS3{}
+	fakeErr := &awstest.MockFakeRequestFailure{}
 	fakeErr.On("Message").Return("Request failed on aws side")
 	fakeS3.On("GetObject", mock.Anything).Return(nil, fakeErr)
 
@@ -88,7 +87,7 @@ func TestS3Backend_ReadWithError(t *testing.T) {
 
 func TestS3Backend_Read(t *testing.T) {
 	assert := assert.New(t)
-	fakeS3 := &mocks.FakeS3{}
+	fakeS3 := &awstest.MockFakeS3{}
 	fakeResponse, _ := os.Open("testdata/valid.tfstate")
 	defer fakeResponse.Close()
 	fakeS3.On("GetObject", &s3.GetObjectInput{

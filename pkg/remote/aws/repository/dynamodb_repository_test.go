@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/aws/aws-sdk-go/aws"
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,13 +19,13 @@ func Test_dynamoDBRepository_ListAllTopics(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		mocks   func(client *mocks.DynamodbClient)
+		mocks   func(client *awstest.MockFakeDynamoDB)
 		want    []*string
 		wantErr error
 	}{
 		{
 			name: "List with 2 pages",
-			mocks: func(client *mocks.DynamodbClient) {
+			mocks: func(client *awstest.MockFakeDynamoDB) {
 				client.On("ListTablesPages",
 					&dynamodb.ListTablesInput{},
 					mock.MatchedBy(func(callback func(res *dynamodb.ListTablesOutput, lastPage bool) bool) bool {
@@ -58,10 +58,10 @@ func Test_dynamoDBRepository_ListAllTopics(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.DynamodbClient{}
-			tt.mocks(client)
+			client := awstest.MockFakeDynamoDB{}
+			tt.mocks(&client)
 			r := &dynamoDBRepository{
-				client: client,
+				client: &client,
 			}
 			got, err := r.ListAllTables()
 			assert.Equal(t, tt.wantErr, err)

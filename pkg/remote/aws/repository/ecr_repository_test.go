@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/ecr"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/aws/aws-sdk-go/aws"
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,13 +19,13 @@ func Test_ecrRepository_ListAllRepositories(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		mocks   func(client *mocks.ECRClient)
+		mocks   func(client *awstest.MockFakeECR)
 		want    []*ecr.Repository
 		wantErr error
 	}{
 		{
 			name: "List with 2 pages",
-			mocks: func(client *mocks.ECRClient) {
+			mocks: func(client *awstest.MockFakeECR) {
 				client.On("DescribeRepositoriesPages",
 					&ecr.DescribeRepositoriesInput{},
 					mock.MatchedBy(func(callback func(res *ecr.DescribeRepositoriesOutput, lastPage bool) bool) bool {
@@ -58,10 +58,10 @@ func Test_ecrRepository_ListAllRepositories(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.ECRClient{}
-			tt.mocks(client)
+			client := awstest.MockFakeECR{}
+			tt.mocks(&client)
 			r := &ecrRepository{
-				client: client,
+				client: &client,
 			}
 			got, err := r.ListAllRepositories()
 			assert.Equal(t, tt.wantErr, err)
