@@ -3,6 +3,7 @@ package state
 import (
 	"fmt"
 
+	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/fatih/color"
 	"github.com/hashicorp/terraform/addrs"
 	"github.com/hashicorp/terraform/states"
@@ -30,6 +31,7 @@ type TerraformStateReader struct {
 	enumerator     enumerator.StateEnumerator
 	deserializers  []deserializer.CTYDeserializer
 	backendOptions *backend.Options
+	progress       output.Progress
 }
 
 func (r *TerraformStateReader) initReader() error {
@@ -37,8 +39,8 @@ func (r *TerraformStateReader) initReader() error {
 	return nil
 }
 
-func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options) (*TerraformStateReader, error) {
-	reader := TerraformStateReader{library: library, config: config, deserializers: iac.Deserializers(), backendOptions: backendOpts}
+func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options, progress output.Progress) (*TerraformStateReader, error) {
+	reader := TerraformStateReader{library: library, config: config, deserializers: iac.Deserializers(), backendOptions: backendOpts, progress: progress}
 	err := reader.initReader()
 	if err != nil {
 		return nil, err
@@ -210,6 +212,7 @@ func (r *TerraformStateReader) retrieveForState(path string) ([]resource.Resourc
 		"path":    r.config.Path,
 		"backend": r.config.Backend,
 	}).Debug("Reading resources from state")
+	r.progress.Inc()
 	values, err := r.retrieve()
 	if err != nil {
 		return nil, err

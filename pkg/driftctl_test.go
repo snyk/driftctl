@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
+	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/jmespath/go-jmespath"
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/mock"
@@ -64,13 +65,22 @@ func runTest(t *testing.T, cases TestCases) {
 				c.mocks(resourceFactory)
 			}
 
+			scanProgress := &output.MockProgress{}
+			scanProgress.On("Start").Return().Once()
+			scanProgress.On("Stop").Return().Once()
+
+			iacProgress := &output.MockProgress{}
+			iacProgress.On("Start").Return().Once()
+			iacProgress.On("Stop").Return().Once()
+
 			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, &pkg.ScanOptions{
 				Filter: filter,
-			})
+			}, scanProgress, iacProgress)
 
 			analysis, err := driftctl.Run()
 
 			c.assert(test.NewScanResult(t, analysis), err)
+			scanProgress.AssertExpectations(t)
 		})
 	}
 }

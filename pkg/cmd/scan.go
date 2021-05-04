@@ -155,9 +155,10 @@ func scanRun(opts *pkg.ScanOptions) error {
 	providerLibrary := terraform.NewProviderLibrary()
 	supplierLibrary := resource.NewSupplierLibrary()
 
-	progress := globaloutput.NewProgress()
+	iacProgress := globaloutput.NewProgress("Scanning states", "Scanned states", true)
+	scanProgress := globaloutput.NewProgress("Scanning resources", "Scanned resources", true)
 
-	err := remote.Activate(opts.To, alerter, providerLibrary, supplierLibrary, progress)
+	err := remote.Activate(opts.To, alerter, providerLibrary, supplierLibrary, scanProgress)
 	if err != nil {
 		return err
 	}
@@ -171,14 +172,14 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	scanner := pkg.NewScanner(supplierLibrary.Suppliers(), alerter)
 
-	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions)
+	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress)
 	if err != nil {
 		return err
 	}
 
 	resFactory := terraform.NewTerraformResourceFactory(providerLibrary)
 
-	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, resFactory, opts)
+	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, resFactory, opts, scanProgress, iacProgress)
 
 	go func() {
 		<-c
@@ -186,10 +187,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		ctl.Stop()
 	}()
 
-	progress.Start()
 	analysis, err := ctl.Run()
-	progress.Stop()
-
 	if err != nil {
 		return err
 	}
