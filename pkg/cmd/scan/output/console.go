@@ -1,6 +1,7 @@
 package output
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"reflect"
@@ -8,8 +9,10 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/fatih/color"
-	"github.com/nsf/jsondiff"
+	"github.com/mattn/go-isatty"
 	"github.com/r3labs/diff/v2"
+	"github.com/yudai/gojsondiff"
+	"github.com/yudai/gojsondiff/formatter"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/cloudskiff/driftctl/pkg/remote"
@@ -183,18 +186,19 @@ func groupByType(resources []resource.Resource) map[string][]resource.Resource {
 func jsonDiff(a, b interface{}, prefix string) string {
 	aStr := fmt.Sprintf("%s", a)
 	bStr := fmt.Sprintf("%s", b)
-	opts := jsondiff.DefaultConsoleOptions()
-	opts.Prefix = prefix
-	opts.Indent = "  "
-	opts.Added = jsondiff.Tag{
-		Begin: color.GreenString("+ "),
+	d := gojsondiff.New()
+	var aJson map[string]interface{}
+	_ = json.Unmarshal([]byte(aStr), &aJson)
+	diff, _ := d.Compare([]byte(aStr), []byte(bStr))
+	f := formatter.NewAsciiFormatter(aJson, formatter.AsciiFormatterConfig{
+		Coloring: isatty.IsTerminal(os.Stdout.Fd()),
+	})
+	// Set foreground green color for added lines and red color for deleted lines
+	formatter.AsciiStyles = map[string]string{
+		"+": "32",
+		"-": "31",
 	}
-	opts.Removed = jsondiff.Tag{
-		Begin: color.RedString("- "),
-	}
-	opts.Changed = jsondiff.Tag{
-		Begin: color.YellowString("~ "),
-	}
-	_, str := jsondiff.Compare([]byte(aStr), []byte(bStr), &opts)
-	return str
+	diffStr, _ := f.Format(diff)
+
+	return diffStr
 }
