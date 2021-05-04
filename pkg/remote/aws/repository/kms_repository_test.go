@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/kms"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/aws/aws-sdk-go/aws"
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,13 +18,13 @@ import (
 func Test_KMSRepository_ListAllKeys(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *mocks.KMSClient)
+		mocks   func(client *awstest.MockFakeKMS)
 		want    []*kms.KeyListEntry
 		wantErr error
 	}{
 		{
 			name: "List only customer keys",
-			mocks: func(client *mocks.KMSClient) {
+			mocks: func(client *awstest.MockFakeKMS) {
 				client.On("ListKeysPages",
 					&kms.ListKeysInput{},
 					mock.MatchedBy(func(callback func(res *kms.ListKeysOutput, lastPage bool) bool) bool {
@@ -72,10 +72,10 @@ func Test_KMSRepository_ListAllKeys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.KMSClient{}
-			tt.mocks(client)
+			client := awstest.MockFakeKMS{}
+			tt.mocks(&client)
 			r := &kmsRepository{
-				client: client,
+				client: &client,
 			}
 			got, err := r.ListAllKeys()
 			assert.Equal(t, tt.wantErr, err)
@@ -94,13 +94,13 @@ func Test_KMSRepository_ListAllKeys(t *testing.T) {
 func Test_KMSRepository_ListAllAliases(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *mocks.KMSClient)
+		mocks   func(client *awstest.MockFakeKMS)
 		want    []*kms.AliasListEntry
 		wantErr error
 	}{
 		{
 			name: "List only customer aliases",
-			mocks: func(client *mocks.KMSClient) {
+			mocks: func(client *awstest.MockFakeKMS) {
 				client.On("ListAliasesPages",
 					&kms.ListAliasesInput{},
 					mock.MatchedBy(func(callback func(res *kms.ListAliasesOutput, lastPage bool) bool) bool {
@@ -129,10 +129,10 @@ func Test_KMSRepository_ListAllAliases(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.KMSClient{}
-			tt.mocks(client)
+			client := awstest.MockFakeKMS{}
+			tt.mocks(&client)
 			r := &kmsRepository{
-				client: client,
+				client: &client,
 			}
 			got, err := r.ListAllAliases()
 			assert.Equal(t, tt.wantErr, err)

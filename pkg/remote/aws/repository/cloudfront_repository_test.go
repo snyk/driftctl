@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/cloudfront"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/aws/aws-sdk-go/aws"
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,13 +18,13 @@ import (
 func Test_cloudfrontRepository_ListAllDistributions(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *mocks.CloudfrontClient)
+		mocks   func(client *awstest.MockFakeCloudFront)
 		want    []*cloudfront.DistributionSummary
 		wantErr error
 	}{
 		{
 			name: "list multiple distributions",
-			mocks: func(client *mocks.CloudfrontClient) {
+			mocks: func(client *awstest.MockFakeCloudFront) {
 				client.On("ListDistributionsPages",
 					&cloudfront.ListDistributionsInput{},
 					mock.MatchedBy(func(callback func(res *cloudfront.ListDistributionsOutput, lastPage bool) bool) bool {
@@ -61,10 +61,10 @@ func Test_cloudfrontRepository_ListAllDistributions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.CloudfrontClient{}
-			tt.mocks(client)
+			client := awstest.MockFakeCloudFront{}
+			tt.mocks(&client)
 			r := &cloudfrontRepository{
-				client: client,
+				client: &client,
 			}
 			got, err := r.ListAllDistributions()
 			assert.Equal(t, tt.wantErr, err)

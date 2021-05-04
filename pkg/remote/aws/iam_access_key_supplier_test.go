@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
@@ -24,8 +25,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
@@ -36,13 +35,13 @@ func TestIamAccessKeySupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeIAM)
+		mocks   func(client *awstest.MockFakeIAM)
 		err     error
 	}{
 		{
 			test:    "no iam access_key",
 			dirName: "iam_access_key_empty",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListUsersPages",
 					&iam.ListUsersInput{},
 					mock.MatchedBy(func(callback func(res *iam.ListUsersOutput, lastPage bool) bool) bool {
@@ -60,7 +59,7 @@ func TestIamAccessKeySupplier_Resources(t *testing.T) {
 		{
 			test:    "iam multiples keys for multiples users",
 			dirName: "iam_access_key_multiple",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListUsersPages",
 					&iam.ListUsersInput{},
 					mock.MatchedBy(func(callback func(res *iam.ListUsersOutput, lastPage bool) bool) bool {
@@ -118,7 +117,7 @@ func TestIamAccessKeySupplier_Resources(t *testing.T) {
 		{
 			test:    "Cannot list iam user",
 			dirName: "iam_access_key_empty",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListUsersPages",
 					&iam.ListUsersInput{},
 					mock.MatchedBy(func(callback func(res *iam.ListUsersOutput, lastPage bool) bool) bool {
@@ -131,7 +130,7 @@ func TestIamAccessKeySupplier_Resources(t *testing.T) {
 		{
 			test:    "Cannot list iam access_key",
 			dirName: "iam_access_key_empty",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListUsersPages",
 					&iam.ListUsersInput{},
 					mock.MatchedBy(func(callback func(res *iam.ListUsersOutput, lastPage bool) bool) bool {
@@ -162,7 +161,7 @@ func TestIamAccessKeySupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeIam := mocks.FakeIAM{}
+			fakeIam := awstest.MockFakeIAM{}
 			c.mocks(&fakeIam)
 
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)

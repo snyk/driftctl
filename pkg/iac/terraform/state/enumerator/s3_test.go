@@ -7,8 +7,8 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -16,7 +16,7 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 	tests := []struct {
 		name   string
 		config config.SupplierConfig
-		mocks  func(client *mocks.FakeS3)
+		mocks  func(client *awstest.MockFakeS3)
 		want   []string
 		err    string
 	}{
@@ -25,7 +25,7 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 			config: config.SupplierConfig{
 				Path: "bucket-name/a/nested/prefix",
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				input := &s3.ListObjectsV2Input{
 					Bucket: awssdk.String("bucket-name"),
 					Prefix: awssdk.String("a/nested/prefix"),
@@ -84,7 +84,7 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 			config: config.SupplierConfig{
 				Path: "bucket-name/a/nested/prefix",
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				input := &s3.ListObjectsV2Input{
 					Bucket: awssdk.String("bucket-name"),
 					Prefix: awssdk.String("a/nested/prefix"),
@@ -126,7 +126,7 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 			config: config.SupplierConfig{
 				Path: "bucket-name",
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				client.On("ListObjectsV2Pages", mock.Anything, mock.Anything).Return(errors.New("error when listing"))
 			},
 			want: nil,
@@ -135,7 +135,7 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 		{
 			name:   "test when empty config used",
 			config: config.SupplierConfig{},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				client.On("ListObjectsV2Pages", mock.Anything, mock.Anything).Return(errors.New("error when listing"))
 			},
 			want: nil,
@@ -146,7 +146,7 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 			config: config.SupplierConfig{
 				Path: "bucket-name/a/nested/prefix",
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				client.On("ListObjectsV2Pages", mock.Anything, mock.Anything).Return(errors.New("error when listing"))
 			},
 			want: nil,
@@ -155,7 +155,7 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fakeS3 := mocks.FakeS3{}
+			fakeS3 := awstest.MockFakeS3{}
 			tt.mocks(&fakeS3)
 			s := &S3Enumerator{
 				config: tt.config,

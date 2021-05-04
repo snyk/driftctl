@@ -5,13 +5,13 @@ import (
 	"testing"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 
@@ -31,13 +31,13 @@ func TestVPCSecurityGroupSupplier_Resources(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeEC2)
+		mocks   func(client *awstest.MockFakeEC2)
 		err     error
 	}{
 		{
 			test:    "no security groups",
 			dirName: "vpc_security_group_empty",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeSecurityGroupsPages",
 					&ec2.DescribeSecurityGroupsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool) bool {
@@ -50,7 +50,7 @@ func TestVPCSecurityGroupSupplier_Resources(t *testing.T) {
 		{
 			test:    "with security groups",
 			dirName: "vpc_security_group_multiple",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeSecurityGroupsPages",
 					&ec2.DescribeSecurityGroupsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool) bool {
@@ -74,7 +74,7 @@ func TestVPCSecurityGroupSupplier_Resources(t *testing.T) {
 		{
 			test:    "cannot list security groups",
 			dirName: "vpc_security_group_empty",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeSecurityGroupsPages",
 					&ec2.DescribeSecurityGroupsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool) bool {
@@ -99,7 +99,7 @@ func TestVPCSecurityGroupSupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
-			fakeEC2 := mocks.FakeEC2{}
+			fakeEC2 := awstest.MockFakeEC2{}
 			tt.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			securityGroupDeserializer := awsdeserializer.NewVPCSecurityGroupDeserializer()
