@@ -139,10 +139,10 @@ func (d DriftCTL) scan() (remoteResources []resource.Resource, resourcesFromStat
 	logrus.Info("Start reading IaC")
 	d.iacProgress.Start()
 	resourcesFromState, err = d.iacSupplier.Resources()
+	d.iacProgress.Stop()
 	if err != nil {
 		return nil, nil, err
 	}
-	d.iacProgress.Stop()
 
 	logrus.Info("Start scanning cloud provider")
 	d.scanProgress.Start()
