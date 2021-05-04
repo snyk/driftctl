@@ -3,13 +3,8 @@ package state
 import (
 	"fmt"
 
-	"github.com/cloudskiff/driftctl/pkg/iac"
-	"github.com/cloudskiff/driftctl/pkg/iac/config"
-	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
-	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/enumerator"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/cloudskiff/driftctl/pkg/output"
+	"github.com/fatih/color"
 	"github.com/hashicorp/terraform/addrs"
 	"github.com/hashicorp/terraform/states"
 	"github.com/hashicorp/terraform/states/statefile"
@@ -17,6 +12,14 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	ctyconvert "github.com/zclconf/go-cty/cty/convert"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
+
+	"github.com/cloudskiff/driftctl/pkg/iac"
+	"github.com/cloudskiff/driftctl/pkg/iac/config"
+	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
+	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/enumerator"
+	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
+	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
 const TerraformStateReaderSupplier = "tfstate"
@@ -28,6 +31,7 @@ type TerraformStateReader struct {
 	enumerator     enumerator.StateEnumerator
 	deserializers  []deserializer.CTYDeserializer
 	backendOptions *backend.Options
+	progress       output.Progress
 }
 
 func (r *TerraformStateReader) initReader() error {
@@ -35,8 +39,8 @@ func (r *TerraformStateReader) initReader() error {
 	return nil
 }
 
-func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options) (*TerraformStateReader, error) {
-	reader := TerraformStateReader{library: library, config: config, deserializers: iac.Deserializers(), backendOptions: backendOpts}
+func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options, progress output.Progress) (*TerraformStateReader, error) {
+	reader := TerraformStateReader{library: library, config: config, deserializers: iac.Deserializers(), backendOptions: backendOpts, progress: progress}
 	err := reader.initReader()
 	if err != nil {
 		return nil, err
@@ -51,7 +55,7 @@ func (r *TerraformStateReader) retrieve() (map[string][]cty.Value, error) {
 	}
 	r.backend = b
 
-	state, err := read(r.backend)
+	state, err := read(r.config.Path, r.backend)
 	defer r.backend.Close()
 	if err != nil {
 		return nil, err
@@ -195,7 +199,6 @@ func (r *TerraformStateReader) decode(values map[string][]cty.Value) ([]resource
 }
 
 func (r *TerraformStateReader) Resources() ([]resource.Resource, error) {
-
 	if r.enumerator == nil {
 		return r.retrieveForState(r.config.Path)
 	}
@@ -209,6 +212,7 @@ func (r *TerraformStateReader) retrieveForState(path string) ([]resource.Resourc
 		"path":    r.config.Path,
 		"backend": r.config.Backend,
 	}).Debug("Reading resources from state")
+	r.progress.Inc()
 	values, err := r.retrieve()
 	if err != nil {
 		return nil, err
@@ -229,6 +233,11 @@ func (r *TerraformStateReader) retrieveMultiplesStates() ([]resource.Resource, e
 	for _, key := range keys {
 		resources, err := r.retrieveForState(key)
 		if err != nil {
+			if _, ok := err.(*UnsupportedVersionError); ok {
+				color.New(color.Bold, color.FgYellow).Printf("WARNING: %s", err)
+				continue
+			}
+
 			return nil, err
 		}
 		results = append(results, resources...)
@@ -237,18 +246,31 @@ func (r *TerraformStateReader) retrieveMultiplesStates() ([]resource.Resource, e
 	return results, nil
 }
 
-func read(reader backend.Backend) (*states.State, error) {
-	state, err := readState(reader)
+func read(path string, reader backend.Backend) (*states.State, error) {
+	state, err := readState(path, reader)
 	if err != nil {
 		return nil, err
 	}
 	return state, nil
 }
 
-func readState(reader backend.Backend) (*states.State, error) {
+func readState(path string, reader backend.Backend) (*states.State, error) {
 	state, err := statefile.Read(reader)
 	if err != nil {
 		return nil, err
 	}
+
+	supported, err := IsVersionSupported(state.TerraformVersion.String())
+	if err != nil {
+		return nil, err
+	}
+
+	if !supported {
+		return nil, &UnsupportedVersionError{
+			StateFile: path,
+			Version:   state.TerraformVersion,
+		}
+	}
+
 	return state.State, nil
 }

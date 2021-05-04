@@ -3,6 +3,7 @@ package backend
 import (
 	"fmt"
 	"io"
+	"net/http"
 
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/pkg/errors"
@@ -13,12 +14,14 @@ var supportedBackends = []string{
 	BackendKeyS3,
 	BackendKeyHTTP,
 	BackendKeyHTTPS,
+	BackendKeyTFCloud,
 }
 
 type Backend io.ReadCloser
 
 type Options struct {
-	Headers map[string]string
+	Headers      map[string]string
+	TFCloudToken string
 }
 
 func IsSupported(backend string) bool {
@@ -46,7 +49,9 @@ func GetBackend(config config.SupplierConfig, opts *Options) (Backend, error) {
 	case BackendKeyHTTP:
 		fallthrough
 	case BackendKeyHTTPS:
-		return NewHTTPReader(fmt.Sprintf("%s://%s", config.Backend, config.Path), opts)
+		return NewHTTPReader(&http.Client{}, fmt.Sprintf("%s://%s", config.Backend, config.Path), opts)
+	case BackendKeyTFCloud:
+		return NewTFCloudReader(&http.Client{}, config.Path, opts)
 	default:
 		return nil, errors.Errorf("Unsupported backend '%s'", backend)
 	}

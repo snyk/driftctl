@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/r3labs/diff/v2"
 
@@ -39,6 +40,7 @@ type Analysis struct {
 	differences []Difference
 	summary     Summary
 	alerts      alerter.Alerts
+	Duration    time.Duration
 }
 
 type serializableDifference struct {
