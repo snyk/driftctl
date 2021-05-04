@@ -9,8 +9,9 @@ import (
 
 func TestAcc_Aws_DbInstance(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Paths: []string{"./testdata/acc/aws_db_instance"},
-		Args:  []string{"scan", "--filter", "Type=='aws_db_instance'"},
+		TerraformVersion: "0.14.9",
+		Paths:            []string{"./testdata/acc/aws_db_instance"},
+		Args:             []string{"scan", "--filter", "Type=='aws_db_instance'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

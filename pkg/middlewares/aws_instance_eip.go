@@ -15,20 +15,7 @@ func (a AwsInstanceEIP) Execute(remoteResources, resourcesFromState *[]resource.
 			continue
 		}
 
-		if resource.IsRefactoredResource("aws_instance") {
-			instance, _ := remoteResource.(*resource.AbstractResource)
-
-			if a.hasEIPV2(instance, resourcesFromState) {
-				logrus.WithFields(logrus.Fields{
-					"instance": instance.TerraformId(),
-				}).Debug("Ignore instance public ip and dns as it has an eip attached")
-				a.ignorePublicIpAndDnsV2(instance, remoteResources, resourcesFromState)
-			}
-
-			continue
-		}
-
-		instance, _ := remoteResource.(*aws.AwsInstance)
+		instance, _ := remoteResource.(*resource.AbstractResource)
 
 		if a.hasEIP(instance, resourcesFromState) {
 			logrus.WithFields(logrus.Fields{
@@ -41,39 +28,7 @@ func (a AwsInstanceEIP) Execute(remoteResources, resourcesFromState *[]resource.
 	return nil
 }
 
-func (a AwsInstanceEIP) hasEIP(instance *aws.AwsInstance, resources *[]resource.Resource) bool {
-	for _, res := range *resources {
-		if res.TerraformType() == aws.AwsEipResourceType {
-			eip, _ := res.(*aws.AwsEip)
-			if *eip.Instance == instance.Id {
-				return true
-			}
-		}
-		if res.TerraformType() == aws.AwsEipAssociationResourceType {
-			eip, _ := res.(*aws.AwsEipAssociation)
-			if *eip.InstanceId == instance.Id {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
-func (a AwsInstanceEIP) ignorePublicIpAndDns(instance *aws.AwsInstance, resourcesSet ...*[]resource.Resource) {
-	for _, resources := range resourcesSet {
-		for _, res := range *resources {
-			if res.TerraformType() == instance.TerraformType() &&
-				res.TerraformId() == instance.TerraformId() {
-				instance, _ := res.(*aws.AwsInstance)
-				instance.PublicDns = nil
-				instance.PublicIp = nil
-			}
-		}
-	}
-}
-
-func (a AwsInstanceEIP) hasEIPV2(instance *resource.AbstractResource, resources *[]resource.Resource) bool {
+func (a AwsInstanceEIP) hasEIP(instance *resource.AbstractResource, resources *[]resource.Resource) bool {
 	for _, res := range *resources {
 		if res.TerraformType() == aws.AwsEipResourceType {
 			eip, _ := res.(*aws.AwsEip)
@@ -92,7 +47,7 @@ func (a AwsInstanceEIP) hasEIPV2(instance *resource.AbstractResource, resources 
 	return false
 }
 
-func (a AwsInstanceEIP) ignorePublicIpAndDnsV2(instance *resource.AbstractResource, resourcesSet ...*[]resource.Resource) {
+func (a AwsInstanceEIP) ignorePublicIpAndDns(instance *resource.AbstractResource, resourcesSet ...*[]resource.Resource) {
 	for _, resources := range resourcesSet {
 		for _, res := range *resources {
 			if res.TerraformType() == instance.TerraformType() &&

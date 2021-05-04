@@ -584,14 +584,14 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					Type: "aws_instance",
 					Attrs: &resource.Attributes{
 						"availability_zone": "us-east-1",
-						"root_block_device": []interface{}{
-							map[string]interface{}{
+						"root_block_device": []map[string]interface{}{
+							{
 								"volume_id":   "vol-02862d9b39045a3a4",
 								"volume_type": "gp2",
 							},
 						},
-						"ebs_block_device": []interface{}{
-							map[string]interface{}{
+						"ebs_block_device": []map[string]interface{}{
+							{
 								"volume_id": "vol-018c5ae89895aca4c",
 								"encrypted": true,
 							},
@@ -629,14 +629,14 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"availability_zone":    "us-east-1",
 					},
 				}
-				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", mock.MatchedBy(func(input map[string]interface{}) bool {
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return matchByAttributes(input, map[string]interface{}{
 						"id":                   "vol-018c5ae89895aca4c",
 						"availability_zone":    "us-east-1",
 						"encrypted":            true,
 						"multi_attach_enabled": false,
 					})
-				}), mock.Anything, "aws_ebs_volume").Times(1).Return(foo, nil)
+				})).Times(1).Return(&foo, nil)
 
 				bar := resource.AbstractResource{
 					Id:   "vol-02862d9b39045a3a4",
@@ -647,14 +647,14 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"availability_zone":    "us-east-1",
 					},
 				}
-				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", mock.MatchedBy(func(input map[string]interface{}) bool {
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return matchByAttributes(input, map[string]interface{}{
 						"id":                   "vol-02862d9b39045a3a4",
 						"availability_zone":    "us-east-1",
 						"type":                 "gp2",
 						"multi_attach_enabled": false,
 					})
-				}), mock.Anything, "aws_ebs_volume").Times(1).Return(bar, nil)
+				})).Times(1).Return(&bar, nil)
 			},
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertManagedCount(2)

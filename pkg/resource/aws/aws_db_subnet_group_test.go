@@ -9,8 +9,9 @@ import (
 
 func TestAcc_Aws_DbSubnetGroup(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Paths: []string{"./testdata/acc/aws_db_subnet_group"},
-		Args:  []string{"scan", "--filter", "Type=='aws_db_subnet_group' && Id!='default'"},
+		TerraformVersion: "0.14.9",
+		Paths:            []string{"./testdata/acc/aws_db_subnet_group"},
+		Args:             []string{"scan", "--filter", "Type=='aws_db_subnet_group' && Id!='default'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

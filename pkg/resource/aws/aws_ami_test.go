@@ -9,8 +9,9 @@ import (
 
 func TestAcc_Aws_Ami(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Paths: []string{"./testdata/acc/aws_ami"},
-		Args:  []string{"scan", "--filter", "Type=='aws_ami'"},
+		TerraformVersion: "0.14.9",
+		Paths:            []string{"./testdata/acc/aws_ami"},
+		Args:             []string{"scan", "--filter", "Type=='aws_ami'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

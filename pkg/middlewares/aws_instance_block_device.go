@@ -32,8 +32,7 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 		instance, _ := stateRes.(*resource.AbstractResource)
 
 		if rootBlockDevice, exist := instance.Attrs.Get("root_block_device"); exist {
-			for _, rootBlock := range rootBlockDevice.([]interface{}) {
-				rootBlock := rootBlock.(map[string]interface{})
+			for _, rootBlock := range rootBlockDevice.([]map[string]interface{}) {
 				logrus.WithFields(logrus.Fields{
 					"volume":   rootBlock["volume_id"],
 					"instance": instance.TerraformId(),
@@ -49,15 +48,15 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 					"multi_attach_enabled": false,
 					"tags":                 (*instance.Attrs)["volume_tags"],
 				}
-				newRes := a.resourceFactory.CreateAbstractResource(data, rootBlock["volume_id"].(string), "aws_ebs_volume")
-				newStateResources = append(newStateResources, &newRes)
+				newRes := a.resourceFactory.CreateAbstractResource("aws_ebs_volume", rootBlock["volume_id"].(string), data)
+				newStateResources = append(newStateResources, newRes)
 			}
 			instance.Attrs.SafeDelete([]string{"root_block_device"})
+			instance.Attrs.SafeDelete([]string{"volume_tags"})
 		}
 
 		if ebsBlockDevice, exist := instance.Attrs.Get("ebs_block_device"); exist {
-			for _, blockDevice := range ebsBlockDevice.([]interface{}) {
-				blockDevice := blockDevice.(map[string]interface{})
+			for _, blockDevice := range ebsBlockDevice.([]map[string]interface{}) {
 				logrus.WithFields(logrus.Fields{
 					"volume":   blockDevice["volume_id"],
 					"instance": instance.TerraformId(),
@@ -73,10 +72,11 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 					"multi_attach_enabled": false,
 					"tags":                 (*instance.Attrs)["volume_tags"],
 				}
-				newRes := a.resourceFactory.CreateAbstractResource(data, blockDevice["volume_id"].(string), "aws_ebs_volume")
-				newStateResources = append(newStateResources, &newRes)
+				newRes := a.resourceFactory.CreateAbstractResource("aws_ebs_volume", blockDevice["volume_id"].(string), data)
+				newStateResources = append(newStateResources, newRes)
 			}
 			instance.Attrs.SafeDelete([]string{"ebs_block_device"})
+			instance.Attrs.SafeDelete([]string{"volume_tags"})
 		}
 		newStateResources = append(newStateResources, instance)
 	}

@@ -10,10 +10,10 @@ import (
 
 type TerraformResourceFactory struct {
 	providerLibrary          *ProviderLibrary
-	resourceSchemaRepository *resource.SchemaRepository
+	resourceSchemaRepository resource.SchemaRepositoryInterface
 }
 
-func NewTerraformResourceFactory(providerLibrary *ProviderLibrary, resourceSchemaRepository *resource.SchemaRepository) *TerraformResourceFactory {
+func NewTerraformResourceFactory(providerLibrary *ProviderLibrary, resourceSchemaRepository resource.SchemaRepositoryInterface) *TerraformResourceFactory {
 	return &TerraformResourceFactory{
 		providerLibrary:          providerLibrary,
 		resourceSchemaRepository: resourceSchemaRepository,
@@ -50,18 +50,18 @@ func (r *TerraformResourceFactory) CreateResource(data interface{}, ty string) (
 	return &val, nil
 }
 
-func (r *TerraformResourceFactory) CreateAbstractResource(data map[string]interface{}, id, ty string) resource.AbstractResource {
-	ctyAttr := resource.Attributes(data)
-	ctyAttr.SanitizeDefaultsV3()
+func (r *TerraformResourceFactory) CreateAbstractResource(ty, id string, data map[string]interface{}) *resource.AbstractResource {
+	attributes := resource.Attributes(data)
+	attributes.SanitizeDefaultsV3()
 
-	schema, exist := r.resourceSchemaRepository.GetSchema(ty)
+	schema, exist := r.resourceSchemaRepository.(*resource.SchemaRepository).GetSchema(ty)
 	if exist && schema.NormalizeFunc != nil {
-		schema.NormalizeFunc(&ctyAttr)
+		schema.NormalizeFunc(&attributes)
 	}
 
-	return resource.AbstractResource{
+	return &resource.AbstractResource{
 		Id:    id,
 		Type:  ty,
-		Attrs: &ctyAttr,
+		Attrs: &attributes,
 	}
 }

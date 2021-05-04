@@ -9,8 +9,9 @@ import (
 
 func TestAcc_Aws_EbsSnapshot(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		Paths: []string{"./testdata/acc/aws_ebs_snapshot"},
-		Args:  []string{"scan", "--filter", "Type=='aws_ebs_snapshot'"},
+		TerraformVersion: "0.14.9",
+		Paths:            []string{"./testdata/acc/aws_ebs_snapshot"},
+		Args:             []string{"scan", "--filter", "Type=='aws_ebs_snapshot'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

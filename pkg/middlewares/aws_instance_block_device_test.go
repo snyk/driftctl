@@ -34,9 +34,6 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 						Type: "aws_instance",
 						Attrs: &resource.Attributes{
 							"availability_zone": "eu-west-3",
-							"volume_tags": map[string]string{
-								"Name": "rootVol",
-							},
 						},
 					},
 					&resource.AbstractResource{
@@ -91,8 +88,8 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 							"volume_tags": map[string]string{
 								"Name": "rootVol",
 							},
-							"root_block_device": []interface{}{
-								map[string]interface{}{
+							"root_block_device": []map[string]interface{}{
+								{
 									"volume_id":   "vol-02862d9b39045a3a4",
 									"volume_type": "gp2",
 									"device_name": "/dev/sda1",
@@ -102,8 +99,8 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 									"iops":        1234,
 								},
 							},
-							"ebs_block_device": []interface{}{
-								map[string]interface{}{
+							"ebs_block_device": []map[string]interface{}{
+								{
 									"volume_id":             "vol-018c5ae89895aca4c",
 									"volume_type":           "gp2",
 									"device_name":           "/dev/sdb",
@@ -134,9 +131,9 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 						},
 					},
 				}
-				factory.On("CreateAbstractResource", mock.MatchedBy(func(input map[string]interface{}) bool {
+				factory.On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "vol-02862d9b39045a3a4"
-				}), mock.Anything, "aws_ebs_volume").Times(1).Return(foo, nil)
+				})).Times(1).Return(&foo, nil)
 
 				bar := resource.AbstractResource{
 					Id:   "vol-018c5ae89895aca4c",
@@ -153,9 +150,9 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 						},
 					},
 				}
-				factory.On("CreateAbstractResource", mock.MatchedBy(func(input map[string]interface{}) bool {
+				factory.On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "vol-018c5ae89895aca4c"
-				}), mock.Anything, "aws_ebs_volume").Times(1).Return(bar, nil)
+				})).Times(1).Return(&bar, nil)
 			},
 			false,
 		},

@@ -109,5 +109,8 @@ func initAwsDbInstanceMetaData(resourceSchemaRepository resource.SchemaRepositor
 		val.SafeDelete([]string{"password"})
 		val.SafeDelete([]string{"skip_final_snapshot"})
 		val.SafeDelete([]string{"timeouts"})
+		val.SafeDelete([]string{"snapshot_identifier"})
+		val.SafeDelete([]string{"allow_major_version_upgrade"})
+		val.SafeDelete([]string{"apply_immediately"})
 	})
 }

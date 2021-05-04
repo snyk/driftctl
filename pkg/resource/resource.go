@@ -62,7 +62,7 @@ func (a *AbstractResource) CtyValue() *cty.Value {
 
 type ResourceFactory interface {
 	CreateResource(data interface{}, ty string) (*cty.Value, error)
-	CreateAbstractResource(data map[string]interface{}, id, ty string) AbstractResource
+	CreateAbstractResource(ty, id string, data map[string]interface{}) *AbstractResource
 }
 
 type SerializableResource struct {
