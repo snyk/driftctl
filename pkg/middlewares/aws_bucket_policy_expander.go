@@ -49,31 +49,16 @@ func (m *AwsBucketPolicyExpander) handlePolicy(bucket *resource.AbstractResource
 	if !exist || policyAttr == nil || policyAttr == "" {
 		return nil
 	}
-	policy := policyAttr.(string)
 
-	bucketAttr, _ := bucket.Attrs.Get("bucket")
-	bucketName := bucketAttr.(string)
 	data := map[string]interface{}{
 		"id":     bucket.TerraformId(),
 		"bucket": (*bucket.Attrs)["bucket"],
 		"policy": (*bucket.Attrs)["policy"],
 	}
-	ctyVal, err := m.resourceFactory.CreateResource(data, "aws_s3_bucket_policy")
-	if err != nil {
-		return err
-	}
 
-	newPolicy := &aws.AwsS3BucketPolicy{
-		Id:     bucket.TerraformId(),
-		Bucket: &bucketName,
-		Policy: &policy,
-		CtyVal: ctyVal,
-	}
-	normalizedRes, err := newPolicy.NormalizeForState()
-	if err != nil {
-		return err
-	}
-	*results = append(*results, normalizedRes)
+	newPolicy := m.resourceFactory.CreateAbstractResource(aws.AwsS3BucketPolicyResourceType, bucket.TerraformId(), data)
+
+	*results = append(*results, newPolicy)
 	logrus.WithFields(logrus.Fields{
 		"id": newPolicy.TerraformId(),
 	}).Debug("Created new policy from bucket")
