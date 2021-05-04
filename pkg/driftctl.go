@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"time"
 
 	globaloutput "github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/jmespath/go-jmespath"
@@ -19,15 +20,16 @@ import (
 )
 
 type ScanOptions struct {
-	Coverage       bool
-	Detect         bool
-	From           []config.SupplierConfig
-	To             string
-	Output         output.OutputConfig
-	Filter         *jmespath.JMESPath
-	Quiet          bool
-	BackendOptions *backend.Options
-	StrictMode     bool
+	Coverage         bool
+	Detect           bool
+	From             []config.SupplierConfig
+	To               string
+	Output           output.OutputConfig
+	Filter           *jmespath.JMESPath
+	Quiet            bool
+	BackendOptions   *backend.Options
+	StrictMode       bool
+	DisableTelemetry bool
 }
 
 type DriftCTL struct {
@@ -57,6 +59,7 @@ func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier
 }
 
 func (d DriftCTL) Run() (*analyser.Analysis, error) {
+	start := time.Now()
 	remoteResources, resourcesFromState, err := d.scan()
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -112,6 +115,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	driftIgnore := filter.NewDriftIgnore()
 
 	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState, driftIgnore)
+	analysis.Duration = time.Since(start)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to perform resources analysis")

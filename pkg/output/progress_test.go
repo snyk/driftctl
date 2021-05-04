@@ -10,9 +10,14 @@ import (
 func TestProgressTimeoutDoesNotInc(t *testing.T) {
 	progress := NewProgress("loading", "loaded", false)
 	progress.Start()
+	progress.Inc()
 	progress.Stop() // should not hang
-	progress.Inc()  // should not hang or inc
-	assert.Equal(t, uint64(0), progress.Val())
+	progress.Inc()  // should restart progress and inc
+	assert.Equal(t, uint64(2), progress.Val())
+	assert.Equal(t, true, progress.started.Load())
+
+	progress.Stop()
+	assert.Equal(t, false, progress.started.Load())
 }
 
 func TestProgressTimeoutDoesNotHang(t *testing.T) {
@@ -21,10 +26,9 @@ func TestProgressTimeoutDoesNotHang(t *testing.T) {
 	time.Sleep(progressTimeout)
 	for progress.started.Load() == true {
 	}
-	progress.Inc()  // should not hang or inc
+	progress.Inc()  // should not hang but inc
 	progress.Stop() // should not hang
-	assert.Equal(t, uint64(0), progress.Val())
-
+	assert.Equal(t, uint64(1), progress.Val())
 }
 
 func TestProgress(t *testing.T) {

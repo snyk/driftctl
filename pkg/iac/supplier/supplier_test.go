@@ -104,6 +104,7 @@ func TestGetSupportedSchemes(t *testing.T) {
 		"tfstate+s3://",
 		"tfstate+http://",
 		"tfstate+https://",
+		"tfstate+tfcloud://",
 	}
 
 	if got := GetSupportedSchemes(); !reflect.DeepEqual(got, want) {
