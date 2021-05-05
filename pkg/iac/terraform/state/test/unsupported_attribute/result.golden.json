@@ -1,77 +1,69 @@
 [
  {
-  "Ami": "ami-0f8e5edde3a79f541",
-  "Arn": "arn:aws:ec2:eu-west-3:929327065333:instance/i-002c7d44410fee60e",
-  "AssociatePublicIpAddress": true,
-  "AvailabilityZone": "eu-west-3a",
-  "CpuCoreCount": 1,
-  "CpuThreadsPerCore": 2,
-  "DisableApiTermination": false,
-  "EbsOptimized": false,
-  "GetPasswordData": false,
-  "Hibernation": false,
-  "HostId": null,
-  "IamInstanceProfile": "",
   "Id": "i-002c7d44410fee60e",
-  "InstanceInitiatedShutdownBehavior": null,
-  "InstanceState": "running",
-  "InstanceType": "t3.micro",
-  "Ipv6AddressCount": 0,
-  "Ipv6Addresses": [],
-  "KeyName": "",
-  "Monitoring": false,
-  "OutpostArn": "",
-  "PasswordData": "",
-  "PlacementGroup": "",
-  "PrimaryNetworkInterfaceId": "eni-004ddff1c7a130f8b",
-  "PrivateDns": "ip-172-31-11-192.eu-west-3.compute.internal",
-  "PrivateIp": "172.31.11.192",
-  "PublicDns": "ec2-15-188-23-233.eu-west-3.compute.amazonaws.com",
-  "PublicIp": "15.188.23.233",
-  "SecondaryPrivateIps": [],
-  "SecurityGroups": [
-   "default"
-  ],
-  "SourceDestCheck": true,
-  "SubnetId": "subnet-63c5f90a",
-  "Tags": {
-   "Name": "HelloWorld"
-  },
-  "Tenancy": "default",
-  "UserData": null,
-  "UserDataBase64": null,
-  "VolumeTags": {},
-  "VpcSecurityGroupIds": [
-   "sg-a74815c8"
-  ],
-  "CreditSpecification": [
-   {
-    "CpuCredits": "unlimited"
-   }
-  ],
-  "EbsBlockDevice": null,
-  "EphemeralBlockDevice": [],
-  "MetadataOptions": [
-   {
-    "HttpEndpoint": "enabled",
-    "HttpPutResponseHopLimit": 1,
-    "HttpTokens": "optional"
-   }
-  ],
-  "NetworkInterface": [],
-  "RootBlockDevice": [
-   {
-    "DeleteOnTermination": true,
-    "DeviceName": "/dev/sda1",
-    "Encrypted": false,
-    "Iops": 100,
-    "KmsKeyId": "",
-    "VolumeId": "vol-08b1deab4881e2b00",
-    "VolumeSize": 8,
-    "VolumeType": "gp2"
-   }
-  ],
-  "Timeouts": null,
-  "CtyVal": {}
+  "Type": "aws_instance",
+  "Attrs": {
+   "ami": "ami-0f8e5edde3a79f541",
+   "arn": "arn:aws:ec2:eu-west-3:929327065333:instance/i-002c7d44410fee60e",
+   "associate_public_ip_address": true,
+   "availability_zone": "eu-west-3a",
+   "cpu_core_count": 1,
+   "cpu_threads_per_core": 2,
+   "credit_specification": [
+    {
+     "cpu_credits": "unlimited"
+    }
+   ],
+   "disable_api_termination": false,
+   "ebs_optimized": false,
+   "get_password_data": false,
+   "hibernation": false,
+   "iam_instance_profile": "",
+   "id": "i-002c7d44410fee60e",
+   "instance_state": "running",
+   "instance_type": "t3.micro",
+   "ipv6_address_count": 0,
+   "key_name": "",
+   "metadata_options": [
+    {
+     "http_endpoint": "enabled",
+     "http_put_response_hop_limit": 1,
+     "http_tokens": "optional"
+    }
+   ],
+   "monitoring": false,
+   "outpost_arn": "",
+   "password_data": "",
+   "placement_group": "",
+   "primary_network_interface_id": "eni-004ddff1c7a130f8b",
+   "private_dns": "ip-172-31-11-192.eu-west-3.compute.internal",
+   "private_ip": "172.31.11.192",
+   "public_dns": "ec2-15-188-23-233.eu-west-3.compute.amazonaws.com",
+   "public_ip": "15.188.23.233",
+   "root_block_device": [
+    {
+     "delete_on_termination": true,
+     "device_name": "/dev/sda1",
+     "encrypted": false,
+     "iops": 100,
+     "kms_key_id": "",
+     "volume_id": "vol-08b1deab4881e2b00",
+     "volume_size": 8,
+     "volume_type": "gp2"
+    }
+   ],
+   "security_groups": [
+    "default"
+   ],
+   "source_dest_check": true,
+   "subnet_id": "subnet-63c5f90a",
+   "tags": {
+    "Name": "HelloWorld"
+   },
+   "tenancy": "default",
+   "vpc_security_group_ids": [
+    "sg-a74815c8"
+   ]
+  }
  }
 ]

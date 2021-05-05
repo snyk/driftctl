@@ -29,13 +29,14 @@ type ScanOptions struct {
 }
 
 type DriftCTL struct {
-	remoteSupplier  resource.Supplier
-	iacSupplier     resource.Supplier
-	alerter         alerter.AlerterInterface
-	analyzer        analyser.Analyzer
-	filter          *jmespath.JMESPath
-	resourceFactory resource.ResourceFactory
-	strictMode      bool
+	remoteSupplier           resource.Supplier
+	iacSupplier              resource.Supplier
+	alerter                  alerter.AlerterInterface
+	analyzer                 analyser.Analyzer
+	filter                   *jmespath.JMESPath
+	resourceFactory          resource.ResourceFactory
+	strictMode               bool
+	resourceSchemaRepository resource.SchemaRepositoryInterface
 }
 
 func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, alerter *alerter.Alerter, resFactory resource.ResourceFactory, opts *ScanOptions, resourceSchemaRepository resource.SchemaRepositoryInterface) *DriftCTL {
@@ -47,6 +48,7 @@ func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier
 		opts.Filter,
 		resFactory,
 		opts.StrictMode,
+		resourceSchemaRepository,
 	}
 }
 

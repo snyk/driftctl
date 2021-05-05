@@ -1,24 +1,26 @@
 [
  {
-  "Arn": "arn:aws:ec2:us-east-1:929327065333:vpc/vpc-41d1d13b",
-  "AssignGeneratedIpv6CidrBlock": false,
-  "CidrBlock": "172.31.0.0/16",
-  "DefaultNetworkAclId": "acl-e88ee595",
-  "DefaultRouteTableId": "rtb-9642cde8",
-  "DefaultSecurityGroupId": "sg-e633c1c8",
-  "DhcpOptionsId": "dopt-d29e33a8",
-  "EnableClassiclink": false,
-  "EnableClassiclinkDnsSupport": false,
-  "EnableDnsHostnames": true,
-  "EnableDnsSupport": true,
   "Id": "vpc-41d1d13b",
-  "InstanceTenancy": "default",
-  "Ipv6AssociationId": "",
-  "Ipv6CidrBlock": "",
-  "MainRouteTableId": "rtb-9642cde8",
-  "OwnerId": "929327065333",
-  "Tags": null,
-  "CtyVal": {}
+  "Type": "aws_default_vpc",
+  "Attrs": {
+   "arn": "arn:aws:ec2:us-east-1:929327065333:vpc/vpc-41d1d13b",
+   "assign_generated_ipv6_cidr_block": false,
+   "cidr_block": "172.31.0.0/16",
+   "default_network_acl_id": "acl-e88ee595",
+   "default_route_table_id": "rtb-9642cde8",
+   "default_security_group_id": "sg-e633c1c8",
+   "dhcp_options_id": "dopt-d29e33a8",
+   "enable_classiclink": false,
+   "enable_classiclink_dns_support": false,
+   "enable_dns_hostnames": true,
+   "enable_dns_support": true,
+   "id": "vpc-41d1d13b",
+   "instance_tenancy": "default",
+   "ipv6_association_id": "",
+   "ipv6_cidr_block": "",
+   "main_route_table_id": "rtb-9642cde8",
+   "owner_id": "929327065333"
+  }
  },
  {
   "Arn": "arn:aws:ec2:us-east-1:929327065333:vpc/vpc-0a5666c0cfc366714",
@@ -42,14 +44,14 @@
   "CtyVal": {}
  },
  {
-  "DefaultRouteTableId": "rtb-9642cde8",
   "Id": "rtb-9642cde8",
-  "OwnerId": "929327065333",
-  "PropagatingVgws": null,
-  "Route": null,
-  "Tags": null,
-  "VpcId": "vpc-41d1d13b",
-  "CtyVal": {}
+  "Type": "aws_default_route_table",
+  "Attrs": {
+   "default_route_table_id": "rtb-9642cde8",
+   "id": "rtb-9642cde8",
+   "owner_id": "929327065333",
+   "vpc_id": "vpc-41d1d13b"
+  }
  },
  {
   "Id": "rtb-0232602f0f07748fc",

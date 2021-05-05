@@ -36,9 +36,9 @@ func (e *FilterEngine) Run(resources []resource.Resource) ([]resource.Resource, 
 		// We need to serialize all attributes to untyped interface from JMESPath to work
 		// map[string]string and map[string]SomeThing will not work without it
 		// https://github.com/jmespath/go-jmespath/issues/22
-		var attrs interface{}
+		var attrs map[string]interface{}
 		if abstractRes, ok := res.(*resource.AbstractResource); ok {
-			attrs = abstractRes.Attrs
+			attrs = *abstractRes.Attrs
 		} else {
 			ctyVal := res.CtyValue()
 			if ctyVal == nil {

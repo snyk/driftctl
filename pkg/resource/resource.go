@@ -19,7 +19,18 @@ type Resource interface {
 }
 
 var refactoredResources = []string{
+	"aws_ami",
 	"aws_cloudfront_distribution",
+	"aws_db_instance",
+	"aws_db_subnet_group",
+	"aws_default_route_table",
+	"aws_default_security_group",
+	"aws_default_subnet",
+	"aws_default_vpc",
+	"aws_dynamodb_table",
+	"aws_ebs_snapshot",
+	"aws_instance",
+	"aws_ebs_volume",
 }
 
 func IsRefactoredResource(typ string) bool {
@@ -51,6 +62,7 @@ func (a *AbstractResource) CtyValue() *cty.Value {
 
 type ResourceFactory interface {
 	CreateResource(data interface{}, ty string) (*cty.Value, error)
+	CreateAbstractResource(ty, id string, data map[string]interface{}) *AbstractResource
 }
 
 type SerializableResource struct {

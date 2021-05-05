@@ -170,7 +170,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		return err
 	}
 
-	resFactory := terraform.NewTerraformResourceFactory(providerLibrary)
+	resFactory := terraform.NewTerraformResourceFactory(providerLibrary, resourceSchemaRepository)
 
 	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, resFactory, opts, resourceSchemaRepository)
 

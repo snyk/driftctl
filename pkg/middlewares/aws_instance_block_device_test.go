@@ -4,15 +4,11 @@ import (
 	"strings"
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/stretchr/testify/mock"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
-
 	"github.com/r3labs/diff/v2"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
@@ -33,98 +29,130 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 				resourcesFromState *[]resource.Resource
 			}{
 				expectedResource: &[]resource.Resource{
-					&aws.AwsInstance{
-						Id:               "dummy-instance",
-						RootBlockDevice:  nil,
-						EbsBlockDevice:   nil,
-						AvailabilityZone: awssdk.String("eu-west-3"),
-						VolumeTags: map[string]string{
-							"Name": "rootVol",
+					&resource.AbstractResource{
+						Id:   "dummy-instance",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"availability_zone": "eu-west-3",
 						},
 					},
-					&aws.AwsEbsVolume{
-						AvailabilityZone:   awssdk.String("eu-west-3"),
-						Encrypted:          awssdk.Bool(true),
-						Id:                 "vol-02862d9b39045a3a4",
-						Iops:               awssdk.Int(1234),
-						KmsKeyId:           awssdk.String("kms"),
-						Size:               awssdk.Int(8),
-						Type:               awssdk.String("gp2"),
-						MultiAttachEnabled: awssdk.Bool(false),
-						Tags: map[string]string{
-							"Name": "rootVol",
+					&resource.AbstractResource{
+						Id:   "vol-02862d9b39045a3a4",
+						Type: "aws_ebs_volume",
+						Attrs: &resource.Attributes{
+							"id":                   "vol-02862d9b39045a3a4",
+							"encrypted":            true,
+							"multi_attach_enabled": false,
+							"availability_zone":    "eu-west-3",
+							"iops":                 1234,
+							"kms_key_id":           "kms",
+							"size":                 8,
+							"type":                 "gp2",
+							"tags": map[string]interface{}{
+								"Name": "rootVol",
+							},
 						},
 					},
-					&aws.AwsEbsVolume{
-						AvailabilityZone:   awssdk.String("eu-west-3"),
-						Type:               awssdk.String("gp2"),
-						Id:                 "vol-018c5ae89895aca4c",
-						Size:               awssdk.Int(23),
-						Encrypted:          awssdk.Bool(true),
-						MultiAttachEnabled: awssdk.Bool(false),
-						Tags: map[string]string{
-							"Name": "rootVol",
+					&resource.AbstractResource{
+						Id:   "vol-018c5ae89895aca4c",
+						Type: "aws_ebs_volume",
+						Attrs: &resource.Attributes{
+							"id":                   "vol-018c5ae89895aca4c",
+							"encrypted":            true,
+							"multi_attach_enabled": false,
+							"availability_zone":    "eu-west-3",
+							"size":                 23,
+							"type":                 "gp2",
+							"tags": map[string]interface{}{
+								"Name": "rootVol",
+							},
 						},
 					},
-					&aws.AwsEbsVolume{
-						Id: "vol-foobar",
+					&resource.AbstractResource{
+						Id:    "vol-foobar",
+						Type:  "aws_ebs_volume",
+						Attrs: &resource.Attributes{},
 					},
 				},
 				resourcesFromState: &[]resource.Resource{
-					&aws.AwsEbsVolume{
-						Id: "vol-foobar",
+					&resource.AbstractResource{
+						Id:    "vol-foobar",
+						Type:  "aws_ebs_volume",
+						Attrs: &resource.Attributes{},
 					},
-					&aws.AwsInstance{
-						Id:               "dummy-instance",
-						AvailabilityZone: awssdk.String("eu-west-3"),
-						VolumeTags: map[string]string{
-							"Name": "rootVol",
-						},
-						EbsBlockDevice: &[]struct {
-							DeleteOnTermination *bool   `cty:"delete_on_termination"`
-							DeviceName          *string `cty:"device_name"`
-							Encrypted           *bool   `cty:"encrypted" computed:"true"`
-							Iops                *int    `cty:"iops" computed:"true"`
-							KmsKeyId            *string `cty:"kms_key_id" computed:"true"`
-							SnapshotId          *string `cty:"snapshot_id" computed:"true"`
-							VolumeId            *string `cty:"volume_id" computed:"true"`
-							VolumeSize          *int    `cty:"volume_size" computed:"true"`
-							VolumeType          *string `cty:"volume_type" computed:"true"`
-						}{
-							{
-								DeviceName:          awssdk.String("/dev/sdb"),
-								VolumeType:          awssdk.String("gp2"),
-								VolumeId:            awssdk.String("vol-018c5ae89895aca4c"),
-								VolumeSize:          awssdk.Int(23),
-								Encrypted:           awssdk.Bool(true),
-								DeleteOnTermination: awssdk.Bool(true),
+					&resource.AbstractResource{
+						Id:   "dummy-instance",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"availability_zone": "eu-west-3",
+							"volume_tags": map[string]string{
+								"Name": "rootVol",
 							},
-						},
-						RootBlockDevice: &[]struct {
-							DeleteOnTermination *bool   `cty:"delete_on_termination"`
-							DeviceName          *string `cty:"device_name" computed:"true"`
-							Encrypted           *bool   `cty:"encrypted" computed:"true"`
-							Iops                *int    `cty:"iops" computed:"true"`
-							KmsKeyId            *string `cty:"kms_key_id" computed:"true"`
-							VolumeId            *string `cty:"volume_id" computed:"true"`
-							VolumeSize          *int    `cty:"volume_size" computed:"true"`
-							VolumeType          *string `cty:"volume_type" computed:"true"`
-						}{
-							{
-								DeviceName: awssdk.String("/dev/sda1"),
-								Encrypted:  awssdk.Bool(true),
-								Iops:       awssdk.Int(1234),
-								KmsKeyId:   awssdk.String("kms"),
-								VolumeId:   awssdk.String("vol-02862d9b39045a3a4"),
-								VolumeSize: awssdk.Int(8),
-								VolumeType: awssdk.String("gp2"),
+							"root_block_device": []map[string]interface{}{
+								{
+									"volume_id":   "vol-02862d9b39045a3a4",
+									"volume_type": "gp2",
+									"device_name": "/dev/sda1",
+									"encrypted":   true,
+									"kms_key_id":  "kms",
+									"volume_size": 8,
+									"iops":        1234,
+								},
+							},
+							"ebs_block_device": []map[string]interface{}{
+								{
+									"volume_id":             "vol-018c5ae89895aca4c",
+									"volume_type":           "gp2",
+									"device_name":           "/dev/sdb",
+									"encrypted":             true,
+									"delete_on_termination": true,
+									"volume_size":           23,
+								},
 							},
 						},
 					},
 				},
 			},
 			func(factory *terraform.MockResourceFactory) {
-				factory.On("CreateResource", mock.Anything, "aws_ebs_volume").Times(2).Return(nil, nil)
+				foo := resource.AbstractResource{
+					Id:   "vol-02862d9b39045a3a4",
+					Type: "aws_ebs_volume",
+					Attrs: &resource.Attributes{
+						"id":                   "vol-02862d9b39045a3a4",
+						"encrypted":            true,
+						"multi_attach_enabled": false,
+						"availability_zone":    "eu-west-3",
+						"iops":                 1234,
+						"kms_key_id":           "kms",
+						"size":                 8,
+						"type":                 "gp2",
+						"tags": map[string]interface{}{
+							"Name": "rootVol",
+						},
+					},
+				}
+				factory.On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "vol-02862d9b39045a3a4"
+				})).Times(1).Return(&foo, nil)
+
+				bar := resource.AbstractResource{
+					Id:   "vol-018c5ae89895aca4c",
+					Type: "aws_ebs_volume",
+					Attrs: &resource.Attributes{
+						"id":                   "vol-018c5ae89895aca4c",
+						"encrypted":            true,
+						"multi_attach_enabled": false,
+						"availability_zone":    "eu-west-3",
+						"size":                 23,
+						"type":                 "gp2",
+						"tags": map[string]interface{}{
+							"Name": "rootVol",
+						},
+					},
+				}
+				factory.On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "vol-018c5ae89895aca4c"
+				})).Times(1).Return(&bar, nil)
 			},
 			false,
 		},

@@ -20,25 +20,34 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 		expected args
 	}{
 		{
-			name: "test that public ip and dns are nulled whith eip",
+			name: "test that public ip and dns are nilled with eip",
 			args: args{
 				remoteResources: &[]resource.Resource{
-					&aws.AwsInstance{
-						Id:        "instance1",
-						PublicIp:  awssdk.String("1.2.3.4"),
-						PublicDns: awssdk.String("dns-of-eip.com"),
+					&resource.AbstractResource{
+						Id:   "instance1",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"public_ip":  "1.2.3.4",
+							"public_dns": "dns-of-eip.com",
+						},
 					},
-					&aws.AwsInstance{
-						Id:        "instance2",
-						PublicIp:  awssdk.String("1.2.3.4"),
-						PublicDns: awssdk.String("dns-of-eip.com"),
+					&resource.AbstractResource{
+						Id:   "instance2",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"public_ip":  "1.2.3.4",
+							"public_dns": "dns-of-eip.com",
+						},
 					},
 				},
 				resourcesFromState: &[]resource.Resource{
-					&aws.AwsInstance{
-						Id:        "instance1",
-						PublicIp:  awssdk.String("5.6.7.8"),
-						PublicDns: awssdk.String("example.com"),
+					&resource.AbstractResource{
+						Id:   "instance1",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"public_ip":  "5.6.7.8",
+							"public_dns": "example.com",
+						},
 					},
 					&aws.AwsEip{
 						Instance: awssdk.String("instance1"),
@@ -47,18 +56,25 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 			},
 			expected: args{
 				remoteResources: &[]resource.Resource{
-					&aws.AwsInstance{
-						Id: "instance1",
+					&resource.AbstractResource{
+						Id:    "instance1",
+						Type:  "aws_instance",
+						Attrs: &resource.Attributes{},
 					},
-					&aws.AwsInstance{
-						Id:        "instance2",
-						PublicIp:  awssdk.String("1.2.3.4"),
-						PublicDns: awssdk.String("dns-of-eip.com"),
+					&resource.AbstractResource{
+						Id:   "instance2",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"public_ip":  "1.2.3.4",
+							"public_dns": "dns-of-eip.com",
+						},
 					},
 				},
 				resourcesFromState: &[]resource.Resource{
-					&aws.AwsInstance{
-						Id: "instance1",
+					&resource.AbstractResource{
+						Id:    "instance1",
+						Type:  "aws_instance",
+						Attrs: &resource.Attributes{},
 					},
 					&aws.AwsEip{
 						Instance: awssdk.String("instance1"),
@@ -67,25 +83,34 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 			},
 		},
 		{
-			name: "test that public ip and dns are nulled when eip association",
+			name: "test that public ip and dns are nilled when eip association",
 			args: args{
 				remoteResources: &[]resource.Resource{
-					&aws.AwsInstance{
-						Id:        "instance1",
-						PublicIp:  awssdk.String("1.2.3.4"),
-						PublicDns: awssdk.String("dns-of-eip.com"),
+					&resource.AbstractResource{
+						Id:   "instance1",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"public_ip":  "1.2.3.4",
+							"public_dns": "dns-of-eip.com",
+						},
 					},
-					&aws.AwsInstance{
-						Id:        "instance2",
-						PublicIp:  awssdk.String("1.2.3.4"),
-						PublicDns: awssdk.String("dns-of-eip.com"),
+					&resource.AbstractResource{
+						Id:   "instance2",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"public_ip":  "1.2.3.4",
+							"public_dns": "dns-of-eip.com",
+						},
 					},
 				},
 				resourcesFromState: &[]resource.Resource{
-					&aws.AwsInstance{
-						Id:        "instance1",
-						PublicIp:  awssdk.String("5.6.7.8"),
-						PublicDns: awssdk.String("example.com"),
+					&resource.AbstractResource{
+						Id:   "instance1",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"public_ip":  "5.6.7.8",
+							"public_dns": "example.com",
+						},
 					},
 					&aws.AwsEipAssociation{
 						InstanceId: awssdk.String("instance1"),
@@ -94,18 +119,25 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 			},
 			expected: args{
 				remoteResources: &[]resource.Resource{
-					&aws.AwsInstance{
-						Id: "instance1",
+					&resource.AbstractResource{
+						Id:    "instance1",
+						Type:  "aws_instance",
+						Attrs: &resource.Attributes{},
 					},
-					&aws.AwsInstance{
-						Id:        "instance2",
-						PublicIp:  awssdk.String("1.2.3.4"),
-						PublicDns: awssdk.String("dns-of-eip.com"),
+					&resource.AbstractResource{
+						Id:   "instance2",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"public_ip":  "1.2.3.4",
+							"public_dns": "dns-of-eip.com",
+						},
 					},
 				},
 				resourcesFromState: &[]resource.Resource{
-					&aws.AwsInstance{
-						Id: "instance1",
+					&resource.AbstractResource{
+						Id:    "instance1",
+						Type:  "aws_instance",
+						Attrs: &resource.Attributes{},
 					},
 					&aws.AwsEipAssociation{
 						InstanceId: awssdk.String("instance1"),
