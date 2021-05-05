@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -22,8 +23,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
@@ -33,13 +32,13 @@ func TestVPCSecurityGroupRuleSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeEC2)
+		mocks   func(client *awstest.MockFakeEC2)
 		err     error
 	}{
 		{
 			test:    "no security group rules",
 			dirName: "vpc_security_group_rule_empty",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeSecurityGroupsPages",
 					&ec2.DescribeSecurityGroupsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool) bool {
@@ -60,7 +59,7 @@ func TestVPCSecurityGroupRuleSupplier_Resources(t *testing.T) {
 		{
 			test:    "with security group rules",
 			dirName: "vpc_security_group_rule_multiple",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeSecurityGroupsPages",
 					&ec2.DescribeSecurityGroupsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool) bool {
@@ -167,7 +166,7 @@ func TestVPCSecurityGroupRuleSupplier_Resources(t *testing.T) {
 		{
 			test:    "should ignore default security group default rules",
 			dirName: "vpc_security_group_default_rules",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeSecurityGroupsPages",
 					&ec2.DescribeSecurityGroupsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool) bool {
@@ -223,7 +222,7 @@ func TestVPCSecurityGroupRuleSupplier_Resources(t *testing.T) {
 		{
 			test:    "cannot list security group rules",
 			dirName: "vpc_security_group_rule_empty",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeSecurityGroupsPages",
 					&ec2.DescribeSecurityGroupsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool) bool {
@@ -248,7 +247,7 @@ func TestVPCSecurityGroupRuleSupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeEC2 := mocks.FakeEC2{}
+			fakeEC2 := awstest.MockFakeEC2{}
 			c.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			deserializer := awsdeserializer.NewVPCSecurityGroupRuleDeserializer()

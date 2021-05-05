@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/assert"
 
@@ -19,13 +19,13 @@ func Test_snsRepository_ListAllTopics(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		mocks   func(client *mocks.SNSClient)
+		mocks   func(client *awstest.MockFakeSNS)
 		want    []*sns.Topic
 		wantErr error
 	}{
 		{
 			name: "List with 2 pages",
-			mocks: func(client *mocks.SNSClient) {
+			mocks: func(client *awstest.MockFakeSNS) {
 				client.On("ListTopicsPages",
 					&sns.ListTopicsInput{},
 					mock.MatchedBy(func(callback func(res *sns.ListTopicsOutput, lastPage bool) bool) bool {
@@ -58,7 +58,7 @@ func Test_snsRepository_ListAllTopics(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.SNSClient{}
+			client := &awstest.MockFakeSNS{}
 			tt.mocks(client)
 			r := &snsRepository{
 				client: client,
@@ -80,13 +80,13 @@ func Test_snsRepository_ListAllTopics(t *testing.T) {
 func Test_snsRepository_ListAllSubscriptions(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *mocks.SNSClient)
+		mocks   func(client *awstest.MockFakeSNS)
 		want    []*sns.Subscription
 		wantErr error
 	}{
 		{
 			name: "List with 2 pages",
-			mocks: func(client *mocks.SNSClient) {
+			mocks: func(client *awstest.MockFakeSNS) {
 				client.On("ListSubscriptionsPages",
 					&sns.ListSubscriptionsInput{},
 					mock.MatchedBy(func(callback func(res *sns.ListSubscriptionsOutput, lastPage bool) bool) bool {
@@ -119,7 +119,7 @@ func Test_snsRepository_ListAllSubscriptions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.SNSClient{}
+			client := &awstest.MockFakeSNS{}
 			tt.mocks(client)
 			r := &snsRepository{
 				client: client,

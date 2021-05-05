@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
@@ -24,8 +25,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
@@ -35,13 +34,13 @@ func TestSubnetSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeEC2)
+		mocks   func(client *awstest.MockFakeEC2)
 		err     error
 	}{
 		{
 			test:    "no Subnet",
 			dirName: "subnet_empty",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeSubnetsPages",
 					&ec2.DescribeSubnetsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeSubnetsOutput, lastPage bool) bool) bool {
@@ -54,7 +53,7 @@ func TestSubnetSupplier_Resources(t *testing.T) {
 		{
 			test:    "mixed default Subnet and Subnet",
 			dirName: "subnet",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeSubnetsPages",
 					&ec2.DescribeSubnetsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeSubnetsOutput, lastPage bool) bool) bool {
@@ -98,7 +97,7 @@ func TestSubnetSupplier_Resources(t *testing.T) {
 		{
 			test:    "cannot list Subnet",
 			dirName: "subnet_empty",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeSubnetsPages",
 					&ec2.DescribeSubnetsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeSubnetsOutput, lastPage bool) bool) bool {
@@ -123,7 +122,7 @@ func TestSubnetSupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeEC2 := mocks.FakeEC2{}
+			fakeEC2 := awstest.MockFakeEC2{}
 			c.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			SubnetDeserializer := awsdeserializer.NewSubnetDeserializer()

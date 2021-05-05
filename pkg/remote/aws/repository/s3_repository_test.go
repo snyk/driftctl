@@ -8,8 +8,8 @@ import (
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 	"github.com/pkg/errors"
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/assert"
@@ -19,13 +19,13 @@ func Test_s3Repository_ListAllBuckets(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		mocks   func(client *mocks.FakeS3)
+		mocks   func(client *awstest.MockFakeS3)
 		want    []*s3.Bucket
 		wantErr error
 	}{
 		{
 			name: "List buckets",
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				client.On("ListBuckets", &s3.ListBucketsInput{}).Return(
 					&s3.ListBucketsOutput{
 						Buckets: []*s3.Bucket{
@@ -45,7 +45,7 @@ func Test_s3Repository_ListAllBuckets(t *testing.T) {
 		},
 		{
 			name: "Error listing buckets",
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				client.On("ListBuckets", &s3.ListBucketsInput{}).Return(
 					nil,
 					awserr.NewRequestFailure(nil, 403, ""),
@@ -57,7 +57,7 @@ func Test_s3Repository_ListAllBuckets(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockedClient := &mocks.FakeS3{}
+			mockedClient := &awstest.MockFakeS3{}
 			tt.mocks(mockedClient)
 			factory := client.MockAwsClientFactoryInterface{}
 			factory.On("GetS3Client", (*aws.Config)(nil)).Return(mockedClient).Once()
@@ -84,7 +84,7 @@ func Test_s3Repository_ListBucketInventoryConfigurations(t *testing.T) {
 			bucket s3.Bucket
 			region string
 		}
-		mocks   func(client *mocks.FakeS3)
+		mocks   func(client *awstest.MockFakeS3)
 		want    []*s3.InventoryConfiguration
 		wantErr string
 	}{
@@ -99,7 +99,7 @@ func Test_s3Repository_ListBucketInventoryConfigurations(t *testing.T) {
 				},
 				region: "us-east-1",
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				client.On(
 					"ListBucketInventoryConfigurations",
 					&s3.ListBucketInventoryConfigurationsInput{
@@ -156,7 +156,7 @@ func Test_s3Repository_ListBucketInventoryConfigurations(t *testing.T) {
 				},
 				region: "us-east-1",
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				client.On(
 					"ListBucketInventoryConfigurations",
 					&s3.ListBucketInventoryConfigurationsInput{
@@ -173,7 +173,7 @@ func Test_s3Repository_ListBucketInventoryConfigurations(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockedClient := &mocks.FakeS3{}
+			mockedClient := &awstest.MockFakeS3{}
 			tt.mocks(mockedClient)
 			factory := client.MockAwsClientFactoryInterface{}
 			factory.On("GetS3Client", &aws.Config{Region: awssdk.String(tt.input.region)}).Return(mockedClient).Once()
@@ -205,7 +205,7 @@ func Test_s3Repository_ListBucketMetricsConfigurations(t *testing.T) {
 			bucket s3.Bucket
 			region string
 		}
-		mocks   func(client *mocks.FakeS3)
+		mocks   func(client *awstest.MockFakeS3)
 		want    []*s3.MetricsConfiguration
 		wantErr string
 	}{
@@ -220,7 +220,7 @@ func Test_s3Repository_ListBucketMetricsConfigurations(t *testing.T) {
 				},
 				region: "us-east-1",
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				client.On(
 					"ListBucketMetricsConfigurations",
 					&s3.ListBucketMetricsConfigurationsInput{
@@ -277,7 +277,7 @@ func Test_s3Repository_ListBucketMetricsConfigurations(t *testing.T) {
 				},
 				region: "us-east-1",
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				client.On(
 					"ListBucketMetricsConfigurations",
 					&s3.ListBucketMetricsConfigurationsInput{
@@ -294,7 +294,7 @@ func Test_s3Repository_ListBucketMetricsConfigurations(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockedClient := &mocks.FakeS3{}
+			mockedClient := &awstest.MockFakeS3{}
 			tt.mocks(mockedClient)
 			factory := client.MockAwsClientFactoryInterface{}
 			factory.On("GetS3Client", &aws.Config{Region: awssdk.String(tt.input.region)}).Return(mockedClient).Once()
@@ -326,7 +326,7 @@ func Test_s3Repository_ListBucketAnalyticsConfigurations(t *testing.T) {
 			bucket s3.Bucket
 			region string
 		}
-		mocks   func(client *mocks.FakeS3)
+		mocks   func(client *awstest.MockFakeS3)
 		want    []*s3.AnalyticsConfiguration
 		wantErr string
 	}{
@@ -341,7 +341,7 @@ func Test_s3Repository_ListBucketAnalyticsConfigurations(t *testing.T) {
 				},
 				region: "us-east-1",
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				client.On(
 					"ListBucketAnalyticsConfigurations",
 					&s3.ListBucketAnalyticsConfigurationsInput{
@@ -398,7 +398,7 @@ func Test_s3Repository_ListBucketAnalyticsConfigurations(t *testing.T) {
 				},
 				region: "us-east-1",
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				client.On(
 					"ListBucketAnalyticsConfigurations",
 					&s3.ListBucketAnalyticsConfigurationsInput{
@@ -415,7 +415,7 @@ func Test_s3Repository_ListBucketAnalyticsConfigurations(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockedClient := &mocks.FakeS3{}
+			mockedClient := &awstest.MockFakeS3{}
 			tt.mocks(mockedClient)
 			factory := client.MockAwsClientFactoryInterface{}
 			factory.On("GetS3Client", &aws.Config{Region: awssdk.String(tt.input.region)}).Return(mockedClient).Once()
@@ -445,7 +445,7 @@ func Test_s3Repository_GetBucketLocation(t *testing.T) {
 	tests := []struct {
 		name    string
 		bucket  *s3.Bucket
-		mocks   func(client *mocks.FakeS3)
+		mocks   func(client *awstest.MockFakeS3)
 		want    string
 		wantErr string
 	}{
@@ -454,7 +454,7 @@ func Test_s3Repository_GetBucketLocation(t *testing.T) {
 			bucket: &s3.Bucket{
 				Name: awssdk.String("test-bucket"),
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				client.On("GetBucketLocation", &s3.GetBucketLocationInput{
 					Bucket: awssdk.String("test-bucket"),
 				}).Return(
@@ -471,7 +471,7 @@ func Test_s3Repository_GetBucketLocation(t *testing.T) {
 			bucket: &s3.Bucket{
 				Name: awssdk.String("test-bucket"),
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				client.On("GetBucketLocation", &s3.GetBucketLocationInput{
 					Bucket: awssdk.String("test-bucket"),
 				}).Return(
@@ -486,7 +486,7 @@ func Test_s3Repository_GetBucketLocation(t *testing.T) {
 			bucket: &s3.Bucket{
 				Name: awssdk.String("test-bucket"),
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				client.On("GetBucketLocation", &s3.GetBucketLocationInput{
 					Bucket: awssdk.String("test-bucket"),
 				}).Return(
@@ -501,7 +501,7 @@ func Test_s3Repository_GetBucketLocation(t *testing.T) {
 			bucket: &s3.Bucket{
 				Name: awssdk.String("test-bucket"),
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				client.On("GetBucketLocation", &s3.GetBucketLocationInput{
 					Bucket: awssdk.String("test-bucket"),
 				}).Return(
@@ -514,7 +514,7 @@ func Test_s3Repository_GetBucketLocation(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockedClient := &mocks.FakeS3{}
+			mockedClient := &awstest.MockFakeS3{}
 			tt.mocks(mockedClient)
 			factory := client.MockAwsClientFactoryInterface{}
 			factory.On("GetS3Client", (*aws.Config)(nil)).Return(mockedClient).Once()

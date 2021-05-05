@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -23,8 +24,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
@@ -34,13 +33,13 @@ func TestVPCSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeEC2)
+		mocks   func(client *awstest.MockFakeEC2)
 		err     error
 	}{
 		{
 			test:    "no VPC",
 			dirName: "vpc_empty",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeVpcsPages",
 					&ec2.DescribeVpcsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeVpcsOutput, lastPage bool) bool) bool {
@@ -53,7 +52,7 @@ func TestVPCSupplier_Resources(t *testing.T) {
 		{
 			test:    "mixed default VPC and VPC",
 			dirName: "vpc",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeVpcsPages",
 					&ec2.DescribeVpcsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeVpcsOutput, lastPage bool) bool) bool {
@@ -88,7 +87,7 @@ func TestVPCSupplier_Resources(t *testing.T) {
 		{
 			test:    "cannot list VPC",
 			dirName: "vpc_empty",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeVpcsPages",
 					&ec2.DescribeVpcsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeVpcsOutput, lastPage bool) bool) bool {
@@ -113,7 +112,7 @@ func TestVPCSupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeEC2 := mocks.FakeEC2{}
+			fakeEC2 := awstest.MockFakeEC2{}
 			c.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			VPCDeserializer := awsdeserializer.NewVPCDeserializer()

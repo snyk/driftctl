@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/route53"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/aws/aws-sdk-go/aws"
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,13 +19,13 @@ func Test_route53Repository_ListAllHealthChecks(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		mocks   func(client *mocks.Route53Client)
+		mocks   func(client *awstest.MockFakeRoute53)
 		want    []*route53.HealthCheck
 		wantErr error
 	}{
 		{
 			name: "List with 2 pages",
-			mocks: func(client *mocks.Route53Client) {
+			mocks: func(client *awstest.MockFakeRoute53) {
 				client.On("ListHealthChecksPages",
 					&route53.ListHealthChecksInput{},
 					mock.MatchedBy(func(callback func(res *route53.ListHealthChecksOutput, lastPage bool) bool) bool {
@@ -58,10 +58,10 @@ func Test_route53Repository_ListAllHealthChecks(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.Route53Client{}
-			tt.mocks(client)
+			client := awstest.MockFakeRoute53{}
+			tt.mocks(&client)
 			r := &route53Repository{
-				client: client,
+				client: &client,
 			}
 			got, err := r.ListAllHealthChecks()
 			assert.Equal(t, tt.wantErr, err)
@@ -80,12 +80,12 @@ func Test_route53Repository_ListAllHealthChecks(t *testing.T) {
 func Test_route53Repository_ListAllZones(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *mocks.Route53Client)
+		mocks   func(client *awstest.MockFakeRoute53)
 		want    []*route53.HostedZone
 		wantErr error
 	}{
 		{name: "Zones with 2 pages",
-			mocks: func(client *mocks.Route53Client) {
+			mocks: func(client *awstest.MockFakeRoute53) {
 				client.On("ListHostedZonesPages",
 					&route53.ListHostedZonesInput{},
 					mock.MatchedBy(func(callback func(res *route53.ListHostedZonesOutput, lastPage bool) bool) bool {
@@ -118,10 +118,10 @@ func Test_route53Repository_ListAllZones(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.Route53Client{}
-			tt.mocks(client)
+			client := awstest.MockFakeRoute53{}
+			tt.mocks(&client)
 			r := &route53Repository{
-				client: client,
+				client: &client,
 			}
 			got, err := r.ListAllZones()
 			assert.Equal(t, tt.wantErr, err)
@@ -141,7 +141,7 @@ func Test_route53Repository_ListRecordsForZone(t *testing.T) {
 	tests := []struct {
 		name    string
 		zoneIds []string
-		mocks   func(client *mocks.Route53Client)
+		mocks   func(client *awstest.MockFakeRoute53)
 		want    []*route53.ResourceRecordSet
 		wantErr error
 	}{
@@ -150,7 +150,7 @@ func Test_route53Repository_ListRecordsForZone(t *testing.T) {
 			zoneIds: []string{
 				"1",
 			},
-			mocks: func(client *mocks.Route53Client) {
+			mocks: func(client *awstest.MockFakeRoute53) {
 				client.On("ListResourceRecordSetsPages",
 					&route53.ListResourceRecordSetsInput{
 						HostedZoneId: aws.String("1"),
@@ -185,10 +185,10 @@ func Test_route53Repository_ListRecordsForZone(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.Route53Client{}
-			tt.mocks(client)
+			client := awstest.MockFakeRoute53{}
+			tt.mocks(&client)
 			r := &route53Repository{
-				client: client,
+				client: &client,
 			}
 			for _, id := range tt.zoneIds {
 				got, err := r.ListRecordsForZone(id)

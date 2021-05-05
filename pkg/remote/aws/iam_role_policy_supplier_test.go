@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
@@ -23,8 +24,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
@@ -35,13 +34,13 @@ func TestIamRolePolicySupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeIAM)
+		mocks   func(client *awstest.MockFakeIAM)
 		err     error
 	}{
 		{
 			test:    "multiples roles without any inline policies",
 			dirName: "iam_role_policy_empty",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListRolesPages",
 					&iam.ListRolesInput{},
 					mock.MatchedBy(func(callback func(res *iam.ListRolesOutput, lastPage bool) bool) bool {
@@ -73,7 +72,7 @@ func TestIamRolePolicySupplier_Resources(t *testing.T) {
 		{
 			test:    "iam multiples roles with inline policies",
 			dirName: "iam_role_policy_multiple",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListRolesPages",
 					&iam.ListRolesInput{},
 					mock.MatchedBy(func(callback func(res *iam.ListRolesOutput, lastPage bool) bool) bool {
@@ -134,7 +133,7 @@ func TestIamRolePolicySupplier_Resources(t *testing.T) {
 		{
 			test:    "Cannot list roles",
 			dirName: "iam_role_policy_empty",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListRolesPages",
 					&iam.ListRolesInput{},
 					mock.MatchedBy(func(callback func(res *iam.ListRolesOutput, lastPage bool) bool) bool {
@@ -159,7 +158,7 @@ func TestIamRolePolicySupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeIam := mocks.FakeIAM{}
+			fakeIam := awstest.MockFakeIAM{}
 			c.mocks(&fakeIam)
 
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
