@@ -112,8 +112,8 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 			Change: diff.Change{
 				Type: diff.UPDATE,
 				Path: []string{"Json"},
-				From: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Removed\":\"Added\",\"Changed\":[\"ec2:DescribeInstances\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
-				To:   "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Changed\":[\"ec2:*\"],\"NewField\":[\"foobar\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
+				From: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Removed\":\"Added\",\"Changed\":[\"oldValue1\", \"oldValue2\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
+				To:   "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Changed\":\"newValue\",\"NewField\":[\"foobar\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
 			},
 		},
 	}})

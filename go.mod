@@ -17,9 +17,9 @@ require (
 	github.com/jmespath/go-jmespath v0.3.0
 	github.com/joho/godotenv v1.3.0
 	github.com/mattn/go-colorable v0.1.7 // indirect
+	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/go-testing-interface v1.0.4 // indirect
-	github.com/nsf/jsondiff v0.0.0-20200515183724-f29ed568f4ce
 	github.com/pkg/errors v0.9.1
 	github.com/r3labs/diff/v2 v2.6.0
 	github.com/shurcooL/githubv4 v0.0.0-20201206200315-234843c633fa
@@ -29,6 +29,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.1
+	github.com/yudai/gojsondiff v1.0.0
 	github.com/zclconf/go-cty v1.7.0
 	go.uber.org/atomic v1.4.0
 	golang.org/x/net v0.0.0-20210119194325-5f4716e94777 // indirect

@@ -55,7 +55,7 @@ fi
 
 if ! which gox > /dev/null; then
     echo "+ Installing gox..."
-    go install github.com/mitchellh/gox
+    go install github.com/mitchellh/gox@v1.0.0
 fi
 
 # Delete old binaries
