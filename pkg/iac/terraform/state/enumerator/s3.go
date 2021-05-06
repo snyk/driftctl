@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/pkg/errors"
 
+	"github.com/bmatcuk/doublestar/v4"
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 )
 
@@ -40,15 +41,16 @@ func (s *S3Enumerator) Enumerate() ([]string, error) {
 	}
 	bucket := bucketPath[0]
 	prefix := strings.Join(bucketPath[1:], "/")
-	hasGlob := HasMeta(prefix)
 
 	prefix, pattern, err := GlobS3(prefix)
 	if err != nil {
 		return nil, err
 	}
 
+	fullPattern := filepath.Join(prefix, pattern)
+
 	// filepath match does not compile so we use the match method to report the pattern error
-	if _, err := filepath.Match(pattern, ""); err != nil {
+	if _, err := doublestar.Match(fullPattern, ""); err != nil {
 		return nil, err
 	}
 
@@ -61,7 +63,7 @@ func (s *S3Enumerator) Enumerate() ([]string, error) {
 		for _, metadata := range output.Contents {
 			if aws.Int64Value(metadata.Size) > 0 {
 				key := *metadata.Key
-				if match, _ := filepath.Match(filepath.Join(prefix, pattern), key); !hasGlob || match {
+				if match, _ := doublestar.Match(fullPattern, key); match {
 					files = append(files, filepath.Join(bucket, key))
 				}
 			}
