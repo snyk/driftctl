@@ -1,8 +1,6 @@
 package middlewares
 
 import (
-	"reflect"
-
 	"github.com/sirupsen/logrus"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -24,26 +22,27 @@ func (m S3BucketAcl) Execute(remoteResources, resourcesFromState *[]resource.Res
 			continue
 		}
 
-		decodedIacResource, _ := iacResource.(*aws.AwsS3Bucket)
+		decodedIacResource, _ := iacResource.(*resource.AbstractResource)
 
 		for _, remoteResource := range *remoteResources {
 			if resource.IsSameResource(remoteResource, decodedIacResource) {
-				decodedRemoteResource, _ := remoteResource.(*aws.AwsS3Bucket)
-				if decodedIacResource.Acl != nil && *decodedIacResource.Acl != "private" {
+				decodedRemoteResource, _ := remoteResource.(*resource.AbstractResource)
+				aclAttr, exist := decodedIacResource.Attrs.Get("acl")
+				if !exist || aclAttr == nil || aclAttr == "" {
+					break
+				}
+				if aclAttr != "private" {
 					logrus.WithFields(logrus.Fields{
 						"type": decodedRemoteResource.TerraformType(),
 						"id":   decodedRemoteResource.TerraformId(),
 					}).Debug("Found a resource to update")
-					// Use reflection to reset to zero value
-					reflect.ValueOf(decodedRemoteResource.Grant).Elem().Set(
-						reflect.Zero(
-							reflect.ValueOf(*decodedRemoteResource.Grant).Type(),
-						),
-					)
+					decodedRemoteResource.Attrs.SafeDelete([]string{"grant"})
 				}
 				break
 			}
 		}
+
+		decodedIacResource.Attrs.SafeDelete([]string{"acl"})
 	}
 
 	return nil

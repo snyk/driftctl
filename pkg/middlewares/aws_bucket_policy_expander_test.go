@@ -24,17 +24,22 @@ func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 		{
 			"Inline policy, no aws_s3_bucket_policy attached",
 			[]resource.Resource{
-				&aws.AwsS3Bucket{
-					Id:     "foo",
-					Bucket: awssdk.String("foo"),
-					Policy: awssdk.String("{\"Id\":\"MYINLINEBUCKETPOLICY\",\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":\"8.8.8.8/32\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-test-policy-like-sqs/*\",\"Sid\":\"IPAllow\"}],\"Version\":\"2012-10-17\"}"),
+				&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{
+						"bucket": "foo",
+						"policy": "{\"Id\":\"MYINLINEBUCKETPOLICY\",\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":\"8.8.8.8/32\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-test-policy-like-sqs/*\",\"Sid\":\"IPAllow\"}],\"Version\":\"2012-10-17\"}",
+					},
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsS3Bucket{
-					Id:     "foo",
-					Bucket: awssdk.String("foo"),
-					Policy: nil,
+				&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{
+						"bucket": "foo",
+					},
 				},
 				&aws.AwsS3BucketPolicy{
 					Id:     "foo",
@@ -46,10 +51,12 @@ func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 		{
 			"No inline policy, aws_s3_bucket_policy attached",
 			[]resource.Resource{
-				&aws.AwsS3Bucket{
-					Id:     "foo",
-					Bucket: awssdk.String("foo"),
-					Policy: nil,
+				&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{
+						"bucket": "foo",
+					},
 				},
 				&aws.AwsS3BucketPolicy{
 					Id:     "foo",
@@ -58,10 +65,12 @@ func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsS3Bucket{
-					Id:     "foo",
-					Bucket: awssdk.String("foo"),
-					Policy: nil,
+				&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{
+						"bucket": "foo",
+					},
 				},
 				&aws.AwsS3BucketPolicy{
 					Id:     "foo",
@@ -73,10 +82,13 @@ func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 		{
 			"Inline policy and aws_s3_bucket_policy",
 			[]resource.Resource{
-				&aws.AwsS3Bucket{
-					Id:     "foo",
-					Bucket: awssdk.String("foo"),
-					Policy: awssdk.String("{\"Id\":\"MYINLINEBUCKETPOLICY\",\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":\"8.8.8.8/32\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-test-policy-like-sqs/*\",\"Sid\":\"IPAllow\"}],\"Version\":\"2012-10-17\"}"),
+				&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{
+						"bucket": "foo",
+						"policy": awssdk.String("{\"Id\":\"MYINLINEBUCKETPOLICY\",\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":\"8.8.8.8/32\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-test-policy-like-sqs/*\",\"Sid\":\"IPAllow\"}],\"Version\":\"2012-10-17\"}"),
+					},
 				},
 				&aws.AwsS3BucketPolicy{
 					Id:     "foo",
@@ -85,15 +97,40 @@ func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsS3Bucket{
-					Id:     "foo",
-					Bucket: awssdk.String("foo"),
-					Policy: nil,
+				&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{
+						"bucket": "foo",
+					},
 				},
 				&aws.AwsS3BucketPolicy{
 					Id:     "foo",
 					Bucket: awssdk.String("foo"),
 					Policy: awssdk.String("{\"Id\":\"MYBUCKETPOLICY\",\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":\"8.8.8.8/32\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-test-policy-like-sqs/*\",\"Sid\":\"IPAllow\"}],\"Version\":\"2012-10-17\"}"),
+				},
+			},
+		},
+		{
+			"empty policy ",
+			[]resource.Resource{
+				&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{
+						"bucket": "foo",
+						"policy": "",
+					},
+				},
+			},
+			[]resource.Resource{
+				&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{
+						"bucket": "foo",
+						"policy": "",
+					},
 				},
 			},
 		},

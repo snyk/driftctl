@@ -1,551 +1,521 @@
 [
- {
-  "AccelerationStatus": "",
-  "Acl": "private",
-  "Arn": "arn:aws:s3:::bucket-martin-test-drift2",
-  "Bucket": "bucket-martin-test-drift2",
-  "BucketDomainName": "bucket-martin-test-drift2.s3.amazonaws.com",
-  "BucketPrefix": null,
-  "BucketRegionalDomainName": "bucket-martin-test-drift2.s3.eu-west-3.amazonaws.com",
-  "ForceDestroy": false,
-  "HostedZoneId": "Z3R1K369G5AVDG",
-  "Id": "bucket-martin-test-drift2",
-  "Policy": null,
-  "Region": "eu-west-3",
-  "RequestPayer": "BucketOwner",
-  "Tags": {},
-  "WebsiteDomain": null,
-  "WebsiteEndpoint": null,
-  "CorsRule": [],
-  "Grant": [],
-  "LifecycleRule": [],
-  "Logging": [],
-  "ObjectLockConfiguration": [],
-  "ReplicationConfiguration": [],
-  "ServerSideEncryptionConfiguration": [],
-  "Versioning": [
-   {
-    "Enabled": false,
-    "MfaDelete": false
-   }
-  ],
-  "Website": [],
-  "CtyVal": {}
- },
- {
-  "AccelerationStatus": "",
-  "Acl": "private",
-  "Arn": "arn:aws:s3:::bucket-martin-test-drift3",
-  "Bucket": "bucket-martin-test-drift3",
-  "BucketDomainName": "bucket-martin-test-drift3.s3.amazonaws.com",
-  "BucketPrefix": null,
-  "BucketRegionalDomainName": "bucket-martin-test-drift3.s3.eu-west-3.amazonaws.com",
-  "ForceDestroy": false,
-  "HostedZoneId": "Z3R1K369G5AVDG",
-  "Id": "bucket-martin-test-drift3",
-  "Policy": null,
-  "Region": "eu-west-3",
-  "RequestPayer": "BucketOwner",
-  "Tags": {},
-  "WebsiteDomain": null,
-  "WebsiteEndpoint": null,
-  "CorsRule": [],
-  "Grant": [],
-  "LifecycleRule": [],
-  "Logging": [],
-  "ObjectLockConfiguration": [],
-  "ReplicationConfiguration": [],
-  "ServerSideEncryptionConfiguration": [],
-  "Versioning": [
-   {
-    "Enabled": false,
-    "MfaDelete": false
-   }
-  ],
-  "Website": [],
-  "CtyVal": {}
- },
- {
-  "AccelerationStatus": "",
-  "Acl": "private",
-  "Arn": "arn:aws:s3:::bucket-martin-test-drift",
-  "Bucket": "bucket-martin-test-drift",
-  "BucketDomainName": "bucket-martin-test-drift.s3.amazonaws.com",
-  "BucketPrefix": null,
-  "BucketRegionalDomainName": "bucket-martin-test-drift.s3.eu-west-3.amazonaws.com",
-  "ForceDestroy": false,
-  "HostedZoneId": "Z3R1K369G5AVDG",
-  "Id": "bucket-martin-test-drift",
-  "Policy": null,
-  "Region": "eu-west-3",
-  "RequestPayer": "BucketOwner",
-  "Tags": {},
-  "WebsiteDomain": null,
-  "WebsiteEndpoint": null,
-  "CorsRule": [],
-  "Grant": [],
-  "LifecycleRule": [],
-  "Logging": [],
-  "ObjectLockConfiguration": [],
-  "ReplicationConfiguration": [],
-  "ServerSideEncryptionConfiguration": [],
-  "Versioning": [
-   {
-    "Enabled": false,
-    "MfaDelete": false
-   }
-  ],
-  "Website": [],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift",
-  "Id": "bucket-martin-test-drift:Analytics_Bucket1",
-  "Name": "Analytics_Bucket1",
-  "Filter": [],
-  "StorageClassAnalysis": [
-   {
-    "DataExport": [
-     {
-      "OutputSchemaVersion": "V_1",
-      "Destination": [
-       {
-        "S3BucketDestination": [
-         {
-          "BucketAccountId": "",
-          "BucketArn": "arn:aws:s3:::bucket-martin-test-drift",
-          "Format": "CSV",
-          "Prefix": ""
-         }
-        ]
-       }
+  {
+    "Id": "bucket-martin-test-drift",
+    "Type": "aws_s3_bucket",
+    "Attrs": {
+      "acceleration_status": "",
+      "acl": "private",
+      "arn": "arn:aws:s3:::bucket-martin-test-drift",
+      "bucket": "bucket-martin-test-drift",
+      "bucket_domain_name": "bucket-martin-test-drift.s3.amazonaws.com",
+      "bucket_regional_domain_name": "bucket-martin-test-drift.s3.eu-west-3.amazonaws.com",
+      "force_destroy": false,
+      "hosted_zone_id": "Z3R1K369G5AVDG",
+      "id": "bucket-martin-test-drift",
+      "region": "eu-west-3",
+      "request_payer": "BucketOwner",
+      "versioning": [
+        {
+          "enabled": false,
+          "mfa_delete": false
+        }
       ]
-     }
-    ]
-   }
-  ],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift",
-  "Id": "bucket-martin-test-drift:Analytics2_Bucket1",
-  "Name": "Analytics2_Bucket1",
-  "Filter": [],
-  "StorageClassAnalysis": [
-   {
-    "DataExport": [
-     {
-      "OutputSchemaVersion": "V_1",
-      "Destination": [
-       {
-        "S3BucketDestination": [
-         {
-          "BucketAccountId": "",
-          "BucketArn": "arn:aws:s3:::bucket-martin-test-drift",
-          "Format": "CSV",
-          "Prefix": ""
-         }
-        ]
-       }
+    }
+  },
+  {
+    "Id": "bucket-martin-test-drift3",
+    "Type": "aws_s3_bucket",
+    "Attrs": {
+      "acceleration_status": "",
+      "acl": "private",
+      "arn": "arn:aws:s3:::bucket-martin-test-drift3",
+      "bucket": "bucket-martin-test-drift3",
+      "bucket_domain_name": "bucket-martin-test-drift3.s3.amazonaws.com",
+      "bucket_regional_domain_name": "bucket-martin-test-drift3.s3.eu-west-3.amazonaws.com",
+      "force_destroy": false,
+      "hosted_zone_id": "Z3R1K369G5AVDG",
+      "id": "bucket-martin-test-drift3",
+      "region": "eu-west-3",
+      "request_payer": "BucketOwner",
+      "versioning": [
+        {
+          "enabled": false,
+          "mfa_delete": false
+        }
       ]
-     }
-    ]
-   }
-  ],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift2",
-  "Id": "bucket-martin-test-drift2:Analytics2_Bucket2",
-  "Name": "Analytics2_Bucket2",
-  "Filter": [],
-  "StorageClassAnalysis": [
-   {
-    "DataExport": [
-     {
-      "OutputSchemaVersion": "V_1",
-      "Destination": [
-       {
-        "S3BucketDestination": [
-         {
-          "BucketAccountId": "",
-          "BucketArn": "arn:aws:s3:::bucket-martin-test-drift2",
-          "Format": "CSV",
-          "Prefix": ""
-         }
-        ]
-       }
+    }
+  },
+  {
+    "Id": "bucket-martin-test-drift2",
+    "Type": "aws_s3_bucket",
+    "Attrs": {
+      "acceleration_status": "",
+      "acl": "private",
+      "arn": "arn:aws:s3:::bucket-martin-test-drift2",
+      "bucket": "bucket-martin-test-drift2",
+      "bucket_domain_name": "bucket-martin-test-drift2.s3.amazonaws.com",
+      "bucket_regional_domain_name": "bucket-martin-test-drift2.s3.eu-west-3.amazonaws.com",
+      "force_destroy": false,
+      "hosted_zone_id": "Z3R1K369G5AVDG",
+      "id": "bucket-martin-test-drift2",
+      "region": "eu-west-3",
+      "request_payer": "BucketOwner",
+      "versioning": [
+        {
+          "enabled": false,
+          "mfa_delete": false
+        }
       ]
-     }
-    ]
-   }
-  ],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift2",
-  "Id": "bucket-martin-test-drift2:Analytics_Bucket2",
-  "Name": "Analytics_Bucket2",
-  "Filter": [],
-  "StorageClassAnalysis": [
-   {
-    "DataExport": [
-     {
-      "OutputSchemaVersion": "V_1",
-      "Destination": [
-       {
-        "S3BucketDestination": [
-         {
-          "BucketAccountId": "",
-          "BucketArn": "arn:aws:s3:::bucket-martin-test-drift2",
-          "Format": "CSV",
-          "Prefix": ""
-         }
+    }
+  },
+  {
+    "Bucket": "bucket-martin-test-drift",
+    "Id": "bucket-martin-test-drift:Analytics2_Bucket1",
+    "Name": "Analytics2_Bucket1",
+    "Filter": [],
+    "StorageClassAnalysis": [
+      {
+        "DataExport": [
+          {
+            "OutputSchemaVersion": "V_1",
+            "Destination": [
+              {
+                "S3BucketDestination": [
+                  {
+                    "BucketAccountId": "",
+                    "BucketArn": "arn:aws:s3:::bucket-martin-test-drift",
+                    "Format": "CSV",
+                    "Prefix": ""
+                  }
+                ]
+              }
+            ]
+          }
         ]
-       }
-      ]
-     }
-    ]
-   }
-  ],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift3",
-  "Id": "bucket-martin-test-drift3:Analytics2_Bucket3",
-  "Name": "Analytics2_Bucket3",
-  "Filter": [],
-  "StorageClassAnalysis": [
-   {
-    "DataExport": [
-     {
-      "OutputSchemaVersion": "V_1",
-      "Destination": [
-       {
-        "S3BucketDestination": [
-         {
-          "BucketAccountId": "",
-          "BucketArn": "arn:aws:s3:::bucket-martin-test-drift3",
-          "Format": "CSV",
-          "Prefix": ""
-         }
-        ]
-       }
-      ]
-     }
-    ]
-   }
-  ],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift3",
-  "Id": "bucket-martin-test-drift3:Analytics_Bucket3",
-  "Name": "Analytics_Bucket3",
-  "Filter": [],
-  "StorageClassAnalysis": [
-   {
-    "DataExport": [
-     {
-      "OutputSchemaVersion": "V_1",
-      "Destination": [
-       {
-        "S3BucketDestination": [
-         {
-          "BucketAccountId": "",
-          "BucketArn": "arn:aws:s3:::bucket-martin-test-drift3",
-          "Format": "CSV",
-          "Prefix": ""
-         }
-        ]
-       }
-      ]
-     }
-    ]
-   }
-  ],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift",
-  "Enabled": true,
-  "Id": "bucket-martin-test-drift:Inventory2_Bucket1",
-  "IncludedObjectVersions": "All",
-  "Name": "Inventory2_Bucket1",
-  "OptionalFields": [],
-  "Destination": [
-   {
-    "Bucket": [
-     {
-      "AccountId": "",
-      "BucketArn": "arn:aws:s3:::bucket-martin-test-drift",
-      "Format": "ORC",
-      "Prefix": "",
-      "Encryption": []
-     }
-    ]
-   }
-  ],
-  "Filter": [],
-  "Schedule": [
-   {
-    "Frequency": "Daily"
-   }
-  ],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift3",
-  "Enabled": true,
-  "Id": "bucket-martin-test-drift3:Inventory_Bucket3",
-  "IncludedObjectVersions": "All",
-  "Name": "Inventory_Bucket3",
-  "OptionalFields": [],
-  "Destination": [
-   {
-    "Bucket": [
-     {
-      "AccountId": "",
-      "BucketArn": "arn:aws:s3:::bucket-martin-test-drift3",
-      "Format": "ORC",
-      "Prefix": "",
-      "Encryption": []
-     }
-    ]
-   }
-  ],
-  "Filter": [],
-  "Schedule": [
-   {
-    "Frequency": "Daily"
-   }
-  ],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift2",
-  "Enabled": true,
-  "Id": "bucket-martin-test-drift2:Inventory2_Bucket2",
-  "IncludedObjectVersions": "All",
-  "Name": "Inventory2_Bucket2",
-  "OptionalFields": [],
-  "Destination": [
-   {
-    "Bucket": [
-     {
-      "AccountId": "",
-      "BucketArn": "arn:aws:s3:::bucket-martin-test-drift2",
-      "Format": "ORC",
-      "Prefix": "",
-      "Encryption": []
-     }
-    ]
-   }
-  ],
-  "Filter": [],
-  "Schedule": [
-   {
-    "Frequency": "Daily"
-   }
-  ],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift",
-  "Enabled": true,
-  "Id": "bucket-martin-test-drift:Inventory_Bucket1",
-  "IncludedObjectVersions": "All",
-  "Name": "Inventory_Bucket1",
-  "OptionalFields": [],
-  "Destination": [
-   {
-    "Bucket": [
-     {
-      "AccountId": "",
-      "BucketArn": "arn:aws:s3:::bucket-martin-test-drift",
-      "Format": "ORC",
-      "Prefix": "",
-      "Encryption": []
-     }
-    ]
-   }
-  ],
-  "Filter": [],
-  "Schedule": [
-   {
-    "Frequency": "Daily"
-   }
-  ],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift3",
-  "Enabled": true,
-  "Id": "bucket-martin-test-drift3:Inventory2_Bucket3",
-  "IncludedObjectVersions": "All",
-  "Name": "Inventory2_Bucket3",
-  "OptionalFields": [],
-  "Destination": [
-   {
-    "Bucket": [
-     {
-      "AccountId": "",
-      "BucketArn": "arn:aws:s3:::bucket-martin-test-drift3",
-      "Format": "ORC",
-      "Prefix": "",
-      "Encryption": []
-     }
-    ]
-   }
-  ],
-  "Filter": [],
-  "Schedule": [
-   {
-    "Frequency": "Daily"
-   }
-  ],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift2",
-  "Enabled": true,
-  "Id": "bucket-martin-test-drift2:Inventory_Bucket2",
-  "IncludedObjectVersions": "All",
-  "Name": "Inventory_Bucket2",
-  "OptionalFields": [],
-  "Destination": [
-   {
-    "Bucket": [
-     {
-      "AccountId": "",
-      "BucketArn": "arn:aws:s3:::bucket-martin-test-drift2",
-      "Format": "ORC",
-      "Prefix": "",
-      "Encryption": []
-     }
-    ]
-   }
-  ],
-  "Filter": [],
-  "Schedule": [
-   {
-    "Frequency": "Daily"
-   }
-  ],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift",
-  "Id": "bucket-martin-test-drift:Metrics2_Bucket1",
-  "Name": "Metrics2_Bucket1",
-  "Filter": [],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift3",
-  "Id": "bucket-martin-test-drift3:Metrics2_Bucket3",
-  "Name": "Metrics2_Bucket3",
-  "Filter": [],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift2",
-  "Id": "bucket-martin-test-drift2:Metrics_Bucket2",
-  "Name": "Metrics_Bucket2",
-  "Filter": [],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift",
-  "Id": "bucket-martin-test-drift:Metrics_Bucket1",
-  "Name": "Metrics_Bucket1",
-  "Filter": [],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift2",
-  "Id": "bucket-martin-test-drift2:Metrics2_Bucket2",
-  "Name": "Metrics2_Bucket2",
-  "Filter": [],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift3",
-  "Id": "bucket-martin-test-drift3:Metrics_Bucket3",
-  "Name": "Metrics_Bucket3",
-  "Filter": [],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift",
-  "Id": "bucket-martin-test-drift",
-  "LambdaFunction": [
-   {
-    "Events": [
-     "s3:ObjectCreated:*"
+      }
     ],
-    "FilterPrefix": "AWSLogs/",
-    "FilterSuffix": ".log",
-    "Id": "tf-s3-lambda-20201028152606931900000001",
-    "LambdaFunctionArn": "arn:aws:lambda:eu-west-3:526954929923:function:example_lambda_name1"
-   },
-   {
-    "Events": [
-     "s3:ObjectCreated:*"
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift2",
+    "Id": "bucket-martin-test-drift2:Analytics2_Bucket2",
+    "Name": "Analytics2_Bucket2",
+    "Filter": [],
+    "StorageClassAnalysis": [
+      {
+        "DataExport": [
+          {
+            "OutputSchemaVersion": "V_1",
+            "Destination": [
+              {
+                "S3BucketDestination": [
+                  {
+                    "BucketAccountId": "",
+                    "BucketArn": "arn:aws:s3:::bucket-martin-test-drift2",
+                    "Format": "CSV",
+                    "Prefix": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     ],
-    "FilterPrefix": "OtherLogs/",
-    "FilterSuffix": ".log",
-    "Id": "tf-s3-lambda-20201028152606931900000002",
-    "LambdaFunctionArn": "arn:aws:lambda:eu-west-3:526954929923:function:example_lambda_name2"
-   }
-  ],
-  "Queue": [],
-  "Topic": [],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift3",
-  "Id": "bucket-martin-test-drift3",
-  "LambdaFunction": [
-   {
-    "Events": [
-     "s3:ObjectCreated:*"
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift3",
+    "Id": "bucket-martin-test-drift3:Analytics2_Bucket3",
+    "Name": "Analytics2_Bucket3",
+    "Filter": [],
+    "StorageClassAnalysis": [
+      {
+        "DataExport": [
+          {
+            "OutputSchemaVersion": "V_1",
+            "Destination": [
+              {
+                "S3BucketDestination": [
+                  {
+                    "BucketAccountId": "",
+                    "BucketArn": "arn:aws:s3:::bucket-martin-test-drift3",
+                    "Format": "CSV",
+                    "Prefix": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     ],
-    "FilterPrefix": "AWSLogs/",
-    "FilterSuffix": ".log",
-    "Id": "tf-s3-lambda-20201028110604152000000003",
-    "LambdaFunctionArn": "arn:aws:lambda:eu-west-3:526954929923:function:example_lambda_name1"
-   },
-   {
-    "Events": [
-     "s3:ObjectCreated:*"
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift3",
+    "Id": "bucket-martin-test-drift3:Analytics_Bucket3",
+    "Name": "Analytics_Bucket3",
+    "Filter": [],
+    "StorageClassAnalysis": [
+      {
+        "DataExport": [
+          {
+            "OutputSchemaVersion": "V_1",
+            "Destination": [
+              {
+                "S3BucketDestination": [
+                  {
+                    "BucketAccountId": "",
+                    "BucketArn": "arn:aws:s3:::bucket-martin-test-drift3",
+                    "Format": "CSV",
+                    "Prefix": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     ],
-    "FilterPrefix": "OtherLogs/",
-    "FilterSuffix": ".log",
-    "Id": "tf-s3-lambda-20201028110604152000000004",
-    "LambdaFunctionArn": "arn:aws:lambda:eu-west-3:526954929923:function:example_lambda_name2"
-   }
-  ],
-  "Queue": [],
-  "Topic": [],
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift3",
-  "Id": "bucket-martin-test-drift3",
-  "Policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift3/*\",\"Sid\":\"PublicReadGetObject\"}],\"Version\":\"2012-10-17\"}",
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift",
-  "Id": "bucket-martin-test-drift",
-  "Policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift/*\",\"Sid\":\"PublicReadGetObject\"}],\"Version\":\"2012-10-17\"}",
-  "CtyVal": {}
- },
- {
-  "Bucket": "bucket-martin-test-drift2",
-  "Id": "bucket-martin-test-drift2",
-  "Policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift2/*\",\"Sid\":\"PublicReadGetObject\"}],\"Version\":\"2012-10-17\"}",
-  "CtyVal": {}
- }
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift",
+    "Id": "bucket-martin-test-drift:Analytics_Bucket1",
+    "Name": "Analytics_Bucket1",
+    "Filter": [],
+    "StorageClassAnalysis": [
+      {
+        "DataExport": [
+          {
+            "OutputSchemaVersion": "V_1",
+            "Destination": [
+              {
+                "S3BucketDestination": [
+                  {
+                    "BucketAccountId": "",
+                    "BucketArn": "arn:aws:s3:::bucket-martin-test-drift",
+                    "Format": "CSV",
+                    "Prefix": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift2",
+    "Id": "bucket-martin-test-drift2:Analytics_Bucket2",
+    "Name": "Analytics_Bucket2",
+    "Filter": [],
+    "StorageClassAnalysis": [
+      {
+        "DataExport": [
+          {
+            "OutputSchemaVersion": "V_1",
+            "Destination": [
+              {
+                "S3BucketDestination": [
+                  {
+                    "BucketAccountId": "",
+                    "BucketArn": "arn:aws:s3:::bucket-martin-test-drift2",
+                    "Format": "CSV",
+                    "Prefix": ""
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift",
+    "Enabled": true,
+    "Id": "bucket-martin-test-drift:Inventory_Bucket1",
+    "IncludedObjectVersions": "All",
+    "Name": "Inventory_Bucket1",
+    "OptionalFields": [],
+    "Destination": [
+      {
+        "Bucket": [
+          {
+            "AccountId": "",
+            "BucketArn": "arn:aws:s3:::bucket-martin-test-drift",
+            "Format": "ORC",
+            "Prefix": "",
+            "Encryption": []
+          }
+        ]
+      }
+    ],
+    "Filter": [],
+    "Schedule": [
+      {
+        "Frequency": "Daily"
+      }
+    ],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift2",
+    "Enabled": true,
+    "Id": "bucket-martin-test-drift2:Inventory_Bucket2",
+    "IncludedObjectVersions": "All",
+    "Name": "Inventory_Bucket2",
+    "OptionalFields": [],
+    "Destination": [
+      {
+        "Bucket": [
+          {
+            "AccountId": "",
+            "BucketArn": "arn:aws:s3:::bucket-martin-test-drift2",
+            "Format": "ORC",
+            "Prefix": "",
+            "Encryption": []
+          }
+        ]
+      }
+    ],
+    "Filter": [],
+    "Schedule": [
+      {
+        "Frequency": "Daily"
+      }
+    ],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift3",
+    "Enabled": true,
+    "Id": "bucket-martin-test-drift3:Inventory2_Bucket3",
+    "IncludedObjectVersions": "All",
+    "Name": "Inventory2_Bucket3",
+    "OptionalFields": [],
+    "Destination": [
+      {
+        "Bucket": [
+          {
+            "AccountId": "",
+            "BucketArn": "arn:aws:s3:::bucket-martin-test-drift3",
+            "Format": "ORC",
+            "Prefix": "",
+            "Encryption": []
+          }
+        ]
+      }
+    ],
+    "Filter": [],
+    "Schedule": [
+      {
+        "Frequency": "Daily"
+      }
+    ],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift",
+    "Enabled": true,
+    "Id": "bucket-martin-test-drift:Inventory2_Bucket1",
+    "IncludedObjectVersions": "All",
+    "Name": "Inventory2_Bucket1",
+    "OptionalFields": [],
+    "Destination": [
+      {
+        "Bucket": [
+          {
+            "AccountId": "",
+            "BucketArn": "arn:aws:s3:::bucket-martin-test-drift",
+            "Format": "ORC",
+            "Prefix": "",
+            "Encryption": []
+          }
+        ]
+      }
+    ],
+    "Filter": [],
+    "Schedule": [
+      {
+        "Frequency": "Daily"
+      }
+    ],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift2",
+    "Enabled": true,
+    "Id": "bucket-martin-test-drift2:Inventory2_Bucket2",
+    "IncludedObjectVersions": "All",
+    "Name": "Inventory2_Bucket2",
+    "OptionalFields": [],
+    "Destination": [
+      {
+        "Bucket": [
+          {
+            "AccountId": "",
+            "BucketArn": "arn:aws:s3:::bucket-martin-test-drift2",
+            "Format": "ORC",
+            "Prefix": "",
+            "Encryption": []
+          }
+        ]
+      }
+    ],
+    "Filter": [],
+    "Schedule": [
+      {
+        "Frequency": "Daily"
+      }
+    ],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift3",
+    "Enabled": true,
+    "Id": "bucket-martin-test-drift3:Inventory_Bucket3",
+    "IncludedObjectVersions": "All",
+    "Name": "Inventory_Bucket3",
+    "OptionalFields": [],
+    "Destination": [
+      {
+        "Bucket": [
+          {
+            "AccountId": "",
+            "BucketArn": "arn:aws:s3:::bucket-martin-test-drift3",
+            "Format": "ORC",
+            "Prefix": "",
+            "Encryption": []
+          }
+        ]
+      }
+    ],
+    "Filter": [],
+    "Schedule": [
+      {
+        "Frequency": "Daily"
+      }
+    ],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift",
+    "Id": "bucket-martin-test-drift:Metrics_Bucket1",
+    "Name": "Metrics_Bucket1",
+    "Filter": [],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift2",
+    "Id": "bucket-martin-test-drift2:Metrics2_Bucket2",
+    "Name": "Metrics2_Bucket2",
+    "Filter": [],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift3",
+    "Id": "bucket-martin-test-drift3:Metrics2_Bucket3",
+    "Name": "Metrics2_Bucket3",
+    "Filter": [],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift3",
+    "Id": "bucket-martin-test-drift3:Metrics_Bucket3",
+    "Name": "Metrics_Bucket3",
+    "Filter": [],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift",
+    "Id": "bucket-martin-test-drift:Metrics2_Bucket1",
+    "Name": "Metrics2_Bucket1",
+    "Filter": [],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift2",
+    "Id": "bucket-martin-test-drift2:Metrics_Bucket2",
+    "Name": "Metrics_Bucket2",
+    "Filter": [],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift",
+    "Id": "bucket-martin-test-drift",
+    "LambdaFunction": [
+      {
+        "Events": [
+          "s3:ObjectCreated:*"
+        ],
+        "FilterPrefix": "AWSLogs/",
+        "FilterSuffix": ".log",
+        "Id": "tf-s3-lambda-20201028152606931900000001",
+        "LambdaFunctionArn": "arn:aws:lambda:eu-west-3:526954929923:function:example_lambda_name1"
+      },
+      {
+        "Events": [
+          "s3:ObjectCreated:*"
+        ],
+        "FilterPrefix": "OtherLogs/",
+        "FilterSuffix": ".log",
+        "Id": "tf-s3-lambda-20201028152606931900000002",
+        "LambdaFunctionArn": "arn:aws:lambda:eu-west-3:526954929923:function:example_lambda_name2"
+      }
+    ],
+    "Queue": [],
+    "Topic": [],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift3",
+    "Id": "bucket-martin-test-drift3",
+    "LambdaFunction": [
+      {
+        "Events": [
+          "s3:ObjectCreated:*"
+        ],
+        "FilterPrefix": "AWSLogs/",
+        "FilterSuffix": ".log",
+        "Id": "tf-s3-lambda-20201028110604152000000003",
+        "LambdaFunctionArn": "arn:aws:lambda:eu-west-3:526954929923:function:example_lambda_name1"
+      },
+      {
+        "Events": [
+          "s3:ObjectCreated:*"
+        ],
+        "FilterPrefix": "OtherLogs/",
+        "FilterSuffix": ".log",
+        "Id": "tf-s3-lambda-20201028110604152000000004",
+        "LambdaFunctionArn": "arn:aws:lambda:eu-west-3:526954929923:function:example_lambda_name2"
+      }
+    ],
+    "Queue": [],
+    "Topic": [],
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift3",
+    "Id": "bucket-martin-test-drift3",
+    "Policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift3/*\",\"Sid\":\"PublicReadGetObject\"}],\"Version\":\"2012-10-17\"}",
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift2",
+    "Id": "bucket-martin-test-drift2",
+    "Policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift2/*\",\"Sid\":\"PublicReadGetObject\"}],\"Version\":\"2012-10-17\"}",
+    "CtyVal": {}
+  },
+  {
+    "Bucket": "bucket-martin-test-drift",
+    "Id": "bucket-martin-test-drift",
+    "Policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift/*\",\"Sid\":\"PublicReadGetObject\"}],\"Version\":\"2012-10-17\"}",
+    "CtyVal": {}
+  }
 ]

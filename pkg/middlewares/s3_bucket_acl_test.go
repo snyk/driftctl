@@ -5,7 +5,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -25,125 +24,174 @@ func TestS3BucketAcl_Execute(t *testing.T) {
 			name: "grant field on remote resource must be reset if acl != private in state resource",
 			args: args{
 				remoteResources: &[]resource.Resource{
-					&aws.AwsS3Bucket{
-						Id: "testgrant",
-						Grant: &[]struct {
-							Id          string   `cty:"id"`
-							Permissions []string `cty:"permissions"`
-							Type        *string  `cty:"type"`
-							Uri         *string  `cty:"uri"`
-						}{
-							{
-								"356616ba70ebbea29732c95eef24f9ea326b9018c167651705348b5af406a6db",
-								[]string{"FULL_CONTROL"},
-								awssdk.String("CanonicalUser"),
-								awssdk.String(""),
+					&resource.AbstractResource{
+						Id:   "testgrant",
+						Type: aws.AwsS3BucketResourceType,
+						Attrs: &resource.Attributes{
+							"grant": []map[string]interface{}{
+								{
+									"id":          "356616ba70ebbea29732c95eef24f9ea326b9018c167651705348b5af406a6db",
+									"permissions": []string{"FULL_CONTROL"},
+									"type":        "CanonicalUser",
+									"uri":         "",
+								},
 							},
 						},
 					},
 				},
 				resourcesFromState: &[]resource.Resource{
 					&aws.AwsAmi{},
-					&aws.AwsS3Bucket{
-						Id:  "testgrant",
-						Acl: awssdk.String("public-read"),
+					&resource.AbstractResource{
+						Id:   "testgrant",
+						Type: aws.AwsS3BucketResourceType,
+						Attrs: &resource.Attributes{
+							"acl": "public-read",
+						},
 					},
 				},
 			},
 			assert: func(assert *assert.Assertions, remoteResources, resourcesFromState *[]resource.Resource) {
-				s3Bucket, _ := (*remoteResources)[0].(*aws.AwsS3Bucket)
-				assert.Empty(s3Bucket.Grant)
+				remoteRes, _ := (*remoteResources)[0].(*resource.AbstractResource)
+				stateRes, _ := (*resourcesFromState)[1].(*resource.AbstractResource)
+				_, exist := remoteRes.Attrs.Get("grant")
+				_, stateAclExist := stateRes.Attrs.Get("acl")
+				_, remoteAclExist := remoteRes.Attrs.Get("acl")
+				assert.False(exist)
+				assert.False(stateAclExist)
+				assert.False(remoteAclExist)
 			},
 		},
 		{
 			name: "does not modify grant field on remote resource if acl field is private",
 			args: args{
 				remoteResources: &[]resource.Resource{
-					&aws.AwsS3Bucket{
-						Id: "testgrant",
-						Grant: &[]struct {
-							Id          string   `cty:"id"`
-							Permissions []string `cty:"permissions"`
-							Type        *string  `cty:"type"`
-							Uri         *string  `cty:"uri"`
-						}{
-							{
-								"356616ba70ebbea29732c95eef24f9ea326b9018c167651705348b5af406a6db",
-								[]string{"FULL_CONTROL"},
-								awssdk.String("CanonicalUser"),
-								awssdk.String(""),
+					&resource.AbstractResource{
+						Id:   "testgrant",
+						Type: aws.AwsS3BucketResourceType,
+						Attrs: &resource.Attributes{
+							"grant": []map[string]interface{}{
+								{
+									"id":          "356616ba70ebbea29732c95eef24f9ea326b9018c167651705348b5af406a6db",
+									"permissions": []string{"FULL_CONTROL"},
+									"type":        "CanonicalUser",
+									"uri":         "",
+								},
 							},
 						},
 					},
 				},
 				resourcesFromState: &[]resource.Resource{
 					&aws.AwsAmi{},
-					&aws.AwsS3Bucket{
-						Id:  "testgrant",
-						Acl: awssdk.String("private"),
+					&resource.AbstractResource{
+						Id:   "testgrant",
+						Type: aws.AwsS3BucketResourceType,
+						Attrs: &resource.Attributes{
+							"acl": "private",
+						},
 					},
 				},
 			},
 			assert: func(assert *assert.Assertions, remoteResources, resourcesFromState *[]resource.Resource) {
-				s3Bucket, _ := (*remoteResources)[0].(*aws.AwsS3Bucket)
-				assert.Len(*s3Bucket.Grant, 1)
-				expected := struct {
-					Id          string   `cty:"id"`
-					Permissions []string `cty:"permissions"`
-					Type        *string  `cty:"type"`
-					Uri         *string  `cty:"uri"`
-				}{
-					Id:          "356616ba70ebbea29732c95eef24f9ea326b9018c167651705348b5af406a6db",
-					Permissions: []string{"FULL_CONTROL"},
-					Type:        awssdk.String("CanonicalUser"),
-					Uri:         awssdk.String(""),
+				s3Bucket, _ := (*remoteResources)[0].(*resource.AbstractResource)
+				grantAttr, exist := s3Bucket.Attrs.Get("grant")
+				grant := grantAttr.([]map[string]interface{})
+				assert.True(exist)
+				assert.Len(grant, 1)
+				expected := map[string]interface{}{
+					"id":          "356616ba70ebbea29732c95eef24f9ea326b9018c167651705348b5af406a6db",
+					"permissions": []string{"FULL_CONTROL"},
+					"type":        "CanonicalUser",
+					"uri":         "",
 				}
-				assert.Equal(expected, (*s3Bucket.Grant)[0])
+				assert.Equal(expected, grant[0])
 			},
 		},
 		{
 			name: "does not modify grant field on remote resource if acl field is undefined",
 			args: args{
 				remoteResources: &[]resource.Resource{
-					&aws.AwsS3Bucket{
-						Id: "testgrant",
-						Grant: &[]struct {
-							Id          string   `cty:"id"`
-							Permissions []string `cty:"permissions"`
-							Type        *string  `cty:"type"`
-							Uri         *string  `cty:"uri"`
-						}{
-							{
-								"356616ba70ebbea29732c95eef24f9ea326b9018c167651705348b5af406a6db",
-								[]string{"FULL_CONTROL"},
-								awssdk.String("CanonicalUser"),
-								awssdk.String(""),
+					&resource.AbstractResource{
+						Id:   "testgrant",
+						Type: aws.AwsS3BucketResourceType,
+						Attrs: &resource.Attributes{
+							"grant": []map[string]interface{}{
+								{
+									"id":          "356616ba70ebbea29732c95eef24f9ea326b9018c167651705348b5af406a6db",
+									"permissions": []string{"FULL_CONTROL"},
+									"type":        "CanonicalUser",
+									"uri":         "",
+								},
 							},
 						},
 					},
 				},
 				resourcesFromState: &[]resource.Resource{
 					&aws.AwsAmi{},
-					&aws.AwsS3Bucket{
-						Id: "testgrant",
+					&resource.AbstractResource{
+						Id:    "testgrant",
+						Type:  aws.AwsS3BucketResourceType,
+						Attrs: &resource.Attributes{},
 					},
 				},
 			},
 			assert: func(assert *assert.Assertions, remoteResources, resourcesFromState *[]resource.Resource) {
-				s3Bucket, _ := (*remoteResources)[0].(*aws.AwsS3Bucket)
-				assert.Len(*s3Bucket.Grant, 1)
-				expected := struct {
-					Id          string   `cty:"id"`
-					Permissions []string `cty:"permissions"`
-					Type        *string  `cty:"type"`
-					Uri         *string  `cty:"uri"`
-				}{
-					Id:          "356616ba70ebbea29732c95eef24f9ea326b9018c167651705348b5af406a6db",
-					Permissions: []string{"FULL_CONTROL"},
-					Type:        awssdk.String("CanonicalUser"),
-					Uri:         awssdk.String(""),
+				s3Bucket, _ := (*remoteResources)[0].(*resource.AbstractResource)
+				grantAttr, exist := s3Bucket.Attrs.Get("grant")
+				grant := grantAttr.([]map[string]interface{})
+				assert.True(exist)
+				assert.Len(grant, 1)
+				expected := map[string]interface{}{
+					"id":          "356616ba70ebbea29732c95eef24f9ea326b9018c167651705348b5af406a6db",
+					"permissions": []string{"FULL_CONTROL"},
+					"type":        "CanonicalUser",
+					"uri":         "",
 				}
-				assert.Equal(expected, (*s3Bucket.Grant)[0])
+				assert.Equal(expected, grant[0])
+			},
+		},
+		{
+			name: "does not modify grant field on remote resource if acl field is empty",
+			args: args{
+				remoteResources: &[]resource.Resource{
+					&resource.AbstractResource{
+						Id:   "testgrant",
+						Type: aws.AwsS3BucketResourceType,
+						Attrs: &resource.Attributes{
+							"grant": []map[string]interface{}{
+								{
+									"id":          "356616ba70ebbea29732c95eef24f9ea326b9018c167651705348b5af406a6db",
+									"permissions": []string{"FULL_CONTROL"},
+									"type":        "CanonicalUser",
+									"uri":         "",
+								},
+							},
+						},
+					},
+				},
+				resourcesFromState: &[]resource.Resource{
+					&aws.AwsAmi{},
+					&resource.AbstractResource{
+						Id:   "testgrant",
+						Type: aws.AwsS3BucketResourceType,
+						Attrs: &resource.Attributes{
+							"acl": "",
+						},
+					},
+				},
+			},
+			assert: func(assert *assert.Assertions, remoteResources, resourcesFromState *[]resource.Resource) {
+				s3Bucket, _ := (*remoteResources)[0].(*resource.AbstractResource)
+				grantAttr, exist := s3Bucket.Attrs.Get("grant")
+				grant := grantAttr.([]map[string]interface{})
+				assert.True(exist)
+				assert.Len(grant, 1)
+				expected := map[string]interface{}{
+					"id":          "356616ba70ebbea29732c95eef24f9ea326b9018c167651705348b5af406a6db",
+					"permissions": []string{"FULL_CONTROL"},
+					"type":        "CanonicalUser",
+					"uri":         "",
+				}
+				assert.Equal(expected, grant[0])
 			},
 		},
 	}

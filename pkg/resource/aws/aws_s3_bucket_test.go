@@ -11,7 +11,7 @@ func TestAcc_AwsS3Bucket_BucketInUsEast1(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.14.9",
 		Paths:            []string{"./testdata/acc/aws_s3_bucket"},
-		Args:             []string{"scan", "--filter", "Type=='aws_s3_bucket'"},
+		Args:             []string{"scan", "--filter", "Type=='aws_s3_bucket' || Type=='aws_s3_bucket_policy'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
@@ -21,8 +21,10 @@ func TestAcc_AwsS3Bucket_BucketInUsEast1(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					result.AssertManagedCount(1)
-					result.Equal("aws_s3_bucket", result.Analysis.Managed()[0].TerraformType())
+					result.AssertManagedCount(5)
+					// Actually we have a false positive drift on policies due to AWS behavior
+					// AWS rework policy and mutate single element array into a string
+					// result.AssertDriftCountTotal(0)
 				},
 			},
 		},
