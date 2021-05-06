@@ -1,19 +1,18 @@
 package enumerator
 
 import (
+	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/bmatcuk/doublestar/v4"
 )
 
 func GlobS3(path string) (prefix string, pattern string, err error) {
 	if !HasMeta(path) {
 		return path, "", nil
-	}
-	if strings.Contains(path, "**") {
-		return prefix, pattern, errors.New("** not supported for S3 pattern")
 	}
 	prefix, pattern = splitDirPattern(path)
 	return
@@ -48,34 +47,13 @@ func Glob(pattern string) ([]string, error) {
 		return filepath.Glob(pattern)
 	}
 
-	globs := strings.Split(pattern, "**")
-	var files = []string{""}
-
-	for _, glob := range globs {
-		var matches []string
-		var exists = map[string]bool{}
-		for _, match := range files {
-			paths, err := filepath.Glob(match + glob)
-			if err != nil {
-				return nil, err
-			}
-			for _, path := range paths {
-				err = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
-					if err != nil {
-						return err
-					}
-					if _, ok := exists[path]; !ok {
-						matches = append(matches, path)
-						exists[path] = true
-					}
-					return nil
-				})
-				if err != nil {
-					return nil, err
-				}
-			}
-		}
-		files = matches
+	var files []string
+	err := doublestar.GlobWalk(os.DirFS("."), path.Clean(pattern), func(path string, d fs.DirEntry) error {
+		files = append(files, path)
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	return files, nil

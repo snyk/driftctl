@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/aws/aws-sdk-go v1.34.2
+	github.com/bmatcuk/doublestar/v4 v4.0.1 // indirect
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/fatih/color v1.9.0
 	github.com/getsentry/sentry-go v0.9.0

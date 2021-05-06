@@ -107,6 +107,7 @@ func TestFileEnumerator_Enumerate(t *testing.T) {
 			got, err := s.Enumerate()
 			if err != nil && err.Error() != tt.err {
 				t.Fatalf("Expected error '%s', got '%s'", tt.err, err.Error())
+				return
 			}
 			if err != nil && tt.err == "" {
 				t.Fatalf("Expected error '%s' but got nil", tt.err)
