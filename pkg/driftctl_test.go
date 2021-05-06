@@ -584,14 +584,14 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					Type: "aws_instance",
 					Attrs: &resource.Attributes{
 						"availability_zone": "us-east-1",
-						"root_block_device": []map[string]interface{}{
-							{
+						"root_block_device": []interface{}{
+							map[string]interface{}{
 								"volume_id":   "vol-02862d9b39045a3a4",
 								"volume_type": "gp2",
 							},
 						},
-						"ebs_block_device": []map[string]interface{}{
-							{
+						"ebs_block_device": []interface{}{
+							map[string]interface{}{
 								"volume_id": "vol-018c5ae89895aca4c",
 								"encrypted": true,
 							},

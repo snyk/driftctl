@@ -32,7 +32,8 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 		instance, _ := stateRes.(*resource.AbstractResource)
 
 		if rootBlockDevice, exist := instance.Attrs.Get("root_block_device"); exist {
-			for _, rootBlock := range rootBlockDevice.([]map[string]interface{}) {
+			for _, rootBlock := range rootBlockDevice.([]interface{}) {
+				rootBlock := rootBlock.(map[string]interface{})
 				logrus.WithFields(logrus.Fields{
 					"volume":   rootBlock["volume_id"],
 					"instance": instance.TerraformId(),
@@ -56,7 +57,8 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 		}
 
 		if ebsBlockDevice, exist := instance.Attrs.Get("ebs_block_device"); exist {
-			for _, blockDevice := range ebsBlockDevice.([]map[string]interface{}) {
+			for _, blockDevice := range ebsBlockDevice.([]interface{}) {
+				blockDevice := blockDevice.(map[string]interface{})
 				logrus.WithFields(logrus.Fields{
 					"volume":   blockDevice["volume_id"],
 					"instance": instance.TerraformId(),
