@@ -85,7 +85,7 @@ func TestAcc_AwsInstance_WithBlockDevices(t *testing.T) {
 						analyser.Change{
 							Change: diff.Change{
 								Type: diff.CREATE,
-								Path: []string{"Tags", "Env"},
+								Path: []string{"tags", "Env"},
 								From: nil,
 								To:   "Production",
 							},

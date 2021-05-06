@@ -88,8 +88,8 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 							"volume_tags": map[string]string{
 								"Name": "rootVol",
 							},
-							"root_block_device": []map[string]interface{}{
-								{
+							"root_block_device": []interface{}{
+								map[string]interface{}{
 									"volume_id":   "vol-02862d9b39045a3a4",
 									"volume_type": "gp2",
 									"device_name": "/dev/sda1",
@@ -99,8 +99,8 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 									"iops":        1234,
 								},
 							},
-							"ebs_block_device": []map[string]interface{}{
-								{
+							"ebs_block_device": []interface{}{
+								map[string]interface{}{
 									"volume_id":             "vol-018c5ae89895aca4c",
 									"volume_type":           "gp2",
 									"device_name":           "/dev/sdb",
