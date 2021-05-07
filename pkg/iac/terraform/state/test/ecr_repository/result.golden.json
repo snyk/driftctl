@@ -1,24 +1,25 @@
 [
  {
-  "Arn": "arn:aws:ecr:eu-west-3:726421854799:repository/bar",
   "Id": "bar",
-  "ImageTagMutability": "MUTABLE",
-  "Name": "bar",
-  "RegistryId": "726421854799",
-  "RepositoryUrl": "726421854799.dkr.ecr.eu-west-3.amazonaws.com/bar",
-  "Tags": null,
-  "EncryptionConfiguration": [
-   {
-    "EncryptionType": "AES256",
-    "KmsKey": ""
-   }
-  ],
-  "ImageScanningConfiguration": [
-   {
-    "ScanOnPush": true
-   }
-  ],
-  "Timeouts": null,
-  "CtyVal": {}
+  "Type": "aws_ecr_repository",
+  "Attrs": {
+   "arn": "arn:aws:ecr:eu-west-3:726421854799:repository/bar",
+   "encryption_configuration": [
+    {
+     "encryption_type": "AES256",
+     "kms_key": ""
+    }
+   ],
+   "id": "bar",
+   "image_scanning_configuration": [
+    {
+     "scan_on_push": true
+    }
+   ],
+   "image_tag_mutability": "MUTABLE",
+   "name": "bar",
+   "registry_id": "726421854799",
+   "repository_url": "726421854799.dkr.ecr.eu-west-3.amazonaws.com/bar"
+  }
  }
 ]

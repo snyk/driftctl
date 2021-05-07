@@ -65,7 +65,7 @@ func TestAcc_AwsECRRepository(t *testing.T) {
 						analyser.Change{
 							Change: diff.Change{
 								Type: diff.UPDATE,
-								Path: []string{"ImageTagMutability"},
+								Path: []string{"image_tag_mutability"},
 								From: "MUTABLE",
 								To:   "IMMUTABLE",
 							},

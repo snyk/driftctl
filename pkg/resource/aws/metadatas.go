@@ -15,4 +15,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsEbsVolumeMetaData(resourceSchemaRepository)
 	initAwsS3BucketMetaData(resourceSchemaRepository)
 	initAwsS3BucketPolicyMetaData(resourceSchemaRepository)
+	initAwsEcrRepositoryMetaData(resourceSchemaRepository)
 }
