@@ -39,27 +39,18 @@ func (s *S3Enumerator) Enumerate() ([]string, error) {
 	if len(bucketPath) < 2 {
 		return nil, errors.Errorf("Unable to parse S3 path: %s. Must be BUCKET_NAME/PREFIX", s.config.Path)
 	}
-	bucket := bucketPath[0]
-	prefix := strings.Join(bucketPath[1:], "/")
 
-	prefix, pattern, err := GlobS3(prefix)
-	if err != nil {
-		return nil, err
-	}
+	bucket := bucketPath[0]
+	prefix, pattern := GlobS3(strings.Join(bucketPath[1:], "/"))
 
 	fullPattern := filepath.Join(prefix, pattern)
-
-	// filepath match does not compile so we use the match method to report the pattern error
-	if _, err := doublestar.Match(fullPattern, ""); err != nil {
-		return nil, err
-	}
 
 	files := make([]string, 0)
 	input := &s3.ListObjectsV2Input{
 		Bucket: &bucket,
 		Prefix: &prefix,
 	}
-	err = s.client.ListObjectsV2Pages(input, func(output *s3.ListObjectsV2Output, lastPage bool) bool {
+	err := s.client.ListObjectsV2Pages(input, func(output *s3.ListObjectsV2Output, lastPage bool) bool {
 		for _, metadata := range output.Contents {
 			if aws.Int64Value(metadata.Size) > 0 {
 				key := *metadata.Key
@@ -70,7 +61,6 @@ func (s *S3Enumerator) Enumerate() ([]string, error) {
 		}
 		return !lastPage
 	})
-
 	if err != nil {
 		return nil, err
 	}

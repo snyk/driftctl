@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFileEnumerator_Enumerate(t *testing.T) {
@@ -105,13 +106,10 @@ func TestFileEnumerator_Enumerate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := NewFileEnumerator(tt.config)
 			got, err := s.Enumerate()
-			if err != nil && err.Error() != tt.err {
-				t.Fatalf("Expected error '%s', got '%s'", tt.err, err.Error())
-				return
-			}
-			if err != nil && tt.err == "" {
-				t.Fatalf("Expected error '%s' but got nil", tt.err)
-				return
+			if tt.err != "" {
+				assert.EqualError(t, err, tt.err)
+			} else {
+				assert.NoError(t, err)
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Enumerate() got = %v, want %v", got, tt.want)

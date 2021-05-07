@@ -279,7 +279,7 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 				t.Fatalf("Expected error '%s', got '%s'", tt.err, err.Error())
 				return
 			}
-			if err != nil && tt.err == "" {
+			if tt.err != "" && err == nil {
 				t.Fatalf("Expected error '%s' but got nil", tt.err)
 				return
 			}
