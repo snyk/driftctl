@@ -529,42 +529,47 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				},
 			},
 			remoteResources: []resource.Resource{
-				&aws.AwsS3BucketPolicy{
-					Id:     "foo",
-					Bucket: awssdk.String("foo"),
-					Policy: awssdk.String("{\"Id\":\"bar\"}"),
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"id":     cty.StringVal("foo"),
-							"bucket": cty.StringVal("foo"),
-							"policy": cty.StringVal("{\"Id\":\"bar\"}"),
-						})
-						return &v
-					}(),
+				&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsS3BucketPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"id":     "foo",
+						"bucket": "foo",
+						"policy": "{\"Id\":\"bar\"}",
+					},
 				},
 			},
 			mocks: func(factory resource.ResourceFactory) {
-				foo := cty.ObjectVal(map[string]cty.Value{
-					"id":     cty.StringVal("foo"),
-					"bucket": cty.StringVal("foo"),
-					"policy": cty.StringVal("{\"Id\":\"foo\"}"),
+				factory.(*terraform.MockResourceFactory).On(
+					"CreateAbstractResource",
+					aws.AwsS3BucketPolicyResourceType,
+					"foo",
+					map[string]interface{}{
+						"id":     "foo",
+						"bucket": "foo",
+						"policy": "{\"Id\":\"foo\"}",
+					},
+				).Once().Return(&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsS3BucketPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"id":     "foo",
+						"bucket": "foo",
+						"policy": "{\"Id\":\"foo\"}",
+					},
 				})
-				factory.(*terraform.MockResourceFactory).On("CreateResource", map[string]interface{}{
-					"id":     "foo",
-					"bucket": "foo",
-					"policy": "{\"Id\":\"foo\"}",
-				}, "aws_s3_bucket_policy").Times(1).Return(&foo, nil)
 			},
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
 				result.AssertResourceHasDrift("foo", "aws_s3_bucket_policy", analyser.Change{
 					Change: diff.Change{
 						Type: diff.UPDATE,
-						Path: []string{"Policy"},
+						Path: []string{"policy"},
 						From: "{\"Id\":\"foo\"}",
 						To:   "{\"Id\":\"bar\"}",
 					},
-					Computed: false,
+					Computed:   false,
+					JsonString: true,
 				})
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {

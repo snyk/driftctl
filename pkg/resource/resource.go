@@ -32,6 +32,11 @@ var refactoredResources = []string{
 	"aws_instance",
 	"aws_ebs_volume",
 	"aws_s3_bucket",
+	"aws_s3_bucket_policy",
+	"aws_s3_bucket_notification",
+	"aws_s3_bucket_metric",
+	"aws_s3_bucket_inventory",
+	"aws_s3_bucket_analytics_configuration",
 }
 
 func IsRefactoredResource(typ string) bool {
