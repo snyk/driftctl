@@ -1,28 +1,5 @@
 [
  {
-  "Id": "bucket-martin-test-drift2",
-  "Type": "aws_s3_bucket",
-  "Attrs": {
-   "acceleration_status": "",
-   "acl": "private",
-   "arn": "arn:aws:s3:::bucket-martin-test-drift2",
-   "bucket": "bucket-martin-test-drift2",
-   "bucket_domain_name": "bucket-martin-test-drift2.s3.amazonaws.com",
-   "bucket_regional_domain_name": "bucket-martin-test-drift2.s3.eu-west-3.amazonaws.com",
-   "force_destroy": false,
-   "hosted_zone_id": "Z3R1K369G5AVDG",
-   "id": "bucket-martin-test-drift2",
-   "region": "eu-west-3",
-   "request_payer": "BucketOwner",
-   "versioning": [
-    {
-     "enabled": false,
-     "mfa_delete": false
-    }
-   ]
-  }
- },
- {
   "Id": "bucket-martin-test-drift",
   "Type": "aws_s3_bucket",
   "Attrs": {
@@ -32,7 +9,6 @@
    "bucket": "bucket-martin-test-drift",
    "bucket_domain_name": "bucket-martin-test-drift.s3.amazonaws.com",
    "bucket_regional_domain_name": "bucket-martin-test-drift.s3.eu-west-3.amazonaws.com",
-   "force_destroy": false,
    "hosted_zone_id": "Z3R1K369G5AVDG",
    "id": "bucket-martin-test-drift",
    "region": "eu-west-3",
@@ -55,7 +31,6 @@
    "bucket": "bucket-martin-test-drift3",
    "bucket_domain_name": "bucket-martin-test-drift3.s3.amazonaws.com",
    "bucket_regional_domain_name": "bucket-martin-test-drift3.s3.eu-west-3.amazonaws.com",
-   "force_destroy": false,
    "hosted_zone_id": "Z3R1K369G5AVDG",
    "id": "bucket-martin-test-drift3",
    "region": "eu-west-3",
@@ -69,31 +44,23 @@
   }
  },
  {
-  "Id": "bucket-martin-test-drift:Analytics2_Bucket1",
-  "Type": "aws_s3_bucket_analytics_configuration",
+  "Id": "bucket-martin-test-drift2",
+  "Type": "aws_s3_bucket",
   "Attrs": {
-   "bucket": "bucket-martin-test-drift",
-   "id": "bucket-martin-test-drift:Analytics2_Bucket1",
-   "name": "Analytics2_Bucket1",
-   "storage_class_analysis": [
+   "acceleration_status": "",
+   "acl": "private",
+   "arn": "arn:aws:s3:::bucket-martin-test-drift2",
+   "bucket": "bucket-martin-test-drift2",
+   "bucket_domain_name": "bucket-martin-test-drift2.s3.amazonaws.com",
+   "bucket_regional_domain_name": "bucket-martin-test-drift2.s3.eu-west-3.amazonaws.com",
+   "hosted_zone_id": "Z3R1K369G5AVDG",
+   "id": "bucket-martin-test-drift2",
+   "region": "eu-west-3",
+   "request_payer": "BucketOwner",
+   "versioning": [
     {
-     "data_export": [
-      {
-       "destination": [
-        {
-         "s3_bucket_destination": [
-          {
-           "bucket_account_id": "",
-           "bucket_arn": "arn:aws:s3:::bucket-martin-test-drift",
-           "format": "CSV",
-           "prefix": ""
-          }
-         ]
-        }
-       ],
-       "output_schema_version": "V_1"
-      }
-     ]
+     "enabled": false,
+     "mfa_delete": false
     }
    ]
   }
@@ -115,36 +82,6 @@
           {
            "bucket_account_id": "",
            "bucket_arn": "arn:aws:s3:::bucket-martin-test-drift2",
-           "format": "CSV",
-           "prefix": ""
-          }
-         ]
-        }
-       ],
-       "output_schema_version": "V_1"
-      }
-     ]
-    }
-   ]
-  }
- },
- {
-  "Id": "bucket-martin-test-drift3:Analytics2_Bucket3",
-  "Type": "aws_s3_bucket_analytics_configuration",
-  "Attrs": {
-   "bucket": "bucket-martin-test-drift3",
-   "id": "bucket-martin-test-drift3:Analytics2_Bucket3",
-   "name": "Analytics2_Bucket3",
-   "storage_class_analysis": [
-    {
-     "data_export": [
-      {
-       "destination": [
-        {
-         "s3_bucket_destination": [
-          {
-           "bucket_account_id": "",
-           "bucket_arn": "arn:aws:s3:::bucket-martin-test-drift3",
            "format": "CSV",
            "prefix": ""
           }
@@ -189,6 +126,36 @@
   }
  },
  {
+  "Id": "bucket-martin-test-drift:Analytics_Bucket1",
+  "Type": "aws_s3_bucket_analytics_configuration",
+  "Attrs": {
+   "bucket": "bucket-martin-test-drift",
+   "id": "bucket-martin-test-drift:Analytics_Bucket1",
+   "name": "Analytics_Bucket1",
+   "storage_class_analysis": [
+    {
+     "data_export": [
+      {
+       "destination": [
+        {
+         "s3_bucket_destination": [
+          {
+           "bucket_account_id": "",
+           "bucket_arn": "arn:aws:s3:::bucket-martin-test-drift",
+           "format": "CSV",
+           "prefix": ""
+          }
+         ]
+        }
+       ],
+       "output_schema_version": "V_1"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
   "Id": "bucket-martin-test-drift3:Analytics_Bucket3",
   "Type": "aws_s3_bucket_analytics_configuration",
   "Attrs": {
@@ -219,12 +186,12 @@
   }
  },
  {
-  "Id": "bucket-martin-test-drift:Analytics_Bucket1",
+  "Id": "bucket-martin-test-drift:Analytics2_Bucket1",
   "Type": "aws_s3_bucket_analytics_configuration",
   "Attrs": {
    "bucket": "bucket-martin-test-drift",
-   "id": "bucket-martin-test-drift:Analytics_Bucket1",
-   "name": "Analytics_Bucket1",
+   "id": "bucket-martin-test-drift:Analytics2_Bucket1",
+   "name": "Analytics2_Bucket1",
    "storage_class_analysis": [
     {
      "data_export": [
@@ -244,6 +211,64 @@
        "output_schema_version": "V_1"
       }
      ]
+    }
+   ]
+  }
+ },
+ {
+  "Id": "bucket-martin-test-drift3:Analytics2_Bucket3",
+  "Type": "aws_s3_bucket_analytics_configuration",
+  "Attrs": {
+   "bucket": "bucket-martin-test-drift3",
+   "id": "bucket-martin-test-drift3:Analytics2_Bucket3",
+   "name": "Analytics2_Bucket3",
+   "storage_class_analysis": [
+    {
+     "data_export": [
+      {
+       "destination": [
+        {
+         "s3_bucket_destination": [
+          {
+           "bucket_account_id": "",
+           "bucket_arn": "arn:aws:s3:::bucket-martin-test-drift3",
+           "format": "CSV",
+           "prefix": ""
+          }
+         ]
+        }
+       ],
+       "output_schema_version": "V_1"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "Id": "bucket-martin-test-drift2:Inventory_Bucket2",
+  "Type": "aws_s3_bucket_inventory",
+  "Attrs": {
+   "bucket": "bucket-martin-test-drift2",
+   "destination": [
+    {
+     "bucket": [
+      {
+       "account_id": "",
+       "bucket_arn": "arn:aws:s3:::bucket-martin-test-drift2",
+       "format": "ORC",
+       "prefix": ""
+      }
+     ]
+    }
+   ],
+   "enabled": true,
+   "id": "bucket-martin-test-drift2:Inventory_Bucket2",
+   "included_object_versions": "All",
+   "name": "Inventory_Bucket2",
+   "schedule": [
+    {
+     "frequency": "Daily"
     }
    ]
   }
@@ -305,34 +330,6 @@
   }
  },
  {
-  "Id": "bucket-martin-test-drift2:Inventory2_Bucket2",
-  "Type": "aws_s3_bucket_inventory",
-  "Attrs": {
-   "bucket": "bucket-martin-test-drift2",
-   "destination": [
-    {
-     "bucket": [
-      {
-       "account_id": "",
-       "bucket_arn": "arn:aws:s3:::bucket-martin-test-drift2",
-       "format": "ORC",
-       "prefix": ""
-      }
-     ]
-    }
-   ],
-   "enabled": true,
-   "id": "bucket-martin-test-drift2:Inventory2_Bucket2",
-   "included_object_versions": "All",
-   "name": "Inventory2_Bucket2",
-   "schedule": [
-    {
-     "frequency": "Daily"
-    }
-   ]
-  }
- },
- {
   "Id": "bucket-martin-test-drift:Inventory2_Bucket1",
   "Type": "aws_s3_bucket_inventory",
   "Attrs": {
@@ -353,6 +350,34 @@
    "id": "bucket-martin-test-drift:Inventory2_Bucket1",
    "included_object_versions": "All",
    "name": "Inventory2_Bucket1",
+   "schedule": [
+    {
+     "frequency": "Daily"
+    }
+   ]
+  }
+ },
+ {
+  "Id": "bucket-martin-test-drift2:Inventory2_Bucket2",
+  "Type": "aws_s3_bucket_inventory",
+  "Attrs": {
+   "bucket": "bucket-martin-test-drift2",
+   "destination": [
+    {
+     "bucket": [
+      {
+       "account_id": "",
+       "bucket_arn": "arn:aws:s3:::bucket-martin-test-drift2",
+       "format": "ORC",
+       "prefix": ""
+      }
+     ]
+    }
+   ],
+   "enabled": true,
+   "id": "bucket-martin-test-drift2:Inventory2_Bucket2",
+   "included_object_versions": "All",
+   "name": "Inventory2_Bucket2",
    "schedule": [
     {
      "frequency": "Daily"
@@ -389,49 +414,21 @@
   }
  },
  {
-  "Id": "bucket-martin-test-drift2:Inventory_Bucket2",
-  "Type": "aws_s3_bucket_inventory",
-  "Attrs": {
-   "bucket": "bucket-martin-test-drift2",
-   "destination": [
-    {
-     "bucket": [
-      {
-       "account_id": "",
-       "bucket_arn": "arn:aws:s3:::bucket-martin-test-drift2",
-       "format": "ORC",
-       "prefix": ""
-      }
-     ]
-    }
-   ],
-   "enabled": true,
-   "id": "bucket-martin-test-drift2:Inventory_Bucket2",
-   "included_object_versions": "All",
-   "name": "Inventory_Bucket2",
-   "schedule": [
-    {
-     "frequency": "Daily"
-    }
-   ]
-  }
- },
- {
-  "Id": "bucket-martin-test-drift:Metrics2_Bucket1",
-  "Type": "aws_s3_bucket_metric",
-  "Attrs": {
-   "bucket": "bucket-martin-test-drift",
-   "id": "bucket-martin-test-drift:Metrics2_Bucket1",
-   "name": "Metrics2_Bucket1"
-  }
- },
- {
   "Id": "bucket-martin-test-drift2:Metrics2_Bucket2",
   "Type": "aws_s3_bucket_metric",
   "Attrs": {
    "bucket": "bucket-martin-test-drift2",
    "id": "bucket-martin-test-drift2:Metrics2_Bucket2",
    "name": "Metrics2_Bucket2"
+  }
+ },
+ {
+  "Id": "bucket-martin-test-drift2:Metrics_Bucket2",
+  "Type": "aws_s3_bucket_metric",
+  "Attrs": {
+   "bucket": "bucket-martin-test-drift2",
+   "id": "bucket-martin-test-drift2:Metrics_Bucket2",
+   "name": "Metrics_Bucket2"
   }
  },
  {
@@ -453,49 +450,21 @@
   }
  },
  {
+  "Id": "bucket-martin-test-drift:Metrics2_Bucket1",
+  "Type": "aws_s3_bucket_metric",
+  "Attrs": {
+   "bucket": "bucket-martin-test-drift",
+   "id": "bucket-martin-test-drift:Metrics2_Bucket1",
+   "name": "Metrics2_Bucket1"
+  }
+ },
+ {
   "Id": "bucket-martin-test-drift:Metrics_Bucket1",
   "Type": "aws_s3_bucket_metric",
   "Attrs": {
    "bucket": "bucket-martin-test-drift",
    "id": "bucket-martin-test-drift:Metrics_Bucket1",
    "name": "Metrics_Bucket1"
-  }
- },
- {
-  "Id": "bucket-martin-test-drift2:Metrics_Bucket2",
-  "Type": "aws_s3_bucket_metric",
-  "Attrs": {
-   "bucket": "bucket-martin-test-drift2",
-   "id": "bucket-martin-test-drift2:Metrics_Bucket2",
-   "name": "Metrics_Bucket2"
-  }
- },
- {
-  "Id": "bucket-martin-test-drift",
-  "Type": "aws_s3_bucket_notification",
-  "Attrs": {
-   "bucket": "bucket-martin-test-drift",
-   "id": "bucket-martin-test-drift",
-   "lambda_function": [
-    {
-     "events": [
-      "s3:ObjectCreated:*"
-     ],
-     "filter_prefix": "AWSLogs/",
-     "filter_suffix": ".log",
-     "id": "tf-s3-lambda-20201028152606931900000001",
-     "lambda_function_arn": "arn:aws:lambda:eu-west-3:526954929923:function:example_lambda_name1"
-    },
-    {
-     "events": [
-      "s3:ObjectCreated:*"
-     ],
-     "filter_prefix": "OtherLogs/",
-     "filter_suffix": ".log",
-     "id": "tf-s3-lambda-20201028152606931900000002",
-     "lambda_function_arn": "arn:aws:lambda:eu-west-3:526954929923:function:example_lambda_name2"
-    }
-   ]
   }
  },
  {
@@ -528,11 +497,30 @@
  },
  {
   "Id": "bucket-martin-test-drift",
-  "Type": "aws_s3_bucket_policy",
+  "Type": "aws_s3_bucket_notification",
   "Attrs": {
    "bucket": "bucket-martin-test-drift",
    "id": "bucket-martin-test-drift",
-   "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"PublicReadGetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift/*\"}]}"
+   "lambda_function": [
+    {
+     "events": [
+      "s3:ObjectCreated:*"
+     ],
+     "filter_prefix": "AWSLogs/",
+     "filter_suffix": ".log",
+     "id": "tf-s3-lambda-20201028152606931900000001",
+     "lambda_function_arn": "arn:aws:lambda:eu-west-3:526954929923:function:example_lambda_name1"
+    },
+    {
+     "events": [
+      "s3:ObjectCreated:*"
+     ],
+     "filter_prefix": "OtherLogs/",
+     "filter_suffix": ".log",
+     "id": "tf-s3-lambda-20201028152606931900000002",
+     "lambda_function_arn": "arn:aws:lambda:eu-west-3:526954929923:function:example_lambda_name2"
+    }
+   ]
   }
  },
  {
@@ -541,7 +529,7 @@
   "Attrs": {
    "bucket": "bucket-martin-test-drift2",
    "id": "bucket-martin-test-drift2",
-   "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"PublicReadGetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift2/*\"}]}"
+   "policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift2/*\",\"Sid\":\"PublicReadGetObject\"}],\"Version\":\"2012-10-17\"}"
   }
  },
  {
@@ -550,7 +538,16 @@
   "Attrs": {
    "bucket": "bucket-martin-test-drift3",
    "id": "bucket-martin-test-drift3",
-   "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"PublicReadGetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift3/*\"}]}"
+   "policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift3/*\",\"Sid\":\"PublicReadGetObject\"}],\"Version\":\"2012-10-17\"}"
+  }
+ },
+ {
+  "Id": "bucket-martin-test-drift",
+  "Type": "aws_s3_bucket_policy",
+  "Attrs": {
+   "bucket": "bucket-martin-test-drift",
+   "id": "bucket-martin-test-drift",
+   "policy": "{\"Statement\":[{\"Action\":\"s3:GetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-martin-test-drift/*\",\"Sid\":\"PublicReadGetObject\"}],\"Version\":\"2012-10-17\"}"
   }
  }
 ]

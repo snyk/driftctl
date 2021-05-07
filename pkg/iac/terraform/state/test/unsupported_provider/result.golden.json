@@ -1,25 +1,24 @@
 [
-  {
-    "Id": "69vgd6-qa-bucket-001",
-    "Type": "aws_s3_bucket",
-    "Attrs": {
-      "acceleration_status": "",
-      "acl": "private",
-      "arn": "arn:aws:s3:::69vgd6-qa-bucket-001",
-      "bucket": "69vgd6-qa-bucket-001",
-      "bucket_domain_name": "69vgd6-qa-bucket-001.s3.amazonaws.com",
-      "bucket_regional_domain_name": "69vgd6-qa-bucket-001.s3.ca-central-1.amazonaws.com",
-      "force_destroy": false,
-      "hosted_zone_id": "Z1QDHH18159H29",
-      "id": "69vgd6-qa-bucket-001",
-      "region": "ca-central-1",
-      "request_payer": "BucketOwner",
-      "versioning": [
-        {
-          "enabled": false,
-          "mfa_delete": false
-        }
-      ]
+ {
+  "Id": "69vgd6-qa-bucket-001",
+  "Type": "aws_s3_bucket",
+  "Attrs": {
+   "acceleration_status": "",
+   "acl": "private",
+   "arn": "arn:aws:s3:::69vgd6-qa-bucket-001",
+   "bucket": "69vgd6-qa-bucket-001",
+   "bucket_domain_name": "69vgd6-qa-bucket-001.s3.amazonaws.com",
+   "bucket_regional_domain_name": "69vgd6-qa-bucket-001.s3.ca-central-1.amazonaws.com",
+   "hosted_zone_id": "Z1QDHH18159H29",
+   "id": "69vgd6-qa-bucket-001",
+   "region": "ca-central-1",
+   "request_payer": "BucketOwner",
+   "versioning": [
+    {
+     "enabled": false,
+     "mfa_delete": false
     }
+   ]
   }
+ }
 ]

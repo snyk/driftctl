@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/output"
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+	resourcegithub "github.com/cloudskiff/driftctl/pkg/resource/github"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/cloudskiff/driftctl/pkg/iac"
@@ -117,6 +119,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 			library.AddProvider(terraform.AWS, provider)
 
 			repo := testresource.InitFakeSchemaRepository(terraform.AWS, "3.19.0")
+			resourceaws.InitResourcesMetadata(repo)
 
 			r := &TerraformStateReader{
 				config: config.SupplierConfig{
@@ -196,12 +199,16 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 			library := terraform.NewProviderLibrary()
 			library.AddProvider(terraform.GITHUB, provider)
 
+			repo := testresource.InitFakeSchemaRepository(terraform.GITHUB, "4.4.0")
+			resourcegithub.InitResourcesMetadata(repo)
+
 			r := &TerraformStateReader{
 				config: config.SupplierConfig{
 					Path: path.Join(goldenfile.GoldenFilePath, tt.dirName, "terraform.tfstate"),
 				},
-				library:       library,
-				deserializers: iac.Deserializers(),
+				library:                  library,
+				deserializers:            iac.Deserializers(),
+				resourceSchemaRepository: repo,
 			}
 
 			got, err := r.Resources()
