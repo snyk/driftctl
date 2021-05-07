@@ -1,7 +1,6 @@
 package enumerator
 
 import (
-	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
@@ -10,9 +9,9 @@ import (
 	"github.com/bmatcuk/doublestar/v4"
 )
 
-func GlobS3(path string) (prefix string, pattern string, err error) {
+func GlobS3(path string) (prefix string, pattern string) {
 	if !HasMeta(path) {
-		return path, "", nil
+		return path, ""
 	}
 	prefix, pattern = splitDirPattern(path)
 	return
@@ -47,11 +46,7 @@ func Glob(pattern string) ([]string, error) {
 		return filepath.Glob(pattern)
 	}
 
-	var files []string
-	err := doublestar.GlobWalk(os.DirFS("."), path.Clean(pattern), func(path string, d fs.DirEntry) error {
-		files = append(files, path)
-		return nil
-	})
+	files, err := doublestar.Glob(os.DirFS("."), path.Clean(pattern))
 	if err != nil {
 		return nil, err
 	}

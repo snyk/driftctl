@@ -26,6 +26,9 @@ func (s *FileEnumerator) Enumerate() ([]string, error) {
 	path := s.config.Path
 
 	info, err := os.Lstat(path)
+	if isGlob := HasMeta(path); !isGlob && err != nil {
+		return nil, err
+	}
 	if err == nil {
 		// if we got a symlink, use its destination
 		if info.Mode()&os.ModeSymlink != 0 {
