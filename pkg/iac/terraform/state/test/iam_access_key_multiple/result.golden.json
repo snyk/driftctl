@@ -1,27 +1,5 @@
 [
  {
-  "Arn": "arn:aws:iam::929327065333:user/test-driftctl",
-  "ForceDestroy": false,
-  "Id": "test-driftctl",
-  "Name": "test-driftctl",
-  "Path": "/",
-  "PermissionsBoundary": null,
-  "Tags": {},
-  "UniqueId": "AIDA5QYBVVD27TBHIJVSL",
-  "CtyVal": {}
- },
- {
-  "Arn": "arn:aws:iam::929327065333:user/test-driftctl2",
-  "ForceDestroy": false,
-  "Id": "test-driftctl2",
-  "Name": "test-driftctl2",
-  "Path": "/",
-  "PermissionsBoundary": null,
-  "Tags": {},
-  "UniqueId": "AIDA5QYBVVD2RVTK3ODPO",
-  "CtyVal": {}
- },
- {
   "EncryptedSecret": null,
   "Id": "AKIA5QYBVVD223VWU32A",
   "KeyFingerprint": null,

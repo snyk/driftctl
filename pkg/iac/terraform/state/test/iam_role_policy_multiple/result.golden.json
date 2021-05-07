@@ -1,82 +1,62 @@
 [
  {
-  "Arn": "arn:aws:iam::929327065333:role/test_role_0",
-  "AssumeRolePolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
-  "CreateDate": "2020-11-05T13:30:59Z",
-  "Description": "",
-  "ForceDetachPolicies": false,
-  "Id": "test_role_0",
-  "MaxSessionDuration": 3600,
-  "Name": "test_role_0",
-  "NamePrefix": null,
-  "Path": "/",
-  "PermissionsBoundary": null,
-  "Tags": null,
-  "UniqueId": "AROA5QYBVVD2U6C7MVZRS",
-  "CtyVal": {}
- },
- {
-  "Arn": "arn:aws:iam::929327065333:role/test_role_1",
-  "AssumeRolePolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
-  "CreateDate": "2020-11-05T13:30:59Z",
-  "Description": "",
-  "ForceDetachPolicies": false,
-  "Id": "test_role_1",
-  "MaxSessionDuration": 3600,
-  "Name": "test_role_1",
-  "NamePrefix": null,
-  "Path": "/",
-  "PermissionsBoundary": null,
-  "Tags": null,
-  "UniqueId": "AROA5QYBVVD26ZIDQHGWV",
-  "CtyVal": {}
- },
- {
-  "Id": "test_role_0:policy-role0-2",
-  "Name": "policy-role0-2",
-  "NamePrefix": null,
-  "Policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"VisualEditor0\",\n            \"Effect\": \"Allow\",\n            \"Action\": \"account:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}\n",
-  "Role": "test_role_0",
-  "CtyVal": {}
- },
- {
   "Id": "test_role_0:policy-role0-0",
-  "Name": "policy-role0-0",
-  "NamePrefix": null,
-  "Policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"VisualEditor0\",\n            \"Effect\": \"Allow\",\n            \"Action\": \"account:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}\n",
-  "Role": "test_role_0",
-  "CtyVal": {}
+  "Type": "aws_iam_role_policy",
+  "Attrs": {
+   "id": "test_role_0:policy-role0-0",
+   "name": "policy-role0-0",
+   "policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"VisualEditor0\",\n            \"Effect\": \"Allow\",\n            \"Action\": \"account:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}\n",
+   "role": "test_role_0"
+  }
  },
  {
   "Id": "test_role_0:policy-role0-1",
-  "Name": "policy-role0-1",
-  "NamePrefix": null,
-  "Policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"VisualEditor0\",\n            \"Effect\": \"Allow\",\n            \"Action\": \"account:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}\n",
-  "Role": "test_role_0",
-  "CtyVal": {}
+  "Type": "aws_iam_role_policy",
+  "Attrs": {
+   "id": "test_role_0:policy-role0-1",
+   "name": "policy-role0-1",
+   "policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"VisualEditor0\",\n            \"Effect\": \"Allow\",\n            \"Action\": \"account:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}\n",
+   "role": "test_role_0"
+  }
+ },
+ {
+  "Id": "test_role_0:policy-role0-2",
+  "Type": "aws_iam_role_policy",
+  "Attrs": {
+   "id": "test_role_0:policy-role0-2",
+   "name": "policy-role0-2",
+   "policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"VisualEditor0\",\n            \"Effect\": \"Allow\",\n            \"Action\": \"account:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}\n",
+   "role": "test_role_0"
+  }
  },
  {
   "Id": "test_role_1:policy-role1-0",
-  "Name": "policy-role1-0",
-  "NamePrefix": null,
-  "Policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"VisualEditor0\",\n            \"Effect\": \"Allow\",\n            \"Action\": \"account:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}\n",
-  "Role": "test_role_1",
-  "CtyVal": {}
+  "Type": "aws_iam_role_policy",
+  "Attrs": {
+   "id": "test_role_1:policy-role1-0",
+   "name": "policy-role1-0",
+   "policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"VisualEditor0\",\n            \"Effect\": \"Allow\",\n            \"Action\": \"account:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}\n",
+   "role": "test_role_1"
+  }
  },
  {
   "Id": "test_role_1:policy-role1-1",
-  "Name": "policy-role1-1",
-  "NamePrefix": null,
-  "Policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"VisualEditor0\",\n            \"Effect\": \"Allow\",\n            \"Action\": \"account:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}\n",
-  "Role": "test_role_1",
-  "CtyVal": {}
+  "Type": "aws_iam_role_policy",
+  "Attrs": {
+   "id": "test_role_1:policy-role1-1",
+   "name": "policy-role1-1",
+   "policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"VisualEditor0\",\n            \"Effect\": \"Allow\",\n            \"Action\": \"account:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}\n",
+   "role": "test_role_1"
+  }
  },
  {
   "Id": "test_role_1:policy-role1-2",
-  "Name": "policy-role1-2",
-  "NamePrefix": null,
-  "Policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"VisualEditor0\",\n            \"Effect\": \"Allow\",\n            \"Action\": \"account:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}\n",
-  "Role": "test_role_1",
-  "CtyVal": {}
+  "Type": "aws_iam_role_policy",
+  "Attrs": {
+   "id": "test_role_1:policy-role1-2",
+   "name": "policy-role1-2",
+   "policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"VisualEditor0\",\n            \"Effect\": \"Allow\",\n            \"Action\": \"account:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}\n",
+   "role": "test_role_1"
+  }
  }
 ]
