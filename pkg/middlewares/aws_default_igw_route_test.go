@@ -28,26 +28,38 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 					Id:    "default-igw",
 					VpcId: awssdk.String("default-vpc"),
 				},
-				&aws.AwsDefaultRouteTable{
-					Id:    "default-route-table",
-					VpcId: awssdk.String("default-vpc"),
+				&resource.AbstractResource{
+					Id:   "default-route-table",
+					Type: aws.AwsDefaultRouteTableResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "default-vpc",
+					},
 				},
-				&aws.AwsRoute{
-					Id:           "default-igw-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("default-igw"),
+				&resource.AbstractResource{
+					Id:   "default-igw-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "default-route-table",
+						"gateway_id":     "default-igw",
+					},
 				},
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
+				&resource.AbstractResource{
+					Id:   "dummy-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "default-route-table",
+						"gateway_id":     "local",
+					},
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsRoute{
-					Id:           "default-igw-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("default-igw"),
+				&resource.AbstractResource{
+					Id:   "default-igw-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "default-route-table",
+						"gateway_id":     "default-igw",
+					},
 				},
 			},
 			[]resource.Resource{
@@ -58,19 +70,28 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 					Id:    "default-igw",
 					VpcId: awssdk.String("default-vpc"),
 				},
-				&aws.AwsDefaultRouteTable{
-					Id:    "default-route-table",
-					VpcId: awssdk.String("default-vpc"),
+				&resource.AbstractResource{
+					Id:   "default-route-table",
+					Type: aws.AwsDefaultRouteTableResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "default-vpc",
+					},
 				},
-				&aws.AwsRoute{
-					Id:           "default-igw-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("default-igw"),
+				&resource.AbstractResource{
+					Id:   "default-igw-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "default-route-table",
+						"gateway_id":     "default-igw",
+					},
 				},
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
+				&resource.AbstractResource{
+					Id:   "dummy-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "default-route-table",
+						"gateway_id":     "local",
+					},
 				},
 			},
 		},
@@ -84,32 +105,47 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 					Id:    "default-igw",
 					VpcId: awssdk.String("default-vpc"),
 				},
-				&aws.AwsDefaultRouteTable{
-					Id:    "default-route-table",
-					VpcId: awssdk.String("default-vpc"),
+				&resource.AbstractResource{
+					Id:   "default-route-table",
+					Type: aws.AwsDefaultRouteTableResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "default-vpc",
+					},
 				},
-				&aws.AwsRoute{
-					Id:                   "default-igw-route",
-					DestinationCidrBlock: awssdk.String("0.0.0.0/0"),
-					RouteTableId:         awssdk.String("default-route-table"),
-					GatewayId:            awssdk.String("default-igw"),
+				&resource.AbstractResource{
+					Id:   "default-igw-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":         "default-route-table",
+						"gateway_id":             "default-igw",
+						"destination_cidr_block": "0.0.0.0/0",
+					},
 				},
-				&aws.AwsRoute{
-					Id:                   "default-igw-non-default-route",
-					DestinationCidrBlock: awssdk.String("10.0.1.0/24"),
-					RouteTableId:         awssdk.String("default-route-table"),
-					GatewayId:            awssdk.String("default-igw"),
+				&resource.AbstractResource{
+					Id:   "default-igw-non-default-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":         "default-route-table",
+						"gateway_id":             "default-igw",
+						"destination_cidr_block": "10.0.1.0/24",
+					},
 				},
-				&aws.AwsRoute{
-					Id:                       "default-igw-default-ipv6-route",
-					DestinationIpv6CidrBlock: awssdk.String("::/0"),
-					RouteTableId:             awssdk.String("default-route-table"),
-					GatewayId:                awssdk.String("default-igw"),
+				&resource.AbstractResource{
+					Id:   "default-igw-default-ipv6-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":              "default-route-table",
+						"gateway_id":                  "default-igw",
+						"destination_ipv6_cidr_block": "::/0",
+					},
 				},
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
+				&resource.AbstractResource{
+					Id:   "dummy-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "default-route-table",
+						"gateway_id":     "local",
+					},
 				},
 			},
 			[]resource.Resource{},
@@ -121,26 +157,38 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 					Id:    "default-igw",
 					VpcId: awssdk.String("default-vpc"),
 				},
-				&aws.AwsDefaultRouteTable{
-					Id:    "default-route-table",
-					VpcId: awssdk.String("default-vpc"),
+				&resource.AbstractResource{
+					Id:   "default-route-table",
+					Type: aws.AwsDefaultRouteTableResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "default-vpc",
+					},
 				},
-				&aws.AwsRoute{
-					Id:                   "default-igw-non-default-route",
-					DestinationCidrBlock: awssdk.String("10.0.1.0/24"),
-					RouteTableId:         awssdk.String("default-route-table"),
-					GatewayId:            awssdk.String("default-igw"),
+				&resource.AbstractResource{
+					Id:   "default-igw-non-default-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":         "default-route-table",
+						"gateway_id":             "default-igw",
+						"destination_cidr_block": "10.0.1.0/24",
+					},
 				},
-				&aws.AwsRoute{
-					Id:                       "default-igw-default-ipv6-route",
-					DestinationIpv6CidrBlock: awssdk.String("::/0"),
-					RouteTableId:             awssdk.String("default-route-table"),
-					GatewayId:                awssdk.String("default-igw"),
+				&resource.AbstractResource{
+					Id:   "default-igw-default-ipv6-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":              "default-route-table",
+						"gateway_id":                  "default-igw",
+						"destination_ipv6_cidr_block": "::/0",
+					},
 				},
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
+				&resource.AbstractResource{
+					Id:   "dummy-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "default-route-table",
+						"gateway_id":     "local",
+					},
 				},
 			},
 		},

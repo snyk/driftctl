@@ -4,7 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/mock"
@@ -26,42 +25,40 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 		{
 			name: "test with nil route attributes",
 			input: []resource.Resource{
-				&aws.AwsRouteTable{
-					Id:    "table_from_state",
-					Route: nil,
+				&resource.AbstractResource{
+					Id:   "table_from_state",
+					Type: aws.AwsRouteTableResourceType,
+					Attrs: &resource.Attributes{
+						"route": nil,
+					},
 				},
 			},
 			expected: []resource.Resource{
-				&aws.AwsRouteTable{
-					Id:    "table_from_state",
-					Route: nil,
+				&resource.AbstractResource{
+					Id:   "table_from_state",
+					Type: aws.AwsRouteTableResourceType,
+					Attrs: &resource.Attributes{
+						"route": nil,
+					},
 				},
 			},
 		},
 		{
 			name: "test with empty route attributes",
 			input: []resource.Resource{
-				&aws.AwsRouteTable{
-					Id: "table_from_state",
-					Route: &[]struct {
-						CidrBlock              *string `cty:"cidr_block"`
-						EgressOnlyGatewayId    *string `cty:"egress_only_gateway_id"`
-						GatewayId              *string `cty:"gateway_id"`
-						InstanceId             *string `cty:"instance_id"`
-						Ipv6CidrBlock          *string `cty:"ipv6_cidr_block"`
-						LocalGatewayId         *string `cty:"local_gateway_id"`
-						NatGatewayId           *string `cty:"nat_gateway_id"`
-						NetworkInterfaceId     *string `cty:"network_interface_id"`
-						TransitGatewayId       *string `cty:"transit_gateway_id"`
-						VpcEndpointId          *string `cty:"vpc_endpoint_id"`
-						VpcPeeringConnectionId *string `cty:"vpc_peering_connection_id"`
-					}{},
+				&resource.AbstractResource{
+					Id:   "table_from_state",
+					Type: aws.AwsRouteTableResourceType,
+					Attrs: &resource.Attributes{
+						"route": []interface{}{},
+					},
 				},
 			},
 			expected: []resource.Resource{
-				&aws.AwsRouteTable{
+				&resource.AbstractResource{
 					Id:    "table_from_state",
-					Route: nil,
+					Type:  aws.AwsRouteTableResourceType,
+					Attrs: &resource.Attributes{},
 				},
 			},
 		},
@@ -71,29 +68,22 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 				&resource2.FakeResource{
 					Id: "fake_resource",
 				},
-				&aws.AwsRouteTable{
-					Id: "table_from_state",
-					Route: &[]struct {
-						CidrBlock              *string `cty:"cidr_block"`
-						EgressOnlyGatewayId    *string `cty:"egress_only_gateway_id"`
-						GatewayId              *string `cty:"gateway_id"`
-						InstanceId             *string `cty:"instance_id"`
-						Ipv6CidrBlock          *string `cty:"ipv6_cidr_block"`
-						LocalGatewayId         *string `cty:"local_gateway_id"`
-						NatGatewayId           *string `cty:"nat_gateway_id"`
-						NetworkInterfaceId     *string `cty:"network_interface_id"`
-						TransitGatewayId       *string `cty:"transit_gateway_id"`
-						VpcEndpointId          *string `cty:"vpc_endpoint_id"`
-						VpcPeeringConnectionId *string `cty:"vpc_peering_connection_id"`
-					}{
-						{
-							CidrBlock:     awssdk.String("0.0.0.0/0"),
-							GatewayId:     awssdk.String("igw-07b7844a8fd17a638"),
-							VpcEndpointId: awssdk.String(""),
-						},
-						{
-							GatewayId:     awssdk.String("igw-07b7844a8fd17a638"),
-							Ipv6CidrBlock: awssdk.String("::/0"),
+				&resource.AbstractResource{
+					Id:   "table_from_state",
+					Type: aws.AwsRouteTableResourceType,
+					Attrs: &resource.Attributes{
+						"route": []interface{}{
+							map[string]interface{}{
+								"gateway_id":      "igw-07b7844a8fd17a638",
+								"cidr_block":      "0.0.0.0/0",
+								"ipv6_cidr_block": "",
+								"vpc_endpoint_id": "",
+							},
+							map[string]interface{}{
+								"gateway_id":      "igw-07b7844a8fd17a638",
+								"cidr_block":      "",
+								"ipv6_cidr_block": "::/0",
+							},
 						},
 					},
 				},
@@ -102,33 +92,69 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 				&resource2.FakeResource{
 					Id: "fake_resource",
 				},
-				&aws.AwsRouteTable{
+				&resource.AbstractResource{
 					Id:    "table_from_state",
-					Route: nil,
+					Type:  aws.AwsRouteTableResourceType,
+					Attrs: &resource.Attributes{},
 				},
-				&aws.AwsRoute{
-					Id:                      "r-table_from_state1080289494",
-					RouteTableId:            awssdk.String("table_from_state"),
-					DestinationCidrBlock:    awssdk.String("0.0.0.0/0"),
-					GatewayId:               awssdk.String("igw-07b7844a8fd17a638"),
-					Origin:                  awssdk.String("CreateRoute"),
-					State:                   awssdk.String("active"),
-					DestinationPrefixListId: awssdk.String(""),
-					InstanceOwnerId:         awssdk.String(""),
+				&resource.AbstractResource{
+					Id:   "r-table_from_state1080289494",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":             "table_from_state",
+						"origin":                     "CreateRoute",
+						"destination_cidr_block":     "0.0.0.0/0",
+						"gateway_id":                 "igw-07b7844a8fd17a638",
+						"state":                      "active",
+						"destination_prefix_list_id": "",
+						"instance_owner_id":          "",
+					},
 				},
-				&aws.AwsRoute{
-					Id:                       "r-table_from_state2750132062",
-					RouteTableId:             awssdk.String("table_from_state"),
-					DestinationIpv6CidrBlock: awssdk.String("::/0"),
-					GatewayId:                awssdk.String("igw-07b7844a8fd17a638"),
-					Origin:                   awssdk.String("CreateRoute"),
-					State:                    awssdk.String("active"),
-					DestinationPrefixListId:  awssdk.String(""),
-					InstanceOwnerId:          awssdk.String(""),
+				&resource.AbstractResource{
+					Id:   "r-table_from_state2750132062",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":              "table_from_state",
+						"origin":                      "CreateRoute",
+						"destination_ipv6_cidr_block": "::/0",
+						"gateway_id":                  "igw-07b7844a8fd17a638",
+						"state":                       "active",
+						"destination_prefix_list_id":  "",
+						"instance_owner_id":           "",
+					},
 				},
 			},
 			mock: func(factory *terraform.MockResourceFactory) {
-				factory.On("CreateResource", mock.Anything, "aws_route").Times(2).Return(nil, nil)
+				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "r-table_from_state1080289494"
+				})).Times(1).Return(&resource.AbstractResource{
+					Id:   "r-table_from_state1080289494",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":             "table_from_state",
+						"origin":                     "CreateRoute",
+						"destination_cidr_block":     "0.0.0.0/0",
+						"gateway_id":                 "igw-07b7844a8fd17a638",
+						"state":                      "active",
+						"destination_prefix_list_id": "",
+						"instance_owner_id":          "",
+					},
+				}, nil)
+				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "r-table_from_state2750132062"
+				})).Times(1).Return(&resource.AbstractResource{
+					Id:   "r-table_from_state2750132062",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":              "table_from_state",
+						"origin":                      "CreateRoute",
+						"destination_ipv6_cidr_block": "::/0",
+						"gateway_id":                  "igw-07b7844a8fd17a638",
+						"state":                       "active",
+						"destination_prefix_list_id":  "",
+						"instance_owner_id":           "",
+					},
+				}, nil)
 			},
 		},
 		{
@@ -137,28 +163,22 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 				&resource2.FakeResource{
 					Id: "fake_resource",
 				},
-				&aws.AwsDefaultRouteTable{
-					Id: "default_route_table_from_state",
-					Route: &[]struct {
-						CidrBlock              *string `cty:"cidr_block"`
-						EgressOnlyGatewayId    *string `cty:"egress_only_gateway_id"`
-						GatewayId              *string `cty:"gateway_id"`
-						InstanceId             *string `cty:"instance_id"`
-						Ipv6CidrBlock          *string `cty:"ipv6_cidr_block"`
-						NatGatewayId           *string `cty:"nat_gateway_id"`
-						NetworkInterfaceId     *string `cty:"network_interface_id"`
-						TransitGatewayId       *string `cty:"transit_gateway_id"`
-						VpcEndpointId          *string `cty:"vpc_endpoint_id"`
-						VpcPeeringConnectionId *string `cty:"vpc_peering_connection_id"`
-					}{
-						{
-							CidrBlock:     awssdk.String("0.0.0.0/0"),
-							GatewayId:     awssdk.String("igw-07b7844a8fd17a638"),
-							VpcEndpointId: awssdk.String(""),
-						},
-						{
-							GatewayId:     awssdk.String("igw-07b7844a8fd17a638"),
-							Ipv6CidrBlock: awssdk.String("::/0"),
+				&resource.AbstractResource{
+					Id:   "default_route_table_from_state",
+					Type: aws.AwsDefaultRouteTableResourceType,
+					Attrs: &resource.Attributes{
+						"route": []interface{}{
+							map[string]interface{}{
+								"gateway_id":      "igw-07b7844a8fd17a638",
+								"cidr_block":      "0.0.0.0/0",
+								"ipv6_cidr_block": "",
+								"vpc_endpoint_id": "",
+							},
+							map[string]interface{}{
+								"gateway_id":      "igw-07b7844a8fd17a638",
+								"cidr_block":      "",
+								"ipv6_cidr_block": "::/0",
+							},
 						},
 					},
 				},
@@ -167,33 +187,69 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 				&resource2.FakeResource{
 					Id: "fake_resource",
 				},
-				&aws.AwsDefaultRouteTable{
+				&resource.AbstractResource{
 					Id:    "default_route_table_from_state",
-					Route: nil,
+					Type:  aws.AwsDefaultRouteTableResourceType,
+					Attrs: &resource.Attributes{},
 				},
-				&aws.AwsRoute{
-					Id:                      "r-default_route_table_from_state1080289494",
-					RouteTableId:            awssdk.String("default_route_table_from_state"),
-					DestinationCidrBlock:    awssdk.String("0.0.0.0/0"),
-					GatewayId:               awssdk.String("igw-07b7844a8fd17a638"),
-					Origin:                  awssdk.String("CreateRoute"),
-					State:                   awssdk.String("active"),
-					DestinationPrefixListId: awssdk.String(""),
-					InstanceOwnerId:         awssdk.String(""),
+				&resource.AbstractResource{
+					Id:   "r-default_route_table_from_state1080289494",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":             "default_route_table_from_state",
+						"origin":                     "CreateRoute",
+						"destination_cidr_block":     "0.0.0.0/0",
+						"gateway_id":                 "igw-07b7844a8fd17a638",
+						"state":                      "active",
+						"destination_prefix_list_id": "",
+						"instance_owner_id":          "",
+					},
 				},
-				&aws.AwsRoute{
-					Id:                       "r-default_route_table_from_state2750132062",
-					RouteTableId:             awssdk.String("default_route_table_from_state"),
-					DestinationIpv6CidrBlock: awssdk.String("::/0"),
-					GatewayId:                awssdk.String("igw-07b7844a8fd17a638"),
-					Origin:                   awssdk.String("CreateRoute"),
-					State:                    awssdk.String("active"),
-					DestinationPrefixListId:  awssdk.String(""),
-					InstanceOwnerId:          awssdk.String(""),
+				&resource.AbstractResource{
+					Id:   "r-default_route_table_from_state2750132062",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":              "default_route_table_from_state",
+						"origin":                      "CreateRoute",
+						"destination_ipv6_cidr_block": "::/0",
+						"gateway_id":                  "igw-07b7844a8fd17a638",
+						"state":                       "active",
+						"destination_prefix_list_id":  "",
+						"instance_owner_id":           "",
+					},
 				},
 			},
 			mock: func(factory *terraform.MockResourceFactory) {
-				factory.On("CreateResource", mock.Anything, "aws_route").Times(2).Return(nil, nil)
+				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "r-default_route_table_from_state1080289494"
+				})).Times(1).Return(&resource.AbstractResource{
+					Id:   "r-default_route_table_from_state1080289494",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":             "default_route_table_from_state",
+						"origin":                     "CreateRoute",
+						"destination_cidr_block":     "0.0.0.0/0",
+						"gateway_id":                 "igw-07b7844a8fd17a638",
+						"state":                      "active",
+						"destination_prefix_list_id": "",
+						"instance_owner_id":          "",
+					},
+				}, nil)
+				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "r-default_route_table_from_state2750132062"
+				})).Times(1).Return(&resource.AbstractResource{
+					Id:   "r-default_route_table_from_state2750132062",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":              "default_route_table_from_state",
+						"origin":                      "CreateRoute",
+						"destination_ipv6_cidr_block": "::/0",
+						"gateway_id":                  "igw-07b7844a8fd17a638",
+						"state":                       "active",
+						"destination_prefix_list_id":  "",
+						"instance_owner_id":           "",
+					},
+				}, nil)
 			},
 		},
 		{
@@ -202,38 +258,35 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 				&resource2.FakeResource{
 					Id: "fake_resource",
 				},
-				&aws.AwsRoute{
-					Id:                       "r-default_route_table_from_state2750132062",
-					RouteTableId:             awssdk.String("default_route_table_from_state"),
-					DestinationIpv6CidrBlock: awssdk.String("::/0"),
-					GatewayId:                awssdk.String("igw-07b7844a8fd17a638"),
-					Origin:                   awssdk.String("CreateRoute"),
-					State:                    awssdk.String("active"),
-					DestinationPrefixListId:  awssdk.String(""),
-					InstanceOwnerId:          awssdk.String(""),
+				&resource.AbstractResource{
+					Id:   "r-default_route_table_from_state2750132062",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":              "default_route_table_from_state",
+						"origin":                      "CreateRoute",
+						"destination_ipv6_cidr_block": "::/0",
+						"gateway_id":                  "igw-07b7844a8fd17a638",
+						"state":                       "active",
+						"destination_prefix_list_id":  "",
+						"instance_owner_id":           "",
+					},
 				},
-				&aws.AwsDefaultRouteTable{
-					Id: "default_route_table_from_state",
-					Route: &[]struct {
-						CidrBlock              *string `cty:"cidr_block"`
-						EgressOnlyGatewayId    *string `cty:"egress_only_gateway_id"`
-						GatewayId              *string `cty:"gateway_id"`
-						InstanceId             *string `cty:"instance_id"`
-						Ipv6CidrBlock          *string `cty:"ipv6_cidr_block"`
-						NatGatewayId           *string `cty:"nat_gateway_id"`
-						NetworkInterfaceId     *string `cty:"network_interface_id"`
-						TransitGatewayId       *string `cty:"transit_gateway_id"`
-						VpcEndpointId          *string `cty:"vpc_endpoint_id"`
-						VpcPeeringConnectionId *string `cty:"vpc_peering_connection_id"`
-					}{
-						{
-							CidrBlock:     awssdk.String("0.0.0.0/0"),
-							GatewayId:     awssdk.String("igw-07b7844a8fd17a638"),
-							VpcEndpointId: awssdk.String(""),
-						},
-						{
-							GatewayId:     awssdk.String("igw-07b7844a8fd17a638"),
-							Ipv6CidrBlock: awssdk.String("::/0"),
+				&resource.AbstractResource{
+					Id:   "default_route_table_from_state",
+					Type: aws.AwsDefaultRouteTableResourceType,
+					Attrs: &resource.Attributes{
+						"route": []interface{}{
+							map[string]interface{}{
+								"gateway_id":      "igw-07b7844a8fd17a638",
+								"cidr_block":      "0.0.0.0/0",
+								"ipv6_cidr_block": "",
+								"vpc_endpoint_id": "",
+							},
+							map[string]interface{}{
+								"gateway_id":      "igw-07b7844a8fd17a638",
+								"cidr_block":      "",
+								"ipv6_cidr_block": "::/0",
+							},
 						},
 					},
 				},
@@ -242,33 +295,54 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 				&resource2.FakeResource{
 					Id: "fake_resource",
 				},
-				&aws.AwsDefaultRouteTable{
+				&resource.AbstractResource{
 					Id:    "default_route_table_from_state",
-					Route: nil,
+					Type:  aws.AwsDefaultRouteTableResourceType,
+					Attrs: &resource.Attributes{},
 				},
-				&aws.AwsRoute{
-					Id:                      "r-default_route_table_from_state1080289494",
-					RouteTableId:            awssdk.String("default_route_table_from_state"),
-					DestinationCidrBlock:    awssdk.String("0.0.0.0/0"),
-					GatewayId:               awssdk.String("igw-07b7844a8fd17a638"),
-					Origin:                  awssdk.String("CreateRoute"),
-					State:                   awssdk.String("active"),
-					DestinationPrefixListId: awssdk.String(""),
-					InstanceOwnerId:         awssdk.String(""),
+				&resource.AbstractResource{
+					Id:   "r-default_route_table_from_state1080289494",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":             "default_route_table_from_state",
+						"origin":                     "CreateRoute",
+						"destination_cidr_block":     "0.0.0.0/0",
+						"gateway_id":                 "igw-07b7844a8fd17a638",
+						"state":                      "active",
+						"destination_prefix_list_id": "",
+						"instance_owner_id":          "",
+					},
 				},
-				&aws.AwsRoute{
-					Id:                       "r-default_route_table_from_state2750132062",
-					RouteTableId:             awssdk.String("default_route_table_from_state"),
-					DestinationIpv6CidrBlock: awssdk.String("::/0"),
-					GatewayId:                awssdk.String("igw-07b7844a8fd17a638"),
-					Origin:                   awssdk.String("CreateRoute"),
-					State:                    awssdk.String("active"),
-					DestinationPrefixListId:  awssdk.String(""),
-					InstanceOwnerId:          awssdk.String(""),
+				&resource.AbstractResource{
+					Id:   "r-default_route_table_from_state2750132062",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":              "default_route_table_from_state",
+						"origin":                      "CreateRoute",
+						"destination_ipv6_cidr_block": "::/0",
+						"gateway_id":                  "igw-07b7844a8fd17a638",
+						"state":                       "active",
+						"destination_prefix_list_id":  "",
+						"instance_owner_id":           "",
+					},
 				},
 			},
 			func(factory *terraform.MockResourceFactory) {
-				factory.On("CreateResource", mock.Anything, "aws_route").Times(2).Return(nil, nil)
+				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "r-default_route_table_from_state1080289494"
+				})).Times(1).Return(&resource.AbstractResource{
+					Id:   "r-default_route_table_from_state1080289494",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":             "default_route_table_from_state",
+						"origin":                     "CreateRoute",
+						"destination_cidr_block":     "0.0.0.0/0",
+						"gateway_id":                 "igw-07b7844a8fd17a638",
+						"state":                      "active",
+						"destination_prefix_list_id": "",
+						"instance_owner_id":          "",
+					},
+				}, nil)
 			},
 		},
 		{
@@ -277,39 +351,35 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 				&resource2.FakeResource{
 					Id: "fake_resource",
 				},
-				&aws.AwsRoute{
-					Id:                      "r-table_from_state1080289494",
-					RouteTableId:            awssdk.String("table_from_state"),
-					DestinationCidrBlock:    awssdk.String("0.0.0.0/0"),
-					GatewayId:               awssdk.String("igw-07b7844a8fd17a638"),
-					Origin:                  awssdk.String("CreateRoute"),
-					State:                   awssdk.String("active"),
-					DestinationPrefixListId: awssdk.String(""),
-					InstanceOwnerId:         awssdk.String(""),
+				&resource.AbstractResource{
+					Id:   "r-table_from_state1080289494",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":             "table_from_state",
+						"origin":                     "CreateRoute",
+						"destination_cidr_block":     "0.0.0.0/0",
+						"gateway_id":                 "igw-07b7844a8fd17a638",
+						"state":                      "active",
+						"destination_prefix_list_id": "",
+						"instance_owner_id":          "",
+					},
 				},
-				&aws.AwsRouteTable{
-					Id: "table_from_state",
-					Route: &[]struct {
-						CidrBlock              *string `cty:"cidr_block"`
-						EgressOnlyGatewayId    *string `cty:"egress_only_gateway_id"`
-						GatewayId              *string `cty:"gateway_id"`
-						InstanceId             *string `cty:"instance_id"`
-						Ipv6CidrBlock          *string `cty:"ipv6_cidr_block"`
-						LocalGatewayId         *string `cty:"local_gateway_id"`
-						NatGatewayId           *string `cty:"nat_gateway_id"`
-						NetworkInterfaceId     *string `cty:"network_interface_id"`
-						TransitGatewayId       *string `cty:"transit_gateway_id"`
-						VpcEndpointId          *string `cty:"vpc_endpoint_id"`
-						VpcPeeringConnectionId *string `cty:"vpc_peering_connection_id"`
-					}{
-						{
-							CidrBlock:     awssdk.String("0.0.0.0/0"),
-							GatewayId:     awssdk.String("igw-07b7844a8fd17a638"),
-							VpcEndpointId: awssdk.String(""),
-						},
-						{
-							GatewayId:     awssdk.String("igw-07b7844a8fd17a638"),
-							Ipv6CidrBlock: awssdk.String("::/0"),
+				&resource.AbstractResource{
+					Id:   "table_from_state",
+					Type: aws.AwsRouteTableResourceType,
+					Attrs: &resource.Attributes{
+						"route": []interface{}{
+							map[string]interface{}{
+								"gateway_id":      "igw-07b7844a8fd17a638",
+								"cidr_block":      "0.0.0.0/0",
+								"ipv6_cidr_block": "",
+								"vpc_endpoint_id": "",
+							},
+							map[string]interface{}{
+								"gateway_id":      "igw-07b7844a8fd17a638",
+								"cidr_block":      "",
+								"ipv6_cidr_block": "::/0",
+							},
 						},
 					},
 				},
@@ -318,33 +388,54 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 				&resource2.FakeResource{
 					Id: "fake_resource",
 				},
-				&aws.AwsRouteTable{
+				&resource.AbstractResource{
 					Id:    "table_from_state",
-					Route: nil,
+					Type:  aws.AwsRouteTableResourceType,
+					Attrs: &resource.Attributes{},
 				},
-				&aws.AwsRoute{
-					Id:                      "r-table_from_state1080289494",
-					RouteTableId:            awssdk.String("table_from_state"),
-					DestinationCidrBlock:    awssdk.String("0.0.0.0/0"),
-					GatewayId:               awssdk.String("igw-07b7844a8fd17a638"),
-					Origin:                  awssdk.String("CreateRoute"),
-					State:                   awssdk.String("active"),
-					DestinationPrefixListId: awssdk.String(""),
-					InstanceOwnerId:         awssdk.String(""),
+				&resource.AbstractResource{
+					Id:   "r-table_from_state1080289494",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":             "table_from_state",
+						"origin":                     "CreateRoute",
+						"destination_cidr_block":     "0.0.0.0/0",
+						"gateway_id":                 "igw-07b7844a8fd17a638",
+						"state":                      "active",
+						"destination_prefix_list_id": "",
+						"instance_owner_id":          "",
+					},
 				},
-				&aws.AwsRoute{
-					Id:                       "r-table_from_state2750132062",
-					RouteTableId:             awssdk.String("table_from_state"),
-					DestinationIpv6CidrBlock: awssdk.String("::/0"),
-					GatewayId:                awssdk.String("igw-07b7844a8fd17a638"),
-					Origin:                   awssdk.String("CreateRoute"),
-					State:                    awssdk.String("active"),
-					DestinationPrefixListId:  awssdk.String(""),
-					InstanceOwnerId:          awssdk.String(""),
+				&resource.AbstractResource{
+					Id:   "r-table_from_state2750132062",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":              "table_from_state",
+						"origin":                      "CreateRoute",
+						"destination_ipv6_cidr_block": "::/0",
+						"gateway_id":                  "igw-07b7844a8fd17a638",
+						"state":                       "active",
+						"destination_prefix_list_id":  "",
+						"instance_owner_id":           "",
+					},
 				},
 			},
 			func(factory *terraform.MockResourceFactory) {
-				factory.On("CreateResource", mock.Anything, "aws_route").Times(2).Return(nil, nil)
+				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "r-table_from_state2750132062"
+				})).Times(1).Return(&resource.AbstractResource{
+					Id:   "r-table_from_state2750132062",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":              "table_from_state",
+						"origin":                      "CreateRoute",
+						"destination_ipv6_cidr_block": "::/0",
+						"gateway_id":                  "igw-07b7844a8fd17a638",
+						"state":                       "active",
+						"destination_prefix_list_id":  "",
+						"instance_owner_id":           "",
+					},
+				}, nil)
 			},
 		},
 	}
@@ -358,7 +449,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 			}
 
 			m := NewAwsRouteTableExpander(mockedAlerter, factory)
-			err := m.Execute(nil, &tt.input)
+			err := m.Execute(&[]resource.Resource{}, &tt.input)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -388,62 +479,51 @@ func TestAwsRouteTableExpander_ExecuteWithInvalidRoutes(t *testing.T) {
 	))
 
 	input := []resource.Resource{
-		&aws.AwsRouteTable{
-			Id: "table_from_state",
-			Route: &[]struct {
-				CidrBlock              *string `cty:"cidr_block"`
-				EgressOnlyGatewayId    *string `cty:"egress_only_gateway_id"`
-				GatewayId              *string `cty:"gateway_id"`
-				InstanceId             *string `cty:"instance_id"`
-				Ipv6CidrBlock          *string `cty:"ipv6_cidr_block"`
-				LocalGatewayId         *string `cty:"local_gateway_id"`
-				NatGatewayId           *string `cty:"nat_gateway_id"`
-				NetworkInterfaceId     *string `cty:"network_interface_id"`
-				TransitGatewayId       *string `cty:"transit_gateway_id"`
-				VpcEndpointId          *string `cty:"vpc_endpoint_id"`
-				VpcPeeringConnectionId *string `cty:"vpc_peering_connection_id"`
-			}{
-				{
-					GatewayId: awssdk.String("igw-07b7844a8fd17a638"),
+		&resource.AbstractResource{
+			Id:   "table_from_state",
+			Type: aws.AwsRouteTableResourceType,
+			Attrs: &resource.Attributes{
+				"route": []interface{}{
+					map[string]interface{}{
+						"gateway_id":      "igw-07b7844a8fd17a638",
+						"cidr_block":      "",
+						"ipv6_cidr_block": "",
+					},
 				},
 			},
 		},
-		&aws.AwsDefaultRouteTable{
-			Id: "default_table_from_state",
-			Route: &[]struct {
-				CidrBlock              *string `cty:"cidr_block"`
-				EgressOnlyGatewayId    *string `cty:"egress_only_gateway_id"`
-				GatewayId              *string `cty:"gateway_id"`
-				InstanceId             *string `cty:"instance_id"`
-				Ipv6CidrBlock          *string `cty:"ipv6_cidr_block"`
-				NatGatewayId           *string `cty:"nat_gateway_id"`
-				NetworkInterfaceId     *string `cty:"network_interface_id"`
-				TransitGatewayId       *string `cty:"transit_gateway_id"`
-				VpcEndpointId          *string `cty:"vpc_endpoint_id"`
-				VpcPeeringConnectionId *string `cty:"vpc_peering_connection_id"`
-			}{
-				{
-					GatewayId: awssdk.String("igw-07b7844a8fd17a638"),
+		&resource.AbstractResource{
+			Id:   "default_table_from_state",
+			Type: aws.AwsDefaultRouteTableResourceType,
+			Attrs: &resource.Attributes{
+				"route": []interface{}{
+					map[string]interface{}{
+						"gateway_id":      "igw-07b7844a8fd17a638",
+						"cidr_block":      "",
+						"ipv6_cidr_block": "",
+					},
 				},
 			},
 		},
 	}
 
 	expected := []resource.Resource{
-		&aws.AwsRouteTable{
+		&resource.AbstractResource{
 			Id:    "table_from_state",
-			Route: nil,
+			Type:  aws.AwsRouteTableResourceType,
+			Attrs: &resource.Attributes{},
 		},
-		&aws.AwsDefaultRouteTable{
+		&resource.AbstractResource{
 			Id:    "default_table_from_state",
-			Route: nil,
+			Type:  aws.AwsDefaultRouteTableResourceType,
+			Attrs: &resource.Attributes{},
 		},
 	}
 
 	factory := &terraform.MockResourceFactory{}
 
 	m := NewAwsRouteTableExpander(mockedAlerter, factory)
-	err := m.Execute(nil, &input)
+	err := m.Execute(&[]resource.Resource{}, &input)
 	if err != nil {
 		t.Fatal(err)
 	}

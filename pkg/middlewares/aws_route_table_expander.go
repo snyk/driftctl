@@ -53,13 +53,12 @@ func (m AwsRouteTableExpander) Execute(remoteResources, resourcesFromState *[]re
 			continue
 		}
 
-		table, _ := res.(*aws.AwsRouteTable)
-		defaultTable, isDefault := res.(*aws.AwsDefaultRouteTable)
+		table, _ := res.(*resource.AbstractResource)
 		newList = append(newList, res)
 
 		var err error
-		if isDefault {
-			err = m.handleDefaultTable(defaultTable, &newList, *resourcesFromState)
+		if res.TerraformType() == aws.AwsDefaultRouteTableResourceType {
+			err = m.handleDefaultTable(table, &newList, *resourcesFromState)
 		} else {
 			err = m.handleTable(table, &newList, *resourcesFromState)
 		}
@@ -68,157 +67,114 @@ func (m AwsRouteTableExpander) Execute(remoteResources, resourcesFromState *[]re
 			return err
 		}
 	}
+
+	newRemoteResources := make([]resource.Resource, 0)
+	for _, remoteRes := range *remoteResources {
+		if remoteRes.TerraformType() != aws.AwsRouteTableResourceType &&
+			remoteRes.TerraformType() != aws.AwsDefaultRouteTableResourceType {
+			newRemoteResources = append(newRemoteResources, remoteRes)
+			continue
+		}
+		table, _ := remoteRes.(*resource.AbstractResource)
+		table.Attrs.SafeDelete([]string{"route"})
+		newRemoteResources = append(newRemoteResources, table)
+	}
+
 	*resourcesFromState = newList
+	*remoteResources = newRemoteResources
 	return nil
 }
 
-func (m *AwsRouteTableExpander) handleTable(table *aws.AwsRouteTable, results *[]resource.Resource, resourcesFromState []resource.Resource) error {
-	if table.Route == nil ||
-		len(*table.Route) < 1 {
+func (m *AwsRouteTableExpander) handleTable(table *resource.AbstractResource, results *[]resource.Resource, resourcesFromState []resource.Resource) error {
+	routes, exist := table.Attrs.Get("route")
+	if !exist || routes == nil {
 		return nil
 	}
-	for _, route := range *table.Route {
-		routeId, err := aws.CalculateRouteID(&table.Id, route.CidrBlock, route.Ipv6CidrBlock)
+	for _, route := range routes.([]interface{}) {
+		route := route.(map[string]interface{})
+		routeId, err := aws.CalculateRouteID(&table.Id, awssdk.String(route["cidr_block"].(string)), awssdk.String(route["ipv6_cidr_block"].(string)))
 		if err != nil {
 			m.alerter.SendAlert(aws.AwsRouteTableResourceType, newInvalidRouteAlert(aws.AwsRouteTableResourceType, table.Id))
 			continue
 		}
 
 		data := map[string]interface{}{
-			"destination_cidr_block":      route.CidrBlock,
-			"destination_ipv6_cidr_block": route.Ipv6CidrBlock,
+			"destination_cidr_block":      route["cidr_block"],
+			"destination_ipv6_cidr_block": route["ipv6_cidr_block"],
 			"destination_prefix_list_id":  "",
-			"egress_only_gateway_id":      route.EgressOnlyGatewayId,
-			"gateway_id":                  route.GatewayId,
+			"egress_only_gateway_id":      route["egress_only_gateway_id"],
+			"gateway_id":                  route["gateway_id"],
 			"id":                          routeId,
-			"instance_id":                 route.InstanceId,
+			"instance_id":                 route["instance_id"],
 			"instance_owner_id":           "",
-			"local_gateway_id":            route.LocalGatewayId,
-			"nat_gateway_id":              route.NatGatewayId,
-			"network_interface_id":        route.NetworkInterfaceId,
+			"local_gateway_id":            route["local_gateway_id"],
+			"nat_gateway_id":              route["nat_gateway_id"],
+			"network_interface_id":        route["network_interface_id"],
 			"origin":                      "CreateRoute",
 			"route_table_id":              table.Id,
 			"state":                       "active",
-			"transit_gateway_id":          route.TransitGatewayId,
-			"vpc_endpoint_id":             route.VpcEndpointId,
-			"vpc_peering_connection_id":   route.VpcPeeringConnectionId,
+			"transit_gateway_id":          route["transit_gateway_id"],
+			"vpc_endpoint_id":             route["vpc_endpoint_id"],
+			"vpc_peering_connection_id":   route["vpc_peering_connection_id"],
 		}
-		ctyVal, err := m.resourceFactory.CreateResource(data, "aws_route")
-		if err != nil {
-			return err
-		}
-
 		// Don't expand if the route already exists as a dedicated resource
 		if m.routeExists(routeId, resourcesFromState) {
 			continue
 		}
-
-		newRouteFromTable := &aws.AwsRoute{
-			DestinationCidrBlock:     route.CidrBlock,
-			DestinationIpv6CidrBlock: route.Ipv6CidrBlock,
-			DestinationPrefixListId:  awssdk.String(""),
-			EgressOnlyGatewayId:      route.EgressOnlyGatewayId,
-			GatewayId:                route.GatewayId,
-			Id:                       routeId,
-			InstanceId:               route.InstanceId,
-			InstanceOwnerId:          awssdk.String(""),
-			LocalGatewayId:           route.LocalGatewayId,
-			NatGatewayId:             route.NatGatewayId,
-			NetworkInterfaceId:       route.NetworkInterfaceId,
-			Origin:                   awssdk.String("CreateRoute"),
-			RouteTableId:             awssdk.String(table.Id),
-			State:                    awssdk.String("active"),
-			TransitGatewayId:         route.TransitGatewayId,
-			VpcEndpointId:            route.VpcEndpointId,
-			VpcPeeringConnectionId:   route.VpcPeeringConnectionId,
-			CtyVal:                   ctyVal,
-		}
-		normalizedRes, err := newRouteFromTable.NormalizeForState()
-		if err != nil {
-			return err
-		}
-		*results = append(*results, normalizedRes)
+		newRes := m.resourceFactory.CreateAbstractResource(aws.AwsRouteResourceType, routeId, data)
+		*results = append(*results, newRes)
 		logrus.WithFields(logrus.Fields{
-			"route": newRouteFromTable.String(),
+			// "route": newRes.String(), TODO
+			"route": routeId,
 		}).Debug("Created new route from route table")
 	}
-
-	table.Route = nil
-
+	table.Attrs.SafeDelete([]string{"route"})
 	return nil
 }
 
-func (m *AwsRouteTableExpander) handleDefaultTable(table *aws.AwsDefaultRouteTable, results *[]resource.Resource, resourcesFromState []resource.Resource) error {
-	if table.Route == nil ||
-		len(*table.Route) < 1 {
+func (m *AwsRouteTableExpander) handleDefaultTable(table *resource.AbstractResource, results *[]resource.Resource, resourcesFromState []resource.Resource) error {
+	routes, exist := table.Attrs.Get("route")
+	if !exist || routes == nil {
 		return nil
 	}
-	for _, route := range *table.Route {
-		routeId, err := aws.CalculateRouteID(&table.Id, route.CidrBlock, route.Ipv6CidrBlock)
+	for _, route := range routes.([]interface{}) {
+		route := route.(map[string]interface{})
+		routeId, err := aws.CalculateRouteID(&table.Id, awssdk.String(route["cidr_block"].(string)), awssdk.String(route["ipv6_cidr_block"].(string)))
 		if err != nil {
 			m.alerter.SendAlert(aws.AwsDefaultRouteTableResourceType, newInvalidRouteAlert(aws.AwsDefaultRouteTableResourceType, table.Id))
 			continue
 		}
 
 		data := map[string]interface{}{
-			"destination_cidr_block":      route.CidrBlock,
-			"destination_ipv6_cidr_block": route.Ipv6CidrBlock,
+			"destination_cidr_block":      route["cidr_block"],
+			"destination_ipv6_cidr_block": route["ipv6_cidr_block"],
 			"destination_prefix_list_id":  "",
-			"egress_only_gateway_id":      route.EgressOnlyGatewayId,
-			"gateway_id":                  route.GatewayId,
+			"egress_only_gateway_id":      route["egress_only_gateway_id"],
+			"gateway_id":                  route["gateway_id"],
 			"id":                          routeId,
-			"instance_id":                 route.InstanceId,
+			"instance_id":                 route["instance_id"],
 			"instance_owner_id":           "",
-			"nat_gateway_id":              route.NatGatewayId,
-			"network_interface_id":        route.NetworkInterfaceId,
+			"nat_gateway_id":              route["nat_gateway_id"],
+			"network_interface_id":        route["network_interface_id"],
 			"origin":                      "CreateRoute",
 			"route_table_id":              table.Id,
 			"state":                       "active",
-			"transit_gateway_id":          route.TransitGatewayId,
-			"vpc_endpoint_id":             route.VpcEndpointId,
-			"vpc_peering_connection_id":   route.VpcPeeringConnectionId,
+			"transit_gateway_id":          route["transit_gateway_id"],
+			"vpc_endpoint_id":             route["vpc_endpoint_id"],
+			"vpc_peering_connection_id":   route["vpc_peering_connection_id"],
 		}
-		ctyVal, err := m.resourceFactory.CreateResource(data, "aws_route")
-		if err != nil {
-			return err
-		}
-
 		// Don't expand if the route already exists as a dedicated resource
 		if m.routeExists(routeId, resourcesFromState) {
 			continue
 		}
-
-		newRouteFromTable := &aws.AwsRoute{
-			DestinationCidrBlock:     route.CidrBlock,
-			DestinationIpv6CidrBlock: route.Ipv6CidrBlock,
-			DestinationPrefixListId:  awssdk.String(""),
-			EgressOnlyGatewayId:      route.EgressOnlyGatewayId,
-			GatewayId:                route.GatewayId,
-			Id:                       routeId,
-			InstanceId:               route.InstanceId,
-			InstanceOwnerId:          awssdk.String(""),
-			NatGatewayId:             route.NatGatewayId,
-			NetworkInterfaceId:       route.NetworkInterfaceId,
-			Origin:                   awssdk.String("CreateRoute"),
-			RouteTableId:             awssdk.String(table.Id),
-			State:                    awssdk.String("active"),
-			TransitGatewayId:         route.TransitGatewayId,
-			VpcEndpointId:            route.VpcEndpointId,
-			VpcPeeringConnectionId:   route.VpcPeeringConnectionId,
-			CtyVal:                   ctyVal,
-		}
-		normalizedRes, err := newRouteFromTable.NormalizeForState()
-		if err != nil {
-			return err
-		}
-		*results = append(*results, normalizedRes)
+		newRes := m.resourceFactory.CreateAbstractResource(aws.AwsRouteResourceType, routeId, data)
+		*results = append(*results, newRes)
 		logrus.WithFields(logrus.Fields{
-			"route": newRouteFromTable.String(),
+			// "route": newRes.String(), TODO
+			"route": routeId,
 		}).Debug("Created new route from default route table")
 	}
-
-	table.Route = nil
-
+	table.Attrs.SafeDelete([]string{"route"})
 	return nil
 }
 

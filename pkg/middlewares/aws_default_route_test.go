@@ -4,7 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -26,37 +25,52 @@ func TestAwsDefaultRoute_Execute(t *testing.T) {
 				&resource2.FakeResource{
 					Id: "fake",
 				},
-				&aws.AwsRoute{
-					Id:           "a-dummy-route",
-					Origin:       awssdk.String("CreateRoute"),
-					RouteTableId: awssdk.String("fake-table-id"),
+				&resource.AbstractResource{
+					Id:   "a-dummy-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "fake-table-id",
+						"origin":         "CreateRoute",
+					},
 				},
-				&aws.AwsRoute{
-					Id:           "default-managed-by-IaC",
-					Origin:       awssdk.String("CreateRouteTable"),
-					RouteTableId: awssdk.String("fake-table-id"),
+				&resource.AbstractResource{
+					Id:   "default-managed-by-IaC",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "fake-table-id",
+						"origin":         "CreateRouteTable",
+					},
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsRoute{
-					Id:           "default-managed-by-IaC",
-					Origin:       awssdk.String("CreateRouteTable"),
-					RouteTableId: awssdk.String("fake-table-id"),
+				&resource.AbstractResource{
+					Id:   "default-managed-by-IaC",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "fake-table-id",
+						"origin":         "CreateRouteTable",
+					},
 				},
 			},
 			[]resource.Resource{
 				&resource2.FakeResource{
 					Id: "fake",
 				},
-				&aws.AwsRoute{
-					Id:           "a-dummy-route",
-					Origin:       awssdk.String("CreateRoute"),
-					RouteTableId: awssdk.String("fake-table-id"),
+				&resource.AbstractResource{
+					Id:   "a-dummy-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "fake-table-id",
+						"origin":         "CreateRoute",
+					},
 				},
-				&aws.AwsRoute{
-					Id:           "default-managed-by-IaC",
-					Origin:       awssdk.String("CreateRouteTable"),
-					RouteTableId: awssdk.String("fake-table-id"),
+				&resource.AbstractResource{
+					Id:   "default-managed-by-IaC",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "fake-table-id",
+						"origin":         "CreateRouteTable",
+					},
 				},
 			},
 		},
@@ -66,15 +80,21 @@ func TestAwsDefaultRoute_Execute(t *testing.T) {
 				&resource2.FakeResource{
 					Id: "fake",
 				},
-				&aws.AwsRoute{
-					Id:           "a-dummy-route",
-					Origin:       awssdk.String("CreateRoute"),
-					RouteTableId: awssdk.String("fake-table-id"),
+				&resource.AbstractResource{
+					Id:   "a-dummy-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "fake-table-id",
+						"origin":         "CreateRoute",
+					},
 				},
-				&aws.AwsRoute{
-					Id:           "default-managed-by-IaC",
-					Origin:       awssdk.String("CreateRouteTable"),
-					RouteTableId: awssdk.String("fake-table-id"),
+				&resource.AbstractResource{
+					Id:   "default-managed-by-IaC",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "fake-table-id",
+						"origin":         "CreateRouteTable",
+					},
 				},
 			},
 			[]resource.Resource{},
@@ -82,10 +102,13 @@ func TestAwsDefaultRoute_Execute(t *testing.T) {
 				&resource2.FakeResource{
 					Id: "fake",
 				},
-				&aws.AwsRoute{
-					Id:           "a-dummy-route",
-					Origin:       awssdk.String("CreateRoute"),
-					RouteTableId: awssdk.String("fake-table-id"),
+				&resource.AbstractResource{
+					Id:   "a-dummy-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "fake-table-id",
+						"origin":         "CreateRoute",
+					},
 				},
 			},
 		},

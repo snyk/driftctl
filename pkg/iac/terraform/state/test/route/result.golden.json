@@ -1,44 +1,30 @@
 [
  {
-  "DestinationCidrBlock": "1.1.1.1/32",
-  "DestinationIpv6CidrBlock": null,
-  "DestinationPrefixListId": "",
-  "EgressOnlyGatewayId": null,
-  "GatewayId": "igw-0125fbf19e83d008b",
   "Id": "r-rtb-0232602f0f07748fc243279527",
-  "InstanceId": null,
-  "InstanceOwnerId": "",
-  "LocalGatewayId": null,
-  "NatGatewayId": null,
-  "NetworkInterfaceId": null,
-  "Origin": "CreateRoute",
-  "RouteTableId": "rtb-0232602f0f07748fc",
-  "State": "active",
-  "TransitGatewayId": null,
-  "VpcEndpointId": null,
-  "VpcPeeringConnectionId": null,
-  "Timeouts": null,
-  "CtyVal": {}
+  "Type": "aws_route",
+  "Attrs": {
+   "destination_cidr_block": "1.1.1.1/32",
+   "destination_prefix_list_id": "",
+   "gateway_id": "igw-0125fbf19e83d008b",
+   "id": "r-rtb-0232602f0f07748fc243279527",
+   "instance_owner_id": "",
+   "origin": "CreateRoute",
+   "route_table_id": "rtb-0232602f0f07748fc",
+   "state": "active"
+  }
  },
  {
-  "DestinationCidrBlock": null,
-  "DestinationIpv6CidrBlock": "::/0",
-  "DestinationPrefixListId": "",
-  "EgressOnlyGatewayId": null,
-  "GatewayId": "igw-0125fbf19e83d008b",
   "Id": "r-rtb-0232602f0f07748fc2750132062",
-  "InstanceId": null,
-  "InstanceOwnerId": "",
-  "LocalGatewayId": null,
-  "NatGatewayId": null,
-  "NetworkInterfaceId": null,
-  "Origin": "CreateRoute",
-  "RouteTableId": "rtb-0232602f0f07748fc",
-  "State": "active",
-  "TransitGatewayId": null,
-  "VpcEndpointId": null,
-  "VpcPeeringConnectionId": null,
-  "Timeouts": null,
-  "CtyVal": {}
+  "Type": "aws_route",
+  "Attrs": {
+   "destination_ipv6_cidr_block": "::/0",
+   "destination_prefix_list_id": "",
+   "gateway_id": "igw-0125fbf19e83d008b",
+   "id": "r-rtb-0232602f0f07748fc2750132062",
+   "instance_owner_id": "",
+   "origin": "CreateRoute",
+   "route_table_id": "rtb-0232602f0f07748fc",
+   "state": "active"
+  }
  }
 ]
