@@ -26,7 +26,6 @@
    "root_device_name": "/dev/xvda",
    "root_snapshot_id": "snap-00672558cecd93a61",
    "sriov_net_support": "simple",
-   "timeouts": {},
    "virtualization_type": "hvm"
   }
  }

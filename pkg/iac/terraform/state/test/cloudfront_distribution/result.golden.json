@@ -38,13 +38,11 @@
    "default_root_object": "",
    "domain_name": "d1g0dw0i1wvlgd.cloudfront.net",
    "enabled": false,
-   "etag": "E2CKBANLXUPWGQ",
    "hosted_zone_id": "Z2FDTNDATAQYW2",
    "http_version": "http2",
    "id": "E1M9CNS0XSHI19",
    "in_progress_validation_batches": 0,
    "is_ipv6_enabled": false,
-   "last_modified_time": "2021-02-16 10:17:35.404 +0000 UTC",
    "ordered_cache_behavior": [
     {
      "allowed_methods": [
@@ -128,8 +126,6 @@
      ]
     }
    ],
-   "retain_on_delete": false,
-   "status": "Deployed",
    "trusted_signers": [
     {
      "enabled": false
@@ -144,7 +140,6 @@
      "ssl_support_method": ""
     }
    ],
-   "wait_for_deployment": true,
    "web_acl_id": ""
   }
  }

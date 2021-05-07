@@ -35,7 +35,7 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	supplierLibrary.AddSupplier(NewGithubBranchProtectionSupplier(provider, repository))
 
 	resourceSchemaRepository.Init(provider.Schema())
-	github.InitMetadatas(resourceSchemaRepository)
+	github.InitResourcesMetadata(resourceSchemaRepository)
 
 	return nil
 }

@@ -48,7 +48,7 @@ func runTest(t *testing.T, cases TestCases) {
 		}
 		repo := testresource.InitFakeSchemaRepository(c.provider.Name, c.provider.Version)
 		aws.InitResourcesMetadata(repo)
-		github.InitMetadatas(repo)
+		github.InitResourcesMetadata(repo)
 		t.Run(c.name, func(t *testing.T) {
 			testAlerter := alerter.NewAlerter()
 
