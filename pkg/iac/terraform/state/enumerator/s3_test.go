@@ -129,7 +129,7 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 			config: config.SupplierConfig{
 				Path: "bucket-name/a/nested/prefix/**/*.tfstate",
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				input := &s3.ListObjectsV2Input{
 					Bucket: awssdk.String("bucket-name"),
 					Prefix: awssdk.String("a/nested/prefix"),
@@ -186,7 +186,7 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 			config: config.SupplierConfig{
 				Path: "bucket-name/a/nested/prefix/*.tfstate",
 			},
-			mocks: func(client *mocks.FakeS3) {
+			mocks: func(client *awstest.MockFakeS3) {
 				input := &s3.ListObjectsV2Input{
 					Bucket: awssdk.String("bucket-name"),
 					Prefix: awssdk.String("a/nested/prefix"),
