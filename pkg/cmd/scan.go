@@ -7,6 +7,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/cloudskiff/driftctl/pkg/telemetry"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -60,9 +61,14 @@ func NewScanCmd() *cobra.Command {
 			}
 			opts.Output = *out
 
-			filterFlag, _ := cmd.Flags().GetString("filter")
-			if filterFlag != "" {
-				expr, err := filter.BuildExpression(filterFlag)
+			filterFlag, _ := cmd.Flags().GetStringArray("filter")
+
+			if len(filterFlag) > 1 {
+				return errors.New("Filter flag should be specified only once")
+			}
+
+			if len(filterFlag) == 1 && filterFlag[0] != "" {
+				expr, err := filter.BuildExpression(filterFlag[0])
 				if err != nil {
 					return errors.Wrap(err, "unable to parse filter expression")
 				}
@@ -70,6 +76,7 @@ func NewScanCmd() *cobra.Command {
 			}
 
 			opts.Quiet, _ = cmd.Flags().GetBool("quiet")
+			opts.DisableTelemetry, _ = cmd.Flags().GetBool("disable-telemetry")
 
 			return nil
 		},
@@ -79,16 +86,14 @@ func NewScanCmd() *cobra.Command {
 	}
 
 	fl := cmd.Flags()
-	fl.BoolP(
+	fl.Bool(
 		"quiet",
-		"",
 		false,
 		"Do not display anything but scan results",
 	)
-	fl.StringP(
+	fl.StringArray(
 		"filter",
-		"",
-		"",
+		[]string{},
 		"JMESPath expression to filter on\n"+
 			"Examples : \n"+
 			"  - Type == 'aws_s3_bucket' (will filter only s3 buckets)\n"+
@@ -125,6 +130,12 @@ func NewScanCmd() *cobra.Command {
 		"Use those HTTP headers to query the provided URL.\n"+
 			"Only used with tfstate+http(s) backend for now.\n",
 	)
+	fl.StringVar(&opts.BackendOptions.TFCloudToken,
+		"tfc-token",
+		"",
+		"Terraform Cloud / Enterprise API token.\n"+
+			"Only used with tfstate+tfcloud backend.\n",
+	)
 	fl.BoolVar(&opts.StrictMode,
 		"strict",
 		false,
@@ -144,9 +155,10 @@ func scanRun(opts *pkg.ScanOptions) error {
 	providerLibrary := terraform.NewProviderLibrary()
 	supplierLibrary := resource.NewSupplierLibrary()
 
-	progress := globaloutput.NewProgress()
+	iacProgress := globaloutput.NewProgress("Scanning states", "Scanned states", true)
+	scanProgress := globaloutput.NewProgress("Scanning resources", "Scanned resources", true)
 
-	err := remote.Activate(opts.To, alerter, providerLibrary, supplierLibrary, progress)
+	err := remote.Activate(opts.To, alerter, providerLibrary, supplierLibrary, scanProgress)
 	if err != nil {
 		return err
 	}
@@ -160,14 +172,14 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	scanner := pkg.NewScanner(supplierLibrary.Suppliers(), alerter)
 
-	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions)
+	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress)
 	if err != nil {
 		return err
 	}
 
 	resFactory := terraform.NewTerraformResourceFactory(providerLibrary)
 
-	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, resFactory, opts)
+	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, resFactory, opts, scanProgress, iacProgress)
 
 	go func() {
 		<-c
@@ -175,10 +187,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		ctl.Stop()
 	}()
 
-	progress.Start()
 	analysis, err := ctl.Run()
-	progress.Stop()
-
 	if err != nil {
 		return err
 	}
@@ -186,6 +195,10 @@ func scanRun(opts *pkg.ScanOptions) error {
 	err = selectedOutput.Write(analysis)
 	if err != nil {
 		return err
+	}
+
+	if !opts.DisableTelemetry {
+		telemetry.SendTelemetry(analysis)
 	}
 
 	if !analysis.IsSync() {

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
@@ -23,8 +24,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
@@ -35,13 +34,13 @@ func TestIamRolePolicyAttachmentSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeIAM)
+		mocks   func(client *awstest.MockFakeIAM)
 		err     error
 	}{
 		{
 			test:    "iam multiples roles multiple policies",
 			dirName: "iam_role_policy_attachment_multiple",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListRolesPages",
 					&iam.ListRolesInput{},
 					mock.MatchedBy(func(callback func(res *iam.ListRolesOutput, lastPage bool) bool) bool {
@@ -120,7 +119,7 @@ func TestIamRolePolicyAttachmentSupplier_Resources(t *testing.T) {
 		{
 			test:    "check that we ignore policy for ignored roles",
 			dirName: "iam_role_policy_attachment_for_ignored_roles",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListRolesPages",
 					&iam.ListRolesInput{},
 					mock.MatchedBy(func(callback func(res *iam.ListRolesOutput, lastPage bool) bool) bool {
@@ -143,7 +142,7 @@ func TestIamRolePolicyAttachmentSupplier_Resources(t *testing.T) {
 		{
 			test:    "Cannot list roles",
 			dirName: "iam_role_policy_attachment_for_ignored_roles",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListRolesPages",
 					&iam.ListRolesInput{},
 					mock.MatchedBy(func(callback func(res *iam.ListRolesOutput, lastPage bool) bool) bool {
@@ -156,7 +155,7 @@ func TestIamRolePolicyAttachmentSupplier_Resources(t *testing.T) {
 		{
 			test:    "Cannot list roles policies",
 			dirName: "iam_role_policy_attachment_for_ignored_roles",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListRolesPages",
 					&iam.ListRolesInput{},
 					mock.MatchedBy(func(callback func(res *iam.ListRolesOutput, lastPage bool) bool) bool {
@@ -194,7 +193,7 @@ func TestIamRolePolicyAttachmentSupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeIam := mocks.FakeIAM{}
+			fakeIam := awstest.MockFakeIAM{}
 			c.mocks(&fakeIam)
 
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)

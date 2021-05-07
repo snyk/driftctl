@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
@@ -23,8 +24,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
@@ -35,13 +34,13 @@ func TestIamUserPolicySupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeIAM)
+		mocks   func(client *awstest.MockFakeIAM)
 		err     error
 	}{
 		{
 			test:    "no iam user (no policy)",
 			dirName: "iam_user_policy_empty",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListUsersPages", mock.Anything, mock.Anything).Return(nil)
 				client.On("ListUserPoliciesPages", mock.Anything, mock.Anything).Panic("ListUsersPoliciesPages should not be called when there is no user")
 			},
@@ -50,7 +49,7 @@ func TestIamUserPolicySupplier_Resources(t *testing.T) {
 		{
 			test:    "iam multiples users multiple policies",
 			dirName: "iam_user_policy_multiple",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListUsersPages",
 					&iam.ListUsersInput{},
 					mock.MatchedBy(func(callback func(res *iam.ListUsersOutput, lastPage bool) bool) bool {
@@ -140,7 +139,7 @@ func TestIamUserPolicySupplier_Resources(t *testing.T) {
 		{
 			test:    "cannot list iam user (no policy)",
 			dirName: "iam_user_policy_empty",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListUsersPages", mock.Anything, mock.Anything).Return(awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsIamUserPolicyResourceType, resourceaws.AwsIamUserResourceType),
@@ -149,7 +148,7 @@ func TestIamUserPolicySupplier_Resources(t *testing.T) {
 		{
 			test:    "cannot list user policy",
 			dirName: "iam_user_policy_empty",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListUsersPages",
 					&iam.ListUsersInput{},
 					mock.MatchedBy(func(callback func(res *iam.ListUsersOutput, lastPage bool) bool) bool {
@@ -183,7 +182,7 @@ func TestIamUserPolicySupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeIam := mocks.FakeIAM{}
+			fakeIam := awstest.MockFakeIAM{}
 			c.mocks(&fakeIam)
 
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)

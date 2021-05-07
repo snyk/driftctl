@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -16,13 +16,13 @@ import (
 func Test_sqsRepository_ListAllQueues(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *mocks.FakeSQS)
+		mocks   func(client *awstest.MockFakeSQS)
 		want    []*string
 		wantErr error
 	}{
 		{
 			name: "list with multiple pages",
-			mocks: func(client *mocks.FakeSQS) {
+			mocks: func(client *awstest.MockFakeSQS) {
 				client.On("ListQueuesPages",
 					&sqs.ListQueuesInput{},
 					mock.MatchedBy(func(callback func(res *sqs.ListQueuesOutput, lastPage bool) bool) bool {
@@ -49,7 +49,7 @@ func Test_sqsRepository_ListAllQueues(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.FakeSQS{}
+			client := &awstest.MockFakeSQS{}
 			tt.mocks(client)
 			r := &sqsRepository{
 				client: client,

@@ -2,7 +2,9 @@ package pkg
 
 import (
 	"fmt"
+	"time"
 
+	globaloutput "github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/jmespath/go-jmespath"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -18,15 +20,16 @@ import (
 )
 
 type ScanOptions struct {
-	Coverage       bool
-	Detect         bool
-	From           []config.SupplierConfig
-	To             string
-	Output         output.OutputConfig
-	Filter         *jmespath.JMESPath
-	Quiet          bool
-	BackendOptions *backend.Options
-	StrictMode     bool
+	Coverage         bool
+	Detect           bool
+	From             []config.SupplierConfig
+	To               string
+	Output           output.OutputConfig
+	Filter           *jmespath.JMESPath
+	Quiet            bool
+	BackendOptions   *backend.Options
+	StrictMode       bool
+	DisableTelemetry bool
 }
 
 type DriftCTL struct {
@@ -37,9 +40,11 @@ type DriftCTL struct {
 	filter          *jmespath.JMESPath
 	resourceFactory resource.ResourceFactory
 	strictMode      bool
+	scanProgress    globaloutput.Progress
+	iacProgress     globaloutput.Progress
 }
 
-func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, alerter *alerter.Alerter, resFactory resource.ResourceFactory, opts *ScanOptions) *DriftCTL {
+func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier, alerter *alerter.Alerter, resFactory resource.ResourceFactory, opts *ScanOptions, scanProgress globaloutput.Progress, iacProgress globaloutput.Progress) *DriftCTL {
 	return &DriftCTL{
 		remoteSupplier,
 		iacSupplier,
@@ -48,10 +53,13 @@ func NewDriftCTL(remoteSupplier resource.Supplier, iacSupplier resource.Supplier
 		opts.Filter,
 		resFactory,
 		opts.StrictMode,
+		scanProgress,
+		iacProgress,
 	}
 }
 
 func (d DriftCTL) Run() (*analyser.Analysis, error) {
+	start := time.Now()
 	remoteResources, resourcesFromState, err := d.scan()
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -107,6 +115,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	driftIgnore := filter.NewDriftIgnore()
 
 	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState, driftIgnore)
+	analysis.Duration = time.Since(start)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to perform resources analysis")
@@ -132,12 +141,16 @@ func (d DriftCTL) Stop() {
 
 func (d DriftCTL) scan() (remoteResources []resource.Resource, resourcesFromState []resource.Resource, err error) {
 	logrus.Info("Start reading IaC")
+	d.iacProgress.Start()
 	resourcesFromState, err = d.iacSupplier.Resources()
+	d.iacProgress.Stop()
 	if err != nil {
 		return nil, nil, err
 	}
 
 	logrus.Info("Start scanning cloud provider")
+	d.scanProgress.Start()
+	defer d.scanProgress.Stop()
 	remoteResources, err = d.remoteSupplier.Resources()
 	if err != nil {
 		return nil, nil, err

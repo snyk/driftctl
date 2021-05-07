@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
@@ -13,7 +14,6 @@ import (
 	awssdk "github.com/aws/aws-sdk-go/aws"
 
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -30,13 +30,13 @@ func TestInternetGatewaySupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeEC2)
+		mocks   func(client *awstest.MockFakeEC2)
 		err     error
 	}{
 		{
 			test:    "no internet gateways",
 			dirName: "internet_gateway_empty",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeInternetGatewaysPages",
 					&ec2.DescribeInternetGatewaysInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeInternetGatewaysOutput, lastPage bool) bool) bool {
@@ -49,7 +49,7 @@ func TestInternetGatewaySupplier_Resources(t *testing.T) {
 		{
 			test:    "multiple internet gateways",
 			dirName: "internet_gateway_multiple",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeInternetGatewaysPages",
 					&ec2.DescribeInternetGatewaysInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeInternetGatewaysOutput, lastPage bool) bool) bool {
@@ -71,7 +71,7 @@ func TestInternetGatewaySupplier_Resources(t *testing.T) {
 		{
 			test:    "cannot list internet gateways",
 			dirName: "internet_gateway_empty",
-			mocks: func(client *mocks.FakeEC2) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeInternetGatewaysPages",
 					&ec2.DescribeInternetGatewaysInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeInternetGatewaysOutput, lastPage bool) bool) bool {
@@ -96,7 +96,7 @@ func TestInternetGatewaySupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeEC2 := mocks.FakeEC2{}
+			fakeEC2 := awstest.MockFakeEC2{}
 			c.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			internetGatewayDeserializer := awsdeserializer.NewInternetGatewayDeserializer()

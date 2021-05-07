@@ -80,7 +80,7 @@ func run() int {
 }
 
 func flushSentry() {
-	fmt.Print("Sending error report ...")
-	gosentry.Flush(60 * time.Second)
-	fmt.Printf(" done, thank you %s\n", color.RedString("❤️"))
+	ttl := 60 * time.Second
+	ok := gosentry.Flush(ttl)
+	logrus.WithField("timeout", ttl).WithField("success", ok).Debug("Flushed Sentry events")
 }

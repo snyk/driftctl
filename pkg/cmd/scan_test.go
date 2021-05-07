@@ -39,6 +39,8 @@ func TestScanCmd_Valid(t *testing.T) {
 		{args: []string{"scan", "-t", "aws+tf", "-f", "tfstate://test"}},
 		{args: []string{"scan", "--to", "aws+tf", "--from", "tfstate://test"}},
 		{args: []string{"scan", "--to", "aws+tf", "--from", "tfstate+https://github.com/state.tfstate"}},
+		{args: []string{"scan", "--to", "aws+tf", "--from", "tfstate+tfcloud://workspace_id"}},
+		{args: []string{"scan", "--tfc-token", "token"}},
 		{args: []string{"scan", "--filter", "Type=='aws_s3_bucket'"}},
 		{args: []string{"scan", "--strict"}},
 	}
@@ -69,15 +71,16 @@ func TestScanCmd_Invalid(t *testing.T) {
 		{args: []string{"scan", "-f"}, expected: `flag needs an argument: 'f' in -f`},
 		{args: []string{"scan", "--from"}, expected: `flag needs an argument: --from`},
 		{args: []string{"scan", "--from"}, expected: `flag needs an argument: --from`},
-		{args: []string{"scan", "--from", "tosdgjhgsdhgkjs"}, expected: "Unable to parse from flag 'tosdgjhgsdhgkjs': \nAccepted schemes are: tfstate://,tfstate+s3://,tfstate+http://,tfstate+https://"},
-		{args: []string{"scan", "--from", "://"}, expected: "Unable to parse from flag '://': \nAccepted schemes are: tfstate://,tfstate+s3://,tfstate+http://,tfstate+https://"},
-		{args: []string{"scan", "--from", "://test"}, expected: "Unable to parse from flag '://test': \nAccepted schemes are: tfstate://,tfstate+s3://,tfstate+http://,tfstate+https://"},
-		{args: []string{"scan", "--from", "tosdgjhgsdhgkjs://"}, expected: "Unable to parse from flag 'tosdgjhgsdhgkjs://': \nAccepted schemes are: tfstate://,tfstate+s3://,tfstate+http://,tfstate+https://"},
-		{args: []string{"scan", "--from", "terraform+foo+bar://test"}, expected: "Unable to parse from scheme 'terraform+foo+bar': \nAccepted schemes are: tfstate://,tfstate+s3://,tfstate+http://,tfstate+https://"},
+		{args: []string{"scan", "--from", "tosdgjhgsdhgkjs"}, expected: "Unable to parse from flag 'tosdgjhgsdhgkjs': \nAccepted schemes are: tfstate://,tfstate+s3://,tfstate+http://,tfstate+https://,tfstate+tfcloud://"},
+		{args: []string{"scan", "--from", "://"}, expected: "Unable to parse from flag '://': \nAccepted schemes are: tfstate://,tfstate+s3://,tfstate+http://,tfstate+https://,tfstate+tfcloud://"},
+		{args: []string{"scan", "--from", "://test"}, expected: "Unable to parse from flag '://test': \nAccepted schemes are: tfstate://,tfstate+s3://,tfstate+http://,tfstate+https://,tfstate+tfcloud://"},
+		{args: []string{"scan", "--from", "tosdgjhgsdhgkjs://"}, expected: "Unable to parse from flag 'tosdgjhgsdhgkjs://': \nAccepted schemes are: tfstate://,tfstate+s3://,tfstate+http://,tfstate+https://,tfstate+tfcloud://"},
+		{args: []string{"scan", "--from", "terraform+foo+bar://test"}, expected: "Unable to parse from scheme 'terraform+foo+bar': \nAccepted schemes are: tfstate://,tfstate+s3://,tfstate+http://,tfstate+https://,tfstate+tfcloud://"},
 		{args: []string{"scan", "--from", "unsupported://test"}, expected: "Unsupported IaC source 'unsupported': \nAccepted values are: tfstate"},
-		{args: []string{"scan", "--from", "tfstate+foobar://test"}, expected: "Unsupported IaC backend 'foobar': \nAccepted values are: s3,http,https"},
-		{args: []string{"scan", "--from", "tfstate:///tmp/test", "--from", "tfstate+toto://test"}, expected: "Unsupported IaC backend 'toto': \nAccepted values are: s3,http,https"},
+		{args: []string{"scan", "--from", "tfstate+foobar://test"}, expected: "Unsupported IaC backend 'foobar': \nAccepted values are: s3,http,https,tfcloud"},
+		{args: []string{"scan", "--from", "tfstate:///tmp/test", "--from", "tfstate+toto://test"}, expected: "Unsupported IaC backend 'toto': \nAccepted values are: s3,http,https,tfcloud"},
 		{args: []string{"scan", "--filter", "Type='test'"}, expected: "unable to parse filter expression: SyntaxError: Expected tRbracket, received: tUnknown"},
+		{args: []string{"scan", "--filter", "Type='test'", "--filter", "Type='test2'"}, expected: "Filter flag should be specified only once"},
 	}
 
 	for _, tt := range cases {
