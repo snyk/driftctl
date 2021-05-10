@@ -66,7 +66,6 @@ func NewDriftctlCmd(build build.BuildInterface) *DriftctlCmd {
 	cmd.PersistentFlags().BoolP("send-crash-report", "", false, "Enable error reporting. Crash data will be sent to us via Sentry.\nWARNING: may leak sensitive data (please read the documentation for more details)\nThis flag should be used only if an error occurs during execution")
 
 	cmd.AddCommand(NewScanCmd())
-	cmd.AddCommand(NewGenDriftIgnoreCmd())
 
 	return cmd
 }
