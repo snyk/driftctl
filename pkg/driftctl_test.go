@@ -110,6 +110,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			assert: func(result *test.ScanResult, err error) {
 				result.NotZero(result.Duration)
 			},
+			options: &pkg.ScanOptions{},
 		},
 		{
 			name: "infrastructure should be in sync",
@@ -314,7 +315,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			},
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertManagedCount(2)
-				result.AssertUnmanagedCount(1)
+				result.AssertUnmanagedCount(2)
 				result.AssertDeletedCount(0)
 				result.AssertDriftCountTotal(0)
 			},
