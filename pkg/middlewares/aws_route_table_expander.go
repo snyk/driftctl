@@ -3,7 +3,6 @@ package middlewares
 import (
 	"fmt"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/sirupsen/logrus"
 
 	"github.com/cloudskiff/driftctl/pkg/alerter"
@@ -92,7 +91,15 @@ func (m *AwsRouteTableExpander) handleTable(table *resource.AbstractResource, re
 	}
 	for _, route := range routes.([]interface{}) {
 		route := route.(map[string]interface{})
-		routeId, err := aws.CalculateRouteID(&table.Id, awssdk.String(route["cidr_block"].(string)), awssdk.String(route["ipv6_cidr_block"].(string)))
+		cidrBlock := ""
+		if route["cidr_block"] != nil {
+			cidrBlock = route["cidr_block"].(string)
+		}
+		ipv6CidrBlock := ""
+		if route["ipv6_cidr_block"] != nil {
+			ipv6CidrBlock = route["ipv6_cidr_block"].(string)
+		}
+		routeId, err := aws.CalculateRouteID(&table.Id, &cidrBlock, &ipv6CidrBlock)
 		if err != nil {
 			m.alerter.SendAlert(aws.AwsRouteTableResourceType, newInvalidRouteAlert(aws.AwsRouteTableResourceType, table.Id))
 			continue
@@ -101,7 +108,6 @@ func (m *AwsRouteTableExpander) handleTable(table *resource.AbstractResource, re
 		data := map[string]interface{}{
 			"destination_cidr_block":      route["cidr_block"],
 			"destination_ipv6_cidr_block": route["ipv6_cidr_block"],
-			"destination_prefix_list_id":  "",
 			"egress_only_gateway_id":      route["egress_only_gateway_id"],
 			"gateway_id":                  route["gateway_id"],
 			"id":                          routeId,
@@ -124,7 +130,6 @@ func (m *AwsRouteTableExpander) handleTable(table *resource.AbstractResource, re
 		newRes := m.resourceFactory.CreateAbstractResource(aws.AwsRouteResourceType, routeId, data)
 		*results = append(*results, newRes)
 		logrus.WithFields(logrus.Fields{
-			// "route": newRes.String(), TODO
 			"route": routeId,
 		}).Debug("Created new route from route table")
 	}
@@ -139,7 +144,15 @@ func (m *AwsRouteTableExpander) handleDefaultTable(table *resource.AbstractResou
 	}
 	for _, route := range routes.([]interface{}) {
 		route := route.(map[string]interface{})
-		routeId, err := aws.CalculateRouteID(&table.Id, awssdk.String(route["cidr_block"].(string)), awssdk.String(route["ipv6_cidr_block"].(string)))
+		cidrBlock := ""
+		if route["cidr_block"] != nil {
+			cidrBlock = route["cidr_block"].(string)
+		}
+		ipv6CidrBlock := ""
+		if route["ipv6_cidr_block"] != nil {
+			ipv6CidrBlock = route["ipv6_cidr_block"].(string)
+		}
+		routeId, err := aws.CalculateRouteID(&table.Id, &cidrBlock, &ipv6CidrBlock)
 		if err != nil {
 			m.alerter.SendAlert(aws.AwsDefaultRouteTableResourceType, newInvalidRouteAlert(aws.AwsDefaultRouteTableResourceType, table.Id))
 			continue
@@ -148,12 +161,10 @@ func (m *AwsRouteTableExpander) handleDefaultTable(table *resource.AbstractResou
 		data := map[string]interface{}{
 			"destination_cidr_block":      route["cidr_block"],
 			"destination_ipv6_cidr_block": route["ipv6_cidr_block"],
-			"destination_prefix_list_id":  "",
 			"egress_only_gateway_id":      route["egress_only_gateway_id"],
 			"gateway_id":                  route["gateway_id"],
 			"id":                          routeId,
 			"instance_id":                 route["instance_id"],
-			"instance_owner_id":           "",
 			"nat_gateway_id":              route["nat_gateway_id"],
 			"network_interface_id":        route["network_interface_id"],
 			"origin":                      "CreateRoute",
@@ -170,7 +181,6 @@ func (m *AwsRouteTableExpander) handleDefaultTable(table *resource.AbstractResou
 		newRes := m.resourceFactory.CreateAbstractResource(aws.AwsRouteResourceType, routeId, data)
 		*results = append(*results, newRes)
 		logrus.WithFields(logrus.Fields{
-			// "route": newRes.String(), TODO
 			"route": routeId,
 		}).Debug("Created new route from default route table")
 	}

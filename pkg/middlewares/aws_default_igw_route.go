@@ -49,7 +49,6 @@ func (m AwsDefaultInternetGatewayRoute) Execute(remoteResources, resourcesFromSt
 
 		// Else, resource is not added to newRemoteResources slice so it will be ignored
 		logrus.WithFields(logrus.Fields{
-			// "route": route.String(), TODO
 			"id":   route.TerraformId(),
 			"type": route.TerraformType(),
 		}).Debug("Ignoring default internet gateway route as it is not managed by IaC")

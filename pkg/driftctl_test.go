@@ -721,9 +721,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					Attrs: &resource.Attributes{
 						"route": []interface{}{
 							map[string]interface{}{
-								"gateway_id":      "igw-07b7844a8fd17a638",
-								"cidr_block":      "0.0.0.0/0",
-								"ipv6_cidr_block": "",
+								"gateway_id": "igw-07b7844a8fd17a638",
+								"cidr_block": "0.0.0.0/0",
 							},
 							map[string]interface{}{
 								"gateway_id":      "igw-07b7844a8fd17a638",
@@ -739,13 +738,11 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					Id:   "r-table1080289494",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
-						"route_table_id":             "table",
-						"origin":                     "CreateRoute",
-						"destination_cidr_block":     "0.0.0.0/0",
-						"gateway_id":                 "igw-07b7844a8fd17a638",
-						"state":                      "active",
-						"destination_prefix_list_id": "",
-						"instance_owner_id":          "",
+						"route_table_id":         "table",
+						"origin":                 "CreateRoute",
+						"destination_cidr_block": "0.0.0.0/0",
+						"gateway_id":             "igw-07b7844a8fd17a638",
+						"state":                  "active",
 					},
 				},
 				&resource.AbstractResource{
@@ -757,8 +754,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"destination_ipv6_cidr_block": "::/0",
 						"gateway_id":                  "igw-07b7844a8fd17a638",
 						"state":                       "active",
-						"destination_prefix_list_id":  "",
-						"instance_owner_id":           "",
 					},
 				},
 			},
@@ -775,13 +770,11 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					Id:   "r-table1080289494",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
-						"route_table_id":             "table",
-						"origin":                     "CreateRoute",
-						"destination_cidr_block":     "0.0.0.0/0",
-						"gateway_id":                 "igw-07b7844a8fd17a638",
-						"state":                      "active",
-						"destination_prefix_list_id": "",
-						"instance_owner_id":          "",
+						"route_table_id":         "table",
+						"origin":                 "CreateRoute",
+						"destination_cidr_block": "0.0.0.0/0",
+						"gateway_id":             "igw-07b7844a8fd17a638",
+						"state":                  "active",
 					},
 				}, nil)
 				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_route", "r-table2750132062", mock.MatchedBy(func(input map[string]interface{}) bool {
@@ -801,8 +794,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"destination_ipv6_cidr_block": "::/0",
 						"gateway_id":                  "igw-07b7844a8fd17a638",
 						"state":                       "active",
-						"destination_prefix_list_id":  "",
-						"instance_owner_id":           "",
 					},
 				}, nil)
 			},
