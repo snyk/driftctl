@@ -25,9 +25,9 @@ func (m AwsDefaultRoute) Execute(remoteResources, resourcesFromState *[]resource
 			continue
 		}
 
-		route, _ := remoteResource.(*aws.AwsRoute)
+		route, _ := remoteResource.(*resource.AbstractResource)
 		// Ignore all non-default routes, check if route is coming from table creation
-		if route.Origin != nil && *route.Origin != "CreateRouteTable" {
+		if origin, exist := route.Attrs.Get("origin"); exist && origin != "CreateRouteTable" {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
@@ -49,9 +49,9 @@ func (m AwsDefaultRoute) Execute(remoteResources, resourcesFromState *[]resource
 
 		// Else, resource is not added to newRemoteResources slice so it will be ignored
 		logrus.WithFields(logrus.Fields{
-			"route": route.String(),
-			"id":    route.TerraformId(),
-			"type":  route.TerraformType(),
+			// "route": route.String(), TODO
+			"id":   route.TerraformId(),
+			"type": route.TerraformType(),
 		}).Debug("Ignoring default route as it is not managed by IaC")
 	}
 

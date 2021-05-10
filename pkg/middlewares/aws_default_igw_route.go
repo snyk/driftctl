@@ -25,7 +25,7 @@ func (m AwsDefaultInternetGatewayRoute) Execute(remoteResources, resourcesFromSt
 			continue
 		}
 
-		route, _ := remoteResource.(*aws.AwsRoute)
+		route, _ := remoteResource.(*resource.AbstractResource)
 		// Ignore all routes except the one that came from the default internet gateway
 		if !isDefaultInternetGatewayRoute(route, remoteResources) {
 			newRemoteResources = append(newRemoteResources, remoteResource)
@@ -49,9 +49,8 @@ func (m AwsDefaultInternetGatewayRoute) Execute(remoteResources, resourcesFromSt
 
 		// Else, resource is not added to newRemoteResources slice so it will be ignored
 		logrus.WithFields(logrus.Fields{
-			"route": route.String(),
-			"id":    route.TerraformId(),
-			"type":  route.TerraformType(),
+			"id":   route.TerraformId(),
+			"type": route.TerraformType(),
 		}).Debug("Ignoring default internet gateway route as it is not managed by IaC")
 	}
 
@@ -61,13 +60,13 @@ func (m AwsDefaultInternetGatewayRoute) Execute(remoteResources, resourcesFromSt
 }
 
 // Return true if the route's target is the default internet gateway (e.g. attached to the default vpc)
-func isDefaultInternetGatewayRoute(route *aws.AwsRoute, remoteResources *[]resource.Resource) bool {
+func isDefaultInternetGatewayRoute(route *resource.AbstractResource, remoteResources *[]resource.Resource) bool {
 	for _, remoteResource := range *remoteResources {
 		if remoteResource.TerraformType() == aws.AwsInternetGatewayResourceType &&
 			isDefaultInternetGateway(remoteResource.(*aws.AwsInternetGateway), remoteResources) {
-			return route.GatewayId != nil &&
-				*route.GatewayId == remoteResource.TerraformId() &&
-				route.DestinationCidrBlock != nil && *route.DestinationCidrBlock == "0.0.0.0/0"
+			gtwId, gtwIdExist := route.Attrs.Get("gateway_id")
+			destCIDRBlock, destCIDRBlockExist := route.Attrs.Get("destination_cidr_block")
+			return gtwIdExist && destCIDRBlockExist && gtwId == remoteResource.TerraformId() && destCIDRBlock == "0.0.0.0/0"
 		}
 	}
 	return false
