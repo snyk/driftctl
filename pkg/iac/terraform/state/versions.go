@@ -18,8 +18,7 @@ type UnsupportedVersionError struct {
 }
 
 func (u *UnsupportedVersionError) Error() string {
-	return fmt.Sprintf("%s was generated using Terraform %s which is currently not supported by driftctl\n"+
-		"Please read documentation at https://docs.driftctl.com/limitations", u.StateFile, u.Version)
+	return fmt.Sprintf("%s was generated using Terraform %s which is currently not supported by driftctl. Please read documentation at https://docs.driftctl.com/limitations", u.StateFile, u.Version)
 }
 
 func IsVersionSupported(rawVersion string) (bool, error) {

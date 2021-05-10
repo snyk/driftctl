@@ -263,7 +263,7 @@ func TestTerraformStateReader_VersionSupported(t *testing.T) {
 		{
 			name:      "should detect unsupported version",
 			statePath: "testdata/v4/unsupported_version.tfstate",
-			err:       errors.New("terraform.tfstate was generated using Terraform 0.10.26 which is currently not supported by driftctl\nPlease read documentation at https://docs.driftctl.com/limitations"),
+			err:       errors.New("terraform.tfstate was generated using Terraform 0.10.26 which is currently not supported by driftctl. Please read documentation at https://docs.driftctl.com/limitations"),
 		},
 		{
 			name:      "should detect supported version",
