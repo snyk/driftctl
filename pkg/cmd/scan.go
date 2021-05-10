@@ -7,6 +7,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/cloudskiff/driftctl/pkg/telemetry"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -75,6 +76,7 @@ func NewScanCmd() *cobra.Command {
 			}
 
 			opts.Quiet, _ = cmd.Flags().GetBool("quiet")
+			opts.DisableTelemetry, _ = cmd.Flags().GetBool("disable-telemetry")
 
 			return nil
 		},
@@ -128,6 +130,12 @@ func NewScanCmd() *cobra.Command {
 		"Use those HTTP headers to query the provided URL.\n"+
 			"Only used with tfstate+http(s) backend for now.\n",
 	)
+	fl.StringVar(&opts.BackendOptions.TFCloudToken,
+		"tfc-token",
+		"",
+		"Terraform Cloud / Enterprise API token.\n"+
+			"Only used with tfstate+tfcloud backend.\n",
+	)
 	fl.BoolVar(&opts.StrictMode,
 		"strict",
 		false,
@@ -147,11 +155,12 @@ func scanRun(opts *pkg.ScanOptions) error {
 	providerLibrary := terraform.NewProviderLibrary()
 	supplierLibrary := resource.NewSupplierLibrary()
 
-	progress := globaloutput.NewProgress()
+	iacProgress := globaloutput.NewProgress("Scanning states", "Scanned states", true)
+	scanProgress := globaloutput.NewProgress("Scanning resources", "Scanned resources", true)
 
 	resourceSchemaRepository := resource.NewSchemaRepository()
 
-	err := remote.Activate(opts.To, alerter, providerLibrary, supplierLibrary, progress, resourceSchemaRepository)
+	err := remote.Activate(opts.To, alerter, providerLibrary, supplierLibrary, scanProgress, resourceSchemaRepository)
 	if err != nil {
 		return err
 	}
@@ -165,14 +174,14 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	scanner := pkg.NewScanner(supplierLibrary.Suppliers(), alerter, resourceSchemaRepository)
 
-	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, resourceSchemaRepository)
+	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, resourceSchemaRepository)
 	if err != nil {
 		return err
 	}
 
 	resFactory := terraform.NewTerraformResourceFactory(providerLibrary, resourceSchemaRepository)
 
-	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, resFactory, opts, resourceSchemaRepository)
+	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, resFactory, opts, scanProgress, iacProgress, resourceSchemaRepository)
 
 	go func() {
 		<-c
@@ -180,10 +189,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		ctl.Stop()
 	}()
 
-	progress.Start()
 	analysis, err := ctl.Run()
-	progress.Stop()
-
 	if err != nil {
 		return err
 	}
@@ -191,6 +197,10 @@ func scanRun(opts *pkg.ScanOptions) error {
 	err = selectedOutput.Write(analysis)
 	if err != nil {
 		return err
+	}
+
+	if !opts.DisableTelemetry {
+		telemetry.SendTelemetry(analysis)
 	}
 
 	if !analysis.IsSync() {

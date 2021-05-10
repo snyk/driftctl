@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFileEnumerator_Enumerate(t *testing.T) {
@@ -20,9 +21,37 @@ func TestFileEnumerator_Enumerate(t *testing.T) {
 				Path: "testdata/states",
 			},
 			want: []string{
-				"testdata/states/route53/directory/route53.state",
-				"testdata/states/s3/terraform.tfstate",
+				"testdata/states/symlink.tfstate",
 				"testdata/states/terraform.tfstate",
+				"testdata/states/lambda/lambda.tfstate",
+				"testdata/states/s3/terraform.tfstate",
+				"testdata/states/symlink-to-s3-folder/terraform.tfstate",
+			},
+		},
+		{
+			name: "subfolder nesting glob",
+			config: config.SupplierConfig{
+				Path: "testdata/states/**/*.tfstate",
+			},
+			want: []string{
+				"testdata/states/symlink.tfstate",
+				"testdata/states/terraform.tfstate",
+				"testdata/states/lambda/lambda.tfstate",
+				"testdata/states/s3/terraform.tfstate",
+				"testdata/states/symlink-to-s3-folder/terraform.tfstate",
+			},
+		},
+		{
+			name: "subfolder nesting glob upper directory",
+			config: config.SupplierConfig{
+				Path: "testdata/states/s3/../**/*.tfstate",
+			},
+			want: []string{
+				"testdata/states/symlink.tfstate",
+				"testdata/states/terraform.tfstate",
+				"testdata/states/lambda/lambda.tfstate",
+				"testdata/states/s3/terraform.tfstate",
+				"testdata/states/symlink-to-s3-folder/terraform.tfstate",
 			},
 		},
 		{
@@ -31,9 +60,11 @@ func TestFileEnumerator_Enumerate(t *testing.T) {
 				Path: "testdata/symlink",
 			},
 			want: []string{
-				"testdata/states/route53/directory/route53.state",
-				"testdata/states/s3/terraform.tfstate",
+				"testdata/states/symlink.tfstate",
 				"testdata/states/terraform.tfstate",
+				"testdata/states/lambda/lambda.tfstate",
+				"testdata/states/s3/terraform.tfstate",
+				"testdata/states/symlink-to-s3-folder/terraform.tfstate",
 			},
 		},
 		{
@@ -75,12 +106,10 @@ func TestFileEnumerator_Enumerate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := NewFileEnumerator(tt.config)
 			got, err := s.Enumerate()
-			if err != nil && err.Error() != tt.err {
-				t.Fatalf("Expected error '%s', got '%s'", tt.err, err.Error())
-			}
-			if err != nil && tt.err == "" {
-				t.Fatalf("Expected error '%s' but got nil", tt.err)
-				return
+			if tt.err != "" {
+				assert.EqualError(t, err, tt.err)
+			} else {
+				assert.NoError(t, err)
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Enumerate() got = %v, want %v", got, tt.want)

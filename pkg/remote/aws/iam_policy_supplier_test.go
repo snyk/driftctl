@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
@@ -22,7 +23,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
@@ -34,13 +34,13 @@ func TestIamPolicySupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeIAM)
+		mocks   func(client *awstest.MockFakeIAM)
 		err     error
 	}{
 		{
 			test:    "no iam custom policies",
 			dirName: "iam_policy_empty",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On(
 					"ListPoliciesPages",
 					&iam.ListPoliciesInput{Scope: aws.String("Local")},
@@ -52,7 +52,7 @@ func TestIamPolicySupplier_Resources(t *testing.T) {
 		{
 			test:    "iam multiples custom policies",
 			dirName: "iam_policy_multiple",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On("ListPoliciesPages",
 					&iam.ListPoliciesInput{Scope: aws.String(iam.PolicyScopeTypeLocal)},
 					mock.MatchedBy(func(callback func(res *iam.ListPoliciesOutput, lastPage bool) bool) bool {
@@ -77,7 +77,7 @@ func TestIamPolicySupplier_Resources(t *testing.T) {
 		{
 			test:    "cannot list iam custom policies",
 			dirName: "iam_policy_empty",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				client.On(
 					"ListPoliciesPages",
 					&iam.ListPoliciesInput{Scope: aws.String("Local")},
@@ -102,7 +102,7 @@ func TestIamPolicySupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeIam := mocks.FakeIAM{}
+			fakeIam := awstest.MockFakeIAM{}
 			c.mocks(&fakeIam)
 
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)

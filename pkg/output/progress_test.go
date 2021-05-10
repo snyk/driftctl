@@ -8,7 +8,7 @@ import (
 )
 
 func TestProgressTimeoutDoesNotInc(t *testing.T) {
-	progress := NewProgress()
+	progress := NewProgress("loading", "loaded", false)
 	progress.Start()
 	progress.Inc()
 	progress.Stop() // should not hang
@@ -21,7 +21,7 @@ func TestProgressTimeoutDoesNotInc(t *testing.T) {
 }
 
 func TestProgressTimeoutDoesNotHang(t *testing.T) {
-	progress := NewProgress()
+	progress := NewProgress("loading", "loaded", false)
 	progress.Start()
 	time.Sleep(progressTimeout)
 	for progress.started.Load() == true {
@@ -32,7 +32,7 @@ func TestProgressTimeoutDoesNotHang(t *testing.T) {
 }
 
 func TestProgress(t *testing.T) {
-	progress := NewProgress()
+	progress := NewProgress("loading", "loaded", false)
 	progress.Start()
 	progress.Inc()
 	progress.Inc()
