@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/mock"
 	"github.com/zclconf/go-cty/cty"
@@ -1042,378 +1041,304 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 		{
 			name: "test security group rule sanitizer middleware",
 			stateResources: []resource.Resource{
-				&aws.AwsSecurityGroupRule{
-					Id:                    "sgrule-3970541193",
-					Type:                  awssdk.String("ingress"),
-					SecurityGroupId:       awssdk.String("sg-0254c038e32f25530"),
-					Protocol:              awssdk.String("tcp"),
-					FromPort:              awssdk.Int(0),
-					ToPort:                awssdk.Int(65535),
-					Self:                  awssdk.Bool(true),
-					SourceSecurityGroupId: awssdk.String("sg-0254c038e32f25530"),
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"id":                       cty.StringVal("sgrule-3970541193"),
-							"type":                     cty.StringVal("ingress"),
-							"security_group_id":        cty.StringVal("sg-0254c038e32f25530"),
-							"protocol":                 cty.StringVal("tcp"),
-							"from_port":                cty.NumberIntVal(0),
-							"to_port":                  cty.NumberIntVal(65535),
-							"self":                     cty.BoolVal(true),
-							"source_security_group_id": cty.StringVal("sg-0254c038e32f25530"),
-						})
-						return &v
-					}(),
+				&resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-3970541193",
+					Attrs: &resource.Attributes{
+						"id":                       "sgrule-3970541193",
+						"type":                     "ingress",
+						"security_group_id":        "sg-0254c038e32f25530",
+						"protocol":                 "tcp",
+						"from_port":                0,
+						"to_port":                  65535,
+						"self":                     true,
+						"source_security_group_id": "sg-0254c038e32f25530",
+					},
 				},
-				&aws.AwsSecurityGroupRule{
-					Id:              "sgrule-845917806",
-					Type:            awssdk.String("egress"),
-					SecurityGroupId: awssdk.String("sg-0254c038e32f25530"),
-					Protocol:        awssdk.String("-1"),
-					FromPort:        awssdk.Int(0),
-					ToPort:          awssdk.Int(0),
-					CidrBlocks:      &[]string{"0.0.0.0/0"},
-					Ipv6CidrBlocks:  &[]string{"::/0"},
+				&resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-845917806",
+					Attrs: &resource.Attributes{
+						"id":                "sgrule-845917806",
+						"type":              "egress",
+						"security_group_id": "sg-0254c038e32f25530",
+						"protocol":          "-1",
+						"from_port":         0,
+						"to_port":           0,
+						"cidr_blocks":       &[]string{"0.0.0.0/0"},
+						"ipv6_cidr_blocks":  &[]string{"::/0"},
+					},
 				},
-				&aws.AwsSecurityGroupRule{
-					Id:              "sgrule-294318973",
-					Type:            awssdk.String("ingress"),
-					SecurityGroupId: awssdk.String("sg-0254c038e32f25530"),
-					Protocol:        awssdk.String("-1"),
-					FromPort:        awssdk.Int(0),
-					ToPort:          awssdk.Int(0),
-					CidrBlocks:      &[]string{"1.2.0.0/16", "5.6.7.0/24"},
+				&resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-294318973",
+					Attrs: &resource.Attributes{
+						"id":                "sgrule-294318973",
+						"type":              "ingress",
+						"security_group_id": "sg-0254c038e32f25530",
+						"protocol":          "-1",
+						"from_port":         0,
+						"to_port":           0,
+						"cidr_blocks":       &[]string{"1.2.0.0/16", "5.6.7.0/24"},
+					},
 				},
-				&aws.AwsSecurityGroupRule{
-					Id:              "sgrule-2471889226",
-					Type:            awssdk.String("ingress"),
-					SecurityGroupId: awssdk.String("sg-0254c038e32f25530"),
-					Protocol:        awssdk.String("tcp"),
-					FromPort:        awssdk.Int(0),
-					ToPort:          awssdk.Int(0),
-					PrefixListIds:   &[]string{"pl-abb451c2"},
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"id":                cty.StringVal("sgrule-2471889226"),
-							"type":              cty.StringVal("ingress"),
-							"security_group_id": cty.StringVal("sg-0254c038e32f25530"),
-							"protocol":          cty.StringVal("tcp"),
-							"from_port":         cty.NumberIntVal(0),
-							"to_port":           cty.NumberIntVal(0),
-							"prefix_list_ids": cty.SetVal([]cty.Value{
-								cty.StringVal("pl-abb451c2"),
-							}),
-						})
-						return &v
-					}(),
+				&resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-2471889226",
+					Attrs: &resource.Attributes{
+						"id":                "sgrule-2471889226",
+						"type":              "ingress",
+						"security_group_id": "sg-0254c038e32f25530",
+						"protocol":          "tcp",
+						"from_port":         0,
+						"to_port":           0,
+						"prefix_list_ids":   &[]string{"pl-abb451c2"},
+					},
 				},
-				&aws.AwsSecurityGroupRule{
-					Id:                    "sgrule-3587309474",
-					Type:                  awssdk.String("ingress"),
-					SecurityGroupId:       awssdk.String("sg-0254c038e32f25530"),
-					Protocol:              awssdk.String("tcp"),
-					FromPort:              awssdk.Int(0),
-					ToPort:                awssdk.Int(65535),
-					SourceSecurityGroupId: awssdk.String("sg-9e0204ff"),
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"id":                       cty.StringVal("sgrule-3587309474"),
-							"type":                     cty.StringVal("ingress"),
-							"security_group_id":        cty.StringVal("sg-0254c038e32f25530"),
-							"protocol":                 cty.StringVal("tcp"),
-							"from_port":                cty.NumberIntVal(0),
-							"to_port":                  cty.NumberIntVal(65535),
-							"source_security_group_id": cty.StringVal("sg-9e0204ff"),
-						})
-						return &v
-					}(),
+				&resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-3587309474",
+					Attrs: &resource.Attributes{
+						"id":                       "sgrule-3587309474",
+						"type":                     "ingress",
+						"security_group_id":        "sg-0254c038e32f25530",
+						"protocol":                 "tcp",
+						"from_port":                0,
+						"to_port":                  65535,
+						"source_security_group_id": "sg-9e0204ff",
+					},
 				},
 			},
 			remoteResources: []resource.Resource{
-				&aws.AwsSecurityGroupRule{
-					Id:                    "sgrule-3970541193",
-					Type:                  awssdk.String("ingress"),
-					SecurityGroupId:       awssdk.String("sg-0254c038e32f25530"),
-					Protocol:              awssdk.String("tcp"),
-					FromPort:              awssdk.Int(0),
-					ToPort:                awssdk.Int(65535),
-					Self:                  awssdk.Bool(true),
-					SourceSecurityGroupId: awssdk.String("sg-0254c038e32f25530"),
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"id":                       cty.StringVal("sgrule-3970541193"),
-							"type":                     cty.StringVal("ingress"),
-							"security_group_id":        cty.StringVal("sg-0254c038e32f25530"),
-							"protocol":                 cty.StringVal("tcp"),
-							"from_port":                cty.NumberIntVal(0),
-							"to_port":                  cty.NumberIntVal(65535),
-							"self":                     cty.BoolVal(true),
-							"source_security_group_id": cty.StringVal("sg-0254c038e32f25530"),
-						})
-						return &v
-					}(),
+				&resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-3970541193",
+					Attrs: &resource.Attributes{
+						"id":                       "sgrule-3970541193",
+						"type":                     "ingress",
+						"security_group_id":        "sg-0254c038e32f25530",
+						"protocol":                 "tcp",
+						"from_port":                0,
+						"to_port":                  65535,
+						"self":                     true,
+						"source_security_group_id": "sg-0254c038e32f25530",
+					},
 				},
-				&aws.AwsSecurityGroupRule{
-					Id:              "sgrule-1707973622",
-					Type:            awssdk.String("egress"),
-					SecurityGroupId: awssdk.String("sg-0254c038e32f25530"),
-					Protocol:        awssdk.String("-1"),
-					FromPort:        awssdk.Int(0),
-					ToPort:          awssdk.Int(0),
-					CidrBlocks:      &[]string{"0.0.0.0/0"},
-					Ipv6CidrBlocks:  &[]string{},
-					PrefixListIds:   &[]string{},
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"id":                cty.StringVal("sgrule-1707973622"),
-							"type":              cty.StringVal("egress"),
-							"security_group_id": cty.StringVal("sg-0254c038e32f25530"),
-							"protocol":          cty.StringVal("-1"),
-							"from_port":         cty.NumberIntVal(0),
-							"to_port":           cty.NumberIntVal(0),
-							"cidr_blocks": cty.SetVal([]cty.Value{
-								cty.StringVal("0.0.0.0/0"),
-							}),
-							"ipv6_cidr_blocks": cty.SetValEmpty(cty.String),
-							"prefix_list_ids":  cty.SetValEmpty(cty.String),
-						})
-						return &v
-					}(),
-				},
-				&aws.AwsSecurityGroupRule{
-					Id:              "sgrule-2821752134",
-					Type:            awssdk.String("egress"),
-					SecurityGroupId: awssdk.String("sg-0254c038e32f25530"),
-					Protocol:        awssdk.String("-1"),
-					FromPort:        awssdk.Int(0),
-					ToPort:          awssdk.Int(0),
-					CidrBlocks:      &[]string{},
-					Ipv6CidrBlocks:  &[]string{"::/0"},
-					PrefixListIds:   &[]string{},
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"id":                cty.StringVal("sgrule-2821752134"),
-							"type":              cty.StringVal("egress"),
-							"security_group_id": cty.StringVal("sg-0254c038e32f25530"),
-							"protocol":          cty.StringVal("-1"),
-							"from_port":         cty.NumberIntVal(0),
-							"to_port":           cty.NumberIntVal(0),
-							"cidr_blocks":       cty.SetValEmpty(cty.String),
-							"ipv6_cidr_blocks": cty.SetVal([]cty.Value{
-								cty.StringVal("::/0"),
-							}),
-							"prefix_list_ids": cty.SetValEmpty(cty.String),
-						})
-						return &v
-					}(),
-				},
-				&aws.AwsSecurityGroupRule{
-					Id:              "sgrule-2165103420",
-					Type:            awssdk.String("ingress"),
-					SecurityGroupId: awssdk.String("sg-0254c038e32f25530"),
-					Protocol:        awssdk.String("-1"),
-					FromPort:        awssdk.Int(0),
-					ToPort:          awssdk.Int(0),
-					CidrBlocks:      &[]string{"5.6.7.0/24"},
-					Ipv6CidrBlocks:  &[]string{},
-					PrefixListIds:   &[]string{},
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"id":                cty.StringVal("sgrule-2165103420"),
-							"type":              cty.StringVal("ingress"),
-							"security_group_id": cty.StringVal("sg-0254c038e32f25530"),
-							"protocol":          cty.StringVal("-1"),
-							"from_port":         cty.NumberIntVal(0),
-							"to_port":           cty.NumberIntVal(0),
-							"cidr_blocks": cty.SetVal([]cty.Value{
-								cty.StringVal("5.6.7.0/24"),
-							}),
-							"ipv6_cidr_blocks": cty.SetValEmpty(cty.String),
-							"prefix_list_ids":  cty.SetValEmpty(cty.String),
-						})
-						return &v
-					}(),
-				},
-				&aws.AwsSecurityGroupRule{
-					Id:              "sgrule-2582518759",
-					Type:            awssdk.String("ingress"),
-					SecurityGroupId: awssdk.String("sg-0254c038e32f25530"),
-					Protocol:        awssdk.String("-1"),
-					FromPort:        awssdk.Int(0),
-					ToPort:          awssdk.Int(0),
-					CidrBlocks:      &[]string{"1.2.0.0/16"},
-					Ipv6CidrBlocks:  &[]string{},
-					PrefixListIds:   &[]string{},
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"id":                cty.StringVal("sgrule-2582518759"),
-							"type":              cty.StringVal("ingress"),
-							"security_group_id": cty.StringVal("sg-0254c038e32f25530"),
-							"protocol":          cty.StringVal("-1"),
-							"from_port":         cty.NumberIntVal(0),
-							"to_port":           cty.NumberIntVal(0),
-							"cidr_blocks": cty.SetVal([]cty.Value{
-								cty.StringVal("1.2.0.0/16"),
-							}),
-							"ipv6_cidr_blocks": cty.SetValEmpty(cty.String),
-							"prefix_list_ids":  cty.SetValEmpty(cty.String),
-						})
-						return &v
-					}(),
-				},
-				&aws.AwsSecurityGroupRule{
-					Id:              "sgrule-2471889226",
-					Type:            awssdk.String("ingress"),
-					SecurityGroupId: awssdk.String("sg-0254c038e32f25530"),
-					Protocol:        awssdk.String("tcp"),
-					FromPort:        awssdk.Int(0),
-					ToPort:          awssdk.Int(0),
-					PrefixListIds:   &[]string{"pl-abb451c2"},
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"id":                cty.StringVal("sgrule-2471889226"),
-							"type":              cty.StringVal("ingress"),
-							"security_group_id": cty.StringVal("sg-0254c038e32f25530"),
-							"protocol":          cty.StringVal("tcp"),
-							"from_port":         cty.NumberIntVal(0),
-							"to_port":           cty.NumberIntVal(0),
-							"prefix_list_ids": cty.SetVal([]cty.Value{
-								cty.StringVal("pl-abb451c2"),
-							}),
-						})
-						return &v
-					}(),
-				},
-				&aws.AwsSecurityGroupRule{
-					Id:                    "sgrule-3587309474",
-					Type:                  awssdk.String("ingress"),
-					SecurityGroupId:       awssdk.String("sg-0254c038e32f25530"),
-					Protocol:              awssdk.String("tcp"),
-					FromPort:              awssdk.Int(0),
-					ToPort:                awssdk.Int(65535),
-					SourceSecurityGroupId: awssdk.String("sg-9e0204ff"),
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"id":                       cty.StringVal("sgrule-3587309474"),
-							"type":                     cty.StringVal("ingress"),
-							"security_group_id":        cty.StringVal("sg-0254c038e32f25530"),
-							"protocol":                 cty.StringVal("tcp"),
-							"from_port":                cty.NumberIntVal(0),
-							"to_port":                  cty.NumberIntVal(65535),
-							"source_security_group_id": cty.StringVal("sg-9e0204ff"),
-						})
-						return &v
-					}(),
-				},
-			},
-			mocks: func(factory resource.ResourceFactory) {
-				rule1 := cty.ObjectVal(map[string]cty.Value{
-					"id":                cty.StringVal("sgrule-1707973622"),
-					"type":              cty.StringVal("egress"),
-					"security_group_id": cty.StringVal("sg-0254c038e32f25530"),
-					"protocol":          cty.StringVal("-1"),
-					"from_port":         cty.NumberIntVal(0),
-					"to_port":           cty.NumberIntVal(0),
-					"cidr_blocks": cty.SetVal([]cty.Value{
-						cty.StringVal("0.0.0.0/0"),
-					}),
-					"ipv6_cidr_blocks": cty.SetValEmpty(cty.String),
-					"prefix_list_ids":  cty.SetValEmpty(cty.String),
-				})
-				factory.(*terraform.MockResourceFactory).On("CreateResource", mock.MatchedBy(func(input map[string]interface{}) bool {
-					return matchByAttributes(input, map[string]interface{}{
+				&resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-1707973622",
+					Attrs: &resource.Attributes{
 						"id":                "sgrule-1707973622",
-						"type":              awssdk.String("egress"),
-						"security_group_id": awssdk.String("sg-0254c038e32f25530"),
-						"protocol":          awssdk.String("-1"),
-						"from_port":         awssdk.Int(0),
-						"to_port":           awssdk.Int(0),
+						"type":              "egress",
+						"security_group_id": "sg-0254c038e32f25530",
+						"protocol":          "-1",
+						"from_port":         0,
+						"to_port":           0,
 						"cidr_blocks":       &[]string{"0.0.0.0/0"},
 						"ipv6_cidr_blocks":  &[]string{},
 						"prefix_list_ids":   &[]string{},
-					})
-				}), "aws_security_group_rule").Times(1).Return(&rule1, nil)
-
-				rule2 := cty.ObjectVal(map[string]cty.Value{
-					"id":                cty.StringVal("sgrule-2821752134"),
-					"type":              cty.StringVal("egress"),
-					"security_group_id": cty.StringVal("sg-0254c038e32f25530"),
-					"protocol":          cty.StringVal("-1"),
-					"from_port":         cty.NumberIntVal(0),
-					"to_port":           cty.NumberIntVal(0),
-					"cidr_blocks":       cty.SetValEmpty(cty.String),
-					"ipv6_cidr_blocks": cty.SetVal([]cty.Value{
-						cty.StringVal("::/0"),
-					}),
-					"prefix_list_ids": cty.SetValEmpty(cty.String),
-				})
-				factory.(*terraform.MockResourceFactory).On("CreateResource", mock.MatchedBy(func(input map[string]interface{}) bool {
-					return matchByAttributes(input, map[string]interface{}{
+					},
+				},
+				&resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-2821752134",
+					Attrs: &resource.Attributes{
 						"id":                "sgrule-2821752134",
-						"type":              awssdk.String("egress"),
-						"security_group_id": awssdk.String("sg-0254c038e32f25530"),
-						"protocol":          awssdk.String("-1"),
-						"from_port":         awssdk.Int(0),
-						"to_port":           awssdk.Int(0),
+						"type":              "egress",
+						"security_group_id": "sg-0254c038e32f25530",
+						"protocol":          "-1",
+						"from_port":         0,
+						"to_port":           0,
 						"cidr_blocks":       &[]string{},
 						"ipv6_cidr_blocks":  &[]string{"::/0"},
 						"prefix_list_ids":   &[]string{},
-					})
-				}), "aws_security_group_rule").Times(1).Return(&rule2, nil)
-
-				rule3 := cty.ObjectVal(map[string]cty.Value{
-					"id":                cty.StringVal("sgrule-2165103420"),
-					"type":              cty.StringVal("ingress"),
-					"security_group_id": cty.StringVal("sg-0254c038e32f25530"),
-					"protocol":          cty.StringVal("-1"),
-					"from_port":         cty.NumberIntVal(0),
-					"to_port":           cty.NumberIntVal(0),
-					"cidr_blocks": cty.SetVal([]cty.Value{
-						cty.StringVal("5.6.7.0/24"),
-					}),
-					"ipv6_cidr_blocks": cty.SetValEmpty(cty.String),
-					"prefix_list_ids":  cty.SetValEmpty(cty.String),
-				})
-				factory.(*terraform.MockResourceFactory).On("CreateResource", mock.MatchedBy(func(input map[string]interface{}) bool {
-					return matchByAttributes(input, map[string]interface{}{
+					},
+				},
+				&resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-2165103420",
+					Attrs: &resource.Attributes{
 						"id":                "sgrule-2165103420",
-						"type":              awssdk.String("ingress"),
-						"security_group_id": awssdk.String("sg-0254c038e32f25530"),
-						"protocol":          awssdk.String("-1"),
-						"from_port":         awssdk.Int(0),
-						"to_port":           awssdk.Int(0),
+						"type":              "ingress",
+						"security_group_id": "sg-0254c038e32f25530",
+						"protocol":          "-1",
+						"from_port":         0,
+						"to_port":           0,
 						"cidr_blocks":       &[]string{"5.6.7.0/24"},
 						"ipv6_cidr_blocks":  &[]string{},
 						"prefix_list_ids":   &[]string{},
-					})
-				}), "aws_security_group_rule").Times(1).Return(&rule3, nil)
-
-				rule4 := cty.ObjectVal(map[string]cty.Value{
-					"id":                cty.StringVal("sgrule-2582518759"),
-					"type":              cty.StringVal("ingress"),
-					"security_group_id": cty.StringVal("sg-0254c038e32f25530"),
-					"protocol":          cty.StringVal("-1"),
-					"from_port":         cty.NumberIntVal(0),
-					"to_port":           cty.NumberIntVal(0),
-					"cidr_blocks": cty.SetVal([]cty.Value{
-						cty.StringVal("1.2.0.0/16"),
-					}),
-					"ipv6_cidr_blocks": cty.SetValEmpty(cty.String),
-					"prefix_list_ids":  cty.SetValEmpty(cty.String),
-				})
-				factory.(*terraform.MockResourceFactory).On("CreateResource", mock.MatchedBy(func(input map[string]interface{}) bool {
-					return matchByAttributes(input, map[string]interface{}{
+					},
+				},
+				&resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-2582518759",
+					Attrs: &resource.Attributes{
 						"id":                "sgrule-2582518759",
-						"type":              awssdk.String("ingress"),
-						"security_group_id": awssdk.String("sg-0254c038e32f25530"),
-						"protocol":          awssdk.String("-1"),
-						"from_port":         awssdk.Int(0),
-						"to_port":           awssdk.Int(0),
+						"type":              "ingress",
+						"security_group_id": "sg-0254c038e32f25530",
+						"protocol":          "-1",
+						"from_port":         0,
+						"to_port":           0,
 						"cidr_blocks":       &[]string{"1.2.0.0/16"},
 						"ipv6_cidr_blocks":  &[]string{},
 						"prefix_list_ids":   &[]string{},
-					})
-				}), "aws_security_group_rule").Times(1).Return(&rule4, nil)
+					},
+				},
+				&resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-2471889226",
+					Attrs: &resource.Attributes{
+						"id":                "sgrule-2471889226",
+						"type":              "ingress",
+						"security_group_id": "sg-0254c038e32f25530",
+						"protocol":          "tcp",
+						"from_port":         0,
+						"to_port":           0,
+						"prefix_list_ids":   &[]string{"pl-abb451c2"},
+					},
+				},
+				&resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-3587309474",
+					Attrs: &resource.Attributes{
+						"id":                       "sgrule-3587309474",
+						"type":                     "ingress",
+						"security_group_id":        "sg-0254c038e32f25530",
+						"protocol":                 "tcp",
+						"from_port":                0,
+						"to_port":                  65535,
+						"source_security_group_id": "sg-9e0204ff",
+					},
+				},
+			},
+			mocks: func(factory resource.ResourceFactory) {
+				rule1 := resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-1707973622",
+					Attrs: &resource.Attributes{
+						"id":                "sgrule-1707973622",
+						"type":              "egress",
+						"security_group_id": "sg-0254c038e32f25530",
+						"protocol":          "-1",
+						"from_port":         0,
+						"to_port":           0,
+						"cidr_blocks": []string{
+							"0.0.0.0/0",
+						},
+						"ipv6_cidr_blocks": []string{},
+						"prefix_list_ids":  []string{},
+					},
+				}
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule1.Id,
+					mock.MatchedBy(func(input map[string]interface{}) bool {
+						return matchByAttributes(input, map[string]interface{}{
+							"id":                "sgrule-1707973622",
+							"type":              "egress",
+							"security_group_id": "sg-0254c038e32f25530",
+							"protocol":          "-1",
+							"from_port":         0,
+							"to_port":           0,
+							"cidr_blocks":       &[]string{"0.0.0.0/0"},
+							"ipv6_cidr_blocks":  &[]string{},
+							"prefix_list_ids":   &[]string{},
+						})
+					})).Times(1).Return(&rule1, nil)
+
+				rule2 := resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-2821752134",
+					Attrs: &resource.Attributes{
+						"id":                "sgrule-2821752134",
+						"type":              "egress",
+						"security_group_id": "sg-0254c038e32f25530",
+						"protocol":          "-1",
+						"from_port":         0,
+						"to_port":           0,
+						"cidr_blocks":       []string{},
+						"ipv6_cidr_blocks": []string{
+							"::/0",
+						},
+						"prefix_list_ids": []string{},
+					},
+				}
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule2.Id,
+					mock.MatchedBy(func(input map[string]interface{}) bool {
+						return matchByAttributes(input, map[string]interface{}{
+							"id":                "sgrule-2821752134",
+							"type":              "egress",
+							"security_group_id": "sg-0254c038e32f25530",
+							"protocol":          "-1",
+							"from_port":         0,
+							"to_port":           0,
+							"cidr_blocks":       &[]string{},
+							"ipv6_cidr_blocks":  &[]string{"::/0"},
+							"prefix_list_ids":   &[]string{},
+						})
+					})).Times(1).Return(&rule2, nil)
+
+				rule3 := resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-2165103420",
+					Attrs: &resource.Attributes{
+						"id":                "sgrule-2165103420",
+						"type":              "ingress",
+						"security_group_id": "sg-0254c038e32f25530",
+						"protocol":          "-1",
+						"from_port":         0,
+						"to_port":           0,
+						"cidr_blocks": []string{
+							"5.6.7.0/24",
+						},
+						"ipv6_cidr_blocks": []string{},
+						"prefix_list_ids":  []string{},
+					},
+				}
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule3.Id,
+					mock.MatchedBy(func(input map[string]interface{}) bool {
+						return matchByAttributes(input, map[string]interface{}{
+							"id":                "sgrule-2165103420",
+							"type":              "ingress",
+							"security_group_id": "sg-0254c038e32f25530",
+							"protocol":          "-1",
+							"from_port":         0,
+							"to_port":           0,
+							"cidr_blocks":       &[]string{"5.6.7.0/24"},
+							"ipv6_cidr_blocks":  &[]string{},
+							"prefix_list_ids":   &[]string{},
+						})
+					})).Times(1).Return(&rule3, nil)
+
+				rule4 := resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-2582518759",
+					Attrs: &resource.Attributes{
+						"id":                "sgrule-2582518759",
+						"type":              "ingress",
+						"security_group_id": "sg-0254c038e32f25530",
+						"protocol":          "-1",
+						"from_port":         0,
+						"to_port":           0,
+						"cidr_blocks": []string{
+							"1.2.0.0/16",
+						},
+						"ipv6_cidr_blocks": []string{},
+						"prefix_list_ids":  []string{},
+					},
+				}
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule4.Id,
+					mock.MatchedBy(func(input map[string]interface{}) bool {
+						return matchByAttributes(input, map[string]interface{}{
+							"id":                "sgrule-2582518759",
+							"type":              "ingress",
+							"security_group_id": "sg-0254c038e32f25530",
+							"protocol":          "-1",
+							"from_port":         0,
+							"to_port":           0,
+							"cidr_blocks":       &[]string{"1.2.0.0/16"},
+							"ipv6_cidr_blocks":  &[]string{},
+							"prefix_list_ids":   &[]string{},
+						})
+					})).Times(1).Return(&rule4, nil)
 			},
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertManagedCount(7)

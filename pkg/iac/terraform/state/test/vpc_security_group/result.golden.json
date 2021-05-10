@@ -1,20 +1,44 @@
 [
  {
-  "Arn": "arn:aws:ec2:eu-west-3:047081014315:security-group/sg-0254c038e32f25530",
-  "Description": "Managed by Terraform",
-  "Egress": null,
   "Id": "sg-0254c038e32f25530",
-  "Ingress": null,
-  "Name": "foo",
-  "NamePrefix": "",
-  "OwnerId": "047081014315",
-  "RevokeRulesOnDelete": false,
-  "Tags": {
-   "Name": "Foo SG"
-  },
-  "VpcId": "vpc-618f6e09",
-  "Timeouts": null,
-  "CtyVal": {}
+  "Type": "aws_security_group",
+  "Attrs": {
+   "arn": "arn:aws:ec2:eu-west-3:047081014315:security-group/sg-0254c038e32f25530",
+   "description": "Managed by Terraform",
+   "egress": [
+    {
+     "cidr_blocks": [
+      "0.0.0.0/0"
+     ],
+     "description": "Bar",
+     "from_port": 0,
+     "protocol": "-1",
+     "self": false,
+     "to_port": 0
+    }
+   ],
+   "id": "sg-0254c038e32f25530",
+   "ingress": [
+    {
+     "cidr_blocks": [
+      "0.0.0.0/0"
+     ],
+     "description": "Foo",
+     "from_port": 0,
+     "protocol": "-1",
+     "self": false,
+     "to_port": 0
+    }
+   ],
+   "name": "foo",
+   "name_prefix": "",
+   "owner_id": "047081014315",
+   "revoke_rules_on_delete": false,
+   "tags": {
+    "Name": "Foo SG"
+   },
+   "vpc_id": "vpc-618f6e09"
+  }
  },
  {
   "Id": "sg-9e0204ff",

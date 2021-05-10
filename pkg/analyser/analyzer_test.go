@@ -862,27 +862,47 @@ func TestAnalyze(t *testing.T) {
 		{
 			name: "Test alert on unmanaged security group rules",
 			iac: []resource.Resource{
-				&aws.AwsSecurityGroup{
-					Id: "managed security group",
+				&resource.AbstractResource{
+					Id:   "managed security group",
+					Type: aws.AwsSecurityGroupResourceType,
+					Attrs: &resource.Attributes{
+						"id": "managed security group",
+					},
 				},
 			},
 			cloud: []resource.Resource{
-				&aws.AwsSecurityGroup{
-					Id: "managed security group",
+				&resource.AbstractResource{
+					Id:   "managed security group",
+					Type: aws.AwsSecurityGroupResourceType,
+					Attrs: &resource.Attributes{
+						"id": "managed security group",
+					},
 				},
-				&aws.AwsSecurityGroupRule{
-					Id: "unmanaged rule",
+				&resource.AbstractResource{
+					Id:   "unmanaged rule",
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Attrs: &resource.Attributes{
+						"id": "unmanaged rule",
+					},
 				},
 			},
 			expected: Analysis{
 				managed: []resource.Resource{
-					&aws.AwsSecurityGroup{
-						Id: "managed security group",
+					&resource.AbstractResource{
+						Id:   "managed security group",
+						Type: aws.AwsSecurityGroupResourceType,
+						Attrs: &resource.Attributes{
+							"id": "managed security group",
+						},
 					},
 				},
 				unmanaged: []resource.Resource{
-					&aws.AwsSecurityGroupRule{
-						Id: "unmanaged rule",
+					&resource.AbstractResource{
+						Id:   "unmanaged rule",
+						Type: aws.AwsSecurityGroupRuleResourceType,
+						Attrs: &resource.Attributes{
+							"id": "unmanaged rule",
+						},
 					},
 				},
 				summary: Summary{

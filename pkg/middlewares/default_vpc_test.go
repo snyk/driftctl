@@ -11,8 +11,12 @@ import (
 func TestAwsDefaultVPCShouldBeIgnored(t *testing.T) {
 	middleware := NewAwsDefaultVPC()
 	remoteResources := []resource.Resource{
-		&aws.AwsDefaultVpc{
-			Id: "foobar",
+		&resource.AbstractResource{
+			Id:   "foobar",
+			Type: aws.AwsDefaultVpcResourceType,
+			Attrs: &resource.Attributes{
+				"id": "foobar",
+			},
 		},
 	}
 	stateResources := []resource.Resource{}
@@ -30,8 +34,12 @@ func TestAwsDefaultVPCShouldBeIgnored(t *testing.T) {
 func TestAwsDefaultVPCShouldNotBeIgnoredWhenManaged(t *testing.T) {
 	middleware := NewAwsDefaultVPC()
 	remoteResources := []resource.Resource{
-		&aws.AwsDefaultVpc{
-			Id: "foobar",
+		&resource.AbstractResource{
+			Id:   "foobar",
+			Type: aws.AwsDefaultVpcResourceType,
+			Attrs: &resource.Attributes{
+				"id": "foobar",
+			},
 		},
 	}
 	stateResources := []resource.Resource{

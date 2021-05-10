@@ -3,7 +3,6 @@ package middlewares
 import (
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -14,61 +13,111 @@ import (
 func TestVPCSecurityGroupRuleSanitizer(t *testing.T) {
 
 	factory := &terraform.MockResourceFactory{}
-	factory.On("CreateResource", mock.Anything, "aws_security_group_rule").Times(8).Return(nil, nil)
+	factory.On("CreateAbstractResource", aws.AwsSecurityGroupRuleResourceType, "sgrule-1175318309", mock.Anything).Times(1).Return(
+		&resource.AbstractResource{
+			Id:    "sgrule-1175318309",
+			Type:  aws.AwsSecurityGroupRuleResourceType,
+			Attrs: nil,
+		}, nil)
+
+	factory.On("CreateAbstractResource", aws.AwsSecurityGroupRuleResourceType, "sgrule-2582518759", mock.Anything).Times(1).Return(
+		&resource.AbstractResource{
+			Id:    "sgrule-2582518759",
+			Type:  aws.AwsSecurityGroupRuleResourceType,
+			Attrs: nil,
+		}, nil)
+
+	factory.On("CreateAbstractResource", aws.AwsSecurityGroupRuleResourceType, "sgrule-2165103420", mock.Anything).Times(1).Return(
+		&resource.AbstractResource{
+			Id:    "sgrule-2165103420",
+			Type:  aws.AwsSecurityGroupRuleResourceType,
+			Attrs: nil,
+		}, nil)
+
+	factory.On("CreateAbstractResource", aws.AwsSecurityGroupRuleResourceType, "sgrule-350400929", mock.Anything).Times(1).Return(
+		&resource.AbstractResource{
+			Id:    "sgrule-350400929",
+			Type:  aws.AwsSecurityGroupRuleResourceType,
+			Attrs: nil,
+		}, nil)
 
 	middleware := NewVPCSecurityGroupRuleSanitizer(factory)
 	var remoteResources []resource.Resource
 	stateResources := []resource.Resource{
-		&aws.AwsSecurityGroup{
+		&resource.AbstractResource{
 			Id:   "sg-test",
-			Name: awssdk.String("test"),
+			Type: aws.AwsSecurityGroupResourceType,
+			Attrs: &resource.Attributes{
+				"id":   "sg-test",
+				"name": "test",
+			},
 		},
-		&aws.AwsSecurityGroupRule{
-			Id:                    "sgrule-3970541193",
-			Type:                  awssdk.String("ingress"),
-			SecurityGroupId:       awssdk.String("sg-0254c038e32f25530"),
-			Protocol:              awssdk.String("tcp"),
-			FromPort:              awssdk.Int(0),
-			ToPort:                awssdk.Int(65535),
-			Self:                  awssdk.Bool(true),
-			SourceSecurityGroupId: awssdk.String("sg-0254c038e32f25530"),
+		&resource.AbstractResource{
+			Id:   "sgrule-3970541193",
+			Type: aws.AwsSecurityGroupRuleResourceType,
+			Attrs: &resource.Attributes{
+				"id":                       "sgrule-3970541193",
+				"type":                     "ingress",
+				"security_group_id":        "sg-0254c038e32f25530",
+				"protocol":                 "tcp",
+				"from_port":                0,
+				"to_port":                  65535,
+				"self":                     true,
+				"source_security_group_id": "sg-0254c038e32f25530",
+			},
 		},
-		&aws.AwsSecurityGroupRule{
-			Id:              "sgrule-845917806",
-			Type:            awssdk.String("egress"),
-			SecurityGroupId: awssdk.String("sg-0cc8b3c3c2851705a"),
-			Protocol:        awssdk.String("-1"),
-			FromPort:        awssdk.Int(0),
-			ToPort:          awssdk.Int(0),
-			CidrBlocks:      &[]string{"0.0.0.0/0"},
-			Ipv6CidrBlocks:  &[]string{"::/0"},
+		&resource.AbstractResource{
+			Id:   "sgrule-845917806",
+			Type: aws.AwsSecurityGroupRuleResourceType,
+			Attrs: &resource.Attributes{
+				"id":                "sgrule-845917806",
+				"type":              "egress",
+				"security_group_id": "sg-0cc8b3c3c2851705a",
+				"protocol":          "-1",
+				"from_port":         0,
+				"to_port":           0,
+				"cidr_blocks":       &[]string{"0.0.0.0/0"},
+				"ipv6_cidr_blocks":  &[]string{"::/0"},
+			},
 		},
-		&aws.AwsSecurityGroupRule{
-			Id:              "sgrule-294318973",
-			Type:            awssdk.String("ingress"),
-			SecurityGroupId: awssdk.String("sg-0254c038e32f25530"),
-			Protocol:        awssdk.String("-1"),
-			FromPort:        awssdk.Int(0),
-			ToPort:          awssdk.Int(0),
-			CidrBlocks:      &[]string{"1.2.0.0/16", "5.6.7.0/24"},
+		&resource.AbstractResource{
+			Id:   "sgrule-294318973",
+			Type: aws.AwsSecurityGroupRuleResourceType,
+			Attrs: &resource.Attributes{
+				"id":                "sgrule-294318973",
+				"type":              "ingress",
+				"security_group_id": "sg-0254c038e32f25530",
+				"protocol":          "-1",
+				"from_port":         0,
+				"to_port":           0,
+				"cidr_blocks":       &[]string{"1.2.0.0/16", "5.6.7.0/24"},
+			},
 		},
-		&aws.AwsSecurityGroupRule{
-			Id:              "sgrule-2471889226",
-			Type:            awssdk.String("ingress"),
-			SecurityGroupId: awssdk.String("sg-0254c038e32f25530"),
-			Protocol:        awssdk.String("tcp"),
-			FromPort:        awssdk.Int(0),
-			ToPort:          awssdk.Int(0),
-			PrefixListIds:   &[]string{"pl-abb451c2"},
+		&resource.AbstractResource{
+			Id:   "sgrule-2471889226",
+			Type: aws.AwsSecurityGroupRuleResourceType,
+			Attrs: &resource.Attributes{
+				"id":                "sgrule-2471889226",
+				"type":              "ingress",
+				"security_group_id": "sg-0254c038e32f25530",
+				"protocol":          "tcp",
+				"from_port":         0,
+				"to_port":           0,
+				"prefix_list_id":    &[]string{"pl-abb451c2"},
+			},
 		},
-		&aws.AwsSecurityGroupRule{
-			Id:                    "sgrule-3587309474",
-			Type:                  awssdk.String("ingress"),
-			SecurityGroupId:       awssdk.String("sg-0254c038e32f25530"),
-			Protocol:              awssdk.String("tcp"),
-			FromPort:              awssdk.Int(0),
-			ToPort:                awssdk.Int(65535),
-			SourceSecurityGroupId: awssdk.String("sg-9e0204ff"),
+		&resource.AbstractResource{
+			Id:   "sgrule-3587309474",
+			Type: aws.AwsSecurityGroupRuleResourceType,
+			Attrs: &resource.Attributes{
+				"id":                "sgrule-3587309474",
+				"type":              "ingress",
+				"security_group_id": "sg-0254c038e32f25530",
+				"protocol":          "tcp",
+				"from_port":         0,
+				"to_port":           65535,
+				"prefix_list_id":    &[]string{"sg-9e0204ff"},
+			},
 		},
 	}
 	err := middleware.Execute(&remoteResources, &stateResources)
