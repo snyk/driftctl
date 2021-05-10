@@ -2,7 +2,6 @@ package analyser
 
 import (
 	"encoding/json"
-	"fmt"
 	"sort"
 	"strings"
 	"time"
@@ -56,13 +55,6 @@ type serializableAnalysis struct {
 	Differences []serializableDifference               `json:"differences"`
 	Coverage    int                                    `json:"coverage"`
 	Alerts      map[string][]alerter.SerializableAlert `json:"alerts"`
-}
-
-type GenDriftIgnoreOptions struct {
-	ExcludeUnmanaged bool
-	ExcludeDeleted   bool
-	ExcludeDrifted   bool
-	InputPath        string
 }
 
 func (a Analysis) MarshalJSON() ([]byte, error) {
@@ -209,40 +201,6 @@ func (a *Analysis) SortResources() {
 	a.differences = SortDifferences(a.differences)
 }
 
-func (a *Analysis) DriftIgnoreList(opts GenDriftIgnoreOptions) (int, string) {
-	var list []string
-
-	resourceCount := 0
-
-	addResources := func(res ...resource.Resource) {
-		for _, r := range res {
-			list = append(list, fmt.Sprintf("%s.%s", r.TerraformType(), escapeKey(r.TerraformId())))
-		}
-		resourceCount += len(res)
-	}
-	addDifferences := func(diff ...Difference) {
-		for _, d := range diff {
-			addResources(d.Res)
-		}
-		resourceCount += len(diff)
-	}
-
-	if !opts.ExcludeUnmanaged && a.Summary().TotalUnmanaged > 0 {
-		list = append(list, "# Resources not covered by IaC")
-		addResources(a.Unmanaged()...)
-	}
-	if !opts.ExcludeDeleted && a.Summary().TotalDeleted > 0 {
-		list = append(list, "# Missing resources")
-		addResources(a.Deleted()...)
-	}
-	if !opts.ExcludeDrifted && a.Summary().TotalDrifted > 0 {
-		list = append(list, "# Changed resources")
-		addDifferences(a.Differences()...)
-	}
-
-	return resourceCount, strings.Join(list, "\n")
-}
-
 func SortDifferences(diffs []Difference) []Difference {
 	sort.SliceStable(diffs, func(i, j int) bool {
 		if diffs[i].Res.TerraformType() != diffs[j].Res.TerraformType() {
@@ -263,11 +221,4 @@ func SortChanges(changes []Change) []Change {
 		return strings.Join(changes[i].Path, ".") < strings.Join(changes[j].Path, ".")
 	})
 	return changes
-}
-
-func escapeKey(line string) string {
-	line = strings.ReplaceAll(line, `\`, `\\`)
-	line = strings.ReplaceAll(line, `.`, `\.`)
-
-	return line
 }
