@@ -234,7 +234,7 @@ func (r *TerraformStateReader) retrieveMultiplesStates() ([]resource.Resource, e
 		resources, err := r.retrieveForState(key)
 		if err != nil {
 			if _, ok := err.(*UnsupportedVersionError); ok {
-				color.New(color.Bold, color.FgYellow).Printf("WARNING: %s", err)
+				color.New(color.Bold, color.FgYellow).Printf("WARNING: %s\n", err)
 				continue
 			}
 
