@@ -53,9 +53,11 @@ func TestAwsSqsQueuePolicyExpander_Execute(t *testing.T) {
 				},
 			},
 			func(factory *terraform.MockResourceFactory) {
-				factory.On("CreateAbstractResource", "aws_sqs_queue_policy", "foo", mock.MatchedBy(func(input map[string]interface{}) bool {
-					return input["id"] == "foo"
-				})).Once().Return(&resource.AbstractResource{
+				factory.On("CreateAbstractResource", "aws_sqs_queue_policy", "foo", map[string]interface{}{
+					"id":        "foo",
+					"queue_url": "foo",
+					"policy":    "{\"Id\":\"MYINLINESQSPOLICY\",\"Statement\":[{\"Action\":\"sqs:SendMessage\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:sqs:eu-west-3:047081014315:foo\",\"Sid\":\"Stmt1611769527792\"}],\"Version\":\"2012-10-17\"}",
+				}).Once().Return(&resource.AbstractResource{
 					Id:   "foo",
 					Type: aws.AwsSqsQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -104,9 +106,8 @@ func TestAwsSqsQueuePolicyExpander_Execute(t *testing.T) {
 						"policy":    "{\"Id\":\"MYSQSPOLICY\",\"Statement\":[{\"Action\":\"sqs:SendMessage\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:sqs:eu-west-3:047081014315:foo\",\"Sid\":\"Stmt1611769527792\"}],\"Version\":\"2012-10-17\"}",
 					},
 				},
-			}, func(factory *terraform.MockResourceFactory) {
-				factory.On("CreateResource", mock.Anything, "aws_sqs_queue_policy").Once().Return(nil, nil)
 			},
+			func(factory *terraform.MockResourceFactory) {},
 		},
 		{
 			"Inline policy duplicate aws_sqs_queue_policy",
@@ -147,9 +148,7 @@ func TestAwsSqsQueuePolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			func(factory *terraform.MockResourceFactory) {
-				factory.On("CreateResource", mock.Anything, "aws_sqs_queue_policy").Once().Return(nil, nil)
-			},
+			func(factory *terraform.MockResourceFactory) {},
 		},
 		{
 			"Inline policy and aws_sqs_queue_policy",

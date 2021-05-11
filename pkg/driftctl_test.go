@@ -1002,13 +1002,11 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				},
 			},
 			mocks: func(factory resource.ResourceFactory) {
-				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_sqs_queue_policy", "foo", mock.MatchedBy(func(input map[string]interface{}) bool {
-					return matchByAttributes(input, map[string]interface{}{
-						"id":        "foo",
-						"queue_url": "foo",
-						"policy":    "{\"policy\":\"bar\"}",
-					})
-				})).Times(1).Return(&resource.AbstractResource{
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_sqs_queue_policy", "foo", map[string]interface{}{
+					"id":        "foo",
+					"queue_url": "foo",
+					"policy":    "{\"policy\":\"bar\"}",
+				}).Times(1).Return(&resource.AbstractResource{
 					Id:   "foo",
 					Type: aws.AwsSqsQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
