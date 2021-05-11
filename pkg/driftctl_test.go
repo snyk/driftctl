@@ -814,51 +814,53 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 		{
 			name: "test sns topic policy expander middleware",
 			stateResources: []resource.Resource{
-				&aws.AwsSnsTopic{
-					Id:     "foo",
-					Arn:    awssdk.String("arn"),
-					Policy: awssdk.String("{\"policy\":\"bar\"}"),
+				&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsSnsTopicResourceType,
+					Attrs: &resource.Attributes{
+						"arn":    "arn",
+						"id":     "foo",
+						"policy": "{\"policy\":\"bar\"}",
+					},
 				},
 			},
 			remoteResources: []resource.Resource{
-				&aws.AwsSnsTopicPolicy{
-					Id:     "foo",
-					Arn:    awssdk.String("arn"),
-					Policy: awssdk.String("{\"policy\":\"baz\"}"),
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"id":     cty.StringVal("foo"),
-							"arn":    cty.StringVal("arn"),
-							"policy": cty.StringVal("{\"policy\":\"baz\"}"),
-						})
-						return &v
-					}(),
+				&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsSnsTopicPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"id":     "foo",
+						"arn":    "arn",
+						"policy": "{\"policy\":\"baz\"}",
+					},
 				},
 			},
 			mocks: func(factory resource.ResourceFactory) {
-				foo := cty.ObjectVal(map[string]cty.Value{
-					"id":     cty.StringVal("foo"),
-					"arn":    cty.StringVal("arn"),
-					"policy": cty.StringVal("{\"policy\":\"bar\"}"),
-				})
-				factory.(*terraform.MockResourceFactory).On("CreateResource", mock.MatchedBy(func(input map[string]interface{}) bool {
-					return matchByAttributes(input, map[string]interface{}{
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "foo", "aws_sns_topic_policy", map[string]interface{}{
+					"id":     "foo",
+					"arn":    "arn",
+					"policy": "{\"policy\":\"bar\"}",
+				}).Times(1).Return(&resource.AbstractResource{
+					Id:   "foo",
+					Type: aws.AwsSnsTopicPolicyResourceType,
+					Attrs: &resource.Attributes{
 						"id":     "foo",
-						"arn":    awssdk.String("arn"),
-						"policy": awssdk.String("{\"policy\":\"bar\"}"),
-					})
-				}), "aws_sns_topic_policy").Times(1).Return(&foo, nil)
+						"arn":    "arn",
+						"policy": "{\"policy\":\"bar\"}",
+					},
+				}, nil)
 			},
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
 				result.AssertResourceHasDrift("foo", "aws_sns_topic_policy", analyser.Change{
 					Change: diff.Change{
 						Type: diff.UPDATE,
-						Path: []string{"Policy"},
+						Path: []string{"policy"},
 						From: "{\"policy\":\"bar\"}",
 						To:   "{\"policy\":\"baz\"}",
 					},
-					Computed: false,
+					Computed:   false,
+					JsonString: true,
 				})
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {

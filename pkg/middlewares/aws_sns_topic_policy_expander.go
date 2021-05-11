@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -9,12 +10,14 @@ import (
 
 // Explodes policy found in aws_sns_topic from state resources to aws_sns_topic_policy resources
 type AwsSNSTopicPolicyExpander struct {
-	resourceFactory resource.ResourceFactory
+	resourceFactory          resource.ResourceFactory
+	resourceSchemaRepository resource.SchemaRepositoryInterface
 }
 
-func NewAwsSNSTopicPolicyExpander(resourceFactory resource.ResourceFactory) AwsSNSTopicPolicyExpander {
+func NewAwsSNSTopicPolicyExpander(resourceFactory resource.ResourceFactory, resourceSchemaRepository resource.SchemaRepositoryInterface) AwsSNSTopicPolicyExpander {
 	return AwsSNSTopicPolicyExpander{
 		resourceFactory,
+		resourceSchemaRepository,
 	}
 }
 
@@ -27,11 +30,11 @@ func (m AwsSNSTopicPolicyExpander) Execute(_, resourcesFromState *[]resource.Res
 			continue
 		}
 
-		topic, _ := res.(*aws.AwsSnsTopic)
+		topic, _ := res.(*resource.AbstractResource)
 		newList = append(newList, res)
 
 		if m.hasPolicyAttached(topic, resourcesFromState) {
-			topic.Policy = nil
+			topic.Attrs.SafeDelete([]string{"policy"})
 			continue
 		}
 
@@ -44,43 +47,35 @@ func (m AwsSNSTopicPolicyExpander) Execute(_, resourcesFromState *[]resource.Res
 	return nil
 }
 
-func (m *AwsSNSTopicPolicyExpander) splitPolicy(topic *aws.AwsSnsTopic, results *[]resource.Resource) error {
-	if topic.Policy == nil || *topic.Policy == "" {
+func (m *AwsSNSTopicPolicyExpander) splitPolicy(topic *resource.AbstractResource, results *[]resource.Resource) error {
+	policy, exist := topic.Attrs.Get("policy")
+	if !exist || policy == "" {
 		return nil
 	}
 
+	arn, exist := topic.Attrs.Get("arn")
+	if !exist || arn == "" {
+		return errors.Errorf("No arn found for resource %s (%s)", topic.Id, topic.Type)
+	}
+
 	data := map[string]interface{}{
-		"arn":    topic.Arn,
+		"arn":    arn,
 		"id":     topic.Id,
-		"policy": topic.Policy,
-	}
-	ctyVal, err := m.resourceFactory.CreateResource(data, "aws_sns_topic_policy")
-	if err != nil {
-		return err
+		"policy": policy,
 	}
 
-	newPolicy := &aws.AwsSnsTopicPolicy{
-		Id:     topic.Id,
-		Arn:    topic.Arn,
-		Policy: topic.Policy,
-		CtyVal: ctyVal,
-	}
+	newPolicy := m.resourceFactory.CreateAbstractResource(topic.Id, "aws_sns_topic_policy", data)
 
-	normalized, err := newPolicy.NormalizeForState()
-	if err != nil {
-		return err
-	}
-
-	*results = append(*results, normalized)
+	*results = append(*results, newPolicy)
 	logrus.WithFields(logrus.Fields{
 		"id": newPolicy.TerraformId(),
 	}).Debug("Created new policy from sns_topic")
 
-	topic.Policy = nil
+	topic.Attrs.SafeDelete([]string{"policy"})
 	return nil
 }
 
-func (m *AwsSNSTopicPolicyExpander) hasPolicyAttached(topic *aws.AwsSnsTopic, resourcesFromState *[]resource.Resource) bool {
+func (m *AwsSNSTopicPolicyExpander) hasPolicyAttached(topic *resource.AbstractResource, resourcesFromState *[]resource.Resource) bool {
 	for _, res := range *resourcesFromState {
 		if res.TerraformType() == aws.AwsSnsTopicPolicyResourceType &&
 			res.TerraformId() == topic.Id {
