@@ -836,13 +836,11 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				},
 			},
 			mocks: func(factory resource.ResourceFactory) {
-				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "foo", "aws_sns_topic_policy", mock.MatchedBy(func(input map[string]interface{}) bool {
-					return matchByAttributes(input, map[string]interface{}{
-						"id":     "foo",
-						"arn":    "arn",
-						"policy": "{\"policy\":\"bar\"}",
-					})
-				})).Times(1).Return(&resource.AbstractResource{
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "foo", "aws_sns_topic_policy", map[string]interface{}{
+					"id":     "foo",
+					"arn":    "arn",
+					"policy": "{\"policy\":\"bar\"}",
+				}).Times(1).Return(&resource.AbstractResource{
 					Id:   "foo",
 					Type: aws.AwsSnsTopicPolicyResourceType,
 					Attrs: &resource.Attributes{
