@@ -62,7 +62,7 @@ loop:
 				if resource.IsRefactoredResource(res.TerraformType()) {
 					schema, exist := s.resourceSchemaRepository.GetSchema(res.TerraformType())
 					ctyAttr := resource.ToResourceAttributes(res.CtyValue())
-					ctyAttr.SanitizeDefaultsV3()
+					ctyAttr.SanitizeDefaults()
 					if exist && schema.NormalizeFunc != nil {
 						schema.NormalizeFunc(ctyAttr)
 					}

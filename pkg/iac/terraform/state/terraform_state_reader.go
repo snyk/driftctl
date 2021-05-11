@@ -181,7 +181,7 @@ func (r *TerraformStateReader) decode(values map[string][]cty.Value) ([]resource
 			if resource.IsRefactoredResource(res.TerraformType()) {
 				schema, exist := r.resourceSchemaRepository.GetSchema(res.TerraformType())
 				ctyAttr := resource.ToResourceAttributes(res.CtyValue())
-				ctyAttr.SanitizeDefaultsV3()
+				ctyAttr.SanitizeDefaults()
 				if exist && schema.NormalizeFunc != nil {
 					schema.NormalizeFunc(ctyAttr)
 				}
