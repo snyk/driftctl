@@ -28,7 +28,7 @@ func (m AwsDefaults) awsIamRoleDefaults(remoteResources []resource.Resource) []r
 			continue
 		}
 
-		if match := strings.HasPrefix(*remoteResource.(*aws.AwsIamRole).Path, defaultIamRolePathPrefix); match {
+		if match := strings.HasPrefix((*remoteResource.(*resource.AbstractResource).Attrs)["path"].(string), defaultIamRolePathPrefix); match {
 			resourcesToIgnore = append(resourcesToIgnore, remoteResource)
 		}
 	}
@@ -45,15 +45,16 @@ func (m AwsDefaults) awsIamRolePolicyDefaults(remoteResources []resource.Resourc
 			continue
 		}
 
-		var role *aws.AwsIamRole
+		var role *resource.AbstractResource
 		for _, res := range remoteResources {
-			if res.TerraformType() == aws.AwsIamRoleResourceType && res.TerraformId() == *remoteResource.(*aws.AwsIamRolePolicy).Role {
-				role = res.(*aws.AwsIamRole)
+			if res.TerraformType() == aws.AwsIamRoleResourceType &&
+				res.TerraformId() == (*remoteResource.(*resource.AbstractResource).Attrs)["role"] {
+				role = res.(*resource.AbstractResource)
 				break
 			}
 		}
 
-		if match := strings.HasPrefix(*role.Path, defaultIamRolePathPrefix); match {
+		if match := strings.HasPrefix((*role.Attrs)["path"].(string), defaultIamRolePathPrefix); match {
 			resourcesToIgnore = append(resourcesToIgnore, remoteResource)
 		}
 	}

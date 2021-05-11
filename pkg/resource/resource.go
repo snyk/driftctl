@@ -43,6 +43,15 @@ var refactoredResources = []string{
 	"aws_sns_topic_subscription",
 	"aws_sns_topic_policy",
 	"aws_sns_topic",
+	"aws_iam_policy",
+	"aws_iam_policy_attachment",
+	"aws_iam_role",
+	"aws_iam_role_policy",
+	"aws_iam_role_policy_attachment",
+	"aws_iam_user",
+	"aws_iam_user_policy",
+	"aws_iam_user_policy_attachment",
+	"aws_key_pair",
 }
 
 func IsRefactoredResource(typ string) bool {

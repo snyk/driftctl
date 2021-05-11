@@ -1,14 +1,14 @@
 [
  {
-  "Arn": "arn:aws:iam::929327065333:user/MODULE-USER",
-  "ForceDestroy": false,
   "Id": "MODULE-USER",
-  "Name": "MODULE-USER",
-  "Path": "/",
-  "PermissionsBoundary": null,
-  "Tags": null,
-  "UniqueId": "AIDA5QYBVVD22N3IK6SAR",
-  "CtyVal": {}
+  "Type": "aws_iam_user",
+  "Attrs": {
+   "arn": "arn:aws:iam::929327065333:user/MODULE-USER",
+   "id": "MODULE-USER",
+   "name": "MODULE-USER",
+   "path": "/",
+   "unique_id": "AIDA5QYBVVD22N3IK6SAR"
+  }
  },
  {
   "EncryptedSecret": null,

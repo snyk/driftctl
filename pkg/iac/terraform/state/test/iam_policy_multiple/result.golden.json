@@ -1,32 +1,38 @@
 [
  {
-  "Arn": "arn:aws:iam::929327065333:policy/policy-2",
-  "Description": "",
-  "Id": "arn:aws:iam::929327065333:policy/policy-2",
-  "Name": "policy-2",
-  "NamePrefix": null,
-  "Path": "/",
-  "Policy": "{\"Statement\":[{\"Action\":\"ec2:*\",\"Effect\":\"Allow\",\"Resource\":\"*\",\"Sid\":\"EC2Admin\"}],\"Version\":\"2012-10-17\"}",
-  "CtyVal": {}
- },
- {
-  "Arn": "arn:aws:iam::929327065333:policy/policy-0",
-  "Description": "",
   "Id": "arn:aws:iam::929327065333:policy/policy-0",
-  "Name": "policy-0",
-  "NamePrefix": null,
-  "Path": "/",
-  "Policy": "{\"Statement\":[{\"Action\":\"ec2:*\",\"Effect\":\"Allow\",\"Resource\":\"*\",\"Sid\":\"EC2Admin\"}],\"Version\":\"2012-10-17\"}",
-  "CtyVal": {}
+  "Type": "aws_iam_policy",
+  "Attrs": {
+   "arn": "arn:aws:iam::929327065333:policy/policy-0",
+   "description": "",
+   "id": "arn:aws:iam::929327065333:policy/policy-0",
+   "name": "policy-0",
+   "path": "/",
+   "policy": "{\"Statement\":[{\"Action\":\"ec2:*\",\"Effect\":\"Allow\",\"Resource\":\"*\",\"Sid\":\"EC2Admin\"}],\"Version\":\"2012-10-17\"}"
+  }
  },
  {
-  "Arn": "arn:aws:iam::929327065333:policy/policy-1",
-  "Description": "",
   "Id": "arn:aws:iam::929327065333:policy/policy-1",
-  "Name": "policy-1",
-  "NamePrefix": null,
-  "Path": "/",
-  "Policy": "{\"Statement\":[{\"Action\":\"ec2:*\",\"Effect\":\"Allow\",\"Resource\":\"*\",\"Sid\":\"EC2Admin\"}],\"Version\":\"2012-10-17\"}",
-  "CtyVal": {}
+  "Type": "aws_iam_policy",
+  "Attrs": {
+   "arn": "arn:aws:iam::929327065333:policy/policy-1",
+   "description": "",
+   "id": "arn:aws:iam::929327065333:policy/policy-1",
+   "name": "policy-1",
+   "path": "/",
+   "policy": "{\"Statement\":[{\"Action\":\"ec2:*\",\"Effect\":\"Allow\",\"Resource\":\"*\",\"Sid\":\"EC2Admin\"}],\"Version\":\"2012-10-17\"}"
+  }
+ },
+ {
+  "Id": "arn:aws:iam::929327065333:policy/policy-2",
+  "Type": "aws_iam_policy",
+  "Attrs": {
+   "arn": "arn:aws:iam::929327065333:policy/policy-2",
+   "description": "",
+   "id": "arn:aws:iam::929327065333:policy/policy-2",
+   "name": "policy-2",
+   "path": "/",
+   "policy": "{\"Statement\":[{\"Action\":\"ec2:*\",\"Effect\":\"Allow\",\"Resource\":\"*\",\"Sid\":\"EC2Admin\"}],\"Version\":\"2012-10-17\"}"
+  }
  }
 ]

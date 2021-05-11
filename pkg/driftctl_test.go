@@ -73,6 +73,10 @@ func runTest(t *testing.T, cases TestCases) {
 				c.mocks(resourceFactory)
 			}
 
+			if c.options == nil {
+				c.options = &pkg.ScanOptions{}
+			}
+
 			scanProgress := &output.MockProgress{}
 			scanProgress.On("Start").Return().Once()
 			scanProgress.On("Stop").Return().Once()
@@ -110,7 +114,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			assert: func(result *test.ScanResult, err error) {
 				result.NotZero(result.Duration)
 			},
-			options: &pkg.ScanOptions{},
 		},
 		{
 			name: "infrastructure should be in sync",
@@ -277,40 +280,74 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should ignore default AWS IAM role when strict mode is disabled",
+			mocks: func(factory resource.ResourceFactory) {
+				factory.(*terraform.MockResourceFactory).On(
+					"CreateAbstractResource",
+					aws.AwsIamPolicyAttachmentResourceType,
+					"role-test-1-policy-test-1",
+					map[string]interface{}{
+						"roles": []string{"role-test-1"},
+					},
+				).Once().Return(&resource.AbstractResource{
+					Id:   "role-test-1-policy-test-1",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"roles": []string{"role-test-1"},
+					},
+				})
+			},
 			stateResources: []resource.Resource{
 				testresource.FakeResource{
 					Id: "fake",
 				},
-				&aws.AwsIamPolicy{
-					Id:  "role-policy-test-1",
-					Arn: func(p string) *string { return &p }("policy-test-1"),
+				&resource.AbstractResource{
+					Id:   "role-policy-test-1",
+					Type: aws.AwsIamPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn": "policy-test-1",
+					},
 				},
 			},
 			remoteResources: []resource.Resource{
 				testresource.FakeResource{
 					Id: "fake",
 				},
-				&aws.AwsIamRole{
+				&resource.AbstractResource{
 					Id:   "role-test-1",
-					Path: func(p string) *string { return &p }("/aws-service-role/test"),
+					Type: aws.AwsIamRoleResourceType,
+					Attrs: &resource.Attributes{
+						"path": "/aws-service-role/test",
+					},
 				},
-				&aws.AwsIamRolePolicy{
+				&resource.AbstractResource{
 					Id:   "role-policy-test-1",
-					Role: func(p string) *string { return &p }("role-test-1"),
+					Type: aws.AwsIamRolePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"role": "role-test-1",
+					},
 				},
-				&aws.AwsIamPolicy{
-					Id:  "role-policy-test-1",
-					Arn: func(p string) *string { return &p }("policy-test-1"),
+				&resource.AbstractResource{
+					Id:   "role-policy-test-1",
+					Type: aws.AwsIamPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn": "policy-test-1",
+					},
 				},
-				&aws.AwsIamPolicyAttachment{
-					Id:        "policy-attachment-test-1",
-					PolicyArn: func(p string) *string { return &p }("policy-test-1"),
-					Users:     func(p []string) *[]string { return &p }([]string{}),
-					Roles:     func(p []string) *[]string { return &p }([]string{"role-test-1"}),
+				&resource.AbstractResource{
+					Id:   "policy-attachment-test-1",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"policy_arn": "policy-test-1",
+						"users":      []string{},
+						"roles":      []string{"role-test-1"},
+					},
 				},
-				&aws.AwsIamRole{
+				&resource.AbstractResource{
 					Id:   "role-test-2",
-					Path: func(p string) *string { return &p }("/not-aws-service-role/test"),
+					Type: aws.AwsIamRoleResourceType,
+					Attrs: &resource.Attributes{
+						"path": "/not-aws-service-role/test",
+					},
 				},
 			},
 			assert: func(result *test.ScanResult, err error) {
@@ -327,40 +364,74 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should not ignore default AWS IAM role when strict mode is enabled",
+			mocks: func(factory resource.ResourceFactory) {
+				factory.(*terraform.MockResourceFactory).On(
+					"CreateAbstractResource",
+					aws.AwsIamPolicyAttachmentResourceType,
+					"role-test-1-policy-test-1",
+					map[string]interface{}{
+						"roles": []string{"role-test-1"},
+					},
+				).Once().Return(&resource.AbstractResource{
+					Id:   "role-test-1-policy-test-1",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"roles": []string{"role-test-1"},
+					},
+				})
+			},
 			stateResources: []resource.Resource{
 				testresource.FakeResource{
 					Id: "fake",
 				},
-				&aws.AwsIamPolicy{
-					Id:  "policy-test-1",
-					Arn: func(p string) *string { return &p }("policy-test-1"),
+				&resource.AbstractResource{
+					Id:   "policy-test-1",
+					Type: aws.AwsIamPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn": "policy-test-1",
+					},
 				},
 			},
 			remoteResources: []resource.Resource{
 				testresource.FakeResource{
 					Id: "fake",
 				},
-				&aws.AwsIamRole{
+				&resource.AbstractResource{
 					Id:   "role-test-1",
-					Path: func(p string) *string { return &p }("/aws-service-role/test"),
+					Type: aws.AwsIamRoleResourceType,
+					Attrs: &resource.Attributes{
+						"path": "/aws-service-role/test",
+					},
 				},
-				&aws.AwsIamRolePolicy{
+				&resource.AbstractResource{
 					Id:   "role-policy-test-1",
-					Role: func(p string) *string { return &p }("role-test-1"),
+					Type: aws.AwsIamRolePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"role": "role-test-1",
+					},
 				},
-				&aws.AwsIamPolicy{
-					Id:  "policy-test-1",
-					Arn: func(p string) *string { return &p }("policy-test-1"),
+				&resource.AbstractResource{
+					Id:   "policy-test-1",
+					Type: aws.AwsIamPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn": "policy-test-1",
+					},
 				},
-				&aws.AwsIamPolicyAttachment{
-					Id:        "policy-attachment-test-1",
-					PolicyArn: func(p string) *string { return &p }("policy-test-1"),
-					Users:     func(p []string) *[]string { return &p }([]string{}),
-					Roles:     func(p []string) *[]string { return &p }([]string{"role-test-1"}),
+				&resource.AbstractResource{
+					Id:   "policy-attachment-test-1",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"policy_arn": "policy-test-1",
+						"users":      []string{},
+						"roles":      []string{"role-test-1"},
+					},
 				},
-				&aws.AwsIamRole{
+				&resource.AbstractResource{
 					Id:   "role-test-2",
-					Path: func(p string) *string { return &p }("/not-aws-service-role/test"),
+					Type: aws.AwsIamRoleResourceType,
+					Attrs: &resource.Attributes{
+						"path": "/not-aws-service-role/test",
+					},
 				},
 			},
 			assert: func(result *test.ScanResult, err error) {
@@ -377,40 +448,74 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should not ignore default AWS IAM role when strict mode is enabled and a filter is specified",
+			mocks: func(factory resource.ResourceFactory) {
+				factory.(*terraform.MockResourceFactory).On(
+					"CreateAbstractResource",
+					aws.AwsIamPolicyAttachmentResourceType,
+					"role-test-1-policy-test-1",
+					map[string]interface{}{
+						"roles": []string{"role-test-1"},
+					},
+				).Once().Return(&resource.AbstractResource{
+					Id:   "role-test-1-policy-test-1",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"roles": []string{"role-test-1"},
+					},
+				})
+			},
 			stateResources: []resource.Resource{
 				testresource.FakeResource{
 					Id: "fake",
 				},
-				&aws.AwsIamPolicy{
-					Id:  "policy-test-1",
-					Arn: func(p string) *string { return &p }("policy-test-1"),
+				&resource.AbstractResource{
+					Id:   "policy-test-1",
+					Type: aws.AwsIamPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn": "policy-test-1",
+					},
 				},
 			},
 			remoteResources: []resource.Resource{
 				testresource.FakeResource{
 					Id: "fake",
 				},
-				&aws.AwsIamRole{
+				&resource.AbstractResource{
 					Id:   "role-test-1",
-					Path: func(p string) *string { return &p }("/aws-service-role/test"),
+					Type: aws.AwsIamRoleResourceType,
+					Attrs: &resource.Attributes{
+						"path": "/aws-service-role/test",
+					},
 				},
-				&aws.AwsIamRolePolicy{
+				&resource.AbstractResource{
 					Id:   "role-policy-test-1",
-					Role: func(p string) *string { return &p }("role-test-1"),
+					Type: aws.AwsIamRolePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"role": "role-test-1",
+					},
 				},
-				&aws.AwsIamPolicy{
-					Id:  "policy-test-1",
-					Arn: func(p string) *string { return &p }("policy-test-1"),
+				&resource.AbstractResource{
+					Id:   "policy-test-1",
+					Type: aws.AwsIamPolicyResourceType,
+					Attrs: &resource.Attributes{
+						"arn": "policy-test-1",
+					},
 				},
-				&aws.AwsIamPolicyAttachment{
-					Id:        "policy-attachment-test-1",
-					PolicyArn: func(p string) *string { return &p }("policy-test-1"),
-					Users:     func(p []string) *[]string { return &p }([]string{}),
-					Roles:     func(p []string) *[]string { return &p }([]string{"role-test-1"}),
+				&resource.AbstractResource{
+					Id:   "policy-attachment-test-1",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"policy_arn": "policy-test-1",
+						"users":      []string{},
+						"roles":      []string{"role-test-1"},
+					},
 				},
-				&aws.AwsIamRole{
+				&resource.AbstractResource{
 					Id:   "role-test-2",
-					Path: func(p string) *string { return &p }("/not-aws-service-role/test"),
+					Type: aws.AwsIamRoleResourceType,
+					Attrs: &resource.Attributes{
+						"path": "/not-aws-service-role/test",
+					},
 				},
 			},
 			assert: func(result *test.ScanResult, err error) {

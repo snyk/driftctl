@@ -8,10 +8,14 @@ import (
 )
 
 // Split Policy attachment when there is multiple user and groups and generate a repeatable id
-type IamPolicyAttachmentSanitizer struct{}
+type IamPolicyAttachmentSanitizer struct {
+	resourceFactory resource.ResourceFactory
+}
 
-func NewIamPolicyAttachmentSanitizer() IamPolicyAttachmentSanitizer {
-	return IamPolicyAttachmentSanitizer{}
+func NewIamPolicyAttachmentSanitizer(resourceFactory resource.ResourceFactory) IamPolicyAttachmentSanitizer {
+	return IamPolicyAttachmentSanitizer{
+		resourceFactory,
+	}
 }
 
 func (m IamPolicyAttachmentSanitizer) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
@@ -24,7 +28,7 @@ func (m IamPolicyAttachmentSanitizer) Execute(remoteResources, resourcesFromStat
 			continue
 		}
 
-		policyAttachment := stateResource.(*resourceaws.AwsIamPolicyAttachment)
+		policyAttachment := stateResource.(*resource.AbstractResource)
 
 		newStateResources = append(newStateResources, m.sanitize(policyAttachment)...)
 	}
@@ -38,7 +42,7 @@ func (m IamPolicyAttachmentSanitizer) Execute(remoteResources, resourcesFromStat
 			continue
 		}
 
-		policyAttachment := stateResource.(*resourceaws.AwsIamPolicyAttachment)
+		policyAttachment := stateResource.(*resource.AbstractResource)
 
 		newRemoteResources = append(newRemoteResources, m.sanitize(policyAttachment)...)
 	}
@@ -49,33 +53,37 @@ func (m IamPolicyAttachmentSanitizer) Execute(remoteResources, resourcesFromStat
 	return nil
 }
 
-func (m IamPolicyAttachmentSanitizer) sanitize(policyAttachment *resourceaws.AwsIamPolicyAttachment) []resource.Resource {
+func (m IamPolicyAttachmentSanitizer) sanitize(policyAttachment *resource.AbstractResource) []resource.Resource {
 
 	var newResources []resource.Resource
 
-	if policyAttachment.Users != nil {
+	users := (*policyAttachment.Attrs)["users"]
+	if users != nil {
 		// we create one attachment per user
-		for _, user := range *policyAttachment.Users {
-			newAttachment := *policyAttachment
-
-			// Id is generated with unique id in state so we override it with something repeatable
-			newAttachment.Id = fmt.Sprintf("%s-%s", user, *policyAttachment.PolicyArn)
-
-			newAttachment.Users = &[]string{user}
-			newResources = append(newResources, &newAttachment)
+		for _, user := range users.([]string) {
+			newAttachment := m.resourceFactory.CreateAbstractResource(
+				resourceaws.AwsIamPolicyAttachmentResourceType,
+				fmt.Sprintf("%s-%s", user, (*policyAttachment.Attrs)["policy_arn"]),
+				map[string]interface{}{
+					"users": []string{user},
+				},
+			)
+			newResources = append(newResources, newAttachment)
 		}
 	}
 
-	if policyAttachment.Roles != nil {
+	roles := (*policyAttachment.Attrs)["roles"]
+	if roles != nil {
 		// we create one attachment per role
-		for _, role := range *policyAttachment.Roles {
-			newAttachment := *policyAttachment
-
-			// Id is generated with unique id in state so we override it with something repeatable
-			newAttachment.Id = fmt.Sprintf("%s-%s", role, *policyAttachment.PolicyArn)
-
-			newAttachment.Roles = &[]string{role}
-			newResources = append(newResources, &newAttachment)
+		for _, role := range roles.([]string) {
+			newAttachment := m.resourceFactory.CreateAbstractResource(
+				resourceaws.AwsIamPolicyAttachmentResourceType,
+				fmt.Sprintf("%s-%s", role, (*policyAttachment.Attrs)["policy_arn"]),
+				map[string]interface{}{
+					"roles": []string{role},
+				},
+			)
+			newResources = append(newResources, newAttachment)
 		}
 	}
 	return newResources

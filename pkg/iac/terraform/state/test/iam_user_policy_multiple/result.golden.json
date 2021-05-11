@@ -1,164 +1,122 @@
 [
  {
-  "Arn": "arn:aws:iam::526954929923:user/system/loadbalancer3",
-  "ForceDestroy": false,
-  "Id": "loadbalancer3",
-  "Name": "loadbalancer3",
-  "Path": "/system/",
-  "PermissionsBoundary": null,
-  "Tags": null,
-  "UniqueId": "AIDAXVMHWD4BUICVKAIIT",
-  "CtyVal": {}
- },
- {
-  "Arn": "arn:aws:iam::526954929923:user/system/loadbalancer2",
-  "ForceDestroy": false,
-  "Id": "loadbalancer2",
-  "Name": "loadbalancer2",
-  "Path": "/system/",
-  "PermissionsBoundary": null,
-  "Tags": null,
-  "UniqueId": "AIDAXVMHWD4BTVLVQM236",
-  "CtyVal": {}
- },
- {
-  "Arn": "arn:aws:iam::526954929923:user/system/loadbalancer",
-  "ForceDestroy": false,
-  "Id": "loadbalancer",
-  "Name": "loadbalancer",
-  "Path": "/system/",
-  "PermissionsBoundary": null,
-  "Tags": null,
-  "UniqueId": "AIDAXVMHWD4B7BHWL7YKF",
-  "CtyVal": {}
- },
- {
-  "Id": "loadbalancer3:test34",
-  "Name": "test34",
-  "NamePrefix": null,
-  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
-  "User": "loadbalancer3",
-  "CtyVal": {}
- },
- {
-  "Id": "loadbalancer:test4",
-  "Name": "test4",
-  "NamePrefix": null,
-  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
-  "User": "loadbalancer",
-  "CtyVal": {}
- },
- {
-  "Id": "loadbalancer2:test23",
-  "Name": "test23",
-  "NamePrefix": null,
-  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
-  "User": "loadbalancer2",
-  "CtyVal": {}
- },
- {
-  "Id": "loadbalancer:test2",
-  "Name": "test2",
-  "NamePrefix": null,
-  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
-  "User": "loadbalancer",
-  "CtyVal": {}
- },
- {
-  "Id": "loadbalancer2:test22",
-  "Name": "test22",
-  "NamePrefix": null,
-  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
-  "User": "loadbalancer2",
-  "CtyVal": {}
- },
- {
-  "Id": "loadbalancer3:test32",
-  "Name": "test32",
-  "NamePrefix": null,
-  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
-  "User": "loadbalancer3",
-  "CtyVal": {}
- },
- {
-  "Id": "loadbalancer:test3",
-  "Name": "test3",
-  "NamePrefix": null,
-  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
-  "User": "loadbalancer",
-  "CtyVal": {}
+  "Id": "loadbalancer2:test2",
+  "Type": "aws_iam_user_policy",
+  "Attrs": {
+   "id": "loadbalancer2:test2",
+   "name": "test2",
+   "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+   "user": "loadbalancer2"
+  }
  },
  {
   "Id": "loadbalancer2:test24",
-  "Name": "test24",
-  "NamePrefix": null,
-  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
-  "User": "loadbalancer2",
-  "CtyVal": {}
+  "Type": "aws_iam_user_policy",
+  "Attrs": {
+   "id": "loadbalancer2:test24",
+   "name": "test24",
+   "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+   "user": "loadbalancer2"
+  }
  },
  {
   "Id": "loadbalancer3:test3",
-  "Name": "test3",
-  "NamePrefix": null,
-  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
-  "User": "loadbalancer3",
-  "CtyVal": {}
+  "Type": "aws_iam_user_policy",
+  "Attrs": {
+   "id": "loadbalancer3:test3",
+   "name": "test3",
+   "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+   "user": "loadbalancer3"
+  }
  },
  {
   "Id": "loadbalancer3:test33",
-  "Name": "test33",
-  "NamePrefix": null,
-  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
-  "User": "loadbalancer3",
-  "CtyVal": {}
+  "Type": "aws_iam_user_policy",
+  "Attrs": {
+   "id": "loadbalancer3:test33",
+   "name": "test33",
+   "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+   "user": "loadbalancer3"
+  }
+ },
+ {
+  "Id": "loadbalancer3:test34",
+  "Type": "aws_iam_user_policy",
+  "Attrs": {
+   "id": "loadbalancer3:test34",
+   "name": "test34",
+   "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+   "user": "loadbalancer3"
+  }
+ },
+ {
+  "Id": "loadbalancer:test3",
+  "Type": "aws_iam_user_policy",
+  "Attrs": {
+   "id": "loadbalancer:test3",
+   "name": "test3",
+   "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+   "user": "loadbalancer"
+  }
+ },
+ {
+  "Id": "loadbalancer:test4",
+  "Type": "aws_iam_user_policy",
+  "Attrs": {
+   "id": "loadbalancer:test4",
+   "name": "test4",
+   "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+   "user": "loadbalancer"
+  }
+ },
+ {
+  "Id": "loadbalancer2:test22",
+  "Type": "aws_iam_user_policy",
+  "Attrs": {
+   "id": "loadbalancer2:test22",
+   "name": "test22",
+   "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+   "user": "loadbalancer2"
+  }
+ },
+ {
+  "Id": "loadbalancer2:test23",
+  "Type": "aws_iam_user_policy",
+  "Attrs": {
+   "id": "loadbalancer2:test23",
+   "name": "test23",
+   "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+   "user": "loadbalancer2"
+  }
+ },
+ {
+  "Id": "loadbalancer3:test32",
+  "Type": "aws_iam_user_policy",
+  "Attrs": {
+   "id": "loadbalancer3:test32",
+   "name": "test32",
+   "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+   "user": "loadbalancer3"
+  }
  },
  {
   "Id": "loadbalancer:test",
-  "Name": "test",
-  "NamePrefix": null,
-  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
-  "User": "loadbalancer",
-  "CtyVal": {}
+  "Type": "aws_iam_user_policy",
+  "Attrs": {
+   "id": "loadbalancer:test",
+   "name": "test",
+   "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+   "user": "loadbalancer"
+  }
  },
  {
-  "Id": "loadbalancer2:test2",
-  "Name": "test2",
-  "NamePrefix": null,
-  "Policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
-  "User": "loadbalancer2",
-  "CtyVal": {}
- },
- {
-  "EncryptedSecret": null,
-  "Id": "AKIAXVMHWD4BZZ46XCIU",
-  "KeyFingerprint": null,
-  "PgpKey": null,
-  "Secret": null,
-  "SesSmtpPasswordV4": null,
-  "Status": "Active",
-  "User": "loadbalancer2",
-  "CtyVal": {}
- },
- {
-  "EncryptedSecret": null,
-  "Id": "AKIAXVMHWD4BYCOUMTPB",
-  "KeyFingerprint": null,
-  "PgpKey": null,
-  "Secret": null,
-  "SesSmtpPasswordV4": null,
-  "Status": "Active",
-  "User": "loadbalancer",
-  "CtyVal": {}
- },
- {
-  "EncryptedSecret": null,
-  "Id": "AKIAXVMHWD4BQM7NGPEU",
-  "KeyFingerprint": null,
-  "PgpKey": null,
-  "Secret": null,
-  "SesSmtpPasswordV4": null,
-  "Status": "Active",
-  "User": "loadbalancer3",
-  "CtyVal": {}
+  "Id": "loadbalancer:test2",
+  "Type": "aws_iam_user_policy",
+  "Attrs": {
+   "id": "loadbalancer:test2",
+   "name": "test2",
+   "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+   "user": "loadbalancer"
+  }
  }
 ]

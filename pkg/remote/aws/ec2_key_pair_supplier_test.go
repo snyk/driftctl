@@ -19,9 +19,6 @@ import (
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/r3labs/diff/v2"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -97,54 +94,6 @@ func TestEC2KeyPairSupplier_Resources(t *testing.T) {
 			assert.Equal(t, tt.err, err)
 
 			test.CtyTestDiff(got, tt.dirName, provider, deserializer, shouldUpdate, t)
-		})
-	}
-}
-
-func TestEC2KeyPair_Diff(t *testing.T) {
-	tests := []struct {
-		test      string
-		firstRes  resourceaws.AwsKeyPair
-		secondRes resourceaws.AwsKeyPair
-		wantErr   bool
-	}{
-		{
-			test: "no diff - identical resource",
-			firstRes: resourceaws.AwsKeyPair{
-				Id: "foo",
-			},
-			secondRes: resourceaws.AwsKeyPair{
-				Id: "foo",
-			},
-			wantErr: false,
-		},
-		{
-			test: "no diff - with PublicKey and KeyNamePrefix",
-			firstRes: resourceaws.AwsKeyPair{
-				Id:            "bar",
-				PublicKey:     aws.String("ssh-rsa BBBBB3NzaC1yc2E"),
-				KeyNamePrefix: aws.String("test"),
-			},
-			secondRes: resourceaws.AwsKeyPair{
-				Id:            "bar",
-				PublicKey:     nil,
-				KeyNamePrefix: nil,
-			},
-			wantErr: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.test, func(t *testing.T) {
-			changelog, err := diff.Diff(tt.firstRes, tt.secondRes)
-			if err != nil {
-				panic(err)
-			}
-			if len(changelog) > 0 {
-				for _, change := range changelog {
-					t.Errorf("got = %v, want %v", awsutil.Prettify(change.From), awsutil.Prettify(change.To))
-				}
-			}
 		})
 	}
 }
