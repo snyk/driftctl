@@ -20,6 +20,7 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsRouteMetaData(resourceSchemaRepository)
 	initSnsTopicSubscriptionMetaData(resourceSchemaRepository)
 	initSnsTopicPolicyMetaData(resourceSchemaRepository)
+	initAwsIAMAccessKeyMetaData(resourceSchemaRepository)
 	initAwsIAMPolicyMetaData(resourceSchemaRepository)
 	initAwsIAMPolicyAttachmentMetaData(resourceSchemaRepository)
 	initAwsIAMRoleMetaData(resourceSchemaRepository)
