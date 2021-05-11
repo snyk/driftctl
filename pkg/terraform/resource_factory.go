@@ -52,7 +52,7 @@ func (r *TerraformResourceFactory) CreateResource(data interface{}, ty string) (
 
 func (r *TerraformResourceFactory) CreateAbstractResource(ty, id string, data map[string]interface{}) *resource.AbstractResource {
 	attributes := resource.Attributes(data)
-	attributes.SanitizeDefaultsV3()
+	attributes.SanitizeDefaults()
 
 	schema, exist := r.resourceSchemaRepository.(*resource.SchemaRepository).GetSchema(ty)
 	if exist && schema.NormalizeFunc != nil {

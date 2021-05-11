@@ -191,62 +191,6 @@ func (a *Attributes) SafeSet(path []string, value interface{}) error {
 	return errors.New("Error setting value") // should not happen ?
 }
 
-func (a *Attributes) SanitizeDefaults() {
-	original := reflect.ValueOf(*a)
-	copy := reflect.New(original.Type()).Elem()
-	a.run("", original, copy)
-	*a = copy.Interface().(Attributes)
-}
-
-func (a *Attributes) run(path string, original, copy reflect.Value) {
-	switch original.Kind() {
-	case reflect.Ptr:
-		originalValue := original.Elem()
-		if !originalValue.IsValid() {
-			return
-		}
-		copy.Set(reflect.New(originalValue.Type()))
-		a.run(path, originalValue, copy.Elem())
-	case reflect.Interface:
-		// Get rid of the wrapping interface
-		originalValue := original.Elem()
-		if !originalValue.IsValid() {
-			return
-		}
-		if originalValue.Kind() == reflect.Slice || originalValue.Kind() == reflect.Map {
-			if originalValue.Len() == 0 {
-				return
-			}
-		}
-		// Create a new object. Now new gives us a pointer, but we want the value it
-		// points to, so we have to call Elem() to unwrap it
-		copyValue := reflect.New(originalValue.Type()).Elem()
-		a.run(path, originalValue, copyValue)
-		copy.Set(copyValue)
-
-	case reflect.Struct:
-		for i := 0; i < original.NumField(); i += 1 {
-			field := original.Field(i)
-			a.run(concatenatePath(path, field.String()), field, copy.Field(i))
-		}
-	case reflect.Slice:
-		copy.Set(reflect.MakeSlice(original.Type(), original.Len(), original.Cap()))
-		for i := 0; i < original.Len(); i += 1 {
-			a.run(concatenatePath(path, strconv.Itoa(i)), original.Index(i), copy.Index(i))
-		}
-	case reflect.Map:
-		copy.Set(reflect.MakeMap(original.Type()))
-		for _, key := range original.MapKeys() {
-			originalValue := original.MapIndex(key)
-			copyValue := reflect.New(originalValue.Type()).Elem()
-			a.run(concatenatePath(path, key.String()), originalValue, copyValue)
-			copy.SetMapIndex(key, copyValue)
-		}
-	default:
-		copy.Set(original)
-	}
-}
-
 func concatenatePath(path, next string) string {
 	if path == "" {
 		return next
@@ -254,14 +198,14 @@ func concatenatePath(path, next string) string {
 	return strings.Join([]string{path, next}, ".")
 }
 
-func (a *Attributes) SanitizeDefaultsV3() {
+func (a *Attributes) SanitizeDefaults() {
 	original := reflect.ValueOf(*a)
 	copy := reflect.New(original.Type()).Elem()
-	a.runV3("", original, copy)
+	a.sanitize("", original, copy)
 	*a = copy.Interface().(Attributes)
 }
 
-func (a *Attributes) runV3(path string, original, copy reflect.Value) bool {
+func (a *Attributes) sanitize(path string, original, copy reflect.Value) bool {
 	switch original.Kind() {
 	case reflect.Ptr:
 		originalValue := original.Elem()
@@ -269,7 +213,7 @@ func (a *Attributes) runV3(path string, original, copy reflect.Value) bool {
 			return false
 		}
 		copy.Set(reflect.New(originalValue.Type()))
-		a.runV3(path, originalValue, copy.Elem())
+		a.sanitize(path, originalValue, copy.Elem())
 	case reflect.Interface:
 		// Get rid of the wrapping interface
 		originalValue := original.Elem()
@@ -284,25 +228,25 @@ func (a *Attributes) runV3(path string, original, copy reflect.Value) bool {
 		// Create a new object. Now new gives us a pointer, but we want the value it
 		// points to, so we have to call Elem() to unwrap it
 		copyValue := reflect.New(originalValue.Type()).Elem()
-		a.runV3(path, originalValue, copyValue)
+		a.sanitize(path, originalValue, copyValue)
 		copy.Set(copyValue)
 
 	case reflect.Struct:
 		for i := 0; i < original.NumField(); i += 1 {
 			field := original.Field(i)
-			a.runV3(concatenatePath(path, field.String()), field, copy.Field(i))
+			a.sanitize(concatenatePath(path, field.String()), field, copy.Field(i))
 		}
 	case reflect.Slice:
 		copy.Set(reflect.MakeSlice(original.Type(), original.Len(), original.Cap()))
 		for i := 0; i < original.Len(); i += 1 {
-			a.runV3(concatenatePath(path, strconv.Itoa(i)), original.Index(i), copy.Index(i))
+			a.sanitize(concatenatePath(path, strconv.Itoa(i)), original.Index(i), copy.Index(i))
 		}
 	case reflect.Map:
 		copy.Set(reflect.MakeMap(original.Type()))
 		for _, key := range original.MapKeys() {
 			originalValue := original.MapIndex(key)
 			copyValue := reflect.New(originalValue.Type()).Elem()
-			created := a.runV3(concatenatePath(path, key.String()), originalValue, copyValue)
+			created := a.sanitize(concatenatePath(path, key.String()), originalValue, copyValue)
 			if created {
 				copy.SetMapIndex(key, copyValue)
 			}
