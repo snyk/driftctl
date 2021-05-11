@@ -1,8 +1,6 @@
 package aws
 
 import (
-	"fmt"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
@@ -26,9 +24,10 @@ func (r *AwsInstance) NormalizeForProvider() (resource.Resource, error) {
 	return r, nil
 }
 
-func (r *AwsInstance) String() string {
+func (r *AwsInstance) Attributes() map[string]string {
+	attrs := make(map[string]string)
 	if name, ok := r.Tags["Name"]; ok {
-		return fmt.Sprintf("%s (Name: %s)", r.TerraformId(), name)
+		attrs["Name"] = name
 	}
-	return r.TerraformId()
+	return attrs
 }

@@ -1,12 +1,15 @@
 Found missing resources:
   FakeResourceStringer:
-    - Name: 'deleted resource'
+    - dfjkgnbsgj
+        Name: deleted resource
 Found resources not covered by IaC:
   FakeResourceStringer:
-    - Name: 'unmanaged resource'
+    - duysgkfdjfdgfhd
+        Name: unmanaged resource
 Found changed resources:
-  - Name: 'resource with diff' (FakeResourceStringer):
-    ~ Name: "" => "resource with diff"
+    - gdsfhgkbn (FakeResourceStringer):
+        Name: resource with diff
+            ~ Name: "" => "resource with diff"
 Found 3 resource(s)
  - 33% coverage
  - 1 covered by IaC

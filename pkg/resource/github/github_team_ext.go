@@ -1,17 +1,17 @@
 package github
 
 import (
-	"fmt"
-
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
-func (r *GithubTeam) String() string {
-	if r.Name != nil {
-		return fmt.Sprintf("%s (Id: %s)", *r.Name, r.Id)
+func (r *GithubTeam) Attributes() map[string]string {
+	attrs := make(map[string]string)
+	attrs["Id"] = r.Id
+	if r.Name != nil && *r.Name != "" {
+		attrs["Name"] = *r.Name
 	}
-	return r.Id
+	return attrs
 }
 
 func (r *GithubTeam) NormalizeForState() (resource.Resource, error) {

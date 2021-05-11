@@ -2,12 +2,12 @@ package github
 
 import (
 	"encoding/base64"
-	"fmt"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
-func (r *GithubBranchProtection) String() string {
+func (r *GithubBranchProtection) Attributes() map[string]string {
+	attrs := make(map[string]string)
 	if r.Pattern != nil {
 		repoId := ""
 		if r.RepositoryId != nil {
@@ -18,11 +18,16 @@ func (r *GithubBranchProtection) String() string {
 		}
 
 		if repoId == "" {
-			return fmt.Sprintf("Branch: %s (Id: %s)", *r.Pattern, r.Id)
+			attrs["Branch"] = *r.Pattern
+			attrs["Id"] = r.Id
+			return attrs
 		}
-		return fmt.Sprintf("Branch: %s (RepoId: %s)", *r.Pattern, repoId)
+		attrs["Branch"] = *r.Pattern
+		attrs["RepoId"] = repoId
+		return attrs
 	}
-	return r.Id
+	attrs["Id"] = r.Id
+	return attrs
 }
 
 func (r *GithubBranchProtection) NormalizeForState() (resource.Resource, error) {

@@ -8,16 +8,18 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (r *AwsRoute) String() string {
-	var destination string
+func (r *AwsRoute) Attributes() map[string]string {
+	attrs := make(map[string]string)
+	if r.RouteTableId != nil && *r.RouteTableId != "" {
+		attrs["Table"] = *r.RouteTableId
+	}
 	if r.DestinationCidrBlock != nil && *r.DestinationCidrBlock != "" {
-		destination = *r.DestinationCidrBlock
+		attrs["Destination"] = *r.DestinationCidrBlock
 	}
 	if r.DestinationIpv6CidrBlock != nil && *r.DestinationIpv6CidrBlock != "" {
-		destination = *r.DestinationIpv6CidrBlock
+		attrs["Destination"] = *r.DestinationIpv6CidrBlock
 	}
-	output := fmt.Sprintf("Table: %s, Destination: %s", *r.RouteTableId, destination)
-	return output
+	return attrs
 }
 
 func CalculateRouteID(tableId, CidrBlock, Ipv6CidrBlock *string) (string, error) {

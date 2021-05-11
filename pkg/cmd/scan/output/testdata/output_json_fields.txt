@@ -1,7 +1,7 @@
 Found changed resources:
-  - diff-id-1 (aws_diff_resource):
-    ~ Json:
-         {
+    - diff-id-1 (aws_diff_resource):
+        ~ Json:
+            {
    "Statement": [
      {
 -      "Changed": [
@@ -20,9 +20,9 @@ Found changed resources:
    "Version": "2012-10-17"
  }
 
-  - diff-id-2 (aws_diff_resource):
-    ~ Json:
-         {
+    - diff-id-2 (aws_diff_resource):
+        ~ Json:
+            {
 -  "foo": "bar"
 +  "bar": "foo"
  }

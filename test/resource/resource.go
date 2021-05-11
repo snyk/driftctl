@@ -1,11 +1,8 @@
 package resource
 
 import (
-	"fmt"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/test/schemas"
-
 	"github.com/hashicorp/terraform/providers"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -65,8 +62,12 @@ func (r *FakeResourceStringer) CtyValue() *cty.Value {
 	return r.CtyVal
 }
 
-func (d *FakeResourceStringer) String() string {
-	return fmt.Sprintf("Name: '%s'", d.Name)
+func (d *FakeResourceStringer) Attributes() map[string]string {
+	attrs := make(map[string]string)
+	if d.Name != "" {
+		attrs["Name"] = d.Name
+	}
+	return attrs
 }
 
 func InitFakeSchemaRepository(provider, version string) resource.SchemaRepositoryInterface {
