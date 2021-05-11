@@ -192,6 +192,152 @@ func Test_IAMRepository_ListAllRoles(t *testing.T) {
 	}
 }
 
+func Test_IAMRepository_ListAllRolePolicyAttachments(t *testing.T) {
+	tests := []struct {
+		name    string
+		roles   []*iam.Role
+		mocks   func(client *mocks.FakeIAM)
+		want    []*AttachedRolePolicy
+		wantErr error
+	}{
+		{
+			name: "List only role policy attachments with multiple pages",
+			roles: []*iam.Role{
+				{
+					RoleName: aws.String("test-role"),
+				},
+				{
+					RoleName: aws.String("test-role2"),
+				},
+			},
+			mocks: func(client *mocks.FakeIAM) {
+
+				shouldSkipfirst := false
+				shouldSkipSecond := false
+
+				client.On("ListAttachedRolePoliciesPages",
+					&iam.ListAttachedRolePoliciesInput{
+						RoleName: aws.String("test-role"),
+					},
+					mock.MatchedBy(func(callback func(res *iam.ListAttachedRolePoliciesOutput, lastPage bool) bool) bool {
+						if shouldSkipfirst {
+							return false
+						}
+						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
+							&iam.AttachedPolicy{
+								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy"),
+								PolicyName: aws.String("policy"),
+							},
+							&iam.AttachedPolicy{
+								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy2"),
+								PolicyName: aws.String("policy2"),
+							},
+						}}, false)
+						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
+							&iam.AttachedPolicy{
+								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy3"),
+								PolicyName: aws.String("policy3"),
+							},
+						}}, true)
+						shouldSkipfirst = true
+						return true
+					})).Return(nil).Once()
+
+				client.On("ListAttachedRolePoliciesPages",
+					&iam.ListAttachedRolePoliciesInput{
+						RoleName: aws.String("test-role2"),
+					},
+					mock.MatchedBy(func(callback func(res *iam.ListAttachedRolePoliciesOutput, lastPage bool) bool) bool {
+						if shouldSkipSecond {
+							return false
+						}
+						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
+							&iam.AttachedPolicy{
+								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy"),
+								PolicyName: aws.String("policy"),
+							},
+							&iam.AttachedPolicy{
+								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy2"),
+								PolicyName: aws.String("policy2"),
+							},
+						}}, false)
+						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
+							&iam.AttachedPolicy{
+								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy3"),
+								PolicyName: aws.String("policy3"),
+							},
+						}}, true)
+						shouldSkipSecond = true
+						return true
+					})).Return(nil).Once()
+			},
+			want: []*AttachedRolePolicy{
+				{
+					iam.AttachedPolicy{
+						PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy"),
+						PolicyName: aws.String("policy"),
+					},
+					*aws.String("test-role"),
+				},
+				{
+					iam.AttachedPolicy{
+						PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy2"),
+						PolicyName: aws.String("policy2"),
+					},
+					*aws.String("test-role"),
+				},
+				{
+					iam.AttachedPolicy{
+						PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy3"),
+						PolicyName: aws.String("policy3"),
+					},
+					*aws.String("test-role"),
+				},
+				{
+					iam.AttachedPolicy{
+						PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy"),
+						PolicyName: aws.String("policy"),
+					},
+					*aws.String("test-role2"),
+				},
+				{
+					iam.AttachedPolicy{
+						PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy2"),
+						PolicyName: aws.String("policy2"),
+					},
+					*aws.String("test-role2"),
+				},
+				{
+					iam.AttachedPolicy{
+						PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy3"),
+						PolicyName: aws.String("policy3"),
+					},
+					*aws.String("test-role2"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := &mocks.FakeIAM{}
+			tt.mocks(client)
+			r := &iamRepository{
+				client: client,
+			}
+			got, err := r.ListAllRolePolicyAttachments(tt.roles)
+			assert.Equal(t, tt.wantErr, err)
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %v -> %v", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}
+
 func Test_IAMRepository_ListAllRolePolicies(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -283,6 +429,7 @@ func Test_IAMRepository_ListAllRolePolicies(t *testing.T) {
 		})
 	}
 }
+
 func Test_IAMRepository_ListAllUserPolicyAttachments(t *testing.T) {
 	tests := []struct {
 		name    string
