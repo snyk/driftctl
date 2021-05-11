@@ -192,6 +192,97 @@ func Test_IAMRepository_ListAllRoles(t *testing.T) {
 	}
 }
 
+func Test_IAMRepository_ListAllRolePolicies(t *testing.T) {
+	tests := []struct {
+		name    string
+		roles   []*iam.Role
+		mocks   func(client *mocks.FakeIAM)
+		want    []string
+		wantErr error
+	}{
+		{
+			name: "List only role policies with multiple pages",
+			roles: []*iam.Role{
+				{
+					RoleName: aws.String("test_role_0"),
+				},
+				{
+					RoleName: aws.String("test_role_1"),
+				},
+			},
+			mocks: func(client *mocks.FakeIAM) {
+				firstMockCalled := false
+				client.On("ListRolePoliciesPages",
+					&iam.ListRolePoliciesInput{
+						RoleName: aws.String("test_role_0"),
+					},
+					mock.MatchedBy(func(callback func(res *iam.ListRolePoliciesOutput, lastPage bool) bool) bool {
+						if firstMockCalled {
+							return false
+						}
+						callback(&iam.ListRolePoliciesOutput{
+							PolicyNames: []*string{
+								aws.String("policy-role0-0"),
+								aws.String("policy-role0-1"),
+							},
+						}, false)
+						callback(&iam.ListRolePoliciesOutput{
+							PolicyNames: []*string{
+								aws.String("policy-role0-2"),
+							},
+						}, true)
+						firstMockCalled = true
+						return true
+					})).Once().Return(nil)
+				client.On("ListRolePoliciesPages",
+					&iam.ListRolePoliciesInput{
+						RoleName: aws.String("test_role_1"),
+					},
+					mock.MatchedBy(func(callback func(res *iam.ListRolePoliciesOutput, lastPage bool) bool) bool {
+						callback(&iam.ListRolePoliciesOutput{
+							PolicyNames: []*string{
+								aws.String("policy-role1-0"),
+								aws.String("policy-role1-1"),
+							},
+						}, false)
+						callback(&iam.ListRolePoliciesOutput{
+							PolicyNames: []*string{
+								aws.String("policy-role1-2"),
+							},
+						}, true)
+						return true
+					})).Once().Return(nil)
+			},
+			want: []string{
+				*aws.String("test_role_0:policy-role0-0"),
+				*aws.String("test_role_0:policy-role0-1"),
+				*aws.String("test_role_0:policy-role0-2"),
+				*aws.String("test_role_1:policy-role1-0"),
+				*aws.String("test_role_1:policy-role1-1"),
+				*aws.String("test_role_1:policy-role1-2"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := &mocks.FakeIAM{}
+			tt.mocks(client)
+			r := &iamRepository{
+				client: client,
+			}
+			got, err := r.ListAllRolePolicies(tt.roles)
+			assert.Equal(t, tt.wantErr, err)
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %v -> %v", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}
 func Test_IAMRepository_ListAllUserPolicyAttachments(t *testing.T) {
 	tests := []struct {
 		name    string
