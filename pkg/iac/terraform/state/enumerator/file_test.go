@@ -101,6 +101,30 @@ func TestFileEnumerator_Enumerate(t *testing.T) {
 			want: nil,
 			err:  "lstat testdata/invalid_symlink/test: no such file or directory",
 		},
+		{
+			name: "test no state found with simple path",
+			config: config.SupplierConfig{
+				Path: "testdata/no_state_here",
+			},
+			want: nil,
+			err:  "no Terraform state was found in testdata/no_state_here, exiting",
+		},
+		{
+			name: "test no state found with double star glob path",
+			config: config.SupplierConfig{
+				Path: "testdata/no_state_here/**/*.tfstate",
+			},
+			want: nil,
+			err:  "no Terraform state was found in testdata/no_state_here/**/*.tfstate, exiting",
+		},
+		{
+			name: "test no state found with simple glob path",
+			config: config.SupplierConfig{
+				Path: "testdata/no_state_here/test/*",
+			},
+			want: nil,
+			err:  "no Terraform state was found in testdata/no_state_here/test/*, exiting",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

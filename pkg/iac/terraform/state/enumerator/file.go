@@ -1,6 +1,7 @@
 package enumerator
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -51,6 +52,13 @@ func (s *FileEnumerator) Enumerate() ([]string, error) {
 	}
 
 	keys, err := Glob(path)
+	if err != nil {
+		return keys, err
+	}
+
+	if len(keys) == 0 {
+		return keys, fmt.Errorf("no Terraform state was found in %s, exiting", s.config.Path)
+	}
 
 	return keys, err
 }
