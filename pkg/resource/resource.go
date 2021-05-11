@@ -71,6 +71,12 @@ var refactoredResources = []string{
 	// "aws_sqs_queue_policy",
 	// "aws_subnet",
 	// "aws_vpc",
+
+	"github_branch_protection",
+	"github_membership",
+	"github_repository",
+	"github_team",
+	"github_team_membership",
 }
 
 func IsRefactoredResource(typ string) bool {
