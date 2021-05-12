@@ -340,7 +340,7 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 				tt.mocks(factory)
 			}
 
-			m := NewIamPolicyAttachmentSanitizer(factory)
+			m := NewIamPolicyAttachmentExpander(factory)
 			if err := m.Execute(tt.args.RemoteResources, tt.args.ResourcesFromState); (err != nil) != tt.wantErr {
 				t.Errorf("Execute() error = %v, wantErr %v", err, tt.wantErr)
 			}

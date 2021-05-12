@@ -8,17 +8,17 @@ import (
 )
 
 // Split Policy attachment when there is multiple user and groups and generate a repeatable id
-type IamPolicyAttachmentSanitizer struct {
+type IamPolicyAttachmentExpander struct {
 	resourceFactory resource.ResourceFactory
 }
 
-func NewIamPolicyAttachmentSanitizer(resourceFactory resource.ResourceFactory) IamPolicyAttachmentSanitizer {
-	return IamPolicyAttachmentSanitizer{
+func NewIamPolicyAttachmentExpander(resourceFactory resource.ResourceFactory) IamPolicyAttachmentExpander {
+	return IamPolicyAttachmentExpander{
 		resourceFactory,
 	}
 }
 
-func (m IamPolicyAttachmentSanitizer) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+func (m IamPolicyAttachmentExpander) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
 	var newStateResources = make([]resource.Resource, 0)
 
 	for _, stateResource := range *resourcesFromState {
@@ -30,7 +30,7 @@ func (m IamPolicyAttachmentSanitizer) Execute(remoteResources, resourcesFromStat
 
 		policyAttachment := stateResource.(*resource.AbstractResource)
 
-		newStateResources = append(newStateResources, m.sanitize(policyAttachment)...)
+		newStateResources = append(newStateResources, m.expand(policyAttachment)...)
 	}
 
 	var newRemoteResources = make([]resource.Resource, 0)
@@ -44,7 +44,7 @@ func (m IamPolicyAttachmentSanitizer) Execute(remoteResources, resourcesFromStat
 
 		policyAttachment := stateResource.(*resource.AbstractResource)
 
-		newRemoteResources = append(newRemoteResources, m.sanitize(policyAttachment)...)
+		newRemoteResources = append(newRemoteResources, m.expand(policyAttachment)...)
 	}
 
 	*resourcesFromState = newStateResources
@@ -53,7 +53,7 @@ func (m IamPolicyAttachmentSanitizer) Execute(remoteResources, resourcesFromStat
 	return nil
 }
 
-func (m IamPolicyAttachmentSanitizer) sanitize(policyAttachment *resource.AbstractResource) []resource.Resource {
+func (m IamPolicyAttachmentExpander) expand(policyAttachment *resource.AbstractResource) []resource.Resource {
 
 	var newResources []resource.Resource
 
