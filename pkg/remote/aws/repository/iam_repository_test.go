@@ -122,6 +122,77 @@ func Test_IAMRepository_ListAllAccessKeys(t *testing.T) {
 		})
 	}
 }
+
+func Test_IAMRepository_ListAllUsers(t *testing.T) {
+	tests := []struct {
+		name    string
+		mocks   func(client *mocks.FakeIAM)
+		want    []*iam.User
+		wantErr error
+	}{
+		{
+			name: "List only users with multiple pages",
+			mocks: func(client *mocks.FakeIAM) {
+
+				client.On("ListUsersPages",
+					&iam.ListUsersInput{},
+					mock.MatchedBy(func(callback func(res *iam.ListUsersOutput, lastPage bool) bool) bool {
+						callback(&iam.ListUsersOutput{Users: []*iam.User{
+							{
+								UserName: aws.String("test-driftctl"),
+							},
+							{
+								UserName: aws.String("test-driftctl2"),
+							},
+						}}, false)
+						callback(&iam.ListUsersOutput{Users: []*iam.User{
+							{
+								UserName: aws.String("test-driftctl3"),
+							},
+							{
+								UserName: aws.String("test-driftctl4"),
+							},
+						}}, true)
+						return true
+					})).Return(nil)
+			},
+			want: []*iam.User{
+				{
+					UserName: aws.String("test-driftctl"),
+				},
+				{
+					UserName: aws.String("test-driftctl2"),
+				},
+				{
+					UserName: aws.String("test-driftctl3"),
+				},
+				{
+					UserName: aws.String("test-driftctl4"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := &mocks.FakeIAM{}
+			tt.mocks(client)
+			r := &iamRepository{
+				client: client,
+			}
+			got, err := r.ListAllUsers()
+			assert.Equal(t, tt.wantErr, err)
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %v -> %v", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}
+
 func Test_IAMRepository_ListAllRoles(t *testing.T) {
 	tests := []struct {
 		name    string
