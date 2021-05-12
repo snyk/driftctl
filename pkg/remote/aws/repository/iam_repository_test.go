@@ -193,6 +193,76 @@ func Test_IAMRepository_ListAllUsers(t *testing.T) {
 	}
 }
 
+func Test_IAMRepository_ListAllPolicies(t *testing.T) {
+	tests := []struct {
+		name    string
+		mocks   func(client *mocks.FakeIAM)
+		want    []*iam.Policy
+		wantErr error
+	}{
+		{
+			name: "List only policies with multiple pages",
+			mocks: func(client *mocks.FakeIAM) {
+
+				client.On("ListPoliciesPages",
+					&iam.ListPoliciesInput{Scope: aws.String(iam.PolicyScopeTypeLocal)},
+					mock.MatchedBy(func(callback func(res *iam.ListPoliciesOutput, lastPage bool) bool) bool {
+						callback(&iam.ListPoliciesOutput{Policies: []*iam.Policy{
+							{
+								PolicyName: aws.String("test-driftctl"),
+							},
+							{
+								PolicyName: aws.String("test-driftctl2"),
+							},
+						}}, false)
+						callback(&iam.ListPoliciesOutput{Policies: []*iam.Policy{
+							{
+								PolicyName: aws.String("test-driftctl3"),
+							},
+							{
+								PolicyName: aws.String("test-driftctl4"),
+							},
+						}}, true)
+						return true
+					})).Return(nil)
+			},
+			want: []*iam.Policy{
+				{
+					PolicyName: aws.String("test-driftctl"),
+				},
+				{
+					PolicyName: aws.String("test-driftctl2"),
+				},
+				{
+					PolicyName: aws.String("test-driftctl3"),
+				},
+				{
+					PolicyName: aws.String("test-driftctl4"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := &mocks.FakeIAM{}
+			tt.mocks(client)
+			r := &iamRepository{
+				client: client,
+			}
+			got, err := r.ListAllPolicies()
+			assert.Equal(t, tt.wantErr, err)
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %v -> %v", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}
+
 func Test_IAMRepository_ListAllRoles(t *testing.T) {
 	tests := []struct {
 		name    string
