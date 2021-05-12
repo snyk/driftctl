@@ -135,12 +135,12 @@ func TestEnumerationAccessDeniedAlert_GetProviderMessage(t *testing.T) {
 		{
 			name:     "test for AWS",
 			provider: aws.RemoteAWSTerraform,
-			want:     "It seems that we got access denied exceptions while listing resources.\nThe latest minimal read-only IAM policy for driftctl is always available here, please update yours: https://docs.driftctl.com/providers/aws/authentication#least-privileged-policy",
+			want:     "It seems that we got access denied exceptions while listing resources.\nThe latest minimal read-only IAM policy for driftctl is always available here, please update yours: https://docs.driftctl.com/aws/policy",
 		},
 		{
 			name:     "test for github",
 			provider: github.RemoteGithubTerraform,
-			want:     "It seems that we got access denied exceptions while listing resources.\nPlease be sure that your Github token has the right permissions, check the last up-to-date documentation there: https://docs.driftctl.com/providers/github/authentication#least-privileged-policy",
+			want:     "It seems that we got access denied exceptions while listing resources.\nPlease be sure that your Github token has the right permissions, check the last up-to-date documentation there: https://docs.driftctl.com/github/policy",
 		},
 	}
 	for _, tt := range tests {
