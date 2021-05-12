@@ -60,7 +60,8 @@ func (m IamPolicyAttachmentSanitizer) sanitize(policyAttachment *resource.Abstra
 	users := (*policyAttachment.Attrs)["users"]
 	if users != nil {
 		// we create one attachment per user
-		for _, user := range users.([]string) {
+		for _, user := range users.([]interface{}) {
+			user := user.(string)
 			newAttachment := m.resourceFactory.CreateAbstractResource(
 				resourceaws.AwsIamPolicyAttachmentResourceType,
 				fmt.Sprintf("%s-%s", user, (*policyAttachment.Attrs)["policy_arn"]),
@@ -75,7 +76,8 @@ func (m IamPolicyAttachmentSanitizer) sanitize(policyAttachment *resource.Abstra
 	roles := (*policyAttachment.Attrs)["roles"]
 	if roles != nil {
 		// we create one attachment per role
-		for _, role := range roles.([]string) {
+		for _, role := range roles.([]interface{}) {
+			role := role.(string)
 			newAttachment := m.resourceFactory.CreateAbstractResource(
 				resourceaws.AwsIamPolicyAttachmentResourceType,
 				fmt.Sprintf("%s-%s", role, (*policyAttachment.Attrs)["policy_arn"]),
