@@ -2,10 +2,6 @@ body {
     font-family: sans-serif;
 }
 
-div {
-    display: block;
-}
-
 .hide {
     display: none;
 }
