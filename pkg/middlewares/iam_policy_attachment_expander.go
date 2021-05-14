@@ -35,14 +35,14 @@ func (m IamPolicyAttachmentExpander) Execute(remoteResources, resourcesFromState
 
 	var newRemoteResources = make([]resource.Resource, 0)
 
-	for _, stateResource := range *remoteResources {
+	for _, remoteResource := range *remoteResources {
 		// Ignore all resources other than policy attachment
-		if stateResource.TerraformType() != resourceaws.AwsIamPolicyAttachmentResourceType {
-			newRemoteResources = append(newRemoteResources, stateResource)
+		if remoteResource.TerraformType() != resourceaws.AwsIamPolicyAttachmentResourceType {
+			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
 
-		policyAttachment := stateResource.(*resource.AbstractResource)
+		policyAttachment := remoteResource.(*resource.AbstractResource)
 
 		newRemoteResources = append(newRemoteResources, m.expand(policyAttachment)...)
 	}
@@ -54,6 +54,33 @@ func (m IamPolicyAttachmentExpander) Execute(remoteResources, resourcesFromState
 }
 
 func (m IamPolicyAttachmentExpander) expand(policyAttachment *resource.AbstractResource) []resource.Resource {
+
+	arn, _ := policyAttachment.Attrs.Get("policy_arn")
+	user, exist := policyAttachment.Attrs.Get("user")
+	if exist {
+		user := user.(string)
+		newAttachment := m.resourceFactory.CreateAbstractResource(
+			resourceaws.AwsIamPolicyAttachmentResourceType,
+			fmt.Sprintf("%s-%s", user, arn),
+			map[string]interface{}{
+				"users": []string{user},
+			},
+		)
+		return []resource.Resource{newAttachment}
+	}
+
+	role, exist := policyAttachment.Attrs.Get("role")
+	if exist {
+		role := role.(string)
+		newAttachment := m.resourceFactory.CreateAbstractResource(
+			resourceaws.AwsIamPolicyAttachmentResourceType,
+			fmt.Sprintf("%s-%s", role, arn),
+			map[string]interface{}{
+				"roles": []string{role},
+			},
+		)
+		return []resource.Resource{newAttachment}
+	}
 
 	var newResources []resource.Resource
 
