@@ -1,14 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
     <title>Driftctl scan report</title>
-    <meta charset="utf-8">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <style>{{.Stylesheet}}</style>
 </head>
 <body>
-
 <div id="app">
-    <h1 class="heading title">Driftctl scan report {{ if (eq .Coverage 100) }}✅{{else}}❌{{end}}</h1>
+    <h1 class="heading title">Driftctl scan report</h1>
     <span class="heading subtitle">Coverage 8%</span>
     <span class="heading date">Apr 21, 2021</span>
     <hr>
@@ -22,37 +22,33 @@
         </select>
     </form>
 
+    {{ if (gt (len .Managed) 0) }}
     <h2>Managed resources <span class="resource-count-managed">({{len .Managed}})</span></h2>
 
-    {{ if (eq (len .Managed) 0) }}
-    <p>There's nothing to see there...</p>
-    {{end}}
     {{range $res := .Managed}}
-    <div class="resource-item">
+    <div class="resource-item resource-item-managed">
         <span class="resource-item-id">{{$res.TerraformId}}</span>
         <span class="resource-item-type">{{$res.TerraformType}}</span>
     </div>
     {{end}}
+    {{end}}
 
+    {{ if (gt (len .Unmanaged) 0) }}
     <h2>Unmanaged resources <span class="resource-count-unmanaged">({{len .Unmanaged}})</span></h2>
 
-    {{ if (eq (len .Unmanaged) 0) }}
-    <p>There's nothing to see there...</p>
-    {{end}}
     {{range $res := .Unmanaged}}
-    <div class="resource-item">
+    <div class="resource-item resource-item-unmanaged">
         <span class="resource-item-id">{{$res.TerraformId}}</span>
         <span class="resource-item-type">{{$res.TerraformType}}</span>
     </div>
     {{end}}
+    {{end}}
 
+    {{ if (gt (len .Differences) 0) }}
     <h2>Changed resources <span class="resource-count-changed">({{len .Differences}})</span></h2>
 
-    {{ if (eq (len .Differences) 0) }}
-    <p>There's nothing to see there...</p>
-    {{end}}
     {{range $diff := .Differences}}
-    <div class="resource-item">
+    <div class="resource-item resource-item-changed">
         <span class="resource-item-id">{{$diff.Res.TerraformId}}</span>
         <span class="resource-item-type">{{$diff.Res.TerraformType}}</span>
         <div>
@@ -62,26 +58,24 @@
         </div>
     </div>
     {{end}}
+    {{end}}
 
+    {{ if (gt (len .Deleted) 0) }}
     <h2>Missing resources <span class="resource-count-deleted">({{len .Deleted}})</span></h2>
 
-    {{ if (eq (len .Deleted) 0) }}
-    <p>There's nothing to see there...</p>
-    {{end}}
     {{range $res := .Deleted}}
-    <div class="resource-item">
+    <div class="resource-item resource-item-deleted">
         <span class="resource-item-id">{{$res.TerraformId}}</span>
         <span class="resource-item-type">{{$res.TerraformType}}</span>
     </div>
     {{end}}
+    {{end}}
 
+    {{ if (gt (len .Alerts) 0) }}
     <h2>Alerts <span class="resource-count-alerts">({{len .Alerts}})</span></h2>
 
-    {{ if (eq (len .Alerts) 0) }}
-    <p>There's nothing to see there...</p>
-    {{end}}
     {{range $type, $messages := .Alerts}}
-    <div class="resource-item">
+    <div class="resource-item resource-item-alerts">
         <span class="resource-item-type">{{ $type }}</span>
         <div>
             {{range $msg := $messages}}
@@ -89,6 +83,7 @@
             {{end}}
         </div>
     </div>
+    {{end}}
     {{end}}
 </div>
 </body>
@@ -106,7 +101,7 @@
     function resourceIdContains(res, query) {
         const el = res.querySelector('.resource-item-id')
         if (!el) {
-            return
+            return false
         }
         return el.innerText.toLowerCase().includes(query.toLowerCase())
     }
@@ -114,9 +109,27 @@
     function resourceTypeEqual(res, type) {
         const el = res.querySelector('.resource-item-type')
         if (!el) {
-            return
+            return false
         }
         return el.innerText === type
+    }
+
+    function refreshCounters() {
+        const counterClassMapping = {
+            '.resource-item-managed': '.resource-count-managed',
+            '.resource-item-unmanaged': '.resource-count-unmanaged',
+            '.resource-item-changed': '.resource-count-changed',
+            '.resource-item-deleted': '.resource-count-deleted',
+            '.resource-item-alerts': '.resource-count-alerts',
+        }
+
+        for (const resClass in counterClassMapping) {
+            const countEl = document.querySelector(counterClassMapping[resClass])
+            if (!countEl){
+                continue
+            }
+            countEl.textContent = Array.from(document.querySelectorAll(resClass)).filter(el => !el.classList.contains('hide')).length
+        }
     }
 
     function refreshState() {
@@ -134,6 +147,8 @@
 
             hideResource(res)
         }
+
+        refreshCounters()
     }
 
     refreshState()
