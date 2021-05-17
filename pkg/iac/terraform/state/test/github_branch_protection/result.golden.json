@@ -1,93 +1,98 @@
 [
  {
-  "AllowsDeletions": true,
-  "AllowsForcePushes": true,
-  "EnforceAdmins": true,
   "Id": "MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0NzI=",
-  "Pattern": "main",
-  "PushRestrictions": [
-   "MDQ6VXNlcjYxNTQ5ODc="
-  ],
-  "RepositoryId": "MDEwOlJlcG9zaXRvcnkzNDI1MzIzNzE=",
-  "RequireSignedCommits": false,
-  "RequiredPullRequestReviews": [
-   {
-    "DismissStaleReviews": true,
-    "DismissalRestrictions": [
-     "MDQ6VXNlcjYxNTQ5ODc="
-    ],
-    "RequireCodeOwnerReviews": false,
-    "RequiredApprovingReviewCount": 1
-   }
-  ],
-  "RequiredStatusChecks": [
-   {
-    "Contexts": [
-     "ci/travis"
-    ],
-    "Strict": false
-   }
-  ],
-  "CtyVal": {}
+  "Type": "github_branch_protection",
+  "Attrs": {
+   "allows_deletions": true,
+   "allows_force_pushes": true,
+   "enforce_admins": true,
+   "id": "MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0NzI=",
+   "pattern": "main",
+   "push_restrictions": [
+    "MDQ6VXNlcjYxNTQ5ODc="
+   ],
+   "require_signed_commits": false,
+   "required_pull_request_reviews": [
+    {
+     "dismiss_stale_reviews": true,
+     "dismissal_restrictions": [
+      "MDQ6VXNlcjYxNTQ5ODc="
+     ],
+     "require_code_owner_reviews": false,
+     "required_approving_review_count": 1
+    }
+   ],
+   "required_status_checks": [
+    {
+     "contexts": [
+      "ci/travis"
+     ],
+     "strict": false
+    }
+   ]
+  }
  },
  {
-  "AllowsDeletions": true,
-  "AllowsForcePushes": true,
-  "EnforceAdmins": true,
   "Id": "MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0NzQ=",
-  "Pattern": "main",
-  "PushRestrictions": [
-   "MDQ6VXNlcjYxNTQ5ODc="
-  ],
-  "RepositoryId": "MDEwOlJlcG9zaXRvcnkzNDI1MzIzODI=",
-  "RequireSignedCommits": false,
-  "RequiredPullRequestReviews": [
-   {
-    "DismissStaleReviews": true,
-    "DismissalRestrictions": [
-     "MDQ6VXNlcjYxNTQ5ODc="
-    ],
-    "RequireCodeOwnerReviews": false,
-    "RequiredApprovingReviewCount": 1
-   }
-  ],
-  "RequiredStatusChecks": [
-   {
-    "Contexts": [
-     "ci/travis"
-    ],
-    "Strict": false
-   }
-  ],
-  "CtyVal": {}
+  "Type": "github_branch_protection",
+  "Attrs": {
+   "allows_deletions": true,
+   "allows_force_pushes": true,
+   "enforce_admins": true,
+   "id": "MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0NzQ=",
+   "pattern": "main",
+   "push_restrictions": [
+    "MDQ6VXNlcjYxNTQ5ODc="
+   ],
+   "require_signed_commits": false,
+   "required_pull_request_reviews": [
+    {
+     "dismiss_stale_reviews": true,
+     "dismissal_restrictions": [
+      "MDQ6VXNlcjYxNTQ5ODc="
+     ],
+     "require_code_owner_reviews": false,
+     "required_approving_review_count": 1
+    }
+   ],
+   "required_status_checks": [
+    {
+     "contexts": [
+      "ci/travis"
+     ],
+     "strict": false
+    }
+   ]
+  }
  },
  {
-  "AllowsDeletions": true,
-  "AllowsForcePushes": true,
-  "EnforceAdmins": true,
   "Id": "MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0NzE=",
-  "Pattern": "main",
-  "PushRestrictions": null,
-  "RepositoryId": "MDEwOlJlcG9zaXRvcnkzNDI1MzIzOTE=",
-  "RequireSignedCommits": false,
-  "RequiredPullRequestReviews": [
-   {
-    "DismissStaleReviews": true,
-    "DismissalRestrictions": [
-     "MDQ6VXNlcjYxNTQ5ODc="
-    ],
-    "RequireCodeOwnerReviews": false,
-    "RequiredApprovingReviewCount": 1
-   }
-  ],
-  "RequiredStatusChecks": [
-   {
-    "Contexts": [
-     "ci/travis"
-    ],
-    "Strict": false
-   }
-  ],
-  "CtyVal": {}
+  "Type": "github_branch_protection",
+  "Attrs": {
+   "allows_deletions": true,
+   "allows_force_pushes": true,
+   "enforce_admins": true,
+   "id": "MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0NzE=",
+   "pattern": "main",
+   "require_signed_commits": false,
+   "required_pull_request_reviews": [
+    {
+     "dismiss_stale_reviews": true,
+     "dismissal_restrictions": [
+      "MDQ6VXNlcjYxNTQ5ODc="
+     ],
+     "require_code_owner_reviews": false,
+     "required_approving_review_count": 1
+    }
+   ],
+   "required_status_checks": [
+    {
+     "contexts": [
+      "ci/travis"
+     ],
+     "strict": false
+    }
+   ]
+  }
  }
 ]

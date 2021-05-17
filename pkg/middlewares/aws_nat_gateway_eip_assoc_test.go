@@ -23,16 +23,20 @@ func TestAwsNatGatewayEipAssoc_Execute(t *testing.T) {
 				&aws.AwsNatGateway{
 					Id: "nat-0a5408508b19ef490",
 				},
-				&aws.AwsEipAssociation{
-					Id: "eipassoc-0d32af6acf31df913",
+				&resource.AbstractResource{
+					Type:  aws.AwsEipAssociationResourceType,
+					Id:    "eipassoc-0d32af6acf31df913",
+					Attrs: &resource.Attributes{},
 				},
 			},
 			expected: []resource.Resource{
 				&aws.AwsNatGateway{
 					Id: "nat-0a5408508b19ef490",
 				},
-				&aws.AwsEipAssociation{
-					Id: "eipassoc-0d32af6acf31df913",
+				&resource.AbstractResource{
+					Type:  aws.AwsEipAssociationResourceType,
+					Id:    "eipassoc-0d32af6acf31df913",
+					Attrs: &resource.Attributes{},
 				},
 			},
 		},
@@ -42,19 +46,28 @@ func TestAwsNatGatewayEipAssoc_Execute(t *testing.T) {
 				&aws.AwsNatGateway{
 					AllocationId: awssdk.String("eipalloc-0f3e9fff457bb770b"),
 				},
-				&aws.AwsEipAssociation{
-					AllocationId: awssdk.String("eipalloc-0f3e9fff457bb770b"),
+				&resource.AbstractResource{
+					Type: aws.AwsEipAssociationResourceType,
+					Attrs: &resource.Attributes{
+						"allocation_id": "eipalloc-0f3e9fff457bb770b",
+					},
 				},
-				&aws.AwsEipAssociation{
-					AllocationId: awssdk.String("eipalloc-1234567890"),
+				&resource.AbstractResource{
+					Type: aws.AwsEipAssociationResourceType,
+					Attrs: &resource.Attributes{
+						"allocation_id": "eipalloc-1234567890",
+					},
 				},
 			},
 			expected: []resource.Resource{
 				&aws.AwsNatGateway{
 					AllocationId: awssdk.String("eipalloc-0f3e9fff457bb770b"),
 				},
-				&aws.AwsEipAssociation{
-					AllocationId: awssdk.String("eipalloc-1234567890"),
+				&resource.AbstractResource{
+					Type: aws.AwsEipAssociationResourceType,
+					Attrs: &resource.Attributes{
+						"allocation_id": "eipalloc-1234567890",
+					},
 				},
 			},
 		},

@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 )
@@ -49,8 +48,11 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 							"public_dns": "example.com",
 						},
 					},
-					&aws.AwsEip{
-						Instance: awssdk.String("instance1"),
+					&resource.AbstractResource{
+						Type: aws.AwsEipResourceType,
+						Attrs: &resource.Attributes{
+							"instance": "instance1",
+						},
 					},
 				},
 			},
@@ -76,8 +78,11 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 						Type:  "aws_instance",
 						Attrs: &resource.Attributes{},
 					},
-					&aws.AwsEip{
-						Instance: awssdk.String("instance1"),
+					&resource.AbstractResource{
+						Type: aws.AwsEipResourceType,
+						Attrs: &resource.Attributes{
+							"instance": "instance1",
+						},
 					},
 				},
 			},
@@ -112,8 +117,11 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 							"public_dns": "example.com",
 						},
 					},
-					&aws.AwsEipAssociation{
-						InstanceId: awssdk.String("instance1"),
+					&resource.AbstractResource{
+						Type: aws.AwsEipAssociationResourceType,
+						Attrs: &resource.Attributes{
+							"instance_id": "instance1",
+						},
 					},
 				},
 			},
@@ -139,8 +147,11 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 						Type:  "aws_instance",
 						Attrs: &resource.Attributes{},
 					},
-					&aws.AwsEipAssociation{
-						InstanceId: awssdk.String("instance1"),
+					&resource.AbstractResource{
+						Type: aws.AwsEipAssociationResourceType,
+						Attrs: &resource.Attributes{
+							"instance_id": "instance1",
+						},
 					},
 				},
 			},

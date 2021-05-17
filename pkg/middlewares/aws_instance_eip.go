@@ -31,14 +31,14 @@ func (a AwsInstanceEIP) Execute(remoteResources, resourcesFromState *[]resource.
 func (a AwsInstanceEIP) hasEIP(instance *resource.AbstractResource, resources *[]resource.Resource) bool {
 	for _, res := range *resources {
 		if res.TerraformType() == aws.AwsEipResourceType {
-			eip, _ := res.(*aws.AwsEip)
-			if *eip.Instance == instance.TerraformId() {
+			eip, _ := res.(*resource.AbstractResource)
+			if (*eip.Attrs)["instance"] == instance.TerraformId() {
 				return true
 			}
 		}
 		if res.TerraformType() == aws.AwsEipAssociationResourceType {
-			eip, _ := res.(*aws.AwsEipAssociation)
-			if *eip.InstanceId == instance.TerraformId() {
+			eip, _ := res.(*resource.AbstractResource)
+			if (*eip.Attrs)["instance_id"] == instance.TerraformId() {
 				return true
 			}
 		}

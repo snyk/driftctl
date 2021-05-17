@@ -26,16 +26,17 @@ func (a AwsNatGatewayEipAssoc) Execute(remoteResources, resourcesFromState *[]re
 			continue
 		}
 
-		eipAssoc, _ := remoteResource.(*aws.AwsEipAssociation)
+		eipAssoc, _ := remoteResource.(*resource.AbstractResource)
 		isAssociatedToNatGateway := false
 
 		// Search for a nat gateway associated with our EIP
 		for _, res := range *remoteResources {
 			if res.TerraformType() == aws.AwsNatGatewayResourceType {
 				gateway, _ := res.(*aws.AwsNatGateway)
+				eipAssocAllocId, exist := eipAssoc.Attrs.Get("allocation_id")
 				if gateway.AllocationId != nil &&
-					eipAssoc.AllocationId != nil &&
-					*gateway.AllocationId == *eipAssoc.AllocationId {
+					exist && eipAssocAllocId != "" &&
+					*gateway.AllocationId == eipAssocAllocId {
 					isAssociatedToNatGateway = true
 					break
 				}
