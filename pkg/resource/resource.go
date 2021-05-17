@@ -55,7 +55,7 @@ var refactoredResources = []string{
 	// "aws_route53_record",
 	// "aws_route53_zone",
 	"aws_route_table",
-	// "aws_route_table_association",
+	"aws_route_table_association",
 	"aws_s3_bucket",
 	"aws_s3_bucket_analytics_configuration",
 	"aws_s3_bucket_inventory",
