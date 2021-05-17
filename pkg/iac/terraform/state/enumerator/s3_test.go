@@ -71,6 +71,7 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 				).Return(nil)
 			},
 			want: []string{},
+			err:  "no Terraform state was found in bucket-name/a/nested/prefix, exiting",
 		},
 		{
 			name: "one test result is returned",
@@ -264,6 +265,93 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 			},
 			want: nil,
 			err:  "error when listing",
+		},
+		{
+			name: "test no state found with simple path",
+			config: config.SupplierConfig{
+				Path: "bucket-name/a/nested/prefix",
+			},
+			mocks: func(client *awstest.MockFakeS3) {
+				input := &s3.ListObjectsV2Input{
+					Bucket: awssdk.String("bucket-name"),
+					Prefix: awssdk.String("a/nested/prefix"),
+				}
+				client.On(
+					"ListObjectsV2Pages",
+					input,
+					mock.MatchedBy(func(callback func(res *s3.ListObjectsV2Output, lastPage bool) bool) bool {
+						callback(&s3.ListObjectsV2Output{
+							Contents: []*s3.Object{
+								{
+									Key:  awssdk.String("a/nested/prefix/1/state1.tfstate"),
+									Size: awssdk.Int64(5),
+								},
+							},
+						}, true)
+						return true
+					}),
+				).Return(nil)
+			},
+			want: []string{},
+			err:  "no Terraform state was found in bucket-name/a/nested/prefix, exiting",
+		},
+		{
+			name: "test no state found with simple glob path",
+			config: config.SupplierConfig{
+				Path: "bucket-name/a/nested/prefix/*",
+			},
+			mocks: func(client *awstest.MockFakeS3) {
+				input := &s3.ListObjectsV2Input{
+					Bucket: awssdk.String("bucket-name"),
+					Prefix: awssdk.String("a/nested/prefix"),
+				}
+				client.On(
+					"ListObjectsV2Pages",
+					input,
+					mock.MatchedBy(func(callback func(res *s3.ListObjectsV2Output, lastPage bool) bool) bool {
+						callback(&s3.ListObjectsV2Output{
+							Contents: []*s3.Object{
+								{
+									Key:  awssdk.String("a/nested/prefix/1/state1.tfstate"),
+									Size: awssdk.Int64(5),
+								},
+							},
+						}, true)
+						return true
+					}),
+				).Return(nil)
+			},
+			want: []string{},
+			err:  "no Terraform state was found in bucket-name/a/nested/prefix/*, exiting",
+		},
+		{
+			name: "test no state found with double star glob path",
+			config: config.SupplierConfig{
+				Path: "bucket-name/a/nested/prefix/**/*.tfstate",
+			},
+			mocks: func(client *awstest.MockFakeS3) {
+				input := &s3.ListObjectsV2Input{
+					Bucket: awssdk.String("bucket-name"),
+					Prefix: awssdk.String("a/nested/prefix"),
+				}
+				client.On(
+					"ListObjectsV2Pages",
+					input,
+					mock.MatchedBy(func(callback func(res *s3.ListObjectsV2Output, lastPage bool) bool) bool {
+						callback(&s3.ListObjectsV2Output{
+							Contents: []*s3.Object{
+								{
+									Key:  awssdk.String("a/nested/prefix/1/dummy.json"),
+									Size: awssdk.Int64(5),
+								},
+							},
+						}, true)
+						return true
+					}),
+				).Return(nil)
+			},
+			want: []string{},
+			err:  "no Terraform state was found in bucket-name/a/nested/prefix/**/*.tfstate, exiting",
 		},
 	}
 	for _, tt := range tests {
