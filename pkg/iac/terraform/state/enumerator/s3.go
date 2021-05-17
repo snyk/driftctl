@@ -1,6 +1,7 @@
 package enumerator
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -63,6 +64,10 @@ func (s *S3Enumerator) Enumerate() ([]string, error) {
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	if len(files) == 0 {
+		return files, fmt.Errorf("no Terraform state was found in %s, exiting", s.config.Path)
 	}
 
 	return files, nil

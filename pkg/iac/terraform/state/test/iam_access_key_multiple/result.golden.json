@@ -1,46 +1,38 @@
 [
  {
-  "EncryptedSecret": null,
   "Id": "AKIA5QYBVVD223VWU32A",
-  "KeyFingerprint": null,
-  "PgpKey": null,
-  "Secret": null,
-  "SesSmtpPasswordV4": null,
-  "Status": "Active",
-  "User": "test-driftctl",
-  "CtyVal": {}
+  "Type": "aws_iam_access_key",
+  "Attrs": {
+   "id": "AKIA5QYBVVD223VWU32A",
+   "status": "Active",
+   "user": "test-driftctl"
+  }
  },
  {
-  "EncryptedSecret": null,
   "Id": "AKIA5QYBVVD2QYI36UZP",
-  "KeyFingerprint": null,
-  "PgpKey": null,
-  "Secret": null,
-  "SesSmtpPasswordV4": null,
-  "Status": "Active",
-  "User": "test-driftctl",
-  "CtyVal": {}
+  "Type": "aws_iam_access_key",
+  "Attrs": {
+   "id": "AKIA5QYBVVD2QYI36UZP",
+   "status": "Active",
+   "user": "test-driftctl"
+  }
  },
  {
-  "EncryptedSecret": null,
-  "Id": "AKIA5QYBVVD26EJME25D",
-  "KeyFingerprint": null,
-  "PgpKey": null,
-  "Secret": null,
-  "SesSmtpPasswordV4": null,
-  "Status": "Active",
-  "User": "test-driftctl2",
-  "CtyVal": {}
- },
- {
-  "EncryptedSecret": null,
   "Id": "AKIA5QYBVVD2SWDFVVMG",
-  "KeyFingerprint": null,
-  "PgpKey": null,
-  "Secret": null,
-  "SesSmtpPasswordV4": null,
-  "Status": "Active",
-  "User": "test-driftctl2",
-  "CtyVal": {}
+  "Type": "aws_iam_access_key",
+  "Attrs": {
+   "id": "AKIA5QYBVVD2SWDFVVMG",
+   "status": "Active",
+   "user": "test-driftctl2"
+  }
+ },
+ {
+  "Id": "AKIA5QYBVVD26EJME25D",
+  "Type": "aws_iam_access_key",
+  "Attrs": {
+   "id": "AKIA5QYBVVD26EJME25D",
+   "status": "Active",
+   "user": "test-driftctl2"
+  }
  }
 ]
