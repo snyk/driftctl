@@ -1,6 +1,9 @@
 package github
 
-import "github.com/zclconf/go-cty/cty"
+import (
+	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/zclconf/go-cty/cty"
+)
 
 const GithubRepositoryResourceType = "github_repository"
 
@@ -65,4 +68,11 @@ func (r *GithubRepository) TerraformType() string {
 
 func (r *GithubRepository) CtyValue() *cty.Value {
 	return r.CtyVal
+}
+
+func initGithubRepositoryMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(GithubRepositoryResourceType, func(val *resource.Attributes) {
+		val.SafeDelete([]string{"auto_init"})
+		val.SafeDelete([]string{"etag"})
+	})
 }

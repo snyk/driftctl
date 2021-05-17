@@ -6,4 +6,4 @@ Ignoring aws_sqs from drift calculation: Listing aws_sqs is forbidden.
 Ignoring aws_sns from drift calculation: Listing aws_sns is forbidden.
 
 It seems that we got access denied exceptions while listing resources.
-The latest minimal read-only IAM policy for driftctl is always available here, please update yours: https://docs.driftctl.com/providers/aws/authentication#least-privileged-policy
+The latest minimal read-only IAM policy for driftctl is always available here, please update yours: https://docs.driftctl.com/aws/policy
