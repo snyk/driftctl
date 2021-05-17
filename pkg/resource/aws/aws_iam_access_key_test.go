@@ -1,37 +1,31 @@
-package aws
+package aws_test
 
 import (
 	"testing"
 
-	"github.com/aws/aws-sdk-go/aws"
+	"github.com/cloudskiff/driftctl/test"
+	"github.com/cloudskiff/driftctl/test/acceptance"
 )
 
-func TestAwsIamAccessKey_String(t *testing.T) {
-	tests := []struct {
-		user   string
-		access AwsIamAccessKey
-		want   string
-	}{
-		{user: "test iam access key stringer with user and id",
-			access: AwsIamAccessKey{
-				User: aws.String("test_user"),
-				Id:   "AKIA2SIQ53JH4CMB42VB",
+func TestAcc_Aws_IamAccessKey(t *testing.T) {
+	acceptance.Run(t, acceptance.AccTestCase{
+		TerraformVersion: "0.14.9",
+		Paths:            []string{"./testdata/acc/aws_iam_access_key"},
+		Args:             []string{"scan", "--filter", "Type=='aws_iam_access_key'"},
+		Checks: []acceptance.AccCheck{
+			{
+				Env: map[string]string{
+					"AWS_REGION": "us-east-1",
+				},
+				Check: func(result *test.ScanResult, stdout string, err error) {
+					if err != nil {
+						t.Fatal(err)
+					}
+					result.AssertDriftCountTotal(0)
+					result.AssertDeletedCount(0)
+					result.AssertManagedCount(1)
+				},
 			},
-			want: "AKIA2SIQ53JH4CMB42VB (User: test_user)",
 		},
-		{user: "test iam access key stringer without user",
-			access: AwsIamAccessKey{
-				User: nil,
-				Id:   "AKIA2SIQ53JH4CMB42VB",
-			},
-			want: "AKIA2SIQ53JH4CMB42VB",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.user, func(t *testing.T) {
-			if got := tt.access.String(); got != tt.want {
-				t.Errorf("String() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	})
 }

@@ -33,7 +33,7 @@ var refactoredResources = []string{
 	"aws_ecr_repository",
 	"aws_eip",
 	"aws_eip_association",
-	// "aws_iam_access_key",
+	"aws_iam_access_key",
 	"aws_iam_policy",
 	"aws_iam_policy_attachment",
 	"aws_iam_role",

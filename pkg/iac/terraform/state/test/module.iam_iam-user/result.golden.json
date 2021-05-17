@@ -11,14 +11,12 @@
   }
  },
  {
-  "EncryptedSecret": null,
   "Id": "AKIA5QYBVVD2VIEMMUIQ",
-  "KeyFingerprint": null,
-  "PgpKey": null,
-  "Secret": null,
-  "SesSmtpPasswordV4": null,
-  "Status": "Active",
-  "User": "MODULE-USER",
-  "CtyVal": {}
+  "Type": "aws_iam_access_key",
+  "Attrs": {
+   "id": "AKIA5QYBVVD2VIEMMUIQ",
+   "status": "Active",
+   "user": "MODULE-USER"
+  }
  }
 ]
