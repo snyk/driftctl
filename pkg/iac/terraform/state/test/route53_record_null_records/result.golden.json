@@ -1,21 +1,13 @@
 [
  {
-  "AllowOverwrite": true,
-  "Fqdn": "foo-0.com",
-  "HealthCheckId": "",
   "Id": "Z1035360GLIB82T1EH2G_foo-0.com_NS",
-  "MultivalueAnswerRoutingPolicy": null,
-  "Name": "foo-0.com",
-  "Records": null,
-  "SetIdentifier": "",
-  "Ttl": 172800,
-  "Type": "NS",
-  "ZoneId": "Z1035360GLIB82T1EH2G",
-  "Alias": null,
-  "FailoverRoutingPolicy": [],
-  "GeolocationRoutingPolicy": [],
-  "LatencyRoutingPolicy": [],
-  "WeightedRoutingPolicy": [],
-  "CtyVal": {}
+  "Type": "aws_route53_record",
+  "Attrs": {
+   "fqdn": "foo-0.com",
+   "id": "Z1035360GLIB82T1EH2G_foo-0.com_NS",
+   "ttl": 172800,
+   "type": "NS",
+   "zone_id": "Z1035360GLIB82T1EH2G"
+  }
  }
 ]

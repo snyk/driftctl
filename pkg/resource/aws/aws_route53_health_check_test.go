@@ -64,7 +64,7 @@ func TestAcc_AwsRoute53HealthCheck(t *testing.T) {
 						analyser.Change{
 							Change: diff.Change{
 								Type: diff.UPDATE,
-								Path: []string{"Disabled"},
+								Path: []string{"disabled"},
 								From: false,
 								To:   true,
 							},
@@ -78,7 +78,7 @@ func TestAcc_AwsRoute53HealthCheck(t *testing.T) {
 						analyser.Change{
 							Change: diff.Change{
 								Type: diff.UPDATE,
-								Path: []string{"ResourcePath"},
+								Path: []string{"resource_path"},
 								From: "/",
 								To:   "/bad",
 							},
