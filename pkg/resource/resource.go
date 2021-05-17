@@ -43,7 +43,7 @@ var refactoredResources = []string{
 	"aws_iam_user_policy",
 	"aws_iam_user_policy_attachment",
 	"aws_instance",
-	// "aws_internet_gateway",
+	"aws_internet_gateway",
 	"aws_key_pair",
 	// "aws_kms_alias",
 	// "aws_kms_key",

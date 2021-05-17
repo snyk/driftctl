@@ -4,7 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -24,9 +23,12 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 				&aws.AwsDefaultVpc{
 					Id: "default-vpc",
 				},
-				&aws.AwsInternetGateway{
-					Id:    "default-igw",
-					VpcId: awssdk.String("default-vpc"),
+				&resource.AbstractResource{
+					Id:   "default-igw",
+					Type: aws.AwsInternetGatewayResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "default-vpc",
+					},
 				},
 				&resource.AbstractResource{
 					Id:   "default-route-table",
@@ -66,9 +68,12 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 				&aws.AwsDefaultVpc{
 					Id: "default-vpc",
 				},
-				&aws.AwsInternetGateway{
-					Id:    "default-igw",
-					VpcId: awssdk.String("default-vpc"),
+				&resource.AbstractResource{
+					Id:   "default-igw",
+					Type: aws.AwsInternetGatewayResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "default-vpc",
+					},
 				},
 				&resource.AbstractResource{
 					Id:   "default-route-table",
@@ -101,9 +106,12 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 				&aws.AwsDefaultVpc{
 					Id: "default-vpc",
 				},
-				&aws.AwsInternetGateway{
-					Id:    "default-igw",
-					VpcId: awssdk.String("default-vpc"),
+				&resource.AbstractResource{
+					Id:   "default-igw",
+					Type: aws.AwsInternetGatewayResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "default-vpc",
+					},
 				},
 				&resource.AbstractResource{
 					Id:   "default-route-table",
@@ -153,9 +161,12 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 				&aws.AwsDefaultVpc{
 					Id: "default-vpc",
 				},
-				&aws.AwsInternetGateway{
-					Id:    "default-igw",
-					VpcId: awssdk.String("default-vpc"),
+				&resource.AbstractResource{
+					Id:   "default-igw",
+					Type: aws.AwsInternetGatewayResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "default-vpc",
+					},
 				},
 				&resource.AbstractResource{
 					Id:   "default-route-table",

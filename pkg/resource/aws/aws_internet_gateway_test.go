@@ -22,7 +22,7 @@ func TestAcc_AwsInternetGateway(t *testing.T) {
 						t.Fatal(err)
 					}
 					result.AssertInfrastructureIsInSync()
-					result.Equal(1, result.Summary().TotalManaged)
+					result.AssertManagedCount(1)
 				},
 			},
 		},
