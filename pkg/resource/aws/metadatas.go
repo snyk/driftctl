@@ -28,4 +28,6 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsIAMUserMetaData(resourceSchemaRepository)
 	initAwsIAMUserPolicyMetaData(resourceSchemaRepository)
 	initAwsKeyPairMetaData(resourceSchemaRepository)
+	initAwsKmsKeyMetaData(resourceSchemaRepository)
+	initAwsKmsAliasMetaData(resourceSchemaRepository)
 }
