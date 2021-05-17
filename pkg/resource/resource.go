@@ -31,9 +31,9 @@ var refactoredResources = []string{
 	"aws_ebs_snapshot",
 	"aws_ebs_volume",
 	"aws_ecr_repository",
-	// "aws_eip",
-	// "aws_eip_association",
-	// "aws_iam_access_key",
+	"aws_eip",
+	"aws_eip_association",
+	"aws_iam_access_key",
 	"aws_iam_policy",
 	"aws_iam_policy_attachment",
 	"aws_iam_role",
@@ -71,6 +71,12 @@ var refactoredResources = []string{
 	// "aws_sqs_queue_policy",
 	// "aws_subnet",
 	// "aws_vpc",
+
+	"github_branch_protection",
+	"github_membership",
+	"github_repository",
+	"github_team",
+	"github_team_membership",
 }
 
 func IsRefactoredResource(typ string) bool {

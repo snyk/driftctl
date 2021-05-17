@@ -156,7 +156,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 	supplierLibrary := resource.NewSupplierLibrary()
 
 	iacProgress := globaloutput.NewProgress("Scanning states", "Scanned states", true)
-	scanProgress := globaloutput.NewProgress("Scanning resources", "Scanned resources", true)
+	scanProgress := globaloutput.NewProgress("Scanning resources", "Scanned resources", false)
 
 	resourceSchemaRepository := resource.NewSchemaRepository()
 

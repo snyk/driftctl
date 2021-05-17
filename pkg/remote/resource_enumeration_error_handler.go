@@ -34,9 +34,9 @@ func (e *EnumerationAccessDeniedAlert) GetProviderMessage() string {
 	message := "It seems that we got access denied exceptions while listing resources.\n"
 	switch e.provider {
 	case github.RemoteGithubTerraform:
-		message += "Please be sure that your Github token has the right permissions, check the last up-to-date documentation there: https://docs.driftctl.com/providers/github/authentication#least-privileged-policy"
+		message += "Please be sure that your Github token has the right permissions, check the last up-to-date documentation there: https://docs.driftctl.com/github/policy"
 	case aws.RemoteAWSTerraform:
-		message += "The latest minimal read-only IAM policy for driftctl is always available here, please update yours: https://docs.driftctl.com/providers/aws/authentication#least-privileged-policy"
+		message += "The latest minimal read-only IAM policy for driftctl is always available here, please update yours: https://docs.driftctl.com/aws/policy"
 	default:
 		return ""
 	}
