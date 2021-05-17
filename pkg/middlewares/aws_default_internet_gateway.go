@@ -24,7 +24,7 @@ func (m AwsDefaultInternetGateway) Execute(remoteResources, resourcesFromState *
 			continue
 		}
 
-		internetGateway, _ := remoteResource.(*aws.AwsInternetGateway)
+		internetGateway, _ := remoteResource.(*resource.AbstractResource)
 		// Ignore all non-default internet gateways
 		if !isDefaultInternetGateway(internetGateway, remoteResources) {
 			newRemoteResources = append(newRemoteResources, remoteResource)
@@ -59,10 +59,11 @@ func (m AwsDefaultInternetGateway) Execute(remoteResources, resourcesFromState *
 }
 
 // Return true if the internet gateway is the default one (e.g. attached to the default vpc)
-func isDefaultInternetGateway(internetGateway *aws.AwsInternetGateway, remoteResources *[]resource.Resource) bool {
+func isDefaultInternetGateway(internetGateway *resource.AbstractResource, remoteResources *[]resource.Resource) bool {
 	for _, remoteResource := range *remoteResources {
 		if remoteResource.TerraformType() == aws.AwsDefaultVpcResourceType {
-			return *internetGateway.VpcId == remoteResource.TerraformId()
+			vpcId, exist := internetGateway.Attrs.Get("vpc_id")
+			return exist && vpcId == remoteResource.TerraformId()
 		}
 	}
 	return false

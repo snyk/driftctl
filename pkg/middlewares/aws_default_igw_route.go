@@ -63,7 +63,7 @@ func (m AwsDefaultInternetGatewayRoute) Execute(remoteResources, resourcesFromSt
 func isDefaultInternetGatewayRoute(route *resource.AbstractResource, remoteResources *[]resource.Resource) bool {
 	for _, remoteResource := range *remoteResources {
 		if remoteResource.TerraformType() == aws.AwsInternetGatewayResourceType &&
-			isDefaultInternetGateway(remoteResource.(*aws.AwsInternetGateway), remoteResources) {
+			isDefaultInternetGateway(remoteResource.(*resource.AbstractResource), remoteResources) {
 			gtwId, gtwIdExist := route.Attrs.Get("gateway_id")
 			destCIDRBlock, destCIDRBlockExist := route.Attrs.Get("destination_cidr_block")
 			return gtwIdExist && destCIDRBlockExist && gtwId == remoteResource.TerraformId() && destCIDRBlock == "0.0.0.0/0"

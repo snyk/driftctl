@@ -4,7 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -31,19 +30,28 @@ func TestAwsDefaultInternetGateway_Execute(t *testing.T) {
 				&aws.AwsVpc{
 					Id: "dummy-vpc",
 				},
-				&aws.AwsInternetGateway{
-					Id:    "default-igw",
-					VpcId: awssdk.String("default-vpc"),
+				&resource.AbstractResource{
+					Id:   "default-igw",
+					Type: aws.AwsInternetGatewayResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "default-vpc",
+					},
 				},
-				&aws.AwsInternetGateway{
-					Id:    "dummy-igw",
-					VpcId: awssdk.String("dummy-vpc"),
+				&resource.AbstractResource{
+					Id:   "dummy-igw",
+					Type: aws.AwsInternetGatewayResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "dummy-vpc",
+					},
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsInternetGateway{
-					Id:    "default-igw",
-					VpcId: awssdk.String("default-vpc"),
+				&resource.AbstractResource{
+					Id:   "default-igw",
+					Type: aws.AwsInternetGatewayResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "default-vpc",
+					},
 				},
 			},
 			[]resource.Resource{
@@ -56,13 +64,19 @@ func TestAwsDefaultInternetGateway_Execute(t *testing.T) {
 				&aws.AwsVpc{
 					Id: "dummy-vpc",
 				},
-				&aws.AwsInternetGateway{
-					Id:    "default-igw",
-					VpcId: awssdk.String("default-vpc"),
+				&resource.AbstractResource{
+					Id:   "default-igw",
+					Type: aws.AwsInternetGatewayResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "default-vpc",
+					},
 				},
-				&aws.AwsInternetGateway{
-					Id:    "dummy-igw",
-					VpcId: awssdk.String("dummy-vpc"),
+				&resource.AbstractResource{
+					Id:   "dummy-igw",
+					Type: aws.AwsInternetGatewayResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "dummy-vpc",
+					},
 				},
 			},
 		},
@@ -78,13 +92,19 @@ func TestAwsDefaultInternetGateway_Execute(t *testing.T) {
 				&aws.AwsVpc{
 					Id: "dummy-vpc",
 				},
-				&aws.AwsInternetGateway{
-					Id:    "default-igw",
-					VpcId: awssdk.String("default-vpc"),
+				&resource.AbstractResource{
+					Id:   "default-igw",
+					Type: aws.AwsInternetGatewayResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "default-vpc",
+					},
 				},
-				&aws.AwsInternetGateway{
-					Id:    "dummy-igw",
-					VpcId: awssdk.String("dummy-vpc"),
+				&resource.AbstractResource{
+					Id:   "dummy-igw",
+					Type: aws.AwsInternetGatewayResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "dummy-vpc",
+					},
 				},
 			},
 			[]resource.Resource{},
@@ -98,9 +118,12 @@ func TestAwsDefaultInternetGateway_Execute(t *testing.T) {
 				&aws.AwsVpc{
 					Id: "dummy-vpc",
 				},
-				&aws.AwsInternetGateway{
-					Id:    "dummy-igw",
-					VpcId: awssdk.String("dummy-vpc"),
+				&resource.AbstractResource{
+					Id:   "dummy-igw",
+					Type: aws.AwsInternetGatewayResourceType,
+					Attrs: &resource.Attributes{
+						"vpc_id": "dummy-vpc",
+					},
 				},
 			},
 		},
