@@ -13,7 +13,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
-func TestIamPolicyAttachmentSanitizer_Execute(t *testing.T) {
+func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 	type resources struct {
 		RemoteResources    *[]resource.Resource
 		ResourcesFromState *[]resource.Resource
@@ -116,7 +116,7 @@ func TestIamPolicyAttachmentSanitizer_Execute(t *testing.T) {
 						Type: aws.AwsIamPolicyAttachmentResourceType,
 						Attrs: &resource.Attributes{
 							"policy_arn": "arn",
-							"users":      []string{"jean", "paul", "pierre"},
+							"users":      []interface{}{"jean", "paul", "pierre"},
 						},
 					},
 					&resource.AbstractResource{
@@ -124,7 +124,7 @@ func TestIamPolicyAttachmentSanitizer_Execute(t *testing.T) {
 						Type: aws.AwsIamPolicyAttachmentResourceType,
 						Attrs: &resource.Attributes{
 							"policy_arn": "thisisarn",
-							"users":      []string{"jean", "paul", "jacques"},
+							"users":      []interface{}{"jean", "paul", "jacques"},
 						},
 					},
 				},
@@ -134,7 +134,7 @@ func TestIamPolicyAttachmentSanitizer_Execute(t *testing.T) {
 						Type: aws.AwsIamPolicyAttachmentResourceType,
 						Attrs: &resource.Attributes{
 							"policy_arn": "fromstatearn",
-							"users":      []string{"jean"},
+							"users":      []interface{}{"jean"},
 						},
 					},
 				},
@@ -269,7 +269,7 @@ func TestIamPolicyAttachmentSanitizer_Execute(t *testing.T) {
 						Type: aws.AwsIamPolicyAttachmentResourceType,
 						Attrs: &resource.Attributes{
 							"policy_arn": "arn",
-							"roles":      []string{"role1", "role2", "pierre"},
+							"roles":      []interface{}{"role1", "role2", "pierre"},
 						},
 					},
 					&resource.AbstractResource{
@@ -277,7 +277,7 @@ func TestIamPolicyAttachmentSanitizer_Execute(t *testing.T) {
 						Type: aws.AwsIamPolicyAttachmentResourceType,
 						Attrs: &resource.Attributes{
 							"policy_arn": "thisisarn",
-							"roles":      []string{"role1", "role2", "role3"},
+							"roles":      []interface{}{"role1", "role2", "role3"},
 						},
 					},
 				},
@@ -287,7 +287,7 @@ func TestIamPolicyAttachmentSanitizer_Execute(t *testing.T) {
 						Type: aws.AwsIamPolicyAttachmentResourceType,
 						Attrs: &resource.Attributes{
 							"policy_arn": "fromstatearn",
-							"roles":      []string{"role1"},
+							"roles":      []interface{}{"role1"},
 						},
 					},
 				},
@@ -340,7 +340,7 @@ func TestIamPolicyAttachmentSanitizer_Execute(t *testing.T) {
 				tt.mocks(factory)
 			}
 
-			m := NewIamPolicyAttachmentSanitizer(factory)
+			m := NewIamPolicyAttachmentExpander(factory)
 			if err := m.Execute(tt.args.RemoteResources, tt.args.ResourcesFromState); (err != nil) != tt.wantErr {
 				t.Errorf("Execute() error = %v, wantErr %v", err, tt.wantErr)
 			}

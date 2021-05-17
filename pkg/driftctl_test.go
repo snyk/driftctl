@@ -338,8 +338,8 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
 						"policy_arn": "policy-test-1",
-						"users":      []string{},
-						"roles":      []string{"role-test-1"},
+						"users":      []interface{}{},
+						"roles":      []interface{}{"role-test-1"},
 					},
 				},
 				&resource.AbstractResource{
@@ -422,8 +422,8 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
 						"policy_arn": "policy-test-1",
-						"users":      []string{},
-						"roles":      []string{"role-test-1"},
+						"users":      []interface{}{},
+						"roles":      []interface{}{"role-test-1"},
 					},
 				},
 				&resource.AbstractResource{
@@ -506,8 +506,8 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
 						"policy_arn": "policy-test-1",
-						"users":      []string{},
-						"roles":      []string{"role-test-1"},
+						"users":      []interface{}{},
+						"roles":      []interface{}{"role-test-1"},
 					},
 				},
 				&resource.AbstractResource{

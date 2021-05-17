@@ -8,17 +8,17 @@ import (
 )
 
 // Split Policy attachment when there is multiple user and groups and generate a repeatable id
-type IamPolicyAttachmentSanitizer struct {
+type IamPolicyAttachmentExpander struct {
 	resourceFactory resource.ResourceFactory
 }
 
-func NewIamPolicyAttachmentSanitizer(resourceFactory resource.ResourceFactory) IamPolicyAttachmentSanitizer {
-	return IamPolicyAttachmentSanitizer{
+func NewIamPolicyAttachmentExpander(resourceFactory resource.ResourceFactory) IamPolicyAttachmentExpander {
+	return IamPolicyAttachmentExpander{
 		resourceFactory,
 	}
 }
 
-func (m IamPolicyAttachmentSanitizer) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+func (m IamPolicyAttachmentExpander) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
 	var newStateResources = make([]resource.Resource, 0)
 
 	for _, stateResource := range *resourcesFromState {
@@ -30,21 +30,21 @@ func (m IamPolicyAttachmentSanitizer) Execute(remoteResources, resourcesFromStat
 
 		policyAttachment := stateResource.(*resource.AbstractResource)
 
-		newStateResources = append(newStateResources, m.sanitize(policyAttachment)...)
+		newStateResources = append(newStateResources, m.expand(policyAttachment)...)
 	}
 
 	var newRemoteResources = make([]resource.Resource, 0)
 
-	for _, stateResource := range *remoteResources {
+	for _, remoteResource := range *remoteResources {
 		// Ignore all resources other than policy attachment
-		if stateResource.TerraformType() != resourceaws.AwsIamPolicyAttachmentResourceType {
-			newRemoteResources = append(newRemoteResources, stateResource)
+		if remoteResource.TerraformType() != resourceaws.AwsIamPolicyAttachmentResourceType {
+			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
 
-		policyAttachment := stateResource.(*resource.AbstractResource)
+		policyAttachment := remoteResource.(*resource.AbstractResource)
 
-		newRemoteResources = append(newRemoteResources, m.sanitize(policyAttachment)...)
+		newRemoteResources = append(newRemoteResources, m.expand(policyAttachment)...)
 	}
 
 	*resourcesFromState = newStateResources
@@ -53,14 +53,42 @@ func (m IamPolicyAttachmentSanitizer) Execute(remoteResources, resourcesFromStat
 	return nil
 }
 
-func (m IamPolicyAttachmentSanitizer) sanitize(policyAttachment *resource.AbstractResource) []resource.Resource {
+func (m IamPolicyAttachmentExpander) expand(policyAttachment *resource.AbstractResource) []resource.Resource {
+
+	arn, _ := policyAttachment.Attrs.Get("policy_arn")
+	user, exist := policyAttachment.Attrs.Get("user")
+	if exist {
+		user := user.(string)
+		newAttachment := m.resourceFactory.CreateAbstractResource(
+			resourceaws.AwsIamPolicyAttachmentResourceType,
+			fmt.Sprintf("%s-%s", user, arn),
+			map[string]interface{}{
+				"users": []string{user},
+			},
+		)
+		return []resource.Resource{newAttachment}
+	}
+
+	role, exist := policyAttachment.Attrs.Get("role")
+	if exist {
+		role := role.(string)
+		newAttachment := m.resourceFactory.CreateAbstractResource(
+			resourceaws.AwsIamPolicyAttachmentResourceType,
+			fmt.Sprintf("%s-%s", role, arn),
+			map[string]interface{}{
+				"roles": []string{role},
+			},
+		)
+		return []resource.Resource{newAttachment}
+	}
 
 	var newResources []resource.Resource
 
 	users := (*policyAttachment.Attrs)["users"]
 	if users != nil {
 		// we create one attachment per user
-		for _, user := range users.([]string) {
+		for _, user := range users.([]interface{}) {
+			user := user.(string)
 			newAttachment := m.resourceFactory.CreateAbstractResource(
 				resourceaws.AwsIamPolicyAttachmentResourceType,
 				fmt.Sprintf("%s-%s", user, (*policyAttachment.Attrs)["policy_arn"]),
@@ -75,7 +103,8 @@ func (m IamPolicyAttachmentSanitizer) sanitize(policyAttachment *resource.Abstra
 	roles := (*policyAttachment.Attrs)["roles"]
 	if roles != nil {
 		// we create one attachment per role
-		for _, role := range roles.([]string) {
+		for _, role := range roles.([]interface{}) {
+			role := role.(string)
 			newAttachment := m.resourceFactory.CreateAbstractResource(
 				resourceaws.AwsIamPolicyAttachmentResourceType,
 				fmt.Sprintf("%s-%s", role, (*policyAttachment.Attrs)["policy_arn"]),

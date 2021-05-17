@@ -72,7 +72,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		middlewares.NewAwsInstanceBlockDeviceResourceMapper(d.resourceFactory),
 		middlewares.NewVPCDefaultSecurityGroupSanitizer(),
 		middlewares.NewVPCSecurityGroupRuleSanitizer(d.resourceFactory),
-		middlewares.NewIamPolicyAttachmentSanitizer(d.resourceFactory),
+		middlewares.NewIamPolicyAttachmentExpander(d.resourceFactory),
 		middlewares.AwsInstanceEIP{},
 		middlewares.NewAwsDefaultInternetGatewayRoute(),
 		middlewares.NewAwsDefaultInternetGateway(),
