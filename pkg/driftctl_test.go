@@ -941,7 +941,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				},
 			},
 			mocks: func(factory resource.ResourceFactory) {
-				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "foo", "aws_sns_topic_policy", map[string]interface{}{
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_sns_topic_policy", "foo", map[string]interface{}{
 					"id":     "foo",
 					"arn":    "arn",
 					"policy": "{\"policy\":\"bar\"}",

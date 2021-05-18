@@ -21,7 +21,16 @@ func NewAwsSNSTopicPolicyExpander(resourceFactory resource.ResourceFactory, reso
 	}
 }
 
-func (m AwsSNSTopicPolicyExpander) Execute(_, resourcesFromState *[]resource.Resource) error {
+func (m AwsSNSTopicPolicyExpander) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+
+	for _, res := range *remoteResources {
+		if res.TerraformType() != aws.AwsSnsTopicResourceType {
+			continue
+		}
+		topic, _ := res.(*resource.AbstractResource)
+		topic.Attrs.SafeDelete([]string{"policy"})
+	}
+
 	newList := make([]resource.Resource, 0)
 	for _, res := range *resourcesFromState {
 		// Ignore all resources other than sns_topic
@@ -64,7 +73,7 @@ func (m *AwsSNSTopicPolicyExpander) splitPolicy(topic *resource.AbstractResource
 		"policy": policy,
 	}
 
-	newPolicy := m.resourceFactory.CreateAbstractResource(topic.Id, "aws_sns_topic_policy", data)
+	newPolicy := m.resourceFactory.CreateAbstractResource("aws_sns_topic_policy", topic.Id, data)
 
 	*results = append(*results, newPolicy)
 	logrus.WithFields(logrus.Fields{

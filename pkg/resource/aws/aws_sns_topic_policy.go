@@ -4,6 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
+	"github.com/cloudskiff/driftctl/pkg/helpers"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
@@ -33,5 +34,13 @@ func initSnsTopicPolicyMetaData(resourceSchemaRepository resource.SchemaReposito
 		"policy": func(attributeSchema *resource.AttributeSchema) {
 			attributeSchema.JsonString = true
 		},
+	})
+
+	resourceSchemaRepository.SetNormalizeFunc(AwsSnsTopicPolicyResourceType, func(val *resource.Attributes) {
+		jsonString, err := helpers.NormalizeJsonString((*val)["policy"])
+		if err != nil {
+			return
+		}
+		val.SafeSet([]string{"policy"}, jsonString)
 	})
 }

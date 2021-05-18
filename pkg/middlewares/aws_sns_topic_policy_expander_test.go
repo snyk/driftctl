@@ -57,7 +57,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 				},
 			},
 			mock: func(factory *terraform.MockResourceFactory) {
-				factory.On("CreateAbstractResource", "ID", awsresource.AwsSnsTopicPolicyResourceType, map[string]interface{}{
+				factory.On("CreateAbstractResource", awsresource.AwsSnsTopicPolicyResourceType, "ID", map[string]interface{}{
 					"arn":    "arn",
 					"id":     "ID",
 					"policy": "{\"policy\":\"coucou\"}",
@@ -209,7 +209,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 				},
 			},
 			mock: func(factory *terraform.MockResourceFactory) {
-				factory.On("CreateAbstractResource", "ID", awsresource.AwsSnsTopicPolicyResourceType, mock.MatchedBy(func(input map[string]interface{}) bool {
+				factory.On("CreateAbstractResource", awsresource.AwsSnsTopicPolicyResourceType, "ID", mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "ID"
 				})).Once().Return(&resource.AbstractResource{
 					Id:   "ID",

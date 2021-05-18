@@ -42,8 +42,7 @@ func TestAcc_AwsSNSTopicPolicy(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					result.AssertDriftCountTotal(0)
-					result.AssertDeletedCount(0)
+					result.AssertInfrastructureIsInSync()
 					result.AssertManagedCount(6)
 				},
 			},

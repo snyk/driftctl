@@ -52,8 +52,7 @@ func TestAcc_AwsSNSTopic(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					result.AssertDriftCountTotal(0)
-					result.AssertDeletedCount(0)
+					result.AssertInfrastructureIsInSync()
 					result.AssertManagedCount(3)
 
 					for _, resource := range result.Analysis.Managed() {
@@ -92,7 +91,7 @@ func TestAcc_AwsSNSTopic(t *testing.T) {
 						analyser.Change{
 							Change: diff.Change{
 								Type: diff.UPDATE,
-								Path: []string{"DisplayName"},
+								Path: []string{"display_name"},
 								From: "user-updates-topic3",
 								To:   "CHANGED",
 							},
