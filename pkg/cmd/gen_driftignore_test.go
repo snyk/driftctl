@@ -59,7 +59,7 @@ func TestGenDriftIgnoreCmd_Input(t *testing.T) {
 			name:   "test error when input flag is not specified",
 			args:   []string{},
 			output: "",
-			err:    errors.New("Error: you need to specify an input to parse JSON from"),
+			err:    errors.New("Error: you must specify an input to parse JSON from. Use driftctl gen-driftignore -i <drifts.json>\nGenerate a JSON file using the output flag: driftctl scan -o json://path/to/drifts.json"),
 		},
 	}
 
