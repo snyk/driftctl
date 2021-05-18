@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -28,50 +28,34 @@ func TestNatGatewaySupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeEC2)
+		mocks   func(repo *repository.MockEC2Repository)
 		err     error
 	}{
 		{
 			test:    "no gateway",
 			dirName: "nat_gateway_empty",
-			mocks: func(client *mocks.FakeEC2) {
-				client.On("DescribeNatGatewaysPages",
-					&ec2.DescribeNatGatewaysInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeNatGatewaysOutput, lastPage bool) bool) bool {
-						callback(&ec2.DescribeNatGatewaysOutput{}, true)
-						return true
-					})).Return(nil)
+			mocks: func(repo *repository.MockEC2Repository) {
+				repo.On("ListAllNatGateways").Once().Return([]*ec2.NatGateway{}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "single aws_nat_gateway",
 			dirName: "nat_gateway",
-			mocks: func(client *mocks.FakeEC2) {
-				client.On("DescribeNatGatewaysPages",
-					&ec2.DescribeNatGatewaysInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeNatGatewaysOutput, lastPage bool) bool) bool {
-						callback(&ec2.DescribeNatGatewaysOutput{
-							NatGateways: []*ec2.NatGateway{
-								{
-									NatGatewayId: aws.String("nat-0a5408508b19ef490"), // nat1
-								},
-							},
-						}, true)
-						return true
-					})).Return(nil)
+			mocks: func(repo *repository.MockEC2Repository) {
+				repo.On("ListAllNatGateways").Once().Return([]*ec2.NatGateway{
+					{
+						NatGatewayId: aws.String("nat-0a5408508b19ef490"),
+					},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "cannot list gateway",
 			dirName: "nat_gateway_empty",
-			mocks: func(client *mocks.FakeEC2) {
-				client.On("DescribeNatGatewaysPages",
-					&ec2.DescribeNatGatewaysInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeNatGatewaysOutput, lastPage bool) bool) bool {
-						return true
-					})).Return(awserr.NewRequestFailure(nil, 403, ""))
+			mocks: func(repo *repository.MockEC2Repository) {
+				repo.On("ListAllNatGateways").Once().Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsNatGatewayResourceType),
 		},
@@ -91,7 +75,7 @@ func TestNatGatewaySupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeEC2 := mocks.FakeEC2{}
+			fakeEC2 := repository.MockEC2Repository{}
 			c.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			natGatewaydeserializer := awsdeserializer.NewNatGatewayDeserializer()
