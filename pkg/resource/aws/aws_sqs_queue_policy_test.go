@@ -27,7 +27,7 @@ func TestAcc_AwsSqsQueuePolicy(t *testing.T) {
 						return sqs.New(awsutils.Session()).ListQueuesPages(&sqs.ListQueuesInput{},
 							func(resp *sqs.ListQueuesOutput, lastPage bool) bool {
 								logrus.Debugf("Retrieved %d SQS queues", len(resp.QueueUrls))
-								if len(resp.QueueUrls) == 3 {
+								if len(resp.QueueUrls) >= 3 {
 									doneCh <- struct{}{}
 								}
 								return !lastPage
@@ -43,7 +43,7 @@ func TestAcc_AwsSqsQueuePolicy(t *testing.T) {
 						t.Fatal(err)
 					}
 					result.AssertInfrastructureIsInSync()
-					result.Equal(2, result.Summary().TotalManaged)
+					result.AssertManagedCount(2)
 				},
 			},
 		},
