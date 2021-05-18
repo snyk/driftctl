@@ -18,6 +18,8 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsS3BucketPolicyMetaData(resourceSchemaRepository)
 	initAwsEcrRepositoryMetaData(resourceSchemaRepository)
 	initAwsRouteMetaData(resourceSchemaRepository)
+	initAwsRoute53RecordMetaData(resourceSchemaRepository)
+	initAwsRoute53ZoneMetaData(resourceSchemaRepository)
 	initSnsTopicSubscriptionMetaData(resourceSchemaRepository)
 	initSnsTopicPolicyMetaData(resourceSchemaRepository)
 	initAwsIAMAccessKeyMetaData(resourceSchemaRepository)
