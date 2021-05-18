@@ -4,6 +4,7 @@ package aws
 import (
 	"github.com/zclconf/go-cty/cty"
 
+	"github.com/cloudskiff/driftctl/pkg/helpers"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
@@ -43,5 +44,24 @@ func initSnsTopicSubscriptionMetaData(resourceSchemaRepository resource.SchemaRe
 		"filter_policy": func(attributeSchema *resource.AttributeSchema) {
 			attributeSchema.JsonString = true
 		},
+	})
+
+	resourceSchemaRepository.SetNormalizeFunc(AwsSnsTopicSubscriptionResourceType, func(val *resource.Attributes) {
+		jsonString, err := helpers.NormalizeJsonString((*val)["delivery_policy"])
+		if err == nil {
+			val.SafeSet([]string{"delivery_policy"}, jsonString)
+		}
+
+		jsonString, err = helpers.NormalizeJsonString((*val)["filter_policy"])
+		if err == nil {
+			val.SafeSet([]string{"filter_policy"}, jsonString)
+		}
+
+		val.DeleteIfDefault("endpoint_auto_confirms")
+
+		v, exists := val.Get("confirmation_timeout_in_minutes")
+		if exists && v.(float64) == 1 {
+			val.SafeDelete([]string{"confirmation_timeout_in_minutes"})
+		}
 	})
 }
