@@ -173,6 +173,38 @@ func (_m *MockEC2Repository) ListAllSnapshots() ([]*ec2.Snapshot, error) {
 	return r0, r1
 }
 
+// ListAllSubnets provides a mock function with given fields:
+func (_m *MockEC2Repository) ListAllSubnets() ([]*ec2.Subnet, []*ec2.Subnet, error) {
+	ret := _m.Called()
+
+	var r0 []*ec2.Subnet
+	if rf, ok := ret.Get(0).(func() []*ec2.Subnet); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ec2.Subnet)
+		}
+	}
+
+	var r1 []*ec2.Subnet
+	if rf, ok := ret.Get(1).(func() []*ec2.Subnet); ok {
+		r1 = rf()
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).([]*ec2.Subnet)
+		}
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func() error); ok {
+		r2 = rf()
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
 // ListAllVolumes provides a mock function with given fields:
 func (_m *MockEC2Repository) ListAllVolumes() ([]*ec2.Volume, error) {
 	ret := _m.Called()
