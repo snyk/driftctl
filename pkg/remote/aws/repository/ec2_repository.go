@@ -16,6 +16,7 @@ type EC2Repository interface {
 	ListAllInstances() ([]*ec2.Instance, error)
 	ListAllKeyPairs() ([]*ec2.KeyPairInfo, error)
 	ListAllInternetGateways() ([]*ec2.InternetGateway, error)
+	ListAllSubnets() ([]*ec2.Subnet, []*ec2.Subnet, error)
 }
 
 type EC2Client interface {
@@ -135,4 +136,25 @@ func (r *ec2Repository) ListAllInternetGateways() ([]*ec2.InternetGateway, error
 		return nil, err
 	}
 	return internetGateways, nil
+}
+
+func (r *ec2Repository) ListAllSubnets() ([]*ec2.Subnet, []*ec2.Subnet, error) {
+	input := ec2.DescribeSubnetsInput{}
+	var subnets []*ec2.Subnet
+	var defaultSubnets []*ec2.Subnet
+	err := r.client.DescribeSubnetsPages(&input,
+		func(resp *ec2.DescribeSubnetsOutput, lastPage bool) bool {
+			for _, subnet := range resp.Subnets {
+				if subnet.DefaultForAz != nil && *subnet.DefaultForAz {
+					defaultSubnets = append(defaultSubnets, subnet)
+					continue
+				}
+				subnets = append(subnets, subnet)
+			}
+			return !lastPage
+		})
+	if err != nil {
+		return nil, nil, err
+	}
+	return subnets, defaultSubnets, nil
 }

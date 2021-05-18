@@ -507,3 +507,111 @@ func Test_ec2Repository_ListAllInternetGateways(t *testing.T) {
 		})
 	}
 }
+
+func Test_ec2Repository_ListAllSubnets(t *testing.T) {
+	tests := []struct {
+		name              string
+		mocks             func(client *MockEC2Client)
+		wantSubnet        []*ec2.Subnet
+		wantDefaultSubnet []*ec2.Subnet
+		wantErr           error
+	}{
+		{
+			name: "List with 2 pages",
+			mocks: func(client *MockEC2Client) {
+				client.On("DescribeSubnetsPages",
+					&ec2.DescribeSubnetsInput{},
+					mock.MatchedBy(func(callback func(res *ec2.DescribeSubnetsOutput, lastPage bool) bool) bool {
+						callback(&ec2.DescribeSubnetsOutput{
+							Subnets: []*ec2.Subnet{
+								{
+									SubnetId:     aws.String("subnet-0b13f1e0eacf67424"), // subnet2
+									DefaultForAz: aws.Bool(false),
+								},
+								{
+									SubnetId:     aws.String("subnet-0c9b78001fe186e22"), // subnet3
+									DefaultForAz: aws.Bool(false),
+								},
+								{
+									SubnetId:     aws.String("subnet-05810d3f933925f6d"), // subnet1
+									DefaultForAz: aws.Bool(false),
+								},
+							},
+						}, false)
+						callback(&ec2.DescribeSubnetsOutput{
+							Subnets: []*ec2.Subnet{
+								{
+									SubnetId:     aws.String("subnet-44fe0c65"), // us-east-1a
+									DefaultForAz: aws.Bool(true),
+								},
+								{
+									SubnetId:     aws.String("subnet-65e16628"), // us-east-1b
+									DefaultForAz: aws.Bool(true),
+								},
+								{
+									SubnetId:     aws.String("subnet-afa656f0"), // us-east-1c
+									DefaultForAz: aws.Bool(true),
+								},
+							},
+						}, true)
+						return true
+					})).Return(nil)
+			},
+			wantSubnet: []*ec2.Subnet{
+				{
+					SubnetId:     aws.String("subnet-0b13f1e0eacf67424"), // subnet2
+					DefaultForAz: aws.Bool(false),
+				},
+				{
+					SubnetId:     aws.String("subnet-0c9b78001fe186e22"), // subnet3
+					DefaultForAz: aws.Bool(false),
+				},
+				{
+					SubnetId:     aws.String("subnet-05810d3f933925f6d"), // subnet1
+					DefaultForAz: aws.Bool(false),
+				},
+			},
+			wantDefaultSubnet: []*ec2.Subnet{
+				{
+					SubnetId:     aws.String("subnet-44fe0c65"), // us-east-1a
+					DefaultForAz: aws.Bool(true),
+				},
+				{
+					SubnetId:     aws.String("subnet-65e16628"), // us-east-1b
+					DefaultForAz: aws.Bool(true),
+				},
+				{
+					SubnetId:     aws.String("subnet-afa656f0"), // us-east-1c
+					DefaultForAz: aws.Bool(true),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := &MockEC2Client{}
+			tt.mocks(client)
+			r := &ec2Repository{
+				client: client,
+			}
+			gotSubnet, gotDefaultSubnet, err := r.ListAllSubnets()
+			assert.Equal(t, tt.wantErr, err)
+			changelog, err := diff.Diff(gotSubnet, tt.wantSubnet)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+			changelog, err = diff.Diff(gotDefaultSubnet, tt.wantDefaultSubnet)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}

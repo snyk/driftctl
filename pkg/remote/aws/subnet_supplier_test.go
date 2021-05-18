@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -24,8 +25,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
@@ -35,75 +34,56 @@ func TestSubnetSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeEC2)
+		mocks   func(repo *repository.MockEC2Repository)
 		err     error
 	}{
 		{
 			test:    "no Subnet",
 			dirName: "subnet_empty",
-			mocks: func(client *mocks.FakeEC2) {
-				client.On("DescribeSubnetsPages",
-					&ec2.DescribeSubnetsInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeSubnetsOutput, lastPage bool) bool) bool {
-						callback(&ec2.DescribeSubnetsOutput{}, true)
-						return true
-					})).Return(nil)
+			mocks: func(repo *repository.MockEC2Repository) {
+				repo.On("ListAllSubnets").Once().Return([]*ec2.Subnet{}, []*ec2.Subnet{}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "mixed default Subnet and Subnet",
 			dirName: "subnet",
-			mocks: func(client *mocks.FakeEC2) {
-				client.On("DescribeSubnetsPages",
-					&ec2.DescribeSubnetsInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeSubnetsOutput, lastPage bool) bool) bool {
-						callback(&ec2.DescribeSubnetsOutput{
-							Subnets: []*ec2.Subnet{
-								{
-									SubnetId:     aws.String("subnet-44fe0c65"), // us-east-1a
-									DefaultForAz: aws.Bool(true),
-								},
-								{
-									SubnetId:     aws.String("subnet-65e16628"), // us-east-1b
-									DefaultForAz: aws.Bool(true),
-								},
-								{
-									SubnetId:     aws.String("subnet-afa656f0"), // us-east-1c
-									DefaultForAz: aws.Bool(true),
-								},
-								{
-									SubnetId:     aws.String("subnet-05810d3f933925f6d"), // subnet1
-									DefaultForAz: aws.Bool(false),
-								},
-							},
-						}, false)
-						callback(&ec2.DescribeSubnetsOutput{
-							Subnets: []*ec2.Subnet{
-								{
-									SubnetId:     aws.String("subnet-0b13f1e0eacf67424"), // subnet2
-									DefaultForAz: aws.Bool(false),
-								},
-								{
-									SubnetId:     aws.String("subnet-0c9b78001fe186e22"), // subnet3
-									DefaultForAz: aws.Bool(false),
-								},
-							},
-						}, true)
-						return true
-					})).Return(nil)
+			mocks: func(repo *repository.MockEC2Repository) {
+				repo.On("ListAllSubnets").Once().Return([]*ec2.Subnet{
+					{
+						SubnetId:     aws.String("subnet-05810d3f933925f6d"), // subnet1
+						DefaultForAz: aws.Bool(false),
+					},
+					{
+						SubnetId:     aws.String("subnet-0b13f1e0eacf67424"), // subnet2
+						DefaultForAz: aws.Bool(false),
+					},
+					{
+						SubnetId:     aws.String("subnet-0c9b78001fe186e22"), // subnet3
+						DefaultForAz: aws.Bool(false),
+					},
+				}, []*ec2.Subnet{
+					{
+						SubnetId:     aws.String("subnet-44fe0c65"), // us-east-1a
+						DefaultForAz: aws.Bool(true),
+					},
+					{
+						SubnetId:     aws.String("subnet-65e16628"), // us-east-1b
+						DefaultForAz: aws.Bool(true),
+					},
+					{
+						SubnetId:     aws.String("subnet-afa656f0"), // us-east-1c
+						DefaultForAz: aws.Bool(true),
+					},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "cannot list Subnet",
 			dirName: "subnet_empty",
-			mocks: func(client *mocks.FakeEC2) {
-				client.On("DescribeSubnetsPages",
-					&ec2.DescribeSubnetsInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeSubnetsOutput, lastPage bool) bool) bool {
-						return true
-					})).Return(awserr.NewRequestFailure(nil, 403, ""))
+			mocks: func(repo *repository.MockEC2Repository) {
+				repo.On("ListAllSubnets").Once().Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSubnetResourceType),
 		},
@@ -123,7 +103,7 @@ func TestSubnetSupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeEC2 := mocks.FakeEC2{}
+			fakeEC2 := repository.MockEC2Repository{}
 			c.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			SubnetDeserializer := awsdeserializer.NewSubnetDeserializer()
