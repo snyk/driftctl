@@ -20,7 +20,7 @@ func NewGenDriftIgnoreCmd() *cobra.Command {
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.InputPath == "" {
-				return errors.New("Error: you need to specify an input to parse JSON from")
+				return errors.New("Error: you must specify an input to parse JSON from. Use driftctl gen-driftignore -i <drifts.json>\nGenerate a JSON file using the output flag: driftctl scan -o json://path/to/drifts.json")
 			}
 
 			_, list, err := genDriftIgnore(opts)
