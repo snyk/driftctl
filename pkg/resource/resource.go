@@ -51,9 +51,9 @@ var refactoredResources = []string{
 	// "aws_lambda_function",
 	// "aws_nat_gateway",
 	"aws_route",
-	// "aws_route53_health_check",
-	// "aws_route53_record",
-	// "aws_route53_zone",
+	"aws_route53_health_check",
+	"aws_route53_record",
+	"aws_route53_zone",
 	"aws_route_table",
 	"aws_route_table_association",
 	"aws_s3_bucket",
@@ -226,6 +226,14 @@ func (a *Attributes) SafeSet(path []string, value interface{}) error {
 		*a = m
 	}
 	return errors.New("Error setting value") // should not happen ?
+}
+
+func (a *Attributes) DeleteIfDefault(path string) {
+	val, exist := a.Get(path)
+	ty := reflect.TypeOf(val)
+	if exist && val == reflect.Zero(ty).Interface() {
+		a.SafeDelete([]string{path})
+	}
 }
 
 func concatenatePath(path, next string) string {
