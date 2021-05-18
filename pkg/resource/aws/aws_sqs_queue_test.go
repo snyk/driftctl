@@ -35,7 +35,7 @@ func TestAcc_AwsSqsQueue(t *testing.T) {
 						return sqs.New(awsutils.Session()).ListQueuesPages(&sqs.ListQueuesInput{},
 							func(resp *sqs.ListQueuesOutput, lastPage bool) bool {
 								logrus.Debugf("Retrieved %d SQS queues", len(resp.QueueUrls))
-								if len(resp.QueueUrls) == 2 {
+								if len(resp.QueueUrls) >= 2 {
 									doneCh <- struct{}{}
 								}
 								return !lastPage
@@ -82,7 +82,7 @@ func TestAcc_AwsSqsQueue(t *testing.T) {
 						analyser.Change{
 							Change: diff.Change{
 								Type: diff.UPDATE,
-								Path: []string{"DelaySeconds"},
+								Path: []string{"delay_seconds"},
 								From: float64(0),
 								To:   float64(200),
 							},

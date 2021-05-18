@@ -20,7 +20,15 @@ func NewAwsSqsQueuePolicyExpander(resourceFactory resource.ResourceFactory, reso
 	}
 }
 
-func (m AwsSqsQueuePolicyExpander) Execute(_, resourcesFromState *[]resource.Resource) error {
+func (m AwsSqsQueuePolicyExpander) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+	for _, res := range *remoteResources {
+		if res.TerraformType() != aws.AwsSqsQueueResourceType {
+			continue
+		}
+		queue, _ := res.(*resource.AbstractResource)
+		queue.Attrs.SafeDelete([]string{"policy"})
+	}
+
 	newList := make([]resource.Resource, 0)
 	for _, res := range *resourcesFromState {
 		// Ignore all resources other than sqs_queue
@@ -52,7 +60,10 @@ func (m AwsSqsQueuePolicyExpander) Execute(_, resourcesFromState *[]resource.Res
 }
 
 func (m *AwsSqsQueuePolicyExpander) handlePolicy(queue *resource.AbstractResource, results *[]resource.Resource) error {
-	policy, _ := queue.Attrs.Get("policy")
+	policy, exists := queue.Attrs.Get("policy")
+	if !exists || policy.(string) == "" {
+		return nil
+	}
 
 	data := map[string]interface{}{
 		"queue_url": queue.Id,
