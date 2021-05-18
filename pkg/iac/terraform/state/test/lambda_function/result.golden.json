@@ -1,88 +1,56 @@
 [
  {
-  "Arn": "arn:aws:lambda:eu-west-3:047081014315:function:bar",
-  "CodeSigningConfigArn": null,
-  "Description": "",
-  "Filename": "lambda.zip",
-  "FunctionName": "bar",
-  "Handler": "lambda.handler",
   "Id": "bar",
-  "ImageUri": null,
-  "InvokeArn": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:047081014315:function:bar/invocations",
-  "KmsKeyArn": "",
-  "LastModified": "2020-10-16T09:04:42.050+0000",
-  "Layers": [],
-  "MemorySize": 128,
-  "PackageType": null,
-  "Publish": false,
-  "QualifiedArn": "arn:aws:lambda:eu-west-3:047081014315:function:bar:$LATEST",
-  "ReservedConcurrentExecutions": -1,
-  "Role": "arn:aws:iam::047081014315:role/iam_for_lambda",
-  "Runtime": "nodejs12.x",
-  "S3Bucket": null,
-  "S3Key": null,
-  "S3ObjectVersion": null,
-  "SigningJobArn": null,
-  "SigningProfileVersionArn": null,
-  "SourceCodeHash": "PoaAEeOCmEFZojnrhEJvNzs+jg7/w1lL9GiFYvlM6aw=",
-  "SourceCodeSize": 352,
-  "Tags": {},
-  "Timeout": 3,
-  "Version": "$LATEST",
-  "DeadLetterConfig": [],
-  "Environment": [],
-  "FileSystemConfig": [],
-  "ImageConfig": null,
-  "Timeouts": null,
-  "TracingConfig": [
-   {
-    "Mode": "PassThrough"
-   }
-  ],
-  "VpcConfig": [],
-  "CtyVal": {}
+  "Type": "aws_lambda_function",
+  "Attrs": {
+   "arn": "arn:aws:lambda:eu-west-3:047081014315:function:bar",
+   "description": "",
+   "function_name": "bar",
+   "handler": "lambda.handler",
+   "id": "bar",
+   "invoke_arn": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:047081014315:function:bar/invocations",
+   "kms_key_arn": "",
+   "memory_size": 128,
+   "qualified_arn": "arn:aws:lambda:eu-west-3:047081014315:function:bar:$LATEST",
+   "reserved_concurrent_executions": -1,
+   "role": "arn:aws:iam::047081014315:role/iam_for_lambda",
+   "runtime": "nodejs12.x",
+   "source_code_hash": "PoaAEeOCmEFZojnrhEJvNzs+jg7/w1lL9GiFYvlM6aw=",
+   "source_code_size": 352,
+   "timeout": 3,
+   "tracing_config": [
+    {
+     "mode": "PassThrough"
+    }
+   ],
+   "version": "$LATEST"
+  }
  },
  {
-  "Arn": "arn:aws:lambda:eu-west-3:047081014315:function:foo",
-  "CodeSigningConfigArn": null,
-  "Description": "",
-  "Filename": "lambda.zip",
-  "FunctionName": "foo",
-  "Handler": "lambda.handler",
   "Id": "foo",
-  "ImageUri": null,
-  "InvokeArn": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:047081014315:function:foo/invocations",
-  "KmsKeyArn": "",
-  "LastModified": "2020-10-16T09:04:36.176+0000",
-  "Layers": [],
-  "MemorySize": 128,
-  "PackageType": null,
-  "Publish": false,
-  "QualifiedArn": "arn:aws:lambda:eu-west-3:047081014315:function:foo:$LATEST",
-  "ReservedConcurrentExecutions": -1,
-  "Role": "arn:aws:iam::047081014315:role/iam_for_lambda",
-  "Runtime": "nodejs12.x",
-  "S3Bucket": null,
-  "S3Key": null,
-  "S3ObjectVersion": null,
-  "SigningJobArn": null,
-  "SigningProfileVersionArn": null,
-  "SourceCodeHash": "PoaAEeOCmEFZojnrhEJvNzs+jg7/w1lL9GiFYvlM6aw=",
-  "SourceCodeSize": 352,
-  "Tags": {},
-  "Timeout": 3,
-  "Version": "$LATEST",
-  "DeadLetterConfig": [],
-  "Environment": [],
-  "FileSystemConfig": [],
-  "ImageConfig": null,
-  "Timeouts": null,
-  "TracingConfig": [
-   {
-    "Mode": "PassThrough"
-   }
-  ],
-  "VpcConfig": [],
-  "CtyVal": {}
+  "Type": "aws_lambda_function",
+  "Attrs": {
+   "arn": "arn:aws:lambda:eu-west-3:047081014315:function:foo",
+   "description": "",
+   "function_name": "foo",
+   "handler": "lambda.handler",
+   "id": "foo",
+   "invoke_arn": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:047081014315:function:foo/invocations",
+   "kms_key_arn": "",
+   "memory_size": 128,
+   "qualified_arn": "arn:aws:lambda:eu-west-3:047081014315:function:foo:$LATEST",
+   "reserved_concurrent_executions": -1,
+   "role": "arn:aws:iam::047081014315:role/iam_for_lambda",
+   "runtime": "nodejs12.x",
+   "source_code_hash": "PoaAEeOCmEFZojnrhEJvNzs+jg7/w1lL9GiFYvlM6aw=",
+   "source_code_size": 352,
+   "timeout": 3,
+   "tracing_config": [
+    {
+     "mode": "PassThrough"
+    }
+   ],
+   "version": "$LATEST"
+  }
  }
 ]
