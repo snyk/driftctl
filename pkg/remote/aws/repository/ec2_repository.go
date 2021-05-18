@@ -15,6 +15,7 @@ type EC2Repository interface {
 	ListAllAddressesAssociation() ([]string, error)
 	ListAllInstances() ([]*ec2.Instance, error)
 	ListAllKeyPairs() ([]*ec2.KeyPairInfo, error)
+	ListAllInternetGateways() ([]*ec2.InternetGateway, error)
 }
 
 type EC2Client interface {
@@ -119,4 +120,19 @@ func (r *ec2Repository) ListAllKeyPairs() ([]*ec2.KeyPairInfo, error) {
 		return nil, err
 	}
 	return pairs.KeyPairs, err
+}
+
+func (r *ec2Repository) ListAllInternetGateways() ([]*ec2.InternetGateway, error) {
+	var internetGateways []*ec2.InternetGateway
+	input := ec2.DescribeInternetGatewaysInput{}
+	err := r.client.DescribeInternetGatewaysPages(&input,
+		func(resp *ec2.DescribeInternetGatewaysOutput, lastPage bool) bool {
+			internetGateways = append(internetGateways, resp.InternetGateways...)
+			return !lastPage
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return internetGateways, nil
 }

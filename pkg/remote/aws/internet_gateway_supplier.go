@@ -2,7 +2,7 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -16,7 +16,7 @@ import (
 type InternetGatewaySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       ec2iface.EC2API
+	client       repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -24,13 +24,13 @@ func NewInternetGatewaySupplier(provider *AWSTerraformProvider) *InternetGateway
 	return &InternetGatewaySupplier{
 		provider,
 		awsdeserializer.NewInternetGatewayDeserializer(),
-		ec2.New(provider.session),
+		repository.NewEC2Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *InternetGatewaySupplier) Resources() ([]resource.Resource, error) {
-	internetGateways, err := listInternetGateways(s.client)
+	internetGateways, err := s.client.ListAllInternetGateways()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsInternetGatewayResourceType)
 	}
@@ -63,19 +63,4 @@ func (s *InternetGatewaySupplier) readInternetGateway(internetGateway ec2.Intern
 		return cty.NilVal, err
 	}
 	return *val, nil
-}
-
-func listInternetGateways(client ec2iface.EC2API) ([]*ec2.InternetGateway, error) {
-	var internetGateways []*ec2.InternetGateway
-	input := ec2.DescribeInternetGatewaysInput{}
-	err := client.DescribeInternetGatewaysPages(&input,
-		func(resp *ec2.DescribeInternetGatewaysOutput, lastPage bool) bool {
-			internetGateways = append(internetGateways, resp.InternetGateways...)
-			return !lastPage
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-	return internetGateways, nil
 }
