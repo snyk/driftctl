@@ -49,35 +49,17 @@ func initAwsRouteMetaData(resourceSchemaRepository resource.SchemaRepositoryInte
 	resourceSchemaRepository.SetNormalizeFunc(AwsRouteResourceType, func(val *resource.Attributes) {
 		val.SafeDelete([]string{"timeouts"})
 
-		if v, exist := val.Get("vpc_endpoint_id"); exist && v == "" {
-			val.SafeDelete([]string{"vpc_endpoint_id"})
-		}
-		if v, exist := val.Get("local_gateway_id"); exist && v == "" {
-			val.SafeDelete([]string{"local_gateway_id"})
-		}
-		if v, exist := val.Get("destination_cidr_block"); exist && v == "" {
-			val.SafeDelete([]string{"destination_cidr_block"})
-		}
-		if v, exist := val.Get("destination_ipv6_cidr_block"); exist && v == "" {
-			val.SafeDelete([]string{"destination_ipv6_cidr_block"})
-		}
-		if v, exist := val.Get("egress_only_gateway_id"); exist && v == "" {
-			val.SafeDelete([]string{"egress_only_gateway_id"})
-		}
-		if v, exist := val.Get("nat_gateway_id"); exist && v == "" {
-			val.SafeDelete([]string{"nat_gateway_id"})
-		}
-		if v, exist := val.Get("instance_id"); exist && v == "" {
-			val.SafeDelete([]string{"instance_id"})
-		}
-		if v, exist := val.Get("network_interface_id"); exist && v == "" {
-			val.SafeDelete([]string{"network_interface_id"})
-		}
-		if v, exist := val.Get("transit_gateway_id"); exist && v == "" {
-			val.SafeDelete([]string{"transit_gateway_id"})
-		}
-		if v, exist := val.Get("vpc_peering_connection_id"); exist && v == "" {
-			val.SafeDelete([]string{"vpc_peering_connection_id"})
-		}
+		val.DeleteIfDefault("vpc_endpoint_id")
+		val.DeleteIfDefault("local_gateway_id")
+		val.DeleteIfDefault("destination_cidr_block")
+		val.DeleteIfDefault("destination_ipv6_cidr_block")
+		val.DeleteIfDefault("egress_only_gateway_id")
+		val.DeleteIfDefault("nat_gateway_id")
+		val.DeleteIfDefault("instance_id")
+		val.DeleteIfDefault("network_interface_id")
+		val.DeleteIfDefault("transit_gateway_id")
+		val.DeleteIfDefault("vpc_peering_connection_id")
+		val.DeleteIfDefault("destination_prefix_list_id")
+		val.DeleteIfDefault("instance_owner_id")
 	})
 }

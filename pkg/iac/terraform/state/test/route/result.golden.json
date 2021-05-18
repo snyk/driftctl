@@ -4,10 +4,8 @@
   "Type": "aws_route",
   "Attrs": {
    "destination_cidr_block": "1.1.1.1/32",
-   "destination_prefix_list_id": "",
    "gateway_id": "igw-0125fbf19e83d008b",
    "id": "r-rtb-0232602f0f07748fc243279527",
-   "instance_owner_id": "",
    "origin": "CreateRoute",
    "route_table_id": "rtb-0232602f0f07748fc",
    "state": "active"
@@ -18,10 +16,8 @@
   "Type": "aws_route",
   "Attrs": {
    "destination_ipv6_cidr_block": "::/0",
-   "destination_prefix_list_id": "",
    "gateway_id": "igw-0125fbf19e83d008b",
    "id": "r-rtb-0232602f0f07748fc2750132062",
-   "instance_owner_id": "",
    "origin": "CreateRoute",
    "route_table_id": "rtb-0232602f0f07748fc",
    "state": "active"
