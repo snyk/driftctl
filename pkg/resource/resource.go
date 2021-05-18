@@ -49,7 +49,7 @@ var refactoredResources = []string{
 	"aws_kms_key",
 	// "aws_lambda_event_source_mapping",
 	// "aws_lambda_function",
-	// "aws_nat_gateway",
+	"aws_nat_gateway",
 	"aws_route",
 	"aws_route53_health_check",
 	"aws_route53_record",

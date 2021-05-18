@@ -4,7 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -20,8 +19,10 @@ func TestAwsNatGatewayEipAssoc_Execute(t *testing.T) {
 		{
 			name: "test nil values do not crash middleware",
 			input: []resource.Resource{
-				&aws.AwsNatGateway{
-					Id: "nat-0a5408508b19ef490",
+				&resource.AbstractResource{
+					Id:    "nat-0a5408508b19ef490",
+					Type:  aws.AwsNatGatewayResourceType,
+					Attrs: &resource.Attributes{},
 				},
 				&resource.AbstractResource{
 					Type:  aws.AwsEipAssociationResourceType,
@@ -30,8 +31,10 @@ func TestAwsNatGatewayEipAssoc_Execute(t *testing.T) {
 				},
 			},
 			expected: []resource.Resource{
-				&aws.AwsNatGateway{
-					Id: "nat-0a5408508b19ef490",
+				&resource.AbstractResource{
+					Id:    "nat-0a5408508b19ef490",
+					Type:  aws.AwsNatGatewayResourceType,
+					Attrs: &resource.Attributes{},
 				},
 				&resource.AbstractResource{
 					Type:  aws.AwsEipAssociationResourceType,
@@ -43,8 +46,11 @@ func TestAwsNatGatewayEipAssoc_Execute(t *testing.T) {
 		{
 			name: "test eip assoc ignored when associated to a nat gateway",
 			input: []resource.Resource{
-				&aws.AwsNatGateway{
-					AllocationId: awssdk.String("eipalloc-0f3e9fff457bb770b"),
+				&resource.AbstractResource{
+					Type: aws.AwsNatGatewayResourceType,
+					Attrs: &resource.Attributes{
+						"allocation_id": "eipalloc-0f3e9fff457bb770b",
+					},
 				},
 				&resource.AbstractResource{
 					Type: aws.AwsEipAssociationResourceType,
@@ -60,8 +66,11 @@ func TestAwsNatGatewayEipAssoc_Execute(t *testing.T) {
 				},
 			},
 			expected: []resource.Resource{
-				&aws.AwsNatGateway{
-					AllocationId: awssdk.String("eipalloc-0f3e9fff457bb770b"),
+				&resource.AbstractResource{
+					Type: aws.AwsNatGatewayResourceType,
+					Attrs: &resource.Attributes{
+						"allocation_id": "eipalloc-0f3e9fff457bb770b",
+					},
 				},
 				&resource.AbstractResource{
 					Type: aws.AwsEipAssociationResourceType,
