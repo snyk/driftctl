@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -18,6 +19,10 @@ func NewGenDriftIgnoreCmd() *cobra.Command {
 		Long:  "This command will generate a new .driftignore file containing your current drifts and send output to /dev/stdout\n\nExample: driftctl scan -o json://stdout | driftctl gen-driftignore > .driftignore",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if opts.InputPath == "" {
+				return errors.New("Error: you need to specify an input to parse JSON from")
+			}
+
 			_, list, err := genDriftIgnore(opts)
 			if err != nil {
 				return err
@@ -34,7 +39,7 @@ func NewGenDriftIgnoreCmd() *cobra.Command {
 	fl.BoolVar(&opts.ExcludeUnmanaged, "exclude-unmanaged", false, "Exclude resources not managed by IaC")
 	fl.BoolVar(&opts.ExcludeDeleted, "exclude-missing", false, "Exclude missing resources")
 	fl.BoolVar(&opts.ExcludeDrifted, "exclude-changed", false, "Exclude resources that changed on cloud provider")
-	fl.StringVarP(&opts.InputPath, "from", "f", "/dev/stdin", "Input where the JSON should be parsed from")
+	fl.StringVarP(&opts.InputPath, "input", "i", "", "Input where the JSON should be parsed from")
 
 	return cmd
 }
