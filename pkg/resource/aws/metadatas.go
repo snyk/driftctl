@@ -32,4 +32,6 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsKeyPairMetaData(resourceSchemaRepository)
 	initAwsKmsKeyMetaData(resourceSchemaRepository)
 	initAwsKmsAliasMetaData(resourceSchemaRepository)
+	initAwsSubnetMetaData(resourceSchemaRepository)
+	initAwsSqsQueuePolicyMetaData(resourceSchemaRepository)
 }

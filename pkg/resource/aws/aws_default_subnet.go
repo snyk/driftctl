@@ -2,8 +2,9 @@
 package aws
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
 const AwsDefaultSubnetResourceType = "aws_default_subnet"

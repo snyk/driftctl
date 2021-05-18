@@ -27,6 +27,10 @@ resource "aws_default_subnet" "default-c" {
 resource "aws_subnet" "subnet1" {
   vpc_id = aws_vpc.vpc_for_subnets.id
   cidr_block = "10.0.0.0/24"
+    timeouts {
+        create = "60m"
+        delete = "2h"
+    }
 }
 
 resource "aws_subnet" "subnet2" {

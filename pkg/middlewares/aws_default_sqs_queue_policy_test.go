@@ -4,12 +4,11 @@ import (
 	"strings"
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-
 	"github.com/aws/aws-sdk-go/aws/awsutil"
+	"github.com/r3labs/diff/v2"
+
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	"github.com/r3labs/diff/v2"
 )
 
 func TestAwsDefaultSqsQueuePolicy_Execute(t *testing.T) {
@@ -22,58 +21,108 @@ func TestAwsDefaultSqsQueuePolicy_Execute(t *testing.T) {
 		{
 			"test default sqs queue policy managed by IaC",
 			[]resource.Resource{
-				&aws.AwsSqsQueuePolicy{
-					Id:     "non-default-sqs-queue-policy",
-					Policy: awssdk.String("foo"),
+				&resource.AbstractResource{
+					Id:   "non-default-sqs-queue-policy",
+					Type: aws.AwsSqsQueuePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"queue_url": "non-default-sqs-queue-policy",
+						"id":        "non-default-sqs-queue-policy",
+						"policy":    "foo",
+					},
 				},
-				&aws.AwsSqsQueuePolicy{
-					Id:     "default-sqs-queue-policy",
-					Policy: awssdk.String(""),
+				&resource.AbstractResource{
+					Id:   "default-sqs-queue-policy",
+					Type: aws.AwsSqsQueuePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"queue_url": "default-sqs-queue-policy",
+						"id":        "default-sqs-queue-policy",
+						"policy":    "",
+					},
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsSqsQueuePolicy{
-					Id:     "non-default-sqs-queue-policy",
-					Policy: awssdk.String("foo"),
+				&resource.AbstractResource{
+					Id:   "non-default-sqs-queue-policy",
+					Type: aws.AwsSqsQueuePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"queue_url": "non-default-sqs-queue-policy",
+						"id":        "non-default-sqs-queue-policy",
+						"policy":    "foo",
+					},
 				},
-				&aws.AwsSqsQueuePolicy{
-					Id:     "default-sqs-queue-policy",
-					Policy: awssdk.String(""),
+				&resource.AbstractResource{
+					Id:   "default-sqs-queue-policy",
+					Type: aws.AwsSqsQueuePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"queue_url": "default-sqs-queue-policy",
+						"id":        "default-sqs-queue-policy",
+						"policy":    "",
+					},
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsSqsQueuePolicy{
-					Id:     "non-default-sqs-queue-policy",
-					Policy: awssdk.String("foo"),
+				&resource.AbstractResource{
+					Id:   "non-default-sqs-queue-policy",
+					Type: aws.AwsSqsQueuePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"queue_url": "non-default-sqs-queue-policy",
+						"id":        "non-default-sqs-queue-policy",
+						"policy":    "foo",
+					},
 				},
-				&aws.AwsSqsQueuePolicy{
-					Id:     "default-sqs-queue-policy",
-					Policy: awssdk.String(""),
+				&resource.AbstractResource{
+					Id:   "default-sqs-queue-policy",
+					Type: aws.AwsSqsQueuePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"queue_url": "default-sqs-queue-policy",
+						"id":        "default-sqs-queue-policy",
+						"policy":    "",
+					},
 				},
 			},
 		},
 		{
 			"test default sqs queue policy not managed by IaC",
 			[]resource.Resource{
-				&aws.AwsSqsQueuePolicy{
-					Id:     "non-default-sqs-queue-policy",
-					Policy: awssdk.String("foo"),
+				&resource.AbstractResource{
+					Id:   "non-default-sqs-queue-policy",
+					Type: aws.AwsSqsQueuePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"queue_url": "non-default-sqs-queue-policy",
+						"id":        "non-default-sqs-queue-policy",
+						"policy":    "foo",
+					},
 				},
-				&aws.AwsSqsQueuePolicy{
-					Id:     "default-sqs-queue-policy",
-					Policy: awssdk.String(""),
+				&resource.AbstractResource{
+					Id:   "default-sqs-queue-policy",
+					Type: aws.AwsSqsQueuePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"queue_url": "default-sqs-queue-policy",
+						"id":        "default-sqs-queue-policy",
+						"policy":    "",
+					},
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsSqsQueuePolicy{
-					Id:     "non-default-sqs-queue-policy",
-					Policy: awssdk.String("foo"),
+				&resource.AbstractResource{
+					Id:   "non-default-sqs-queue-policy",
+					Type: aws.AwsSqsQueuePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"queue_url": "non-default-sqs-queue-policy",
+						"id":        "non-default-sqs-queue-policy",
+						"policy":    "foo",
+					},
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsSqsQueuePolicy{
-					Id:     "non-default-sqs-queue-policy",
-					Policy: awssdk.String("foo"),
+				&resource.AbstractResource{
+					Id:   "non-default-sqs-queue-policy",
+					Type: aws.AwsSqsQueuePolicyResourceType,
+					Attrs: &resource.Attributes{
+						"queue_url": "non-default-sqs-queue-policy",
+						"id":        "non-default-sqs-queue-policy",
+						"policy":    "foo",
+					},
 				},
 			},
 		},

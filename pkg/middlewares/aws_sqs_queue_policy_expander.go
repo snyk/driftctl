@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/sirupsen/logrus"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -10,12 +9,14 @@ import (
 
 // Explodes policy found in aws_sqs_queue.policy from state resources to dedicated resources
 type AwsSqsQueuePolicyExpander struct {
-	resourceFactory resource.ResourceFactory
+	resourceFactory          resource.ResourceFactory
+	resourceSchemaRepository resource.SchemaRepositoryInterface
 }
 
-func NewAwsSqsQueuePolicyExpander(resourceFactory resource.ResourceFactory) AwsSqsQueuePolicyExpander {
+func NewAwsSqsQueuePolicyExpander(resourceFactory resource.ResourceFactory, resourceSchemaRepository resource.SchemaRepositoryInterface) AwsSqsQueuePolicyExpander {
 	return AwsSqsQueuePolicyExpander{
 		resourceFactory,
+		resourceSchemaRepository,
 	}
 }
 
@@ -28,15 +29,16 @@ func (m AwsSqsQueuePolicyExpander) Execute(_, resourcesFromState *[]resource.Res
 			continue
 		}
 
-		queue, _ := res.(*aws.AwsSqsQueue)
+		queue, _ := res.(*resource.AbstractResource)
 		newList = append(newList, res)
 
-		if queue.Policy == nil {
+		policy, exist := queue.Attrs.Get("policy")
+		if !exist || policy == nil {
 			continue
 		}
 
 		if m.hasPolicyAttached(queue, resourcesFromState) {
-			queue.Policy = nil
+			queue.Attrs.SafeDelete([]string{"policy"})
 			continue
 		}
 
@@ -49,32 +51,22 @@ func (m AwsSqsQueuePolicyExpander) Execute(_, resourcesFromState *[]resource.Res
 	return nil
 }
 
-func (m *AwsSqsQueuePolicyExpander) handlePolicy(queue *aws.AwsSqsQueue, results *[]resource.Resource) error {
+func (m *AwsSqsQueuePolicyExpander) handlePolicy(queue *resource.AbstractResource, results *[]resource.Resource) error {
+	policy, _ := queue.Attrs.Get("policy")
+
 	data := map[string]interface{}{
 		"queue_url": queue.Id,
 		"id":        queue.Id,
-		"policy":    queue.Policy,
+		"policy":    policy,
 	}
-	ctyVal, err := m.resourceFactory.CreateResource(data, "aws_sqs_queue_policy")
-	if err != nil {
-		return err
-	}
-	newPolicy := &aws.AwsSqsQueuePolicy{
-		Id:       queue.Id,
-		QueueUrl: awssdk.String(queue.Id),
-		Policy:   queue.Policy,
-		CtyVal:   ctyVal,
-	}
-	normalizedRes, err := newPolicy.NormalizeForState()
-	if err != nil {
-		return err
-	}
-	*results = append(*results, normalizedRes)
+
+	newPolicy := m.resourceFactory.CreateAbstractResource("aws_sqs_queue_policy", queue.Id, data)
+	*results = append(*results, newPolicy)
 	logrus.WithFields(logrus.Fields{
 		"id": newPolicy.TerraformId(),
 	}).Debug("Created new policy from sqs queue")
 
-	queue.Policy = nil
+	queue.Attrs.SafeDelete([]string{"policy"})
 	return nil
 }
 
@@ -82,7 +74,7 @@ func (m *AwsSqsQueuePolicyExpander) handlePolicy(queue *aws.AwsSqsQueue, results
 // It is mandatory since it's possible to have a aws_sqs_queue with an inline policy
 // AND a aws_sqs_queue_policy resource at the same time. At the end, on the AWS console,
 // the aws_sqs_queue_policy will be used.
-func (m *AwsSqsQueuePolicyExpander) hasPolicyAttached(queue *aws.AwsSqsQueue, resourcesFromState *[]resource.Resource) bool {
+func (m *AwsSqsQueuePolicyExpander) hasPolicyAttached(queue *resource.AbstractResource, resourcesFromState *[]resource.Resource) bool {
 	for _, res := range *resourcesFromState {
 		if res.TerraformType() == aws.AwsSqsQueuePolicyResourceType &&
 			res.TerraformId() == queue.Id {
