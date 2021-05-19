@@ -61,7 +61,7 @@ func (r *AwsSecurityGroup) CtyValue() *cty.Value {
 }
 
 func initAwsSecurityGroupMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsDefaultSecurityGroupResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsSecurityGroupResourceType, func(val *resource.Attributes) {
 		val.SafeDelete([]string{"revoke_rules_on_delete"})
 		val.SafeDelete([]string{"timeouts"})
 
