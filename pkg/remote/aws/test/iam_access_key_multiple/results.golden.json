@@ -1,6 +1,26 @@
 [
  {
   "encrypted_secret": null,
+  "id": "AKIA5QYBVVD223VWU32A",
+  "key_fingerprint": null,
+  "pgp_key": null,
+  "secret": null,
+  "ses_smtp_password_v4": null,
+  "status": "Active",
+  "user": "test-driftctl"
+ },
+ {
+  "encrypted_secret": null,
+  "id": "AKIA5QYBVVD2QYI36UZP",
+  "key_fingerprint": null,
+  "pgp_key": null,
+  "secret": null,
+  "ses_smtp_password_v4": null,
+  "status": "Active",
+  "user": "test-driftctl"
+ },
+ {
+  "encrypted_secret": null,
   "id": "AKIA5QYBVVD26EJME25D",
   "key_fingerprint": null,
   "pgp_key": null,
@@ -8,46 +28,6 @@
   "ses_smtp_password_v4": null,
   "status": "Active",
   "user": "test-driftctl2"
- },
- {
-  "encrypted_secret": null,
-  "id": "AKIA5QYBVVD2QYI36UZP",
-  "key_fingerprint": null,
-  "pgp_key": null,
-  "secret": null,
-  "ses_smtp_password_v4": null,
-  "status": "Active",
-  "user": "test-driftctl"
- },
- {
-  "encrypted_secret": null,
-  "id": "AKIA5QYBVVD223VWU32A",
-  "key_fingerprint": null,
-  "pgp_key": null,
-  "secret": null,
-  "ses_smtp_password_v4": null,
-  "status": "Active",
-  "user": "test-driftctl"
- },
- {
-  "encrypted_secret": null,
-  "id": "AKIA5QYBVVD2QYI36UZP",
-  "key_fingerprint": null,
-  "pgp_key": null,
-  "secret": null,
-  "ses_smtp_password_v4": null,
-  "status": "Active",
-  "user": "test-driftctl"
- },
- {
-  "encrypted_secret": null,
-  "id": "AKIA5QYBVVD223VWU32A",
-  "key_fingerprint": null,
-  "pgp_key": null,
-  "secret": null,
-  "ses_smtp_password_v4": null,
-  "status": "Active",
-  "user": "test-driftctl"
  },
  {
   "encrypted_secret": null,
