@@ -1,9 +1,9 @@
 package aws
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
+
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -18,7 +18,7 @@ import (
 type IamPolicySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       iamiface.IAMAPI
+	client       repository.IAMRepository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -26,13 +26,13 @@ func NewIamPolicySupplier(provider *AWSTerraformProvider, deserializer *resource
 	return &IamPolicySupplier{
 		provider,
 		deserializer,
-		iam.New(provider.session),
+		repository.NewIAMClient(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *IamPolicySupplier) Resources() ([]resource.Resource, error) {
-	policies, err := listIamPolicies(s.client)
+	policies, err := s.client.ListAllPolicies()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamPolicyResourceType)
 	}
@@ -41,7 +41,7 @@ func (s *IamPolicySupplier) Resources() ([]resource.Resource, error) {
 		for _, policy := range policies {
 			u := *policy
 			s.runner.Run(func() (cty.Value, error) {
-				return s.readRes(&u)
+				return s.readPolicy(&u)
 			})
 		}
 		results, err = s.runner.Wait()
@@ -52,7 +52,7 @@ func (s *IamPolicySupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(resourceaws.AwsIamPolicyResourceType, results)
 }
 
-func (s *IamPolicySupplier) readRes(resource *iam.Policy) (cty.Value, error) {
+func (s *IamPolicySupplier) readPolicy(resource *iam.Policy) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamPolicyResourceType,
@@ -65,19 +65,4 @@ func (s *IamPolicySupplier) readRes(resource *iam.Policy) (cty.Value, error) {
 	}
 
 	return *res, nil
-}
-
-func listIamPolicies(client iamiface.IAMAPI) ([]*iam.Policy, error) {
-	var resources []*iam.Policy
-	input := &iam.ListPoliciesInput{
-		Scope: aws.String(iam.PolicyScopeTypeLocal),
-	}
-	err := client.ListPoliciesPages(input, func(res *iam.ListPoliciesOutput, lastPage bool) bool {
-		resources = append(resources, res.Policies...)
-		return !lastPage
-	})
-	if err != nil {
-		return nil, err
-	}
-	return resources, nil
 }
