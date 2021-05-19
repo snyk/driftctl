@@ -2,10 +2,10 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
@@ -18,7 +18,7 @@ import (
 type IamUserSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       iamiface.IAMAPI
+	client       repository.IAMRepository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -26,22 +26,22 @@ func NewIamUserSupplier(provider *AWSTerraformProvider) *IamUserSupplier {
 	return &IamUserSupplier{
 		provider,
 		awsdeserializer.NewIamUserDeserializer(),
-		iam.New(provider.session),
+		repository.NewIAMClient(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *IamUserSupplier) Resources() ([]resource.Resource, error) {
-	users, err := listIamUsers(s.client, resourceaws.AwsIamUserResourceType)
+	users, err := s.client.ListAllUsers()
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamUserResourceType)
 	}
 	results := make([]cty.Value, 0)
 	if len(users) > 0 {
 		for _, user := range users {
 			u := *user
 			s.runner.Run(func() (cty.Value, error) {
-				return s.readRes(&u)
+				return s.readUser(&u)
 			})
 		}
 		results, err = s.runner.Wait()
@@ -52,7 +52,7 @@ func (s *IamUserSupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s *IamUserSupplier) readRes(user *iam.User) (cty.Value, error) {
+func (s *IamUserSupplier) readUser(user *iam.User) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamUserResourceType,
@@ -65,17 +65,4 @@ func (s *IamUserSupplier) readRes(user *iam.User) (cty.Value, error) {
 	}
 
 	return *res, nil
-}
-
-func listIamUsers(client iamiface.IAMAPI, supplierType string) ([]*iam.User, error) {
-	var resources []*iam.User
-	input := &iam.ListUsersInput{}
-	err := client.ListUsersPages(input, func(res *iam.ListUsersOutput, lastPage bool) bool {
-		resources = append(resources, res.Users...)
-		return !lastPage
-	})
-	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, supplierType, resourceaws.AwsIamUserResourceType)
-	}
-	return resources, nil
 }
