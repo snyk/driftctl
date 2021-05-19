@@ -4,13 +4,11 @@ import (
 	"context"
 	"testing"
 
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-
-	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-
 	"github.com/aws/aws-sdk-go/aws/awserr"
-
 	"github.com/cloudskiff/driftctl/pkg/parallel"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
@@ -18,12 +16,11 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/iam"
 
-	"github.com/cloudskiff/driftctl/test/goldenfile"
-	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
+	"github.com/cloudskiff/driftctl/test/goldenfile"
+	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -35,148 +32,99 @@ func TestIamRolePolicyAttachmentSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeIAM)
+		mocks   func(repo *repository.MockIAMRepository)
 		err     error
 	}{
 		{
-			test:    "iam multiples roles multiple policies",
-			dirName: "iam_role_policy_attachment_multiple",
-			mocks: func(client *mocks.FakeIAM) {
-				client.On("ListRolesPages",
-					&iam.ListRolesInput{},
-					mock.MatchedBy(func(callback func(res *iam.ListRolesOutput, lastPage bool) bool) bool {
-						callback(&iam.ListRolesOutput{Roles: []*iam.Role{
-							{
-								RoleName: aws.String("test-role"),
-							},
-							{
-								RoleName: aws.String("test-role2"),
-							},
-						}}, true)
-						return true
-					})).Return(nil).Once()
-
-				shouldSkipfirst := false
-				shouldSkipSecond := false
-
-				client.On("ListAttachedRolePoliciesPages",
-					&iam.ListAttachedRolePoliciesInput{
+			test:    "no iam role policy",
+			dirName: "iam_role_policy_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				roles := []*iam.Role{
+					{
 						RoleName: aws.String("test-role"),
 					},
-					mock.MatchedBy(func(callback func(res *iam.ListAttachedRolePoliciesOutput, lastPage bool) bool) bool {
-						if shouldSkipfirst {
-							return false
-						}
-						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy"),
-								PolicyName: aws.String("policy"),
-							},
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy2"),
-								PolicyName: aws.String("policy2"),
-							},
-						}}, false)
-						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy3"),
-								PolicyName: aws.String("policy3"),
-							},
-						}}, true)
-						shouldSkipfirst = true
-						return true
-					})).Return(nil).Once()
-
-				client.On("ListAttachedRolePoliciesPages",
-					&iam.ListAttachedRolePoliciesInput{
-						RoleName: aws.String("test-role2"),
-					},
-					mock.MatchedBy(func(callback func(res *iam.ListAttachedRolePoliciesOutput, lastPage bool) bool) bool {
-						if shouldSkipSecond {
-							return false
-						}
-						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy"),
-								PolicyName: aws.String("policy"),
-							},
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy2"),
-								PolicyName: aws.String("policy2"),
-							},
-						}}, false)
-						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy3"),
-								PolicyName: aws.String("policy3"),
-							},
-						}}, true)
-						shouldSkipSecond = true
-						return true
-					})).Return(nil).Once()
+				}
+				repo.On("ListAllRoles").Return(roles, nil)
+				repo.On("ListAllRolePolicyAttachments", roles).Return([]*repository.AttachedRolePolicy{}, nil)
 			},
 			err: nil,
 		},
 		{
-			test:    "check that we ignore policy for ignored roles",
-			dirName: "iam_role_policy_attachment_for_ignored_roles",
-			mocks: func(client *mocks.FakeIAM) {
-				client.On("ListRolesPages",
-					&iam.ListRolesInput{},
-					mock.MatchedBy(func(callback func(res *iam.ListRolesOutput, lastPage bool) bool) bool {
-						callback(&iam.ListRolesOutput{Roles: []*iam.Role{
-							{
-								RoleName: aws.String("AWSServiceRoleForOrganizations"),
-							},
-							{
-								RoleName: aws.String("AWSServiceRoleForSupport"),
-							},
-							{
-								RoleName: aws.String("AWSServiceRoleForTrustedAdvisor"),
-							},
-						}}, true)
-						return true
-					})).Return(nil)
+			test:    "iam multiples roles multiple policies",
+			dirName: "iam_role_policy_attachment_multiple",
+			mocks: func(repo *repository.MockIAMRepository) {
+				roles := []*iam.Role{
+					{
+						RoleName: aws.String("test-role"),
+					},
+					{
+						RoleName: aws.String("test-role2"),
+					},
+				}
+				repo.On("ListAllRoles").Return(roles, nil)
+				repo.On("ListAllRolePolicyAttachments", roles).Return([]*repository.AttachedRolePolicy{
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy"),
+							PolicyName: aws.String("policy"),
+						},
+						RoleName: *aws.String("test-role"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy2"),
+							PolicyName: aws.String("policy2"),
+						},
+						RoleName: *aws.String("test-role"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy3"),
+							PolicyName: aws.String("policy3"),
+						},
+						RoleName: *aws.String("test-role"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy"),
+							PolicyName: aws.String("policy"),
+						},
+						RoleName: *aws.String("test-role2"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy2"),
+							PolicyName: aws.String("policy2"),
+						},
+						RoleName: *aws.String("test-role2"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy3"),
+							PolicyName: aws.String("policy3"),
+						},
+						RoleName: *aws.String("test-role2"),
+					},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "Cannot list roles",
 			dirName: "iam_role_policy_attachment_for_ignored_roles",
-			mocks: func(client *mocks.FakeIAM) {
-				client.On("ListRolesPages",
-					&iam.ListRolesInput{},
-					mock.MatchedBy(func(callback func(res *iam.ListRolesOutput, lastPage bool) bool) bool {
-						callback(&iam.ListRolesOutput{Roles: []*iam.Role{}}, true)
-						return true
-					})).Return(awserr.NewRequestFailure(nil, 403, ""))
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllRoles").Once().Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsIamRolePolicyAttachmentResourceType, resourceaws.AwsIamRoleResourceType),
 		},
 		{
-			test:    "Cannot list roles policies",
+			test:    "Cannot list roles policy attachment",
 			dirName: "iam_role_policy_attachment_for_ignored_roles",
-			mocks: func(client *mocks.FakeIAM) {
-				client.On("ListRolesPages",
-					&iam.ListRolesInput{},
-					mock.MatchedBy(func(callback func(res *iam.ListRolesOutput, lastPage bool) bool) bool {
-						callback(&iam.ListRolesOutput{Roles: []*iam.Role{
-							{
-								RoleName: aws.String("test-role"),
-							},
-							{
-								RoleName: aws.String("test-role2"),
-							},
-						}}, true)
-						return true
-					})).Return(nil).Once()
-				client.On("ListAttachedRolePoliciesPages",
-					mock.Anything,
-					mock.MatchedBy(func(callback func(res *iam.ListAttachedRolePoliciesOutput, lastPage bool) bool) bool {
-						return true
-					})).Return(awserr.NewRequestFailure(nil, 403, "")).Once()
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllRoles").Once().Return([]*iam.Role{}, nil)
+				repo.On("ListAllRolePolicyAttachments", mock.Anything).Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			err: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsIamRolePolicyAttachmentResourceType, resourceaws.AwsIamRolePolicyResourceType),
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsIamRolePolicyAttachmentResourceType),
 		},
 	}
 	for _, c := range cases {
@@ -194,7 +142,7 @@ func TestIamRolePolicyAttachmentSupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeIam := mocks.FakeIAM{}
+			fakeIam := repository.MockIAMRepository{}
 			c.mocks(&fakeIam)
 
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
