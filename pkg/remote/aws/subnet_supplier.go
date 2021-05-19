@@ -2,7 +2,7 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
@@ -20,7 +20,7 @@ type SubnetSupplier struct {
 	reader                    terraform.ResourceReader
 	defaultSubnetDeserializer deserializer.CTYDeserializer
 	subnetDeserializer        deserializer.CTYDeserializer
-	client                    ec2iface.EC2API
+	client                    repository.EC2Repository
 	defaultSubnetRunner       *terraform.ParallelResourceReader
 	subnetRunner              *terraform.ParallelResourceReader
 }
@@ -30,28 +30,14 @@ func NewSubnetSupplier(provider *AWSTerraformProvider) *SubnetSupplier {
 		provider,
 		awsdeserializer.NewDefaultSubnetDeserializer(),
 		awsdeserializer.NewSubnetDeserializer(),
-		ec2.New(provider.session),
+		repository.NewEC2Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *SubnetSupplier) Resources() ([]resource.Resource, error) {
-	input := ec2.DescribeSubnetsInput{}
-	var subnets []*ec2.Subnet
-	var defaultSubnets []*ec2.Subnet
-	err := s.client.DescribeSubnetsPages(&input,
-		func(resp *ec2.DescribeSubnetsOutput, lastPage bool) bool {
-			for _, subnet := range resp.Subnets {
-				if subnet.DefaultForAz != nil && *subnet.DefaultForAz {
-					defaultSubnets = append(defaultSubnets, subnet)
-					continue
-				}
-				subnets = append(subnets, subnet)
-			}
-			return !lastPage
-		},
-	)
+	subnets, defaultSubnets, err := s.client.ListAllSubnets()
 
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsSubnetResourceType)
