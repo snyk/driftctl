@@ -62,6 +62,7 @@ func (m AwsSqsQueuePolicyExpander) Execute(remoteResources, resourcesFromState *
 func (m *AwsSqsQueuePolicyExpander) handlePolicy(queue *resource.AbstractResource, results *[]resource.Resource) error {
 	policy, exists := queue.Attrs.Get("policy")
 	if !exists || policy.(string) == "" {
+		queue.Attrs.SafeDelete([]string{"policy"})
 		return nil
 	}
 
