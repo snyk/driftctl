@@ -47,10 +47,10 @@ func TestInternetGatewaySupplier_Resources(t *testing.T) {
 			mocks: func(repo *repository.MockEC2Repository) {
 				repo.On("ListAllInternetGateways").Once().Return([]*ec2.InternetGateway{
 					{
-						InternetGatewayId: awssdk.String("igw-025e25487b9ee553b"),
+						InternetGatewayId: awssdk.String("igw-0184eb41aadc62d1c"),
 					},
 					{
-						InternetGatewayId: awssdk.String("igw-0aa10b4e92738d8ed"),
+						InternetGatewayId: awssdk.String("igw-047b487f5c60fca99"),
 					},
 				}, nil)
 			},
