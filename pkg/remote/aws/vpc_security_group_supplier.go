@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -18,7 +18,7 @@ import (
 type VPCSecurityGroupSupplier struct {
 	reader                     terraform.ResourceReader
 	deserializer               *resource.Deserializer
-	client                     ec2iface.EC2API
+	client                     repository.EC2Repository
 	defaultSecurityGroupRunner *terraform.ParallelResourceReader
 	securityGroupRunner        *terraform.ParallelResourceReader
 }
@@ -27,14 +27,14 @@ func NewVPCSecurityGroupSupplier(provider *AWSTerraformProvider, deserializer *r
 	return &VPCSecurityGroupSupplier{
 		provider,
 		deserializer,
-		ec2.New(provider.session),
+		repository.NewEC2Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *VPCSecurityGroupSupplier) Resources() ([]resource.Resource, error) {
-	securityGroups, defaultSecurityGroups, err := listSecurityGroups(s.client)
+	securityGroups, defaultSecurityGroups, err := s.client.ListAllSecurityGroups()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsSecurityGroupResourceType)
 	}
@@ -92,26 +92,6 @@ func (s *VPCSecurityGroupSupplier) readSecurityGroup(securityGroup ec2.SecurityG
 		return cty.NilVal, err
 	}
 	return *val, nil
-}
-
-func listSecurityGroups(client ec2iface.EC2API) ([]*ec2.SecurityGroup, []*ec2.SecurityGroup, error) {
-	var securityGroups []*ec2.SecurityGroup
-	var defaultSecurityGroups []*ec2.SecurityGroup
-	input := &ec2.DescribeSecurityGroupsInput{}
-	err := client.DescribeSecurityGroupsPages(input, func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool {
-		for _, securityGroup := range res.SecurityGroups {
-			if isDefaultSecurityGroup(*securityGroup) {
-				defaultSecurityGroups = append(defaultSecurityGroups, securityGroup)
-				continue
-			}
-			securityGroups = append(securityGroups, securityGroup)
-		}
-		return !lastPage
-	})
-	if err != nil {
-		return nil, nil, err
-	}
-	return securityGroups, defaultSecurityGroups, nil
 }
 
 // Return true if the security group is considered as a default one
