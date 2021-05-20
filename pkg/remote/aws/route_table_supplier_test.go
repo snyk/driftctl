@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	awstest "github.com/cloudskiff/driftctl/test/aws"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
@@ -30,70 +31,49 @@ func TestRouteTableSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *awstest.MockFakeEC2)
+		mocks   func(client *repository.MockEC2Repository)
 		err     error
 	}{
 		{
 			test:    "no route table",
 			dirName: "route_table_empty",
-			mocks: func(client *awstest.MockFakeEC2) {
-				client.On("DescribeRouteTablesPages",
-					&ec2.DescribeRouteTablesInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeRouteTablesOutput, lastPage bool) bool) bool {
-						callback(&ec2.DescribeRouteTablesOutput{}, true)
-						return true
-					})).Return(nil)
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllRouteTables").Once().Return([]*ec2.RouteTable{}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "mixed default_route_table and route_table",
 			dirName: "route_table",
-			mocks: func(client *awstest.MockFakeEC2) {
-				client.On("DescribeRouteTablesPages",
-					&ec2.DescribeRouteTablesInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeRouteTablesOutput, lastPage bool) bool) bool {
-						callback(&ec2.DescribeRouteTablesOutput{
-							RouteTables: []*ec2.RouteTable{
-								{
-									RouteTableId: aws.String("rtb-08b7b71af15e183ce"), // table1
-								},
-								{
-									RouteTableId: aws.String("rtb-0002ac731f6fdea55"), // table2
-								},
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllRouteTables").Once().Return([]*ec2.RouteTable{
+					{
+						RouteTableId: aws.String("rtb-08b7b71af15e183ce"), // table1
+					},
+					{
+						RouteTableId: aws.String("rtb-0002ac731f6fdea55"), // table2
+					},
+					{
+						RouteTableId: aws.String("rtb-0eabf071c709c0976"), // default_table
+						VpcId:        awssdk.String("vpc-0b4a6b3536da20ecd"),
+						Associations: []*ec2.RouteTableAssociation{
+							{
+								Main: awssdk.Bool(true),
 							},
-						}, false)
-						callback(&ec2.DescribeRouteTablesOutput{
-							RouteTables: []*ec2.RouteTable{
-								{
-									RouteTableId: aws.String("rtb-0eabf071c709c0976"), // default_table
-									VpcId:        awssdk.String("vpc-0b4a6b3536da20ecd"),
-									Associations: []*ec2.RouteTableAssociation{
-										{
-											Main: awssdk.Bool(true),
-										},
-									},
-								},
-								{
-									RouteTableId: aws.String("rtb-0c55d55593f33fbac"), // table3
-								},
-							},
-						}, true)
-						return true
-					})).Return(nil)
+						},
+					},
+					{
+						RouteTableId: aws.String("rtb-0c55d55593f33fbac"), // table3
+					},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "cannot list route table",
 			dirName: "route_table_empty",
-			mocks: func(client *awstest.MockFakeEC2) {
-				client.On("DescribeRouteTablesPages",
-					&ec2.DescribeRouteTablesInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeRouteTablesOutput, lastPage bool) bool) bool {
-						callback(&ec2.DescribeRouteTablesOutput{}, true)
-						return true
-					})).Return(awserr.NewRequestFailure(nil, 403, ""))
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllRouteTables").Once().Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRouteTableResourceType),
 		},
@@ -118,7 +98,7 @@ func TestRouteTableSupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeEC2 := awstest.MockFakeEC2{}
+			fakeEC2 := repository.MockEC2Repository{}
 			c.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			s := &RouteTableSupplier{
