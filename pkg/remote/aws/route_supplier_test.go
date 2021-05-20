@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -12,7 +13,6 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -29,7 +29,7 @@ func TestRouteSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeEC2)
+		mocks   func(client *repository.MockEC2Repository)
 		err     error
 	}{
 		{
@@ -37,111 +37,91 @@ func TestRouteSupplier_Resources(t *testing.T) {
 			// as a default route will always be present in each route table
 			test:    "no route",
 			dirName: "route_empty",
-			mocks: func(client *mocks.FakeEC2) {
-				client.On("DescribeRouteTablesPages",
-					&ec2.DescribeRouteTablesInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeRouteTablesOutput, lastPage bool) bool) bool {
-						callback(&ec2.DescribeRouteTablesOutput{}, true)
-						return true
-					})).Return(nil)
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllRouteTables").Once().Return([]*ec2.RouteTable{}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "mixed default_route_table and route_table",
 			dirName: "route",
-			mocks: func(client *mocks.FakeEC2) {
-				client.On("DescribeRouteTablesPages",
-					&ec2.DescribeRouteTablesInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeRouteTablesOutput, lastPage bool) bool) bool {
-						callback(&ec2.DescribeRouteTablesOutput{
-							RouteTables: []*ec2.RouteTable{
-								{
-									RouteTableId: awssdk.String("rtb-096bdfb69309c54c3"), // table1
-									Routes: []*ec2.Route{
-										{
-											DestinationCidrBlock: awssdk.String("10.0.0.0/16"),
-											Origin:               awssdk.String("CreateRouteTable"), // default route
-										},
-										{
-											DestinationCidrBlock: awssdk.String("1.1.1.1/32"),
-											GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
-										},
-										{
-											DestinationIpv6CidrBlock: awssdk.String("::/0"),
-											GatewayId:                awssdk.String("igw-030e74f73bd67f21b"),
-										},
-									},
-								},
-								{
-									RouteTableId: awssdk.String("rtb-0169b0937fd963ddc"), // table2
-									Routes: []*ec2.Route{
-										{
-											DestinationCidrBlock: awssdk.String("10.0.0.0/16"),
-											Origin:               awssdk.String("CreateRouteTable"), // default route
-										},
-										{
-											DestinationCidrBlock: awssdk.String("0.0.0.0/0"),
-											GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
-										},
-										{
-											DestinationIpv6CidrBlock: awssdk.String("::/0"),
-											GatewayId:                awssdk.String("igw-030e74f73bd67f21b"),
-										},
-									},
-								},
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllRouteTables").Once().Return([]*ec2.RouteTable{
+					{
+						RouteTableId: awssdk.String("rtb-096bdfb69309c54c3"), // table1
+						Routes: []*ec2.Route{
+							{
+								DestinationCidrBlock: awssdk.String("10.0.0.0/16"),
+								Origin:               awssdk.String("CreateRouteTable"), // default route
 							},
-						}, false)
-						callback(&ec2.DescribeRouteTablesOutput{
-							RouteTables: []*ec2.RouteTable{
-								{
-									RouteTableId: awssdk.String("rtb-02780c485f0be93c5"), // default_table
-									VpcId:        awssdk.String("vpc-09fe5abc2309ba49d"),
-									Associations: []*ec2.RouteTableAssociation{
-										{
-											Main: awssdk.Bool(true),
-										},
-									},
-									Routes: []*ec2.Route{
-										{
-											DestinationCidrBlock: awssdk.String("10.0.0.0/16"),
-											Origin:               awssdk.String("CreateRouteTable"), // default route
-										},
-										{
-											DestinationCidrBlock: awssdk.String("10.1.1.0/24"),
-											GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
-										},
-										{
-											DestinationCidrBlock: awssdk.String("10.1.2.0/24"),
-											GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
-										},
-									},
-								},
-								{
-									RouteTableId: awssdk.String(""), // table3
-									Routes: []*ec2.Route{
-										{
-											DestinationCidrBlock: awssdk.String("10.0.0.0/16"),
-											Origin:               awssdk.String("CreateRouteTable"), // default route
-										},
-									},
-								},
+							{
+								DestinationCidrBlock: awssdk.String("1.1.1.1/32"),
+								GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
 							},
-						}, true)
-						return true
-					})).Return(nil)
+							{
+								DestinationIpv6CidrBlock: awssdk.String("::/0"),
+								GatewayId:                awssdk.String("igw-030e74f73bd67f21b"),
+							},
+						},
+					},
+					{
+						RouteTableId: awssdk.String("rtb-0169b0937fd963ddc"), // table2
+						Routes: []*ec2.Route{
+							{
+								DestinationCidrBlock: awssdk.String("10.0.0.0/16"),
+								Origin:               awssdk.String("CreateRouteTable"), // default route
+							},
+							{
+								DestinationCidrBlock: awssdk.String("0.0.0.0/0"),
+								GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
+							},
+							{
+								DestinationIpv6CidrBlock: awssdk.String("::/0"),
+								GatewayId:                awssdk.String("igw-030e74f73bd67f21b"),
+							},
+						},
+					},
+					{
+						RouteTableId: awssdk.String("rtb-02780c485f0be93c5"), // default_table
+						VpcId:        awssdk.String("vpc-09fe5abc2309ba49d"),
+						Associations: []*ec2.RouteTableAssociation{
+							{
+								Main: awssdk.Bool(true),
+							},
+						},
+						Routes: []*ec2.Route{
+							{
+								DestinationCidrBlock: awssdk.String("10.0.0.0/16"),
+								Origin:               awssdk.String("CreateRouteTable"), // default route
+							},
+							{
+								DestinationCidrBlock: awssdk.String("10.1.1.0/24"),
+								GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
+							},
+							{
+								DestinationCidrBlock: awssdk.String("10.1.2.0/24"),
+								GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
+							},
+						},
+					},
+					{
+						RouteTableId: awssdk.String(""), // table3
+						Routes: []*ec2.Route{
+							{
+								DestinationCidrBlock: awssdk.String("10.0.0.0/16"),
+								Origin:               awssdk.String("CreateRouteTable"), // default route
+							},
+						},
+					},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "cannot list route table",
 			dirName: "route_empty",
-			mocks: func(client *mocks.FakeEC2) {
-				client.On("DescribeRouteTablesPages",
-					&ec2.DescribeRouteTablesInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeRouteTablesOutput, lastPage bool) bool) bool {
-						return true
-					})).Return(awserr.NewRequestFailure(nil, 403, ""))
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllRouteTables").Once().Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRouteResourceType, resourceaws.AwsRouteTableResourceType),
 		},
@@ -161,7 +141,7 @@ func TestRouteSupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeEC2 := mocks.FakeEC2{}
+			fakeEC2 := repository.MockEC2Repository{}
 			c.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			routeDeserializer := awsdeserializer.NewRouteDeserializer()

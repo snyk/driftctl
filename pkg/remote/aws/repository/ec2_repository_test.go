@@ -688,3 +688,184 @@ func Test_ec2Repository_ListAllNatGateways(t *testing.T) {
 		})
 	}
 }
+
+func Test_ec2Repository_ListAllRouteTables(t *testing.T) {
+	tests := []struct {
+		name    string
+		mocks   func(client *MockEC2Client)
+		want    []*ec2.RouteTable
+		wantErr error
+	}{
+		{
+			name: "List only route with multiple pages",
+			mocks: func(client *MockEC2Client) {
+				client.On("DescribeRouteTablesPages",
+					&ec2.DescribeRouteTablesInput{},
+					mock.MatchedBy(func(callback func(res *ec2.DescribeRouteTablesOutput, lastPage bool) bool) bool {
+						callback(&ec2.DescribeRouteTablesOutput{
+							RouteTables: []*ec2.RouteTable{
+								{
+									RouteTableId: aws.String("rtb-096bdfb69309c54c3"), // table1
+									Routes: []*ec2.Route{
+										{
+											DestinationCidrBlock: aws.String("10.0.0.0/16"),
+											Origin:               aws.String("CreateRouteTable"), // default route
+										},
+										{
+											DestinationCidrBlock: aws.String("1.1.1.1/32"),
+											GatewayId:            aws.String("igw-030e74f73bd67f21b"),
+										},
+										{
+											DestinationIpv6CidrBlock: aws.String("::/0"),
+											GatewayId:                aws.String("igw-030e74f73bd67f21b"),
+										},
+									},
+								},
+								{
+									RouteTableId: aws.String("rtb-0169b0937fd963ddc"), // table2
+									Routes: []*ec2.Route{
+										{
+											DestinationCidrBlock: aws.String("10.0.0.0/16"),
+											Origin:               aws.String("CreateRouteTable"), // default route
+										},
+										{
+											DestinationCidrBlock: aws.String("0.0.0.0/0"),
+											GatewayId:            aws.String("igw-030e74f73bd67f21b"),
+										},
+										{
+											DestinationIpv6CidrBlock: aws.String("::/0"),
+											GatewayId:                aws.String("igw-030e74f73bd67f21b"),
+										},
+									},
+								},
+							},
+						}, false)
+						callback(&ec2.DescribeRouteTablesOutput{
+							RouteTables: []*ec2.RouteTable{
+								{
+									RouteTableId: aws.String("rtb-02780c485f0be93c5"), // default_table
+									VpcId:        aws.String("vpc-09fe5abc2309ba49d"),
+									Associations: []*ec2.RouteTableAssociation{
+										{
+											Main: aws.Bool(true),
+										},
+									},
+									Routes: []*ec2.Route{
+										{
+											DestinationCidrBlock: aws.String("10.0.0.0/16"),
+											Origin:               aws.String("CreateRouteTable"), // default route
+										},
+										{
+											DestinationCidrBlock: aws.String("10.1.1.0/24"),
+											GatewayId:            aws.String("igw-030e74f73bd67f21b"),
+										},
+										{
+											DestinationCidrBlock: aws.String("10.1.2.0/24"),
+											GatewayId:            aws.String("igw-030e74f73bd67f21b"),
+										},
+									},
+								},
+								{
+									RouteTableId: aws.String(""), // table3
+									Routes: []*ec2.Route{
+										{
+											DestinationCidrBlock: aws.String("10.0.0.0/16"),
+											Origin:               aws.String("CreateRouteTable"), // default route
+										},
+									},
+								},
+							},
+						}, true)
+						return true
+					})).Return(nil)
+			},
+			want: []*ec2.RouteTable{
+				{
+					RouteTableId: aws.String("rtb-096bdfb69309c54c3"), // table1
+					Routes: []*ec2.Route{
+						{
+							DestinationCidrBlock: aws.String("10.0.0.0/16"),
+							Origin:               aws.String("CreateRouteTable"), // default route
+						},
+						{
+							DestinationCidrBlock: aws.String("1.1.1.1/32"),
+							GatewayId:            aws.String("igw-030e74f73bd67f21b"),
+						},
+						{
+							DestinationIpv6CidrBlock: aws.String("::/0"),
+							GatewayId:                aws.String("igw-030e74f73bd67f21b"),
+						},
+					},
+				},
+				{
+					RouteTableId: aws.String("rtb-0169b0937fd963ddc"), // table2
+					Routes: []*ec2.Route{
+						{
+							DestinationCidrBlock: aws.String("10.0.0.0/16"),
+							Origin:               aws.String("CreateRouteTable"), // default route
+						},
+						{
+							DestinationCidrBlock: aws.String("0.0.0.0/0"),
+							GatewayId:            aws.String("igw-030e74f73bd67f21b"),
+						},
+						{
+							DestinationIpv6CidrBlock: aws.String("::/0"),
+							GatewayId:                aws.String("igw-030e74f73bd67f21b"),
+						},
+					},
+				},
+				{
+					RouteTableId: aws.String("rtb-02780c485f0be93c5"), // default_table
+					VpcId:        aws.String("vpc-09fe5abc2309ba49d"),
+					Associations: []*ec2.RouteTableAssociation{
+						{
+							Main: aws.Bool(true),
+						},
+					},
+					Routes: []*ec2.Route{
+						{
+							DestinationCidrBlock: aws.String("10.0.0.0/16"),
+							Origin:               aws.String("CreateRouteTable"), // default route
+						},
+						{
+							DestinationCidrBlock: aws.String("10.1.1.0/24"),
+							GatewayId:            aws.String("igw-030e74f73bd67f21b"),
+						},
+						{
+							DestinationCidrBlock: aws.String("10.1.2.0/24"),
+							GatewayId:            aws.String("igw-030e74f73bd67f21b"),
+						},
+					},
+				},
+				{
+					RouteTableId: aws.String(""), // table3
+					Routes: []*ec2.Route{
+						{
+							DestinationCidrBlock: aws.String("10.0.0.0/16"),
+							Origin:               aws.String("CreateRouteTable"), // default route
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := &MockEC2Client{}
+			tt.mocks(client)
+			r := &ec2Repository{
+				client: client,
+			}
+			got, err := r.ListAllRouteTables()
+			assert.Equal(t, tt.wantErr, err)
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}

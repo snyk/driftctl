@@ -18,6 +18,7 @@ type EC2Repository interface {
 	ListAllInternetGateways() ([]*ec2.InternetGateway, error)
 	ListAllSubnets() ([]*ec2.Subnet, []*ec2.Subnet, error)
 	ListAllNatGateways() ([]*ec2.NatGateway, error)
+	ListAllRouteTables() ([]*ec2.RouteTable, error)
 }
 
 type EC2Client interface {
@@ -175,4 +176,21 @@ func (r *ec2Repository) ListAllNatGateways() ([]*ec2.NatGateway, error) {
 	}
 
 	return result, nil
+}
+
+func (r *ec2Repository) ListAllRouteTables() ([]*ec2.RouteTable, error) {
+	var routeTables []*ec2.RouteTable
+	input := ec2.DescribeRouteTablesInput{}
+	err := r.client.DescribeRouteTablesPages(&input,
+		func(resp *ec2.DescribeRouteTablesOutput, lastPage bool) bool {
+			routeTables = append(routeTables, resp.RouteTables...)
+			return !lastPage
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return routeTables, nil
 }
