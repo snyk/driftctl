@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -11,7 +12,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 
@@ -31,55 +31,40 @@ func TestVPCSecurityGroupSupplier_Resources(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.FakeEC2)
+		mocks   func(client *repository.MockEC2Repository)
 		err     error
 	}{
 		{
 			test:    "no security groups",
 			dirName: "vpc_security_group_empty",
-			mocks: func(client *mocks.FakeEC2) {
-				client.On("DescribeSecurityGroupsPages",
-					&ec2.DescribeSecurityGroupsInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool) bool {
-						callback(&ec2.DescribeSecurityGroupsOutput{}, true)
-						return true
-					})).Return(nil)
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{}, []*ec2.SecurityGroup{}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "with security groups",
 			dirName: "vpc_security_group_multiple",
-			mocks: func(client *mocks.FakeEC2) {
-				client.On("DescribeSecurityGroupsPages",
-					&ec2.DescribeSecurityGroupsInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool) bool {
-						callback(&ec2.DescribeSecurityGroupsOutput{
-							SecurityGroups: []*ec2.SecurityGroup{
-								{
-									GroupId:   aws.String("sg-0254c038e32f25530"),
-									GroupName: aws.String("foo"),
-								},
-								{
-									GroupId:   aws.String("sg-9e0204ff"),
-									GroupName: aws.String("default"),
-								},
-							},
-						}, true)
-						return true
-					})).Return(nil)
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{
+					{
+						GroupId:   aws.String("sg-0254c038e32f25530"),
+						GroupName: aws.String("foo"),
+					},
+				}, []*ec2.SecurityGroup{
+					{
+						GroupId:   aws.String("sg-9e0204ff"),
+						GroupName: aws.String("default"),
+					},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "cannot list security groups",
 			dirName: "vpc_security_group_empty",
-			mocks: func(client *mocks.FakeEC2) {
-				client.On("DescribeSecurityGroupsPages",
-					&ec2.DescribeSecurityGroupsInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool) bool {
-						return true
-					})).Return(awserr.NewRequestFailure(nil, 403, ""))
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllSecurityGroups").Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSecurityGroupResourceType),
 		},
@@ -99,7 +84,7 @@ func TestVPCSecurityGroupSupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
-			fakeEC2 := mocks.FakeEC2{}
+			fakeEC2 := repository.MockEC2Repository{}
 			tt.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			securityGroupDeserializer := awsdeserializer.NewVPCSecurityGroupDeserializer()
