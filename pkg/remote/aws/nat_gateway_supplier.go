@@ -2,7 +2,7 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -16,7 +16,7 @@ import (
 type NatGatewaySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       ec2iface.EC2API
+	client       repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -24,14 +24,13 @@ func NewNatGatewaySupplier(provider *AWSTerraformProvider) *NatGatewaySupplier {
 	return &NatGatewaySupplier{
 		provider,
 		awsdeserializer.NewNatGatewayDeserializer(),
-		ec2.New(provider.session),
+		repository.NewEC2Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *NatGatewaySupplier) Resources() ([]resource.Resource, error) {
-
-	retrievedNatGateways, err := listNatGateways(s.client)
+	retrievedNatGateways, err := s.client.ListAllNatGateways()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsNatGatewayResourceType)
 	}
@@ -71,21 +70,4 @@ func (s *NatGatewaySupplier) readNatGateway(gateway ec2.NatGateway) (cty.Value, 
 		return cty.NilVal, err
 	}
 	return *val, nil
-}
-
-func listNatGateways(client ec2iface.EC2API) ([]*ec2.NatGateway, error) {
-	var result []*ec2.NatGateway
-	input := ec2.DescribeNatGatewaysInput{}
-	err := client.DescribeNatGatewaysPages(&input,
-		func(resp *ec2.DescribeNatGatewaysOutput, lastPage bool) bool {
-			result = append(result, resp.NatGateways...)
-			return !lastPage
-		},
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
 }
