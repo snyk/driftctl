@@ -58,29 +58,6 @@ func (_m *MockEC2Repository) ListAllAddressesAssociation() ([]string, error) {
 	return r0, r1
 }
 
-// ListAllNatGateways provides a mock function with given fields:
-func (_m *MockEC2Repository) ListAllNatGateways() ([]*ec2.NatGateway, error) {
-	ret := _m.Called()
-
-	var r0 []*ec2.NatGateway
-	if rf, ok := ret.Get(0).(func() []*ec2.NatGateway); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*ec2.NatGateway)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // ListAllImages provides a mock function with given fields:
 func (_m *MockEC2Repository) ListAllImages() ([]*ec2.Image, error) {
 	ret := _m.Called()
@@ -160,6 +137,52 @@ func (_m *MockEC2Repository) ListAllKeyPairs() ([]*ec2.KeyPairInfo, error) {
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*ec2.KeyPairInfo)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ListAllNatGateways provides a mock function with given fields:
+func (_m *MockEC2Repository) ListAllNatGateways() ([]*ec2.NatGateway, error) {
+	ret := _m.Called()
+
+	var r0 []*ec2.NatGateway
+	if rf, ok := ret.Get(0).(func() []*ec2.NatGateway); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ec2.NatGateway)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ListAllRouteTables provides a mock function with given fields:
+func (_m *MockEC2Repository) ListAllRouteTables() ([]*ec2.RouteTable, error) {
+	ret := _m.Called()
+
+	var r0 []*ec2.RouteTable
+	if rf, ok := ret.Get(0).(func() []*ec2.RouteTable); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ec2.RouteTable)
 		}
 	}
 
