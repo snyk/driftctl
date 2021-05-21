@@ -1,13 +1,10 @@
 package aws
 
 import (
-	"fmt"
-
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
-	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -20,7 +17,7 @@ import (
 type IamUserPolicySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       iamiface.IAMAPI
+	client       repository.IAMRepository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -28,34 +25,26 @@ func NewIamUserPolicySupplier(provider *AWSTerraformProvider) *IamUserPolicySupp
 	return &IamUserPolicySupplier{
 		provider,
 		awsdeserializer.NewIamUserPolicyDeserializer(),
-		iam.New(provider.session),
+		repository.NewIAMClient(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *IamUserPolicySupplier) Resources() ([]resource.Resource, error) {
-	users, err := listIamUsers(s.client, resourceaws.AwsIamUserPolicyResourceType)
+	users, err := s.client.ListAllUsers()
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, resourceaws.AwsIamUserPolicyResourceType, resourceaws.AwsIamUserResourceType)
+	}
+	policies, err := s.client.ListAllUserPolicies(users)
+	if err != nil {
+		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamUserPolicyResourceType)
 	}
 	results := make([]cty.Value, 0)
-	if len(users) > 0 {
-		policies := make([]string, 0)
-		for _, user := range users {
-			userName := *user.UserName
-			policyList, err := listIamUserPolicies(userName, s.client)
-			if err != nil {
-				return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamUserPolicyResourceType)
-			}
-			for _, polName := range policyList {
-				policies = append(policies, fmt.Sprintf("%s:%s", userName, *polName))
-			}
-		}
-
+	if len(policies) > 0 {
 		for _, policy := range policies {
-			polName := policy
+			p := policy
 			s.runner.Run(func() (cty.Value, error) {
-				return s.readRes(polName)
+				return s.readUserPolicy(p)
 			})
 		}
 		results, err = s.runner.Wait()
@@ -66,7 +55,7 @@ func (s *IamUserPolicySupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(results)
 }
 
-func (s *IamUserPolicySupplier) readRes(policyName string) (cty.Value, error) {
+func (s *IamUserPolicySupplier) readUserPolicy(policyName string) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamUserPolicyResourceType,
@@ -79,19 +68,4 @@ func (s *IamUserPolicySupplier) readRes(policyName string) (cty.Value, error) {
 	}
 
 	return *res, nil
-}
-
-func listIamUserPolicies(username string, client iamiface.IAMAPI) ([]*string, error) {
-	var policyNames []*string
-	input := &iam.ListUserPoliciesInput{
-		UserName: &username,
-	}
-	err := client.ListUserPoliciesPages(input, func(res *iam.ListUserPoliciesOutput, lastPage bool) bool {
-		policyNames = append(policyNames, res.PolicyNames...)
-		return !lastPage
-	})
-	if err != nil {
-		return nil, err
-	}
-	return policyNames, nil
 }
