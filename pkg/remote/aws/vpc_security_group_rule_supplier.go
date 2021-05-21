@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
@@ -11,7 +12,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	"github.com/hashicorp/terraform/flatmap"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -25,7 +25,7 @@ const (
 type VPCSecurityGroupRuleSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       ec2iface.EC2API
+	client       repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -33,13 +33,13 @@ func NewVPCSecurityGroupRuleSupplier(provider *AWSTerraformProvider) *VPCSecurit
 	return &VPCSecurityGroupRuleSupplier{
 		provider,
 		awsdeserializer.NewVPCSecurityGroupRuleDeserializer(),
-		ec2.New(provider.session),
+		repository.NewEC2Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *VPCSecurityGroupRuleSupplier) Resources() ([]resource.Resource, error) {
-	securityGroups, defaultSecurityGroups, err := listSecurityGroups(s.client)
+	securityGroups, defaultSecurityGroups, err := s.client.ListAllSecurityGroups()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsSecurityGroupRuleResourceType)
 	}
