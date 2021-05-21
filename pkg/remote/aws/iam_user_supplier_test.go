@@ -6,14 +6,13 @@ import (
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	awstest "github.com/cloudskiff/driftctl/test/aws"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 
 	"github.com/cloudskiff/driftctl/pkg/parallel"
-
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 
@@ -86,12 +85,17 @@ func TestIamUserSupplier_Resources(t *testing.T) {
 		providerLibrary := terraform.NewProviderLibrary()
 		supplierLibrary := resource.NewSupplierLibrary()
 
+		repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+		resourceaws.InitResourcesMetadata(repo)
+		factory := terraform.NewTerraformResourceFactory(repo)
+
+		deserializer := resource.NewDeserializer(factory)
 		if shouldUpdate {
 			provider, err := InitTestAwsProvider(providerLibrary)
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewIamUserSupplier(provider))
+			supplierLibrary.AddSupplier(NewIamUserSupplier(provider, deserializer))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
@@ -99,7 +103,6 @@ func TestIamUserSupplier_Resources(t *testing.T) {
 			c.mocks(&fakeIam)
 
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
-			deserializer := awsdeserializer.NewIamUserDeserializer()
 			s := &IamUserSupplier{
 				provider,
 				deserializer,

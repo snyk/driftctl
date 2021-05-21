@@ -4,10 +4,9 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -17,15 +16,15 @@ import (
 
 type EC2KeyPairSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2KeyPairSupplier(provider *AWSTerraformProvider) *EC2KeyPairSupplier {
+func NewEC2KeyPairSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *EC2KeyPairSupplier {
 	return &EC2KeyPairSupplier{
 		provider,
-		awsdeserializer.NewEC2KeyPairDeserializer(),
+		deserializer,
 		repository.NewEC2Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -49,7 +48,7 @@ func (s *EC2KeyPairSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsKeyPairResourceType, results)
 }
 
 func (s *EC2KeyPairSupplier) readKeyPair(name string) (cty.Value, error) {

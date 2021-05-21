@@ -1,14 +1,15 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/sirupsen/logrus"
@@ -17,15 +18,15 @@ import (
 
 type IamRolePolicyAttachmentSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       iamiface.IAMAPI
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamRolePolicyAttachmentSupplier(provider *AWSTerraformProvider) *IamRolePolicyAttachmentSupplier {
+func NewIamRolePolicyAttachmentSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *IamRolePolicyAttachmentSupplier {
 	return &IamRolePolicyAttachmentSupplier{
 		provider,
-		awsdeserializer.NewIamRolePolicyAttachmentDeserializer(),
+		deserializer,
 		iam.New(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -63,14 +64,14 @@ func (s *IamRolePolicyAttachmentSupplier) Resources() ([]resource.Resource, erro
 		}
 	}
 
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsIamRolePolicyAttachmentResourceType, results)
 }
 
 func (s *IamRolePolicyAttachmentSupplier) readRes(attachedPol attachedRolePolicy) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamRolePolicyAttachmentResourceType,
-			ID: *attachedPol.PolicyName,
+			ID: fmt.Sprintf("%s-%s", *attachedPol.PolicyName, attachedPol.RoleName),
 			Attributes: map[string]string{
 				"role":       attachedPol.RoleName,
 				"policy_arn": *attachedPol.PolicyArn,

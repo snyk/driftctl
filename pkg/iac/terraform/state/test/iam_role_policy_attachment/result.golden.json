@@ -1,7 +1,7 @@
 [
  {
-  "Id": "test-role2-arn:aws:iam::526954929923:policy/test-policy2",
-  "Type": "aws_iam_policy_attachment",
+  "Id": "test-role2-20201118162909011200000002",
+  "Type": "aws_iam_role_policy_attachment",
   "Attrs": {
    "id": "test-role2-20201118162909011200000002",
    "policy_arn": "arn:aws:iam::526954929923:policy/test-policy2",
@@ -9,8 +9,8 @@
   }
  },
  {
-  "Id": "test-role-arn:aws:iam::526954929923:policy/test-policy",
-  "Type": "aws_iam_policy_attachment",
+  "Id": "test-role-20201118162849968800000001",
+  "Type": "aws_iam_role_policy_attachment",
   "Attrs": {
    "id": "test-role-20201118162849968800000001",
    "policy_arn": "arn:aws:iam::526954929923:policy/test-policy",
@@ -18,8 +18,8 @@
   }
  },
  {
-  "Id": "test-role-arn:aws:iam::526954929923:policy/test-policy2",
-  "Type": "aws_iam_policy_attachment",
+  "Id": "test-role-20201118162849994600000002",
+  "Type": "aws_iam_role_policy_attachment",
   "Attrs": {
    "id": "test-role-20201118162849994600000002",
    "policy_arn": "arn:aws:iam::526954929923:policy/test-policy2",
@@ -27,8 +27,8 @@
   }
  },
  {
-  "Id": "test-role2-arn:aws:iam::526954929923:policy/test-policy",
-  "Type": "aws_iam_policy_attachment",
+  "Id": "test-role2-20201118162908999800000001",
+  "Type": "aws_iam_role_policy_attachment",
   "Attrs": {
    "id": "test-role2-20201118162908999800000001",
    "policy_arn": "arn:aws:iam::526954929923:policy/test-policy",

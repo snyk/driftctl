@@ -4,50 +4,48 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/test/schemas"
 	"github.com/hashicorp/terraform/providers"
-	"github.com/zclconf/go-cty/cty"
 )
 
 type FakeResource struct {
-	Id        string `cty:"id"`
-	FooBar    string `cty:"foo_bar"`
-	BarFoo    string `cty:"bar_foo" computed:"true"`
-	Json      string `cty:"json" jsonstring:"true"`
-	Type      string
-	Tags      map[string]string `cty:"tags"`
-	CustomMap map[string]struct {
-		Tag string `cty:"tag"`
-	} `cty:"custom_map"`
-	Slice  []string `cty:"slice"`
-	Struct struct {
-		Baz string `cty:"baz" computed:"true"`
-		Bar string `cty:"bar"`
-	} `cty:"struct"`
-	StructSlice []struct {
-		String string   `cty:"string" computed:"true"`
-		Array  []string `cty:"array" computed:"true"`
-	} `cty:"struct_slice"`
-	CtyVal *cty.Value `diff:"-"`
+	Id    string
+	Type  string
+	Attrs *resource.Attributes
 }
 
-func (d FakeResource) TerraformId() string {
+func (d *FakeResource) Schema() *resource.Schema {
+	return nil
+}
+
+func (d *FakeResource) TerraformId() string {
 	return d.Id
 }
 
-func (d FakeResource) TerraformType() string {
+func (d *FakeResource) TerraformType() string {
 	if d.Type != "" {
 		return d.Type
 	}
 	return "FakeResource"
 }
 
-func (r FakeResource) CtyValue() *cty.Value {
-	return r.CtyVal
+func (d *FakeResource) Attributes() *resource.Attributes {
+	return d.Attrs
 }
 
 type FakeResourceStringer struct {
-	Id     string
-	Name   string
-	CtyVal *cty.Value `diff:"-"`
+	Id    string
+	Attrs *resource.Attributes
+}
+
+func (d *FakeResourceStringer) Schema() *resource.Schema {
+	return nil
+}
+
+func (d *FakeResourceStringer) HumanReadableAttributes() map[string]string {
+	attrs := make(map[string]string)
+	if name := d.Attributes().GetString("name"); name != nil && *name != "" {
+		attrs["Name"] = *name
+	}
+	return attrs
 }
 
 func (d *FakeResourceStringer) TerraformId() string {
@@ -58,16 +56,8 @@ func (d *FakeResourceStringer) TerraformType() string {
 	return "FakeResourceStringer"
 }
 
-func (r *FakeResourceStringer) CtyValue() *cty.Value {
-	return r.CtyVal
-}
-
-func (d *FakeResourceStringer) Attributes() map[string]string {
-	attrs := make(map[string]string)
-	if d.Name != "" {
-		attrs["Name"] = d.Name
-	}
-	return attrs
+func (d *FakeResourceStringer) Attributes() *resource.Attributes {
+	return d.Attrs
 }
 
 func InitFakeSchemaRepository(provider, version string) resource.SchemaRepositoryInterface {

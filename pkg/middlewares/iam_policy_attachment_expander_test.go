@@ -33,7 +33,8 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 					aws.AwsIamPolicyAttachmentResourceType,
 					"jean-arn",
 					map[string]interface{}{
-						"users": []string{"jean"},
+						"policy_arn": "arn",
+						"users":      []interface{}{"jean"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "jean-arn",
@@ -44,7 +45,8 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 					aws.AwsIamPolicyAttachmentResourceType,
 					"paul-arn",
 					map[string]interface{}{
-						"users": []string{"paul"},
+						"policy_arn": "arn",
+						"users":      []interface{}{"paul"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "paul-arn",
@@ -55,7 +57,8 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 					aws.AwsIamPolicyAttachmentResourceType,
 					"pierre-arn",
 					map[string]interface{}{
-						"users": []string{"pierre"},
+						"policy_arn": "arn",
+						"users":      []interface{}{"pierre"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "pierre-arn",
@@ -66,7 +69,8 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 					aws.AwsIamPolicyAttachmentResourceType,
 					"jean-thisisarn",
 					map[string]interface{}{
-						"users": []string{"jean"},
+						"policy_arn": "thisisarn",
+						"users":      []interface{}{"jean"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "jean-thisisarn",
@@ -77,7 +81,8 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 					aws.AwsIamPolicyAttachmentResourceType,
 					"paul-thisisarn",
 					map[string]interface{}{
-						"users": []string{"paul"},
+						"policy_arn": "thisisarn",
+						"users":      []interface{}{"paul"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "paul-thisisarn",
@@ -88,7 +93,8 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 					aws.AwsIamPolicyAttachmentResourceType,
 					"jacques-thisisarn",
 					map[string]interface{}{
-						"users": []string{"jacques"},
+						"policy_arn": "thisisarn",
+						"users":      []interface{}{"jacques"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "jacques-thisisarn",
@@ -99,7 +105,8 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 					aws.AwsIamPolicyAttachmentResourceType,
 					"jean-fromstatearn",
 					map[string]interface{}{
-						"users": []string{"jean"},
+						"policy_arn": "fromstatearn",
+						"users":      []interface{}{"jean"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "jean-fromstatearn",
@@ -186,7 +193,8 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 					aws.AwsIamPolicyAttachmentResourceType,
 					"role1-arn",
 					map[string]interface{}{
-						"roles": []string{"role1"},
+						"policy_arn": "arn",
+						"roles":      []interface{}{"role1"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "role1-arn",
@@ -197,7 +205,8 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 					aws.AwsIamPolicyAttachmentResourceType,
 					"role2-arn",
 					map[string]interface{}{
-						"roles": []string{"role2"},
+						"policy_arn": "arn",
+						"roles":      []interface{}{"role2"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "role2-arn",
@@ -208,7 +217,8 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 					aws.AwsIamPolicyAttachmentResourceType,
 					"pierre-arn",
 					map[string]interface{}{
-						"roles": []string{"pierre"},
+						"policy_arn": "arn",
+						"roles":      []interface{}{"pierre"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "pierre-arn",
@@ -219,7 +229,8 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 					aws.AwsIamPolicyAttachmentResourceType,
 					"role1-thisisarn",
 					map[string]interface{}{
-						"roles": []string{"role1"},
+						"policy_arn": "thisisarn",
+						"roles":      []interface{}{"role1"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "role1-thisisarn",
@@ -230,7 +241,8 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 					aws.AwsIamPolicyAttachmentResourceType,
 					"role2-thisisarn",
 					map[string]interface{}{
-						"roles": []string{"role2"},
+						"policy_arn": "thisisarn",
+						"roles":      []interface{}{"role2"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "role2-thisisarn",
@@ -241,7 +253,8 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 					aws.AwsIamPolicyAttachmentResourceType,
 					"role3-thisisarn",
 					map[string]interface{}{
-						"roles": []string{"role3"},
+						"policy_arn": "thisisarn",
+						"roles":      []interface{}{"role3"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "role3-thisisarn",
@@ -252,7 +265,8 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 					aws.AwsIamPolicyAttachmentResourceType,
 					"role1-fromstatearn",
 					map[string]interface{}{
-						"roles": []string{"role1"},
+						"policy_arn": "fromstatearn",
+						"roles":      []interface{}{"role1"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "role1-fromstatearn",

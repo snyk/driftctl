@@ -88,8 +88,9 @@ func TestGetIACSupplier(t *testing.T) {
 			progress.On("Start").Return().Times(1)
 
 			repo := resource.InitFakeSchemaRepository("aws", "3.19.0")
+			factory := terraform.NewTerraformResourceFactory(repo)
 
-			_, err := GetIACSupplier(tt.args.config, terraform.NewProviderLibrary(), tt.args.options, progress, repo)
+			_, err := GetIACSupplier(tt.args.config, terraform.NewProviderLibrary(), tt.args.options, progress, factory)
 			if tt.wantErr != nil && err.Error() != tt.wantErr.Error() {
 				t.Errorf("GetIACSupplier() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -14,8 +14,9 @@ type AttributeSchema struct {
 }
 
 type Schema struct {
-	Attributes    map[string]AttributeSchema
-	NormalizeFunc func(res *AbstractResource)
+	Attributes                  map[string]AttributeSchema
+	NormalizeFunc               func(res *AbstractResource)
+	HumanReadableAttributesFunc func(res *AbstractResource) map[string]string
 }
 
 func (s *Schema) IsComputedField(path []string) bool {
@@ -38,6 +39,7 @@ type SchemaRepositoryInterface interface {
 	GetSchema(resourceType string) (*Schema, bool)
 	UpdateSchema(typ string, schemasMutators map[string]func(attributeSchema *AttributeSchema))
 	SetNormalizeFunc(typ string, normalizeFunc func(res *AbstractResource))
+	SetHumanReadableAttributesFunc(typ string, humanReadableAttributesFunc func(res *AbstractResource) map[string]string)
 }
 
 type SchemaRepository struct {
@@ -108,4 +110,13 @@ func (r *SchemaRepository) SetNormalizeFunc(typ string, normalizeFunc func(res *
 		return
 	}
 	(*metadata).NormalizeFunc = normalizeFunc
+}
+
+func (r *SchemaRepository) SetHumanReadableAttributesFunc(typ string, humanReadableAttributesFunc func(res *AbstractResource) map[string]string) {
+	metadata, exist := r.GetSchema(typ)
+	if !exist {
+		logrus.WithFields(logrus.Fields{"type": typ}).Warning("Unable to add human readable attributes, no schema found")
+		return
+	}
+	(*metadata).HumanReadableAttributesFunc = humanReadableAttributesFunc
 }

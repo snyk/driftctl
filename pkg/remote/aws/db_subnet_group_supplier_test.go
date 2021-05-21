@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
@@ -13,8 +14,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/stretchr/testify/assert"
-
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 
@@ -75,17 +74,22 @@ func TestDBSubnetGroupSupplier_Resources(t *testing.T) {
 		providerLibrary := terraform.NewProviderLibrary()
 		supplierLibrary := resource.NewSupplierLibrary()
 
+		repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+		resourceaws.InitResourcesMetadata(repo)
+		factory := terraform.NewTerraformResourceFactory(repo)
+
+		deserializer := resource.NewDeserializer(factory)
+
 		if shouldUpdate {
 			provider, err := InitTestAwsProvider(providerLibrary)
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewDBInstanceSupplier(provider))
+			supplierLibrary.AddSupplier(NewDBInstanceSupplier(provider, deserializer))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
-			deserializer := awsdeserializer.NewDBSubnetGroupDeserializer()
 			client := &repository.MockRDSRepository{}
 			tt.mocks(client)
 			s := &DBSubnetGroupSupplier{

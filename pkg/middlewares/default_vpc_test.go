@@ -43,8 +43,12 @@ func TestAwsDefaultVPCShouldNotBeIgnoredWhenManaged(t *testing.T) {
 		},
 	}
 	stateResources := []resource.Resource{
-		&aws.AwsDefaultVpc{
-			Id: "foobar",
+		&resource.AbstractResource{
+			Id:   "foobar",
+			Type: aws.AwsDefaultVpcResourceType,
+			Attrs: &resource.Attributes{
+				"id": "foobar",
+			},
 		},
 	}
 	err := middleware.Execute(&remoteResources, &stateResources)

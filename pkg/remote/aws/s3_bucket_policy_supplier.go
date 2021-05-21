@@ -2,28 +2,27 @@ package aws
 
 import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/zclconf/go-cty/cty"
 )
 
 type S3BucketPolicySupplier struct {
 	reader         terraform.ResourceReader
-	deserializer   deserializer.CTYDeserializer
+	deserializer   *resource.Deserializer
 	repository     repository.S3Repository
 	runner         *terraform.ParallelResourceReader
 	providerConfig tf.TerraformProviderConfig
 }
 
-func NewS3BucketPolicySupplier(provider *AWSTerraformProvider, repository repository.S3Repository) *S3BucketPolicySupplier {
+func NewS3BucketPolicySupplier(provider *AWSTerraformProvider, repository repository.S3Repository, deserializer *resource.Deserializer) *S3BucketPolicySupplier {
 	return &S3BucketPolicySupplier{
 		provider,
-		awsdeserializer.NewS3BucketPolicyDeserializer(),
+		deserializer,
 		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		provider.Config,
@@ -67,18 +66,18 @@ func (s *S3BucketPolicySupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	deserializedValues, err := s.deserializer.Deserialize(ctyVals)
+	deserializedValues, err := s.deserializer.Deserialize(aws.AwsS3BucketPolicyResourceType, ctyVals)
 	results := make([]resource.Resource, 0, len(deserializedValues))
 	if err != nil {
 		return deserializedValues, err
 	}
 	for _, val := range deserializedValues {
-		res, ok := val.(*aws.AwsS3BucketPolicy)
-		if ok {
-			if res.Policy != nil && *res.Policy != "" {
-				results = append(results, res)
-			}
+		res, _ := val.(*resource.AbstractResource)
+		policy, _ := res.Attrs.Get("policy")
+		if policy != nil && policy != "" {
+			results = append(results, res)
 		}
+
 	}
 	return results, nil
 }

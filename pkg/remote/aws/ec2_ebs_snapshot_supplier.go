@@ -4,10 +4,9 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -18,15 +17,15 @@ import (
 
 type EC2EbsSnapshotSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2EbsSnapshotSupplier(provider *AWSTerraformProvider) *EC2EbsSnapshotSupplier {
+func NewEC2EbsSnapshotSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *EC2EbsSnapshotSupplier {
 	return &EC2EbsSnapshotSupplier{
 		provider,
-		awsdeserializer.NewEC2EbsSnapshotDeserializer(),
+		deserializer,
 		repository.NewEC2Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -50,7 +49,7 @@ func (s *EC2EbsSnapshotSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsEbsSnapshotResourceType, results)
 }
 
 func (s *EC2EbsSnapshotSupplier) readEbsSnapshot(snapshot ec2.Snapshot) (cty.Value, error) {

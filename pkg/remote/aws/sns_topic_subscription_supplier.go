@@ -12,10 +12,9 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
@@ -35,16 +34,16 @@ func (p *pendingTopicAlert) ShouldIgnoreResource() bool {
 
 type SNSTopicSubscriptionSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.SNSRepository
 	runner       *terraform.ParallelResourceReader
 	alerter      alerter.AlerterInterface
 }
 
-func NewSNSTopicSubscriptionSupplier(provider *AWSTerraformProvider, a alerter.AlerterInterface) *SNSTopicSubscriptionSupplier {
+func NewSNSTopicSubscriptionSupplier(provider *AWSTerraformProvider, a alerter.AlerterInterface, deserializer *resource.Deserializer) *SNSTopicSubscriptionSupplier {
 	return &SNSTopicSubscriptionSupplier{
 		provider,
-		awsdeserializer.NewSNSTopicSubscriptionDeserializer(),
+		deserializer,
 		repository.NewSNSClient(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		a,
@@ -68,7 +67,7 @@ func (s *SNSTopicSubscriptionSupplier) Resources() ([]resource.Resource, error) 
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(retrieve)
+	return s.deserializer.Deserialize(aws.AwsSnsTopicSubscriptionResourceType, retrieve)
 }
 
 func (s *SNSTopicSubscriptionSupplier) readTopicSubscription(subscription *sns.Subscription, alertr alerter.AlerterInterface) (cty.Value, error) {

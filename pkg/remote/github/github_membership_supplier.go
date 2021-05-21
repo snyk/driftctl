@@ -1,11 +1,9 @@
 package github
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourcegithub "github.com/cloudskiff/driftctl/pkg/resource/github"
-	ghdeserializer "github.com/cloudskiff/driftctl/pkg/resource/github/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -13,15 +11,15 @@ import (
 
 type GithubMembershipSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	repository   GithubRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewGithubMembershipSupplier(provider *GithubTerraformProvider, repository GithubRepository) *GithubMembershipSupplier {
+func NewGithubMembershipSupplier(provider *GithubTerraformProvider, repository GithubRepository, deserializer *resource.Deserializer) *GithubMembershipSupplier {
 	return &GithubMembershipSupplier{
 		provider,
-		ghdeserializer.NewGithubMembershipDeserializer(),
+		deserializer,
 		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -55,5 +53,5 @@ func (s GithubMembershipSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourcegithub.GithubMembershipResourceType, results)
 }

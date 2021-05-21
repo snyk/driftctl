@@ -3,10 +3,9 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/hashicorp/terraform/flatmap"
 	"github.com/sirupsen/logrus"
@@ -14,16 +13,16 @@ import (
 )
 
 type RouteSupplier struct {
-	reader            terraform.ResourceReader
-	routeDeserializer deserializer.CTYDeserializer
-	client            ec2iface.EC2API
-	routeRunner       *terraform.ParallelResourceReader
+	reader       terraform.ResourceReader
+	deserializer *resource.Deserializer
+	client       ec2iface.EC2API
+	routeRunner  *terraform.ParallelResourceReader
 }
 
-func NewRouteSupplier(provider *AWSTerraformProvider) *RouteSupplier {
+func NewRouteSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *RouteSupplier {
 	return &RouteSupplier{
 		provider,
-		awsdeserializer.NewRouteDeserializer(),
+		deserializer,
 		ec2.New(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -51,7 +50,7 @@ func (s *RouteSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	deserializedRoutes, err := s.routeDeserializer.Deserialize(routeResources)
+	deserializedRoutes, err := s.deserializer.Deserialize(aws.AwsRouteResourceType, routeResources)
 	if err != nil {
 		return nil, err
 	}

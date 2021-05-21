@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/aws/aws-sdk-go/service/sns"
 
@@ -16,8 +17,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 
 	"github.com/cloudskiff/driftctl/pkg/parallel"
-
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
@@ -90,13 +89,18 @@ func TestSNSTopicSubscriptionSupplier_Resources(t *testing.T) {
 		providerLibrary := terraform.NewProviderLibrary()
 		supplierLibrary := resource.NewSupplierLibrary()
 
+		repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+		resourceaws.InitResourcesMetadata(repo)
+		factory := terraform.NewTerraformResourceFactory(repo)
+
+		deserializer := resource.NewDeserializer(factory)
 		if shouldUpdate {
 			a := alerter.NewAlerter()
 			provider, err := InitTestAwsProvider(providerLibrary)
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewSNSTopicSubscriptionSupplier(provider, a))
+			supplierLibrary.AddSupplier(NewSNSTopicSubscriptionSupplier(provider, a, deserializer))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
@@ -104,10 +108,9 @@ func TestSNSTopicSubscriptionSupplier_Resources(t *testing.T) {
 			fakeClient := mocks.SNSRepository{}
 			c.mocks(&fakeClient)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
-			topicSubscriptionDeserializer := awsdeserializer.NewSNSTopicSubscriptionDeserializer()
 			s := &SNSTopicSubscriptionSupplier{
 				provider,
-				topicSubscriptionDeserializer,
+				deserializer,
 				&fakeClient,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 				a,
@@ -120,7 +123,7 @@ func TestSNSTopicSubscriptionSupplier_Resources(t *testing.T) {
 			}
 			assert.Equal(tt, c.alerts, a.Retrieve())
 			mock.AssertExpectationsForObjects(tt)
-			test.CtyTestDiff(got, c.dirName, provider, topicSubscriptionDeserializer, shouldUpdate, tt)
+			test.CtyTestDiff(got, c.dirName, provider, deserializer, shouldUpdate, tt)
 		})
 	}
 }

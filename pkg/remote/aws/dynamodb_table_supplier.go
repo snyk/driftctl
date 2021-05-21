@@ -6,24 +6,23 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
 type DynamoDBTableSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	repository   repository.DynamoDBRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewDynamoDBTableSupplier(provider *AWSTerraformProvider) *DynamoDBTableSupplier {
+func NewDynamoDBTableSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *DynamoDBTableSupplier {
 	return &DynamoDBTableSupplier{
 		provider,
-		awsdeserializer.NewDynamoDBTableDeserializer(),
+		deserializer,
 		repository.NewDynamoDBRepository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -47,7 +46,7 @@ func (s *DynamoDBTableSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(retrieve)
+	return s.deserializer.Deserialize(aws.AwsDynamodbTableResourceType, retrieve)
 }
 
 func (s *DynamoDBTableSupplier) readTable(tableName *string) (cty.Value, error) {

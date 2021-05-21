@@ -3,11 +3,10 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -15,15 +14,15 @@ import (
 
 type LambdaEventSourceMappingSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.LambdaRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewLambdaEventSourceMappingSupplier(provider *AWSTerraformProvider) *LambdaEventSourceMappingSupplier {
+func NewLambdaEventSourceMappingSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *LambdaEventSourceMappingSupplier {
 	return &LambdaEventSourceMappingSupplier{
 		provider,
-		awsdeserializer.NewLambdaEventSourceMappingDeserializer(),
+		deserializer,
 		repository.NewLambdaRepository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -46,7 +45,7 @@ func (s *LambdaEventSourceMappingSupplier) Resources() ([]resource.Resource, err
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsLambdaEventSourceMappingResourceType, results)
 }
 
 func (s *LambdaEventSourceMappingSupplier) readLambdaEventSourceMapping(sourceMappingConfig lambda.EventSourceMappingConfiguration) (cty.Value, error) {

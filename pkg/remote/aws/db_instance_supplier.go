@@ -2,11 +2,9 @@ package aws
 
 import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/sirupsen/logrus"
@@ -15,15 +13,15 @@ import (
 
 type DBInstanceSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.RDSRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewDBInstanceSupplier(provider *AWSTerraformProvider) *DBInstanceSupplier {
+func NewDBInstanceSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *DBInstanceSupplier {
 	return &DBInstanceSupplier{
 		provider,
-		awsdeserializer.NewDBInstanceDeserializer(),
+		deserializer,
 		repository.NewRDSRepository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -57,5 +55,5 @@ func (s *DBInstanceSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsDbInstanceResourceType, results)
 }

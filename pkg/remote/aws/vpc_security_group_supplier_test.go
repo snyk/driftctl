@@ -6,6 +6,7 @@ import (
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	awstest "github.com/cloudskiff/driftctl/test/aws"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -13,9 +14,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
-
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 
@@ -90,24 +88,26 @@ func TestVPCSecurityGroupSupplier_Resources(t *testing.T) {
 		providerLibrary := terraform.NewProviderLibrary()
 		supplierLibrary := resource.NewSupplierLibrary()
 
+		repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+		resourceaws.InitResourcesMetadata(repo)
+		factory := terraform.NewTerraformResourceFactory(repo)
+
+		deserializer := resource.NewDeserializer(factory)
 		if shouldUpdate {
 			provider, err := InitTestAwsProvider(providerLibrary)
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewVPCSecurityGroupSupplier(provider))
+			supplierLibrary.AddSupplier(NewVPCSecurityGroupSupplier(provider, deserializer))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
 			fakeEC2 := awstest.MockFakeEC2{}
 			tt.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
-			securityGroupDeserializer := awsdeserializer.NewVPCSecurityGroupDeserializer()
-			defaultSecurityGroupDeserializer := awsdeserializer.NewDefaultSecurityGroupDeserializer()
 			s := &VPCSecurityGroupSupplier{
 				provider,
-				defaultSecurityGroupDeserializer,
-				securityGroupDeserializer,
+				deserializer,
 				&fakeEC2,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
@@ -116,8 +116,7 @@ func TestVPCSecurityGroupSupplier_Resources(t *testing.T) {
 			assert.Equal(t, tt.err, err)
 
 			mock.AssertExpectationsForObjects(t)
-			deserializers := []deserializer.CTYDeserializer{securityGroupDeserializer, defaultSecurityGroupDeserializer}
-			test.CtyTestDiffMixed(got, tt.dirName, provider, deserializers, shouldUpdate, t)
+			test.CtyTestDiff(got, tt.dirName, provider, deserializer, shouldUpdate, t)
 		})
 	}
 }

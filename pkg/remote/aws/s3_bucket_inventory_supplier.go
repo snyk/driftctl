@@ -5,28 +5,27 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/zclconf/go-cty/cty"
 )
 
 type S3BucketInventorySupplier struct {
 	reader         terraform.ResourceReader
-	deserializer   deserializer.CTYDeserializer
+	deserializer   *resource.Deserializer
 	repository     repository.S3Repository
 	runner         *terraform.ParallelResourceReader
 	providerConfig tf.TerraformProviderConfig
 }
 
-func NewS3BucketInventorySupplier(provider *AWSTerraformProvider, repository repository.S3Repository) *S3BucketInventorySupplier {
+func NewS3BucketInventorySupplier(provider *AWSTerraformProvider, repository repository.S3Repository, deserializer *resource.Deserializer) *S3BucketInventorySupplier {
 	return &S3BucketInventorySupplier{
 		provider,
-		awsdeserializer.NewS3BucketInventoryDeserializer(),
+		deserializer,
 		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		provider.Config,
@@ -57,7 +56,7 @@ func (s *S3BucketInventorySupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(ctyVals)
+	return s.deserializer.Deserialize(aws.AwsS3BucketInventoryResourceType, ctyVals)
 }
 
 func (s *S3BucketInventorySupplier) listBucketInventoryConfiguration(bucket *s3.Bucket, region string) error {

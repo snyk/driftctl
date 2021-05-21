@@ -20,8 +20,9 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 		{
 			"default internet gateway route is not ignored when managed by IaC",
 			[]resource.Resource{
-				&aws.AwsDefaultVpc{
-					Id: "default-vpc",
+				&resource.AbstractResource{
+					Id:   "default-vpc",
+					Type: aws.AwsDefaultVpcResourceType,
 				},
 				&resource.AbstractResource{
 					Id:   "default-igw",
@@ -65,8 +66,9 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsDefaultVpc{
-					Id: "default-vpc",
+				&resource.AbstractResource{
+					Id:   "default-vpc",
+					Type: aws.AwsDefaultVpcResourceType,
 				},
 				&resource.AbstractResource{
 					Id:   "default-igw",
@@ -103,8 +105,9 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 		{
 			"default internet gateway route is ignored when not managed by IaC",
 			[]resource.Resource{
-				&aws.AwsDefaultVpc{
-					Id: "default-vpc",
+				&resource.AbstractResource{
+					Id:   "default-vpc",
+					Type: aws.AwsDefaultVpcResourceType,
 				},
 				&resource.AbstractResource{
 					Id:   "default-igw",
@@ -158,8 +161,9 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 			},
 			[]resource.Resource{},
 			[]resource.Resource{
-				&aws.AwsDefaultVpc{
-					Id: "default-vpc",
+				&resource.AbstractResource{
+					Id:   "default-vpc",
+					Type: aws.AwsDefaultVpcResourceType,
 				},
 				&resource.AbstractResource{
 					Id:   "default-igw",

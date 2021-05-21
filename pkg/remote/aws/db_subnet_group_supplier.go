@@ -2,10 +2,9 @@ package aws
 
 import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/aws/aws-sdk-go/service/rds"
@@ -18,15 +17,15 @@ import (
 
 type DBSubnetGroupSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.RDSRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewDBSubnetGroupSupplier(provider *AWSTerraformProvider) *DBSubnetGroupSupplier {
+func NewDBSubnetGroupSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *DBSubnetGroupSupplier {
 	return &DBSubnetGroupSupplier{
 		provider,
-		awsdeserializer.NewDBSubnetGroupDeserializer(),
+		deserializer,
 		repository.NewRDSRepository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -50,7 +49,7 @@ func (s *DBSubnetGroupSupplier) Resources() ([]resource.Resource, error) {
 	if err != nil {
 		return nil, err
 	}
-	return s.deserializer.Deserialize(ctyValues)
+	return s.deserializer.Deserialize(aws.AwsDbSubnetGroupResourceType, ctyValues)
 }
 
 func (s *DBSubnetGroupSupplier) readSubnetGroup(subnetGroup rds.DBSubnetGroup) (cty.Value, error) {

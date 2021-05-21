@@ -2,22 +2,31 @@ package output
 
 import (
 	"fmt"
+	"sort"
 )
 
 type AttributesGetter interface {
-	Attributes() map[string]string
+	HumanReadableAttributes() map[string]string
 }
 
 func HumanizeAttribute(res AttributesGetter) string {
-	if len(res.Attributes()) <= 0 {
+	attributes := res.HumanReadableAttributes()
+	if len(attributes) <= 0 {
 		return ""
 	}
+	// sort attributes
+	keys := make([]string, 0, len(attributes))
+	for k := range attributes {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	// retrieve stringer
 	attrString := ""
-	for key, value := range res.Attributes() {
+	for _, k := range keys {
 		if attrString != "" {
 			attrString += ", "
 		}
-		attrString += fmt.Sprintf("%s: %s", key, value)
+		attrString += fmt.Sprintf("%s: %s", k, attributes[k])
 	}
 	return attrString
 }

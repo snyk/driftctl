@@ -6,9 +6,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
-
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -19,15 +16,15 @@ import (
 
 type Route53RecordSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.Route53Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewRoute53RecordSupplier(provider *AWSTerraformProvider) *Route53RecordSupplier {
+func NewRoute53RecordSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *Route53RecordSupplier {
 	return &Route53RecordSupplier{
 		provider,
-		awsdeserializer.NewRoute53RecordDeserializer(),
+		deserializer,
 		repository.NewRoute53Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner())}
 }
@@ -49,7 +46,7 @@ func (s *Route53RecordSupplier) Resources() ([]resource.Resource, error) {
 	if err != nil {
 		return nil, err
 	}
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsRoute53RecordResourceType, results)
 }
 
 func (s *Route53RecordSupplier) listZones() ([][2]string, error) {

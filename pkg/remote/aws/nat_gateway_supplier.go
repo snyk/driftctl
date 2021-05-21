@@ -3,11 +3,10 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -15,15 +14,15 @@ import (
 
 type NatGatewaySupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       ec2iface.EC2API
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewNatGatewaySupplier(provider *AWSTerraformProvider) *NatGatewaySupplier {
+func NewNatGatewaySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *NatGatewaySupplier {
 	return &NatGatewaySupplier{
 		provider,
-		awsdeserializer.NewNatGatewayDeserializer(),
+		deserializer,
 		ec2.New(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -50,7 +49,7 @@ func (s *NatGatewaySupplier) Resources() ([]resource.Resource, error) {
 	}
 
 	// Deserialize
-	resources, err := s.deserializer.Deserialize(natGatewayResources)
+	resources, err := s.deserializer.Deserialize(aws.AwsNatGatewayResourceType, natGatewayResources)
 	if err != nil {
 		return nil, err
 	}

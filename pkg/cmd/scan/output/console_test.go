@@ -8,12 +8,10 @@ import (
 	"path"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/zclconf/go-cty/cty/gocty"
-
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 )
@@ -81,73 +79,6 @@ func TestConsole_Write(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 			aws.InitResourcesMetadata(repo)
-			for _, res := range tt.args.analysis.Managed() {
-				fakeRes, ok := res.(*testresource.FakeResource)
-				if ok {
-					impliedType, _ := gocty.ImpliedType(fakeRes)
-					value, _ := gocty.ToCtyValue(fakeRes, impliedType)
-					fakeRes.CtyVal = &value
-					continue
-				}
-				fakeStringerRes, ok := res.(*testresource.FakeResourceStringer)
-				if ok {
-					impliedType, _ := gocty.ImpliedType(fakeStringerRes)
-					value, _ := gocty.ToCtyValue(fakeStringerRes, impliedType)
-					fakeStringerRes.CtyVal = &value
-					continue
-				}
-			}
-
-			for _, res := range tt.args.analysis.Unmanaged() {
-				fakeRes, ok := res.(*testresource.FakeResource)
-				if ok {
-					impliedType, _ := gocty.ImpliedType(fakeRes)
-					value, _ := gocty.ToCtyValue(fakeRes, impliedType)
-					fakeRes.CtyVal = &value
-					continue
-				}
-				fakeStringerRes, ok := res.(*testresource.FakeResourceStringer)
-				if ok {
-					impliedType, _ := gocty.ImpliedType(fakeStringerRes)
-					value, _ := gocty.ToCtyValue(fakeStringerRes, impliedType)
-					fakeStringerRes.CtyVal = &value
-					continue
-				}
-			}
-
-			for _, res := range tt.args.analysis.Deleted() {
-				fakeRes, ok := res.(*testresource.FakeResource)
-				if ok {
-					impliedType, _ := gocty.ImpliedType(fakeRes)
-					value, _ := gocty.ToCtyValue(fakeRes, impliedType)
-					fakeRes.CtyVal = &value
-					continue
-				}
-				fakeStringerRes, ok := res.(*testresource.FakeResourceStringer)
-				if ok {
-					impliedType, _ := gocty.ImpliedType(fakeStringerRes)
-					value, _ := gocty.ToCtyValue(fakeStringerRes, impliedType)
-					fakeStringerRes.CtyVal = &value
-					continue
-				}
-			}
-
-			for _, d := range tt.args.analysis.Differences() {
-				fakeRes, ok := d.Res.(*testresource.FakeResource)
-				if ok {
-					impliedType, _ := gocty.ImpliedType(fakeRes)
-					value, _ := gocty.ToCtyValue(fakeRes, impliedType)
-					fakeRes.CtyVal = &value
-					continue
-				}
-				fakeStringerRes, ok := d.Res.(*testresource.FakeResourceStringer)
-				if ok {
-					impliedType, _ := gocty.ImpliedType(fakeStringerRes)
-					value, _ := gocty.ToCtyValue(fakeStringerRes, impliedType)
-					fakeStringerRes.CtyVal = &value
-					continue
-				}
-			}
 
 			c := NewConsole()
 

@@ -2,28 +2,27 @@ package aws
 
 import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/zclconf/go-cty/cty"
 )
 
 type S3BucketNotificationSupplier struct {
 	reader         terraform.ResourceReader
-	deserializer   deserializer.CTYDeserializer
+	deserializer   *resource.Deserializer
 	repository     repository.S3Repository
 	runner         *terraform.ParallelResourceReader
 	providerConfig tf.TerraformProviderConfig
 }
 
-func NewS3BucketNotificationSupplier(provider *AWSTerraformProvider, repository repository.S3Repository) *S3BucketNotificationSupplier {
+func NewS3BucketNotificationSupplier(provider *AWSTerraformProvider, repository repository.S3Repository, deserializer *resource.Deserializer) *S3BucketNotificationSupplier {
 	return &S3BucketNotificationSupplier{
 		provider,
-		awsdeserializer.NewS3BucketNotificationDeserializer(),
+		deserializer,
 		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		provider.Config,
@@ -63,20 +62,20 @@ func (s *S3BucketNotificationSupplier) Resources() ([]resource.Resource, error) 
 	if err != nil {
 		return nil, err
 	}
-	deserializedValues, err := s.deserializer.Deserialize(ctyVals)
+	deserializedValues, err := s.deserializer.Deserialize(aws.AwsS3BucketNotificationResourceType, ctyVals)
 	results := make([]resource.Resource, 0, len(deserializedValues))
 	if err != nil {
 		return deserializedValues, err
 	}
 	for _, val := range deserializedValues {
-		res, ok := val.(*aws.AwsS3BucketNotification)
-		if ok {
-			if (res.LambdaFunction != nil && len(*res.LambdaFunction) > 0) ||
-				(res.Queue != nil && len(*res.Queue) > 0) ||
-				(res.Topic != nil && len(*res.Topic) > 0) {
-				results = append(results, res)
-			}
+		res, _ := val.(*resource.AbstractResource)
+
+		if ((*res.Attrs)["lambda_function"] != nil && len((*res.Attrs)["lambda_function"].([]interface{})) > 0) ||
+			((*res.Attrs)["queue"] != nil && len((*res.Attrs)["queue"].([]interface{})) > 0) ||
+			((*res.Attrs)["topic"] != nil && len((*res.Attrs)["topic"].([]interface{})) > 0) {
+			results = append(results, res)
 		}
+
 	}
 	return results, nil
 }

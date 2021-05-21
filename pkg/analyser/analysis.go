@@ -103,26 +103,26 @@ func (a *Analysis) UnmarshalJSON(bytes []byte) error {
 		return err
 	}
 	for _, u := range bla.Unmanaged {
-		a.AddUnmanaged(resource.SerializedResource{
+		a.AddUnmanaged(&resource.SerializedResource{
 			Id:   u.TerraformId(),
 			Type: u.TerraformType(),
 		})
 	}
 	for _, d := range bla.Deleted {
-		a.AddDeleted(resource.SerializedResource{
+		a.AddDeleted(&resource.SerializedResource{
 			Id:   d.TerraformId(),
 			Type: d.TerraformType(),
 		})
 	}
 	for _, m := range bla.Managed {
-		a.AddManaged(resource.SerializedResource{
+		a.AddManaged(&resource.SerializedResource{
 			Id:   m.TerraformId(),
 			Type: m.TerraformType(),
 		})
 	}
 	for _, di := range bla.Differences {
 		a.AddDifference(Difference{
-			Res: resource.SerializedResource{
+			Res: &resource.SerializedResource{
 				Id:   di.Res.TerraformId(),
 				Type: di.Res.TerraformType(),
 			},

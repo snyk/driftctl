@@ -7,10 +7,9 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/hashicorp/terraform/flatmap"
 	"github.com/sirupsen/logrus"
@@ -18,19 +17,17 @@ import (
 )
 
 type RouteTableSupplier struct {
-	reader                        terraform.ResourceReader
-	defaultRouteTableDeserializer deserializer.CTYDeserializer
-	routeTableDeserializer        deserializer.CTYDeserializer
-	client                        ec2iface.EC2API
-	defaultRouteTableRunner       *terraform.ParallelResourceReader
-	routeTableRunner              *terraform.ParallelResourceReader
+	reader                  terraform.ResourceReader
+	deserializer            *resource.Deserializer
+	client                  ec2iface.EC2API
+	defaultRouteTableRunner *terraform.ParallelResourceReader
+	routeTableRunner        *terraform.ParallelResourceReader
 }
 
-func NewRouteTableSupplier(provider *AWSTerraformProvider) *RouteTableSupplier {
+func NewRouteTableSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *RouteTableSupplier {
 	return &RouteTableSupplier{
 		provider,
-		awsdeserializer.NewDefaultRouteTableDeserializer(),
-		awsdeserializer.NewRouteTableDeserializer(),
+		deserializer,
 		ec2.New(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
@@ -89,11 +86,11 @@ func (s *RouteTableSupplier) Resources() ([]resource.Resource, error) {
 	}
 
 	// Deserialize
-	deserializedDefaultRouteTables, err := s.defaultRouteTableDeserializer.Deserialize(defaultRouteTableResources)
+	deserializedDefaultRouteTables, err := s.deserializer.Deserialize(aws.AwsDefaultRouteTableResourceType, defaultRouteTableResources)
 	if err != nil {
 		return nil, err
 	}
-	deserializedRouteTables, err := s.routeTableDeserializer.Deserialize(routeTableResources)
+	deserializedRouteTables, err := s.deserializer.Deserialize(aws.AwsRouteTableResourceType, routeTableResources)
 	if err != nil {
 		return nil, err
 	}

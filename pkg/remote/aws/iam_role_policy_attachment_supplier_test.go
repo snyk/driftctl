@@ -6,14 +6,13 @@ import (
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	awstest "github.com/cloudskiff/driftctl/test/aws"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 
 	"github.com/cloudskiff/driftctl/pkg/parallel"
-
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/aws/aws-sdk-go/aws"
 
@@ -67,19 +66,19 @@ func TestIamRolePolicyAttachmentSupplier_Resources(t *testing.T) {
 							return false
 						}
 						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy"),
-								PolicyName: aws.String("policy"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test-policy"),
+								PolicyName: aws.String("test-policy"),
 							},
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy2"),
-								PolicyName: aws.String("policy2"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test-policy2"),
+								PolicyName: aws.String("test-policy2"),
 							},
 						}}, false)
 						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy3"),
-								PolicyName: aws.String("policy3"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test-policy3"),
+								PolicyName: aws.String("test-policy3"),
 							},
 						}}, true)
 						shouldSkipfirst = true
@@ -95,19 +94,19 @@ func TestIamRolePolicyAttachmentSupplier_Resources(t *testing.T) {
 							return false
 						}
 						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy"),
-								PolicyName: aws.String("policy"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test-policy"),
+								PolicyName: aws.String("test-policy"),
 							},
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy2"),
-								PolicyName: aws.String("policy2"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test-policy2"),
+								PolicyName: aws.String("test-policy2"),
 							},
 						}}, false)
 						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy3"),
-								PolicyName: aws.String("policy3"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test-policy3"),
+								PolicyName: aws.String("test-policy3"),
 							},
 						}}, true)
 						shouldSkipSecond = true
@@ -184,12 +183,17 @@ func TestIamRolePolicyAttachmentSupplier_Resources(t *testing.T) {
 		providerLibrary := terraform.NewProviderLibrary()
 		supplierLibrary := resource.NewSupplierLibrary()
 
+		repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+		resourceaws.InitResourcesMetadata(repo)
+		factory := terraform.NewTerraformResourceFactory(repo)
+
+		deserializer := resource.NewDeserializer(factory)
 		if shouldUpdate {
 			provider, err := InitTestAwsProvider(providerLibrary)
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewIamRolePolicyAttachmentSupplier(provider))
+			supplierLibrary.AddSupplier(NewIamRolePolicyAttachmentSupplier(provider, deserializer))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
@@ -197,7 +201,6 @@ func TestIamRolePolicyAttachmentSupplier_Resources(t *testing.T) {
 			c.mocks(&fakeIam)
 
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
-			deserializer := awsdeserializer.NewIamRolePolicyAttachmentDeserializer()
 			s := &IamRolePolicyAttachmentSupplier{
 				provider,
 				deserializer,
@@ -208,7 +211,7 @@ func TestIamRolePolicyAttachmentSupplier_Resources(t *testing.T) {
 			assert.Equal(tt, c.err, err)
 
 			mock.AssertExpectationsForObjects(tt)
-			test.CtyTestDiff(got, c.dirName, provider, awsdeserializer.NewIamPolicyAttachmentDeserializer(), shouldUpdate, t)
+			test.CtyTestDiff(got, c.dirName, provider, deserializer, shouldUpdate, t)
 		})
 	}
 }

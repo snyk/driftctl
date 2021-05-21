@@ -6,14 +6,13 @@ import (
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	awstest "github.com/cloudskiff/driftctl/test/aws"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 
 	"github.com/cloudskiff/driftctl/pkg/parallel"
-
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/aws/aws-sdk-go/aws"
 
@@ -71,22 +70,22 @@ func TestIamUserPolicyAttachmentSupplier_Resources(t *testing.T) {
 							return false
 						}
 						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test"),
 								PolicyName: aws.String("test-attach"),
 							},
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test2"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test2"),
 								PolicyName: aws.String("test-attach2"),
 							},
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test3"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test3"),
 								PolicyName: aws.String("test-attach3"),
 							},
 						}}, false)
 						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test4"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test4"),
 								PolicyName: aws.String("test-attach4"),
 							},
 						}}, true)
@@ -103,22 +102,22 @@ func TestIamUserPolicyAttachmentSupplier_Resources(t *testing.T) {
 							return false
 						}
 						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test"),
 								PolicyName: aws.String("test-attach"),
 							},
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test2"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test2"),
 								PolicyName: aws.String("test-attach2"),
 							},
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test3"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test3"),
 								PolicyName: aws.String("test-attach3"),
 							},
 						}}, false)
 						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test4"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test4"),
 								PolicyName: aws.String("test-attach4"),
 							},
 						}}, true)
@@ -135,16 +134,16 @@ func TestIamUserPolicyAttachmentSupplier_Resources(t *testing.T) {
 							return false
 						}
 						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test"),
 								PolicyName: aws.String("test-attach"),
 							},
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test2"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test2"),
 								PolicyName: aws.String("test-attach2"),
 							},
-							&iam.AttachedPolicy{
-								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test3"),
+							{
+								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test3"),
 								PolicyName: aws.String("test-attach3"),
 							},
 						}}, false)
@@ -202,12 +201,17 @@ func TestIamUserPolicyAttachmentSupplier_Resources(t *testing.T) {
 		providerLibrary := terraform.NewProviderLibrary()
 		supplierLibrary := resource.NewSupplierLibrary()
 
+		repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+		resourceaws.InitResourcesMetadata(repo)
+		factory := terraform.NewTerraformResourceFactory(repo)
+
+		deserializer := resource.NewDeserializer(factory)
 		if shouldUpdate {
 			provider, err := InitTestAwsProvider(providerLibrary)
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewIamUserPolicyAttachmentSupplier(provider))
+			supplierLibrary.AddSupplier(NewIamUserPolicyAttachmentSupplier(provider, deserializer))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
@@ -215,7 +219,6 @@ func TestIamUserPolicyAttachmentSupplier_Resources(t *testing.T) {
 			c.mocks(&fakeIam)
 
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
-			deserializer := awsdeserializer.NewIamUserPolicyAttachmentDeserializer()
 			s := &IamUserPolicyAttachmentSupplier{
 				provider,
 				deserializer,
@@ -226,7 +229,7 @@ func TestIamUserPolicyAttachmentSupplier_Resources(t *testing.T) {
 			assert.Equal(tt, c.err, err)
 
 			mock.AssertExpectationsForObjects(tt)
-			test.CtyTestDiff(got, c.dirName, provider, awsdeserializer.NewIamPolicyAttachmentDeserializer(), shouldUpdate, t)
+			test.CtyTestDiff(got, c.dirName, provider, deserializer, shouldUpdate, t)
 		})
 	}
 }

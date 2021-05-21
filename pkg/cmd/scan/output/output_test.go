@@ -11,6 +11,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/github"
+	"github.com/cloudskiff/driftctl/pkg/resource"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/r3labs/diff/v2"
 )
@@ -138,17 +139,20 @@ func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddDeleted(
 		&testresource.FakeResourceStringer{
-			Id: "dfjkgnbsgj",
+			Id:    "dfjkgnbsgj",
+			Attrs: &resource.Attributes{},
 		},
 	)
 	a.AddManaged(
 		&testresource.FakeResourceStringer{
-			Id: "usqyfsdbgjsdgjkdfg",
+			Id:    "usqyfsdbgjsdgjkdfg",
+			Attrs: &resource.Attributes{},
 		},
 	)
 	a.AddUnmanaged(
 		&testresource.FakeResourceStringer{
-			Id: "duysgkfdjfdgfhd",
+			Id:    "duysgkfdjfdgfhd",
+			Attrs: &resource.Attributes{},
 		},
 	)
 	return &a
@@ -158,25 +162,33 @@ func fakeAnalysisWithStringerResources() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddDeleted(
 		&testresource.FakeResourceStringer{
-			Id:   "dfjkgnbsgj",
-			Name: "deleted resource",
+			Id: "dfjkgnbsgj",
+			Attrs: &resource.Attributes{
+				"name": "deleted resource",
+			},
 		},
 	)
 	a.AddManaged(
 		&testresource.FakeResourceStringer{
-			Id:   "usqyfsdbgjsdgjkdfg",
-			Name: "managed resource",
+			Id: "usqyfsdbgjsdgjkdfg",
+			Attrs: &resource.Attributes{
+				"name": "managed resource",
+			},
 		},
 	)
 	a.AddUnmanaged(
 		&testresource.FakeResourceStringer{
-			Id:   "duysgkfdjfdgfhd",
-			Name: "unmanaged resource",
+			Id: "duysgkfdjfdgfhd",
+			Attrs: &resource.Attributes{
+				"name": "unmanaged resource",
+			},
 		},
 	)
 	a.AddDifference(analyser.Difference{Res: &testresource.FakeResourceStringer{
-		Id:   "gdsfhgkbn",
-		Name: "resource with diff",
+		Id: "gdsfhgkbn",
+		Attrs: &resource.Attributes{
+			"name": "resource with diff",
+		},
 	}, Changelog: []analyser.Change{
 		{
 			Change: diff.Change{

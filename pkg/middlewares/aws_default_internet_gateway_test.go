@@ -24,11 +24,13 @@ func TestAwsDefaultInternetGateway_Execute(t *testing.T) {
 				&resource2.FakeResource{
 					Id: "fake",
 				},
-				&aws.AwsDefaultVpc{
-					Id: "default-vpc",
+				&resource.AbstractResource{
+					Id:   "default-vpc",
+					Type: aws.AwsDefaultVpcResourceType,
 				},
-				&aws.AwsVpc{
-					Id: "dummy-vpc",
+				&resource.AbstractResource{
+					Id:   "dummy-vpc",
+					Type: aws.AwsVpcResourceType,
 				},
 				&resource.AbstractResource{
 					Id:   "default-igw",
@@ -58,11 +60,13 @@ func TestAwsDefaultInternetGateway_Execute(t *testing.T) {
 				&resource2.FakeResource{
 					Id: "fake",
 				},
-				&aws.AwsDefaultVpc{
-					Id: "default-vpc",
+				&resource.AbstractResource{
+					Id:   "default-vpc",
+					Type: aws.AwsDefaultVpcResourceType,
 				},
-				&aws.AwsVpc{
-					Id: "dummy-vpc",
+				&resource.AbstractResource{
+					Id:   "dummy-vpc",
+					Type: aws.AwsVpcResourceType,
 				},
 				&resource.AbstractResource{
 					Id:   "default-igw",
@@ -86,11 +90,13 @@ func TestAwsDefaultInternetGateway_Execute(t *testing.T) {
 				&resource2.FakeResource{
 					Id: "fake",
 				},
-				&aws.AwsDefaultVpc{
-					Id: "default-vpc",
+				&resource.AbstractResource{
+					Id:   "default-vpc",
+					Type: aws.AwsDefaultVpcResourceType,
 				},
-				&aws.AwsVpc{
-					Id: "dummy-vpc",
+				&resource.AbstractResource{
+					Id:   "dummy-vpc",
+					Type: aws.AwsVpcResourceType,
 				},
 				&resource.AbstractResource{
 					Id:   "default-igw",
@@ -112,11 +118,13 @@ func TestAwsDefaultInternetGateway_Execute(t *testing.T) {
 				&resource2.FakeResource{
 					Id: "fake",
 				},
-				&aws.AwsDefaultVpc{
-					Id: "default-vpc",
+				&resource.AbstractResource{
+					Id:   "default-vpc",
+					Type: aws.AwsDefaultVpcResourceType,
 				},
-				&aws.AwsVpc{
-					Id: "dummy-vpc",
+				&resource.AbstractResource{
+					Id:   "dummy-vpc",
+					Type: aws.AwsVpcResourceType,
 				},
 				&resource.AbstractResource{
 					Id:   "dummy-igw",

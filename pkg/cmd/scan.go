@@ -160,7 +160,9 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	resourceSchemaRepository := resource.NewSchemaRepository()
 
-	err := remote.Activate(opts.To, alerter, providerLibrary, supplierLibrary, scanProgress, resourceSchemaRepository)
+	resFactory := terraform.NewTerraformResourceFactory(resourceSchemaRepository)
+
+	err := remote.Activate(opts.To, alerter, providerLibrary, supplierLibrary, scanProgress, resourceSchemaRepository, resFactory)
 	if err != nil {
 		return err
 	}
@@ -172,14 +174,12 @@ func scanRun(opts *pkg.ScanOptions) error {
 		logrus.Trace("Exited")
 	}()
 
-	scanner := pkg.NewScanner(supplierLibrary.Suppliers(), alerter, resourceSchemaRepository)
+	scanner := pkg.NewScanner(supplierLibrary.Suppliers(), alerter)
 
-	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, resourceSchemaRepository)
+	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, resFactory)
 	if err != nil {
 		return err
 	}
-
-	resFactory := terraform.NewTerraformResourceFactory(providerLibrary, resourceSchemaRepository)
 
 	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, resFactory, opts, scanProgress, iacProgress, resourceSchemaRepository)
 

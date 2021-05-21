@@ -4,10 +4,9 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/sirupsen/logrus"
@@ -16,15 +15,15 @@ import (
 
 type EC2EipAssociationSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2EipAssociationSupplier(provider *AWSTerraformProvider) *EC2EipAssociationSupplier {
+func NewEC2EipAssociationSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *EC2EipAssociationSupplier {
 	return &EC2EipAssociationSupplier{
 		provider,
-		awsdeserializer.NewEC2EipAssociationDeserializer(),
+		deserializer,
 		repository.NewEC2Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner())}
 }
@@ -47,7 +46,7 @@ func (s *EC2EipAssociationSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsEipAssociationResourceType, results)
 }
 
 func (s *EC2EipAssociationSupplier) readEIPAssociation(assocId string) (cty.Value, error) {

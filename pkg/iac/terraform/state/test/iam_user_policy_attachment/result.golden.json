@@ -1,7 +1,7 @@
 [
  {
-  "Id": "loadbalancer2-arn:aws:iam::526954929923:policy/test3",
-  "Type": "aws_iam_policy_attachment",
+  "Id": "loadbalancer2-20201113172254923500000004",
+  "Type": "aws_iam_user_policy_attachment",
   "Attrs": {
    "id": "loadbalancer2-20201113172254923500000004",
    "policy_arn": "arn:aws:iam::526954929923:policy/test3",
@@ -9,8 +9,8 @@
   }
  },
  {
-  "Id": "loadbalancer3-arn:aws:iam::526954929923:policy/test3",
-  "Type": "aws_iam_policy_attachment",
+  "Id": "loadbalancer3-20201113172254986500000006",
+  "Type": "aws_iam_user_policy_attachment",
   "Attrs": {
    "id": "loadbalancer3-20201113172254986500000006",
    "policy_arn": "arn:aws:iam::526954929923:policy/test3",
@@ -18,8 +18,8 @@
   }
  },
  {
-  "Id": "loadbalancer3-arn:aws:iam::526954929923:policy/test2",
-  "Type": "aws_iam_policy_attachment",
+  "Id": "loadbalancer3-20201113172255118300000007",
+  "Type": "aws_iam_user_policy_attachment",
   "Attrs": {
    "id": "loadbalancer3-20201113172255118300000007",
    "policy_arn": "arn:aws:iam::526954929923:policy/test2",
@@ -27,8 +27,8 @@
   }
  },
  {
-  "Id": "loadbalancer-arn:aws:iam::526954929923:policy/test",
-  "Type": "aws_iam_policy_attachment",
+  "Id": "loadbalancer-20201113172255158500000009",
+  "Type": "aws_iam_user_policy_attachment",
   "Attrs": {
    "id": "loadbalancer-20201113172255158500000009",
    "policy_arn": "arn:aws:iam::526954929923:policy/test",
@@ -36,8 +36,8 @@
   }
  },
  {
-  "Id": "loadbalancer-arn:aws:iam::526954929923:policy/test2",
-  "Type": "aws_iam_policy_attachment",
+  "Id": "loadbalancer-2020111317225517310000000a",
+  "Type": "aws_iam_user_policy_attachment",
   "Attrs": {
    "id": "loadbalancer-2020111317225517310000000a",
    "policy_arn": "arn:aws:iam::526954929923:policy/test2",
@@ -45,8 +45,8 @@
   }
  },
  {
-  "Id": "loadbalancer2-arn:aws:iam::526954929923:policy/test",
-  "Type": "aws_iam_policy_attachment",
+  "Id": "loadbalancer2-2020111317225587220000000b",
+  "Type": "aws_iam_user_policy_attachment",
   "Attrs": {
    "id": "loadbalancer2-2020111317225587220000000b",
    "policy_arn": "arn:aws:iam::526954929923:policy/test",
@@ -54,8 +54,8 @@
   }
  },
  {
-  "Id": "loadbalancer2-arn:aws:iam::526954929923:policy/test2",
-  "Type": "aws_iam_policy_attachment",
+  "Id": "loadbalancer2-20201113172255122400000008",
+  "Type": "aws_iam_user_policy_attachment",
   "Attrs": {
    "id": "loadbalancer2-20201113172255122400000008",
    "policy_arn": "arn:aws:iam::526954929923:policy/test2",
@@ -63,8 +63,8 @@
   }
  },
  {
-  "Id": "loadbalancer-arn:aws:iam::526954929923:policy/test3",
-  "Type": "aws_iam_policy_attachment",
+  "Id": "loadbalancer-20201113172254928300000005",
+  "Type": "aws_iam_user_policy_attachment",
   "Attrs": {
    "id": "loadbalancer-20201113172254928300000005",
    "policy_arn": "arn:aws:iam::526954929923:policy/test3",
@@ -72,8 +72,8 @@
   }
  },
  {
-  "Id": "loadbalancer3-arn:aws:iam::526954929923:policy/test",
-  "Type": "aws_iam_policy_attachment",
+  "Id": "loadbalancer3-2020111317225590250000000c",
+  "Type": "aws_iam_user_policy_attachment",
   "Attrs": {
    "id": "loadbalancer3-2020111317225590250000000c",
    "policy_arn": "arn:aws:iam::526954929923:policy/test",

@@ -15,83 +15,19 @@ import (
 type Resource interface {
 	TerraformId() string
 	TerraformType() string
-	CtyValue() *cty.Value
-}
-
-var refactoredResources = []string{
-	"aws_ami",
-	"aws_cloudfront_distribution",
-	"aws_db_instance",
-	"aws_db_subnet_group",
-	"aws_default_route_table",
-	"aws_default_security_group",
-	"aws_default_subnet",
-	"aws_default_vpc",
-	"aws_dynamodb_table",
-	"aws_ebs_snapshot",
-	"aws_ebs_volume",
-	"aws_ecr_repository",
-	"aws_eip",
-	"aws_eip_association",
-	"aws_iam_access_key",
-	"aws_iam_policy",
-	"aws_iam_policy_attachment",
-	"aws_iam_role",
-	"aws_iam_role_policy",
-	"aws_iam_role_policy_attachment",
-	"aws_iam_user",
-	"aws_iam_user_policy",
-	"aws_iam_user_policy_attachment",
-	"aws_instance",
-	"aws_internet_gateway",
-	"aws_key_pair",
-	"aws_kms_alias",
-	"aws_kms_key",
-	"aws_lambda_event_source_mapping",
-	"aws_lambda_function",
-	"aws_nat_gateway",
-	"aws_route",
-	"aws_route53_health_check",
-	"aws_route53_record",
-	"aws_route53_zone",
-	"aws_route_table",
-	"aws_route_table_association",
-	"aws_s3_bucket",
-	"aws_s3_bucket_analytics_configuration",
-	"aws_s3_bucket_inventory",
-	"aws_s3_bucket_metric",
-	"aws_s3_bucket_notification",
-	"aws_s3_bucket_policy",
-	"aws_security_group",
-	"aws_security_group_rule",
-	"aws_sns_topic",
-	"aws_sns_topic_policy",
-	"aws_sns_topic_subscription",
-	"aws_sqs_queue",
-	"aws_sqs_queue_policy",
-	"aws_subnet",
-	"aws_vpc",
-
-	"github_branch_protection",
-	"github_membership",
-	"github_repository",
-	"github_team",
-	"github_team_membership",
-}
-
-func IsRefactoredResource(typ string) bool {
-	for _, refactoredResource := range refactoredResources {
-		if typ == refactoredResource {
-			return true
-		}
-	}
-	return false
+	Attributes() *Attributes
+	Schema() *Schema
 }
 
 type AbstractResource struct {
 	Id    string
 	Type  string
 	Attrs *Attributes
+	Sch   *Schema `json:"-" diff:"-"`
+}
+
+func (a *AbstractResource) Schema() *Schema {
+	return a.Sch
 }
 
 func (a *AbstractResource) TerraformId() string {
@@ -102,12 +38,20 @@ func (a *AbstractResource) TerraformType() string {
 	return a.Type
 }
 
-func (a *AbstractResource) CtyValue() *cty.Value {
-	return nil
+func (a *AbstractResource) Attributes() *Attributes {
+	return a.Attrs
+}
+
+func (a *AbstractResource) HumanReadableAttributes() map[string]string {
+	var attrs map[string]string
+	schema := a.Schema()
+	if schema.HumanReadableAttributesFunc != nil {
+		attrs = schema.HumanReadableAttributesFunc(a)
+	}
+	return attrs
 }
 
 type ResourceFactory interface {
-	CreateResource(data interface{}, ty string) (*cty.Value, error)
 	CreateAbstractResource(ty, id string, data map[string]interface{}) *AbstractResource
 }
 
@@ -120,20 +64,24 @@ type SerializedResource struct {
 	Type string `json:"type"`
 }
 
-func (u SerializedResource) TerraformId() string {
+func (u *SerializedResource) TerraformId() string {
 	return u.Id
 }
 
-func (u SerializedResource) TerraformType() string {
+func (u *SerializedResource) TerraformType() string {
 	return u.Type
 }
 
-func (u SerializedResource) CtyValue() *cty.Value {
-	return &cty.NilVal
+func (u *SerializedResource) Attributes() *Attributes {
+	return nil
+}
+
+func (u *SerializedResource) Schema() *Schema {
+	return nil
 }
 
 func (s *SerializableResource) UnmarshalJSON(bytes []byte) error {
-	var res SerializedResource
+	var res *SerializedResource
 
 	if err := json.Unmarshal(bytes, &res); err != nil {
 		return err
@@ -215,11 +163,15 @@ func (a *Attributes) GetString(path string) *string {
 }
 
 func (a *Attributes) GetStringSlice(path string) []string {
-	val, exist := (*a)[path]
-	if !exist {
+	val := a.GetSlice(path)
+	if val == nil {
 		return nil
 	}
-	return val.([]string)
+	slice := make([]string, 0, len(val))
+	for _, v := range val {
+		slice = append(slice, v.(string))
+	}
+	return slice
 }
 
 func (a *Attributes) GetBool(path string) *bool {
@@ -247,6 +199,26 @@ func (a *Attributes) GetFloat64(path string) *float64 {
 	}
 	v := val.(float64)
 	return &v
+}
+
+func (a *Attributes) GetMap(path string) map[string]interface{} {
+	val, exist := (*a)[path]
+	if !exist {
+		return nil
+	}
+	return val.(map[string]interface{})
+}
+
+func (a *Attributes) GetStringMap(path string) map[string]string {
+	val := a.GetMap(path)
+	if val == nil {
+		return nil
+	}
+	stringMap := make(map[string]string)
+	for k, v := range val {
+		stringMap[k] = v.(string)
+	}
+	return stringMap
 }
 
 func (a *Attributes) SafeDelete(path []string) {

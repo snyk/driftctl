@@ -12,18 +12,16 @@ import (
 )
 
 type Scanner struct {
-	resourceSuppliers        []resource.Supplier
-	runner                   *parallel.ParallelRunner
-	alerter                  *alerter.Alerter
-	resourceSchemaRepository *resource.SchemaRepository
+	resourceSuppliers []resource.Supplier
+	runner            *parallel.ParallelRunner
+	alerter           *alerter.Alerter
 }
 
-func NewScanner(resourceSuppliers []resource.Supplier, alerter *alerter.Alerter, resourceSchemaRepository *resource.SchemaRepository) *Scanner {
+func NewScanner(resourceSuppliers []resource.Supplier, alerter *alerter.Alerter) *Scanner {
 	return &Scanner{
-		resourceSuppliers:        resourceSuppliers,
-		runner:                   parallel.NewParallelRunner(context.TODO(), 10),
-		alerter:                  alerter,
-		resourceSchemaRepository: resourceSchemaRepository,
+		resourceSuppliers: resourceSuppliers,
+		runner:            parallel.NewParallelRunner(context.TODO(), 10),
+		alerter:           alerter,
 	}
 }
 
@@ -57,42 +55,7 @@ loop:
 			if !ok || resources == nil {
 				break loop
 			}
-			for _, res := range resources.([]resource.Resource) {
-
-				if resource.IsRefactoredResource(res.TerraformType()) {
-					schema, exist := s.resourceSchemaRepository.GetSchema(res.TerraformType())
-					ctyAttr := resource.ToResourceAttributes(res.CtyValue())
-					ctyAttr.SanitizeDefaults()
-					newRes := &resource.AbstractResource{
-						Id:    res.TerraformId(),
-						Type:  res.TerraformType(),
-						Attrs: ctyAttr,
-					}
-					if exist && schema.NormalizeFunc != nil {
-						schema.NormalizeFunc(newRes)
-					}
-					results = append(results, newRes)
-					continue
-				}
-
-				normalisable, ok := res.(resource.NormalizedResource)
-				if ok {
-					normalizedRes, err := normalisable.NormalizeForProvider()
-
-					if err != nil {
-						logrus.Errorf("Could not normalize remote for res %s: %+v", res.TerraformId(), err)
-						results = append(results, res)
-					}
-
-					if err == nil {
-						results = append(results, normalizedRes)
-					}
-				}
-
-				if !ok {
-					results = append(results, res)
-				}
-			}
+			results = append(results, resources.([]resource.Resource)...)
 		case <-s.runner.DoneChan():
 			break loop
 		}

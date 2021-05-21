@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/aws/aws-sdk-go/service/route53"
 
@@ -20,7 +21,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
@@ -65,19 +66,23 @@ func TestRoute53HealthCheckSupplier_Resources(t *testing.T) {
 		providerLibrary := terraform.NewProviderLibrary()
 		supplierLibrary := resource.NewSupplierLibrary()
 
+		repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+		resourceaws.InitResourcesMetadata(repo)
+		factory := terraform.NewTerraformResourceFactory(repo)
+
+		deserializer := resource.NewDeserializer(factory)
 		if shouldUpdate {
 			provider, err := InitTestAwsProvider(providerLibrary)
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewRoute53HealthCheckSupplier(provider))
+			supplierLibrary.AddSupplier(NewRoute53HealthCheckSupplier(provider, deserializer))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
 			fakeClient := repository.MockRoute53Repository{}
 			c.mocks(&fakeClient)
 			provider := testmocks.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
-			deserializer := awsdeserializer.NewRoute53HealthCheckDeserializer()
 			s := &Route53HealthCheckSupplier{
 				provider,
 				deserializer,

@@ -3,11 +3,10 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -15,15 +14,15 @@ import (
 
 type LambdaFunctionSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.LambdaRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewLambdaFunctionSupplier(provider *AWSTerraformProvider) *LambdaFunctionSupplier {
+func NewLambdaFunctionSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *LambdaFunctionSupplier {
 	return &LambdaFunctionSupplier{
 		provider,
-		awsdeserializer.NewLambdaFunctionDeserializer(),
+		deserializer,
 		repository.NewLambdaRepository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -47,7 +46,7 @@ func (s *LambdaFunctionSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsLambdaFunctionResourceType, results)
 }
 
 func (s *LambdaFunctionSupplier) readLambda(function lambda.FunctionConfiguration) (cty.Value, error) {
