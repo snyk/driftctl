@@ -869,3 +869,93 @@ func Test_ec2Repository_ListAllRouteTables(t *testing.T) {
 		})
 	}
 }
+
+func Test_ec2Repository_ListAllVPCs(t *testing.T) {
+	tests := []struct {
+		name           string
+		mocks          func(client *MockEC2Client)
+		wantVPC        []*ec2.Vpc
+		wantDefaultVPC []*ec2.Vpc
+		wantErr        error
+	}{
+		{
+			name: "mixed default VPC and VPC",
+			mocks: func(client *MockEC2Client) {
+				client.On("DescribeVpcsPages",
+					&ec2.DescribeVpcsInput{},
+					mock.MatchedBy(func(callback func(res *ec2.DescribeVpcsOutput, lastPage bool) bool) bool {
+						callback(&ec2.DescribeVpcsOutput{
+							Vpcs: []*ec2.Vpc{
+								{
+									VpcId:     aws.String("vpc-a8c5d4c1"),
+									IsDefault: aws.Bool(true),
+								},
+								{
+									VpcId: aws.String("vpc-0768e1fd0029e3fc3"),
+								},
+								{
+									VpcId:     aws.String("vpc-020b072316a95b97f"),
+									IsDefault: aws.Bool(false),
+								},
+							},
+						}, false)
+						callback(&ec2.DescribeVpcsOutput{
+							Vpcs: []*ec2.Vpc{
+								{
+									VpcId:     aws.String("vpc-02c50896b59598761"),
+									IsDefault: aws.Bool(false),
+								},
+							},
+						}, true)
+						return true
+					})).Return(nil)
+			},
+			wantVPC: []*ec2.Vpc{
+				{
+					VpcId: aws.String("vpc-0768e1fd0029e3fc3"),
+				},
+				{
+					VpcId:     aws.String("vpc-020b072316a95b97f"),
+					IsDefault: aws.Bool(false),
+				},
+				{
+					VpcId:     aws.String("vpc-02c50896b59598761"),
+					IsDefault: aws.Bool(false),
+				},
+			},
+			wantDefaultVPC: []*ec2.Vpc{
+				{
+					VpcId:     aws.String("vpc-a8c5d4c1"),
+					IsDefault: aws.Bool(true),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := &MockEC2Client{}
+			tt.mocks(client)
+			r := &ec2Repository{
+				client: client,
+			}
+			gotVPCs, gotDefaultVPCs, err := r.ListAllVPCs()
+			assert.Equal(t, tt.wantErr, err)
+			changelog, err := diff.Diff(gotVPCs, tt.wantVPC)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+			changelog, err = diff.Diff(gotDefaultVPCs, tt.wantDefaultVPC)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}

@@ -19,6 +19,7 @@ type EC2Repository interface {
 	ListAllSubnets() ([]*ec2.Subnet, []*ec2.Subnet, error)
 	ListAllNatGateways() ([]*ec2.NatGateway, error)
 	ListAllRouteTables() ([]*ec2.RouteTable, error)
+	ListAllVPCs() ([]*ec2.Vpc, []*ec2.Vpc, error)
 }
 
 type EC2Client interface {
@@ -193,4 +194,26 @@ func (r *ec2Repository) ListAllRouteTables() ([]*ec2.RouteTable, error) {
 	}
 
 	return routeTables, nil
+}
+
+func (r *ec2Repository) ListAllVPCs() ([]*ec2.Vpc, []*ec2.Vpc, error) {
+	input := ec2.DescribeVpcsInput{}
+	var VPCs []*ec2.Vpc
+	var defaultVPCs []*ec2.Vpc
+	err := r.client.DescribeVpcsPages(&input,
+		func(resp *ec2.DescribeVpcsOutput, lastPage bool) bool {
+			for _, vpc := range resp.Vpcs {
+				if vpc.IsDefault != nil && *vpc.IsDefault {
+					defaultVPCs = append(defaultVPCs, vpc)
+					continue
+				}
+				VPCs = append(VPCs, vpc)
+			}
+			return !lastPage
+		},
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+	return VPCs, defaultVPCs, nil
 }
