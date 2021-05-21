@@ -959,3 +959,75 @@ func Test_ec2Repository_ListAllVPCs(t *testing.T) {
 		})
 	}
 }
+
+func Test_ec2Repository_ListAllSecurityGroups(t *testing.T) {
+	tests := []struct {
+		name                     string
+		mocks                    func(client *MockEC2Client)
+		wantSecurityGroup        []*ec2.SecurityGroup
+		wantDefaultSecurityGroup []*ec2.SecurityGroup
+		wantErr                  error
+	}{
+		{
+			name: "List with 1 pages",
+			mocks: func(client *MockEC2Client) {
+				client.On("DescribeSecurityGroupsPages",
+					&ec2.DescribeSecurityGroupsInput{},
+					mock.MatchedBy(func(callback func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool) bool {
+						callback(&ec2.DescribeSecurityGroupsOutput{
+							SecurityGroups: []*ec2.SecurityGroup{
+								{
+									GroupId:   aws.String("sg-0254c038e32f25530"),
+									GroupName: aws.String("foo"),
+								},
+								{
+									GroupId:   aws.String("sg-9e0204ff"),
+									GroupName: aws.String("default"),
+								},
+							},
+						}, true)
+						return true
+					})).Return(nil)
+			},
+			wantSecurityGroup: []*ec2.SecurityGroup{
+				{
+					GroupId:   aws.String("sg-0254c038e32f25530"),
+					GroupName: aws.String("foo"),
+				},
+			},
+			wantDefaultSecurityGroup: []*ec2.SecurityGroup{
+				{
+					GroupId:   aws.String("sg-9e0204ff"),
+					GroupName: aws.String("default"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := &MockEC2Client{}
+			tt.mocks(client)
+			r := &ec2Repository{
+				client: client,
+			}
+			gotSecurityGroups, gotDefaultSecurityGroups, err := r.ListAllSecurityGroups()
+			assert.Equal(t, tt.wantErr, err)
+			changelog, err := diff.Diff(gotSecurityGroups, tt.wantSecurityGroup)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+			changelog, err = diff.Diff(gotDefaultSecurityGroups, tt.wantDefaultSecurityGroup)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}

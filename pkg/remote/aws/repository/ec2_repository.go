@@ -20,6 +20,7 @@ type EC2Repository interface {
 	ListAllNatGateways() ([]*ec2.NatGateway, error)
 	ListAllRouteTables() ([]*ec2.RouteTable, error)
 	ListAllVPCs() ([]*ec2.Vpc, []*ec2.Vpc, error)
+	ListAllSecurityGroups() ([]*ec2.SecurityGroup, []*ec2.SecurityGroup, error)
 }
 
 type EC2Client interface {
@@ -216,4 +217,24 @@ func (r *ec2Repository) ListAllVPCs() ([]*ec2.Vpc, []*ec2.Vpc, error) {
 		return nil, nil, err
 	}
 	return VPCs, defaultVPCs, nil
+}
+
+func (r *ec2Repository) ListAllSecurityGroups() ([]*ec2.SecurityGroup, []*ec2.SecurityGroup, error) {
+	var securityGroups []*ec2.SecurityGroup
+	var defaultSecurityGroups []*ec2.SecurityGroup
+	input := &ec2.DescribeSecurityGroupsInput{}
+	err := r.client.DescribeSecurityGroupsPages(input, func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool {
+		for _, securityGroup := range res.SecurityGroups {
+			if securityGroup.GroupName != nil && *securityGroup.GroupName == "default" {
+				defaultSecurityGroups = append(defaultSecurityGroups, securityGroup)
+				continue
+			}
+			securityGroups = append(securityGroups, securityGroup)
+		}
+		return !lastPage
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+	return securityGroups, defaultSecurityGroups, nil
 }

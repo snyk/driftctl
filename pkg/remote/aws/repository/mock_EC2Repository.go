@@ -196,6 +196,38 @@ func (_m *MockEC2Repository) ListAllRouteTables() ([]*ec2.RouteTable, error) {
 	return r0, r1
 }
 
+// ListAllSecurityGroups provides a mock function with given fields:
+func (_m *MockEC2Repository) ListAllSecurityGroups() ([]*ec2.SecurityGroup, []*ec2.SecurityGroup, error) {
+	ret := _m.Called()
+
+	var r0 []*ec2.SecurityGroup
+	if rf, ok := ret.Get(0).(func() []*ec2.SecurityGroup); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ec2.SecurityGroup)
+		}
+	}
+
+	var r1 []*ec2.SecurityGroup
+	if rf, ok := ret.Get(1).(func() []*ec2.SecurityGroup); ok {
+		r1 = rf()
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).([]*ec2.SecurityGroup)
+		}
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func() error); ok {
+		r2 = rf()
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
 // ListAllSnapshots provides a mock function with given fields:
 func (_m *MockEC2Repository) ListAllSnapshots() ([]*ec2.Snapshot, error) {
 	ret := _m.Called()
