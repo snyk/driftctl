@@ -329,11 +329,6 @@ func Run(t *testing.T, c AccTestCase) {
 		t.Fatal(err)
 	}
 
-	err = c.terraformApply()
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	defer func() {
 		c.restoreEnv()
 		err := c.terraformDestroy()
@@ -342,6 +337,11 @@ func Run(t *testing.T, c AccTestCase) {
 			t.Fatal(err)
 		}
 	}()
+
+	err = c.terraformApply()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	logger.Init()
 
