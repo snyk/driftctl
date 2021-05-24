@@ -203,11 +203,9 @@ func scanRun(opts *pkg.ScanOptions) error {
 		telemetry.SendTelemetry(analysis)
 	}
 
-	if analysis.Summary().TotalResources-analysis.Summary().TotalManaged > 0 {
-		fmt.Println("\nHint: use gen-driftignore command to generate a .driftignore file based on your drifts")
-	}
-
 	if !analysis.IsSync() {
+		globaloutput.Printf("\nHint: use gen-driftignore command to generate a .driftignore file based on your drifts\n")
+
 		return cmderrors.InfrastructureNotInSync{}
 	}
 
