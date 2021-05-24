@@ -24,7 +24,7 @@ type EC2Client interface {
 
 type ec2Repository struct {
 	client ec2iface.EC2API
-	cache  *cache.Cache
+	cache  cache.Cache
 }
 
 func NewEC2Repository(session *session.Session) *ec2Repository {
