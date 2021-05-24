@@ -9,6 +9,11 @@ terraform {
   }
 }
 
+locals {
+    timestamp = formatdate("YYYYMMDDhhmmss", timestamp())
+    prefix = "eip-${local.timestamp}"
+}
+
 # data source for an official Ubuntu 20.04 AMI
 data "aws_ami" "ubuntu" {
     most_recent = true
@@ -28,6 +33,9 @@ data "aws_ami" "ubuntu" {
 
 resource "aws_vpc" "default" {
     cidr_block           = "10.0.0.0/24"
+    tags = {
+        Name: "${local.prefix}-default"
+    }
 }
 
 resource "aws_internet_gateway" "gw" {
@@ -44,6 +52,9 @@ resource "aws_subnet" "tf_test_subnet" {
     cidr_block              = "10.0.0.0/24"
     depends_on = [aws_internet_gateway.gw]
     availability_zone = "us-east-1a"
+    tags = {
+        Name: "${local.prefix}-tf_test_subnet"
+    }
 }
 
 resource "aws_instance" "instance" {
