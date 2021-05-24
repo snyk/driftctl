@@ -1,0 +1,12 @@
+# Resources not covered by IaC
+aws_iam_user.driftctl
+aws_iam_user.sundowndev
+aws_iam_user.test_user
+aws_iam_role_policy.OrganizationAccountAccessRole:AdministratorAccess
+aws_iam_role_policy.driftctl_assume_role:driftctl_policy\.10
+aws_iam_role.OrganizationAccountAccessRole
+aws_iam_role.driftctl_assume\\_role
+aws_iam_user_policy.driftctl:driftctlrole
+aws_iam_access_key.AKIAXYUOJZ3H5YCXF34G
+aws_iam_access_key.AKIAXYUOJZ3HV2LTLXD2
+aws_iam_access_key.AKIAXYUOJZ3HUSPPQQ4L
