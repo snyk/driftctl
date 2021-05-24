@@ -15,7 +15,7 @@ type AttributeSchema struct {
 
 type Schema struct {
 	Attributes    map[string]AttributeSchema
-	NormalizeFunc func(val *Attributes)
+	NormalizeFunc func(res *AbstractResource)
 }
 
 func (s *Schema) IsComputedField(path []string) bool {
@@ -37,7 +37,7 @@ func (s *Schema) IsJsonStringField(path []string) bool {
 type SchemaRepositoryInterface interface {
 	GetSchema(resourceType string) (*Schema, bool)
 	UpdateSchema(typ string, schemasMutators map[string]func(attributeSchema *AttributeSchema))
-	SetNormalizeFunc(typ string, normalizeFunc func(val *Attributes))
+	SetNormalizeFunc(typ string, normalizeFunc func(res *AbstractResource))
 }
 
 type SchemaRepository struct {
@@ -101,7 +101,7 @@ func (r *SchemaRepository) UpdateSchema(typ string, schemasMutators map[string]f
 	}
 }
 
-func (r *SchemaRepository) SetNormalizeFunc(typ string, normalizeFunc func(val *Attributes)) {
+func (r *SchemaRepository) SetNormalizeFunc(typ string, normalizeFunc func(res *AbstractResource)) {
 	metadata, exist := r.GetSchema(typ)
 	if !exist {
 		logrus.WithFields(logrus.Fields{"type": typ}).Warning("Unable to set normalize func, no schema found")

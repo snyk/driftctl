@@ -3,7 +3,6 @@ package middlewares
 import (
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 )
@@ -15,21 +14,21 @@ func TestDefaultVPCSecurityGroupShouldBeIgnored(t *testing.T) {
 			Id:   "sg-test",
 			Type: aws.AwsSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
-				"name": awssdk.String("test"),
+				"name": "test",
 			},
 		},
 		&resource.AbstractResource{
 			Id:   "sg-foo",
 			Type: aws.AwsSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
-				"name": awssdk.String("foo"),
+				"name": "foo",
 			},
 		},
 		&resource.AbstractResource{
 			Id:   "sg-default",
 			Type: aws.AwsDefaultSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
-				"name": awssdk.String("default"),
+				"name": "default",
 			},
 		},
 	}
@@ -38,7 +37,7 @@ func TestDefaultVPCSecurityGroupShouldBeIgnored(t *testing.T) {
 			Id:   "sg-bar",
 			Type: aws.AwsSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
-				"name": awssdk.String("bar"),
+				"name": "bar",
 			},
 		},
 	}
@@ -58,21 +57,21 @@ func TestDefaultVPCSecurityGroupShouldNotBeIgnoredWhenManaged(t *testing.T) {
 			Id:   "sg-test",
 			Type: aws.AwsSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
-				"name": awssdk.String("test"),
+				"name": "test",
 			},
 		},
 		&resource.AbstractResource{
 			Id:   "sg-foo",
 			Type: aws.AwsSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
-				"name": awssdk.String("foo"),
+				"name": "foo",
 			},
 		},
 		&resource.AbstractResource{
 			Id:   "sg-default",
 			Type: aws.AwsDefaultSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
-				"name": awssdk.String("default"),
+				"name": "default",
 			},
 		},
 	}
@@ -81,7 +80,7 @@ func TestDefaultVPCSecurityGroupShouldNotBeIgnoredWhenManaged(t *testing.T) {
 			Id:   "sg-default",
 			Type: aws.AwsDefaultSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
-				"name": awssdk.String("default"),
+				"name": "default",
 			},
 		},
 	}
@@ -93,8 +92,7 @@ func TestDefaultVPCSecurityGroupShouldNotBeIgnoredWhenManaged(t *testing.T) {
 		t.Error("Default security group was ignored")
 	}
 	managedDefaultSecurityGroup := remoteResources[2].(*resource.AbstractResource)
-	name, _ := managedDefaultSecurityGroup.Attrs.Get("name")
-	if *name.(*string) != "default" {
+	if *managedDefaultSecurityGroup.Attrs.GetString("name") != "default" {
 		t.Error("Default security group is ignored when it should not be")
 	}
 }

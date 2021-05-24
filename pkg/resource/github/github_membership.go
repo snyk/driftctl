@@ -29,7 +29,8 @@ func (r *GithubMembership) CtyValue() *cty.Value {
 }
 
 func initGithubMembershipMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(GithubMembershipResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(GithubMembershipResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.SafeDelete([]string{"etag"})
 	})
 }

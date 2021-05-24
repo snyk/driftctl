@@ -46,7 +46,8 @@ func initSnsTopicSubscriptionMetaData(resourceSchemaRepository resource.SchemaRe
 		},
 	})
 
-	resourceSchemaRepository.SetNormalizeFunc(AwsSnsTopicSubscriptionResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsSnsTopicSubscriptionResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		jsonString, err := helpers.NormalizeJsonString((*val)["delivery_policy"])
 		if err == nil {
 			val.SafeSet([]string{"delivery_policy"}, jsonString)

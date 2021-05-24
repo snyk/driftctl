@@ -54,14 +54,16 @@ func (r *TerraformResourceFactory) CreateAbstractResource(ty, id string, data ma
 	attributes := resource.Attributes(data)
 	attributes.SanitizeDefaults()
 
-	schema, exist := r.resourceSchemaRepository.(*resource.SchemaRepository).GetSchema(ty)
-	if exist && schema.NormalizeFunc != nil {
-		schema.NormalizeFunc(&attributes)
-	}
-
-	return &resource.AbstractResource{
+	res := resource.AbstractResource{
 		Id:    id,
 		Type:  ty,
 		Attrs: &attributes,
 	}
+
+	schema, exist := r.resourceSchemaRepository.(*resource.SchemaRepository).GetSchema(ty)
+	if exist && schema.NormalizeFunc != nil {
+		schema.NormalizeFunc(&res)
+	}
+
+	return &res
 }

@@ -102,7 +102,8 @@ func (r *AwsDbInstance) CtyValue() *cty.Value {
 }
 
 func initAwsDbInstanceMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsDbInstanceResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsDbInstanceResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.SafeDelete([]string{"delete_automated_backups"})
 		val.SafeDelete([]string{"final_snapshot_identifier"})
 		val.SafeDelete([]string{"latest_restorable_time"})

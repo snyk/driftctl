@@ -55,7 +55,8 @@ func (r *AwsRoute53Record) CtyValue() *cty.Value {
 }
 
 func initAwsRoute53RecordMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsRoute53RecordResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsRoute53RecordResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.DeleteIfDefault("health_check_id")
 		val.DeleteIfDefault("set_identifier")
 		val.DeleteIfDefault("ttl")

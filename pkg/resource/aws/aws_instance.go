@@ -107,7 +107,8 @@ func (r *AwsInstance) CtyValue() *cty.Value {
 }
 
 func initAwsInstanceMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsInstanceResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsInstanceResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 		val.SafeDelete([]string{"instance_initiated_shutdown_behavior"})
 	})

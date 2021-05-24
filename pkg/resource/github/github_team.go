@@ -36,7 +36,8 @@ func (r *GithubTeam) CtyValue() *cty.Value {
 }
 
 func initGithubTeamMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(GithubTeamResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(GithubTeamResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		if defaultMaintainer, exist := val.Get("create_default_maintainer"); !exist || defaultMaintainer == nil {
 			(*val)["create_default_maintainer"] = false
 		}

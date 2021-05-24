@@ -43,7 +43,8 @@ func (r *GithubBranchProtection) CtyValue() *cty.Value {
 }
 
 func initGithubBranchProtectionMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(GithubBranchProtectionResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(GithubBranchProtectionResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.SafeDelete([]string{"repository_id"}) // Terraform provider is always returning nil
 	})
 }

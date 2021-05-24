@@ -186,7 +186,7 @@ func (a *Attributes) Copy() *Attributes {
 	res := Attributes{}
 
 	for key, value := range *a {
-		res.Set(key, value)
+		_ = res.SafeSet([]string{key}, value)
 	}
 
 	return &res
@@ -202,7 +202,7 @@ func (a *Attributes) GetSlice(path string) []interface{} {
 	if !exist {
 		return nil
 	}
-	return *val.(*[]interface{})
+	return val.([]interface{})
 }
 
 func (a *Attributes) GetString(path string) *string {
@@ -219,7 +219,7 @@ func (a *Attributes) GetStringSlice(path string) []string {
 	if !exist {
 		return nil
 	}
-	return *val.(*[]string)
+	return val.([]string)
 }
 
 func (a *Attributes) GetBool(path string) *bool {
@@ -232,16 +232,21 @@ func (a *Attributes) GetBool(path string) *bool {
 }
 
 func (a *Attributes) GetInt(path string) *int {
+	val := a.GetFloat64(path)
+	if val == nil {
+		return nil
+	}
+	v := int(*val)
+	return &v
+}
+
+func (a *Attributes) GetFloat64(path string) *float64 {
 	val, exist := (*a)[path]
 	if !exist {
 		return nil
 	}
-	v := val.(int)
+	v := val.(float64)
 	return &v
-}
-
-func (a *Attributes) Set(path string, value interface{}) {
-	(*a)[path] = value
 }
 
 func (a *Attributes) SafeDelete(path []string) {

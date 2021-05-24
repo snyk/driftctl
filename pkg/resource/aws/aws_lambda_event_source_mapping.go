@@ -48,7 +48,8 @@ func (r *AwsLambdaEventSourceMapping) CtyValue() *cty.Value {
 }
 
 func initAwsLambdaEventSourceMappingMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsLambdaEventSourceMappingResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsLambdaEventSourceMappingResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.SafeDelete([]string{"state_transition_reason"})
 		val.SafeDelete([]string{"state"})
 		val.SafeDelete([]string{"starting_position_timestamp"})

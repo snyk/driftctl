@@ -58,7 +58,8 @@ func (r *AwsAmi) CtyValue() *cty.Value {
 }
 
 func initAwsAmiMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsAmiResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsAmiResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 	})
 }

@@ -182,14 +182,13 @@ func (r *TerraformStateReader) decode(values map[string][]cty.Value) ([]resource
 				schema, exist := r.resourceSchemaRepository.GetSchema(res.TerraformType())
 				ctyAttr := resource.ToResourceAttributes(res.CtyValue())
 				ctyAttr.SanitizeDefaults()
-				if exist && schema.NormalizeFunc != nil {
-					schema.NormalizeFunc(ctyAttr)
-				}
-
 				newRes := &resource.AbstractResource{
 					Id:    res.TerraformId(),
 					Type:  res.TerraformType(),
 					Attrs: ctyAttr,
+				}
+				if exist && schema.NormalizeFunc != nil {
+					schema.NormalizeFunc(newRes)
 				}
 				results = append(results, newRes)
 				continue

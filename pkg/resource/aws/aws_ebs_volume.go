@@ -37,7 +37,8 @@ func (r *AwsEbsVolume) CtyValue() *cty.Value {
 }
 
 func initAwsEbsVolumeMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsEbsVolumeResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsEbsVolumeResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.SafeDelete([]string{"arn"})
 		val.SafeDelete([]string{"outpost_arn"})
 		val.SafeDelete([]string{"snapshot_id"})

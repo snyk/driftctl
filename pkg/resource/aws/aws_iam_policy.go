@@ -38,7 +38,8 @@ func initAwsIAMPolicyMetaData(resourceSchemaRepository resource.SchemaRepository
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetNormalizeFunc(AwsIamPolicyResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsIamPolicyResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		jsonString, err := helpers.NormalizeJsonString((*val)["policy"])
 		if err == nil {
 			val.SafeSet([]string{"policy"}, jsonString)

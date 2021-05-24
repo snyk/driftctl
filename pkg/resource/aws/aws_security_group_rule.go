@@ -53,20 +53,20 @@ func CreateSecurityGroupRuleIdHash(attrs *resource.Attributes) string {
 	buf.WriteString(fmt.Sprintf("%s-", *attrs.GetString("protocol")))
 	buf.WriteString(fmt.Sprintf("%s-", *attrs.GetString("type")))
 
-	if attrs.GetStringSlice("cidr_blocks") != nil {
-		for _, v := range attrs.GetStringSlice("cidr_blocks") {
+	if attrs.GetSlice("cidr_blocks") != nil {
+		for _, v := range attrs.GetSlice("cidr_blocks") {
 			buf.WriteString(fmt.Sprintf("%s-", v))
 		}
 	}
 
-	if attrs.GetStringSlice("ipv6_cidr_blocks") != nil {
-		for _, v := range attrs.GetStringSlice("ipv6_cidr_blocks") {
+	if attrs.GetSlice("ipv6_cidr_blocks") != nil {
+		for _, v := range attrs.GetSlice("ipv6_cidr_blocks") {
 			buf.WriteString(fmt.Sprintf("%s-", v))
 		}
 	}
 
-	if attrs.GetStringSlice("prefix_list_ids") != nil {
-		for _, v := range attrs.GetStringSlice("prefix_list_ids") {
+	if attrs.GetSlice("prefix_list_ids") != nil {
+		for _, v := range attrs.GetSlice("prefix_list_ids") {
 			buf.WriteString(fmt.Sprintf("%s-", v))
 		}
 	}
@@ -85,17 +85,14 @@ func CreateSecurityGroupRuleIdHash(attrs *resource.Attributes) string {
 }
 
 func initAwsSecurityGroupRuleMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsDefaultSecurityGroupResourceType, func(val *resource.Attributes) {
-		val.SafeDelete([]string{"self"})
-		if sgid := val.GetString("security_group_id"); sgid != nil && *sgid == "" {
-			val.SafeDelete([]string{"security_group_id"})
-		}
+	resourceSchemaRepository.SetNormalizeFunc(AwsSecurityGroupRuleResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
+		val.DeleteIfDefault("security_group_id")
+		val.DeleteIfDefault("source_security_group_id")
 
 		// On first run, this field is set to null in state file and to "" after one refresh or apply
 		// This ensure that if we find a nil value we dont drift
-		if desc := val.GetString("description"); desc != nil && *desc == "" {
-			val.SafeDelete([]string{"description"})
-		}
+		val.DeleteIfDefault("description")
 
 		// If protocol is all (e.g. -1), tcp, udp, icmp or icmpv6 then we leave the resource untouched
 		// Else we delete the FromPort/ToPort and recreate the rule's id
@@ -106,6 +103,8 @@ func initAwsSecurityGroupRuleMetaData(resourceSchemaRepository resource.SchemaRe
 
 		val.SafeDelete([]string{"from_port"})
 		val.SafeDelete([]string{"to_port"})
-		val.Set("id", CreateSecurityGroupRuleIdHash(val))
+		id := CreateSecurityGroupRuleIdHash(val)
+		val.SafeSet([]string{"id"}, id)
+		res.Id = id
 	})
 }

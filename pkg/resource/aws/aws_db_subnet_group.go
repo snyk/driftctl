@@ -32,7 +32,8 @@ func (r *AwsDbSubnetGroup) CtyValue() *cty.Value {
 }
 
 func initAwsDbSubnetGroupMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsDbSubnetGroupResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsDbSubnetGroupResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.SafeDelete([]string{"name_prefix"})
 	})
 }
