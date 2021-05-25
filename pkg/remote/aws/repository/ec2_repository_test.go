@@ -55,7 +55,7 @@ func Test_ec2Repository_ListAllImages(t *testing.T) {
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
-				cache:  cache.New(5 * 1024),
+				cache:  cache.New(10),
 			}
 			got, err := r.ListAllImages()
 			assert.Equal(t, tt.wantErr, err)
@@ -129,7 +129,7 @@ func Test_ec2Repository_ListAllSnapshots(t *testing.T) {
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
-				cache:  cache.New(5 * 1024),
+				cache:  cache.New(10),
 			}
 			got, err := r.ListAllSnapshots()
 			assert.Equal(t, tt.wantErr, err)
@@ -199,7 +199,7 @@ func Test_ec2Repository_ListAllVolumes(t *testing.T) {
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
-				cache:  cache.New(5 * 1024),
+				cache:  cache.New(10),
 			}
 			got, err := r.ListAllVolumes()
 			assert.Equal(t, tt.wantErr, err)
@@ -254,7 +254,7 @@ func Test_ec2Repository_ListAllAddresses(t *testing.T) {
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
-				cache:  cache.New(5 * 1024),
+				cache:  cache.New(10),
 			}
 			got, err := r.ListAllAddresses()
 			assert.Equal(t, tt.wantErr, err)
@@ -309,7 +309,7 @@ func Test_ec2Repository_ListAllAddressesAssociation(t *testing.T) {
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
-				cache:  cache.New(5 * 1024),
+				cache:  cache.New(10),
 			}
 			got, err := r.ListAllAddressesAssociation()
 			assert.Equal(t, tt.wantErr, err)
@@ -403,7 +403,7 @@ func Test_ec2Repository_ListAllInstances(t *testing.T) {
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
-				cache:  cache.New(5 * 1024),
+				cache:  cache.New(10),
 			}
 			got, err := r.ListAllInstances()
 			assert.Equal(t, tt.wantErr, err)
@@ -458,7 +458,7 @@ func Test_ec2Repository_ListAllKeyPairs(t *testing.T) {
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
-				cache:  cache.New(5 * 1024),
+				cache:  cache.New(10),
 			}
 			got, err := r.ListAllKeyPairs()
 			assert.Equal(t, tt.wantErr, err)
