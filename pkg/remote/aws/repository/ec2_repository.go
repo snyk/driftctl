@@ -30,7 +30,7 @@ type ec2Repository struct {
 func NewEC2Repository(session *session.Session) *ec2Repository {
 	return &ec2Repository{
 		ec2.New(session),
-		cache.New(),
+		cache.New(5 * 1024),
 	}
 }
 
@@ -48,7 +48,7 @@ func (r *ec2Repository) ListAllImages() ([]*ec2.Image, error) {
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Set("ec2AllImages", images.Images)
+	r.cache.Put("ec2AllImages", images.Images)
 	return images.Images, err
 }
 
@@ -70,7 +70,7 @@ func (r *ec2Repository) ListAllSnapshots() ([]*ec2.Snapshot, error) {
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Set("ec2AllSnapshots", snapshots)
+	r.cache.Put("ec2AllSnapshots", snapshots)
 	return snapshots, err
 }
 
@@ -88,7 +88,7 @@ func (r *ec2Repository) ListAllVolumes() ([]*ec2.Volume, error) {
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Set("ec2AllVolumes", volumes)
+	r.cache.Put("ec2AllVolumes", volumes)
 	return volumes, nil
 }
 
@@ -102,7 +102,7 @@ func (r *ec2Repository) ListAllAddresses() ([]*ec2.Address, error) {
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Set("ec2AllAddresses", response.Addresses)
+	r.cache.Put("ec2AllAddresses", response.Addresses)
 	return response.Addresses, nil
 }
 
@@ -121,7 +121,7 @@ func (r *ec2Repository) ListAllAddressesAssociation() ([]string, error) {
 			results = append(results, aws.StringValue(address.AssociationId))
 		}
 	}
-	r.cache.Set("ec2AddressesAssociation", results)
+	r.cache.Put("ec2AddressesAssociation", results)
 	return results, nil
 }
 
@@ -141,7 +141,7 @@ func (r *ec2Repository) ListAllInstances() ([]*ec2.Instance, error) {
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Set("ec2AllInstances", instances)
+	r.cache.Put("ec2AllInstances", instances)
 	return instances, nil
 }
 
@@ -155,6 +155,6 @@ func (r *ec2Repository) ListAllKeyPairs() ([]*ec2.KeyPairInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Set("ec2AllKeyPairs", pairs.KeyPairs)
+	r.cache.Put("ec2AllKeyPairs", pairs.KeyPairs)
 	return pairs.KeyPairs, err
 }
