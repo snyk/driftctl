@@ -35,7 +35,8 @@ func initAwsSqsQueuePolicyMetaData(resourceSchemaRepository resource.SchemaRepos
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetNormalizeFunc(AwsSqsQueuePolicyResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsSqsQueuePolicyResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		jsonString, err := helpers.NormalizeJsonString((*val)["policy"])
 		if err != nil {
 			return

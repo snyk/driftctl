@@ -46,7 +46,8 @@ func (r *AwsRoute) CtyValue() *cty.Value {
 }
 
 func initAwsRouteMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsRouteResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsRouteResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 
 		val.DeleteIfDefault("vpc_endpoint_id")

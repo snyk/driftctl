@@ -31,7 +31,8 @@ func (r *AwsKmsAlias) CtyValue() *cty.Value {
 }
 
 func initAwsKmsAliasMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsKmsAliasResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsKmsAliasResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.SafeDelete([]string{"name"})
 		val.SafeDelete([]string{"name_prefix"})
 	})

@@ -33,7 +33,8 @@ func (r *AwsIamUser) CtyValue() *cty.Value {
 }
 
 func initAwsIAMUserMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsIamUserResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsIamUserResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		permissionsBoundary, exist := val.Get("permissions_boundary")
 		if exist && permissionsBoundary == "" {
 			val.SafeDelete([]string{"permissions_boundary"})

@@ -11,7 +11,7 @@ func TestAcc_AwsSecurityGroup(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.14.9",
 		Paths:            []string{"./testdata/acc/aws_security_group"},
-		Args:             []string{"scan", "--filter", "Type=='aws_security_group' || Type=='aws_default_security_group'"},
+		Args:             []string{"scan", "--filter", "Type=='aws_security_group' || Type=='aws_default_security_group' || Type=='aws_security_group_rule'"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
@@ -21,8 +21,10 @@ func TestAcc_AwsSecurityGroup(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					result.AssertInfrastructureIsInSync()
-					result.Equal(2, result.Summary().TotalManaged)
+					result.AssertManagedCount(31)
+					result.AssertDeletedCount(2)
+					result.AssertUnmanagedCount(5)
+					result.AssertDriftCountTotal(0)
 				},
 			},
 		},

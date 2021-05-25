@@ -55,7 +55,8 @@ func initSnsTopicMetaData(resourceSchemaRepository resource.SchemaRepositoryInte
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetNormalizeFunc(AwsSnsTopicResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsSnsTopicResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.DeleteIfDefault("sqs_success_feedback_sample_rate")
 		val.DeleteIfDefault("lambda_success_feedback_sample_rate")
 		val.DeleteIfDefault("http_success_feedback_sample_rate")

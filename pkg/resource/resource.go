@@ -62,8 +62,8 @@ var refactoredResources = []string{
 	"aws_s3_bucket_metric",
 	"aws_s3_bucket_notification",
 	"aws_s3_bucket_policy",
-	// "aws_security_group",
-	// "aws_security_group_rule",
+	"aws_security_group",
+	"aws_security_group_rule",
 	"aws_sns_topic",
 	"aws_sns_topic_policy",
 	"aws_sns_topic_subscription",
@@ -182,9 +182,71 @@ func ToResourceAttributes(val *cty.Value) *Attributes {
 
 type Attributes map[string]interface{}
 
+func (a *Attributes) Copy() *Attributes {
+	res := Attributes{}
+
+	for key, value := range *a {
+		_ = res.SafeSet([]string{key}, value)
+	}
+
+	return &res
+}
+
 func (a *Attributes) Get(path string) (interface{}, bool) {
 	val, exist := (*a)[path]
 	return val, exist
+}
+
+func (a *Attributes) GetSlice(path string) []interface{} {
+	val, exist := (*a)[path]
+	if !exist {
+		return nil
+	}
+	return val.([]interface{})
+}
+
+func (a *Attributes) GetString(path string) *string {
+	val, exist := (*a)[path]
+	if !exist {
+		return nil
+	}
+	v := val.(string)
+	return &v
+}
+
+func (a *Attributes) GetStringSlice(path string) []string {
+	val, exist := (*a)[path]
+	if !exist {
+		return nil
+	}
+	return val.([]string)
+}
+
+func (a *Attributes) GetBool(path string) *bool {
+	val, exist := (*a)[path]
+	if !exist {
+		return nil
+	}
+	v := val.(bool)
+	return &v
+}
+
+func (a *Attributes) GetInt(path string) *int {
+	val := a.GetFloat64(path)
+	if val == nil {
+		return nil
+	}
+	v := int(*val)
+	return &v
+}
+
+func (a *Attributes) GetFloat64(path string) *float64 {
+	val, exist := (*a)[path]
+	if !exist {
+		return nil
+	}
+	v := val.(float64)
+	return &v
 }
 
 func (a *Attributes) SafeDelete(path []string) {

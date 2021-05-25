@@ -55,7 +55,8 @@ func (r *AwsDefaultSecurityGroup) CtyValue() *cty.Value {
 }
 
 func initAwsDefaultSecurityGroupMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsDefaultSecurityGroupResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsDefaultSecurityGroupResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.SafeDelete([]string{"revoke_rules_on_delete"})
 		val.SafeDelete([]string{"ingress"})
 		val.SafeDelete([]string{"egress"})

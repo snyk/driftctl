@@ -37,4 +37,6 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsLambdaEventSourceMappingMetaData(resourceSchemaRepository)
 	initAwsSubnetMetaData(resourceSchemaRepository)
 	initAwsSqsQueuePolicyMetaData(resourceSchemaRepository)
+	initAwsSecurityGroupRuleMetaData(resourceSchemaRepository)
+	initAwsSecurityGroupMetaData(resourceSchemaRepository)
 }

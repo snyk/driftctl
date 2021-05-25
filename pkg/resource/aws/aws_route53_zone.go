@@ -37,7 +37,8 @@ func (r *AwsRoute53Zone) CtyValue() *cty.Value {
 }
 
 func initAwsRoute53ZoneMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsRoute53ZoneResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsRoute53ZoneResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.SafeDelete([]string{"force_destroy"})
 	})
 }

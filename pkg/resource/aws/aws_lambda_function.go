@@ -80,7 +80,8 @@ func (r *AwsLambdaFunction) CtyValue() *cty.Value {
 }
 
 func initAwsLambdaFunctionMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsLambdaFunctionResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsLambdaFunctionResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 		val.SafeDelete([]string{"publish"})
 		val.SafeDelete([]string{"last_modified"})

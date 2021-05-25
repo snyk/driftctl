@@ -3,7 +3,6 @@ package middlewares
 import (
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 )
@@ -11,23 +10,35 @@ import (
 func TestDefaultVPCSecurityGroupShouldBeIgnored(t *testing.T) {
 	middleware := NewVPCDefaultSecurityGroupSanitizer()
 	remoteResources := []resource.Resource{
-		&aws.AwsSecurityGroup{
+		&resource.AbstractResource{
 			Id:   "sg-test",
-			Name: awssdk.String("test"),
+			Type: aws.AwsSecurityGroupResourceType,
+			Attrs: &resource.Attributes{
+				"name": "test",
+			},
 		},
-		&aws.AwsSecurityGroup{
+		&resource.AbstractResource{
 			Id:   "sg-foo",
-			Name: awssdk.String("foo"),
+			Type: aws.AwsSecurityGroupResourceType,
+			Attrs: &resource.Attributes{
+				"name": "foo",
+			},
 		},
-		&aws.AwsDefaultSecurityGroup{
+		&resource.AbstractResource{
 			Id:   "sg-default",
-			Name: awssdk.String("default"),
+			Type: aws.AwsDefaultSecurityGroupResourceType,
+			Attrs: &resource.Attributes{
+				"name": "default",
+			},
 		},
 	}
 	stateResources := []resource.Resource{
-		&aws.AwsSecurityGroup{
+		&resource.AbstractResource{
 			Id:   "sg-bar",
-			Name: awssdk.String("bar"),
+			Type: aws.AwsSecurityGroupResourceType,
+			Attrs: &resource.Attributes{
+				"name": "bar",
+			},
 		},
 	}
 	err := middleware.Execute(&remoteResources, &stateResources)
@@ -42,23 +53,35 @@ func TestDefaultVPCSecurityGroupShouldBeIgnored(t *testing.T) {
 func TestDefaultVPCSecurityGroupShouldNotBeIgnoredWhenManaged(t *testing.T) {
 	middleware := NewVPCDefaultSecurityGroupSanitizer()
 	remoteResources := []resource.Resource{
-		&aws.AwsSecurityGroup{
+		&resource.AbstractResource{
 			Id:   "sg-test",
-			Name: awssdk.String("test"),
+			Type: aws.AwsSecurityGroupResourceType,
+			Attrs: &resource.Attributes{
+				"name": "test",
+			},
 		},
-		&aws.AwsSecurityGroup{
+		&resource.AbstractResource{
 			Id:   "sg-foo",
-			Name: awssdk.String("foo"),
+			Type: aws.AwsSecurityGroupResourceType,
+			Attrs: &resource.Attributes{
+				"name": "foo",
+			},
 		},
-		&aws.AwsDefaultSecurityGroup{
+		&resource.AbstractResource{
 			Id:   "sg-default",
-			Name: awssdk.String("default"),
+			Type: aws.AwsDefaultSecurityGroupResourceType,
+			Attrs: &resource.Attributes{
+				"name": "default",
+			},
 		},
 	}
 	stateResources := []resource.Resource{
-		&aws.AwsDefaultSecurityGroup{
+		&resource.AbstractResource{
 			Id:   "sg-default",
-			Name: awssdk.String("default"),
+			Type: aws.AwsDefaultSecurityGroupResourceType,
+			Attrs: &resource.Attributes{
+				"name": "default",
+			},
 		},
 	}
 	err := middleware.Execute(&remoteResources, &stateResources)
@@ -68,8 +91,8 @@ func TestDefaultVPCSecurityGroupShouldNotBeIgnoredWhenManaged(t *testing.T) {
 	if len(remoteResources) != 3 {
 		t.Error("Default security group was ignored")
 	}
-	managedDefaultSecurityGroup := remoteResources[2].(*aws.AwsDefaultSecurityGroup)
-	if *managedDefaultSecurityGroup.Name != "default" {
+	managedDefaultSecurityGroup := remoteResources[2].(*resource.AbstractResource)
+	if *managedDefaultSecurityGroup.Attrs.GetString("name") != "default" {
 		t.Error("Default security group is ignored when it should not be")
 	}
 }

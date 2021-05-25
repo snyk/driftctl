@@ -36,7 +36,8 @@ func initSnsTopicPolicyMetaData(resourceSchemaRepository resource.SchemaReposito
 		},
 	})
 
-	resourceSchemaRepository.SetNormalizeFunc(AwsSnsTopicPolicyResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsSnsTopicPolicyResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		jsonString, err := helpers.NormalizeJsonString((*val)["policy"])
 		if err != nil {
 			return

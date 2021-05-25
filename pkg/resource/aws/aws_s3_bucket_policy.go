@@ -34,7 +34,8 @@ func initAwsS3BucketPolicyMetaData(resourceSchemaRepository resource.SchemaRepos
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetNormalizeFunc(AwsS3BucketPolicyResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsS3BucketPolicyResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		jsonString, err := helpers.NormalizeJsonString((*val)["policy"])
 		if err != nil {
 			return

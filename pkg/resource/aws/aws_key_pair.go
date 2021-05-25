@@ -33,7 +33,8 @@ func (r *AwsKeyPair) CtyValue() *cty.Value {
 }
 
 func initAwsKeyPairMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsKeyPairResourceType, func(val *resource.Attributes) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsKeyPairResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
 		val.SafeDelete([]string{"key_name_prefix"})
 		val.SafeDelete([]string{"public_key"})
 	})
