@@ -45,7 +45,7 @@ func (c *LRUCache) Get(key string) interface{} {
 	return nil
 }
 
-func (c *LRUCache) Put(key string, value interface{}) (overridden bool) {
+func (c *LRUCache) Put(key string, value interface{}) bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -53,11 +53,10 @@ func (c *LRUCache) Put(key string, value interface{}) (overridden bool) {
 	if node, ok := c.m[key]; ok {
 		c.l.MoveToFront(node)
 		node.Value.(*list.Element).Value = pair{key: key, value: value}
-		overridden = true
-		return
+		return true
 	}
 
-	// delete the last list node if the list is full
+	// if the list is full, delete the last element
 	if c.l.Len() == c.cap {
 		idx := c.l.Back().Value.(*list.Element).Value.(pair).key
 		delete(c.m, idx)
@@ -74,7 +73,7 @@ func (c *LRUCache) Put(key string, value interface{}) (overridden bool) {
 	element := c.l.PushFront(node)
 	c.m[key] = element
 
-	return
+	return false
 }
 
 func (c *LRUCache) Len() int {

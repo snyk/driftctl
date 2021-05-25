@@ -27,10 +27,10 @@ type ec2Repository struct {
 	cache  cache.Cache
 }
 
-func NewEC2Repository(session *session.Session) *ec2Repository {
+func NewEC2Repository(session *session.Session, c cache.Cache) *ec2Repository {
 	return &ec2Repository{
 		ec2.New(session),
-		cache.New(5 * 1024),
+		c,
 	}
 }
 

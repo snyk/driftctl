@@ -5,6 +5,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -33,6 +34,8 @@ func Init(alerter *alerter.Alerter,
 		return err
 	}
 
+	repositoryCache := cache.New(5 * 1024)
+
 	s3Repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session))
 	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.AWS, provider)
@@ -43,15 +46,15 @@ func Init(alerter *alerter.Alerter,
 	supplierLibrary.AddSupplier(NewS3BucketMetricSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewS3BucketNotificationSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewS3BucketPolicySupplier(provider, s3Repository, deserializer))
-	supplierLibrary.AddSupplier(NewEC2EipSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewEC2EipAssociationSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewEC2EbsVolumeSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewEC2EbsSnapshotSupplier(provider, deserializer))
+	supplierLibrary.AddSupplier(NewEC2EipSupplier(provider, deserializer, repositoryCache))
+	supplierLibrary.AddSupplier(NewEC2EipAssociationSupplier(provider, deserializer, repositoryCache))
+	supplierLibrary.AddSupplier(NewEC2EbsVolumeSupplier(provider, deserializer, repositoryCache))
+	supplierLibrary.AddSupplier(NewEC2EbsSnapshotSupplier(provider, deserializer, repositoryCache))
 	supplierLibrary.AddSupplier(NewRoute53ZoneSupplier(provider, deserializer))
 	supplierLibrary.AddSupplier(NewRoute53RecordSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewEC2InstanceSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewEC2AmiSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewEC2KeyPairSupplier(provider, deserializer))
+	supplierLibrary.AddSupplier(NewEC2InstanceSupplier(provider, deserializer, repositoryCache))
+	supplierLibrary.AddSupplier(NewEC2AmiSupplier(provider, deserializer, repositoryCache))
+	supplierLibrary.AddSupplier(NewEC2KeyPairSupplier(provider, deserializer, repositoryCache))
 	supplierLibrary.AddSupplier(NewLambdaFunctionSupplier(provider, deserializer))
 	supplierLibrary.AddSupplier(NewDBSubnetGroupSupplier(provider, deserializer))
 	supplierLibrary.AddSupplier(NewDBInstanceSupplier(provider, deserializer))
