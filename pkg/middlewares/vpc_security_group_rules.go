@@ -30,6 +30,10 @@ func (m VPCSecurityGroupRuleSanitizer) Execute(remoteResources, resourcesFromSta
 
 		rule, _ := stateResource.(*resource.AbstractResource)
 
+		if rule.Attrs.GetBool("self") != nil && *rule.Attrs.GetBool("self") {
+			_ = rule.Attrs.SafeSet([]string{"source_security_group_id"}, *rule.Attrs.GetString("security_group_id"))
+		}
+
 		if !shouldBeSplit(rule) {
 			rule.Attrs.SafeDelete([]string{"self"})
 			newStateResources = append(newStateResources, stateResource)
