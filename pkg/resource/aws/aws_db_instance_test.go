@@ -7,7 +7,7 @@ import (
 	"github.com/cloudskiff/driftctl/test/acceptance"
 )
 
-func TestAcc_AwsDbInstance_WithCharacterSetName(t *testing.T) {
+func TestAcc_AwsDbInstance(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		Paths: []string{"./testdata/acc/aws_db_instance"},
 		Args:  []string{"scan", "--filter", "Type=='aws_db_instance'"},
@@ -17,8 +17,8 @@ func TestAcc_AwsDbInstance_WithCharacterSetName(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					result.AssertDriftCountTotal(0)
-					result.Equal(1, result.Summary().TotalManaged)
+					result.AssertInfrastructureIsInSync()
+					result.AssertManagedCount(1)
 				},
 			},
 		},
