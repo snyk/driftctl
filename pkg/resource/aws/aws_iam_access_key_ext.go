@@ -1,8 +1,6 @@
 package aws
 
 import (
-	"fmt"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
@@ -19,9 +17,10 @@ func (r *AwsIamAccessKey) NormalizeForProvider() (resource.Resource, error) {
 	return r, nil
 }
 
-func (r *AwsIamAccessKey) String() string {
-	if r.User == nil {
-		return r.TerraformId()
+func (r *AwsIamAccessKey) Attributes() map[string]string {
+	attrs := make(map[string]string)
+	if r.User != nil && *r.User != "" {
+		attrs["User"] = *r.User
 	}
-	return fmt.Sprintf("%s (User: %s)", r.TerraformId(), *r.User)
+	return attrs
 }

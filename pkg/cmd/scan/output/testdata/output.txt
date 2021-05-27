@@ -7,10 +7,10 @@ Found resources not covered by IaC:
     - unmanaged-id-1
     - unmanaged-id-2
 Found changed resources:
-  - diff-id-1 (aws_diff_resource):
-    ~ updated.field: "foobar" => "barfoo"
-    + new.field: <nil> => "newValue"
-    - a: "oldValue" => <nil>
+    - diff-id-1 (aws_diff_resource):
+        ~ updated.field: "foobar" => "barfoo"
+        + new.field: <nil> => "newValue"
+        - a: "oldValue" => <nil>
 Found 6 resource(s)
  - 33% coverage
  - 2 covered by IaC

@@ -53,6 +53,12 @@ func TestConsole_Write(t *testing.T) {
 			wantErr:    false,
 		},
 		{
+			name:       "test console output with resource without attributes",
+			goldenfile: "output_empty_attributes.txt",
+			args:       args{analysis: fakeAnalysisWithoutAttrs()},
+			wantErr:    false,
+		},
+		{
 			name:       "test console output with drift on computed fields",
 			goldenfile: "output_computed_fields.txt",
 			args:       args{analysis: fakeAnalysisWithComputedFields()},

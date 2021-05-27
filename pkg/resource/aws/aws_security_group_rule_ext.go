@@ -84,49 +84,46 @@ func (r *AwsSecurityGroupRule) CreateIdHash() string {
 	return fmt.Sprintf("sgrule-%d", hashcode.String(buf.String()))
 }
 
-func (r *AwsSecurityGroupRule) String() string {
-	attrs := []string{}
+func (r *AwsSecurityGroupRule) Attributes() map[string]string {
+	attrs := make(map[string]string)
 	if r.Type != nil && *r.Type != "" {
-		attrs = append(attrs, fmt.Sprintf("Type: %s", *r.Type))
+		attrs["Type"] = *r.Type
 	}
 	if r.SecurityGroupId != nil && *r.SecurityGroupId != "" {
-		attrs = append(attrs, fmt.Sprintf("SecurityGroup: %s", *r.SecurityGroupId))
+		attrs["SecurityGroup"] = *r.SecurityGroupId
 	}
 	if r.Protocol != nil && *r.Protocol != "" {
 		proto := *r.Protocol
 		if proto == "-1" {
 			proto = "All"
 		}
-		attrs = append(attrs, fmt.Sprintf("Protocol: %s", proto))
+		attrs["Protocol"] = proto
 	}
 	if r.FromPort != nil && r.ToPort != nil {
 		portRange := "All"
-		// If from and to are equal mean we got a single port
-		// So display "%d"
 		if *r.FromPort != 0 && *r.FromPort == *r.ToPort {
 			portRange = fmt.Sprintf("%d", *r.FromPort)
 		}
-		// If we got a port range, display "%d-%d"
 		if *r.FromPort != 0 && *r.ToPort != 0 && *r.FromPort != *r.ToPort {
 			portRange = fmt.Sprintf("%d-%d", *r.FromPort, *r.ToPort)
 		}
-		attrs = append(attrs, fmt.Sprintf("Ports: %s", portRange))
+		attrs["Ports"] = portRange
 	}
 	sourceOrDestination := "Source"
 	if r.Type != nil && *r.Type == "egress" {
 		sourceOrDestination = "Destination"
 	}
 	if r.CidrBlocks != nil && len(*r.CidrBlocks) > 0 {
-		attrs = append(attrs, fmt.Sprintf("%s: %s", sourceOrDestination, strings.Join(*r.CidrBlocks, ", ")))
+		attrs[sourceOrDestination] = strings.Join(*r.CidrBlocks, ", ")
 	}
 	if r.Ipv6CidrBlocks != nil && len(*r.Ipv6CidrBlocks) > 0 {
-		attrs = append(attrs, fmt.Sprintf("%s: %s", sourceOrDestination, strings.Join(*r.Ipv6CidrBlocks, ", ")))
+		attrs[sourceOrDestination] = strings.Join(*r.Ipv6CidrBlocks, ", ")
 	}
 	if r.SourceSecurityGroupId != nil && *r.SourceSecurityGroupId != "" {
-		attrs = append(attrs, fmt.Sprintf("%s: %s", sourceOrDestination, *r.SourceSecurityGroupId))
+		attrs[sourceOrDestination] = *r.SecurityGroupId
 	}
 	if r.PrefixListIds != nil && len(*r.PrefixListIds) > 0 {
-		attrs = append(attrs, fmt.Sprintf("%s: %s", sourceOrDestination, strings.Join(*r.PrefixListIds, ", ")))
+		attrs[sourceOrDestination] = strings.Join(*r.PrefixListIds, ", ")
 	}
-	return strings.Join(attrs, ", ")
+	return attrs
 }
