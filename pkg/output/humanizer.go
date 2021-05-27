@@ -8,7 +8,7 @@ type AttributesGetter interface {
 	Attributes() map[string]string
 }
 
-func HumanMapPrint(res AttributesGetter) string {
+func HumanizeAttribute(res AttributesGetter) string {
 	if len(res.Attributes()) <= 0 {
 		return ""
 	}

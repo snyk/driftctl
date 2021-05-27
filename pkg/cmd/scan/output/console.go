@@ -42,7 +42,9 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 			for _, res := range resources {
 				humanString := fmt.Sprintf("    - %s", res.TerraformId())
 				if humanizerRes, ok := res.(output.AttributesGetter); ok {
-					humanString += fmt.Sprintf("\n        %s", output.HumanMapPrint(humanizerRes))
+					if humanAttrs := output.HumanizeAttribute(humanizerRes); humanAttrs != "" {
+						humanString += fmt.Sprintf("\n        %s", humanAttrs)
+					}
 				}
 				fmt.Println(humanString)
 			}
@@ -57,7 +59,9 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 			for _, res := range resource {
 				humanString := fmt.Sprintf("    - %s", res.TerraformId())
 				if humanizerRes, ok := res.(output.AttributesGetter); ok {
-					humanString += fmt.Sprintf("\n        %s", output.HumanMapPrint(humanizerRes))
+					if humanAttrs := output.HumanizeAttribute(humanizerRes); humanAttrs != "" {
+						humanString += fmt.Sprintf("\n        %s", humanAttrs)
+					}
 				}
 				fmt.Println(humanString)
 			}
@@ -70,8 +74,10 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 			humanString := fmt.Sprintf("    - %s (%s):", difference.Res.TerraformId(), difference.Res.TerraformType())
 			whiteSpace := "        "
 			if humanizerRes, ok := difference.Res.(output.AttributesGetter); ok {
-				humanString += fmt.Sprintf("\n        %s", output.HumanMapPrint(humanizerRes))
-				whiteSpace = "            "
+				if humanAttrs := output.HumanizeAttribute(humanizerRes); humanAttrs != "" {
+					humanString += fmt.Sprintf("\n        %s", humanAttrs)
+					whiteSpace = "            "
+				}
 			}
 			fmt.Println(humanString)
 			for _, change := range difference.Changelog {
