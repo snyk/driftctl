@@ -134,6 +134,26 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 	return &a
 }
 
+func fakeAnalysisWithoutAttrs() *analyser.Analysis {
+	a := analyser.Analysis{}
+	a.AddDeleted(
+		&testresource.FakeResourceStringer{
+			Id: "dfjkgnbsgj",
+		},
+	)
+	a.AddManaged(
+		&testresource.FakeResourceStringer{
+			Id: "usqyfsdbgjsdgjkdfg",
+		},
+	)
+	a.AddUnmanaged(
+		&testresource.FakeResourceStringer{
+			Id: "duysgkfdjfdgfhd",
+		},
+	)
+	return &a
+}
+
 func fakeAnalysisWithStringerResources() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddDeleted(
