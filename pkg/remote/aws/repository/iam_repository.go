@@ -24,7 +24,7 @@ type iamRepository struct {
 	client iamiface.IAMAPI
 }
 
-func NewIAMClient(session *session.Session) *iamRepository {
+func NewIAMRepository(session *session.Session) *iamRepository {
 	return &iamRepository{
 		iam.New(session),
 	}

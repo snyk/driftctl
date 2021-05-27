@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
-	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
+	"github.com/cloudskiff/driftctl/test/mocks"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -125,7 +125,7 @@ func TestIamUserPolicySupplier_Resources(t *testing.T) {
 			fakeIam := repository.MockIAMRepository{}
 			c.mocks(&fakeIam)
 
-			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			s := &IamUserPolicySupplier{
 				provider,
 				deserializer,
