@@ -17,7 +17,7 @@ import (
 type IamUserPolicySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       repository.IAMRepository
+	repo         repository.IAMRepository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -25,17 +25,17 @@ func NewIamUserPolicySupplier(provider *AWSTerraformProvider) *IamUserPolicySupp
 	return &IamUserPolicySupplier{
 		provider,
 		awsdeserializer.NewIamUserPolicyDeserializer(),
-		repository.NewIAMClient(provider.session),
+		repository.NewIAMRepository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *IamUserPolicySupplier) Resources() ([]resource.Resource, error) {
-	users, err := s.client.ListAllUsers()
+	users, err := s.repo.ListAllUsers()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, resourceaws.AwsIamUserPolicyResourceType, resourceaws.AwsIamUserResourceType)
 	}
-	policies, err := s.client.ListAllUserPolicies(users)
+	policies, err := s.repo.ListAllUserPolicies(users)
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamUserPolicyResourceType)
 	}

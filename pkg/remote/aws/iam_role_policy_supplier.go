@@ -17,7 +17,7 @@ import (
 type IamRolePolicySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       repository.IAMRepository
+	repo         repository.IAMRepository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -25,17 +25,17 @@ func NewIamRolePolicySupplier(provider *AWSTerraformProvider) *IamRolePolicySupp
 	return &IamRolePolicySupplier{
 		provider,
 		awsdeserializer.NewIamRolePolicyDeserializer(),
-		repository.NewIAMClient(provider.session),
+		repository.NewIAMRepository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *IamRolePolicySupplier) Resources() ([]resource.Resource, error) {
-	roles, err := s.client.ListAllRoles()
+	roles, err := s.repo.ListAllRoles()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, resourceaws.AwsIamRolePolicyResourceType, resourceaws.AwsIamRoleResourceType)
 	}
-	policies, err := s.client.ListAllRolePolicies(roles)
+	policies, err := s.repo.ListAllRolePolicies(roles)
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamRolePolicyResourceType)
 	}

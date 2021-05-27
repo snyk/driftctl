@@ -16,7 +16,7 @@ import (
 type IamRolePolicyAttachmentSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer deserializer.CTYDeserializer
-	client       repository.IAMRepository
+	repo         repository.IAMRepository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -24,17 +24,17 @@ func NewIamRolePolicyAttachmentSupplier(provider *AWSTerraformProvider) *IamRole
 	return &IamRolePolicyAttachmentSupplier{
 		provider,
 		awsdeserializer.NewIamRolePolicyAttachmentDeserializer(),
-		repository.NewIAMClient(provider.session),
+		repository.NewIAMRepository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *IamRolePolicyAttachmentSupplier) Resources() ([]resource.Resource, error) {
-	roles, err := s.client.ListAllRoles()
+	roles, err := s.repo.ListAllRoles()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, resourceaws.AwsIamRolePolicyAttachmentResourceType, resourceaws.AwsIamRoleResourceType)
 	}
-	policyAttachments, err := s.client.ListAllRolePolicyAttachments(roles)
+	policyAttachments, err := s.repo.ListAllRolePolicyAttachments(roles)
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamRolePolicyAttachmentResourceType)
 	}
