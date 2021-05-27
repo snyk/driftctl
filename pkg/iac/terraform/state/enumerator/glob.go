@@ -1,6 +1,7 @@
 package enumerator
 
 import (
+	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
@@ -46,7 +47,16 @@ func Glob(pattern string) ([]string, error) {
 		return filepath.Glob(pattern)
 	}
 
-	files, err := doublestar.Glob(os.DirFS("."), path.Clean(pattern))
+	var files []string
+
+	err := doublestar.GlobWalk(os.DirFS("."), path.Clean(pattern), func(path string, d fs.DirEntry) error {
+		// Ensure paths aren't actually directories
+		// For example when the directory matches the glob pattern like it's a file
+		if !d.IsDir() {
+			files = append(files, path)
+		}
+		return nil
+	})
 	if err != nil {
 		return nil, err
 	}

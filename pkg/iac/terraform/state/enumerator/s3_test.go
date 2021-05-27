@@ -353,6 +353,34 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 			want: []string{},
 			err:  "no Terraform state was found in bucket-name/a/nested/prefix/**/*.tfstate, exiting",
 		},
+		{
+			name: "test folder terraform.tfstate is not recognized as a file",
+			config: config.SupplierConfig{
+				Path: "bucket-name/a/nested/**/*.tfstate",
+			},
+			mocks: func(client *awstest.MockFakeS3) {
+				input := &s3.ListObjectsV2Input{
+					Bucket: awssdk.String("bucket-name"),
+					Prefix: awssdk.String("a/nested"),
+				}
+				client.On(
+					"ListObjectsV2Pages",
+					input,
+					mock.MatchedBy(func(callback func(res *s3.ListObjectsV2Output, lastPage bool) bool) bool {
+						callback(&s3.ListObjectsV2Output{
+							Contents: []*s3.Object{
+								{
+									Key:  awssdk.String("a/nested/prefix/terraform.tfstate/terraform.tfstate"),
+									Size: awssdk.Int64(5),
+								},
+							},
+						}, true)
+						return true
+					}),
+				).Return(nil)
+			},
+			want: []string{"bucket-name/a/nested/prefix/terraform.tfstate/terraform.tfstate"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
