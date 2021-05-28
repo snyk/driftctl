@@ -43,13 +43,30 @@ func TestCache(t *testing.T) {
 	})
 
 	t.Run("should delete the least used keys", func(t *testing.T) {
-		cache := New(5)
+		keys := []struct {
+			key   string
+			value interface{}
+		}{
+			{key: "test-0", value: nil},
+			{key: "test-1", value: nil},
+			{key: "test-2", value: nil},
+			{key: "test-3", value: nil},
+			{key: "test-4", value: nil},
+			{key: "test-5", value: nil},
+			{key: "test-6", value: "value"},
+			{key: "test-7", value: "value"},
+			{key: "test-8", value: "value"},
+			{key: "test-9", value: "value"},
+			{key: "test-10", value: "value"},
+		}
 
+		cache := New(5)
 		for i := 0; i <= 10; i++ {
 			cache.Put(fmt.Sprintf("test-%d", i), "value")
 		}
-
-		assert.Equal(t, "value", cache.Get("test-10"))
+		for _, k := range keys {
+			assert.Equal(t, k.value, cache.Get(k.key))
+		}
 		assert.Equal(t, 5, cache.Len())
 	})
 }
