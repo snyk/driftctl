@@ -24,11 +24,11 @@ type Route53ZoneSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewRoute53ZoneSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *Route53ZoneSupplier {
+func NewRoute53ZoneSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.Route53Repository) *Route53ZoneSupplier {
 	return &Route53ZoneSupplier{
 		provider,
 		deserializer,
-		repository.NewRoute53Repository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

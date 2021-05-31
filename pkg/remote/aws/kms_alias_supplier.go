@@ -20,11 +20,11 @@ type KMSAliasSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewKMSAliasSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *KMSAliasSupplier {
+func NewKMSAliasSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.KMSRepository) *KMSAliasSupplier {
 	return &KMSAliasSupplier{
 		provider,
 		deserializer,
-		repository.NewKMSRepository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

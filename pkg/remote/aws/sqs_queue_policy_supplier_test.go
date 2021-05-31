@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
@@ -76,7 +77,7 @@ func TestSqsQueuePolicySupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewSqsQueuePolicySupplier(provider, deserializer))
+			supplierLibrary.AddSupplier(NewSqsQueuePolicySupplier(provider, deserializer, repository.NewSQSClient(provider.session)))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {

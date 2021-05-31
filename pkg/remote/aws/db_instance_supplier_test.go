@@ -112,7 +112,7 @@ func TestDBInstanceSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewDBInstanceSupplier(provider, deserializer))
+			supplierLibrary.AddSupplier(NewDBInstanceSupplier(provider, deserializer, repository.NewRDSRepository(provider.session)))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {

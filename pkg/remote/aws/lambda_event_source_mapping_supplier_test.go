@@ -88,7 +88,7 @@ func TestEventLambdaSourceMappingSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider, deserializer))
+			supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider, deserializer, repository.NewLambdaRepository(provider.session)))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {

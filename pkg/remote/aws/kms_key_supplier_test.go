@@ -77,7 +77,7 @@ func TestKMSKeySupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewKMSKeySupplier(provider, deserializer))
+			supplierLibrary.AddSupplier(NewKMSKeySupplier(provider, deserializer, repository.NewKMSRepository(provider.session)))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {

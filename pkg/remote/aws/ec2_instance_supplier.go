@@ -2,7 +2,6 @@ package aws
 
 import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -22,11 +21,11 @@ type EC2InstanceSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2InstanceSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, c cache.Cache) *EC2InstanceSupplier {
+func NewEC2InstanceSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *EC2InstanceSupplier {
 	return &EC2InstanceSupplier{
 		provider,
 		deserializer,
-		repository.NewEC2Repository(provider.session, c),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
