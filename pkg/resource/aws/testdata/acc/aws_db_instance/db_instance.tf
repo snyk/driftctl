@@ -1,13 +1,3 @@
-provider "aws" {
-    region = "us-east-1"
-}
-
-terraform {
-    required_providers {
-        aws = "3.19.0"
-    }
-}
-
 resource "aws_db_instance" "default" {
   allocated_storage    = 10
   engine               = "mysql"
