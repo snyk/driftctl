@@ -1,7 +1,6 @@
 package aws
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -65,9 +64,16 @@ func (r *AwsRoute53Record) NormalizeForProvider() (resource.Resource, error) {
 	return r, nil
 }
 
-func (r *AwsRoute53Record) String() string {
-	if r.Name == nil || r.Fqdn == nil || r.Type == nil || r.ZoneId == nil {
-		return r.TerraformId()
+func (r *AwsRoute53Record) Attributes() map[string]string {
+	attrs := make(map[string]string)
+	if r.Fqdn != nil && *r.Fqdn != "" {
+		attrs["Fqdn"] = *r.Fqdn
 	}
-	return fmt.Sprintf("%s (%s) (Zone: %s)", *r.Fqdn, *r.Type, *r.ZoneId)
+	if r.Type != nil && *r.Type != "" {
+		attrs["Type"] = *r.Type
+	}
+	if r.ZoneId != nil && *r.ZoneId != "" {
+		attrs["ZoneId"] = *r.ZoneId
+	}
+	return attrs
 }

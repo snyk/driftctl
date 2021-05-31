@@ -1,8 +1,6 @@
 package aws
 
 import (
-	"fmt"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
@@ -36,12 +34,13 @@ func (r *AwsSnsTopic) normalizeDefaultFields() {
 	}
 }
 
-func (r *AwsSnsTopic) String() string {
-	if r.DisplayName != nil && *r.DisplayName != "" && r.Name != nil && *r.Name != "" {
-		return fmt.Sprintf("%s (%s)", *r.DisplayName, *r.Name)
-	}
+func (r *AwsSnsTopic) Attributes() map[string]string {
+	attrs := make(map[string]string)
 	if r.Name != nil && *r.Name != "" {
-		return *r.Name
+		attrs["Name"] = *r.Name
+		if r.DisplayName != nil && *r.DisplayName != "" {
+			attrs["DisplayName"] = *r.DisplayName
+		}
 	}
-	return r.Id
+	return attrs
 }

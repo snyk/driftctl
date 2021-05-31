@@ -1,14 +1,15 @@
 package aws
 
-import "fmt"
-
-func (r *AwsRouteTableAssociation) String() string {
-	assoc := fmt.Sprintf("Table: %s", *r.RouteTableId)
+func (r *AwsRouteTableAssociation) Attributes() map[string]string {
+	attrs := make(map[string]string)
+	if r.RouteTableId != nil && *r.RouteTableId != "" {
+		attrs["Table"] = *r.RouteTableId
+	}
 	if r.GatewayId != nil && *r.GatewayId != "" {
-		assoc += fmt.Sprintf(", Gateway: %s", *r.GatewayId)
+		attrs["Gateway"] = *r.GatewayId
 	}
 	if r.SubnetId != nil && *r.SubnetId != "" {
-		assoc += fmt.Sprintf(", Subnet: %s", *r.SubnetId)
+		attrs["Subnet"] = *r.SubnetId
 	}
-	return assoc
+	return attrs
 }

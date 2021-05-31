@@ -1,12 +1,9 @@
 package aws
 
-import (
-	"fmt"
-)
-
-func (r *AwsRoute53Zone) String() string {
-	if r.Name == nil {
-		return r.TerraformId()
+func (r *AwsRoute53Zone) Attributes() map[string]string {
+	attrs := make(map[string]string)
+	if r.Name != nil && *r.Name != "" {
+		attrs["Name"] = *r.Name
 	}
-	return fmt.Sprintf("%s (Id: %s)", *r.Name, r.TerraformId())
+	return attrs
 }

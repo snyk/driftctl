@@ -15,6 +15,7 @@ import (
 	"github.com/yudai/gojsondiff/formatter"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
+	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
@@ -34,43 +35,51 @@ func NewConsole() *Console {
 
 func (c *Console) Write(analysis *analyser.Analysis) error {
 	if analysis.Summary().TotalDeleted > 0 {
-		fmt.Printf("Found missing resources:\n")
+		fmt.Println("Found missing resources:")
 		deletedByType := groupByType(analysis.Deleted())
 		for ty, resources := range deletedByType {
 			fmt.Printf("  %s:\n", ty)
 			for _, res := range resources {
-				humanString := res.TerraformId()
-				if stringer, ok := res.(fmt.Stringer); ok {
-					humanString = stringer.String()
+				humanString := fmt.Sprintf("    - %s", res.TerraformId())
+				if humanizerRes, ok := res.(output.AttributesGetter); ok {
+					if humanAttrs := output.HumanizeAttribute(humanizerRes); humanAttrs != "" {
+						humanString += fmt.Sprintf("\n        %s", humanAttrs)
+					}
 				}
-				fmt.Printf("    - %s\n", humanString)
+				fmt.Println(humanString)
 			}
 		}
 	}
 
 	if analysis.Summary().TotalUnmanaged > 0 {
-		fmt.Printf("Found resources not covered by IaC:\n")
+		fmt.Println("Found resources not covered by IaC:")
 		unmanagedByType := groupByType(analysis.Unmanaged())
 		for ty, resource := range unmanagedByType {
 			fmt.Printf("  %s:\n", ty)
 			for _, res := range resource {
-				humanString := res.TerraformId()
-				if stringer, ok := res.(fmt.Stringer); ok {
-					humanString = stringer.String()
+				humanString := fmt.Sprintf("    - %s", res.TerraformId())
+				if humanizerRes, ok := res.(output.AttributesGetter); ok {
+					if humanAttrs := output.HumanizeAttribute(humanizerRes); humanAttrs != "" {
+						humanString += fmt.Sprintf("\n        %s", humanAttrs)
+					}
 				}
-				fmt.Printf("    - %s\n", humanString)
+				fmt.Println(humanString)
 			}
 		}
 	}
 
 	if analysis.Summary().TotalDrifted > 0 {
-		fmt.Printf("Found changed resources:\n")
+		fmt.Println("Found changed resources:")
 		for _, difference := range analysis.Differences() {
-			humanString := difference.Res.TerraformId()
-			if stringer, ok := difference.Res.(fmt.Stringer); ok {
-				humanString = stringer.String()
+			humanString := fmt.Sprintf("    - %s (%s):", difference.Res.TerraformId(), difference.Res.TerraformType())
+			whiteSpace := "        "
+			if humanizerRes, ok := difference.Res.(output.AttributesGetter); ok {
+				if humanAttrs := output.HumanizeAttribute(humanizerRes); humanAttrs != "" {
+					humanString += fmt.Sprintf("\n        %s", humanAttrs)
+					whiteSpace = "            "
+				}
 			}
-			fmt.Printf("  - %s (%s):\n", humanString, difference.Res.TerraformType())
+			fmt.Println(humanString)
 			for _, change := range difference.Changelog {
 				path := strings.Join(change.Path, ".")
 				pref := fmt.Sprintf("%s %s:", color.YellowString("~"), path)
@@ -81,12 +90,12 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 				}
 				if change.Type == diff.UPDATE {
 					if change.JsonString {
-						prefix := "        "
-						fmt.Printf("    %s\n%s%s\n", pref, prefix, jsonDiff(change.From, change.To, prefix))
+						prefix := "           "
+						fmt.Printf("%s%s\n%s%s\n", whiteSpace, pref, prefix, jsonDiff(change.From, change.To, prefix))
 						continue
 					}
 				}
-				fmt.Printf("    %s %s => %s", pref, prettify(change.From), prettify(change.To))
+				fmt.Printf("%s%s %s => %s", whiteSpace, pref, prettify(change.From), prettify(change.To))
 				if change.Computed {
 					fmt.Printf(" %s", color.YellowString("(computed)"))
 				}
@@ -100,7 +109,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 	enumerationErrorMessage := ""
 	for _, alerts := range analysis.Alerts() {
 		for _, alert := range alerts {
-			fmt.Printf("%s\n", color.YellowString(alert.Message()))
+			fmt.Println(color.YellowString(alert.Message()))
 			if alert, ok := alert.(*remote.EnumerationAccessDeniedAlert); ok && enumerationErrorMessage == "" {
 				enumerationErrorMessage = alert.GetProviderMessage()
 			}

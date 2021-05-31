@@ -1,58 +1,67 @@
 package aws
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
 )
 
-func TestAwsSnsTopic_String(t *testing.T) {
+func TestAwsSnsTopic_Attrs(t *testing.T) {
 	tests := []struct {
 		name     string
 		snsTopic AwsSnsTopic
-		want     string
+		want     map[string]string
 	}{
 		{
 			name: "DisplayName and Name not nil",
 			snsTopic: AwsSnsTopic{
 				DisplayName: aws.String("[DisplayName]"),
-				Id:          "[ID]",
 				Name:        aws.String("[Name]"),
 			},
-			want: "[DisplayName] ([Name])",
+			want: map[string]string{
+				"DisplayName": "[DisplayName]",
+				"Name":        "[Name]",
+			},
+		},
+		{
+			name: "DisplayName not empty and Name empty",
+			snsTopic: AwsSnsTopic{
+				DisplayName: aws.String(""),
+			},
+			want: map[string]string{},
 		},
 		{
 			name: "DisplayName empty and Name not empty",
 			snsTopic: AwsSnsTopic{
 				DisplayName: aws.String(""),
-				Id:          "[ID]",
 				Name:        aws.String("[Name]"),
 			},
-			want: "[Name]",
+			want: map[string]string{
+				"Name": "[Name]",
+			},
 		},
 		{
 			name: "DisplayName and Name empty",
 			snsTopic: AwsSnsTopic{
 				DisplayName: aws.String(""),
-				Id:          "[ID]",
 				Name:        aws.String(""),
 			},
-			want: "[ID]",
+			want: map[string]string{},
 		},
 		{
 			name: "DisplayName and Name nil",
 			snsTopic: AwsSnsTopic{
 				DisplayName: nil,
-				Id:          "[ID]",
 				Name:        nil,
 			},
-			want: "[ID]",
+			want: map[string]string{},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.snsTopic.String(); got != tt.want {
-				t.Errorf("String() = %v, want %v", got, tt.want)
+			if got := tt.snsTopic.Attributes(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Attributes() = %v, want %v", got, tt.want)
 			}
 		})
 	}

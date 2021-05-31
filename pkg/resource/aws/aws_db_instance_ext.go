@@ -14,9 +14,15 @@ func (r *AwsDbInstance) NormalizeForState() (resource.Resource, error) {
 	if r.ApplyImmediately != nil && !*r.ApplyImmediately {
 		r.ApplyImmediately = nil
 	}
+	if r.CharacterSetName != nil && *r.CharacterSetName == "" {
+		r.CharacterSetName = nil
+	}
 	return r, nil
 }
 
 func (r *AwsDbInstance) NormalizeForProvider() (resource.Resource, error) {
+	if r.CharacterSetName != nil && *r.CharacterSetName == "" {
+		r.CharacterSetName = nil
+	}
 	return r, nil
 }

@@ -1,12 +1,13 @@
 package aws
 
 import (
+	"reflect"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 )
 
-func TestAwsRouteTableAssociation_String(t *testing.T) {
+func TestAwsRouteTableAssociation_Attrs(t *testing.T) {
 	type fields struct {
 		GatewayId    *string
 		Id           string
@@ -16,15 +17,23 @@ func TestAwsRouteTableAssociation_String(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		want   string
+		want   map[string]string
 	}{
+		{
+			name:   "test for empty",
+			fields: fields{},
+			want:   map[string]string{},
+		},
 		{
 			name: "test for gateway",
 			fields: fields{
 				GatewayId:    awssdk.String("gateway-id"),
 				RouteTableId: awssdk.String("table-id"),
 			},
-			want: "Table: table-id, Gateway: gateway-id",
+			want: map[string]string{
+				"Table":   "table-id",
+				"Gateway": "gateway-id",
+			},
 		},
 		{
 			name: "test for subnet",
@@ -32,7 +41,10 @@ func TestAwsRouteTableAssociation_String(t *testing.T) {
 				SubnetId:     awssdk.String("subnet-id"),
 				RouteTableId: awssdk.String("table-id"),
 			},
-			want: "Table: table-id, Subnet: subnet-id",
+			want: map[string]string{
+				"Table":  "table-id",
+				"Subnet": "subnet-id",
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -43,8 +55,8 @@ func TestAwsRouteTableAssociation_String(t *testing.T) {
 				RouteTableId: tt.fields.RouteTableId,
 				SubnetId:     tt.fields.SubnetId,
 			}
-			if got := r.String(); got != tt.want {
-				t.Errorf("String() = %v, want %v", got, tt.want)
+			if got := r.Attributes(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Attributes() = %v, want %v", got, tt.want)
 			}
 		})
 	}

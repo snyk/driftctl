@@ -1,23 +1,26 @@
 package github
 
 import (
+	"reflect"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 )
 
-func TestGithubBranchProtection_String(t *testing.T) {
+func TestGithubBranchProtection_Attributes(t *testing.T) {
 	tests := []struct {
 		name string
 		res  GithubBranchProtection
-		want string
+		want map[string]string
 	}{
 		{
 			name: "when pattern is nil",
 			res: GithubBranchProtection{
 				Id: "ABCDEF=",
 			},
-			want: "ABCDEF=",
+			want: map[string]string{
+				"Id": "ABCDEF=",
+			},
 		},
 		{
 			name: "when repo_id is nil",
@@ -25,7 +28,10 @@ func TestGithubBranchProtection_String(t *testing.T) {
 				Id:      "ABCDEF=",
 				Pattern: awssdk.String("my-branch"),
 			},
-			want: "Branch: my-branch (Id: ABCDEF=)",
+			want: map[string]string{
+				"Branch": "my-branch",
+				"Id":     "ABCDEF=",
+			},
 		},
 		{
 			name: "when repo_id is invalid base64 string",
@@ -34,7 +40,10 @@ func TestGithubBranchProtection_String(t *testing.T) {
 				Pattern:      awssdk.String("my-branch"),
 				RepositoryId: awssdk.String("invalid"),
 			},
-			want: "Branch: my-branch (Id: ABCDEF=)",
+			want: map[string]string{
+				"Branch": "my-branch",
+				"Id":     "ABCDEF=",
+			},
 		},
 		{
 			name: "when all fields are valid",
@@ -43,13 +52,16 @@ func TestGithubBranchProtection_String(t *testing.T) {
 				Pattern:      awssdk.String("my-branch"),
 				RepositoryId: awssdk.String("MDEwOlJlcG9zaXRvcnkxMjM0NTY="),
 			},
-			want: "Branch: my-branch (RepoId: 010:Repository123456)",
+			want: map[string]string{
+				"Branch": "my-branch",
+				"RepoId": "010:Repository123456",
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.res.String(); got != tt.want {
-				t.Errorf("String() = %v, want %v", got, tt.want)
+			if got := tt.res.Attributes(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Attributes() = %v, want %v", got, tt.want)
 			}
 		})
 	}

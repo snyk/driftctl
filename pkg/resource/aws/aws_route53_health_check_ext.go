@@ -6,37 +6,30 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
-func (r *AwsRoute53HealthCheck) String() string {
-	str := r.Id
-
+func (r *AwsRoute53HealthCheck) Attributes() map[string]string {
+	attrs := make(map[string]string)
 	name, hasName := r.Tags["Name"]
 	if hasName {
-		str = name
+		attrs["Name"] = name
 	}
-
 	if r.Fqdn != nil && *r.Fqdn != "" {
-		str += fmt.Sprintf(" (fqdn: %s", *r.Fqdn)
-		str = r.addPortAndResPathString(str)
-		str += ")"
+		attrs["Fqdn"] = *r.Fqdn
+		r.addPortAndResPathString(attrs)
 	}
-
 	if r.IpAddress != nil && *r.IpAddress != "" {
-		str += fmt.Sprintf(" (ip: %s", *r.IpAddress)
-		str = r.addPortAndResPathString(str)
-		str += ")"
+		attrs["IpAddress"] = *r.IpAddress
+		r.addPortAndResPathString(attrs)
 	}
-
-	return str
+	return attrs
 }
 
-func (r *AwsRoute53HealthCheck) addPortAndResPathString(str string) string {
+func (r *AwsRoute53HealthCheck) addPortAndResPathString(attrs map[string]string) {
 	if r.Port != nil {
-		str += fmt.Sprintf(", port: %d", *r.Port)
+		attrs["Port"] = fmt.Sprintf("%d", *r.Port)
 	}
 	if r.ResourcePath != nil {
-		str += fmt.Sprintf(", path: %s", *r.ResourcePath)
+		attrs["Path"] = *r.ResourcePath
 	}
-	return str
 }
 
 func (r *AwsRoute53HealthCheck) NormalizeForState() (resource.Resource, error) {
