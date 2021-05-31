@@ -10,7 +10,7 @@
 <div id="app">
     <h1 class="heading title">Driftctl scan report</h1>
     <span class="heading subtitle">Coverage 8%</span>
-    <span class="heading date">Apr 21, 2021</span>
+    <span class="heading date">{{ .ScanDate }}</span>
     <hr>
     <form id="filter-form" action="#">
         <input type="text" name="resource-id-filter" placeholder="Search resources..." onkeyup="refreshState()">
@@ -78,8 +78,8 @@
     <div class="resource-item resource-item-alerts">
         <span class="resource-item-type">{{ $type }}</span>
         <div>
-            {{range $msg := $messages}}
-            <div>- {{ $msg }}</div>
+            {{range $el := $messages}}
+            <div>- {{ $el.Message }}</div>
             {{end}}
         </div>
     </div>
