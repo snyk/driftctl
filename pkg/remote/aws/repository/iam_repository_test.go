@@ -6,20 +6,19 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/iam"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/stretchr/testify/mock"
 
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/cloudskiff/driftctl/mocks"
 )
 
 func Test_IAMRepository_ListAllAccessKeys(t *testing.T) {
 	tests := []struct {
 		name    string
 		users   []*iam.User
-		mocks   func(client *mocks.FakeIAM)
+		mocks   func(client *awstest.MockFakeIAM)
 		want    []*iam.AccessKeyMetadata
 		wantErr error
 	}{
@@ -33,7 +32,7 @@ func Test_IAMRepository_ListAllAccessKeys(t *testing.T) {
 					UserName: aws.String("test-driftctl2"),
 				},
 			},
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 
 				client.On("ListAccessKeysPages",
 					&iam.ListAccessKeysInput{
@@ -104,7 +103,7 @@ func Test_IAMRepository_ListAllAccessKeys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.FakeIAM{}
+			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
@@ -126,13 +125,13 @@ func Test_IAMRepository_ListAllAccessKeys(t *testing.T) {
 func Test_IAMRepository_ListAllUsers(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *mocks.FakeIAM)
+		mocks   func(client *awstest.MockFakeIAM)
 		want    []*iam.User
 		wantErr error
 	}{
 		{
 			name: "List only users with multiple pages",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 
 				client.On("ListUsersPages",
 					&iam.ListUsersInput{},
@@ -174,7 +173,7 @@ func Test_IAMRepository_ListAllUsers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.FakeIAM{}
+			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
@@ -196,13 +195,13 @@ func Test_IAMRepository_ListAllUsers(t *testing.T) {
 func Test_IAMRepository_ListAllPolicies(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *mocks.FakeIAM)
+		mocks   func(client *awstest.MockFakeIAM)
 		want    []*iam.Policy
 		wantErr error
 	}{
 		{
 			name: "List only policies with multiple pages",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 
 				client.On("ListPoliciesPages",
 					&iam.ListPoliciesInput{Scope: aws.String(iam.PolicyScopeTypeLocal)},
@@ -244,7 +243,7 @@ func Test_IAMRepository_ListAllPolicies(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.FakeIAM{}
+			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
@@ -266,13 +265,13 @@ func Test_IAMRepository_ListAllPolicies(t *testing.T) {
 func Test_IAMRepository_ListAllRoles(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *mocks.FakeIAM)
+		mocks   func(client *awstest.MockFakeIAM)
 		want    []*iam.Role
 		wantErr error
 	}{
 		{
 			name: "List only roles with multiple pages",
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 
 				client.On("ListRolesPages",
 					&iam.ListRolesInput{},
@@ -314,7 +313,7 @@ func Test_IAMRepository_ListAllRoles(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.FakeIAM{}
+			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
@@ -337,7 +336,7 @@ func Test_IAMRepository_ListAllRolePolicyAttachments(t *testing.T) {
 	tests := []struct {
 		name    string
 		roles   []*iam.Role
-		mocks   func(client *mocks.FakeIAM)
+		mocks   func(client *awstest.MockFakeIAM)
 		want    []*AttachedRolePolicy
 		wantErr error
 	}{
@@ -351,7 +350,7 @@ func Test_IAMRepository_ListAllRolePolicyAttachments(t *testing.T) {
 					RoleName: aws.String("test-role2"),
 				},
 			},
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 
 				shouldSkipfirst := false
 				shouldSkipSecond := false
@@ -460,7 +459,7 @@ func Test_IAMRepository_ListAllRolePolicyAttachments(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.FakeIAM{}
+			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
@@ -483,7 +482,7 @@ func Test_IAMRepository_ListAllRolePolicies(t *testing.T) {
 	tests := []struct {
 		name    string
 		roles   []*iam.Role
-		mocks   func(client *mocks.FakeIAM)
+		mocks   func(client *awstest.MockFakeIAM)
 		want    []string
 		wantErr error
 	}{
@@ -497,7 +496,7 @@ func Test_IAMRepository_ListAllRolePolicies(t *testing.T) {
 					RoleName: aws.String("test_role_1"),
 				},
 			},
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 				firstMockCalled := false
 				client.On("ListRolePoliciesPages",
 					&iam.ListRolePoliciesInput{
@@ -552,7 +551,7 @@ func Test_IAMRepository_ListAllRolePolicies(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.FakeIAM{}
+			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
@@ -575,7 +574,7 @@ func Test_IAMRepository_ListAllUserPolicyAttachments(t *testing.T) {
 	tests := []struct {
 		name    string
 		users   []*iam.User
-		mocks   func(client *mocks.FakeIAM)
+		mocks   func(client *awstest.MockFakeIAM)
 		want    []*AttachedUserPolicy
 		wantErr error
 	}{
@@ -589,7 +588,7 @@ func Test_IAMRepository_ListAllUserPolicyAttachments(t *testing.T) {
 					UserName: aws.String("loadbalancer2"),
 				},
 			},
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 
 				client.On("ListAttachedUserPoliciesPages",
 					&iam.ListAttachedUserPoliciesInput{
@@ -709,7 +708,7 @@ func Test_IAMRepository_ListAllUserPolicyAttachments(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.FakeIAM{}
+			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
@@ -732,7 +731,7 @@ func Test_IAMRepository_ListAllUserPolicies(t *testing.T) {
 	tests := []struct {
 		name    string
 		users   []*iam.User
-		mocks   func(client *mocks.FakeIAM)
+		mocks   func(client *awstest.MockFakeIAM)
 		want    []string
 		wantErr error
 	}{
@@ -746,7 +745,7 @@ func Test_IAMRepository_ListAllUserPolicies(t *testing.T) {
 					UserName: aws.String("loadbalancer2"),
 				},
 			},
-			mocks: func(client *mocks.FakeIAM) {
+			mocks: func(client *awstest.MockFakeIAM) {
 
 				client.On("ListUserPoliciesPages",
 					&iam.ListUserPoliciesInput{
@@ -798,7 +797,7 @@ func Test_IAMRepository_ListAllUserPolicies(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &mocks.FakeIAM{}
+			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
