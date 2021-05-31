@@ -24,6 +24,7 @@ jobs:
       CHECKPOINT_DISABLE: true # Disable terraform version check
     steps:
       - checkout
+      - run: ./scripts/halt_before_acc.sh
       - go/install:
           version: "1.16.2"
           # Disable cache at it seem to broke go 1.16 installation
@@ -180,7 +181,9 @@ workflows:
               pattern:
                 - TestAcc_Aws
                 - TestAcc_Github_
-          context: driftctl-acc
+          context:
+            - driftctl-acc
+            - nigthly
     triggers:
       - schedule:
           cron: "0 3 * * *"
@@ -200,6 +203,15 @@ workflows:
             branches:
               ignore:
                 - main
+      - test_acc:
+          name: "Acceptance tests: << matrix.pattern >>"
+          matrix:
+            parameters:
+              pattern:
+                - TestAcc_Aws
+                - TestAcc_Github_
+          context:
+            - driftctl-acc
   push:
     jobs:
       - test:
