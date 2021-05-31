@@ -125,6 +125,15 @@ func TestFileEnumerator_Enumerate(t *testing.T) {
 			want: nil,
 			err:  "no Terraform state was found in testdata/no_state_here/test/*, exiting",
 		},
+		{
+			name: "test folder terraform.tfstate is not recognized as a file",
+			config: config.SupplierConfig{
+				Path: "testdata/edge_cases/**/*.tfstate",
+			},
+			want: []string{
+				"testdata/edge_cases/terraform.tfstate/terraform.tfstate",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
