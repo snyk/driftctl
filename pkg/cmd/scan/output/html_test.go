@@ -3,7 +3,6 @@ package output
 import (
 	"io/ioutil"
 	"path"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -65,10 +64,7 @@ func TestHTML_Write(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			prettifiedExpected := strings.ReplaceAll(string(expected), " ", "")
-			prettifiedGot := strings.ReplaceAll(string(got), " ", "")
-
-			assert.Equal(t, prettifiedExpected, prettifiedGot)
+			assert.Equal(t, string(expected), string(got))
 		})
 	}
 }
