@@ -24,7 +24,9 @@ jobs:
       CHECKPOINT_DISABLE: true # Disable terraform version check
     steps:
       - checkout
-      - run: ./scripts/halt_before_acc.sh
+      - run:
+          name: Check if acceptance tests should run
+          command: ./scripts/halt_before_acc.sh
       - go/install:
           version: "1.16.2"
           # Disable cache at it seem to broke go 1.16 installation
