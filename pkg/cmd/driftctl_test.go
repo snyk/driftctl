@@ -111,7 +111,7 @@ func TestDriftctlCmd_Scan(t *testing.T) {
 			env: map[string]string{
 				"DCTL_OUTPUT": "test",
 			},
-			err: fmt.Errorf("Unable to parse output flag 'test': \nAccepted formats are: console://,json://PATH/TO/FILE.json"),
+			err: fmt.Errorf("Unable to parse output flag 'test': \nAccepted formats are: console://,html://PATH/TO/FILE.html,json://PATH/TO/FILE.json"),
 		},
 		{
 			env: map[string]string{
