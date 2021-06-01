@@ -21,9 +21,8 @@ func TestAcc_Aws_IamAccessKey(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					result.AssertDriftCountTotal(0)
-					result.AssertDeletedCount(0)
-					result.AssertManagedCount(1)
+					result.AssertInfrastructureIsInSync()
+					result.AssertManagedCount(2)
 				},
 			},
 		},
