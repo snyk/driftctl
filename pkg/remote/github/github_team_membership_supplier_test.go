@@ -6,11 +6,12 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/resource"
-	ghdeserializer "github.com/cloudskiff/driftctl/pkg/resource/github/deserializer"
+	resourcegithub "github.com/cloudskiff/driftctl/pkg/resource/github"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	dritftctlmocks "github.com/cloudskiff/driftctl/test/mocks"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -48,6 +49,12 @@ func TestGithubTeamMembershipSupplier_Resources(t *testing.T) {
 		providerLibrary := terraform.NewProviderLibrary()
 		supplierLibrary := resource.NewSupplierLibrary()
 
+		repo := testresource.InitFakeSchemaRepository(terraform.GITHUB, "4.4.0")
+		resourcegithub.InitResourcesMetadata(repo)
+		factory := terraform.NewTerraformResourceFactory(repo)
+
+		deserializer := resource.NewDeserializer(factory)
+
 		mockedRepo := MockGithubRepository{}
 		c.mocks(&mockedRepo)
 
@@ -57,12 +64,11 @@ func TestGithubTeamMembershipSupplier_Resources(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			supplierLibrary.AddSupplier(NewGithubTeamMembershipSupplier(provider, &mockedRepo))
+			supplierLibrary.AddSupplier(NewGithubTeamMembershipSupplier(provider, &mockedRepo, deserializer))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
 			provider := dritftctlmocks.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.GITHUB), shouldUpdate)
-			deserializer := ghdeserializer.NewGithubTeamMembershipDeserializer()
 			s := &GithubTeamMembershipSupplier{
 				provider,
 				deserializer,

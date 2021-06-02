@@ -14,7 +14,8 @@ import (
 	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
 	"github.com/cloudskiff/driftctl/test/goldenfile"
@@ -121,13 +122,18 @@ func TestS3BucketMetricSupplier_Resources(t *testing.T) {
 		providerLibrary := terraform.NewProviderLibrary()
 		supplierLibrary := resource.NewSupplierLibrary()
 
+		repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+		resourceaws.InitResourcesMetadata(repo)
+		factory := terraform.NewTerraformResourceFactory(repo)
+
+		deserializer := resource.NewDeserializer(factory)
 		if shouldUpdate {
 			provider, err := InitTestAwsProvider(providerLibrary)
 			if err != nil {
 				t.Fatal(err)
 			}
 			repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session))
-			supplierLibrary.AddSupplier(NewS3BucketMetricSupplier(provider, repository))
+			supplierLibrary.AddSupplier(NewS3BucketMetricSupplier(provider, repository, deserializer))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
@@ -136,7 +142,6 @@ func TestS3BucketMetricSupplier_Resources(t *testing.T) {
 			tt.mocks(&mock)
 
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
-			deserializer := awsdeserializer.NewS3BucketMetricDeserializer()
 			s := &S3BucketMetricSupplier{
 				provider,
 				deserializer,

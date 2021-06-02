@@ -46,7 +46,7 @@
 				{
 					"type": "update",
 					"path": [
-						"Status"
+						"status"
 					],
 					"from": "Active",
 					"to": "Inactive",

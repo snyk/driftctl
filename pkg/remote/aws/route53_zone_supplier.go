@@ -7,10 +7,9 @@ import (
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/aws/aws-sdk-go/service/route53"
@@ -20,15 +19,15 @@ import (
 
 type Route53ZoneSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.Route53Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewRoute53ZoneSupplier(provider *AWSTerraformProvider) *Route53ZoneSupplier {
+func NewRoute53ZoneSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *Route53ZoneSupplier {
 	return &Route53ZoneSupplier{
 		provider,
-		awsdeserializer.NewRoute53ZoneDeserializer(),
+		deserializer,
 		repository.NewRoute53Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -52,7 +51,7 @@ func (s *Route53ZoneSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsRoute53ZoneResourceType, results)
 }
 
 func (s *Route53ZoneSupplier) readZone(hostedZone route53.HostedZone) (cty.Value, error) {

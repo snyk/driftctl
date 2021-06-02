@@ -5,10 +5,9 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/sirupsen/logrus"
@@ -17,15 +16,15 @@ import (
 
 type IamAccessKeySupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       iamiface.IAMAPI
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamAccessKeySupplier(provider *AWSTerraformProvider) *IamAccessKeySupplier {
+func NewIamAccessKeySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *IamAccessKeySupplier {
 	return &IamAccessKeySupplier{
 		provider,
-		awsdeserializer.NewIamAccessKeyDeserializer(),
+		deserializer,
 		iam.New(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -49,7 +48,7 @@ func (s *IamAccessKeySupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsIamAccessKeyResourceType, results)
 }
 
 func (s *IamAccessKeySupplier) readRes(key *iam.AccessKeyMetadata) (cty.Value, error) {

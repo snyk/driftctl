@@ -1,14 +1,15 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/sirupsen/logrus"
@@ -17,15 +18,15 @@ import (
 
 type IamUserPolicyAttachmentSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       iamiface.IAMAPI
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamUserPolicyAttachmentSupplier(provider *AWSTerraformProvider) *IamUserPolicyAttachmentSupplier {
+func NewIamUserPolicyAttachmentSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *IamUserPolicyAttachmentSupplier {
 	return &IamUserPolicyAttachmentSupplier{
 		provider,
-		awsdeserializer.NewIamUserPolicyAttachmentDeserializer(),
+		deserializer,
 		iam.New(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -60,14 +61,14 @@ func (s *IamUserPolicyAttachmentSupplier) Resources() ([]resource.Resource, erro
 		}
 	}
 
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsIamUserPolicyAttachmentResourceType, results)
 }
 
 func (s *IamUserPolicyAttachmentSupplier) readRes(attachedPol attachedUserPolicy) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamUserPolicyAttachmentResourceType,
-			ID: *attachedPol.PolicyName,
+			ID: fmt.Sprintf("%s-%s", *attachedPol.PolicyName, attachedPol.Username),
 			Attributes: map[string]string{
 				"user":       attachedPol.Username,
 				"policy_arn": *attachedPol.PolicyArn,

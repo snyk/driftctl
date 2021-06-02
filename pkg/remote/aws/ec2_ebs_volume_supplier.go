@@ -4,10 +4,9 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -18,15 +17,15 @@ import (
 
 type EC2EbsVolumeSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2EbsVolumeSupplier(provider *AWSTerraformProvider) *EC2EbsVolumeSupplier {
+func NewEC2EbsVolumeSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *EC2EbsVolumeSupplier {
 	return &EC2EbsVolumeSupplier{
 		provider,
-		awsdeserializer.NewEC2EbsVolumeDeserializer(),
+		deserializer,
 		repository.NewEC2Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -50,7 +49,7 @@ func (s *EC2EbsVolumeSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsEbsVolumeResourceType, results)
 }
 
 func (s *EC2EbsVolumeSupplier) readEbsVolume(volume ec2.Volume) (cty.Value, error) {

@@ -6,11 +6,12 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/resource"
-	ghdeserializer "github.com/cloudskiff/driftctl/pkg/resource/github/deserializer"
+	resourcegithub "github.com/cloudskiff/driftctl/pkg/resource/github"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	dritftctlmocks "github.com/cloudskiff/driftctl/test/mocks"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -52,6 +53,12 @@ func TestGithubBranchProtectionSupplier_Resources(t *testing.T) {
 		providerLibrary := terraform.NewProviderLibrary()
 		supplierLibrary := resource.NewSupplierLibrary()
 
+		repo := testresource.InitFakeSchemaRepository(terraform.GITHUB, "4.4.0")
+		resourcegithub.InitResourcesMetadata(repo)
+		factory := terraform.NewTerraformResourceFactory(repo)
+
+		deserializer := resource.NewDeserializer(factory)
+
 		mockedRepo := MockGithubRepository{}
 		c.mocks(&mockedRepo)
 
@@ -61,15 +68,14 @@ func TestGithubBranchProtectionSupplier_Resources(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			supplierLibrary.AddSupplier(NewGithubBranchProtectionSupplier(provider, &mockedRepo))
+			supplierLibrary.AddSupplier(NewGithubBranchProtectionSupplier(provider, &mockedRepo, deserializer))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
 			provider := dritftctlmocks.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.GITHUB), shouldUpdate)
-			GithubBranchProtectionDeserializer := ghdeserializer.NewGithubBranchProtectionDeserializer()
 			s := &GithubBranchProtectionSupplier{
 				provider,
-				GithubBranchProtectionDeserializer,
+				deserializer,
 				&mockedRepo,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
@@ -77,7 +83,7 @@ func TestGithubBranchProtectionSupplier_Resources(t *testing.T) {
 			assert.Equal(tt, c.err, err)
 
 			mock.AssertExpectationsForObjects(tt)
-			test.CtyTestDiff(got, c.dirName, provider, GithubBranchProtectionDeserializer, shouldUpdate, tt)
+			test.CtyTestDiff(got, c.dirName, provider, deserializer, shouldUpdate, tt)
 		})
 	}
 }

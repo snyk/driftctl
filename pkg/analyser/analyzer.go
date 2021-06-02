@@ -1,8 +1,6 @@
 package analyser
 
 import (
-	"reflect"
-
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/r3labs/diff/v2"
 
@@ -39,8 +37,7 @@ func (c *ComputedDiffAlert) ShouldIgnoreResource() bool {
 }
 
 type Analyzer struct {
-	alerter                  *alerter.Alerter
-	resourceSchemaRepository resource.SchemaRepositoryInterface
+	alerter *alerter.Alerter
 }
 
 type Filter interface {
@@ -48,8 +45,8 @@ type Filter interface {
 	IsFieldIgnored(res resource.Resource, path []string) bool
 }
 
-func NewAnalyzer(alerter *alerter.Alerter, resourceSchemaRepository resource.SchemaRepositoryInterface) Analyzer {
-	return Analyzer{alerter, resourceSchemaRepository}
+func NewAnalyzer(alerter *alerter.Alerter) Analyzer {
+	return Analyzer{alerter}
 }
 
 func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resource, filter Filter) (Analysis, error) {
@@ -82,13 +79,7 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 		analysis.AddManaged(stateRes)
 
 		var delta diff.Changelog
-		if resource.IsRefactoredResource(stateRes.TerraformType()) {
-			stateRes, _ := stateRes.(*resource.AbstractResource)
-			remoteRes, _ := remoteRes.(*resource.AbstractResource)
-			delta, _ = diff.Diff(stateRes.Attrs, remoteRes.Attrs)
-		} else {
-			delta, _ = diff.Diff(stateRes, remoteRes)
-		}
+		delta, _ = diff.Diff(stateRes.Attributes(), remoteRes.Attributes())
 
 		if len(delta) == 0 {
 			continue
@@ -100,15 +91,10 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 				continue
 			}
 			c := Change{Change: change}
-			if resource.IsRefactoredResource(stateRes.TerraformType()) {
-				resSchema, exist := a.resourceSchemaRepository.GetSchema(stateRes.TerraformType())
-				if exist {
-					c.Computed = resSchema.IsComputedField(c.Path)
-					c.JsonString = resSchema.IsJsonStringField(c.Path)
-				}
-			} else {
-				c.Computed = a.isComputedField(stateRes, c)
-				c.JsonString = a.isJsonStringField(stateRes, c)
+			resSchema := stateRes.Schema()
+			if resSchema != nil {
+				c.Computed = resSchema.IsComputedField(c.Path)
+				c.JsonString = resSchema.IsJsonStringField(c.Path)
 			}
 			if c.Computed {
 				haveComputedDiff = true
@@ -157,56 +143,6 @@ func removeResourceByIndex(i int, resources []resource.Resource) []resource.Reso
 		return resources[:len(resources)-1]
 	}
 	return append(resources[:i], resources[i+1:]...)
-}
-
-// isComputedField returns true if the field that generated the diff of a resource
-// has a computed tag
-func (a Analyzer) isComputedField(stateRes resource.Resource, change Change) bool {
-	if field, ok := a.getField(reflect.TypeOf(stateRes), change.Path); ok {
-		return field.Tag.Get("computed") == "true"
-	}
-	return false
-}
-
-// isJsonStringField returns true if the field that generated the diff of a resource
-// has a jsonfield tag
-func (a Analyzer) isJsonStringField(stateRes resource.Resource, change Change) bool {
-	if field, ok := a.getField(reflect.TypeOf(stateRes), change.Path); ok {
-		return field.Tag.Get("jsonfield") == "true"
-	}
-	return false
-}
-
-// getField recursively finds the deepest field inside a resource depending on
-// its path and its type
-func (a Analyzer) getField(t reflect.Type, path []string) (reflect.StructField, bool) {
-	switch t.Kind() {
-	case reflect.Ptr:
-		return a.getField(t.Elem(), path)
-	case reflect.Slice:
-		return a.getField(t.Elem(), path[1:])
-	default:
-		{
-			if field, ok := t.FieldByName(path[0]); ok && a.hasNestedFields(field.Type) && len(path) > 1 {
-				return a.getField(field.Type, path[1:])
-			} else {
-				return field, ok
-			}
-		}
-	}
-}
-
-// hasNestedFields will return true if the current field is either a struct
-// or a slice of struct
-func (a Analyzer) hasNestedFields(t reflect.Type) bool {
-	switch t.Kind() {
-	case reflect.Ptr:
-		return a.hasNestedFields(t.Elem())
-	case reflect.Slice:
-		return t.Elem().Kind() == reflect.Struct
-	default:
-		return t.Kind() == reflect.Struct
-	}
 }
 
 // hasUnmanagedSecurityGroupRules returns true if we find at least one unmanaged

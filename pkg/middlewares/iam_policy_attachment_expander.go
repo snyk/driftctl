@@ -54,66 +54,35 @@ func (m IamPolicyAttachmentExpander) Execute(remoteResources, resourcesFromState
 }
 
 func (m IamPolicyAttachmentExpander) expand(policyAttachment *resource.AbstractResource) []resource.Resource {
-
-	arn, _ := policyAttachment.Attrs.Get("policy_arn")
-	user, exist := policyAttachment.Attrs.Get("user")
-	if exist {
+	var newResources []resource.Resource
+	users := policyAttachment.Attrs.GetSlice("users")
+	// we create one attachment per user
+	for _, user := range users {
 		user := user.(string)
 		newAttachment := m.resourceFactory.CreateAbstractResource(
 			resourceaws.AwsIamPolicyAttachmentResourceType,
-			fmt.Sprintf("%s-%s", user, arn),
+			fmt.Sprintf("%s-%s", user, (*policyAttachment.Attrs)["policy_arn"]),
 			map[string]interface{}{
-				"users": []string{user},
+				"policy_arn": *policyAttachment.Attrs.GetString("policy_arn"),
+				"users":      []interface{}{user},
 			},
 		)
-		return []resource.Resource{newAttachment}
+		newResources = append(newResources, newAttachment)
 	}
 
-	role, exist := policyAttachment.Attrs.Get("role")
-	if exist {
+	roles := policyAttachment.Attrs.GetSlice("roles")
+	// we create one attachment per role
+	for _, role := range roles {
 		role := role.(string)
 		newAttachment := m.resourceFactory.CreateAbstractResource(
 			resourceaws.AwsIamPolicyAttachmentResourceType,
-			fmt.Sprintf("%s-%s", role, arn),
+			fmt.Sprintf("%s-%s", role, (*policyAttachment.Attrs)["policy_arn"]),
 			map[string]interface{}{
-				"roles": []string{role},
+				"policy_arn": *policyAttachment.Attrs.GetString("policy_arn"),
+				"roles":      []interface{}{role},
 			},
 		)
-		return []resource.Resource{newAttachment}
-	}
-
-	var newResources []resource.Resource
-
-	users := (*policyAttachment.Attrs)["users"]
-	if users != nil {
-		// we create one attachment per user
-		for _, user := range users.([]interface{}) {
-			user := user.(string)
-			newAttachment := m.resourceFactory.CreateAbstractResource(
-				resourceaws.AwsIamPolicyAttachmentResourceType,
-				fmt.Sprintf("%s-%s", user, (*policyAttachment.Attrs)["policy_arn"]),
-				map[string]interface{}{
-					"users": []string{user},
-				},
-			)
-			newResources = append(newResources, newAttachment)
-		}
-	}
-
-	roles := (*policyAttachment.Attrs)["roles"]
-	if roles != nil {
-		// we create one attachment per role
-		for _, role := range roles.([]interface{}) {
-			role := role.(string)
-			newAttachment := m.resourceFactory.CreateAbstractResource(
-				resourceaws.AwsIamPolicyAttachmentResourceType,
-				fmt.Sprintf("%s-%s", role, (*policyAttachment.Attrs)["policy_arn"]),
-				map[string]interface{}{
-					"roles": []string{role},
-				},
-			)
-			newResources = append(newResources, newAttachment)
-		}
+		newResources = append(newResources, newAttachment)
 	}
 	return newResources
 }

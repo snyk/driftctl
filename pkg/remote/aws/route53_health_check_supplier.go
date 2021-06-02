@@ -7,24 +7,23 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
 type Route53HealthCheckSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.Route53Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewRoute53HealthCheckSupplier(provider *AWSTerraformProvider) *Route53HealthCheckSupplier {
+func NewRoute53HealthCheckSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *Route53HealthCheckSupplier {
 	return &Route53HealthCheckSupplier{
 		provider,
-		awsdeserializer.NewRoute53HealthCheckDeserializer(),
+		deserializer,
 		repository.NewRoute53Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -48,7 +47,7 @@ func (s *Route53HealthCheckSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(retrieve)
+	return s.deserializer.Deserialize(aws.AwsRoute53HealthCheckResourceType, retrieve)
 }
 
 func (s *Route53HealthCheckSupplier) readHealthCheck(healthCheck *route53.HealthCheck) (cty.Value, error) {

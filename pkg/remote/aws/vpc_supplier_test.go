@@ -6,14 +6,12 @@ import (
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	awstest "github.com/cloudskiff/driftctl/test/aws"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
 	"github.com/cloudskiff/driftctl/pkg/parallel"
-
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/aws/aws-sdk-go/service/ec2"
 
@@ -103,24 +101,26 @@ func TestVPCSupplier_Resources(t *testing.T) {
 		providerLibrary := terraform.NewProviderLibrary()
 		supplierLibrary := resource.NewSupplierLibrary()
 
+		repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+		resourceaws.InitResourcesMetadata(repo)
+		factory := terraform.NewTerraformResourceFactory(repo)
+
+		deserializer := resource.NewDeserializer(factory)
 		if shouldUpdate {
 			provider, err := InitTestAwsProvider(providerLibrary)
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewVPCSupplier(provider))
+			supplierLibrary.AddSupplier(NewVPCSupplier(provider, deserializer))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
 			fakeEC2 := awstest.MockFakeEC2{}
 			c.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
-			VPCDeserializer := awsdeserializer.NewVPCDeserializer()
-			defaultVPCDeserializer := awsdeserializer.NewDefaultVPCDeserializer()
 			s := &VPCSupplier{
 				provider,
-				defaultVPCDeserializer,
-				VPCDeserializer,
+				deserializer,
 				&fakeEC2,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
@@ -129,8 +129,7 @@ func TestVPCSupplier_Resources(t *testing.T) {
 			assert.Equal(tt, c.err, err)
 
 			mock.AssertExpectationsForObjects(tt)
-			deserializers := []deserializer.CTYDeserializer{VPCDeserializer, defaultVPCDeserializer}
-			test.CtyTestDiffMixed(got, c.dirName, provider, deserializers, shouldUpdate, tt)
+			test.CtyTestDiff(got, c.dirName, provider, deserializer, shouldUpdate, tt)
 		})
 	}
 }

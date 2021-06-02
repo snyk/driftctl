@@ -3,10 +3,9 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/hashicorp/terraform/flatmap"
 	"github.com/sirupsen/logrus"
@@ -15,15 +14,15 @@ import (
 
 type RouteTableAssociationSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       ec2iface.EC2API
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewRouteTableAssociationSupplier(provider *AWSTerraformProvider) *RouteTableAssociationSupplier {
+func NewRouteTableAssociationSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *RouteTableAssociationSupplier {
 	return &RouteTableAssociationSupplier{
 		provider,
-		awsdeserializer.NewRouteTableAssociationDeserializer(),
+		deserializer,
 		ec2.New(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -56,7 +55,7 @@ func (s *RouteTableAssociationSupplier) Resources() ([]resource.Resource, error)
 	}
 
 	// Deserialize
-	deserializedRouteTableAssociations, err := s.deserializer.Deserialize(routeTableAssociationResources)
+	deserializedRouteTableAssociations, err := s.deserializer.Deserialize(aws.AwsRouteTableAssociationResourceType, routeTableAssociationResources)
 	if err != nil {
 		return nil, err
 	}

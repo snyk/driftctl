@@ -4,7 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
 
@@ -43,17 +42,23 @@ func TestAwsDefaults_Execute(t *testing.T) {
 						"path": "/",
 					},
 				},
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
+				&resource.AbstractResource{
+					Id:   "dummy-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "default-route-table",
+						"gateway_id":     "local",
+					},
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
+				&resource.AbstractResource{
+					Id:   "dummy-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "default-route-table",
+						"gateway_id":     "local",
+					},
 				},
 				&resource.AbstractResource{
 					Id:   "terraform-20210408093258091700000001",
@@ -171,17 +176,23 @@ func TestAwsDefaults_Execute(t *testing.T) {
 						"role": "OrganizationAccountAccessRole",
 					},
 				},
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
+				&resource.AbstractResource{
+					Id:   "dummy-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "default-route-table",
+						"gateway_id":     "local",
+					},
 				},
 			},
 			[]resource.Resource{
-				&aws.AwsRoute{
-					Id:           "dummy-route",
-					RouteTableId: awssdk.String("default-route-table"),
-					GatewayId:    awssdk.String("local"),
+				&resource.AbstractResource{
+					Id:   "dummy-route",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id": "default-route-table",
+						"gateway_id":     "local",
+					},
 				},
 			},
 			diff.Changelog{

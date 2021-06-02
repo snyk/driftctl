@@ -7,24 +7,22 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
 type ECRRepositorySupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.ECRRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewECRRepositorySupplier(provider *AWSTerraformProvider) *ECRRepositorySupplier {
+func NewECRRepositorySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *ECRRepositorySupplier {
 	return &ECRRepositorySupplier{
 		provider,
-		awsdeserializer.NewECRRepositoryDeserializer(),
+		deserializer,
 		repository.NewECRRepository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -48,7 +46,7 @@ func (r *ECRRepositorySupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return r.deserializer.Deserialize(retrieve)
+	return r.deserializer.Deserialize(aws.AwsEcrRepositoryResourceType, retrieve)
 }
 
 func (r *ECRRepositorySupplier) readRepository(repository *ecr.Repository) (cty.Value, error) {

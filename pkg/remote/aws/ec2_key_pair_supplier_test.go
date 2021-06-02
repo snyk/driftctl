@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
@@ -13,8 +14,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/cloudskiff/driftctl/pkg/parallel"
-
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 
@@ -71,17 +70,21 @@ func TestEC2KeyPairSupplier_Resources(t *testing.T) {
 		providerLibrary := terraform.NewProviderLibrary()
 		supplierLibrary := resource.NewSupplierLibrary()
 
+		repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+		resourceaws.InitResourcesMetadata(repo)
+		factory := terraform.NewTerraformResourceFactory(repo)
+
+		deserializer := resource.NewDeserializer(factory)
 		if shouldUpdate {
 			provider, err := InitTestAwsProvider(providerLibrary)
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewEC2KeyPairSupplier(provider))
+			supplierLibrary.AddSupplier(NewEC2KeyPairSupplier(provider, deserializer))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
 			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
-			deserializer := awsdeserializer.NewEC2KeyPairDeserializer()
 			client := &repository.MockEC2Repository{}
 			tt.mock(client)
 			s := &EC2KeyPairSupplier{

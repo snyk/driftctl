@@ -4,10 +4,9 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -17,15 +16,15 @@ import (
 
 type EC2InstanceSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2InstanceSupplier(provider *AWSTerraformProvider) *EC2InstanceSupplier {
+func NewEC2InstanceSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *EC2InstanceSupplier {
 	return &EC2InstanceSupplier{
 		provider,
-		awsdeserializer.NewEC2InstanceDeserializer(),
+		deserializer,
 		repository.NewEC2Repository(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -50,7 +49,7 @@ func (s *EC2InstanceSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsInstanceResourceType, results)
 }
 
 func (s *EC2InstanceSupplier) readInstance(id string) (cty.Value, error) {

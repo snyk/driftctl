@@ -173,37 +173,52 @@ func TestAnalyze(t *testing.T) {
 		{
 			name: "TestDiff",
 			iac: []resource.Resource{
-				&testresource.FakeResource{
-					Id:     "foobar",
-					FooBar: "foobar",
-					BarFoo: "barfoo",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"baz", "bar"},
+				&resource.AbstractResource{
+					Id:   "foobar",
+					Type: aws.AwsAmiResourceType,
+					Attrs: &resource.Attributes{
+						"architecture": "foobar",
+						"arn":          "barfoo",
+						"ebs_block_device": []map[string]interface{}{
+							{
+								"volume_type": "bar",
+								"volume_size": 0,
+							},
+						},
+					},
 				},
 			},
 			cloud: []resource.Resource{
-				&testresource.FakeResource{
-					Id:     "foobar",
-					FooBar: "barfoo",
-					BarFoo: "foobar",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"bar", "baz"},
+				&resource.AbstractResource{
+					Id:   "foobar",
+					Type: aws.AwsAmiResourceType,
+					Attrs: &resource.Attributes{
+						"architecture": "barfoo",
+						"arn":          "foobar",
+						"ebs_block_device": []map[string]interface{}{
+							{
+								"volume_type": "baz",
+								"volume_size": 1,
+							},
+						},
+					},
 				},
 			},
 			expected: Analysis{
 				managed: []resource.Resource{
-					&testresource.FakeResource{
-						Id:     "foobar",
-						FooBar: "foobar",
-						BarFoo: "barfoo",
-						Struct: struct {
-							Baz string `cty:"baz" computed:"true"`
-							Bar string `cty:"bar"`
-						}{"baz", "bar"},
+					&resource.AbstractResource{
+						Id:   "foobar",
+						Type: aws.AwsAmiResourceType,
+						Attrs: &resource.Attributes{
+							"architecture": "foobar",
+							"arn":          "barfoo",
+							"ebs_block_device": []map[string]interface{}{
+								{
+									"volume_type": "bar",
+									"volume_size": 0,
+								},
+							},
+						},
 					},
 				},
 				summary: Summary{
@@ -213,23 +228,38 @@ func TestAnalyze(t *testing.T) {
 				},
 				differences: []Difference{
 					{
-						Res: &testresource.FakeResource{
-							Id:     "foobar",
-							FooBar: "foobar",
-							BarFoo: "barfoo",
-							Struct: struct {
-								Baz string `cty:"baz" computed:"true"`
-								Bar string `cty:"bar"`
-							}{"baz", "bar"},
+						Res: &resource.AbstractResource{
+							Id:   "foobar",
+							Type: aws.AwsAmiResourceType,
+							Attrs: &resource.Attributes{
+								"architecture": "foobar",
+								"arn":          "barfoo",
+								"ebs_block_device": []map[string]interface{}{
+									{
+										"volume_type": "bar",
+										"volume_size": 0,
+									},
+								},
+							},
 						},
 						Changelog: Changelog{
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "foobar",
+									To:   "barfoo",
+									Path: []string{
+										"architecture",
+									},
+								},
+							},
 							{
 								Change: diff.Change{
 									Type: "update",
 									From: "barfoo",
 									To:   "foobar",
 									Path: []string{
-										"BarFoo",
+										"arn",
 									},
 								},
 								Computed: true,
@@ -237,10 +267,12 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "foobar",
-									To:   "barfoo",
+									From: 0,
+									To:   1,
 									Path: []string{
-										"FooBar",
+										"ebs_block_device",
+										"0",
+										"volume_size",
 									},
 								},
 							},
@@ -250,22 +282,11 @@ func TestAnalyze(t *testing.T) {
 									From: "bar",
 									To:   "baz",
 									Path: []string{
-										"Struct",
-										"Bar",
+										"ebs_block_device",
+										"0",
+										"volume_type",
 									},
 								},
-							},
-							{
-								Change: diff.Change{
-									Type: "update",
-									From: "baz",
-									To:   "bar",
-									Path: []string{
-										"Struct",
-										"Baz",
-									},
-								},
-								Computed: true,
 							},
 						},
 					},
@@ -281,19 +302,23 @@ func TestAnalyze(t *testing.T) {
 		{
 			name: "TestDiff with partial ignore",
 			iac: []resource.Resource{
-				&testresource.FakeResource{
-					Id:     "foobar",
-					Type:   "fakeres",
-					FooBar: "foobar",
-					BarFoo: "barfoo",
+				&resource.AbstractResource{
+					Id:   "foobar",
+					Type: aws.AwsAmiResourceType,
+					Attrs: &resource.Attributes{
+						"architecture": "foobar",
+						"arn":          "barfoo",
+					},
 				},
 			},
 			cloud: []resource.Resource{
-				&testresource.FakeResource{
-					Id:     "foobar",
-					Type:   "fakeres",
-					FooBar: "barfoo",
-					BarFoo: "foobar",
+				&resource.AbstractResource{
+					Id:   "foobar",
+					Type: aws.AwsAmiResourceType,
+					Attrs: &resource.Attributes{
+						"architecture": "barfoo",
+						"arn":          "foobar",
+					},
 				},
 			},
 			ignoredDrift: []struct {
@@ -301,22 +326,26 @@ func TestAnalyze(t *testing.T) {
 				path []string
 			}{
 				{
-					res: &testresource.FakeResource{
-						Id:     "foobar",
-						Type:   "fakeres",
-						FooBar: "foobar",
-						BarFoo: "barfoo",
+					res: &resource.AbstractResource{
+						Id:   "foobar",
+						Type: aws.AwsAmiResourceType,
+						Attrs: &resource.Attributes{
+							"architecture": "foobar",
+							"arn":          "barfoo",
+						},
 					},
-					path: []string{"FooBar"},
+					path: []string{"architecture"},
 				},
 			},
 			expected: Analysis{
 				managed: []resource.Resource{
-					&testresource.FakeResource{
-						Id:     "foobar",
-						Type:   "fakeres",
-						FooBar: "foobar",
-						BarFoo: "barfoo",
+					&resource.AbstractResource{
+						Id:   "foobar",
+						Type: aws.AwsAmiResourceType,
+						Attrs: &resource.Attributes{
+							"architecture": "foobar",
+							"arn":          "barfoo",
+						},
 					},
 				},
 				summary: Summary{
@@ -326,11 +355,13 @@ func TestAnalyze(t *testing.T) {
 				},
 				differences: []Difference{
 					{
-						Res: &testresource.FakeResource{
-							Id:     "foobar",
-							Type:   "fakeres",
-							FooBar: "foobar",
-							BarFoo: "barfoo",
+						Res: &resource.AbstractResource{
+							Id:   "foobar",
+							Type: aws.AwsAmiResourceType,
+							Attrs: &resource.Attributes{
+								"architecture": "foobar",
+								"arn":          "barfoo",
+							},
 						},
 						Changelog: Changelog{
 							{
@@ -339,7 +370,7 @@ func TestAnalyze(t *testing.T) {
 									From: "barfoo",
 									To:   "foobar",
 									Path: []string{
-										"BarFoo",
+										"arn",
 									},
 								},
 								Computed: true,
@@ -359,24 +390,30 @@ func TestAnalyze(t *testing.T) {
 			name: "TestDiff with full ignore",
 			iac: []resource.Resource{
 				&testresource.FakeResource{
-					Id:     "foobar",
-					FooBar: "foobar",
-					BarFoo: "barfoo",
+					Id: "foobar",
+					Attrs: &resource.Attributes{
+						"foobar": "foobar",
+						"barfoo": "barfoo",
+					},
 				},
 			},
 			ignoredRes: []resource.Resource{
 				&testresource.FakeResource{
-					Id: "should_be_ignored",
+					Id:    "should_be_ignored",
+					Attrs: &resource.Attributes{},
 				},
 			},
 			cloud: []resource.Resource{
 				&testresource.FakeResource{
-					Id:     "foobar",
-					FooBar: "barfoo",
-					BarFoo: "foobar",
+					Id: "foobar",
+					Attrs: &resource.Attributes{
+						"foobar": "barfoo",
+						"barfoo": "foobar",
+					},
 				},
 				&testresource.FakeResource{
-					Id: "should_be_ignored",
+					Id:    "should_be_ignored",
+					Attrs: &resource.Attributes{},
 				},
 			},
 			ignoredDrift: []struct {
@@ -385,27 +422,33 @@ func TestAnalyze(t *testing.T) {
 			}{
 				{
 					res: &testresource.FakeResource{
-						Id:     "foobar",
-						FooBar: "foobar",
-						BarFoo: "barfoo",
+						Id: "foobar",
+						Attrs: &resource.Attributes{
+							"foobar": "foobar",
+							"barfoo": "barfoo",
+						},
 					},
-					path: []string{"FooBar"},
+					path: []string{"foobar"},
 				},
 				{
 					res: &testresource.FakeResource{
-						Id:     "foobar",
-						FooBar: "foobar",
-						BarFoo: "barfoo",
+						Id: "foobar",
+						Attrs: &resource.Attributes{
+							"foobar": "foobar",
+							"barfoo": "barfoo",
+						},
 					},
-					path: []string{"BarFoo"},
+					path: []string{"barfoo"},
 				},
 			},
 			expected: Analysis{
 				managed: []resource.Resource{
 					&testresource.FakeResource{
-						Id:     "foobar",
-						FooBar: "foobar",
-						BarFoo: "barfoo",
+						Id: "foobar",
+						Attrs: &resource.Attributes{
+							"foobar": "foobar",
+							"barfoo": "barfoo",
+						},
 					},
 				},
 				summary: Summary{
@@ -420,97 +463,113 @@ func TestAnalyze(t *testing.T) {
 			name: "TestDiffWithAlertFiltering",
 			iac: []resource.Resource{
 				&testresource.FakeResource{
-					Id:     "foobar",
-					Type:   "fakeres",
-					FooBar: "foobar",
-					BarFoo: "barfoo",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"baz", "bar"},
+					Id:   "foobar",
+					Type: "fakeres",
+					Attrs: &resource.Attributes{
+						"foobar": "foobar",
+						"barfoo": "barfoo",
+						"struct": map[string]interface{}{
+							"baz": "baz",
+							"bar": "bar",
+						},
+					},
 				},
 				&testresource.FakeResource{
-					Id:     "barfoo",
-					Type:   "fakeres",
-					FooBar: "foobar",
-					BarFoo: "barfoo",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"baz", "bar"},
+					Id:   "barfoo",
+					Type: "fakeres",
+					Attrs: &resource.Attributes{
+						"foobar": "foobar",
+						"barfoo": "barfoo",
+						"struct": map[string]interface{}{
+							"baz": "baz",
+							"bar": "bar",
+						},
+					},
 				},
 				&testresource.FakeResource{
-					Id:     "foobaz",
-					Type:   "other",
-					FooBar: "foobar",
-					BarFoo: "barfoo",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"baz", "bar"},
+					Id:   "foobaz",
+					Type: "other",
+					Attrs: &resource.Attributes{
+						"foobar": "foobar",
+						"barfoo": "barfoo",
+						"struct": map[string]interface{}{
+							"baz": "baz",
+							"bar": "bar",
+						},
+					},
 				},
 				&testresource.FakeResource{
-					Id:     "resource",
-					Type:   "other",
-					FooBar: "foobar",
-					BarFoo: "barfoo",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"baz", "bar"},
-					StructSlice: []struct {
-						String string   `cty:"string" computed:"true"`
-						Array  []string `cty:"array" computed:"true"`
-					}{
-						{"one", []string{"foo"}},
+					Id:   "resource",
+					Type: "other",
+					Attrs: &resource.Attributes{
+						"foobar": "foobar",
+						"barfoo": "barfoo",
+						"struct": map[string]interface{}{
+							"baz": "baz",
+							"bar": "bar",
+						},
+						"structslice": []map[string]interface{}{
+							{
+								"string": "one",
+								"array":  []string{"foo"},
+							},
+						},
 					},
 				},
 			},
 			cloud: []resource.Resource{
 				&testresource.FakeResource{
-					Id:     "foobar",
-					Type:   "fakeres",
-					FooBar: "barfoo",
-					BarFoo: "foobar",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"bar", "baz"},
+					Id:   "foobar",
+					Type: "fakeres",
+					Attrs: &resource.Attributes{
+						"foobar": "barfoo",
+						"barfoo": "foobar",
+						"struct": map[string]interface{}{
+							"baz": "bar",
+							"bar": "baz",
+						},
+					},
 				},
 				&testresource.FakeResource{
-					Id:     "barfoo",
-					Type:   "fakeres",
-					FooBar: "barfoo",
-					BarFoo: "foobar",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"bar", "baz"},
+					Id:   "barfoo",
+					Type: "fakeres",
+					Attrs: &resource.Attributes{
+						"foobar": "barfoo",
+						"barfoo": "foobar",
+						"struct": map[string]interface{}{
+							"baz": "bar",
+							"bar": "baz",
+						},
+					},
 				},
 				&testresource.FakeResource{
-					Id:     "foobaz",
-					Type:   "other",
-					FooBar: "barfoo",
-					BarFoo: "foobar",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"bar", "baz"},
+					Id:   "foobaz",
+					Type: "other",
+					Attrs: &resource.Attributes{
+						"foobar": "barfoo",
+						"barfoo": "foobar",
+						"struct": map[string]interface{}{
+							"baz": "bar",
+							"bar": "baz",
+						},
+					},
 				},
 				&testresource.FakeResource{
-					Id:     "resource",
-					Type:   "other",
-					FooBar: "barfoo",
-					BarFoo: "foobar",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"bar", "baz"},
-					StructSlice: []struct {
-						String string   `cty:"string" computed:"true"`
-						Array  []string `cty:"array" computed:"true"`
-					}{
-						{"two", []string{"oof"}},
+					Id:   "resource",
+					Type: "other",
+					Attrs: &resource.Attributes{
+						"foobar": "barfoo",
+						"barfoo": "foobar",
+						"struct": map[string]interface{}{
+							"baz": "bar",
+							"bar": "baz",
+						},
+						"structslice": []map[string]interface{}{
+							{
+								"string": "two",
+								"array":  []string{"oof"},
+							},
+						},
 					},
 				},
 			},
@@ -528,19 +587,21 @@ func TestAnalyze(t *testing.T) {
 			expected: Analysis{
 				managed: []resource.Resource{
 					&testresource.FakeResource{
-						Id:     "resource",
-						Type:   "other",
-						FooBar: "foobar",
-						BarFoo: "barfoo",
-						Struct: struct {
-							Baz string `cty:"baz" computed:"true"`
-							Bar string `cty:"bar"`
-						}{"baz", "bar"},
-						StructSlice: []struct {
-							String string   `cty:"string" computed:"true"`
-							Array  []string `cty:"array" computed:"true"`
-						}{
-							{"one", []string{"foo"}},
+						Id:   "resource",
+						Type: "other",
+						Attrs: &resource.Attributes{
+							"foobar": "foobar",
+							"barfoo": "barfoo",
+							"struct": map[string]interface{}{
+								"baz": "baz",
+								"bar": "bar",
+							},
+							"structslice": []map[string]interface{}{
+								{
+									"string": "one",
+									"array":  []string{"foo"},
+								},
+							},
 						},
 					},
 				},
@@ -552,19 +613,21 @@ func TestAnalyze(t *testing.T) {
 				differences: []Difference{
 					{
 						Res: &testresource.FakeResource{
-							Id:     "resource",
-							Type:   "other",
-							FooBar: "foobar",
-							BarFoo: "barfoo",
-							Struct: struct {
-								Baz string `cty:"baz" computed:"true"`
-								Bar string `cty:"bar"`
-							}{"baz", "bar"},
-							StructSlice: []struct {
-								String string   `cty:"string" computed:"true"`
-								Array  []string `cty:"array" computed:"true"`
-							}{
-								{"one", []string{"foo"}},
+							Id:   "resource",
+							Type: "other",
+							Attrs: &resource.Attributes{
+								"foobar": "foobar",
+								"barfoo": "barfoo",
+								"struct": map[string]interface{}{
+									"baz": "baz",
+									"bar": "bar",
+								},
+								"structslice": []map[string]interface{}{
+									{
+										"string": "one",
+										"array":  []string{"foo"},
+									},
+								},
 							},
 						},
 						Changelog: Changelog{
@@ -574,10 +637,9 @@ func TestAnalyze(t *testing.T) {
 									From: "barfoo",
 									To:   "foobar",
 									Path: []string{
-										"BarFoo",
+										"barfoo",
 									},
 								},
-								Computed: true,
 							},
 							{
 								Change: diff.Change{
@@ -585,7 +647,7 @@ func TestAnalyze(t *testing.T) {
 									From: "foobar",
 									To:   "barfoo",
 									Path: []string{
-										"FooBar",
+										"foobar",
 									},
 								},
 							},
@@ -595,8 +657,8 @@ func TestAnalyze(t *testing.T) {
 									From: "bar",
 									To:   "baz",
 									Path: []string{
-										"Struct",
-										"Bar",
+										"struct",
+										"bar",
 									},
 								},
 							},
@@ -606,11 +668,10 @@ func TestAnalyze(t *testing.T) {
 									From: "baz",
 									To:   "bar",
 									Path: []string{
-										"Struct",
-										"Baz",
+										"struct",
+										"baz",
 									},
 								},
-								Computed: true,
 							},
 							{
 								Change: diff.Change{
@@ -618,13 +679,12 @@ func TestAnalyze(t *testing.T) {
 									From: "foo",
 									To:   "oof",
 									Path: []string{
-										"StructSlice",
+										"structslice",
 										"0",
-										"Array",
+										"array",
 										"0",
 									},
 								},
-								Computed: true,
 							},
 							{
 								Change: diff.Change{
@@ -632,12 +692,11 @@ func TestAnalyze(t *testing.T) {
 									From: "one",
 									To:   "two",
 									Path: []string{
-										"StructSlice",
+										"structslice",
 										"0",
-										"String",
+										"string",
 									},
 								},
-								Computed: true,
 							},
 						},
 					},
@@ -652,9 +711,6 @@ func TestAnalyze(t *testing.T) {
 					"other.resource": {
 						&alerter.FakeAlert{Msg: "Should not be ignored"},
 					},
-					"": {
-						NewComputedDiffAlert(),
-					},
 				},
 			},
 			hasDrifted: true,
@@ -662,175 +718,60 @@ func TestAnalyze(t *testing.T) {
 		{
 			name: "TestDiff with computed field send 1 alert",
 			iac: []resource.Resource{
-				&testresource.FakeResource{
-					Id:     "foobar",
-					Type:   "fakeres",
-					FooBar: "foobar",
-					BarFoo: "barfoo",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"baz", "bar"},
-				},
-				&testresource.FakeResource{
-					Id:     "resource",
-					Type:   "other",
-					FooBar: "foobar",
-					BarFoo: "barfoo",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"baz", "bar"},
-					StructSlice: []struct {
-						String string   `cty:"string" computed:"true"`
-						Array  []string `cty:"array" computed:"true"`
-					}{
-						{"one", []string{"foo"}},
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: aws.AwsAmiResourceType,
+					Attrs: &resource.Attributes{
+						"id":  "ID",
+						"arn": "ARN",
 					},
 				},
 			},
 			cloud: []resource.Resource{
-				&testresource.FakeResource{
-					Id:     "foobar",
-					Type:   "fakeres",
-					FooBar: "foobar",
-					BarFoo: "barfoo",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"bazdiff", "bardiff"},
-				},
-				&testresource.FakeResource{
-					Id:     "resource",
-					Type:   "other",
-					FooBar: "foobar",
-					BarFoo: "barfoo",
-					Struct: struct {
-						Baz string `cty:"baz" computed:"true"`
-						Bar string `cty:"bar"`
-					}{"bazdiff", "bar"},
-					StructSlice: []struct {
-						String string   `cty:"string" computed:"true"`
-						Array  []string `cty:"array" computed:"true"`
-					}{
-						{"onediff", []string{"foo", "diff"}},
+				&resource.AbstractResource{
+					Id:   "ID",
+					Type: aws.AwsAmiResourceType,
+					Attrs: &resource.Attributes{
+						"id":  "IDCHANGED",
+						"arn": "ARNCHANGED",
 					},
 				},
 			},
 			alerts: alerter.Alerts{},
 			expected: Analysis{
 				managed: []resource.Resource{
-					&testresource.FakeResource{
-						Id:     "foobar",
-						Type:   "fakeres",
-						FooBar: "foobar",
-						BarFoo: "barfoo",
-						Struct: struct {
-							Baz string `cty:"baz" computed:"true"`
-							Bar string `cty:"bar"`
-						}{"baz", "bar"},
-					},
-					&testresource.FakeResource{
-						Id:     "resource",
-						Type:   "other",
-						FooBar: "foobar",
-						BarFoo: "barfoo",
-						Struct: struct {
-							Baz string `cty:"baz" computed:"true"`
-							Bar string `cty:"bar"`
-						}{"baz", "bar"},
-						StructSlice: []struct {
-							String string   `cty:"string" computed:"true"`
-							Array  []string `cty:"array" computed:"true"`
-						}{
-							{"one", []string{"foo"}},
+					&resource.AbstractResource{
+						Id:   "ID",
+						Type: aws.AwsAmiResourceType,
+						Attrs: &resource.Attributes{
+							"id":  "ID",
+							"arn": "ARN",
 						},
 					},
 				},
 				summary: Summary{
-					TotalResources: 2,
-					TotalDrifted:   2,
-					TotalManaged:   2,
+					TotalResources: 1,
+					TotalDrifted:   1,
+					TotalManaged:   1,
 				},
 				differences: []Difference{
 					{
-						Res: &testresource.FakeResource{
-							Id:     "foobar",
-							Type:   "fakeres",
-							FooBar: "foobar",
-							BarFoo: "barfoo",
-							Struct: struct {
-								Baz string `cty:"baz" computed:"true"`
-								Bar string `cty:"bar"`
-							}{"baz", "bar"},
-						},
-						Changelog: Changelog{
-							{
-								Change: diff.Change{
-									Type: "update",
-									From: "bar",
-									To:   "bardiff",
-									Path: []string{
-										"Struct",
-										"Bar",
-									},
-								},
-								Computed: false,
-							},
-							{
-								Change: diff.Change{
-									Type: "update",
-									From: "baz",
-									To:   "bazdiff",
-									Path: []string{
-										"Struct",
-										"Baz",
-									},
-								},
-								Computed: true,
-							},
-						},
-					},
-					{
-						Res: &testresource.FakeResource{
-							Id:     "resource",
-							Type:   "other",
-							FooBar: "foobar",
-							BarFoo: "barfoo",
-							Struct: struct {
-								Baz string `cty:"baz" computed:"true"`
-								Bar string `cty:"bar"`
-							}{"baz", "bar"},
-							StructSlice: []struct {
-								String string   `cty:"string" computed:"true"`
-								Array  []string `cty:"array" computed:"true"`
-							}{
-								{"one", []string{"foo"}},
+						Res: &resource.AbstractResource{
+							Id:   "ID",
+							Type: aws.AwsAmiResourceType,
+							Attrs: &resource.Attributes{
+								"id":  "ID",
+								"arn": "ARN",
 							},
 						},
 						Changelog: Changelog{
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "baz",
-									To:   "bazdiff",
+									From: "ARN",
+									To:   "ARNCHANGED",
 									Path: []string{
-										"Struct",
-										"Baz",
-									},
-								},
-								Computed: true,
-							},
-							{
-								Change: diff.Change{
-									Type: "create",
-									From: nil,
-									To:   "diff",
-									Path: []string{
-										"StructSlice",
-										"0",
-										"Array",
-										"1",
+										"arn",
 									},
 								},
 								Computed: true,
@@ -838,12 +779,10 @@ func TestAnalyze(t *testing.T) {
 							{
 								Change: diff.Change{
 									Type: "update",
-									From: "one",
-									To:   "onediff",
+									From: "ID",
+									To:   "IDCHANGED",
 									Path: []string{
-										"StructSlice",
-										"0",
-										"String",
+										"id",
 									},
 								},
 								Computed: true,
@@ -1016,7 +955,24 @@ func TestAnalyze(t *testing.T) {
 			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 			aws.InitResourcesMetadata(repo)
 
-			analyzer := NewAnalyzer(al, repo)
+			analyzer := NewAnalyzer(al)
+
+			for _, res := range c.cloud {
+				addSchemaToRes(res, repo)
+			}
+
+			for _, res := range c.iac {
+				addSchemaToRes(res, repo)
+			}
+
+			for _, res := range c.ignoredRes {
+				addSchemaToRes(res, repo)
+			}
+
+			for _, drift := range c.ignoredDrift {
+				addSchemaToRes(drift.res, repo)
+			}
+
 			result, err := analyzer.Analyze(c.cloud, c.iac, filter)
 
 			if err != nil {
@@ -1091,6 +1047,14 @@ func TestAnalyze(t *testing.T) {
 	}
 }
 
+func addSchemaToRes(res resource.Resource, repo resource.SchemaRepositoryInterface) {
+	abstractResource, ok := res.(*resource.AbstractResource)
+	if ok {
+		schema, _ := repo.GetSchema(res.TerraformType())
+		abstractResource.Sch = schema
+	}
+}
+
 func TestAnalysis_MarshalJSON(t *testing.T) {
 	goldenFile := "./testdata/output.json"
 	analysis := Analysis{}
@@ -1114,9 +1078,11 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 	)
 	analysis.AddDeleted(
 		&testresource.FakeResource{
-			Id:     "test-driftctl2",
-			Type:   "aws_iam_user",
-			FooBar: "test",
+			Id:   "test-driftctl2",
+			Type: "aws_iam_user",
+			Attrs: &resource.Attributes{
+				"foobar": "test",
+			},
 		},
 		&testresource.FakeResource{
 			Id:   "AKIA5QYBVVD2Y6PBAAPY",
@@ -1132,7 +1098,7 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 			{
 				Change: diff.Change{
 					Type: "update",
-					Path: []string{"Status"},
+					Path: []string{"status"},
 					From: "Active",
 					To:   "Inactive",
 				},
@@ -1172,38 +1138,38 @@ func TestAnalysis_UnmarshalJSON(t *testing.T) {
 			TotalManaged:   2,
 		},
 		managed: []resource.Resource{
-			resource.SerializedResource{
+			&resource.SerializedResource{
 				Id:   "AKIA5QYBVVD25KFXJHYJ",
 				Type: "aws_iam_access_key",
 			},
-			resource.SerializedResource{
+			&resource.SerializedResource{
 				Id:   "test-managed",
 				Type: "aws_iam_user",
 			},
 		},
 		unmanaged: []resource.Resource{
-			resource.SerializedResource{
+			&resource.SerializedResource{
 				Id:   "driftctl",
 				Type: "aws_s3_bucket_policy",
 			},
-			resource.SerializedResource{
+			&resource.SerializedResource{
 				Id:   "driftctl",
 				Type: "aws_s3_bucket_notification",
 			},
 		},
 		deleted: []resource.Resource{
-			resource.SerializedResource{
+			&resource.SerializedResource{
 				Id:   "test-driftctl2",
 				Type: "aws_iam_user",
 			},
-			resource.SerializedResource{
+			&resource.SerializedResource{
 				Id:   "AKIA5QYBVVD2Y6PBAAPY",
 				Type: "aws_iam_access_key",
 			},
 		},
 		differences: []Difference{
 			{
-				Res: resource.SerializedResource{
+				Res: &resource.SerializedResource{
 					Id:   "AKIA5QYBVVD25KFXJHYJ",
 					Type: "aws_iam_access_key",
 				},
@@ -1211,7 +1177,7 @@ func TestAnalysis_UnmarshalJSON(t *testing.T) {
 					{
 						Change: diff.Change{
 							Type: "update",
-							Path: []string{"Status"},
+							Path: []string{"status"},
 							From: "Active",
 							To:   "Inactive",
 						},

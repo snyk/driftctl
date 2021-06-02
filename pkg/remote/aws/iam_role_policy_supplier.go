@@ -4,11 +4,9 @@ import (
 	"fmt"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -19,15 +17,15 @@ import (
 
 type IamRolePolicySupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       iamiface.IAMAPI
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamRolePolicySupplier(provider *AWSTerraformProvider) *IamRolePolicySupplier {
+func NewIamRolePolicySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *IamRolePolicySupplier {
 	return &IamRolePolicySupplier{
 		provider,
-		awsdeserializer.NewIamRolePolicyDeserializer(),
+		deserializer,
 		iam.New(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -49,7 +47,7 @@ func (s *IamRolePolicySupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsIamRolePolicyResourceType, results)
 }
 
 func (s *IamRolePolicySupplier) readRes(name string) (cty.Value, error) {

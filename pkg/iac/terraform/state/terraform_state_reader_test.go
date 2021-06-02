@@ -15,7 +15,6 @@ import (
 	resourcegithub "github.com/cloudskiff/driftctl/pkg/resource/github"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
-	"github.com/cloudskiff/driftctl/pkg/iac"
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/github"
@@ -128,14 +127,15 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 			repo := testresource.InitFakeSchemaRepository(terraform.AWS, "3.19.0")
 			resourceaws.InitResourcesMetadata(repo)
 
+			factory := terraform.NewTerraformResourceFactory(repo)
+
 			r := &TerraformStateReader{
 				config: config.SupplierConfig{
 					Path: path.Join(goldenfile.GoldenFilePath, tt.dirName, "terraform.tfstate"),
 				},
-				library:                  library,
-				deserializers:            iac.Deserializers(),
-				progress:                 progress,
-				resourceSchemaRepository: repo,
+				library:      library,
+				progress:     progress,
+				deserializer: resource.NewDeserializer(factory),
 			}
 
 			got, err := r.Resources()
@@ -211,15 +211,15 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 
 			repo := testresource.InitFakeSchemaRepository(terraform.GITHUB, "4.4.0")
 			resourcegithub.InitResourcesMetadata(repo)
+			factory := terraform.NewTerraformResourceFactory(repo)
 
 			r := &TerraformStateReader{
 				config: config.SupplierConfig{
 					Path: path.Join(goldenfile.GoldenFilePath, tt.dirName, "terraform.tfstate"),
 				},
-				library:                  library,
-				deserializers:            iac.Deserializers(),
-				progress:                 progress,
-				resourceSchemaRepository: repo,
+				library:      library,
+				progress:     progress,
+				deserializer: resource.NewDeserializer(factory),
 			}
 
 			got, err := r.Resources()

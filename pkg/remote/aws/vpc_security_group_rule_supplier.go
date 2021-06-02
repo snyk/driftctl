@@ -3,10 +3,9 @@ package aws
 import (
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -24,15 +23,53 @@ const (
 
 type VPCSecurityGroupRuleSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       ec2iface.EC2API
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewVPCSecurityGroupRuleSupplier(provider *AWSTerraformProvider) *VPCSecurityGroupRuleSupplier {
+type securityGroupRule struct {
+	Type                  string
+	SecurityGroupId       string
+	Protocol              string
+	FromPort              int
+	ToPort                int
+	Self                  bool
+	SourceSecurityGroupId string
+	CidrBlocks            []string
+	Ipv6CidrBlocks        []string
+	PrefixListIds         []string
+}
+
+func (s *securityGroupRule) getId() string {
+	attrs := resource.Attributes{
+		"type":                     s.Type,
+		"security_group_id":        s.SecurityGroupId,
+		"protocol":                 s.Protocol,
+		"from_port":                float64(s.FromPort),
+		"to_port":                  float64(s.ToPort),
+		"self":                     s.Self,
+		"source_security_group_id": s.SourceSecurityGroupId,
+		"cidr_blocks":              toInterfaceSlice(s.CidrBlocks),
+		"ipv6_cidr_blocks":         toInterfaceSlice(s.Ipv6CidrBlocks),
+		"prefix_list_ids":          toInterfaceSlice(s.PrefixListIds),
+	}
+
+	return resourceaws.CreateSecurityGroupRuleIdHash(&attrs)
+}
+
+func toInterfaceSlice(val []string) []interface{} {
+	var res []interface{}
+	for _, v := range val {
+		res = append(res, v)
+	}
+	return res
+}
+
+func NewVPCSecurityGroupRuleSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *VPCSecurityGroupRuleSupplier {
 	return &VPCSecurityGroupRuleSupplier{
 		provider,
-		awsdeserializer.NewVPCSecurityGroupRuleDeserializer(),
+		deserializer,
 		ec2.New(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -60,31 +97,26 @@ func (s *VPCSecurityGroupRuleSupplier) Resources() ([]resource.Resource, error) 
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsSecurityGroupRuleResourceType, results)
 }
 
-func (s *VPCSecurityGroupRuleSupplier) readSecurityGroupRule(securityGroupRule resourceaws.AwsSecurityGroupRule) (cty.Value, error) {
-	id := securityGroupRule.Id
-	f := func(v *[]string) []string {
-		if v != nil {
-			return *v
-		}
-		return []string{}
-	}
+func (s *VPCSecurityGroupRuleSupplier) readSecurityGroupRule(rule securityGroupRule) (cty.Value, error) {
+	id := rule.getId()
+
 	resSgRule, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: resourceaws.AwsSecurityGroupRuleResourceType,
 		ID: id,
 		Attributes: flatmap.Flatten(map[string]interface{}{
-			"type":                     aws.StringValue(securityGroupRule.Type),
-			"security_group_id":        aws.StringValue(securityGroupRule.SecurityGroupId),
-			"protocol":                 aws.StringValue(securityGroupRule.Protocol),
-			"from_port":                aws.IntValue(securityGroupRule.FromPort),
-			"to_port":                  aws.IntValue(securityGroupRule.ToPort),
-			"self":                     aws.BoolValue(securityGroupRule.Self),
-			"source_security_group_id": aws.StringValue(securityGroupRule.SourceSecurityGroupId),
-			"cidr_blocks":              f(securityGroupRule.CidrBlocks),
-			"ipv6_cidr_blocks":         f(securityGroupRule.Ipv6CidrBlocks),
-			"prefix_list_ids":          f(securityGroupRule.PrefixListIds),
+			"type":                     rule.Type,
+			"security_group_id":        rule.SecurityGroupId,
+			"protocol":                 rule.Protocol,
+			"from_port":                rule.FromPort,
+			"to_port":                  rule.ToPort,
+			"self":                     rule.Self,
+			"source_security_group_id": rule.SourceSecurityGroupId,
+			"cidr_blocks":              rule.CidrBlocks,
+			"ipv6_cidr_blocks":         rule.Ipv6CidrBlocks,
+			"prefix_list_ids":          rule.PrefixListIds,
 		}),
 	})
 	if err != nil {
@@ -94,8 +126,8 @@ func (s *VPCSecurityGroupRuleSupplier) readSecurityGroupRule(securityGroupRule r
 	return *resSgRule, nil
 }
 
-func (s *VPCSecurityGroupRuleSupplier) listSecurityGroupsRules(securityGroups []*ec2.SecurityGroup) []resourceaws.AwsSecurityGroupRule {
-	var securityGroupsRules []resourceaws.AwsSecurityGroupRule
+func (s *VPCSecurityGroupRuleSupplier) listSecurityGroupsRules(securityGroups []*ec2.SecurityGroup) []securityGroupRule {
+	var securityGroupsRules []securityGroupRule
 	for _, sg := range securityGroups {
 		for _, rule := range sg.IpPermissions {
 			securityGroupsRules = append(securityGroupsRules, s.addSecurityGroupRule(sgRuleTypeIngress, rule, sg)...)
@@ -109,63 +141,59 @@ func (s *VPCSecurityGroupRuleSupplier) listSecurityGroupsRules(securityGroups []
 
 // addSecurityGroupRule will iterate through each "Source" as per Aws definition and create a
 // rule with custom attributes
-func (s *VPCSecurityGroupRuleSupplier) addSecurityGroupRule(ruleType string, rule *ec2.IpPermission, sg *ec2.SecurityGroup) []resourceaws.AwsSecurityGroupRule {
-	var rules []resourceaws.AwsSecurityGroupRule
+func (s *VPCSecurityGroupRuleSupplier) addSecurityGroupRule(ruleType string, rule *ec2.IpPermission, sg *ec2.SecurityGroup) []securityGroupRule {
+	var rules []securityGroupRule
 	for _, groupPair := range rule.UserIdGroupPairs {
-		r := resourceaws.AwsSecurityGroupRule{
-			Type:            aws.String(ruleType),
-			SecurityGroupId: sg.GroupId,
-			Protocol:        rule.IpProtocol,
-			FromPort:        aws.Int(int(aws.Int64Value(rule.FromPort))),
-			ToPort:          aws.Int(int(aws.Int64Value(rule.ToPort))),
+		r := securityGroupRule{
+			Type:            ruleType,
+			SecurityGroupId: aws.StringValue(sg.GroupId),
+			Protocol:        aws.StringValue(rule.IpProtocol),
+			FromPort:        int(aws.Int64Value(rule.FromPort)),
+			ToPort:          int(aws.Int64Value(rule.ToPort)),
 		}
 		if aws.StringValue(groupPair.GroupId) == aws.StringValue(sg.GroupId) {
-			r.Self = aws.Bool(true)
+			r.Self = true
 		} else {
-			r.SourceSecurityGroupId = groupPair.GroupId
+			r.SourceSecurityGroupId = aws.StringValue(groupPair.GroupId)
 		}
-		r.Id = r.CreateIdHash()
 		rules = append(rules, r)
 	}
 	for _, ipRange := range rule.IpRanges {
-		r := resourceaws.AwsSecurityGroupRule{
-			Type:            aws.String(ruleType),
-			SecurityGroupId: sg.GroupId,
-			Protocol:        rule.IpProtocol,
-			FromPort:        aws.Int(int(aws.Int64Value(rule.FromPort))),
-			ToPort:          aws.Int(int(aws.Int64Value(rule.ToPort))),
-			CidrBlocks:      &[]string{aws.StringValue(ipRange.CidrIp)},
+		r := securityGroupRule{
+			Type:            ruleType,
+			SecurityGroupId: aws.StringValue(sg.GroupId),
+			Protocol:        aws.StringValue(rule.IpProtocol),
+			FromPort:        int(aws.Int64Value(rule.FromPort)),
+			ToPort:          int(aws.Int64Value(rule.ToPort)),
+			CidrBlocks:      []string{aws.StringValue(ipRange.CidrIp)},
 		}
-		r.Id = r.CreateIdHash()
 		rules = append(rules, r)
 	}
 	for _, ipRange := range rule.Ipv6Ranges {
-		r := resourceaws.AwsSecurityGroupRule{
-			Type:            aws.String(ruleType),
-			SecurityGroupId: sg.GroupId,
-			Protocol:        rule.IpProtocol,
-			FromPort:        aws.Int(int(aws.Int64Value(rule.FromPort))),
-			ToPort:          aws.Int(int(aws.Int64Value(rule.ToPort))),
-			Ipv6CidrBlocks:  &[]string{aws.StringValue(ipRange.CidrIpv6)},
+		r := securityGroupRule{
+			Type:            ruleType,
+			SecurityGroupId: aws.StringValue(sg.GroupId),
+			Protocol:        aws.StringValue(rule.IpProtocol),
+			FromPort:        int(aws.Int64Value(rule.FromPort)),
+			ToPort:          int(aws.Int64Value(rule.ToPort)),
+			Ipv6CidrBlocks:  []string{aws.StringValue(ipRange.CidrIpv6)},
 		}
-		r.Id = r.CreateIdHash()
 		rules = append(rules, r)
 	}
 	for _, listId := range rule.PrefixListIds {
-		r := resourceaws.AwsSecurityGroupRule{
-			Type:            aws.String(ruleType),
-			SecurityGroupId: sg.GroupId,
-			Protocol:        rule.IpProtocol,
-			FromPort:        aws.Int(int(aws.Int64Value(rule.FromPort))),
-			ToPort:          aws.Int(int(aws.Int64Value(rule.ToPort))),
-			PrefixListIds:   &[]string{aws.StringValue(listId.PrefixListId)},
+		r := securityGroupRule{
+			Type:            ruleType,
+			SecurityGroupId: aws.StringValue(sg.GroupId),
+			Protocol:        aws.StringValue(rule.IpProtocol),
+			FromPort:        int(aws.Int64Value(rule.FromPort)),
+			ToPort:          int(aws.Int64Value(rule.ToPort)),
+			PrefixListIds:   []string{aws.StringValue(listId.PrefixListId)},
 		}
-		r.Id = r.CreateIdHash()
 		rules = append(rules, r)
 	}
 	// Filter default rules for default security group
 	if sg.GroupName != nil && *sg.GroupName == "default" {
-		results := make([]resourceaws.AwsSecurityGroupRule, 0, len(rules))
+		results := make([]securityGroupRule, 0, len(rules))
 		for _, r := range rules {
 			r := r
 			if s.isDefaultIngress(&r) || s.isDefaultEgress(&r) {
@@ -179,36 +207,27 @@ func (s *VPCSecurityGroupRuleSupplier) addSecurityGroupRule(ruleType string, rul
 	return rules
 }
 
-func (s *VPCSecurityGroupRuleSupplier) isDefaultIngress(rule *resourceaws.AwsSecurityGroupRule) bool {
-	return rule.Type != nil &&
-		*rule.Type == sgRuleTypeIngress &&
-		rule.FromPort != nil &&
-		*rule.FromPort == 0 &&
-		rule.ToPort != nil &&
-		*rule.ToPort == 0 &&
-		rule.Protocol != nil &&
-		*rule.Protocol == "-1" &&
+func (s *VPCSecurityGroupRuleSupplier) isDefaultIngress(rule *securityGroupRule) bool {
+	return rule.Type == sgRuleTypeIngress &&
+		rule.FromPort == 0 &&
+		rule.ToPort == 0 &&
+		rule.Protocol == "-1" &&
 		rule.CidrBlocks == nil &&
 		rule.Ipv6CidrBlocks == nil &&
 		rule.PrefixListIds == nil &&
-		rule.SourceSecurityGroupId == nil &&
-		rule.Self != nil &&
-		*rule.Self
+		rule.SourceSecurityGroupId == "" &&
+		rule.Self
 }
 
-func (s *VPCSecurityGroupRuleSupplier) isDefaultEgress(rule *resourceaws.AwsSecurityGroupRule) bool {
-	return rule.Type != nil &&
-		*rule.Type == sgRuleTypeEgress &&
-		rule.FromPort != nil &&
-		*rule.FromPort == 0 &&
-		rule.ToPort != nil &&
-		*rule.ToPort == 0 &&
-		rule.Protocol != nil &&
-		*rule.Protocol == "-1" &&
+func (s *VPCSecurityGroupRuleSupplier) isDefaultEgress(rule *securityGroupRule) bool {
+	return rule.Type == sgRuleTypeEgress &&
+		rule.FromPort == 0 &&
+		rule.ToPort == 0 &&
+		rule.Protocol == "-1" &&
 		rule.Ipv6CidrBlocks == nil &&
 		rule.PrefixListIds == nil &&
-		rule.SourceSecurityGroupId == nil &&
+		rule.SourceSecurityGroupId == "" &&
 		rule.CidrBlocks != nil &&
-		len(*rule.CidrBlocks) == 1 &&
-		(*rule.CidrBlocks)[0] == "0.0.0.0/0"
+		len(rule.CidrBlocks) == 1 &&
+		(rule.CidrBlocks)[0] == "0.0.0.0/0"
 }

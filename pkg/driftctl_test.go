@@ -4,10 +4,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/r3labs/diff/v2"
-	"github.com/stretchr/testify/mock"
-	"github.com/zclconf/go-cty/cty"
-
 	"github.com/cloudskiff/driftctl/pkg"
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
@@ -19,6 +15,8 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
+	"github.com/r3labs/diff/v2"
+	"github.com/stretchr/testify/mock"
 )
 
 type TestProvider struct {
@@ -31,7 +29,7 @@ type TestCase struct {
 	provider        *TestProvider
 	stateResources  []resource.Resource
 	remoteResources []resource.Resource
-	mocks           func(factory resource.ResourceFactory)
+	mocks           func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface)
 	assert          func(result *test.ScanResult, err error)
 	options         *pkg.ScanOptions
 }
@@ -56,6 +54,14 @@ func runTest(t *testing.T, cases TestCases) {
 				c.stateResources = []resource.Resource{}
 			}
 
+			for _, res := range c.stateResources {
+				abstractResource, ok := res.(*resource.AbstractResource)
+				if ok {
+					schema, _ := repo.GetSchema(abstractResource.TerraformType())
+					abstractResource.Sch = schema
+				}
+			}
+
 			stateSupplier := &resource.MockSupplier{}
 			stateSupplier.On("Resources").Return(c.stateResources, nil)
 
@@ -63,13 +69,20 @@ func runTest(t *testing.T, cases TestCases) {
 				c.remoteResources = []resource.Resource{}
 			}
 
+			for _, res := range c.remoteResources {
+				abstractResource, ok := res.(*resource.AbstractResource)
+				if ok {
+					schema, _ := repo.GetSchema(abstractResource.TerraformType())
+					abstractResource.Sch = schema
+				}
+			}
 			remoteSupplier := &resource.MockSupplier{}
 			remoteSupplier.On("Resources").Return(c.remoteResources, nil)
 
 			resourceFactory := &terraform.MockResourceFactory{}
 
 			if c.mocks != nil {
-				c.mocks(resourceFactory)
+				c.mocks(resourceFactory, repo)
 			}
 
 			if c.options == nil {
@@ -159,14 +172,18 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			name: "we should have changes of field update",
 			stateResources: []resource.Resource{
 				&testresource.FakeResource{
-					Id:     "fake",
-					FooBar: "barfoo",
+					Id: "fake",
+					Attrs: &resource.Attributes{
+						"foobar": "barfoo",
+					},
 				},
 			},
 			remoteResources: []resource.Resource{
 				&testresource.FakeResource{
-					Id:     "fake",
-					FooBar: "foobar",
+					Id: "fake",
+					Attrs: &resource.Attributes{
+						"foobar": "foobar",
+					},
 				},
 			},
 			assert: func(result *test.ScanResult, err error) {
@@ -174,7 +191,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				result.AssertResourceHasDrift("fake", "FakeResource", analyser.Change{
 					Change: diff.Change{
 						Type: diff.UPDATE,
-						Path: []string{"FooBar"},
+						Path: []string{"foobar"},
 						From: "barfoo",
 						To:   "foobar",
 					},
@@ -188,23 +205,29 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		{
 			name: "we should have changes on computed field",
 			stateResources: []resource.Resource{
-				&testresource.FakeResource{
-					Id:     "fake",
-					BarFoo: "barfoo",
+				&resource.AbstractResource{
+					Id:   "fake",
+					Type: aws.AwsAmiResourceType,
+					Attrs: &resource.Attributes{
+						"arn": "barfoo",
+					},
 				},
 			},
 			remoteResources: []resource.Resource{
-				&testresource.FakeResource{
-					Id:     "fake",
-					BarFoo: "foobar",
+				&resource.AbstractResource{
+					Id:   "fake",
+					Type: aws.AwsAmiResourceType,
+					Attrs: &resource.Attributes{
+						"arn": "foobar",
+					},
 				},
 			},
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
-				result.AssertResourceHasDrift("fake", "FakeResource", analyser.Change{
+				result.AssertResourceHasDrift("fake", aws.AwsAmiResourceType, analyser.Change{
 					Change: diff.Change{
 						Type: diff.UPDATE,
-						Path: []string{"BarFoo"},
+						Path: []string{"arn"},
 						From: "barfoo",
 						To:   "foobar",
 					},
@@ -216,18 +239,23 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			}(t),
 		},
 		{
-			name: "we should have changes of deleted field",
+			name: "we should have changes on deleted field",
 			stateResources: []resource.Resource{
 				&testresource.FakeResource{
 					Id: "fake",
-					Tags: map[string]string{
-						"tag1": "deleted",
+					Attrs: &resource.Attributes{
+						"tags": map[string]string{
+							"tag1": "deleted",
+						},
 					},
 				},
 			},
 			remoteResources: []resource.Resource{
 				&testresource.FakeResource{
 					Id: "fake",
+					Attrs: &resource.Attributes{
+						"tags": map[string]string{},
+					},
 				},
 			},
 			assert: func(result *test.ScanResult, err error) {
@@ -235,7 +263,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				result.AssertResourceHasDrift("fake", "FakeResource", analyser.Change{
 					Change: diff.Change{
 						Type: diff.DELETE,
-						Path: []string{"Tags", "tag1"},
+						Path: []string{"tags", "tag1"},
 						From: "deleted",
 						To:   nil,
 					},
@@ -251,13 +279,18 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			stateResources: []resource.Resource{
 				&testresource.FakeResource{
 					Id: "fake",
+					Attrs: &resource.Attributes{
+						"tags": map[string]string{},
+					},
 				},
 			},
 			remoteResources: []resource.Resource{
 				&testresource.FakeResource{
 					Id: "fake",
-					Tags: map[string]string{
-						"tag1": "added",
+					Attrs: &resource.Attributes{
+						"tags": map[string]string{
+							"tag1": "added",
+						},
 					},
 				},
 			},
@@ -266,7 +299,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				result.AssertResourceHasDrift("fake", "FakeResource", analyser.Change{
 					Change: diff.Change{
 						Type: diff.CREATE,
-						Path: []string{"Tags", "tag1"},
+						Path: []string{"tags", "tag1"},
 						From: nil,
 						To:   "added",
 					},
@@ -279,25 +312,28 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should ignore default AWS IAM role when strict mode is disabled",
-			mocks: func(factory resource.ResourceFactory) {
+			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
 				factory.(*terraform.MockResourceFactory).On(
 					"CreateAbstractResource",
 					aws.AwsIamPolicyAttachmentResourceType,
 					"role-test-1-policy-test-1",
 					map[string]interface{}{
-						"roles": []string{"role-test-1"},
+						"policy_arn": "policy-test-1",
+						"roles":      []interface{}{"role-test-1"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "role-test-1-policy-test-1",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
-						"roles": []string{"role-test-1"},
+						"policy_arn": "policy-test-1",
+						"roles":      []interface{}{"role-test-1"},
 					},
 				})
 			},
 			stateResources: []resource.Resource{
-				testresource.FakeResource{
-					Id: "fake",
+				&testresource.FakeResource{
+					Id:    "fake",
+					Attrs: &resource.Attributes{},
 				},
 				&resource.AbstractResource{
 					Id:   "role-policy-test-1",
@@ -308,8 +344,9 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				},
 			},
 			remoteResources: []resource.Resource{
-				testresource.FakeResource{
-					Id: "fake",
+				&testresource.FakeResource{
+					Id:    "fake",
+					Attrs: &resource.Attributes{},
 				},
 				&resource.AbstractResource{
 					Id:   "role-test-1",
@@ -363,25 +400,28 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should not ignore default AWS IAM role when strict mode is enabled",
-			mocks: func(factory resource.ResourceFactory) {
+			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
 				factory.(*terraform.MockResourceFactory).On(
 					"CreateAbstractResource",
 					aws.AwsIamPolicyAttachmentResourceType,
 					"role-test-1-policy-test-1",
 					map[string]interface{}{
-						"roles": []string{"role-test-1"},
+						"policy_arn": "policy-test-1",
+						"roles":      []interface{}{"role-test-1"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "role-test-1-policy-test-1",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
-						"roles": []string{"role-test-1"},
+						"policy_arn": "policy-test-1",
+						"roles":      []interface{}{"role-test-1"},
 					},
 				})
 			},
 			stateResources: []resource.Resource{
-				testresource.FakeResource{
-					Id: "fake",
+				&testresource.FakeResource{
+					Id:    "fake",
+					Attrs: &resource.Attributes{},
 				},
 				&resource.AbstractResource{
 					Id:   "policy-test-1",
@@ -392,8 +432,9 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				},
 			},
 			remoteResources: []resource.Resource{
-				testresource.FakeResource{
-					Id: "fake",
+				&testresource.FakeResource{
+					Id:    "fake",
+					Attrs: &resource.Attributes{},
 				},
 				&resource.AbstractResource{
 					Id:   "role-test-1",
@@ -447,25 +488,28 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should not ignore default AWS IAM role when strict mode is enabled and a filter is specified",
-			mocks: func(factory resource.ResourceFactory) {
+			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
 				factory.(*terraform.MockResourceFactory).On(
 					"CreateAbstractResource",
 					aws.AwsIamPolicyAttachmentResourceType,
 					"role-test-1-policy-test-1",
 					map[string]interface{}{
-						"roles": []string{"role-test-1"},
+						"policy_arn": "policy-test-1",
+						"roles":      []interface{}{"role-test-1"},
 					},
 				).Once().Return(&resource.AbstractResource{
 					Id:   "role-test-1-policy-test-1",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
-						"roles": []string{"role-test-1"},
+						"policy_arn": "policy-test-1",
+						"roles":      []interface{}{"role-test-1"},
 					},
 				})
 			},
 			stateResources: []resource.Resource{
-				testresource.FakeResource{
-					Id: "fake",
+				&testresource.FakeResource{
+					Id:    "fake",
+					Attrs: &resource.Attributes{},
 				},
 				&resource.AbstractResource{
 					Id:   "policy-test-1",
@@ -476,8 +520,9 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				},
 			},
 			remoteResources: []resource.Resource{
-				testresource.FakeResource{
-					Id: "fake",
+				&testresource.FakeResource{
+					Id:    "fake",
+					Attrs: &resource.Attributes{},
 				},
 				&resource.AbstractResource{
 					Id:   "role-test-1",
@@ -549,13 +594,15 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 			name:           "test filtering on Type",
 			stateResources: []resource.Resource{},
 			remoteResources: []resource.Resource{
-				testresource.FakeResource{
-					Id:   "res1",
-					Type: "not-filtered",
+				&testresource.FakeResource{
+					Id:    "res1",
+					Type:  "not-filtered",
+					Attrs: &resource.Attributes{},
 				},
-				testresource.FakeResource{
-					Id:   "res2",
-					Type: "filtered",
+				&testresource.FakeResource{
+					Id:    "res2",
+					Type:  "filtered",
+					Attrs: &resource.Attributes{},
 				},
 			},
 			assert: func(result *test.ScanResult, err error) {
@@ -576,13 +623,15 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 			name:           "test filtering on Id",
 			stateResources: []resource.Resource{},
 			remoteResources: []resource.Resource{
-				testresource.FakeResource{
-					Id:   "res1",
-					Type: "not-filtered",
+				&testresource.FakeResource{
+					Id:    "res1",
+					Type:  "not-filtered",
+					Attrs: &resource.Attributes{},
 				},
-				testresource.FakeResource{
-					Id:   "res2",
-					Type: "filtered",
+				&testresource.FakeResource{
+					Id:    "res2",
+					Type:  "filtered",
+					Attrs: &resource.Attributes{},
 				},
 			},
 			assert: func(result *test.ScanResult, err error) {
@@ -603,19 +652,17 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 			name:           "test filtering on attribute",
 			stateResources: []resource.Resource{},
 			remoteResources: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id:   "res1",
 					Type: "filtered",
-					CtyVal: func() *cty.Value {
-						v := cty.ObjectVal(map[string]cty.Value{
-							"test_field": cty.StringVal("value to filter on"),
-						})
-						return &v
-					}(),
+					Attrs: &resource.Attributes{
+						"test_field": "value to filter on",
+					},
 				},
-				testresource.FakeResource{
-					Id:   "res2",
-					Type: "not-filtered",
+				&testresource.FakeResource{
+					Id:    "res2",
+					Type:  "not-filtered",
+					Attrs: &resource.Attributes{},
 				},
 			},
 			assert: func(result *test.ScanResult, err error) {
@@ -662,7 +709,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory resource.ResourceFactory) {
+			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
 				factory.(*terraform.MockResourceFactory).On(
 					"CreateAbstractResource",
 					aws.AwsS3BucketPolicyResourceType,
@@ -680,6 +727,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"bucket": "foo",
 						"policy": "{\"Id\":\"foo\"}",
 					},
+					Sch: getSchema(repo, aws.AwsS3BucketPolicyResourceType),
 				})
 			},
 			assert: func(result *test.ScanResult, err error) {
@@ -748,7 +796,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory resource.ResourceFactory) {
+			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
 				foo := resource.AbstractResource{
 					Id:   "vol-018c5ae89895aca4c",
 					Type: "aws_ebs_volume",
@@ -757,6 +805,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"multi_attach_enabled": false,
 						"availability_zone":    "us-east-1",
 					},
+					Sch: getSchema(repo, "aws_ebs_volume"),
 				}
 				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return matchByAttributes(input, map[string]interface{}{
@@ -775,6 +824,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"multi_attach_enabled": false,
 						"availability_zone":    "us-east-1",
 					},
+					Sch: getSchema(repo, "aws_ebs_volume"),
 				}
 				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return matchByAttributes(input, map[string]interface{}{
@@ -861,7 +911,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory resource.ResourceFactory) {
+			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
 				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_route", "r-table1080289494", mock.MatchedBy(func(input map[string]interface{}) bool {
 					return matchByAttributes(input, map[string]interface{}{
 						"destination_cidr_block": "0.0.0.0/0",
@@ -939,7 +989,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory resource.ResourceFactory) {
+			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
 				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_sns_topic_policy", "foo", map[string]interface{}{
 					"id":     "foo",
 					"arn":    "arn",
@@ -952,6 +1002,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"arn":    "arn",
 						"policy": "{\"policy\":\"bar\"}",
 					},
+					Sch: getSchema(repo, aws.AwsSnsTopicPolicyResourceType),
 				}, nil)
 			},
 			assert: func(result *test.ScanResult, err error) {
@@ -1000,7 +1051,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory resource.ResourceFactory) {
+			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
 				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_sqs_queue_policy", "foo", map[string]interface{}{
 					"id":        "foo",
 					"queue_url": "foo",
@@ -1013,6 +1064,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"queue_url": "foo",
 						"policy":    "{\"policy\":\"bar\"}",
 					},
+					Sch: getSchema(repo, aws.AwsSqsQueuePolicyResourceType),
 				}, nil)
 			},
 			assert: func(result *test.ScanResult, err error) {
@@ -1211,7 +1263,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory resource.ResourceFactory) {
+			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
 				rule1 := resource.AbstractResource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-1707973622",
@@ -1354,7 +1406,150 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				return &pkg.ScanOptions{Filter: f}
 			}(t),
 		},
+		{
+			name: "test iam_policy_attachment_transformer & iam_policy_attachment_expander middleware",
+			stateResources: []resource.Resource{
+				&resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-3970541193",
+					Attrs: &resource.Attributes{
+						"id":                       "sgrule-3970541193",
+						"type":                     "ingress",
+						"security_group_id":        "sg-0254c038e32f25530",
+						"protocol":                 "tcp",
+						"from_port":                float64(0),
+						"to_port":                  float64(65535),
+						"self":                     true,
+						"source_security_group_id": "sg-0254c038e32f25530",
+					},
+				},
+				&resource.AbstractResource{
+					Id:   "iduser1",
+					Type: aws.AwsIamUserPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"policy_arn": "policy_arn1",
+						"user":       "user1",
+					},
+				},
+				&resource.AbstractResource{
+					Id:   "idrole1",
+					Type: aws.AwsIamRolePolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"policy_arn": "policy_arn1",
+						"role":       "role1",
+					},
+				},
+			},
+			remoteResources: []resource.Resource{
+				&resource.AbstractResource{
+					Type: aws.AwsSecurityGroupRuleResourceType,
+					Id:   "sgrule-3970541193",
+					Attrs: &resource.Attributes{
+						"id":                       "sgrule-3970541193",
+						"type":                     "ingress",
+						"security_group_id":        "sg-0254c038e32f25530",
+						"protocol":                 "tcp",
+						"from_port":                float64(0),
+						"to_port":                  float64(65535),
+						"self":                     true,
+						"source_security_group_id": "sg-0254c038e32f25530",
+					},
+				},
+				&resource.AbstractResource{
+					Id:   "iduser1",
+					Type: aws.AwsIamUserPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"policy_arn": "policy_arn1",
+						"user":       "user1",
+					},
+				},
+				&resource.AbstractResource{
+					Id:   "idrole1",
+					Type: aws.AwsIamRolePolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"policy_arn": "policy_arn1",
+						"role":       "role1",
+					},
+				},
+			},
+			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "iduser1", map[string]interface{}{
+					"id":         "iduser1",
+					"policy_arn": "policy_arn1",
+					"users":      []interface{}{"user1"},
+					"groups":     []interface{}{},
+					"roles":      []interface{}{},
+				}).Twice().Return(&resource.AbstractResource{
+					Id:   "id1",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"id":         "iduser1",
+						"policy_arn": "policy_arn1",
+						"users":      []interface{}{"user1"},
+						"groups":     []interface{}{},
+						"roles":      []interface{}{},
+					},
+				}, nil)
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "user1-policy_arn1", map[string]interface{}{
+					"policy_arn": "policy_arn1",
+					"users":      []interface{}{"user1"},
+				}).Twice().Return(&resource.AbstractResource{
+					Id:   "user1-policy_arn1",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"policy_arn": "policy_arn1",
+						"users":      []interface{}{"user1"},
+					},
+				}, nil)
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "idrole1", map[string]interface{}{
+					"id":         "idrole1",
+					"policy_arn": "policy_arn1",
+					"users":      []interface{}{},
+					"groups":     []interface{}{},
+					"roles":      []interface{}{"role1"},
+				}).Twice().Return(&resource.AbstractResource{
+					Id:   "idrole1",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"id":         "idrole1",
+						"policy_arn": "policy_arn1",
+						"users":      []interface{}{},
+						"groups":     []interface{}{},
+						"roles":      []interface{}{"role1"},
+					},
+				}, nil)
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "role1-policy_arn1", map[string]interface{}{
+					"policy_arn": "policy_arn1",
+					"roles":      []interface{}{"role1"},
+				}).Twice().Return(&resource.AbstractResource{
+					Id:   "role1-policy_arn1",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"policy_arn": "policy_arn1",
+						"roles":      []interface{}{"role1"},
+					},
+				}, nil)
+			},
+			assert: func(result *test.ScanResult, err error) {
+				result.AssertManagedCount(2)
+				result.AssertInfrastructureIsInSync()
+			},
+			options: func(t *testing.T) *pkg.ScanOptions {
+				filterStr := "Type=='aws_iam_policy_attachment'"
+				f, err := filter.BuildExpression(filterStr)
+				if err != nil {
+					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
+				}
+
+				return &pkg.ScanOptions{Filter: f}
+			}(t),
+		},
 	}
 
 	runTest(t, cases)
+}
+
+func getSchema(repo resource.SchemaRepositoryInterface, resourceType string) *resource.Schema {
+	sch, _ := repo.GetSchema(resourceType)
+	return sch
 }

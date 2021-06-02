@@ -5,9 +5,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -17,19 +16,17 @@ import (
 )
 
 type VPCSupplier struct {
-	reader                 terraform.ResourceReader
-	defaultVPCDeserializer deserializer.CTYDeserializer
-	vpcDeserializer        deserializer.CTYDeserializer
-	client                 ec2iface.EC2API
-	defaultVPCRunner       *terraform.ParallelResourceReader
-	vpcRunner              *terraform.ParallelResourceReader
+	reader           terraform.ResourceReader
+	deserializer     *resource.Deserializer
+	client           ec2iface.EC2API
+	defaultVPCRunner *terraform.ParallelResourceReader
+	vpcRunner        *terraform.ParallelResourceReader
 }
 
-func NewVPCSupplier(provider *AWSTerraformProvider) *VPCSupplier {
+func NewVPCSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *VPCSupplier {
 	return &VPCSupplier{
 		provider,
-		awsdeserializer.NewDefaultVPCDeserializer(),
-		awsdeserializer.NewVPCDeserializer(),
+		deserializer,
 		ec2.New(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
@@ -83,11 +80,11 @@ func (s *VPCSupplier) Resources() ([]resource.Resource, error) {
 	}
 
 	// Deserialize
-	deserializedDefaultVPCs, err := s.defaultVPCDeserializer.Deserialize(defaultVPCResources)
+	deserializedDefaultVPCs, err := s.deserializer.Deserialize(aws.AwsDefaultVpcResourceType, defaultVPCResources)
 	if err != nil {
 		return nil, err
 	}
-	deserializedVPCs, err := s.vpcDeserializer.Deserialize(VPCResources)
+	deserializedVPCs, err := s.deserializer.Deserialize(aws.AwsVpcResourceType, VPCResources)
 	if err != nil {
 		return nil, err
 	}

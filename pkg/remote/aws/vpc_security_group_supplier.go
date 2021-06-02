@@ -3,10 +3,9 @@ package aws
 import (
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -17,19 +16,17 @@ import (
 )
 
 type VPCSecurityGroupSupplier struct {
-	reader                           terraform.ResourceReader
-	defaultSecurityGroupDeserializer deserializer.CTYDeserializer
-	securityGroupDeserializer        deserializer.CTYDeserializer
-	client                           ec2iface.EC2API
-	defaultSecurityGroupRunner       *terraform.ParallelResourceReader
-	securityGroupRunner              *terraform.ParallelResourceReader
+	reader                     terraform.ResourceReader
+	deserializer               *resource.Deserializer
+	client                     ec2iface.EC2API
+	defaultSecurityGroupRunner *terraform.ParallelResourceReader
+	securityGroupRunner        *terraform.ParallelResourceReader
 }
 
-func NewVPCSecurityGroupSupplier(provider *AWSTerraformProvider) *VPCSecurityGroupSupplier {
+func NewVPCSecurityGroupSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *VPCSecurityGroupSupplier {
 	return &VPCSecurityGroupSupplier{
 		provider,
-		awsdeserializer.NewDefaultSecurityGroupDeserializer(),
-		awsdeserializer.NewVPCSecurityGroupDeserializer(),
+		deserializer,
 		ec2.New(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
@@ -65,11 +62,11 @@ func (s *VPCSecurityGroupSupplier) Resources() ([]resource.Resource, error) {
 	}
 
 	// Deserialize
-	deserializedDefaultSecurityGroups, err := s.defaultSecurityGroupDeserializer.Deserialize(defaultSecurityGroupResources)
+	deserializedDefaultSecurityGroups, err := s.deserializer.Deserialize(resourceaws.AwsDefaultSecurityGroupResourceType, defaultSecurityGroupResources)
 	if err != nil {
 		return nil, err
 	}
-	deserializedSecurityGroups, err := s.securityGroupDeserializer.Deserialize(securityGroupResources)
+	deserializedSecurityGroups, err := s.deserializer.Deserialize(resourceaws.AwsSecurityGroupResourceType, securityGroupResources)
 	if err != nil {
 		return nil, err
 	}

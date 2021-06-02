@@ -5,28 +5,27 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/zclconf/go-cty/cty"
 )
 
 type S3BucketMetricSupplier struct {
 	reader         terraform.ResourceReader
-	deserializer   deserializer.CTYDeserializer
+	deserializer   *resource.Deserializer
 	repository     repository.S3Repository
 	runner         *terraform.ParallelResourceReader
 	providerConfig tf.TerraformProviderConfig
 }
 
-func NewS3BucketMetricSupplier(provider *AWSTerraformProvider, repository repository.S3Repository) *S3BucketMetricSupplier {
+func NewS3BucketMetricSupplier(provider *AWSTerraformProvider, repository repository.S3Repository, deserializer *resource.Deserializer) *S3BucketMetricSupplier {
 	return &S3BucketMetricSupplier{
 		provider,
-		awsdeserializer.NewS3BucketMetricDeserializer(),
+		deserializer,
 		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		provider.Config,
@@ -57,7 +56,7 @@ func (s *S3BucketMetricSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(ctyVals)
+	return s.deserializer.Deserialize(aws.AwsS3BucketMetricResourceType, ctyVals)
 }
 
 func (s *S3BucketMetricSupplier) listBucketMetricConfiguration(bucket *s3.Bucket, region string) error {

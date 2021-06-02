@@ -1,13 +1,10 @@
 package filter
 
 import (
-	"encoding/json"
 	"errors"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/jmespath/go-jmespath"
-	"github.com/zclconf/go-cty/cty"
-	ctyjson "github.com/zclconf/go-cty/cty/json"
 )
 
 type FilterEngine struct {
@@ -36,17 +33,7 @@ func (e *FilterEngine) Run(resources []resource.Resource) ([]resource.Resource, 
 		// We need to serialize all attributes to untyped interface from JMESPath to work
 		// map[string]string and map[string]SomeThing will not work without it
 		// https://github.com/jmespath/go-jmespath/issues/22
-		var attrs map[string]interface{}
-		if abstractRes, ok := res.(*resource.AbstractResource); ok {
-			attrs = *abstractRes.Attrs
-		} else {
-			ctyVal := res.CtyValue()
-			if ctyVal == nil {
-				ctyVal = &cty.EmptyObjectVal
-			}
-			bytes, _ := ctyjson.Marshal(*ctyVal, ctyVal.Type())
-			_ = json.Unmarshal(bytes, &attrs)
-		}
+		var attrs map[string]interface{} = *res.Attributes()
 
 		f := filtrableResource{
 			Attr: attrs,

@@ -7,24 +7,23 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
 type SNSTopicSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.SNSRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewSNSTopicSupplier(provider *AWSTerraformProvider) *SNSTopicSupplier {
+func NewSNSTopicSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *SNSTopicSupplier {
 	return &SNSTopicSupplier{
 		provider,
-		awsdeserializer.NewSNSTopicDeserializer(),
+		deserializer,
 		repository.NewSNSClient(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -48,7 +47,7 @@ func (s *SNSTopicSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(retrieve)
+	return s.deserializer.Deserialize(aws.AwsSnsTopicResourceType, retrieve)
 }
 
 func (s *SNSTopicSupplier) readTopic(topic sns.Topic) (cty.Value, error) {

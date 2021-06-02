@@ -6,16 +6,16 @@ import (
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	awstest "github.com/cloudskiff/driftctl/test/aws"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
 	"github.com/cloudskiff/driftctl/test/goldenfile"
@@ -82,22 +82,26 @@ func TestNatGatewaySupplier_Resources(t *testing.T) {
 		providerLibrary := terraform.NewProviderLibrary()
 		supplierLibrary := resource.NewSupplierLibrary()
 
+		repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+		resourceaws.InitResourcesMetadata(repo)
+		factory := terraform.NewTerraformResourceFactory(repo)
+
+		deserializer := resource.NewDeserializer(factory)
 		if shouldUpdate {
 			provider, err := InitTestAwsProvider(providerLibrary)
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewNatGatewaySupplier(provider))
+			supplierLibrary.AddSupplier(NewNatGatewaySupplier(provider, deserializer))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
 			fakeEC2 := awstest.MockFakeEC2{}
 			c.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
-			natGatewaydeserializer := awsdeserializer.NewNatGatewayDeserializer()
 			s := &NatGatewaySupplier{
 				provider,
-				natGatewaydeserializer,
+				deserializer,
 				&fakeEC2,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
@@ -105,8 +109,7 @@ func TestNatGatewaySupplier_Resources(t *testing.T) {
 			assert.Equal(tt, c.err, err)
 
 			mock.AssertExpectationsForObjects(tt)
-			deserializers := []deserializer.CTYDeserializer{natGatewaydeserializer}
-			test.CtyTestDiffMixed(got, c.dirName, provider, deserializers, shouldUpdate, tt)
+			test.CtyTestDiff(got, c.dirName, provider, deserializer, shouldUpdate, tt)
 		})
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/aws/aws-sdk-go/service/sns"
 
@@ -15,8 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 
 	"github.com/cloudskiff/driftctl/pkg/parallel"
-
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
@@ -71,22 +70,26 @@ func TestSNSTopicPolicySupplier_Resources(t *testing.T) {
 		providerLibrary := terraform.NewProviderLibrary()
 		supplierLibrary := resource.NewSupplierLibrary()
 
+		repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+		resourceaws.InitResourcesMetadata(repo)
+		factory := terraform.NewTerraformResourceFactory(repo)
+
+		deserializer := resource.NewDeserializer(factory)
 		if shouldUpdate {
 			provider, err := InitTestAwsProvider(providerLibrary)
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewSNSTopicSupplier(provider))
+			supplierLibrary.AddSupplier(NewSNSTopicSupplier(provider, deserializer))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
 			fakeClient := mocks.SNSRepository{}
 			c.mocks(&fakeClient)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
-			SNSTopicPolicyDeserializer := awsdeserializer.NewSNSTopicPolicyDeserializer()
 			s := &SNSTopicPolicySupplier{
 				provider,
-				SNSTopicPolicyDeserializer,
+				deserializer,
 				&fakeClient,
 				terraform.NewParallelResourceReader(parallel.NewParallelRunner(context.TODO(), 10)),
 			}
@@ -94,7 +97,7 @@ func TestSNSTopicPolicySupplier_Resources(t *testing.T) {
 			assert.Equal(tt, c.err, err)
 
 			mock.AssertExpectationsForObjects(tt)
-			test.CtyTestDiff(got, c.dirName, provider, SNSTopicPolicyDeserializer, shouldUpdate, tt)
+			test.CtyTestDiff(got, c.dirName, provider, deserializer, shouldUpdate, tt)
 		})
 	}
 }

@@ -92,6 +92,7 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 		instance, _ := remoteRes.(*resource.AbstractResource)
 		instance.Attrs.SafeDelete([]string{"root_block_device"})
 		instance.Attrs.SafeDelete([]string{"ebs_block_device"})
+		instance.Attrs.SafeDelete([]string{"volume_tags"})
 		newRemoteResources = append(newRemoteResources, instance)
 	}
 

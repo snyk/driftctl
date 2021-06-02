@@ -13,11 +13,9 @@ import (
 	ctyconvert "github.com/zclconf/go-cty/cty/convert"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/cloudskiff/driftctl/pkg/iac"
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
 	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/enumerator"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
@@ -25,14 +23,13 @@ import (
 const TerraformStateReaderSupplier = "tfstate"
 
 type TerraformStateReader struct {
-	library                  *terraform.ProviderLibrary
-	config                   config.SupplierConfig
-	backend                  backend.Backend
-	enumerator               enumerator.StateEnumerator
-	deserializers            []deserializer.CTYDeserializer
-	backendOptions           *backend.Options
-	progress                 output.Progress
-	resourceSchemaRepository resource.SchemaRepositoryInterface
+	library        *terraform.ProviderLibrary
+	config         config.SupplierConfig
+	backend        backend.Backend
+	enumerator     enumerator.StateEnumerator
+	deserializer   *resource.Deserializer
+	backendOptions *backend.Options
+	progress       output.Progress
 }
 
 func (r *TerraformStateReader) initReader() error {
@@ -40,8 +37,8 @@ func (r *TerraformStateReader) initReader() error {
 	return nil
 }
 
-func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options, progress output.Progress, resourceSchemaRepository resource.SchemaRepositoryInterface) (*TerraformStateReader, error) {
-	reader := TerraformStateReader{library: library, config: config, deserializers: iac.Deserializers(), backendOptions: backendOpts, progress: progress, resourceSchemaRepository: resourceSchemaRepository}
+func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options, progress output.Progress, deserializer *resource.Deserializer) (*TerraformStateReader, error) {
+	reader := TerraformStateReader{library: library, config: config, deserializer: deserializer, backendOptions: backendOpts, progress: progress}
 	err := reader.initReader()
 	if err != nil {
 		return nil, err
@@ -159,56 +156,14 @@ func (r *TerraformStateReader) convertInstance(instance *states.ResourceInstance
 
 func (r *TerraformStateReader) decode(values map[string][]cty.Value) ([]resource.Resource, error) {
 	results := make([]resource.Resource, 0)
-	for _, deserializer := range r.deserializers {
 
-		typ := deserializer.HandledType().String()
-		vals, exists := values[typ]
-		if !exists {
-			continue
-		}
-		decodedResources, err := deserializer.Deserialize(vals)
+	for ty, val := range values {
+		decodedResources, err := r.deserializer.Deserialize(ty, val)
 		if err != nil {
-			logrus.Warnf("Could not read from decoder for %s: %+v", typ, err)
+			logrus.WithField("ty", ty).Warnf("Could not read from state: %+v", err)
 			continue
 		}
-		for _, res := range decodedResources {
-			logrus.WithFields(logrus.Fields{
-				"path":    r.config.Path,
-				"backend": r.config.Backend,
-				"id":      res.TerraformId(),
-				"type":    res.TerraformType(),
-			}).Debug("Found IAC resource")
-			if resource.IsRefactoredResource(res.TerraformType()) {
-				schema, exist := r.resourceSchemaRepository.GetSchema(res.TerraformType())
-				ctyAttr := resource.ToResourceAttributes(res.CtyValue())
-				ctyAttr.SanitizeDefaults()
-				newRes := &resource.AbstractResource{
-					Id:    res.TerraformId(),
-					Type:  res.TerraformType(),
-					Attrs: ctyAttr,
-				}
-				if exist && schema.NormalizeFunc != nil {
-					schema.NormalizeFunc(newRes)
-				}
-				results = append(results, newRes)
-				continue
-			}
-			normalisable, ok := res.(resource.NormalizedResource)
-			if ok {
-				normalizedRes, err := normalisable.NormalizeForState()
-				if err != nil {
-					logrus.Errorf("Could not normalize state for res %s: %+v", res.TerraformId(), err)
-					results = append(results, res)
-				}
-
-				if err == nil {
-					results = append(results, normalizedRes)
-				}
-			}
-			if !ok {
-				results = append(results, res)
-			}
-		}
+		results = append(results, decodedResources...)
 	}
 
 	return results, nil

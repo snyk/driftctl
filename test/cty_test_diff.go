@@ -7,8 +7,6 @@ import (
 
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
-
 	"github.com/zclconf/go-cty/cty/json"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -21,20 +19,24 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 )
 
-func doTestDiff(got []resource.Resource, dirName string, provider terraform.TerraformProvider, deserializers []deserializer.CTYDeserializer, shouldUpdate bool) (diff.Changelog, error) {
+func doTestDiff(got []resource.Resource, dirName string, provider terraform.TerraformProvider, deserializer *resource.Deserializer, shouldUpdate bool) (diff.Changelog, error) {
+	resources := make(map[string][]resource.Attributes)
+
+	for _, r := range got {
+		res, exist := resources[r.TerraformType()]
+
+		if !exist {
+			resources[r.TerraformType()] = []resource.Attributes{*r.Attributes()}
+			continue
+		}
+
+		resources[r.TerraformType()] = append(res, *r.Attributes())
+	}
 
 	expectedResources := []resource.Resource{}
-	for _, deserializer := range deserializers {
-		ty := deserializer.HandledType().String()
-
-		resList := []resource.Resource{}
-		for _, res := range got {
-			if res.TerraformType() == ty {
-				resList = append(resList, res)
-			}
-		}
+	for ty, resList := range resources {
 		resGoldenName := "results.golden.json"
-		if len(deserializers) > 1 {
+		if len(resources) > 1 {
 			resGoldenName = fmt.Sprintf("results.%s.golden.json", ty)
 		}
 		ctyType := cty.List(provider.Schema()[ty].Block.ImpliedType())
@@ -54,7 +56,7 @@ func doTestDiff(got []resource.Resource, dirName string, provider terraform.Terr
 		if err != nil {
 			panic(err)
 		}
-		decodedResources, err := deserializer.Deserialize(decodedJson.AsValueSlice())
+		decodedResources, err := deserializer.Deserialize(ty, decodedJson.AsValueSlice())
 		if err != nil {
 			panic(err)
 		}
@@ -72,13 +74,8 @@ func doTestDiff(got []resource.Resource, dirName string, provider terraform.Terr
 	return differ.Diff(got, expectedResources)
 }
 
-func CtyTestDiff(got []resource.Resource, dirName string, provider terraform.TerraformProvider, d deserializer.CTYDeserializer, shouldUpdate bool, t *testing.T) {
-	deserializers := []deserializer.CTYDeserializer{d}
-	CtyTestDiffMixed(got, dirName, provider, deserializers, shouldUpdate, t)
-}
-
-func CtyTestDiffMixed(got []resource.Resource, dirName string, provider terraform.TerraformProvider, deserializers []deserializer.CTYDeserializer, shouldUpdate bool, t *testing.T) {
-	changelog, err := doTestDiff(got, dirName, provider, deserializers, shouldUpdate)
+func CtyTestDiff(got []resource.Resource, dirName string, provider terraform.TerraformProvider, deserializer *resource.Deserializer, shouldUpdate bool, t *testing.T) {
+	changelog, err := doTestDiff(got, dirName, provider, deserializer, shouldUpdate)
 	if err != nil {
 		panic(err)
 	}

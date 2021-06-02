@@ -5,10 +5,9 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 
 	"github.com/sirupsen/logrus"
@@ -17,15 +16,15 @@ import (
 
 type IamUserSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       iamiface.IAMAPI
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamUserSupplier(provider *AWSTerraformProvider) *IamUserSupplier {
+func NewIamUserSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *IamUserSupplier {
 	return &IamUserSupplier{
 		provider,
-		awsdeserializer.NewIamUserDeserializer(),
+		deserializer,
 		iam.New(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -49,7 +48,7 @@ func (s *IamUserSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourceaws.AwsIamUserResourceType, results)
 }
 
 func (s *IamUserSupplier) readRes(user *iam.User) (cty.Value, error) {

@@ -29,18 +29,25 @@ func IsSupplierSupported(supplierKey string) bool {
 	return false
 }
 
-func GetIACSupplier(configs []config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options, progress output.Progress, resourceSchemaRepository resource.SchemaRepositoryInterface) (resource.Supplier, error) {
+func GetIACSupplier(configs []config.SupplierConfig,
+	library *terraform.ProviderLibrary,
+	backendOpts *backend.Options,
+	progress output.Progress,
+	factory resource.ResourceFactory) (resource.Supplier, error) {
+
 	chainSupplier := resource.NewChainSupplier()
 	for _, config := range configs {
 		if !IsSupplierSupported(config.Key) {
 			return nil, errors.Errorf("Unsupported supplier '%s'", config.Key)
 		}
 
+		deserializer := resource.NewDeserializer(factory)
+
 		var supplier resource.Supplier
 		var err error
 		switch config.Key {
 		case state.TerraformStateReaderSupplier:
-			supplier, err = state.NewReader(config, library, backendOpts, progress, resourceSchemaRepository)
+			supplier, err = state.NewReader(config, library, backendOpts, progress, deserializer)
 		default:
 			return nil, errors.Errorf("Unsupported supplier '%s'", config.Key)
 		}

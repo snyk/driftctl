@@ -14,7 +14,14 @@ const RemoteGithubTerraform = "github+tf"
  * Initialize remote (configure credentials, launch tf providers and start gRPC clients)
  * Required to use Scanner
  */
-func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, supplierLibrary *resource.SupplierLibrary, progress output.Progress, resourceSchemaRepository *resource.SchemaRepository) error {
+
+func Init(alerter *alerter.Alerter,
+	providerLibrary *terraform.ProviderLibrary,
+	supplierLibrary *resource.SupplierLibrary,
+	progress output.Progress,
+	resourceSchemaRepository *resource.SchemaRepository,
+	factory resource.ResourceFactory) error {
+
 	provider, err := NewGithubTerraformProvider(progress)
 	if err != nil {
 		return err
@@ -25,14 +32,14 @@ func Init(alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, 
 	}
 
 	repository := NewGithubRepository(provider.GetConfig())
-
+	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.GITHUB, provider)
 
-	supplierLibrary.AddSupplier(NewGithubRepositorySupplier(provider, repository))
-	supplierLibrary.AddSupplier(NewGithubTeamSupplier(provider, repository))
-	supplierLibrary.AddSupplier(NewGithubMembershipSupplier(provider, repository))
-	supplierLibrary.AddSupplier(NewGithubTeamMembershipSupplier(provider, repository))
-	supplierLibrary.AddSupplier(NewGithubBranchProtectionSupplier(provider, repository))
+	supplierLibrary.AddSupplier(NewGithubRepositorySupplier(provider, repository, deserializer))
+	supplierLibrary.AddSupplier(NewGithubTeamSupplier(provider, repository, deserializer))
+	supplierLibrary.AddSupplier(NewGithubMembershipSupplier(provider, repository, deserializer))
+	supplierLibrary.AddSupplier(NewGithubTeamMembershipSupplier(provider, repository, deserializer))
+	supplierLibrary.AddSupplier(NewGithubBranchProtectionSupplier(provider, repository, deserializer))
 
 	resourceSchemaRepository.Init(provider.Schema())
 	github.InitResourcesMetadata(resourceSchemaRepository)

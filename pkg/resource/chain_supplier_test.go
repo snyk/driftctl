@@ -17,10 +17,10 @@ func TestChainSupplier_Resources(t *testing.T) {
 	fakeTestSupplier := mocks.Supplier{}
 	fakeTestSupplier.On("Resources").Return(
 		[]resource.Resource{
-			testresource.FakeResource{
+			&testresource.FakeResource{
 				Id: "fake-supplier-1_fake-resource-1",
 			},
-			testresource.FakeResource{
+			&testresource.FakeResource{
 				Id: "fake-supplier-1_fake-resource-2",
 			},
 		},
@@ -30,10 +30,10 @@ func TestChainSupplier_Resources(t *testing.T) {
 	anotherFakeTestSupplier := mocks.Supplier{}
 	anotherFakeTestSupplier.On("Resources").Return(
 		[]resource.Resource{
-			testresource.FakeResource{
+			&testresource.FakeResource{
 				Id: "fake-supplier-2_fake-resource-1",
 			},
-			testresource.FakeResource{
+			&testresource.FakeResource{
 				Id: "fake-supplier-2_fake-resource-2",
 			},
 		},
@@ -63,10 +63,10 @@ func TestChainSupplier_Resources_WithError(t *testing.T) {
 	fakeTestSupplier.
 		On("Resources").
 		Return([]resource.Resource{
-			testresource.FakeResource{
+			&testresource.FakeResource{
 				Id: "fake-supplier-1_fake-resource-1",
 			},
-			testresource.FakeResource{
+			&testresource.FakeResource{
 				Id: "fake-supplier-1_fake-resource-2",
 			},
 		},

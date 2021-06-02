@@ -1,112 +1,57 @@
 [
  {
-  "groups": [],
-  "id": "loadbalancer-arn:aws:iam::526954929923:policy/test3",
-  "name": "test-attach3",
-  "policy_arn": "arn:aws:iam::526954929923:policy/test3",
-  "roles": [],
-  "users": [
-   "loadbalancer"
-  ]
+  "id": "test-attach2",
+  "policy_arn": "arn:aws:iam::047081014315:policy/test2",
+  "user": "loadbalancer2"
  },
  {
-  "groups": [],
-  "id": "loadbalancer-arn:aws:iam::526954929923:policy/test",
-  "name": "test-attach",
-  "policy_arn": "arn:aws:iam::526954929923:policy/test",
-  "roles": [],
-  "users": [
-   "loadbalancer"
-  ]
+  "id": "test-attach",
+  "policy_arn": "arn:aws:iam::047081014315:policy/test",
+  "user": "loadbalancer2"
  },
  {
-  "groups": [],
-  "id": "loadbalancer3-arn:aws:iam::526954929923:policy/test3",
-  "name": "test-attach3",
-  "policy_arn": "arn:aws:iam::526954929923:policy/test3",
-  "roles": [],
-  "users": [
-   "loadbalancer3"
-  ]
+  "id": "test-attach",
+  "policy_arn": "arn:aws:iam::047081014315:policy/test",
+  "user": "loadbalancer"
  },
  {
-  "groups": [],
-  "id": "loadbalancer-arn:aws:iam::526954929923:policy/test4",
-  "name": "test-attach4",
-  "policy_arn": "arn:aws:iam::526954929923:policy/test4",
-  "roles": [],
-  "users": [
-   "loadbalancer"
-  ]
+  "id": "test-attach2",
+  "policy_arn": "arn:aws:iam::047081014315:policy/test2",
+  "user": "loadbalancer"
  },
  {
-  "groups": [],
-  "id": "loadbalancer-arn:aws:iam::526954929923:policy/test2",
-  "name": "test-attach2",
-  "policy_arn": "arn:aws:iam::526954929923:policy/test2",
-  "roles": [],
-  "users": [
-   "loadbalancer"
-  ]
+  "id": "test-attach3",
+  "policy_arn": "arn:aws:iam::047081014315:policy/test3",
+  "user": "loadbalancer"
  },
  {
-  "groups": [],
-  "id": "loadbalancer2-arn:aws:iam::526954929923:policy/test",
-  "name": "test-attach",
-  "policy_arn": "arn:aws:iam::526954929923:policy/test",
-  "roles": [],
-  "users": [
-   "loadbalancer2"
-  ]
+  "id": "test-attach4",
+  "policy_arn": "arn:aws:iam::047081014315:policy/test4",
+  "user": "loadbalancer"
  },
  {
-  "groups": [],
-  "id": "loadbalancer2-arn:aws:iam::526954929923:policy/test2",
-  "name": "test-attach2",
-  "policy_arn": "arn:aws:iam::526954929923:policy/test2",
-  "roles": [],
-  "users": [
-   "loadbalancer2"
-  ]
+  "id": "test-attach2",
+  "policy_arn": "arn:aws:iam::047081014315:policy/test2",
+  "user": "loadbalancer3"
  },
  {
-  "groups": [],
-  "id": "loadbalancer2-arn:aws:iam::526954929923:policy/test3",
-  "name": "test-attach3",
-  "policy_arn": "arn:aws:iam::526954929923:policy/test3",
-  "roles": [],
-  "users": [
-   "loadbalancer2"
-  ]
+  "id": "test-attach",
+  "policy_arn": "arn:aws:iam::047081014315:policy/test",
+  "user": "loadbalancer3"
  },
  {
-  "groups": [],
-  "id": "loadbalancer2-arn:aws:iam::526954929923:policy/test4",
-  "name": "test-attach4",
-  "policy_arn": "arn:aws:iam::526954929923:policy/test4",
-  "roles": [],
-  "users": [
-   "loadbalancer2"
-  ]
+  "id": "test-attach3",
+  "policy_arn": "arn:aws:iam::047081014315:policy/test3",
+  "user": "loadbalancer3"
  },
  {
-  "groups": [],
-  "id": "loadbalancer3-arn:aws:iam::526954929923:policy/test",
-  "name": "test-attach",
-  "policy_arn": "arn:aws:iam::526954929923:policy/test",
-  "roles": [],
-  "users": [
-   "loadbalancer3"
-  ]
+  "id": "test-attach3",
+  "policy_arn": "arn:aws:iam::047081014315:policy/test3",
+  "user": "loadbalancer2"
  },
  {
-  "groups": [],
-  "id": "loadbalancer3-arn:aws:iam::526954929923:policy/test2",
-  "name": "test-attach2",
-  "policy_arn": "arn:aws:iam::526954929923:policy/test2",
-  "roles": [],
-  "users": [
-   "loadbalancer3"
-  ]
+  "id": "test-attach4",
+  "policy_arn": "arn:aws:iam::047081014315:policy/test4",
+  "user": "loadbalancer2"
  }
 ]

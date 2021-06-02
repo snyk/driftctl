@@ -2,11 +2,10 @@ package aws
 
 import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	awsdeserializer "github.com/cloudskiff/driftctl/pkg/resource/aws/deserializer"
+
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -14,15 +13,15 @@ import (
 
 type SqsQueueSupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	client       repository.SQSRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewSqsQueueSupplier(provider *AWSTerraformProvider) *SqsQueueSupplier {
+func NewSqsQueueSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *SqsQueueSupplier {
 	return &SqsQueueSupplier{
 		provider,
-		awsdeserializer.NewSqsQueueDeserializer(),
+		deserializer,
 		repository.NewSQSClient(provider.session),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -46,7 +45,7 @@ func (s *SqsQueueSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(resources)
+	return s.deserializer.Deserialize(aws.AwsSqsQueueResourceType, resources)
 }
 
 func (s *SqsQueueSupplier) readSqsQueue(queueURL string) (cty.Value, error) {

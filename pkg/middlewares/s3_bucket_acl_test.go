@@ -40,7 +40,9 @@ func TestS3BucketAcl_Execute(t *testing.T) {
 					},
 				},
 				resourcesFromState: &[]resource.Resource{
-					&aws.AwsAmi{},
+					&resource.AbstractResource{
+						Type: aws.AwsAmiResourceType,
+					},
 					&resource.AbstractResource{
 						Id:   "testgrant",
 						Type: aws.AwsS3BucketResourceType,
@@ -81,7 +83,9 @@ func TestS3BucketAcl_Execute(t *testing.T) {
 					},
 				},
 				resourcesFromState: &[]resource.Resource{
-					&aws.AwsAmi{},
+					&resource.AbstractResource{
+						Type: aws.AwsAmiResourceType,
+					},
 					&resource.AbstractResource{
 						Id:   "testgrant",
 						Type: aws.AwsS3BucketResourceType,
@@ -126,7 +130,9 @@ func TestS3BucketAcl_Execute(t *testing.T) {
 					},
 				},
 				resourcesFromState: &[]resource.Resource{
-					&aws.AwsAmi{},
+					&resource.AbstractResource{
+						Type: aws.AwsAmiResourceType,
+					},
 					&resource.AbstractResource{
 						Id:    "testgrant",
 						Type:  aws.AwsS3BucketResourceType,
@@ -169,7 +175,9 @@ func TestS3BucketAcl_Execute(t *testing.T) {
 					},
 				},
 				resourcesFromState: &[]resource.Resource{
-					&aws.AwsAmi{},
+					&resource.AbstractResource{
+						Type: aws.AwsAmiResourceType,
+					},
 					&resource.AbstractResource{
 						Id:   "testgrant",
 						Type: aws.AwsS3BucketResourceType,

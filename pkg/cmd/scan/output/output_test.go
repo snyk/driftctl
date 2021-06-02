@@ -11,6 +11,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/github"
+	"github.com/cloudskiff/driftctl/pkg/resource"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/r3labs/diff/v2"
 )
@@ -138,17 +139,20 @@ func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddDeleted(
 		&testresource.FakeResourceStringer{
-			Id: "dfjkgnbsgj",
+			Id:    "dfjkgnbsgj",
+			Attrs: &resource.Attributes{},
 		},
 	)
 	a.AddManaged(
 		&testresource.FakeResourceStringer{
-			Id: "usqyfsdbgjsdgjkdfg",
+			Id:    "usqyfsdbgjsdgjkdfg",
+			Attrs: &resource.Attributes{},
 		},
 	)
 	a.AddUnmanaged(
 		&testresource.FakeResourceStringer{
-			Id: "duysgkfdjfdgfhd",
+			Id:    "duysgkfdjfdgfhd",
+			Attrs: &resource.Attributes{},
 		},
 	)
 	return &a
@@ -156,27 +160,48 @@ func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 
 func fakeAnalysisWithStringerResources() *analyser.Analysis {
 	a := analyser.Analysis{}
+	fakeResourceStringerSchema := &resource.Schema{HumanReadableAttributesFunc: func(res *resource.AbstractResource) map[string]string {
+		return map[string]string{
+			"Name": (*res.Attrs)["name"].(string),
+		}
+	}}
 	a.AddDeleted(
-		&testresource.FakeResourceStringer{
+		&resource.AbstractResource{
 			Id:   "dfjkgnbsgj",
-			Name: "deleted resource",
+			Type: "FakeResourceStringer",
+			Sch:  fakeResourceStringerSchema,
+			Attrs: &resource.Attributes{
+				"name": "deleted resource",
+			},
 		},
 	)
 	a.AddManaged(
-		&testresource.FakeResourceStringer{
+		&resource.AbstractResource{
 			Id:   "usqyfsdbgjsdgjkdfg",
-			Name: "managed resource",
+			Type: "FakeResourceStringer",
+			Sch:  fakeResourceStringerSchema,
+			Attrs: &resource.Attributes{
+				"name": "managed resource",
+			},
 		},
 	)
 	a.AddUnmanaged(
-		&testresource.FakeResourceStringer{
+		&resource.AbstractResource{
 			Id:   "duysgkfdjfdgfhd",
-			Name: "unmanaged resource",
+			Type: "FakeResourceStringer",
+			Sch:  fakeResourceStringerSchema,
+			Attrs: &resource.Attributes{
+				"name": "unmanaged resource",
+			},
 		},
 	)
-	a.AddDifference(analyser.Difference{Res: &testresource.FakeResourceStringer{
+	a.AddDifference(analyser.Difference{Res: &resource.AbstractResource{
 		Id:   "gdsfhgkbn",
-		Name: "resource with diff",
+		Type: "FakeResourceStringer",
+		Sch:  fakeResourceStringerSchema,
+		Attrs: &resource.Attributes{
+			"name": "resource with diff",
+		},
 	}, Changelog: []analyser.Change{
 		{
 			Change: diff.Change{

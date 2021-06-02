@@ -1,11 +1,9 @@
 package github
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourcegithub "github.com/cloudskiff/driftctl/pkg/resource/github"
-	ghdeserializer "github.com/cloudskiff/driftctl/pkg/resource/github/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -13,15 +11,15 @@ import (
 
 type GithubRepositorySupplier struct {
 	reader       terraform.ResourceReader
-	deserializer deserializer.CTYDeserializer
+	deserializer *resource.Deserializer
 	repository   GithubRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewGithubRepositorySupplier(provider *GithubTerraformProvider, repository GithubRepository) *GithubRepositorySupplier {
+func NewGithubRepositorySupplier(provider *GithubTerraformProvider, repository GithubRepository, deserializer *resource.Deserializer) *GithubRepositorySupplier {
 	return &GithubRepositorySupplier{
 		provider,
-		ghdeserializer.NewGithubRepositoryDeserializer(),
+		deserializer,
 		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
@@ -55,5 +53,5 @@ func (s GithubRepositorySupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(results)
+	return s.deserializer.Deserialize(resourcegithub.GithubRepositoryResourceType, results)
 }
