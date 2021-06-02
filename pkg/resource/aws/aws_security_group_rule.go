@@ -3,8 +3,8 @@ package aws
 import (
 	"bytes"
 	"fmt"
-	"strings"
 
+	"github.com/cloudskiff/driftctl/pkg/helpers"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/hashicorp/terraform/helper/hashcode"
 )
@@ -111,14 +111,14 @@ func initAwsSecurityGroupRuleMetaData(resourceSchemaRepository resource.SchemaRe
 			case "ingress":
 				sourceOrDestination = "Source"
 			}
-			if ipv4 := val.GetStringSlice("cidr_blocks"); len(ipv4) > 0 {
-				attrs[sourceOrDestination] = strings.Join(ipv4, ", ")
+			if ipv4 := val.GetSlice("cidr_blocks"); len(ipv4) > 0 {
+				attrs[sourceOrDestination] = helpers.Join(ipv4, ", ")
 			}
-			if ipv6 := val.GetStringSlice("ipv6_cidr_blocks"); len(ipv6) > 0 {
-				attrs[sourceOrDestination] = strings.Join(ipv6, ", ")
+			if ipv6 := val.GetSlice("ipv6_cidr_blocks"); len(ipv6) > 0 {
+				attrs[sourceOrDestination] = helpers.Join(ipv6, ", ")
 			}
-			if prefixList := val.GetStringSlice("prefix_list_ids"); len(prefixList) > 0 {
-				attrs[sourceOrDestination] = strings.Join(prefixList, ", ")
+			if prefixList := val.GetSlice("prefix_list_ids"); len(prefixList) > 0 {
+				attrs[sourceOrDestination] = helpers.Join(prefixList, ", ")
 			}
 			if sourceSgID := val.GetString("source_security_group_id"); sourceSgID != nil && *sourceSgID != "" {
 				attrs[sourceOrDestination] = *sourceSgID

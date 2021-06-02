@@ -8,8 +8,6 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/zclconf/go-cty/cty"
-	ctyjson "github.com/zclconf/go-cty/cty/json"
 )
 
 type Resource interface {
@@ -113,21 +111,6 @@ func Sort(res []Resource) []Resource {
 	return res
 }
 
-func ToResourceAttributes(val *cty.Value) *Attributes {
-	if val == nil {
-		return nil
-	}
-
-	bytes, _ := ctyjson.Marshal(*val, val.Type())
-	var attrs Attributes
-	err := json.Unmarshal(bytes, &attrs)
-	if err != nil {
-		panic(err)
-	}
-
-	return &attrs
-}
-
 type Attributes map[string]interface{}
 
 func (a *Attributes) Copy() *Attributes {
@@ -160,18 +143,6 @@ func (a *Attributes) GetString(path string) *string {
 	}
 	v := val.(string)
 	return &v
-}
-
-func (a *Attributes) GetStringSlice(path string) []string {
-	val := a.GetSlice(path)
-	if val == nil {
-		return nil
-	}
-	slice := make([]string, 0, len(val))
-	for _, v := range val {
-		slice = append(slice, v.(string))
-	}
-	return slice
 }
 
 func (a *Attributes) GetBool(path string) *bool {
@@ -207,18 +178,6 @@ func (a *Attributes) GetMap(path string) map[string]interface{} {
 		return nil
 	}
 	return val.(map[string]interface{})
-}
-
-func (a *Attributes) GetStringMap(path string) map[string]string {
-	val := a.GetMap(path)
-	if val == nil {
-		return nil
-	}
-	stringMap := make(map[string]string)
-	for k, v := range val {
-		stringMap[k] = v.(string)
-	}
-	return stringMap
 }
 
 func (a *Attributes) SafeDelete(path []string) {

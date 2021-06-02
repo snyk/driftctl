@@ -12,9 +12,9 @@ func initAwsRoute53HealthCheckMetaData(resourceSchemaRepository resource.SchemaR
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsRoute53HealthCheckResourceType, func(res *resource.AbstractResource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)
-		if tags := val.GetStringMap("tags"); tags != nil {
+		if tags := val.GetMap("tags"); tags != nil {
 			if name, ok := tags["name"]; ok {
-				attrs["Name"] = name
+				attrs["Name"] = name.(string)
 			}
 		}
 		port := val.GetInt("port")
