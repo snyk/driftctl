@@ -40,14 +40,6 @@ func (d *FakeResourceStringer) Schema() *resource.Schema {
 	return nil
 }
 
-func (d *FakeResourceStringer) HumanReadableAttributes() map[string]string {
-	attrs := make(map[string]string)
-	if name := d.Attributes().GetString("name"); name != nil && *name != "" {
-		attrs["Name"] = *name
-	}
-	return attrs
-}
-
 func (d *FakeResourceStringer) TerraformId() string {
 	return d.Id
 }

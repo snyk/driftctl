@@ -40,15 +40,6 @@ func (a *AbstractResource) Attributes() *Attributes {
 	return a.Attrs
 }
 
-func (a *AbstractResource) HumanReadableAttributes() map[string]string {
-	var attrs map[string]string
-	schema := a.Schema()
-	if schema.HumanReadableAttributesFunc != nil {
-		attrs = schema.HumanReadableAttributesFunc(a)
-	}
-	return attrs
-}
-
 type ResourceFactory interface {
 	CreateAbstractResource(ty, id string, data map[string]interface{}) *AbstractResource
 }

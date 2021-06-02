@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
@@ -15,7 +16,6 @@ import (
 	"github.com/yudai/gojsondiff/formatter"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
@@ -41,10 +41,8 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 			fmt.Printf("  %s:\n", ty)
 			for _, res := range resources {
 				humanString := fmt.Sprintf("    - %s", res.TerraformId())
-				if humanizerRes, ok := res.(output.AttributesGetter); ok {
-					if humanAttrs := output.HumanizeAttribute(humanizerRes); humanAttrs != "" {
-						humanString += fmt.Sprintf("\n        %s", humanAttrs)
-					}
+				if humanAttrs := formatResourceAttributes(res); humanAttrs != "" {
+					humanString += fmt.Sprintf("\n        %s", humanAttrs)
 				}
 				fmt.Println(humanString)
 			}
@@ -58,10 +56,8 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 			fmt.Printf("  %s:\n", ty)
 			for _, res := range resource {
 				humanString := fmt.Sprintf("    - %s", res.TerraformId())
-				if humanizerRes, ok := res.(output.AttributesGetter); ok {
-					if humanAttrs := output.HumanizeAttribute(humanizerRes); humanAttrs != "" {
-						humanString += fmt.Sprintf("\n        %s", humanAttrs)
-					}
+				if humanAttrs := formatResourceAttributes(res); humanAttrs != "" {
+					humanString += fmt.Sprintf("\n        %s", humanAttrs)
 				}
 				fmt.Println(humanString)
 			}
@@ -73,11 +69,9 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 		for _, difference := range analysis.Differences() {
 			humanString := fmt.Sprintf("    - %s (%s):", difference.Res.TerraformId(), difference.Res.TerraformType())
 			whiteSpace := "        "
-			if humanizerRes, ok := difference.Res.(output.AttributesGetter); ok {
-				if humanAttrs := output.HumanizeAttribute(humanizerRes); humanAttrs != "" {
-					humanString += fmt.Sprintf("\n        %s", humanAttrs)
-					whiteSpace = "            "
-				}
+			if humanAttrs := formatResourceAttributes(difference.Res); humanAttrs != "" {
+				humanString += fmt.Sprintf("\n        %s", humanAttrs)
+				whiteSpace = "            "
 			}
 			fmt.Println(humanString)
 			for _, change := range difference.Changelog {
@@ -210,4 +204,29 @@ func jsonDiff(a, b interface{}, prefix string) string {
 	diffStr, _ := f.Format(diff)
 
 	return diffStr
+}
+
+func formatResourceAttributes(res resource.Resource) string {
+	if res.Schema() == nil || res.Schema().HumanReadableAttributesFunc == nil {
+		return ""
+	}
+	attributes := res.Schema().HumanReadableAttributesFunc(res.(*resource.AbstractResource))
+	if len(attributes) <= 0 {
+		return ""
+	}
+	// sort attributes
+	keys := make([]string, 0, len(attributes))
+	for k := range attributes {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	// retrieve stringer
+	attrString := ""
+	for _, k := range keys {
+		if attrString != "" {
+			attrString += ", "
+		}
+		attrString += fmt.Sprintf("%s: %s", k, attributes[k])
+	}
+	return attrString
 }

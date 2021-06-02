@@ -160,32 +160,45 @@ func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 
 func fakeAnalysisWithStringerResources() *analyser.Analysis {
 	a := analyser.Analysis{}
+	fakeResourceStringerSchema := &resource.Schema{HumanReadableAttributesFunc: func(res *resource.AbstractResource) map[string]string {
+		return map[string]string{
+			"Name": (*res.Attrs)["name"].(string),
+		}
+	}}
 	a.AddDeleted(
-		&testresource.FakeResourceStringer{
-			Id: "dfjkgnbsgj",
+		&resource.AbstractResource{
+			Id:   "dfjkgnbsgj",
+			Type: "FakeResourceStringer",
+			Sch:  fakeResourceStringerSchema,
 			Attrs: &resource.Attributes{
 				"name": "deleted resource",
 			},
 		},
 	)
 	a.AddManaged(
-		&testresource.FakeResourceStringer{
-			Id: "usqyfsdbgjsdgjkdfg",
+		&resource.AbstractResource{
+			Id:   "usqyfsdbgjsdgjkdfg",
+			Type: "FakeResourceStringer",
+			Sch:  fakeResourceStringerSchema,
 			Attrs: &resource.Attributes{
 				"name": "managed resource",
 			},
 		},
 	)
 	a.AddUnmanaged(
-		&testresource.FakeResourceStringer{
-			Id: "duysgkfdjfdgfhd",
+		&resource.AbstractResource{
+			Id:   "duysgkfdjfdgfhd",
+			Type: "FakeResourceStringer",
+			Sch:  fakeResourceStringerSchema,
 			Attrs: &resource.Attributes{
 				"name": "unmanaged resource",
 			},
 		},
 	)
-	a.AddDifference(analyser.Difference{Res: &testresource.FakeResourceStringer{
-		Id: "gdsfhgkbn",
+	a.AddDifference(analyser.Difference{Res: &resource.AbstractResource{
+		Id:   "gdsfhgkbn",
+		Type: "FakeResourceStringer",
+		Sch:  fakeResourceStringerSchema,
 		Attrs: &resource.Attributes{
 			"name": "resource with diff",
 		},
