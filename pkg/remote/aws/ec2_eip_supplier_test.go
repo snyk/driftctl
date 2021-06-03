@@ -83,7 +83,7 @@ func TestEC2EipSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewEC2EipSupplier(provider, deserializer, repository.NewEC2Repository(provider.session, cache.New(0))))
+			supplierLibrary.AddSupplier(NewEC2EipSupplier(provider, repository.NewEC2Repository(provider.session, cache.New(0)), deserializer))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {

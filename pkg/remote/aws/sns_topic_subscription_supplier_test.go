@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
-	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/aws/aws-sdk-go/service/sns"
 
