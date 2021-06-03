@@ -21,11 +21,11 @@ type EC2KeyPairSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2KeyPairSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *EC2KeyPairSupplier {
+func NewEC2KeyPairSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *EC2KeyPairSupplier {
 	return &EC2KeyPairSupplier{
 		provider,
 		deserializer,
-		repository.NewEC2Repository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

@@ -188,7 +188,7 @@ func TestRoute53RecordSupplier_Resources(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				supplierLibrary.AddSupplier(NewRoute53RecordSupplier(provider, deserializer))
+				supplierLibrary.AddSupplier(NewRoute53RecordSupplier(provider, deserializer, repository.NewRoute53Repository(provider.session)))
 			}
 
 			provider := testmocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)

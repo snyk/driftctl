@@ -21,11 +21,11 @@ type EC2InstanceSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2InstanceSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *EC2InstanceSupplier {
+func NewEC2InstanceSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *EC2InstanceSupplier {
 	return &EC2InstanceSupplier{
 		provider,
 		deserializer,
-		repository.NewEC2Repository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

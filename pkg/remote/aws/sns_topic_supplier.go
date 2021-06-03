@@ -20,11 +20,11 @@ type SNSTopicSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewSNSTopicSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *SNSTopicSupplier {
+func NewSNSTopicSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, client repository.SNSRepository) *SNSTopicSupplier {
 	return &SNSTopicSupplier{
 		provider,
 		deserializer,
-		repository.NewSNSClient(provider.session),
+		client,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

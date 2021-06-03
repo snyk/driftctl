@@ -75,7 +75,7 @@ func TestEcrRepositorySupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewECRRepositorySupplier(provider, deserializer))
+			supplierLibrary.AddSupplier(NewECRRepositorySupplier(provider, deserializer, repository.NewECRRepository(provider.session)))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {

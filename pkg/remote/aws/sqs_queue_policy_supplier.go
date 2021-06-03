@@ -18,11 +18,11 @@ type SqsQueuePolicySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewSqsQueuePolicySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *SqsQueuePolicySupplier {
+func NewSqsQueuePolicySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, client repository.SQSRepository) *SqsQueuePolicySupplier {
 	return &SqsQueuePolicySupplier{
 		provider,
 		deserializer,
-		repository.NewSQSClient(provider.session),
+		client,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

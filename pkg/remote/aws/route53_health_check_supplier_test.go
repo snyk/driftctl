@@ -76,7 +76,7 @@ func TestRoute53HealthCheckSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewRoute53HealthCheckSupplier(provider, deserializer))
+			supplierLibrary.AddSupplier(NewRoute53HealthCheckSupplier(provider, deserializer, repository.NewRoute53Repository(provider.session)))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {

@@ -22,11 +22,11 @@ type EC2EipSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2EipSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *EC2EipSupplier {
+func NewEC2EipSupplier(provider *AWSTerraformProvider, repo repository.EC2Repository, deserializer *resource.Deserializer) *EC2EipSupplier {
 	return &EC2EipSupplier{
 		provider,
 		deserializer,
-		repository.NewEC2Repository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

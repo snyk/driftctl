@@ -21,11 +21,11 @@ type EC2AmiSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2AmiSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *EC2AmiSupplier {
+func NewEC2AmiSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *EC2AmiSupplier {
 	return &EC2AmiSupplier{
 		provider,
 		deserializer,
-		repository.NewEC2Repository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

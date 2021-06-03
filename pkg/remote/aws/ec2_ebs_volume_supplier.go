@@ -22,11 +22,11 @@ type EC2EbsVolumeSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2EbsVolumeSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *EC2EbsVolumeSupplier {
+func NewEC2EbsVolumeSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *EC2EbsVolumeSupplier {
 	return &EC2EbsVolumeSupplier{
 		provider,
 		deserializer,
-		repository.NewEC2Repository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

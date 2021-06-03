@@ -1,9 +1,11 @@
 package repository
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -37,7 +39,7 @@ func Test_ec2Repository_ListAllImages(t *testing.T) {
 						{ImageId: aws.String("3")},
 						{ImageId: aws.String("4")},
 					},
-				}, nil)
+				}, nil).Once()
 			},
 			want: []*ec2.Image{
 				{ImageId: aws.String("1")},
@@ -53,6 +55,7 @@ func Test_ec2Repository_ListAllImages(t *testing.T) {
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
+				cache:  cache.New(10),
 			}
 			got, err := r.ListAllImages()
 			assert.Equal(t, tt.wantErr, err)
@@ -64,6 +67,11 @@ func Test_ec2Repository_ListAllImages(t *testing.T) {
 				}
 				t.Fail()
 			}
+
+			// Check that results were cached
+			cachedData, err := r.ListAllImages()
+			assert.NoError(t, err)
+			assert.True(t, reflect.DeepEqual(got, cachedData))
 		})
 	}
 }
@@ -101,7 +109,7 @@ func Test_ec2Repository_ListAllSnapshots(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*ec2.Snapshot{
 				{VolumeId: aws.String("1")},
@@ -121,6 +129,7 @@ func Test_ec2Repository_ListAllSnapshots(t *testing.T) {
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
+				cache:  cache.New(10),
 			}
 			got, err := r.ListAllSnapshots()
 			assert.Equal(t, tt.wantErr, err)
@@ -132,6 +141,11 @@ func Test_ec2Repository_ListAllSnapshots(t *testing.T) {
 				}
 				t.Fail()
 			}
+
+			// Check that results were cached
+			cachedData, err := r.ListAllSnapshots()
+			assert.NoError(t, err)
+			assert.True(t, reflect.DeepEqual(got, cachedData))
 		})
 	}
 }
@@ -165,7 +179,7 @@ func Test_ec2Repository_ListAllVolumes(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*ec2.Volume{
 				{VolumeId: aws.String("1")},
@@ -185,6 +199,7 @@ func Test_ec2Repository_ListAllVolumes(t *testing.T) {
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
+				cache:  cache.New(10),
 			}
 			got, err := r.ListAllVolumes()
 			assert.Equal(t, tt.wantErr, err)
@@ -196,6 +211,11 @@ func Test_ec2Repository_ListAllVolumes(t *testing.T) {
 				}
 				t.Fail()
 			}
+
+			// Check that results were cached
+			cachedData, err := r.ListAllVolumes()
+			assert.NoError(t, err)
+			assert.True(t, reflect.DeepEqual(got, cachedData))
 		})
 	}
 }
@@ -218,7 +238,7 @@ func Test_ec2Repository_ListAllAddresses(t *testing.T) {
 							{AssociationId: aws.String("3")},
 							{AssociationId: aws.String("4")},
 						},
-					}, nil)
+					}, nil).Once()
 			},
 			want: []*ec2.Address{
 				{AssociationId: aws.String("1")},
@@ -234,6 +254,7 @@ func Test_ec2Repository_ListAllAddresses(t *testing.T) {
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
+				cache:  cache.New(10),
 			}
 			got, err := r.ListAllAddresses()
 			assert.Equal(t, tt.wantErr, err)
@@ -245,6 +266,11 @@ func Test_ec2Repository_ListAllAddresses(t *testing.T) {
 				}
 				t.Fail()
 			}
+
+			// Check that results were cached
+			cachedData, err := r.ListAllAddresses()
+			assert.NoError(t, err)
+			assert.True(t, reflect.DeepEqual(got, cachedData))
 		})
 	}
 }
@@ -267,7 +293,7 @@ func Test_ec2Repository_ListAllAddressesAssociation(t *testing.T) {
 							{AssociationId: aws.String("3")},
 							{AssociationId: aws.String("4")},
 						},
-					}, nil)
+					}, nil).Once()
 			},
 			want: []string{
 				"1",
@@ -283,6 +309,7 @@ func Test_ec2Repository_ListAllAddressesAssociation(t *testing.T) {
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
+				cache:  cache.New(10),
 			}
 			got, err := r.ListAllAddressesAssociation()
 			assert.Equal(t, tt.wantErr, err)
@@ -294,6 +321,11 @@ func Test_ec2Repository_ListAllAddressesAssociation(t *testing.T) {
 				}
 				t.Fail()
 			}
+
+			// Check that results were cached
+			cachedData, err := r.ListAllAddressesAssociation()
+			assert.NoError(t, err)
+			assert.True(t, reflect.DeepEqual(got, cachedData))
 		})
 	}
 }
@@ -347,7 +379,7 @@ func Test_ec2Repository_ListAllInstances(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*ec2.Instance{
 				{ImageId: aws.String("1")},
@@ -371,6 +403,7 @@ func Test_ec2Repository_ListAllInstances(t *testing.T) {
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
+				cache:  cache.New(10),
 			}
 			got, err := r.ListAllInstances()
 			assert.Equal(t, tt.wantErr, err)
@@ -382,6 +415,11 @@ func Test_ec2Repository_ListAllInstances(t *testing.T) {
 				}
 				t.Fail()
 			}
+
+			// Check that results were cached
+			cachedData, err := r.ListAllInstances()
+			assert.NoError(t, err)
+			assert.True(t, reflect.DeepEqual(got, cachedData))
 		})
 	}
 }
@@ -404,7 +442,7 @@ func Test_ec2Repository_ListAllKeyPairs(t *testing.T) {
 							{KeyPairId: aws.String("3")},
 							{KeyPairId: aws.String("4")},
 						},
-					}, nil)
+					}, nil).Once()
 			},
 			want: []*ec2.KeyPairInfo{
 				{KeyPairId: aws.String("1")},
@@ -420,6 +458,7 @@ func Test_ec2Repository_ListAllKeyPairs(t *testing.T) {
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
+				cache:  cache.New(10),
 			}
 			got, err := r.ListAllKeyPairs()
 			assert.Equal(t, tt.wantErr, err)
@@ -431,6 +470,11 @@ func Test_ec2Repository_ListAllKeyPairs(t *testing.T) {
 				}
 				t.Fail()
 			}
+
+			// Check that results were cached
+			cachedData, err := r.ListAllKeyPairs()
+			assert.NoError(t, err)
+			assert.True(t, reflect.DeepEqual(got, cachedData))
 		})
 	}
 }

@@ -18,11 +18,11 @@ type DBInstanceSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewDBInstanceSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *DBInstanceSupplier {
+func NewDBInstanceSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.RDSRepository) *DBInstanceSupplier {
 	return &DBInstanceSupplier{
 		provider,
 		deserializer,
-		repository.NewRDSRepository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

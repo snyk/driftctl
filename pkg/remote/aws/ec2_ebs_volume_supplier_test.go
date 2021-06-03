@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
@@ -82,7 +83,7 @@ func TestEC2EbsVolumeSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewEC2EbsVolumeSupplier(provider, deserializer))
+			supplierLibrary.AddSupplier(NewEC2EbsVolumeSupplier(provider, deserializer, repository.NewEC2Repository(provider.session, cache.New(0))))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {

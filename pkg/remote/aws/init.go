@@ -5,6 +5,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -33,7 +34,20 @@ func Init(alerter *alerter.Alerter,
 		return err
 	}
 
+	repositoryCache := cache.New(100)
+
 	s3Repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session))
+	ec2repository := repository.NewEC2Repository(provider.session, repositoryCache)
+	route53repository := repository.NewRoute53Repository(provider.session)
+	lambdaRepository := repository.NewLambdaRepository(provider.session)
+	rdsRepository := repository.NewRDSRepository(provider.session)
+	sqsRepository := repository.NewSQSClient(provider.session)
+	snsRepository := repository.NewSNSClient(provider.session)
+	dynamoDBRepository := repository.NewDynamoDBRepository(provider.session)
+	cloudfrontRepository := repository.NewCloudfrontClient(provider.session)
+	kmsRepository := repository.NewKMSRepository(provider.session)
+	ecrRepository := repository.NewECRRepository(provider.session)
+
 	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.AWS, provider)
 
@@ -43,18 +57,18 @@ func Init(alerter *alerter.Alerter,
 	supplierLibrary.AddSupplier(NewS3BucketMetricSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewS3BucketNotificationSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewS3BucketPolicySupplier(provider, s3Repository, deserializer))
-	supplierLibrary.AddSupplier(NewEC2EipSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewEC2EipAssociationSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewEC2EbsVolumeSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewEC2EbsSnapshotSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewRoute53ZoneSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewRoute53RecordSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewEC2InstanceSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewEC2AmiSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewEC2KeyPairSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewLambdaFunctionSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewDBSubnetGroupSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewDBInstanceSupplier(provider, deserializer))
+	supplierLibrary.AddSupplier(NewEC2EipSupplier(provider, ec2repository, deserializer))
+	supplierLibrary.AddSupplier(NewEC2EipAssociationSupplier(provider, deserializer, ec2repository))
+	supplierLibrary.AddSupplier(NewEC2EbsVolumeSupplier(provider, deserializer, ec2repository))
+	supplierLibrary.AddSupplier(NewEC2EbsSnapshotSupplier(provider, deserializer, ec2repository))
+	supplierLibrary.AddSupplier(NewRoute53ZoneSupplier(provider, deserializer, route53repository))
+	supplierLibrary.AddSupplier(NewRoute53RecordSupplier(provider, deserializer, route53repository))
+	supplierLibrary.AddSupplier(NewEC2InstanceSupplier(provider, deserializer, ec2repository))
+	supplierLibrary.AddSupplier(NewEC2AmiSupplier(provider, deserializer, ec2repository))
+	supplierLibrary.AddSupplier(NewEC2KeyPairSupplier(provider, deserializer, ec2repository))
+	supplierLibrary.AddSupplier(NewLambdaFunctionSupplier(provider, deserializer, lambdaRepository))
+	supplierLibrary.AddSupplier(NewDBSubnetGroupSupplier(provider, deserializer, rdsRepository))
+	supplierLibrary.AddSupplier(NewDBInstanceSupplier(provider, deserializer, rdsRepository))
 	supplierLibrary.AddSupplier(NewVPCSecurityGroupSupplier(provider, deserializer))
 	supplierLibrary.AddSupplier(NewIamUserSupplier(provider, deserializer))
 	supplierLibrary.AddSupplier(NewIamUserPolicySupplier(provider, deserializer))
@@ -72,18 +86,18 @@ func Init(alerter *alerter.Alerter,
 	supplierLibrary.AddSupplier(NewRouteTableAssociationSupplier(provider, deserializer))
 	supplierLibrary.AddSupplier(NewNatGatewaySupplier(provider, deserializer))
 	supplierLibrary.AddSupplier(NewInternetGatewaySupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewSqsQueueSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewSqsQueuePolicySupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewSNSTopicSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewSNSTopicPolicySupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewSNSTopicSubscriptionSupplier(provider, alerter, deserializer))
-	supplierLibrary.AddSupplier(NewDynamoDBTableSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewRoute53HealthCheckSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewCloudfrontDistributionSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewECRRepositorySupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewKMSKeySupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewKMSAliasSupplier(provider, deserializer))
-	supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider, deserializer))
+	supplierLibrary.AddSupplier(NewSqsQueueSupplier(provider, deserializer, sqsRepository))
+	supplierLibrary.AddSupplier(NewSqsQueuePolicySupplier(provider, deserializer, sqsRepository))
+	supplierLibrary.AddSupplier(NewSNSTopicSupplier(provider, deserializer, snsRepository))
+	supplierLibrary.AddSupplier(NewSNSTopicPolicySupplier(provider, deserializer, snsRepository))
+	supplierLibrary.AddSupplier(NewSNSTopicSubscriptionSupplier(provider, alerter, deserializer, snsRepository))
+	supplierLibrary.AddSupplier(NewDynamoDBTableSupplier(provider, deserializer, dynamoDBRepository))
+	supplierLibrary.AddSupplier(NewRoute53HealthCheckSupplier(provider, deserializer, route53repository))
+	supplierLibrary.AddSupplier(NewCloudfrontDistributionSupplier(provider, deserializer, cloudfrontRepository))
+	supplierLibrary.AddSupplier(NewECRRepositorySupplier(provider, deserializer, ecrRepository))
+	supplierLibrary.AddSupplier(NewKMSKeySupplier(provider, deserializer, kmsRepository))
+	supplierLibrary.AddSupplier(NewKMSAliasSupplier(provider, deserializer, kmsRepository))
+	supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider, deserializer, lambdaRepository))
 
 	resourceSchemaRepository.Init(provider.Schema())
 	aws.InitResourcesMetadata(resourceSchemaRepository)

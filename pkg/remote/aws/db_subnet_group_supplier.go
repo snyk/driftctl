@@ -22,11 +22,11 @@ type DBSubnetGroupSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewDBSubnetGroupSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *DBSubnetGroupSupplier {
+func NewDBSubnetGroupSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.RDSRepository) *DBSubnetGroupSupplier {
 	return &DBSubnetGroupSupplier{
 		provider,
 		deserializer,
-		repository.NewRDSRepository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
