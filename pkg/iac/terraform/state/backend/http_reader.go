@@ -46,11 +46,7 @@ func (h *HTTPBackend) Read(p []byte) (n int, err error) {
 			return 0, errors.Errorf("error requesting HTTP(s) backend state: status code: %d", res.StatusCode)
 		}
 	}
-	read, err := h.reader.Read(p)
-	if err != nil {
-		return 0, err
-	}
-	return read, nil
+	return h.reader.Read(p)
 }
 
 func (h *HTTPBackend) Close() error {

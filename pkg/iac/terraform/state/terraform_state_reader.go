@@ -2,12 +2,14 @@ package state
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/fatih/color"
 	"github.com/hashicorp/terraform/addrs"
 	"github.com/hashicorp/terraform/states"
 	"github.com/hashicorp/terraform/states/statefile"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	ctyconvert "github.com/zclconf/go-cty/cty/convert"
@@ -220,6 +222,9 @@ func (r *TerraformStateReader) retrieveMultiplesStates() ([]resource.Resource, e
 func read(path string, reader backend.Backend) (*states.State, error) {
 	state, err := readState(path, reader)
 	if err != nil {
+		if _, ok := reader.(*backend.HTTPBackend); ok && strings.Contains(err.Error(), "The state file could not be parsed as JSON") {
+			return nil, errors.Errorf("given url is not a valid statefile")
+		}
 		return nil, err
 	}
 	return state, nil
