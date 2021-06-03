@@ -8,8 +8,16 @@ terraform {
   }
 }
 
+locals {
+    timestamp = formatdate("YYYYMMDDhhmmss", timestamp())
+    prefix = "rtb-${local.timestamp}"
+}
+
 resource "aws_vpc" "vpc" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block = "10.1.0.0/16"
+  tags = {
+    Name: "${local.prefix}-default"
+  }
 }
 
 resource "aws_default_route_table" "default" {
