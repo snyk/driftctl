@@ -15,14 +15,14 @@ const RemoteGithubTerraform = "github+tf"
  * Required to use Scanner
  */
 
-func Init(alerter *alerter.Alerter,
+func Init(version string, alerter *alerter.Alerter,
 	providerLibrary *terraform.ProviderLibrary,
 	supplierLibrary *resource.SupplierLibrary,
 	progress output.Progress,
 	resourceSchemaRepository *resource.SchemaRepository,
 	factory resource.ResourceFactory) error {
 
-	provider, err := NewGithubTerraformProvider(progress)
+	provider, err := NewGithubTerraformProvider(version, progress)
 	if err != nil {
 		return err
 	}

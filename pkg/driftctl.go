@@ -29,6 +29,7 @@ type ScanOptions struct {
 	BackendOptions   *backend.Options
 	StrictMode       bool
 	DisableTelemetry bool
+	ProviderVersion  string
 }
 
 type DriftCTL struct {

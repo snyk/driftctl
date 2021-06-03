@@ -22,7 +22,6 @@ func TestProviderInstallerInstallDoesNotExist(t *testing.T) {
 	config := ProviderConfig{
 		Key:     "aws",
 		Version: "3.19.0",
-		Postfix: "x5",
 	}
 
 	mockDownloader := mocks.ProviderDownloaderInterface{}
@@ -51,7 +50,6 @@ func TestProviderInstallerInstallWithoutHomeDir(t *testing.T) {
 	config := ProviderConfig{
 		Key:     "aws",
 		Version: "3.19.0",
-		Postfix: "x5",
 	}
 
 	mockDownloader := mocks.ProviderDownloaderInterface{}
@@ -83,7 +81,6 @@ func TestProviderInstallerInstallAlreadyExist(t *testing.T) {
 	config := ProviderConfig{
 		Key:     "aws",
 		Version: "3.19.0",
-		Postfix: "x5",
 	}
 
 	_, err = os.Create(path.Join(fakeTmpHome, expectedSubFolder, config.GetBinaryName()))
@@ -116,7 +113,6 @@ func TestProviderInstallerInstallAlreadyExistButIsDirectory(t *testing.T) {
 	config := ProviderConfig{
 		Key:     "aws",
 		Version: "3.19.0",
-		Postfix: "x5",
 	}
 
 	invalidDirPath := path.Join(fakeTmpHome, expectedSubFolder, config.GetBinaryName())
@@ -145,5 +141,42 @@ func TestProviderInstallerInstallAlreadyExistButIsDirectory(t *testing.T) {
 		),
 		err.Error(),
 	)
+
+}
+
+// Ensure that if a provider exists with a postfix (_x5) we properly detect it
+func TestProviderInstallerInstallPostfixIsHandler(t *testing.T) {
+
+	assert := assert.New(t)
+	fakeTmpHome := t.TempDir()
+	expectedSubFolder := fmt.Sprintf("/.driftctl/plugins/%s_%s", runtime.GOOS, runtime.GOARCH)
+	err := os.MkdirAll(path.Join(fakeTmpHome, expectedSubFolder), 0755)
+	if err != nil {
+		t.Error(err)
+	}
+
+	config := ProviderConfig{
+		Key:     "aws",
+		Version: "3.19.0",
+	}
+
+	_, err = os.Create(path.Join(fakeTmpHome, expectedSubFolder, config.GetBinaryName()+"_x5"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	mockDownloader := mocks.ProviderDownloaderInterface{}
+
+	installer := ProviderInstaller{
+		downloader: &mockDownloader,
+		config:     config,
+		homeDir:    fakeTmpHome,
+	}
+
+	providerPath, err := installer.Install()
+	mockDownloader.AssertExpectations(t)
+
+	assert.Nil(err)
+	assert.Equal(path.Join(fakeTmpHome, expectedSubFolder, config.GetBinaryName()+"_x5"), providerPath)
 
 }

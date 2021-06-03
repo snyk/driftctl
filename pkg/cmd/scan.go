@@ -136,6 +136,11 @@ func NewScanCmd() *cobra.Command {
 		"Terraform Cloud / Enterprise API token.\n"+
 			"Only used with tfstate+tfcloud backend.\n",
 	)
+	fl.StringVar(&opts.ProviderVersion,
+		"tf-provider-version",
+		"",
+		"Terraform provider version to use.\n",
+	)
 	fl.BoolVar(&opts.StrictMode,
 		"strict",
 		false,
@@ -162,7 +167,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	resFactory := terraform.NewTerraformResourceFactory(resourceSchemaRepository)
 
-	err := remote.Activate(opts.To, alerter, providerLibrary, supplierLibrary, scanProgress, resourceSchemaRepository, resFactory)
+	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, supplierLibrary, scanProgress, resourceSchemaRepository, resFactory)
 	if err != nil {
 		return err
 	}

@@ -6,7 +6,7 @@ import (
 )
 
 func InitTestGithubProvider(providerLibrary *terraform.ProviderLibrary) (*GithubTerraformProvider, error) {
-	provider, err := NewGithubTerraformProvider(&output.MockProgress{})
+	provider, err := NewGithubTerraformProvider("", &output.MockProgress{})
 	if err != nil {
 		return nil, err
 	}
