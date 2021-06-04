@@ -40,7 +40,7 @@ func Init(version string, alerter *alerter.Alerter,
 	ec2repository := repository.NewEC2Repository(provider.session, repositoryCache)
 	route53repository := repository.NewRoute53Repository(provider.session)
 	lambdaRepository := repository.NewLambdaRepository(provider.session)
-	rdsRepository := repository.NewRDSRepository(provider.session)
+	rdsRepository := repository.NewRDSRepository(provider.session, repositoryCache)
 	sqsRepository := repository.NewSQSClient(provider.session)
 	snsRepository := repository.NewSNSClient(provider.session)
 	dynamoDBRepository := repository.NewDynamoDBRepository(provider.session)
