@@ -226,7 +226,7 @@ func read(path string, reader backend.Backend) (*states.State, error) {
 	state, err := readState(path, reader)
 	if err != nil {
 		if _, ok := reader.(*backend.HTTPBackend); ok && strings.Contains(err.Error(), "The state file could not be parsed as JSON") {
-			return nil, errors.Errorf("given url is not a valid statefile")
+			return nil, errors.Errorf("given url is not a valid state file")
 		}
 		return nil, err
 	}
