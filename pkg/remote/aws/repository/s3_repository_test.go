@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	awstest "github.com/cloudskiff/driftctl/test/aws"
 	"github.com/pkg/errors"
 	"github.com/r3labs/diff/v2"
@@ -35,7 +37,7 @@ func Test_s3Repository_ListAllBuckets(t *testing.T) {
 						},
 					},
 					nil,
-				)
+				).Once()
 			},
 			want: []*s3.Bucket{
 				{Name: aws.String("bucket1")},
@@ -49,7 +51,7 @@ func Test_s3Repository_ListAllBuckets(t *testing.T) {
 				client.On("ListBuckets", &s3.ListBucketsInput{}).Return(
 					nil,
 					awserr.NewRequestFailure(nil, 403, ""),
-				)
+				).Once()
 			},
 			want:    nil,
 			wantErr: awserr.NewRequestFailure(nil, 403, ""),
@@ -57,14 +59,24 @@ func Test_s3Repository_ListAllBuckets(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			mockedClient := &awstest.MockFakeS3{}
 			tt.mocks(mockedClient)
 			factory := client.MockAwsClientFactoryInterface{}
 			factory.On("GetS3Client", (*aws.Config)(nil)).Return(mockedClient).Once()
-			r := NewS3Repository(&factory)
+			r := NewS3Repository(&factory, store)
 			got, err := r.ListAllBuckets()
 			factory.AssertExpectations(t)
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllBuckets()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*s3.Bucket{}, store.Get("s3ListAllBuckets"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -117,7 +129,7 @@ func Test_s3Repository_ListBucketInventoryConfigurations(t *testing.T) {
 						NextContinuationToken: awssdk.String("nexttoken"),
 					},
 					nil,
-				)
+				).Once()
 				client.On(
 					"ListBucketInventoryConfigurations",
 					&s3.ListBucketInventoryConfigurationsInput{
@@ -134,7 +146,7 @@ func Test_s3Repository_ListBucketInventoryConfigurations(t *testing.T) {
 						IsTruncated: awssdk.Bool(false),
 					},
 					nil,
-				)
+				).Once()
 			},
 			want: []*s3.InventoryConfiguration{
 				{Id: awssdk.String("config1")},
@@ -165,7 +177,7 @@ func Test_s3Repository_ListBucketInventoryConfigurations(t *testing.T) {
 				).Return(
 					nil,
 					errors.New("aws error"),
-				)
+				).Once()
 			},
 			want:    nil,
 			wantErr: "Error listing bucket inventory configuration test-bucket: aws error",
@@ -173,11 +185,12 @@ func Test_s3Repository_ListBucketInventoryConfigurations(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			mockedClient := &awstest.MockFakeS3{}
 			tt.mocks(mockedClient)
 			factory := client.MockAwsClientFactoryInterface{}
 			factory.On("GetS3Client", &aws.Config{Region: awssdk.String(tt.input.region)}).Return(mockedClient).Once()
-			r := NewS3Repository(&factory)
+			r := NewS3Repository(&factory, store)
 			got, err := r.ListBucketInventoryConfigurations(&tt.input.bucket, tt.input.region)
 			factory.AssertExpectations(t)
 			if err != nil && tt.wantErr == "" {
@@ -186,6 +199,15 @@ func Test_s3Repository_ListBucketInventoryConfigurations(t *testing.T) {
 			if err != nil {
 				assert.Equal(t, tt.wantErr, err.Error())
 			}
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListBucketInventoryConfigurations(&tt.input.bucket, tt.input.region)
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*s3.InventoryConfiguration{}, store.Get(fmt.Sprintf("s3ListBucketInventoryConfigurations_%s_%s", *tt.input.bucket.Name, tt.input.region)))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -238,7 +260,7 @@ func Test_s3Repository_ListBucketMetricsConfigurations(t *testing.T) {
 						NextContinuationToken: awssdk.String("nexttoken"),
 					},
 					nil,
-				)
+				).Once()
 				client.On(
 					"ListBucketMetricsConfigurations",
 					&s3.ListBucketMetricsConfigurationsInput{
@@ -255,7 +277,7 @@ func Test_s3Repository_ListBucketMetricsConfigurations(t *testing.T) {
 						IsTruncated: awssdk.Bool(false),
 					},
 					nil,
-				)
+				).Once()
 			},
 			want: []*s3.MetricsConfiguration{
 				{Id: awssdk.String("metric1")},
@@ -286,7 +308,7 @@ func Test_s3Repository_ListBucketMetricsConfigurations(t *testing.T) {
 				).Return(
 					nil,
 					errors.New("aws error"),
-				)
+				).Once()
 			},
 			want:    nil,
 			wantErr: "Error listing bucket metrics configuration test-bucket: aws error",
@@ -294,11 +316,12 @@ func Test_s3Repository_ListBucketMetricsConfigurations(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			mockedClient := &awstest.MockFakeS3{}
 			tt.mocks(mockedClient)
 			factory := client.MockAwsClientFactoryInterface{}
 			factory.On("GetS3Client", &aws.Config{Region: awssdk.String(tt.input.region)}).Return(mockedClient).Once()
-			r := NewS3Repository(&factory)
+			r := NewS3Repository(&factory, store)
 			got, err := r.ListBucketMetricsConfigurations(&tt.input.bucket, tt.input.region)
 			factory.AssertExpectations(t)
 			if err != nil && tt.wantErr == "" {
@@ -307,6 +330,15 @@ func Test_s3Repository_ListBucketMetricsConfigurations(t *testing.T) {
 			if err != nil {
 				assert.Equal(t, tt.wantErr, err.Error())
 			}
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListBucketMetricsConfigurations(&tt.input.bucket, tt.input.region)
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*s3.MetricsConfiguration{}, store.Get(fmt.Sprintf("s3ListBucketMetricsConfigurations_%s_%s", *tt.input.bucket.Name, tt.input.region)))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -359,7 +391,7 @@ func Test_s3Repository_ListBucketAnalyticsConfigurations(t *testing.T) {
 						NextContinuationToken: awssdk.String("nexttoken"),
 					},
 					nil,
-				)
+				).Once()
 				client.On(
 					"ListBucketAnalyticsConfigurations",
 					&s3.ListBucketAnalyticsConfigurationsInput{
@@ -376,7 +408,7 @@ func Test_s3Repository_ListBucketAnalyticsConfigurations(t *testing.T) {
 						IsTruncated: awssdk.Bool(false),
 					},
 					nil,
-				)
+				).Once()
 			},
 			want: []*s3.AnalyticsConfiguration{
 				{Id: awssdk.String("analytic1")},
@@ -407,7 +439,7 @@ func Test_s3Repository_ListBucketAnalyticsConfigurations(t *testing.T) {
 				).Return(
 					nil,
 					errors.New("aws error"),
-				)
+				).Once()
 			},
 			want:    nil,
 			wantErr: "Error listing bucket analytics configuration test-bucket: aws error",
@@ -415,11 +447,12 @@ func Test_s3Repository_ListBucketAnalyticsConfigurations(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			mockedClient := &awstest.MockFakeS3{}
 			tt.mocks(mockedClient)
 			factory := client.MockAwsClientFactoryInterface{}
 			factory.On("GetS3Client", &aws.Config{Region: awssdk.String(tt.input.region)}).Return(mockedClient).Once()
-			r := NewS3Repository(&factory)
+			r := NewS3Repository(&factory, store)
 			got, err := r.ListBucketAnalyticsConfigurations(&tt.input.bucket, tt.input.region)
 			factory.AssertExpectations(t)
 			if err != nil && tt.wantErr == "" {
@@ -428,6 +461,15 @@ func Test_s3Repository_ListBucketAnalyticsConfigurations(t *testing.T) {
 			if err != nil {
 				assert.Equal(t, tt.wantErr, err.Error())
 			}
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListBucketAnalyticsConfigurations(&tt.input.bucket, tt.input.region)
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*s3.AnalyticsConfiguration{}, store.Get(fmt.Sprintf("s3ListBucketAnalyticsConfigurations_%s_%s", *tt.input.bucket.Name, tt.input.region)))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -462,7 +504,7 @@ func Test_s3Repository_GetBucketLocation(t *testing.T) {
 						LocationConstraint: awssdk.String("eu-east-1"),
 					},
 					nil,
-				)
+				).Once()
 			},
 			want: "eu-east-1",
 		},
@@ -477,7 +519,7 @@ func Test_s3Repository_GetBucketLocation(t *testing.T) {
 				}).Return(
 					&s3.GetBucketLocationOutput{},
 					nil,
-				)
+				).Once()
 			},
 			want: "us-east-1",
 		},
@@ -492,7 +534,7 @@ func Test_s3Repository_GetBucketLocation(t *testing.T) {
 				}).Return(
 					nil,
 					awserr.New(s3.ErrCodeNoSuchBucket, "", nil),
-				)
+				).Once()
 			},
 			want: "",
 		},
@@ -507,18 +549,19 @@ func Test_s3Repository_GetBucketLocation(t *testing.T) {
 				}).Return(
 					nil,
 					awserr.New("UnknownError", "aws error", nil),
-				)
+				).Once()
 			},
 			wantErr: "UnknownError: aws error",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			mockedClient := &awstest.MockFakeS3{}
 			tt.mocks(mockedClient)
 			factory := client.MockAwsClientFactoryInterface{}
 			factory.On("GetS3Client", (*aws.Config)(nil)).Return(mockedClient).Once()
-			r := NewS3Repository(&factory)
+			r := NewS3Repository(&factory, store)
 			got, err := r.GetBucketLocation(tt.bucket)
 			factory.AssertExpectations(t)
 			if err != nil && tt.wantErr == "" {
@@ -527,6 +570,15 @@ func Test_s3Repository_GetBucketLocation(t *testing.T) {
 			if err != nil {
 				assert.Equal(t, tt.wantErr, err.Error())
 			}
+
+			if err == nil && tt.want != "" {
+				// Check that results were cached
+				cachedData, err := r.GetBucketLocation(tt.bucket)
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, "", store.Get(fmt.Sprintf("s3GetBucketLocation_%s", *tt.bucket.Name)))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {

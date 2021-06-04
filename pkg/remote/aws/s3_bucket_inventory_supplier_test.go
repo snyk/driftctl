@@ -10,6 +10,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -131,7 +132,7 @@ func TestS3BucketInventorySupplier_Resources(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session))
+			repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session), cache.New(0))
 			supplierLibrary.AddSupplier(NewS3BucketInventorySupplier(provider, repository, deserializer))
 		}
 
