@@ -69,4 +69,31 @@ func TestCache(t *testing.T) {
 		}
 		assert.Equal(t, 5, cache.Len())
 	})
+
+	t.Run("should ignore keys when capacity is 0", func(t *testing.T) {
+		keys := []struct {
+			key   string
+			value interface{}
+		}{
+			{
+				"test",
+				[]string{"slice"},
+			},
+			{
+				"test",
+				[]string{},
+			},
+			{
+				"test2",
+				[]resource.FakeResource{},
+			},
+		}
+		cache := New(0)
+
+		for _, k := range keys {
+			assert.Equal(t, false, cache.Put(k.key, k.value))
+			assert.Equal(t, nil, cache.Get(k.key))
+		}
+		assert.Equal(t, 0, cache.Len())
+	})
 }
