@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudfront"
 	"github.com/aws/aws-sdk-go/service/cloudfront/cloudfrontiface"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 )
 
 type CloudfrontRepository interface {
@@ -12,15 +13,21 @@ type CloudfrontRepository interface {
 
 type cloudfrontRepository struct {
 	client cloudfrontiface.CloudFrontAPI
+	cache  cache.Cache
 }
 
-func NewCloudfrontClient(session *session.Session) *cloudfrontRepository {
+func NewCloudfrontClient(session *session.Session, c cache.Cache) *cloudfrontRepository {
 	return &cloudfrontRepository{
 		cloudfront.New(session),
+		c,
 	}
 }
 
 func (r *cloudfrontRepository) ListAllDistributions() ([]*cloudfront.DistributionSummary, error) {
+	if v := r.cache.Get("cloudfrontListAllDistributions"); v != nil {
+		return v.([]*cloudfront.DistributionSummary), nil
+	}
+
 	var distributions []*cloudfront.DistributionSummary
 	input := cloudfront.ListDistributionsInput{}
 	err := r.client.ListDistributionsPages(&input,
@@ -34,5 +41,7 @@ func (r *cloudfrontRepository) ListAllDistributions() ([]*cloudfront.Distributio
 	if err != nil {
 		return nil, err
 	}
+
+	r.cache.Put("cloudfrontListAllDistributions", distributions)
 	return distributions, nil
 }
