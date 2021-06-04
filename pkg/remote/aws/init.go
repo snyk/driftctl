@@ -38,7 +38,7 @@ func Init(version string, alerter *alerter.Alerter,
 
 	s3Repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session))
 	ec2repository := repository.NewEC2Repository(provider.session, repositoryCache)
-	route53repository := repository.NewRoute53Repository(provider.session)
+	route53repository := repository.NewRoute53Repository(provider.session, repositoryCache)
 	lambdaRepository := repository.NewLambdaRepository(provider.session)
 	rdsRepository := repository.NewRDSRepository(provider.session)
 	sqsRepository := repository.NewSQSClient(provider.session)

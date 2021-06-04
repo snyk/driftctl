@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	testmocks "github.com/cloudskiff/driftctl/test/mocks"
@@ -188,7 +189,7 @@ func TestRoute53RecordSupplier_Resources(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				supplierLibrary.AddSupplier(NewRoute53RecordSupplier(provider, deserializer, repository.NewRoute53Repository(provider.session)))
+				supplierLibrary.AddSupplier(NewRoute53RecordSupplier(provider, deserializer, repository.NewRoute53Repository(provider.session, cache.New(0))))
 			}
 
 			provider := testmocks.NewMockedGoldenTFProvider(tt.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)

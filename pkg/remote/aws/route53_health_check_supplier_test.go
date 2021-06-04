@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/aws/aws-sdk-go/service/route53"
@@ -76,7 +77,7 @@ func TestRoute53HealthCheckSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewRoute53HealthCheckSupplier(provider, deserializer, repository.NewRoute53Repository(provider.session)))
+			supplierLibrary.AddSupplier(NewRoute53HealthCheckSupplier(provider, deserializer, repository.NewRoute53Repository(provider.session, cache.New(0))))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {

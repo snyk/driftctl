@@ -1,14 +1,14 @@
 package repository
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/service/route53"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
-
 	"github.com/aws/aws-sdk-go/aws"
-
+	"github.com/aws/aws-sdk-go/service/route53"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/r3labs/diff/v2"
@@ -44,7 +44,7 @@ func Test_route53Repository_ListAllHealthChecks(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*route53.HealthCheck{
 				{Id: aws.String("1")},
@@ -58,13 +58,24 @@ func Test_route53Repository_ListAllHealthChecks(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := awstest.MockFakeRoute53{}
 			tt.mocks(&client)
 			r := &route53Repository{
 				client: &client,
+				cache:  store,
 			}
 			got, err := r.ListAllHealthChecks()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllHealthChecks()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*route53.HealthCheck{}, store.Get("route53ListAllHealthChecks"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -104,7 +115,7 @@ func Test_route53Repository_ListAllZones(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*route53.HostedZone{
 				{Id: aws.String("1")},
@@ -118,13 +129,24 @@ func Test_route53Repository_ListAllZones(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := awstest.MockFakeRoute53{}
 			tt.mocks(&client)
 			r := &route53Repository{
 				client: &client,
+				cache:  store,
 			}
 			got, err := r.ListAllZones()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllZones()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*route53.HostedZone{}, store.Get("route53ListAllZones"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -171,7 +193,7 @@ func Test_route53Repository_ListRecordsForZone(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*route53.ResourceRecordSet{
 				{Name: aws.String("1")},
@@ -185,14 +207,25 @@ func Test_route53Repository_ListRecordsForZone(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := awstest.MockFakeRoute53{}
 			tt.mocks(&client)
 			r := &route53Repository{
 				client: &client,
+				cache:  store,
 			}
 			for _, id := range tt.zoneIds {
 				got, err := r.ListRecordsForZone(id)
 				assert.Equal(t, tt.wantErr, err)
+
+				if err == nil {
+					// Check that results were cached
+					cachedData, err := r.ListRecordsForZone(id)
+					assert.NoError(t, err)
+					assert.Equal(t, got, cachedData)
+					assert.IsType(t, []*route53.ResourceRecordSet{}, store.Get(fmt.Sprintf("route53ListRecordsForZone_%s", id)))
+				}
+
 				changelog, err := diff.Diff(got, tt.want)
 				assert.Nil(t, err)
 				if len(changelog) > 0 {
