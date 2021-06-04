@@ -35,7 +35,7 @@ func NewEC2Repository(session *session.Session, c cache.Cache) *ec2Repository {
 }
 
 func (r *ec2Repository) ListAllImages() ([]*ec2.Image, error) {
-	if v := r.cache.Get("ec2AllImages"); v != nil {
+	if v := r.cache.Get("ec2ListAllImages"); v != nil {
 		return v.([]*ec2.Image), nil
 	}
 
@@ -48,12 +48,12 @@ func (r *ec2Repository) ListAllImages() ([]*ec2.Image, error) {
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Put("ec2AllImages", images.Images)
+	r.cache.Put("ec2ListAllImages", images.Images)
 	return images.Images, err
 }
 
 func (r *ec2Repository) ListAllSnapshots() ([]*ec2.Snapshot, error) {
-	if v := r.cache.Get("ec2AllSnapshots"); v != nil {
+	if v := r.cache.Get("ec2ListAllSnapshots"); v != nil {
 		return v.([]*ec2.Snapshot), nil
 	}
 
@@ -70,12 +70,12 @@ func (r *ec2Repository) ListAllSnapshots() ([]*ec2.Snapshot, error) {
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Put("ec2AllSnapshots", snapshots)
+	r.cache.Put("ec2ListAllSnapshots", snapshots)
 	return snapshots, err
 }
 
 func (r *ec2Repository) ListAllVolumes() ([]*ec2.Volume, error) {
-	if v := r.cache.Get("ec2AllVolumes"); v != nil {
+	if v := r.cache.Get("ec2ListAllVolumes"); v != nil {
 		return v.([]*ec2.Volume), nil
 	}
 
@@ -88,12 +88,12 @@ func (r *ec2Repository) ListAllVolumes() ([]*ec2.Volume, error) {
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Put("ec2AllVolumes", volumes)
+	r.cache.Put("ec2ListAllVolumes", volumes)
 	return volumes, nil
 }
 
 func (r *ec2Repository) ListAllAddresses() ([]*ec2.Address, error) {
-	if v := r.cache.Get("ec2AllAddresses"); v != nil {
+	if v := r.cache.Get("ec2ListAllAddresses"); v != nil {
 		return v.([]*ec2.Address), nil
 	}
 
@@ -102,12 +102,12 @@ func (r *ec2Repository) ListAllAddresses() ([]*ec2.Address, error) {
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Put("ec2AllAddresses", response.Addresses)
+	r.cache.Put("ec2ListAllAddresses", response.Addresses)
 	return response.Addresses, nil
 }
 
 func (r *ec2Repository) ListAllAddressesAssociation() ([]string, error) {
-	if v := r.cache.Get("ec2AddressesAssociation"); v != nil {
+	if v := r.cache.Get("ec2ListAllAddressesAssociation"); v != nil {
 		return v.([]string), nil
 	}
 
@@ -121,12 +121,12 @@ func (r *ec2Repository) ListAllAddressesAssociation() ([]string, error) {
 			results = append(results, aws.StringValue(address.AssociationId))
 		}
 	}
-	r.cache.Put("ec2AddressesAssociation", results)
+	r.cache.Put("ec2ListAllAddressesAssociation", results)
 	return results, nil
 }
 
 func (r *ec2Repository) ListAllInstances() ([]*ec2.Instance, error) {
-	if v := r.cache.Get("ec2AllInstances"); v != nil {
+	if v := r.cache.Get("ec2ListAllInstances"); v != nil {
 		return v.([]*ec2.Instance), nil
 	}
 
@@ -141,12 +141,12 @@ func (r *ec2Repository) ListAllInstances() ([]*ec2.Instance, error) {
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Put("ec2AllInstances", instances)
+	r.cache.Put("ec2ListAllInstances", instances)
 	return instances, nil
 }
 
 func (r *ec2Repository) ListAllKeyPairs() ([]*ec2.KeyPairInfo, error) {
-	if v := r.cache.Get("ec2AllKeyPairs"); v != nil {
+	if v := r.cache.Get("ec2ListAllKeyPairs"); v != nil {
 		return v.([]*ec2.KeyPairInfo), nil
 	}
 
@@ -155,6 +155,6 @@ func (r *ec2Repository) ListAllKeyPairs() ([]*ec2.KeyPairInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Put("ec2AllKeyPairs", pairs.KeyPairs)
+	r.cache.Put("ec2ListAllKeyPairs", pairs.KeyPairs)
 	return pairs.KeyPairs, err
 }

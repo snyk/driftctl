@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"reflect"
 	"strings"
 	"testing"
 
@@ -51,14 +50,24 @@ func Test_ec2Repository_ListAllImages(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &MockEC2Client{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
-				cache:  cache.New(10),
+				cache:  store,
 			}
 			got, err := r.ListAllImages()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllImages()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*ec2.Image{}, store.Get("ec2ListAllImages"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -67,11 +76,6 @@ func Test_ec2Repository_ListAllImages(t *testing.T) {
 				}
 				t.Fail()
 			}
-
-			// Check that results were cached
-			cachedData, err := r.ListAllImages()
-			assert.NoError(t, err)
-			assert.True(t, reflect.DeepEqual(got, cachedData))
 		})
 	}
 }
@@ -125,14 +129,24 @@ func Test_ec2Repository_ListAllSnapshots(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &MockEC2Client{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
-				cache:  cache.New(10),
+				cache:  store,
 			}
 			got, err := r.ListAllSnapshots()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllSnapshots()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*ec2.Snapshot{}, store.Get("ec2ListAllSnapshots"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -141,11 +155,6 @@ func Test_ec2Repository_ListAllSnapshots(t *testing.T) {
 				}
 				t.Fail()
 			}
-
-			// Check that results were cached
-			cachedData, err := r.ListAllSnapshots()
-			assert.NoError(t, err)
-			assert.True(t, reflect.DeepEqual(got, cachedData))
 		})
 	}
 }
@@ -195,14 +204,24 @@ func Test_ec2Repository_ListAllVolumes(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &MockEC2Client{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
-				cache:  cache.New(10),
+				cache:  store,
 			}
 			got, err := r.ListAllVolumes()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllVolumes()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*ec2.Volume{}, store.Get("ec2ListAllVolumes"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -211,11 +230,6 @@ func Test_ec2Repository_ListAllVolumes(t *testing.T) {
 				}
 				t.Fail()
 			}
-
-			// Check that results were cached
-			cachedData, err := r.ListAllVolumes()
-			assert.NoError(t, err)
-			assert.True(t, reflect.DeepEqual(got, cachedData))
 		})
 	}
 }
@@ -250,14 +264,24 @@ func Test_ec2Repository_ListAllAddresses(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &MockEC2Client{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
-				cache:  cache.New(10),
+				cache:  store,
 			}
 			got, err := r.ListAllAddresses()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllAddresses()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*ec2.Address{}, store.Get("ec2ListAllAddresses"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -266,11 +290,6 @@ func Test_ec2Repository_ListAllAddresses(t *testing.T) {
 				}
 				t.Fail()
 			}
-
-			// Check that results were cached
-			cachedData, err := r.ListAllAddresses()
-			assert.NoError(t, err)
-			assert.True(t, reflect.DeepEqual(got, cachedData))
 		})
 	}
 }
@@ -305,14 +324,24 @@ func Test_ec2Repository_ListAllAddressesAssociation(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &MockEC2Client{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
-				cache:  cache.New(10),
+				cache:  store,
 			}
 			got, err := r.ListAllAddressesAssociation()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllAddressesAssociation()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []string{}, store.Get("ec2ListAllAddressesAssociation"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -321,11 +350,6 @@ func Test_ec2Repository_ListAllAddressesAssociation(t *testing.T) {
 				}
 				t.Fail()
 			}
-
-			// Check that results were cached
-			cachedData, err := r.ListAllAddressesAssociation()
-			assert.NoError(t, err)
-			assert.True(t, reflect.DeepEqual(got, cachedData))
 		})
 	}
 }
@@ -399,14 +423,23 @@ func Test_ec2Repository_ListAllInstances(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &MockEC2Client{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
-				cache:  cache.New(10),
+				cache:  store,
 			}
 			got, err := r.ListAllInstances()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllInstances()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*ec2.Instance{}, store.Get("ec2ListAllInstances"))
+			}
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -415,11 +448,6 @@ func Test_ec2Repository_ListAllInstances(t *testing.T) {
 				}
 				t.Fail()
 			}
-
-			// Check that results were cached
-			cachedData, err := r.ListAllInstances()
-			assert.NoError(t, err)
-			assert.True(t, reflect.DeepEqual(got, cachedData))
 		})
 	}
 }
@@ -454,14 +482,24 @@ func Test_ec2Repository_ListAllKeyPairs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &MockEC2Client{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
-				cache:  cache.New(10),
+				cache:  store,
 			}
 			got, err := r.ListAllKeyPairs()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllKeyPairs()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*ec2.KeyPairInfo{}, store.Get("ec2ListAllKeyPairs"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -470,11 +508,6 @@ func Test_ec2Repository_ListAllKeyPairs(t *testing.T) {
 				}
 				t.Fail()
 			}
-
-			// Check that results were cached
-			cachedData, err := r.ListAllKeyPairs()
-			assert.NoError(t, err)
-			assert.True(t, reflect.DeepEqual(got, cachedData))
 		})
 	}
 }
