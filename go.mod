@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/aws/aws-sdk-go v1.34.2
-	github.com/bmatcuk/doublestar/v4 v4.0.1 // indirect
+	github.com/bmatcuk/doublestar/v4 v4.0.1
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/fatih/color v1.9.0
 	github.com/getsentry/sentry-go v0.10.0
@@ -18,7 +18,7 @@ require (
 	github.com/jmespath/go-jmespath v0.3.0
 	github.com/joho/godotenv v1.3.0
 	github.com/mattn/go-colorable v0.1.7 // indirect
-	github.com/mattn/go-isatty v0.0.12 // indirect
+	github.com/mattn/go-isatty v0.0.12
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/go-testing-interface v1.0.4 // indirect
 	github.com/pkg/errors v0.9.1
