@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/kms"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -77,7 +78,7 @@ func TestKMSAliasSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewKMSAliasSupplier(provider, deserializer, repository.NewKMSRepository(provider.session)))
+			supplierLibrary.AddSupplier(NewKMSAliasSupplier(provider, deserializer, repository.NewKMSRepository(provider.session, cache.New(0))))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
