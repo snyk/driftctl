@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	error2 "github.com/cloudskiff/driftctl/pkg/terraform/error"
 	"github.com/hashicorp/go-getter"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -44,6 +45,9 @@ func (p *ProviderDownloader) Download(url, path string) error {
 		return err
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusForbidden {
+		return error2.ProviderNotFoundError{}
+	}
 	if resp.StatusCode != http.StatusOK {
 		return errors.Errorf("unsuccessful request to %s: %s", url, resp.Status)
 	}

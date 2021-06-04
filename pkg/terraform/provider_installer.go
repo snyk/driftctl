@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"strings"
 
+	error2 "github.com/cloudskiff/driftctl/pkg/terraform/error"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -54,6 +55,10 @@ func (p *ProviderInstaller) Install() (string, error) {
 			providerDir,
 		)
 		if err != nil {
+			if notFoundErr, ok := err.(error2.ProviderNotFoundError); ok {
+				notFoundErr.Version = p.config.Version
+				return "", notFoundErr
+			}
 			return "", err
 		}
 		logrus.Debug("Download successful")

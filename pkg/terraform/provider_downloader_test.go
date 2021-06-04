@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
+	terraformError "github.com/cloudskiff/driftctl/pkg/terraform/error"
 
 	"github.com/stretchr/testify/assert"
 
@@ -34,6 +35,16 @@ func TestProviderDownloader_Download(t *testing.T) {
 				assert.Equal(
 					fmt.Sprintf("unsuccessful request to %s: 404", url),
 					err.Error(),
+				)
+			},
+		},
+		{
+			name:      "TestProviderNotFound(403)",
+			responder: httpmock.NewBytesResponder(http.StatusForbidden, []byte{}),
+			assert: func(assert *assert.Assertions, tmpDir string, err error) {
+				assert.IsType(
+					terraformError.ProviderNotFoundError{},
+					err,
 				)
 			},
 		},

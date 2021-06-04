@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/mocks"
+	terraformError "github.com/cloudskiff/driftctl/pkg/terraform/error"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -179,4 +181,26 @@ func TestProviderInstallerInstallPostfixIsHandler(t *testing.T) {
 	assert.Nil(err)
 	assert.Equal(path.Join(fakeTmpHome, expectedSubFolder, config.GetBinaryName()+"_x5"), providerPath)
 
+}
+
+func TestProviderInstallerVersionDoesNotExist(t *testing.T) {
+
+	assert := assert.New(t)
+
+	config := ProviderConfig{
+		Key:     "aws",
+		Version: "666.666.666",
+	}
+
+	mockDownloader := mocks.ProviderDownloaderInterface{}
+	mockDownloader.On("Download", mock.Anything, mock.Anything).Return(terraformError.ProviderNotFoundError{})
+
+	installer := ProviderInstaller{
+		downloader: &mockDownloader,
+		config:     config,
+	}
+
+	_, err := installer.Install()
+
+	assert.Equal("Provider version 666.666.666 does not exist", err.Error())
 }
