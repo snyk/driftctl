@@ -43,7 +43,7 @@ func Init(version string, alerter *alerter.Alerter,
 	rdsRepository := repository.NewRDSRepository(provider.session)
 	sqsRepository := repository.NewSQSClient(provider.session)
 	snsRepository := repository.NewSNSClient(provider.session)
-	dynamoDBRepository := repository.NewDynamoDBRepository(provider.session)
+	dynamoDBRepository := repository.NewDynamoDBRepository(provider.session, repositoryCache)
 	cloudfrontRepository := repository.NewCloudfrontClient(provider.session)
 	kmsRepository := repository.NewKMSRepository(provider.session)
 	ecrRepository := repository.NewECRRepository(provider.session)
