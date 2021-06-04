@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
-
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/aws/aws-sdk-go/service/lambda"
@@ -43,7 +43,7 @@ func Test_lambdaRepository_ListAllLambdaFunctions(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*lambda.FunctionConfiguration{
 				{FunctionName: aws.String("1")},
@@ -60,13 +60,24 @@ func Test_lambdaRepository_ListAllLambdaFunctions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &MockLambdaClient{}
 			tt.mocks(client)
 			r := &lambdaRepository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllLambdaFunctions()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllLambdaFunctions()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*lambda.FunctionConfiguration{}, store.Get("lambdaListAllLambdaFunctions"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -109,7 +120,7 @@ func Test_lambdaRepository_ListAllLambdaEventSourceMappings(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*lambda.EventSourceMappingConfiguration{
 				{UUID: aws.String("1")},
@@ -126,13 +137,24 @@ func Test_lambdaRepository_ListAllLambdaEventSourceMappings(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &MockLambdaClient{}
 			tt.mocks(client)
 			r := &lambdaRepository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllLambdaEventSourceMappings()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllLambdaEventSourceMappings()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*lambda.EventSourceMappingConfiguration{}, store.Get("lambdaListAllLambdaEventSourceMappings"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
