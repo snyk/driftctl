@@ -49,6 +49,10 @@ func (c *LRUCache) Put(key string, value interface{}) bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	if c.cap == 0 {
+		return false
+	}
+
 	// if the key already exists, move to front and update the value
 	if node, ok := c.m[key]; ok {
 		c.l.MoveToFront(node)
