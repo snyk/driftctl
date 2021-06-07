@@ -16,7 +16,7 @@
 <div id="app">
     <h1 class="heading title">Driftctl scan report</h1>
     <span class="heading subtitle">Coverage 8%</span>
-    <span class="heading date">Jun 01, 2021</span>
+    <span class="heading date">Jun 07, 2021</span>
     <hr>
     <form id="filter-form" action="#">
         <input type="text" name="resource-id-filter" placeholder="Search resources..." onkeyup="refreshState()">
@@ -25,24 +25,12 @@
             
             <option value="aws_unmanaged_resource">aws_unmanaged_resource</option>
             
+            <option value="aws_deleted_resource">aws_deleted_resource</option>
+            
+            <option value="aws_diff_resource">aws_diff_resource</option>
+            
         </select>
     </form>
-
-    
-    <h2>Managed resources <span class="resource-count-managed">(2)</span></h2>
-
-    
-    <div class="resource-item resource-item-managed">
-        <span class="resource-item-id">diff-id-1</span>
-        <span class="resource-item-type">aws_diff_resource</span>
-    </div>
-    
-    <div class="resource-item resource-item-managed">
-        <span class="resource-item-id">no-diff-id-1</span>
-        <span class="resource-item-type">aws_no_diff_resource</span>
-    </div>
-    
-    
 
     
     <h2>Unmanaged resources <span class="resource-count-unmanaged">(2)</span></h2>
@@ -145,7 +133,6 @@
 
     function refreshCounters() {
         const counterClassMapping = {
-            '.resource-item-managed': '.resource-count-managed',
             '.resource-item-unmanaged': '.resource-count-unmanaged',
             '.resource-item-changed': '.resource-count-changed',
             '.resource-item-deleted': '.resource-count-deleted',
