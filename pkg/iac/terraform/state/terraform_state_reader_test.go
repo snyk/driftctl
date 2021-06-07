@@ -110,7 +110,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 
 			if shouldUpdate {
 				var err error
-				realProvider, err = aws.NewAWSTerraformProvider(progress)
+				realProvider, err = aws.NewAWSTerraformProvider("", progress)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -195,7 +195,7 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 
 			if shouldUpdate {
 				var err error
-				realProvider, err = github.NewGithubTerraformProvider(progress)
+				realProvider, err = github.NewGithubTerraformProvider("", progress)
 				if err != nil {
 					t.Fatal(err)
 				}

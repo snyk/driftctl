@@ -2,10 +2,14 @@ package terraform
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"path"
+	"path/filepath"
 	"runtime"
+	"strings"
 
+	error2 "github.com/cloudskiff/driftctl/pkg/terraform/error"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -36,13 +40,11 @@ func NewProviderInstaller(config ProviderConfig) (*ProviderInstaller, error) {
 }
 
 func (p *ProviderInstaller) Install() (string, error) {
-	if p.homeDir == "" {
-		p.homeDir = os.TempDir()
-	}
-	providerDir := path.Join(p.homeDir, fmt.Sprintf("/.driftctl/plugins/%s_%s/", runtime.GOOS, runtime.GOARCH))
-	providerPath := path.Join(providerDir, p.config.GetBinaryName())
+	providerDir := p.getProviderDirectory()
+	providerPath := p.getBinaryPath()
 
 	info, err := os.Stat(providerPath)
+
 	if err != nil && os.IsNotExist(err) {
 		logrus.WithFields(logrus.Fields{
 			"path": providerPath,
@@ -53,6 +55,10 @@ func (p *ProviderInstaller) Install() (string, error) {
 			providerDir,
 		)
 		if err != nil {
+			if notFoundErr, ok := err.(error2.ProviderNotFoundError); ok {
+				notFoundErr.Version = p.config.Version
+				return "", notFoundErr
+			}
 			return "", err
 		}
 		logrus.Debug("Download successful")
@@ -71,5 +77,29 @@ func (p *ProviderInstaller) Install() (string, error) {
 		}).Debug("Found existing provider")
 	}
 
-	return providerPath, nil
+	return p.getBinaryPath(), nil
+}
+
+func (p ProviderInstaller) getProviderDirectory() string {
+	if p.homeDir == "" {
+		p.homeDir = os.TempDir()
+	}
+	return path.Join(p.homeDir, fmt.Sprintf("/.driftctl/plugins/%s_%s/", runtime.GOOS, runtime.GOARCH))
+}
+
+// Handle postfixes in binary names
+func (p *ProviderInstaller) getBinaryPath() string {
+	providerDir := p.getProviderDirectory()
+	binaryName := p.config.GetBinaryName()
+	_, err := os.Stat(path.Join(providerDir, binaryName))
+	if err != nil && os.IsNotExist(err) {
+		_ = filepath.WalkDir(providerDir, func(filePath string, d fs.DirEntry, err error) error {
+			if d != nil && strings.HasPrefix(d.Name(), p.config.GetBinaryName()) {
+				binaryName = d.Name()
+			}
+			return nil
+		})
+	}
+
+	return path.Join(providerDir, binaryName)
 }

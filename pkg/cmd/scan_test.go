@@ -43,6 +43,8 @@ func TestScanCmd_Valid(t *testing.T) {
 		{args: []string{"scan", "--tfc-token", "token"}},
 		{args: []string{"scan", "--filter", "Type=='aws_s3_bucket'"}},
 		{args: []string{"scan", "--strict"}},
+		{args: []string{"scan", "--tf-provider-version", "1.2.3"}},
+		{args: []string{"scan", "--tf-provider-version", "3.30.2"}},
 	}
 
 	for _, tt := range cases {
@@ -81,6 +83,8 @@ func TestScanCmd_Invalid(t *testing.T) {
 		{args: []string{"scan", "--from", "tfstate:///tmp/test", "--from", "tfstate+toto://test"}, expected: "Unsupported IaC backend 'toto': \nAccepted values are: s3,http,https,tfcloud"},
 		{args: []string{"scan", "--filter", "Type='test'"}, expected: "unable to parse filter expression: SyntaxError: Expected tRbracket, received: tUnknown"},
 		{args: []string{"scan", "--filter", "Type='test'", "--filter", "Type='test2'"}, expected: "Filter flag should be specified only once"},
+		{args: []string{"scan", "--tf-provider-version", ".30.2"}, expected: "Invalid version argument .30.2, expected a valid semver string (e.g. 2.13.4)"},
+		{args: []string{"scan", "--tf-provider-version", "foo"}, expected: "Invalid version argument foo, expected a valid semver string (e.g. 2.13.4)"},
 	}
 
 	for _, tt := range cases {

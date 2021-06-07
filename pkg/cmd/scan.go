@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"regexp"
 	"strings"
 	"syscall"
 
@@ -75,6 +76,12 @@ func NewScanCmd() *cobra.Command {
 				opts.Filter = expr
 			}
 
+			providerVersion, _ := cmd.Flags().GetString("tf-provider-version")
+			if err := validateTfProviderVersionString(providerVersion); err != nil {
+				return err
+			}
+			opts.ProviderVersion = providerVersion
+
 			opts.Quiet, _ = cmd.Flags().GetBool("quiet")
 			opts.DisableTelemetry, _ = cmd.Flags().GetBool("disable-telemetry")
 
@@ -136,6 +143,11 @@ func NewScanCmd() *cobra.Command {
 		"Terraform Cloud / Enterprise API token.\n"+
 			"Only used with tfstate+tfcloud backend.\n",
 	)
+	fl.String(
+		"tf-provider-version",
+		"",
+		"Terraform provider version to use.\n",
+	)
 	fl.BoolVar(&opts.StrictMode,
 		"strict",
 		false,
@@ -162,7 +174,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	resFactory := terraform.NewTerraformResourceFactory(resourceSchemaRepository)
 
-	err := remote.Activate(opts.To, alerter, providerLibrary, supplierLibrary, scanProgress, resourceSchemaRepository, resFactory)
+	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, supplierLibrary, scanProgress, resourceSchemaRepository, resFactory)
 	if err != nil {
 		return err
 	}
@@ -340,4 +352,14 @@ func parseOutputFlag(out string) (*output.OutputConfig, error) {
 		Key:     o,
 		Options: options,
 	}, nil
+}
+
+func validateTfProviderVersionString(version string) error {
+	if version == "" {
+		return nil
+	}
+	if match, _ := regexp.MatchString("^\\d+\\.\\d+\\.\\d+$", version); !match {
+		return errors.Errorf("Invalid version argument %s, expected a valid semver string (e.g. 2.13.4)", version)
+	}
+	return nil
 }

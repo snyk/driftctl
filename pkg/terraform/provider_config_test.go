@@ -10,7 +10,6 @@ func TestProviderConfig_GetBinaryName(t *testing.T) {
 	type fields struct {
 		Key     string
 		Version string
-		Postfix string
 	}
 	tests := []struct {
 		name   string
@@ -22,9 +21,8 @@ func TestProviderConfig_GetBinaryName(t *testing.T) {
 			fields: fields{
 				Key:     "aws",
 				Version: "3.24.1",
-				Postfix: "x5",
 			},
-			want: "terraform-provider-aws_v3.24.1_x5",
+			want: "terraform-provider-aws_v3.24.1",
 		},
 		{
 			name: "test for github provider",
@@ -40,7 +38,6 @@ func TestProviderConfig_GetBinaryName(t *testing.T) {
 			c := &ProviderConfig{
 				Key:     tt.fields.Key,
 				Version: tt.fields.Version,
-				Postfix: tt.fields.Postfix,
 			}
 			if got := c.GetBinaryName(); got != tt.want {
 				t.Errorf("GetBinaryName() = %v, want %v", got, tt.want)
@@ -82,7 +79,6 @@ func TestProviderConfig_GetDownloadUrl(t *testing.T) {
 			c := &ProviderConfig{
 				Key:     tt.fields.Key,
 				Version: tt.fields.Version,
-				Postfix: tt.fields.Postfix,
 			}
 			if got := c.GetDownloadUrl(); got != tt.want {
 				t.Errorf("GetDownloadUrl() = %v, want %v", got, tt.want)
