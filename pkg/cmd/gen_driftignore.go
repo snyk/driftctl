@@ -16,7 +16,7 @@ func NewGenDriftIgnoreCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "gen-driftignore",
 		Short: "Generate a .driftignore file based on your scan result",
-		Long:  "This command will generate a new .driftignore file containing your current drifts and send output to /dev/stdout\n\nExample: driftctl scan -o json://stdout | driftctl gen-driftignore > .driftignore",
+		Long:  "This command will generate a new .driftignore file containing your current drifts and send output to /dev/stdout\n\nExample: driftctl scan -o json://stdout | driftctl gen-driftignore -i /dev/stdin > .driftignore",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.InputPath == "" {
