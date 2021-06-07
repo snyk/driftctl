@@ -1,7 +1,258 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap');
+
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+
 body {
-    font-family: sans-serif;
+    line-height: 1;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+blockquote, q {
+    quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/*
+ * Custom style
+ */
+:root {
+    --transitionDuration: 400ms;
+}
+
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+    color: #1C1E21;
+    background-color: #F7F7F9;
+    padding-bottom: 50px;
+}
+
+div.container {
+    max-width: 100%;
+    width: 1280px;
+    margin: auto;
+}
+
+.heading {
+    height: 130px;
 }
 
 .hide {
+    display: none !important;
+}
+
+.d-flex {
+    display: flex;
+    flex-direction: row;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.justify-space-around {
+    justify-content: space-around;
+}
+
+.justify-space-between {
+    justify-content: space-between;
+}
+
+.align-center {
+    align-items: center;
+}
+
+.mt-5 {
+    margin-top: 50px;
+}
+
+.mb-5 {
+    margin-bottom: 50px;
+}
+
+.mt-2 {
+    margin-top: 20px;
+}
+
+.mb-2 {
+    margin-bottom: 20px;
+}
+
+.mt-1 {
+    margin-top: 10px;
+}
+
+.mb-1 {
+    margin-bottom: 10px;
+}
+
+input[type="text"],
+select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ececec;
+    outline: none;
+    transition: var(--transitionDuration);
+    color: #6e7071;
+}
+
+input[type="text"]:focus,
+select:focus {
+    border: 1px solid #71b2c3;
+}
+
+input[name="resource-id-filter"], select[name="resource-type-filter"] {
+    width: 300px;
+}
+
+h1 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.heading-title {
+    margin-bottom: 10px;
+}
+
+.app-content {
+    padding: 25px;
+    border-top: 3px solid #71B2C3;
+    background-color: #ffffff;
+    border-radius: 0 0 10px 10px;
+}
+
+.resource-item {
+    border: 1px solid #ececec;
+    padding: 10px;
+    margin-top: 10px;
+    color: #6e7071;
+}
+
+.resource-item:hover {
+    background-color: #f9f9f9;
+}
+
+.text--bold {
+    font-weight: bold;
+}
+
+.reset-filter-btn {
+    border: none;
+    padding: 8px;
+    font-size: 14px;
+    background-color: transparent;
+    color: #5faabd;
+    cursor: pointer;
+}
+
+/* tabs style */
+.tabs-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tab {
+    cursor: pointer;
+    padding: 10px 20px;
+    margin: 0 2px;
+    background: transparent;
+    display: inline-block;
+    color: #747578;
+    transition: background-color 200ms;
+}
+
+.tab:hover {
+    background-color: #f9f9f9;
+}
+
+.panels {
+    min-height: 200px;
+    width: 100%;
+    padding: 20px;
+}
+
+.panel {
     display: none;
+    animation: fadein .8s;
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.panel-title {
+    font-size: 1.5em;
+    font-weight: bold
+}
+
+.radio {
+    display: none;
+}
+
+#one:checked ~ .panels #one-panel,
+#two:checked ~ .panels #two-panel,
+#three:checked ~ .panels #three-panel,
+#four:checked ~ .panels #four-panel {
+    display: block
+}
+
+#one:checked ~ .tabs #one-tab,
+#two:checked ~ .tabs #two-tab,
+#three:checked ~ .tabs #three-tab,
+#four:checked ~ .tabs #four-tab {
+    background: transparent;
+    color: #747578;
+    border-bottom: 2px solid #71b2c3;
 }
