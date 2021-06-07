@@ -4,104 +4,394 @@
     <title>Driftctl scan report</title>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <style>body {
-    font-family: sans-serif;
+    <style>@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap');
+
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+
+body {
+    line-height: 1;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+blockquote, q {
+    quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/*
+ * Custom style
+ */
+:root {
+    --transitionDuration: 400ms;
+}
+
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+    color: #1C1E21;
+    background-color: #F7F7F9;
+    padding-bottom: 50px;
+}
+
+div.container {
+    max-width: 100%;
+    width: 1280px;
+    margin: auto;
+}
+
+.heading {
+    height: 130px;
 }
 
 .hide {
+    display: none !important;
+}
+
+.d-flex {
+    display: flex;
+    flex-direction: row;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.justify-space-around {
+    justify-content: space-around;
+}
+
+.justify-space-between {
+    justify-content: space-between;
+}
+
+.align-center {
+    align-items: center;
+}
+
+.mt-5 {
+    margin-top: 50px;
+}
+
+.mb-5 {
+    margin-bottom: 50px;
+}
+
+.mt-2 {
+    margin-top: 20px;
+}
+
+.mb-2 {
+    margin-bottom: 20px;
+}
+
+.mt-1 {
+    margin-top: 10px;
+}
+
+.mb-1 {
+    margin-bottom: 10px;
+}
+
+input[type="text"],
+select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ececec;
+    outline: none;
+    transition: var(--transitionDuration);
+    color: #6e7071;
+}
+
+input[type="text"]:focus,
+select:focus {
+    border: 1px solid #71b2c3;
+}
+
+input[name="resource-id-filter"], select[name="resource-type-filter"] {
+    width: 300px;
+}
+
+h1 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.heading-title {
+    margin-bottom: 10px;
+}
+
+.app-content {
+    padding: 25px;
+    border-top: 3px solid #71B2C3;
+    background-color: #ffffff;
+    border-radius: 0 0 10px 10px;
+}
+
+.resource-item {
+    border: 1px solid #ececec;
+    padding: 10px;
+    margin-top: 10px;
+    color: #6e7071;
+}
+
+.resource-item:hover {
+    background-color: #f9f9f9;
+}
+
+.text--bold {
+    font-weight: bold;
+}
+
+.reset-filter-btn {
+    border: none;
+    padding: 8px;
+    font-size: 14px;
+    background-color: transparent;
+    color: #5faabd;
+    cursor: pointer;
+}
+
+/* tabs style */
+.tabs-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tab {
+    cursor: pointer;
+    padding: 10px 20px;
+    margin: 0 2px;
+    background: transparent;
+    display: inline-block;
+    color: #747578;
+    transition: background-color 200ms;
+}
+
+.tab:hover {
+    background-color: #f9f9f9;
+}
+
+.panels {
+    min-height: 200px;
+    width: 100%;
+    padding: 20px;
+}
+
+.panel {
     display: none;
+    animation: fadein .8s;
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.panel-title {
+    font-size: 1.5em;
+    font-weight: bold
+}
+
+.radio {
+    display: none;
+}
+
+#one:checked ~ .panels #one-panel,
+#two:checked ~ .panels #two-panel,
+#three:checked ~ .panels #three-panel,
+#four:checked ~ .panels #four-panel {
+    display: block
+}
+
+#one:checked ~ .tabs #one-tab,
+#two:checked ~ .tabs #two-tab,
+#three:checked ~ .tabs #three-tab,
+#four:checked ~ .tabs #four-tab {
+    background: transparent;
+    color: #747578;
+    border-bottom: 2px solid #71b2c3;
 }</style>
 </head>
 <body>
-<div id="app">
-    <h1 class="heading title">Driftctl scan report</h1>
-    <span class="heading subtitle">Coverage 8%</span>
-    <span class="heading date">Jun 07, 2021</span>
-    <hr>
-    <form id="filter-form" action="#">
-        <input type="text" name="resource-id-filter" placeholder="Search resources..." onkeyup="refreshState()">
-        <select name="resource-type-filter" onchange="refreshState()">
-            <option value="">Resource type</option>
-            
-            <option value="aws_unmanaged_resource">aws_unmanaged_resource</option>
-            
-            <option value="aws_deleted_resource">aws_deleted_resource</option>
-            
-            <option value="aws_diff_resource">aws_diff_resource</option>
-            
-        </select>
-    </form>
-
-    
-    <h2>Unmanaged resources <span class="resource-count-unmanaged">(2)</span></h2>
-
-    
-    <div class="resource-item resource-item-unmanaged">
-        <span class="resource-item-id">unmanaged-id-1</span>
-        <span class="resource-item-type">aws_unmanaged_resource</span>
-    </div>
-    
-    <div class="resource-item resource-item-unmanaged">
-        <span class="resource-item-id">unmanaged-id-2</span>
-        <span class="resource-item-type">aws_unmanaged_resource</span>
-    </div>
-    
-    
-
-    
-    <h2>Changed resources <span class="resource-count-changed">(1)</span></h2>
-
-    
-    <div class="resource-item resource-item-changed">
-        <span class="resource-item-id">diff-id-1</span>
-        <span class="resource-item-type">aws_diff_resource</span>
+<div class="container">
+    <div class="heading d-flex justify-space-between align-center">
         <div>
-            
-            <div>~ updated.field: &#34;foobar&#34; =&gt; &#34;barfoo&#34; </div>
-            
-            <div>&#43; new.field: &lt;nil&gt; =&gt; &#34;newValue&#34; </div>
-            
-            <div>- a: &#34;oldValue&#34; =&gt; &lt;nil&gt; </div>
-            
+            <h1 class="heading-title">Driftctl scan report</h1>
+            <span class="heading-subtitle">Coverage 33%</span>
+        </div>
+        <h2 class="heading-date">Jun 07, 2021</h2>
+    </div>
+    <div class="app-content">
+        <div class="d-flex justify-center mb-2">
+            <form id="filter-form" action="#">
+                <input type="text" name="resource-id-filter" placeholder="Search resources..." onkeyup="refreshState()">
+                <select name="resource-type-filter" onchange="refreshState()">
+                    <option value="">Resource type</option>
+                    
+                    <option value="aws_unmanaged_resource">aws_unmanaged_resource</option>
+                    
+                    <option value="aws_deleted_resource">aws_deleted_resource</option>
+                    
+                    <option value="aws_diff_resource">aws_diff_resource</option>
+                    
+                </select>
+                <button type="button" onclick="resetFilters()" class="reset-filter-btn">Reset filters</button>
+            </form>
+        </div>
+
+        <div class="tabs-wrapper">
+            <input class="radio" id="one" name="group" type="radio" checked>
+            <input class="radio" id="two" name="group" type="radio">
+            <input class="radio" id="three" name="group" type="radio">
+            <input class="radio" id="four" name="group" type="radio">
+            <div class="tabs">
+                
+                <label class="tab" id="one-tab" for="one">Unmanaged resources (<span
+                        class="resource-count-unmanaged">2</span>)</label>
+                
+                
+                <label class="tab" id="two-tab" for="two">Changed resources (<span
+                        class="resource-count-changed">1</span>)</label>
+                
+                
+                <label class="tab" id="three-tab" for="three">Missing resources (<span
+                        class="resource-count-deleted">2</span>)</label>
+                
+                
+                <label class="tab" id="four-tab" for="four">Alerts (<span
+                        class="resource-count-alerts">1</span>)</label>
+                
+            </div>
+            <div class="panels">
+                
+                <div class="panel" id="one-panel">
+                    
+                    <div class="resource-item resource-item-unmanaged d-flex justify-space-between">
+                        <span class="resource-item-id">unmanaged-id-1</span>
+                        <span class="resource-item-type text--bold">aws_unmanaged_resource</span>
+                    </div>
+                    
+                    <div class="resource-item resource-item-unmanaged d-flex justify-space-between">
+                        <span class="resource-item-id">unmanaged-id-2</span>
+                        <span class="resource-item-type text--bold">aws_unmanaged_resource</span>
+                    </div>
+                    
+                </div>
+                
+                
+                <div class="panel" id="two-panel">
+                    
+                    <div class="resource-item resource-item-changed d-flex justify-space-between">
+                        <span class="resource-item-id">diff-id-1</span>
+                        <div>
+                            
+                            <div>~ updated.field: &#34;foobar&#34; =&gt; &#34;barfoo&#34; </div>
+                            
+                            <div>&#43; new.field: &lt;nil&gt; =&gt; &#34;newValue&#34; </div>
+                            
+                            <div>- a: &#34;oldValue&#34; =&gt; &lt;nil&gt; </div>
+                            
+                        </div>
+                        <span class="resource-item-type text--bold">aws_diff_resource</span>
+                    </div>
+                    
+                </div>
+                
+                
+                <div class="panel" id="three-panel">
+                    
+                    <div class="resource-item resource-item-deleted d-flex justify-space-between">
+                        <span class="resource-item-id">deleted-id-1</span>
+                        <span class="resource-item-type text--bold">aws_deleted_resource</span>
+                    </div>
+                    
+                    <div class="resource-item resource-item-deleted d-flex justify-space-between">
+                        <span class="resource-item-id">deleted-id-2</span>
+                        <span class="resource-item-type text--bold">aws_deleted_resource</span>
+                    </div>
+                    
+                </div>
+                
+                
+                <div class="panel" id="four-panel">
+                    
+                    
+                    <div class="resource-item resource-item-alerts">
+                        <span class="resource-item-type text--bold"></span>
+                        <span>- Ignoring aws_vpc from drift calculation: Listing aws_vpc is forbidden.</span>
+                    </div>
+                    
+                    <div class="resource-item resource-item-alerts">
+                        <span class="resource-item-type text--bold"></span>
+                        <span>- Ignoring aws_sqs from drift calculation: Listing aws_sqs is forbidden.</span>
+                    </div>
+                    
+                    <div class="resource-item resource-item-alerts">
+                        <span class="resource-item-type text--bold"></span>
+                        <span>- Ignoring aws_sns from drift calculation: Listing aws_sns is forbidden.</span>
+                    </div>
+                    
+                    
+                </div>
+                
+            </div>
+        </div>
+
+        <div class="empty-message-container">
+            <p>There's nothing to see there...</p>
         </div>
     </div>
-    
-    
-
-    
-    <h2>Missing resources <span class="resource-count-deleted">(2)</span></h2>
-
-    
-    <div class="resource-item resource-item-deleted">
-        <span class="resource-item-id">deleted-id-1</span>
-        <span class="resource-item-type">aws_deleted_resource</span>
-    </div>
-    
-    <div class="resource-item resource-item-deleted">
-        <span class="resource-item-id">deleted-id-2</span>
-        <span class="resource-item-type">aws_deleted_resource</span>
-    </div>
-    
-    
-
-    
-    <h2>Alerts <span class="resource-count-alerts">(1)</span></h2>
-
-    
-    <div class="resource-item resource-item-alerts">
-        <span class="resource-item-type"></span>
-        <div>
-            
-            <div>- Ignoring aws_vpc from drift calculation: Listing aws_vpc is forbidden.</div>
-            
-            <div>- Ignoring aws_sqs from drift calculation: Listing aws_sqs is forbidden.</div>
-            
-            <div>- Ignoring aws_sns from drift calculation: Listing aws_sns is forbidden.</div>
-            
-        </div>
-    </div>
-    
-    
 </div>
 </body>
 <script lang="js">
@@ -141,7 +431,7 @@
 
         for (const resClass in counterClassMapping) {
             const countEl = document.querySelector(counterClassMapping[resClass])
-            if (!countEl){
+            if (!countEl) {
                 continue
             }
             countEl.textContent = Array.from(document.querySelectorAll(resClass)).filter(el => !el.classList.contains('hide')).length
@@ -165,6 +455,12 @@
         }
 
         refreshCounters()
+    }
+
+    function resetFilters() {
+        document.querySelector('input[name=resource-id-filter]').value = ""
+        document.querySelector('select[name=resource-type-filter]').value = ""
+        refreshState()
     }
 
     refreshState()

@@ -7,73 +7,106 @@
     <style>{{.Stylesheet}}</style>
 </head>
 <body>
-<div id="app">
-    <h1 class="heading title">Driftctl scan report</h1>
-    <span class="heading subtitle">Coverage 8%</span>
-    <span class="heading date">{{ .ScanDate }}</span>
-    <hr>
-    <form id="filter-form" action="#">
-        <input type="text" name="resource-id-filter" placeholder="Search resources..." onkeyup="refreshState()">
-        <select name="resource-type-filter" onchange="refreshState()">
-            <option value="">Resource type</option>
-            {{ range $type := getResourceTypes }}
-            <option value="{{$type}}">{{ $type }}</option>
-            {{end}}
-        </select>
-    </form>
-
-    {{ if (gt (len .Unmanaged) 0) }}
-    <h2>Unmanaged resources <span class="resource-count-unmanaged">({{len .Unmanaged}})</span></h2>
-
-    {{range $res := .Unmanaged}}
-    <div class="resource-item resource-item-unmanaged">
-        <span class="resource-item-id">{{$res.TerraformId}}</span>
-        <span class="resource-item-type">{{$res.TerraformType}}</span>
-    </div>
-    {{end}}
-    {{end}}
-
-    {{ if (gt (len .Differences) 0) }}
-    <h2>Changed resources <span class="resource-count-changed">({{len .Differences}})</span></h2>
-
-    {{range $diff := .Differences}}
-    <div class="resource-item resource-item-changed">
-        <span class="resource-item-id">{{$diff.Res.TerraformId}}</span>
-        <span class="resource-item-type">{{$diff.Res.TerraformType}}</span>
+<div class="container">
+    <div class="heading d-flex justify-space-between align-center">
         <div>
-            {{range $change := $diff.Changelog}}
-            <div>{{ formatChange $change }}</div>
-            {{end}}
+            <h1 class="heading-title">Driftctl scan report</h1>
+            <span class="heading-subtitle">Coverage {{.Coverage}}%</span>
+        </div>
+        <h2 class="heading-date">{{ .ScanDate }}</h2>
+    </div>
+    <div class="app-content">
+        <div class="d-flex justify-center mb-2">
+            <form id="filter-form" action="#">
+                <input type="text" name="resource-id-filter" placeholder="Search resources..." onkeyup="refreshState()">
+                <select name="resource-type-filter" onchange="refreshState()">
+                    <option value="">Resource type</option>
+                    {{ range $type := getResourceTypes }}
+                    <option value="{{$type}}">{{ $type }}</option>
+                    {{end}}
+                </select>
+                <button type="button" onclick="resetFilters()" class="reset-filter-btn">Reset filters</button>
+            </form>
+        </div>
+
+        <div class="tabs-wrapper">
+            <input class="radio" id="one" name="group" type="radio" checked>
+            <input class="radio" id="two" name="group" type="radio">
+            <input class="radio" id="three" name="group" type="radio">
+            <input class="radio" id="four" name="group" type="radio">
+            <div class="tabs">
+                {{ if (gt (len .Unmanaged) 0) }}
+                <label class="tab" id="one-tab" for="one">Unmanaged resources (<span
+                        class="resource-count-unmanaged">{{len .Unmanaged}}</span>)</label>
+                {{end}}
+                {{ if (gt (len .Differences) 0) }}
+                <label class="tab" id="two-tab" for="two">Changed resources (<span
+                        class="resource-count-changed">{{len .Differences}}</span>)</label>
+                {{end}}
+                {{ if (gt (len .Deleted) 0) }}
+                <label class="tab" id="three-tab" for="three">Missing resources (<span
+                        class="resource-count-deleted">{{len .Deleted}}</span>)</label>
+                {{end}}
+                {{ if (gt (len .Alerts) 0) }}
+                <label class="tab" id="four-tab" for="four">Alerts (<span
+                        class="resource-count-alerts">{{len .Alerts}}</span>)</label>
+                {{end}}
+            </div>
+            <div class="panels">
+                {{ if (gt (len .Unmanaged) 0) }}
+                <div class="panel" id="one-panel">
+                    {{range $res := .Unmanaged}}
+                    <div class="resource-item resource-item-unmanaged d-flex justify-space-between">
+                        <span class="resource-item-id">{{$res.TerraformId}}</span>
+                        <span class="resource-item-type text--bold">{{$res.TerraformType}}</span>
+                    </div>
+                    {{end}}
+                </div>
+                {{end}}
+                {{ if (gt (len .Differences) 0) }}
+                <div class="panel" id="two-panel">
+                    {{range $diff := .Differences}}
+                    <div class="resource-item resource-item-changed d-flex justify-space-between">
+                        <span class="resource-item-id">{{$diff.Res.TerraformId}}</span>
+                        <div>
+                            {{range $change := $diff.Changelog}}
+                            <div>{{ formatChange $change }}</div>
+                            {{end}}
+                        </div>
+                        <span class="resource-item-type text--bold">{{$diff.Res.TerraformType}}</span>
+                    </div>
+                    {{end}}
+                </div>
+                {{end}}
+                {{ if (gt (len .Deleted) 0) }}
+                <div class="panel" id="three-panel">
+                    {{range $res := .Deleted}}
+                    <div class="resource-item resource-item-deleted d-flex justify-space-between">
+                        <span class="resource-item-id">{{$res.TerraformId}}</span>
+                        <span class="resource-item-type text--bold">{{$res.TerraformType}}</span>
+                    </div>
+                    {{end}}
+                </div>
+                {{end}}
+                {{ if (gt (len .Alerts) 0) }}
+                <div class="panel" id="four-panel">
+                    {{range $type, $messages := .Alerts}}
+                    {{range $el := $messages}}
+                    <div class="resource-item resource-item-alerts">
+                        <span class="resource-item-type text--bold">{{ $type }}</span>
+                        <span>- {{ $el.Message }}</span>
+                    </div>
+                    {{end}}
+                    {{end}}
+                </div>
+                {{end}}
+            </div>
+        </div>
+
+        <div class="empty-message-container">
+            <p>There's nothing to see there...</p>
         </div>
     </div>
-    {{end}}
-    {{end}}
-
-    {{ if (gt (len .Deleted) 0) }}
-    <h2>Missing resources <span class="resource-count-deleted">({{len .Deleted}})</span></h2>
-
-    {{range $res := .Deleted}}
-    <div class="resource-item resource-item-deleted">
-        <span class="resource-item-id">{{$res.TerraformId}}</span>
-        <span class="resource-item-type">{{$res.TerraformType}}</span>
-    </div>
-    {{end}}
-    {{end}}
-
-    {{ if (gt (len .Alerts) 0) }}
-    <h2>Alerts <span class="resource-count-alerts">({{len .Alerts}})</span></h2>
-
-    {{range $type, $messages := .Alerts}}
-    <div class="resource-item resource-item-alerts">
-        <span class="resource-item-type">{{ $type }}</span>
-        <div>
-            {{range $el := $messages}}
-            <div>- {{ $el.Message }}</div>
-            {{end}}
-        </div>
-    </div>
-    {{end}}
-    {{end}}
 </div>
 </body>
 <script lang="js">
@@ -113,7 +146,7 @@
 
         for (const resClass in counterClassMapping) {
             const countEl = document.querySelector(counterClassMapping[resClass])
-            if (!countEl){
+            if (!countEl) {
                 continue
             }
             countEl.textContent = Array.from(document.querySelectorAll(resClass)).filter(el => !el.classList.contains('hide')).length
@@ -137,6 +170,12 @@
         }
 
         refreshCounters()
+    }
+
+    function resetFilters() {
+        document.querySelector('input[name=resource-id-filter]').value = ""
+        document.querySelector('select[name=resource-type-filter]').value = ""
+        refreshState()
     }
 
     refreshState()
