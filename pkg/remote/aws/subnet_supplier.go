@@ -23,11 +23,11 @@ type SubnetSupplier struct {
 	subnetRunner        *terraform.ParallelResourceReader
 }
 
-func NewSubnetSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *SubnetSupplier {
+func NewSubnetSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *SubnetSupplier {
 	return &SubnetSupplier{
 		provider,
 		deserializer,
-		repository.NewEC2Repository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}

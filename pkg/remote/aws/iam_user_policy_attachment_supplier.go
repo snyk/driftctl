@@ -2,12 +2,8 @@ package aws
 
 import (
 	"fmt"
-	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
-	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -65,7 +61,7 @@ func (s *IamUserPolicyAttachmentSupplier) readUserPolicyAttachment(attachedPol *
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamUserPolicyAttachmentResourceType,
-			ID: fmt.Sprintf("%s-%s", *attachedPol.PolicyName, attachedPol.Username),
+			ID: fmt.Sprintf("%s-%s", *attachedPol.PolicyName, attachedPol.UserName),
 			Attributes: map[string]string{
 				"user":       attachedPol.UserName,
 				"policy_arn": *attachedPol.PolicyArn,

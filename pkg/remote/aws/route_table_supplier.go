@@ -7,8 +7,6 @@ import (
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/cloudskiff/driftctl/pkg/remote/deserializer"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 
@@ -26,11 +24,11 @@ type RouteTableSupplier struct {
 	routeTableRunner        *terraform.ParallelResourceReader
 }
 
-func NewRouteTableSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *RouteTableSupplier {
+func NewRouteTableSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *RouteTableSupplier {
 	return &RouteTableSupplier{
 		provider,
 		deserializer,
-		repository.NewEC2Repository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}

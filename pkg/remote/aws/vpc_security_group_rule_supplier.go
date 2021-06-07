@@ -66,11 +66,11 @@ func toInterfaceSlice(val []string) []interface{} {
 	return res
 }
 
-func NewVPCSecurityGroupRuleSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *VPCSecurityGroupRuleSupplier {
+func NewVPCSecurityGroupRuleSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *VPCSecurityGroupRuleSupplier {
 	return &VPCSecurityGroupRuleSupplier{
 		provider,
 		deserializer,
-		repository.NewEC2Repository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

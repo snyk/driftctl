@@ -23,11 +23,11 @@ type VPCSupplier struct {
 	vpcRunner        *terraform.ParallelResourceReader
 }
 
-func NewVPCSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *VPCSupplier {
+func NewVPCSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *VPCSupplier {
 	return &VPCSupplier{
 		provider,
 		deserializer,
-		repository.NewEC2Repository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}

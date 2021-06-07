@@ -4,11 +4,7 @@ import (
 	"context"
 	"testing"
 
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
-
-	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/cloudskiff/driftctl/pkg/parallel"

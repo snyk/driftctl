@@ -23,11 +23,11 @@ type VPCSecurityGroupSupplier struct {
 	securityGroupRunner        *terraform.ParallelResourceReader
 }
 
-func NewVPCSecurityGroupSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *VPCSecurityGroupSupplier {
+func NewVPCSecurityGroupSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *VPCSecurityGroupSupplier {
 	return &VPCSecurityGroupSupplier{
 		provider,
 		deserializer,
-		repository.NewEC2Repository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
