@@ -213,7 +213,6 @@ h2 {
 }
 
 .panels {
-    min-height: 200px;
     width: 100%;
     padding: 20px;
 }
@@ -255,4 +254,8 @@ h2 {
     background: transparent;
     color: #747578;
     border-bottom: 2px solid #71b2c3;
+}
+
+.empty-message-container {
+    color: #747578;
 }

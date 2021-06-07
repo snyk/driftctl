@@ -7,6 +7,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
+	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
@@ -14,20 +15,65 @@ import (
 )
 
 func TestHTML_Write(t *testing.T) {
-	type args struct {
-		analysis *analyser.Analysis
-	}
 	tests := []struct {
 		name       string
 		goldenfile string
-		args       args
+		analysis   func() *analyser.Analysis
 		err        error
 	}{
 		{
 			name:       "test html output",
 			goldenfile: "output.html",
-			args: args{
-				analysis: fakeAnalysisWithAlerts(),
+
+			analysis: func() *analyser.Analysis {
+				a := fakeAnalysisWithAlerts()
+				a.AddDeleted(
+					&testresource.FakeResource{
+						Id:   "deleted-id-3",
+						Type: "aws_deleted_resource",
+					},
+					&testresource.FakeResource{
+						Id:   "deleted-id-4",
+						Type: "aws_deleted_resource",
+					},
+					&testresource.FakeResource{
+						Id:   "deleted-id-5",
+						Type: "aws_deleted_resource",
+					},
+					&testresource.FakeResource{
+						Id:   "deleted-id-6",
+						Type: "aws_deleted_resource",
+					},
+				)
+				a.AddUnmanaged(
+					&testresource.FakeResource{
+						Id:   "unmanaged-id-3",
+						Type: "aws_unmanaged_resource",
+					},
+					&testresource.FakeResource{
+						Id:   "unmanaged-id-4",
+						Type: "aws_unmanaged_resource",
+					},
+					&testresource.FakeResource{
+						Id:   "unmanaged-id-5",
+						Type: "aws_unmanaged_resource",
+					},
+				)
+				a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
+					Id:   "diff-id-1",
+					Type: "aws_diff_resource",
+				}, Changelog: []analyser.Change{
+					{
+						Change: diff.Change{
+							Type: diff.DELETE,
+							Path: []string{"path", "to", "field"},
+							From: nil,
+							To:   []string{"value"},
+						},
+					},
+				}})
+
+				return a
 			},
 			err: nil,
 		},
@@ -42,7 +88,7 @@ func TestHTML_Write(t *testing.T) {
 			}
 			c := NewHTML(tempFile.Name())
 
-			err = c.Write(tt.args.analysis)
+			err = c.Write(tt.analysis())
 			if tt.err != nil {
 				assert.EqualError(t, err, tt.err.Error())
 			} else {
@@ -85,23 +131,23 @@ func TestHTML_DistinctResourceTypes(t *testing.T) {
 		{
 			name: "test empty array",
 			resources: []resource.Resource{
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id:   "deleted-id-1",
 					Type: "aws_deleted_resource",
 				},
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id:   "unmanaged-id-1",
 					Type: "aws_unmanaged_resource",
 				},
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id:   "unmanaged-id-2",
 					Type: "aws_unmanaged_resource",
 				},
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id:   "diff-id-1",
 					Type: "aws_diff_resource",
 				},
-				testresource.FakeResource{
+				&testresource.FakeResource{
 					Id:   "deleted-id-2",
 					Type: "aws_deleted_resource",
 				},

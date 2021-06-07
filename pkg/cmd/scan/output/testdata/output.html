@@ -219,7 +219,6 @@ h2 {
 }
 
 .panels {
-    min-height: 200px;
     width: 100%;
     padding: 20px;
 }
@@ -261,6 +260,10 @@ h2 {
     background: transparent;
     color: #747578;
     border-bottom: 2px solid #71b2c3;
+}
+
+.empty-message-container {
+    color: #747578;
 }</style>
 </head>
 <body>
@@ -268,11 +271,12 @@ h2 {
     <div class="heading d-flex justify-space-between align-center">
         <div>
             <h1 class="heading-title">Driftctl scan report</h1>
-            <span class="heading-subtitle">Coverage 33%</span>
+            <span class="heading-subtitle">Coverage 15%</span>
         </div>
         <h2 class="heading-date">Jun 07, 2021</h2>
     </div>
     <div class="app-content">
+        
         <div class="d-flex justify-center mb-2">
             <form id="filter-form" action="#">
                 <input type="text" name="resource-id-filter" placeholder="Search resources..." onkeyup="refreshState()">
@@ -298,15 +302,15 @@ h2 {
             <div class="tabs">
                 
                 <label class="tab" id="one-tab" for="one">Unmanaged resources (<span
-                        class="resource-count-unmanaged">2</span>)</label>
+                        class="resource-count-unmanaged">5</span>)</label>
                 
                 
                 <label class="tab" id="two-tab" for="two">Changed resources (<span
-                        class="resource-count-changed">1</span>)</label>
+                        class="resource-count-changed">2</span>)</label>
                 
                 
                 <label class="tab" id="three-tab" for="three">Missing resources (<span
-                        class="resource-count-deleted">2</span>)</label>
+                        class="resource-count-deleted">6</span>)</label>
                 
                 
                 <label class="tab" id="four-tab" for="four">Alerts (<span
@@ -324,6 +328,21 @@ h2 {
                     
                     <div class="resource-item resource-item-unmanaged d-flex justify-space-between">
                         <span class="resource-item-id">unmanaged-id-2</span>
+                        <span class="resource-item-type text--bold">aws_unmanaged_resource</span>
+                    </div>
+                    
+                    <div class="resource-item resource-item-unmanaged d-flex justify-space-between">
+                        <span class="resource-item-id">unmanaged-id-3</span>
+                        <span class="resource-item-type text--bold">aws_unmanaged_resource</span>
+                    </div>
+                    
+                    <div class="resource-item resource-item-unmanaged d-flex justify-space-between">
+                        <span class="resource-item-id">unmanaged-id-4</span>
+                        <span class="resource-item-type text--bold">aws_unmanaged_resource</span>
+                    </div>
+                    
+                    <div class="resource-item resource-item-unmanaged d-flex justify-space-between">
+                        <span class="resource-item-id">unmanaged-id-5</span>
                         <span class="resource-item-type text--bold">aws_unmanaged_resource</span>
                     </div>
                     
@@ -346,6 +365,16 @@ h2 {
                         <span class="resource-item-type text--bold">aws_diff_resource</span>
                     </div>
                     
+                    <div class="resource-item resource-item-changed d-flex justify-space-between">
+                        <span class="resource-item-id">diff-id-1</span>
+                        <div>
+                            
+                            <div>- path.to.field: &lt;nil&gt; =&gt; [&#34;value&#34;] </div>
+                            
+                        </div>
+                        <span class="resource-item-type text--bold">aws_diff_resource</span>
+                    </div>
+                    
                 </div>
                 
                 
@@ -358,6 +387,26 @@ h2 {
                     
                     <div class="resource-item resource-item-deleted d-flex justify-space-between">
                         <span class="resource-item-id">deleted-id-2</span>
+                        <span class="resource-item-type text--bold">aws_deleted_resource</span>
+                    </div>
+                    
+                    <div class="resource-item resource-item-deleted d-flex justify-space-between">
+                        <span class="resource-item-id">deleted-id-3</span>
+                        <span class="resource-item-type text--bold">aws_deleted_resource</span>
+                    </div>
+                    
+                    <div class="resource-item resource-item-deleted d-flex justify-space-between">
+                        <span class="resource-item-id">deleted-id-4</span>
+                        <span class="resource-item-type text--bold">aws_deleted_resource</span>
+                    </div>
+                    
+                    <div class="resource-item resource-item-deleted d-flex justify-space-between">
+                        <span class="resource-item-id">deleted-id-5</span>
+                        <span class="resource-item-type text--bold">aws_deleted_resource</span>
+                    </div>
+                    
+                    <div class="resource-item resource-item-deleted d-flex justify-space-between">
+                        <span class="resource-item-id">deleted-id-6</span>
                         <span class="resource-item-type text--bold">aws_deleted_resource</span>
                     </div>
                     
@@ -388,9 +437,10 @@ h2 {
             </div>
         </div>
 
-        <div class="empty-message-container">
+        <div class="empty-message-container mt-5 d-flex justify-center hide">
             <p>There's nothing to see there...</p>
         </div>
+        
     </div>
 </div>
 </body>
@@ -438,6 +488,19 @@ h2 {
         }
     }
 
+    function computeEmptyMessage() {
+        const msgEl = document.querySelector('.empty-message-container')
+        const wrapperEl = document.querySelector('.tabs-wrapper')
+        const count = Array.from(resources).filter(el => !el.classList.contains('hide')).length
+        if (count === 0) {
+            msgEl.classList.remove('hide')
+            wrapperEl.classList.add('hide')
+            return
+        }
+        msgEl.classList.add('hide')
+        wrapperEl.classList.remove('hide')
+    }
+
     function refreshState() {
         const queryFilterInput = document.querySelector('input[name=resource-id-filter]').value
         const typeFilterInput = document.querySelector('select[name=resource-type-filter]').value
@@ -455,6 +518,7 @@ h2 {
         }
 
         refreshCounters()
+        computeEmptyMessage()
     }
 
     function resetFilters() {
