@@ -17,7 +17,6 @@ require (
 	github.com/jarcoal/httpmock v1.0.6
 	github.com/jmespath/go-jmespath v0.3.0
 	github.com/joho/godotenv v1.3.0
-	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mattn/go-isatty v0.0.12
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/go-testing-interface v1.0.4 // indirect
