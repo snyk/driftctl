@@ -15,7 +15,7 @@ import (
 type InternetGatewaySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.EC2Repository
+	repo         repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -29,7 +29,7 @@ func NewInternetGatewaySupplier(provider *AWSTerraformProvider, deserializer *re
 }
 
 func (s *InternetGatewaySupplier) Resources() ([]resource.Resource, error) {
-	internetGateways, err := s.client.ListAllInternetGateways()
+	internetGateways, err := s.repo.ListAllInternetGateways()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsInternetGatewayResourceType)
 	}

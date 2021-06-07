@@ -18,7 +18,7 @@ import (
 type SubnetSupplier struct {
 	reader              terraform.ResourceReader
 	deserializer        *resource.Deserializer
-	client              repository.EC2Repository
+	repo                repository.EC2Repository
 	defaultSubnetRunner *terraform.ParallelResourceReader
 	subnetRunner        *terraform.ParallelResourceReader
 }
@@ -34,7 +34,7 @@ func NewSubnetSupplier(provider *AWSTerraformProvider, deserializer *resource.De
 }
 
 func (s *SubnetSupplier) Resources() ([]resource.Resource, error) {
-	subnets, defaultSubnets, err := s.client.ListAllSubnets()
+	subnets, defaultSubnets, err := s.repo.ListAllSubnets()
 
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsSubnetResourceType)

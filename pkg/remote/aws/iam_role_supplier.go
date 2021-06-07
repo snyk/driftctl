@@ -30,11 +30,11 @@ type IamRoleSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamRoleSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *IamRoleSupplier {
+func NewIamRoleSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.IAMRepository) *IamRoleSupplier {
 	return &IamRoleSupplier{
 		provider,
 		deserializer,
-		repository.NewIAMRepository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

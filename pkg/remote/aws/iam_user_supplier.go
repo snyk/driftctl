@@ -21,11 +21,11 @@ type IamUserSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamUserSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *IamUserSupplier {
+func NewIamUserSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.IAMRepository) *IamUserSupplier {
 	return &IamUserSupplier{
 		provider,
 		deserializer,
-		repository.NewIAMRepository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

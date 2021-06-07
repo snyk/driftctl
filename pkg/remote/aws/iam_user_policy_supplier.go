@@ -19,11 +19,11 @@ type IamUserPolicySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamUserPolicySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *IamUserPolicySupplier {
+func NewIamUserPolicySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.IAMRepository) *IamUserPolicySupplier {
 	return &IamUserPolicySupplier{
 		provider,
 		deserializer,
-		repository.NewIAMRepository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

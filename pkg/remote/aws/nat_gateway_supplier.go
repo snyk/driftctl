@@ -15,7 +15,7 @@ import (
 type NatGatewaySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.EC2Repository
+	repo         repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -29,7 +29,7 @@ func NewNatGatewaySupplier(provider *AWSTerraformProvider, deserializer *resourc
 }
 
 func (s *NatGatewaySupplier) Resources() ([]resource.Resource, error) {
-	retrievedNatGateways, err := s.client.ListAllNatGateways()
+	retrievedNatGateways, err := s.repo.ListAllNatGateways()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsNatGatewayResourceType)
 	}

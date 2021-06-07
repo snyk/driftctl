@@ -24,7 +24,7 @@ const (
 type VPCSecurityGroupRuleSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.EC2Repository
+	repo         repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -76,7 +76,7 @@ func NewVPCSecurityGroupRuleSupplier(provider *AWSTerraformProvider, deserialize
 }
 
 func (s *VPCSecurityGroupRuleSupplier) Resources() ([]resource.Resource, error) {
-	securityGroups, defaultSecurityGroups, err := s.client.ListAllSecurityGroups()
+	securityGroups, defaultSecurityGroups, err := s.repo.ListAllSecurityGroups()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsSecurityGroupRuleResourceType)
 	}

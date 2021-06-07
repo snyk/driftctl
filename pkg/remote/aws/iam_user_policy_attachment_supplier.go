@@ -22,7 +22,7 @@ type IamUserPolicyAttachmentSupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamUserPolicyAttachmentSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *IamUserPolicyAttachmentSupplier {
+func NewIamUserPolicyAttachmentSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.IAMRepository) *IamUserPolicyAttachmentSupplier {
 	return &IamUserPolicyAttachmentSupplier{
 		provider,
 		deserializer,

@@ -16,7 +16,7 @@ import (
 type RouteTableAssociationSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.EC2Repository
+	repo         repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -30,7 +30,7 @@ func NewRouteTableAssociationSupplier(provider *AWSTerraformProvider, deserializ
 }
 
 func (s *RouteTableAssociationSupplier) Resources() ([]resource.Resource, error) {
-	tables, err := s.client.ListAllRouteTables()
+	tables, err := s.repo.ListAllRouteTables()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, aws.AwsRouteTableAssociationResourceType, aws.AwsRouteTableResourceType)
 	}

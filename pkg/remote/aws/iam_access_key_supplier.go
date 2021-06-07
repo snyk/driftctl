@@ -21,11 +21,11 @@ type IamAccessKeySupplier struct {
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamAccessKeySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *IamAccessKeySupplier {
+func NewIamAccessKeySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.IAMRepository) *IamAccessKeySupplier {
 	return &IamAccessKeySupplier{
 		provider,
 		deserializer,
-		repository.NewIAMRepository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

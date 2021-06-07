@@ -18,7 +18,7 @@ import (
 type VPCSupplier struct {
 	reader           terraform.ResourceReader
 	deserializer     *resource.Deserializer
-	client           repository.EC2Repository
+	repo             repository.EC2Repository
 	defaultVPCRunner *terraform.ParallelResourceReader
 	vpcRunner        *terraform.ParallelResourceReader
 }
@@ -34,7 +34,7 @@ func NewVPCSupplier(provider *AWSTerraformProvider, deserializer *resource.Deser
 }
 
 func (s *VPCSupplier) Resources() ([]resource.Resource, error) {
-	VPCs, defaultVPCs, err := s.client.ListAllVPCs()
+	VPCs, defaultVPCs, err := s.repo.ListAllVPCs()
 
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsVpcResourceType)
