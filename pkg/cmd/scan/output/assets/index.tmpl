@@ -16,6 +16,7 @@
         <h2 class="heading-date">{{ .ScanDate }}</h2>
     </div>
     <div class="app-content">
+        {{ if (lt .Coverage 100) }}
         <div class="d-flex justify-center mb-2">
             <form id="filter-form" action="#">
                 <input type="text" name="resource-id-filter" placeholder="Search resources..." onkeyup="refreshState()">
@@ -103,9 +104,14 @@
             </div>
         </div>
 
-        <div class="empty-message-container">
+        <div class="empty-message-container mt-5 d-flex justify-center hide">
             <p>There's nothing to see there...</p>
         </div>
+        {{else}}
+        <div class="d-flex justify-center mt-5 mb-5">
+            <h1>Congrats! Your infrastructure is in sync</h1>
+        </div>
+        {{end}}
     </div>
 </div>
 </body>
@@ -153,6 +159,19 @@
         }
     }
 
+    function computeEmptyMessage() {
+        const msgEl = document.querySelector('.empty-message-container')
+        const wrapperEl = document.querySelector('.tabs-wrapper')
+        const count = Array.from(resources).filter(el => !el.classList.contains('hide')).length
+        if (count === 0) {
+            msgEl.classList.remove('hide')
+            wrapperEl.classList.add('hide')
+            return
+        }
+        msgEl.classList.add('hide')
+        wrapperEl.classList.remove('hide')
+    }
+
     function refreshState() {
         const queryFilterInput = document.querySelector('input[name=resource-id-filter]').value
         const typeFilterInput = document.querySelector('select[name=resource-type-filter]').value
@@ -170,6 +189,7 @@
         }
 
         refreshCounters()
+        computeEmptyMessage()
     }
 
     function resetFilters() {
