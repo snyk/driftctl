@@ -143,7 +143,7 @@ func TestIamRolePolicyAttachmentSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewIamRolePolicyAttachmentSupplier(provider, deserializer))
+			supplierLibrary.AddSupplier(NewIamRolePolicyAttachmentSupplier(provider, deserializer, repository.NewIAMRepository(provider.session)))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {

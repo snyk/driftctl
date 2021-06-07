@@ -546,7 +546,7 @@ func Test_ec2Repository_ListAllInternetGateways(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*ec2.InternetGateway{
 				{
@@ -566,13 +566,24 @@ func Test_ec2Repository_ListAllInternetGateways(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &MockEC2Client{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllInternetGateways()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllInternetGateways()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*ec2.InternetGateway{}, store.Get("ec2ListAllInternetGateways"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -632,7 +643,7 @@ func Test_ec2Repository_ListAllSubnets(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			wantSubnet: []*ec2.Subnet{
 				{
@@ -666,13 +677,26 @@ func Test_ec2Repository_ListAllSubnets(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(2)
 			client := &MockEC2Client{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
+				cache:  store,
 			}
 			gotSubnet, gotDefaultSubnet, err := r.ListAllSubnets()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, cachedDefaultData, err := r.ListAllSubnets()
+				assert.NoError(t, err)
+				assert.Equal(t, gotSubnet, cachedData)
+				assert.Equal(t, gotDefaultSubnet, cachedDefaultData)
+				assert.IsType(t, []*ec2.Subnet{}, store.Get("ec2ListAllSubnets"))
+				assert.IsType(t, []*ec2.Subnet{}, store.Get("ec2ListAllDefaultSubnets"))
+			}
+
 			changelog, err := diff.Diff(gotSubnet, tt.wantSubnet)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -727,7 +751,7 @@ func Test_ec2Repository_ListAllNatGateways(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*ec2.NatGateway{
 				{
@@ -747,13 +771,24 @@ func Test_ec2Repository_ListAllNatGateways(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &MockEC2Client{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllNatGateways()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllNatGateways()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*ec2.NatGateway{}, store.Get("ec2ListAllNatGateways"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -854,7 +889,7 @@ func Test_ec2Repository_ListAllRouteTables(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*ec2.RouteTable{
 				{
@@ -928,13 +963,24 @@ func Test_ec2Repository_ListAllRouteTables(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &MockEC2Client{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllRouteTables()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllRouteTables()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*ec2.RouteTable{}, store.Get("ec2ListAllRouteTables"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -985,7 +1031,7 @@ func Test_ec2Repository_ListAllVPCs(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			wantVPC: []*ec2.Vpc{
 				{
@@ -1010,13 +1056,26 @@ func Test_ec2Repository_ListAllVPCs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(2)
 			client := &MockEC2Client{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
+				cache:  store,
 			}
 			gotVPCs, gotDefaultVPCs, err := r.ListAllVPCs()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, cachedDefaultData, err := r.ListAllVPCs()
+				assert.NoError(t, err)
+				assert.Equal(t, gotVPCs, cachedData)
+				assert.Equal(t, gotDefaultVPCs, cachedDefaultData)
+				assert.IsType(t, []*ec2.Vpc{}, store.Get("ec2ListAllVPCs"))
+				assert.IsType(t, []*ec2.Vpc{}, store.Get("ec2ListAllDefaultVPCs"))
+			}
+
 			changelog, err := diff.Diff(gotVPCs, tt.wantVPC)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -1064,7 +1123,7 @@ func Test_ec2Repository_ListAllSecurityGroups(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			wantSecurityGroup: []*ec2.SecurityGroup{
 				{
@@ -1082,13 +1141,26 @@ func Test_ec2Repository_ListAllSecurityGroups(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(2)
 			client := &MockEC2Client{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
+				cache:  store,
 			}
 			gotSecurityGroups, gotDefaultSecurityGroups, err := r.ListAllSecurityGroups()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, cachedDefaultData, err := r.ListAllSecurityGroups()
+				assert.NoError(t, err)
+				assert.Equal(t, gotSecurityGroups, cachedData)
+				assert.Equal(t, gotDefaultSecurityGroups, cachedDefaultData)
+				assert.IsType(t, []*ec2.SecurityGroup{}, store.Get("ec2ListAllSecurityGroups"))
+				assert.IsType(t, []*ec2.SecurityGroup{}, store.Get("ec2ListAllDefaultSecurityGroups"))
+			}
+
 			changelog, err := diff.Diff(gotSecurityGroups, tt.wantSecurityGroup)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {

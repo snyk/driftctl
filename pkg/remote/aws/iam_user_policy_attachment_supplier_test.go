@@ -184,7 +184,7 @@ func TestIamUserPolicyAttachmentSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewIamUserPolicyAttachmentSupplier(provider, deserializer))
+			supplierLibrary.AddSupplier(NewIamUserPolicyAttachmentSupplier(provider, deserializer, repository.NewIAMRepository(provider.session)))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {

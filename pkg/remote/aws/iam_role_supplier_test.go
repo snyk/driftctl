@@ -106,7 +106,7 @@ func TestIamRoleSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewIamRoleSupplier(provider, deserializer))
+			supplierLibrary.AddSupplier(NewIamRoleSupplier(provider, deserializer, repository.NewIAMRepository(provider.session)))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
