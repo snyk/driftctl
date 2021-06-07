@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	"os"
-	"sort"
 	"strings"
 	"time"
 
@@ -26,23 +25,22 @@ type HTML struct {
 	path string
 }
 
+type HTMLTemplateParams struct {
+	ScanDate    string
+	Coverage    int
+	Summary     analyser.Summary
+	Unmanaged   []resource.Resource
+	Differences []analyser.Difference
+	Deleted     []resource.Resource
+	Alerts      alerter.Alerts
+	Stylesheet  template.CSS
+}
+
 func NewHTML(path string) *HTML {
 	return &HTML{path}
 }
 
 func (c *HTML) Write(analysis *analyser.Analysis) error {
-	type TemplateParams struct {
-		ScanDate    string
-		Coverage    int
-		Summary     analyser.Summary
-		Managed     []resource.Resource
-		Unmanaged   []resource.Resource
-		Differences []analyser.Difference
-		Deleted     []resource.Resource
-		Alerts      alerter.Alerts
-		Stylesheet  template.CSS
-	}
-
 	file := os.Stdout
 	if !isStdOut(c.path) {
 		f, err := os.OpenFile(c.path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
@@ -65,33 +63,15 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 
 	funcMap := template.FuncMap{
 		"getResourceTypes": func() []string {
-			resources := []resource.Resource{}
-			list := []string{}
-
+			resources := make([]resource.Resource, 0)
 			resources = append(resources, analysis.Unmanaged()...)
-			resources = append(resources, analysis.Managed()...)
 			resources = append(resources, analysis.Deleted()...)
 
-			for _, res := range resources {
-				if i := sort.SearchStrings(list, res.TerraformType()); i <= len(list)-1 {
-					continue
-				}
-				list = append(list, res.TerraformType())
-			}
 			for _, d := range analysis.Differences() {
-				if i := sort.SearchStrings(list, d.Res.TerraformType()); i <= len(list)-1 {
-					continue
-				}
-				list = append(list, d.Res.TerraformType())
-			}
-			for kind := range analysis.Alerts() {
-				if i := sort.SearchStrings(list, kind); i <= len(list)-1 {
-					continue
-				}
-				list = append(list, kind)
+				resources = append(resources, d.Res)
 			}
 
-			return list
+			return distinctResourceTypes(resources)
 		},
 		"formatChange": func(ch analyser.Change) string {
 			prefix := ""
@@ -119,11 +99,10 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 		return err
 	}
 
-	data := &TemplateParams{
+	data := &HTMLTemplateParams{
 		ScanDate:    time.Now().Format("Jan 02, 2006"),
 		Summary:     analysis.Summary(),
 		Coverage:    analysis.Coverage(),
-		Managed:     analysis.Managed(),
 		Unmanaged:   analysis.Unmanaged(),
 		Differences: analysis.Differences(),
 		Deleted:     analysis.Deleted(),
@@ -137,4 +116,23 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 	}
 
 	return nil
+}
+
+func distinctResourceTypes(resources []resource.Resource) []string {
+	types := make([]string, 0)
+
+	for _, res := range resources {
+		found := false
+		for _, v := range types {
+			if v == res.TerraformType() {
+				found = true
+				break
+			}
+		}
+		if !found {
+			types = append(types, res.TerraformType())
+		}
+	}
+
+	return types
 }

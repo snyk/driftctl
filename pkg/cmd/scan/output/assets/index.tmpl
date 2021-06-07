@@ -22,17 +22,6 @@
         </select>
     </form>
 
-    {{ if (gt (len .Managed) 0) }}
-    <h2>Managed resources <span class="resource-count-managed">({{len .Managed}})</span></h2>
-
-    {{range $res := .Managed}}
-    <div class="resource-item resource-item-managed">
-        <span class="resource-item-id">{{$res.TerraformId}}</span>
-        <span class="resource-item-type">{{$res.TerraformType}}</span>
-    </div>
-    {{end}}
-    {{end}}
-
     {{ if (gt (len .Unmanaged) 0) }}
     <h2>Unmanaged resources <span class="resource-count-unmanaged">({{len .Unmanaged}})</span></h2>
 
@@ -116,7 +105,6 @@
 
     function refreshCounters() {
         const counterClassMapping = {
-            '.resource-item-managed': '.resource-count-managed',
             '.resource-item-unmanaged': '.resource-count-unmanaged',
             '.resource-item-changed': '.resource-count-changed',
             '.resource-item-deleted': '.resource-count-deleted',
