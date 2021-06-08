@@ -20,20 +20,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
-type pendingTopicAlert struct {
-	endpoint *string
-}
-
-func (p *pendingTopicAlert) Message() string {
-	return fmt.Sprintf("%s with pending confirmation status for endpoint \"%s\" will be ignored",
-		aws.AwsSnsTopicSubscriptionResourceType,
-		awssdk.StringValue(p.endpoint))
-}
-
-func (p *pendingTopicAlert) ShouldIgnoreResource() bool {
-	return false
-}
-
 type wrongArnTopicAlert struct {
 	arn      string
 	endpoint *string
@@ -90,21 +76,11 @@ func (s *SNSTopicSubscriptionSupplier) Resources() ([]resource.Resource, error) 
 
 func (s *SNSTopicSubscriptionSupplier) readTopicSubscription(subscription *sns.Subscription, alertr alerter.AlerterInterface) (cty.Value, error) {
 	if subscription.SubscriptionArn != nil && !arn.IsARN(*subscription.SubscriptionArn) {
-		switch *subscription.SubscriptionArn {
-		case "PendingConfirmation":
-			alertr.SendAlert(
-				fmt.Sprintf("%s.%s", aws.AwsSnsTopicSubscriptionResourceType, *subscription.SubscriptionArn),
-				&pendingTopicAlert{subscription.Endpoint},
-			)
-			return cty.NilVal, nil
-		default:
-			alertr.SendAlert(
-				fmt.Sprintf("%s.%s", aws.AwsSnsTopicSubscriptionResourceType, *subscription.SubscriptionArn),
-				&wrongArnTopicAlert{*subscription.SubscriptionArn, subscription.Endpoint},
-			)
-			return cty.NilVal, nil
-
-		}
+		alertr.SendAlert(
+			fmt.Sprintf("%s.%s", aws.AwsSnsTopicSubscriptionResourceType, *subscription.SubscriptionArn),
+			&wrongArnTopicAlert{*subscription.SubscriptionArn, subscription.Endpoint},
+		)
+		return cty.NilVal, nil
 	}
 
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
