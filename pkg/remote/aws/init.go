@@ -47,7 +47,7 @@ func Init(version string, alerter *alerter.Alerter,
 	cloudfrontRepository := repository.NewCloudfrontClient(provider.session)
 	kmsRepository := repository.NewKMSRepository(provider.session)
 	ecrRepository := repository.NewECRRepository(provider.session)
-	iamRepository := repository.NewIAMRepository(provider.session)
+	iamRepository := repository.NewIAMRepository(provider.session, repositoryCache)
 
 	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.AWS, provider)
