@@ -71,7 +71,7 @@ func TestSNSTopicSubscriptionSupplier_Resources(t *testing.T) {
 			},
 			alerts: map[string][]alerter.Alert{
 				"aws_sns_topic_subscription.PendingConfirmation": []alerter.Alert{
-					&pendingTopicAlert{aws.String("TEST")},
+					&wrongArnTopicAlert{"PendingConfirmation", aws.String("TEST")},
 				},
 				"aws_sns_topic_subscription.Incorrect": []alerter.Alert{
 					&wrongArnTopicAlert{"Incorrect", aws.String("INCORRECT")},
