@@ -317,19 +317,19 @@ h2 {
     <div class="heading d-flex justify-space-between align-center">
         <div>
             <h1 class="heading-title mb-1">Driftctl scan report</h1>
-            <span class="heading-subtitle">Coverage 15%</span>
+            <span class="heading-subtitle">Coverage 0%</span>
         </div>
         <div class="text--right">
             <h2 class="heading-date mb-1">Jun 08, 2021</h2>
-            <span class="heading-subtitle">Scan duration 1m31s</span>
+            <span class="heading-subtitle">Scan duration 0s</span>
         </div>
     </div>
     <div class="card d-flex justify-space-around mb-2 text--grey">
-        <span>Total resources: 13</span>
-        <span>Managed: 15%</span>
-        <span>Changed: 2/2</span>
-        <span>Unmanaged: 38%</span>
-        <span>Missing: 46%</span>
+        <span>Total resources: 0</span>
+        <span>Managed: 0%</span>
+        <span>Changed: 0/0</span>
+        <span>Unmanaged: 0%</span>
+        <span>Missing: 0%</span>
     </div>
     <div class="app-content">
         
@@ -338,12 +338,6 @@ h2 {
                 <input type="text" name="resource-id-filter" placeholder="Search resources..." onkeyup="refreshState()">
                 <select name="resource-type-filter" onchange="refreshState()">
                     <option value="">Resource type</option>
-                    
-                    <option value="aws_unmanaged_resource">aws_unmanaged_resource</option>
-                    
-                    <option value="aws_deleted_resource">aws_deleted_resource</option>
-                    
-                    <option value="aws_diff_resource">aws_diff_resource</option>
                     
                 </select>
                 <button type="button" onclick="resetFilters()" class="reset-filter-btn">Reset filters</button>
@@ -357,150 +351,14 @@ h2 {
             <input class="radio" id="four" name="group" type="radio">
             <div class="tabs">
                 
-                <label class="tab" id="one-tab" for="one">Unmanaged resources (<span
-                        class="resource-count-unmanaged">5</span>)</label>
                 
                 
-                <label class="tab" id="two-tab" for="two">Changed resources (<span
-                        class="resource-count-changed">2</span>)</label>
-                
-                
-                <label class="tab" id="three-tab" for="three">Missing resources (<span
-                        class="resource-count-deleted">6</span>)</label>
-                
-                
-                <label class="tab" id="four-tab" for="four">Alerts (<span
-                        class="resource-count-alerts">1</span>)</label>
                 
             </div>
             <div class="panels">
                 
-                <div class="panel" id="one-panel">
-                    <div class="d-flex justify-space-between text--grey pa-1">
-                        <span>Resource id</span>
-                        <span>Resource type</span>
-                    </div>
-                    
-                    <div class="resource-item resource-item-unmanaged d-flex justify-space-between">
-                        <span class="resource-item-id">unmanaged-id-1</span>
-                        <span class="resource-item-type">aws_unmanaged_resource</span>
-                    </div>
-                    
-                    <div class="resource-item resource-item-unmanaged d-flex justify-space-between">
-                        <span class="resource-item-id">unmanaged-id-2</span>
-                        <span class="resource-item-type">aws_unmanaged_resource</span>
-                    </div>
-                    
-                    <div class="resource-item resource-item-unmanaged d-flex justify-space-between">
-                        <span class="resource-item-id">unmanaged-id-3</span>
-                        <span class="resource-item-type">aws_unmanaged_resource</span>
-                    </div>
-                    
-                    <div class="resource-item resource-item-unmanaged d-flex justify-space-between">
-                        <span class="resource-item-id">unmanaged-id-4</span>
-                        <span class="resource-item-type">aws_unmanaged_resource</span>
-                    </div>
-                    
-                    <div class="resource-item resource-item-unmanaged d-flex justify-space-between">
-                        <span class="resource-item-id">unmanaged-id-5</span>
-                        <span class="resource-item-type">aws_unmanaged_resource</span>
-                    </div>
-                    
-                </div>
                 
                 
-                <div class="panel" id="two-panel">
-                    <div class="d-flex justify-space-between text--grey pa-1">
-                        <span>Resource id</span>
-                        <span>Resource type</span>
-                    </div>
-                    
-                    <div class="resource-item resource-item-changed d-flex justify-space-between">
-                        <span class="resource-item-id">diff-id-1</span>
-                        <div>
-                            
-                            <div>~ updated.field: &#34;foobar&#34; =&gt; &#34;barfoo&#34; </div>
-                            
-                            <div>&#43; new.field: &lt;nil&gt; =&gt; &#34;newValue&#34; </div>
-                            
-                            <div>- a: &#34;oldValue&#34; =&gt; &lt;nil&gt; </div>
-                            
-                        </div>
-                        <span class="resource-item-type">aws_diff_resource</span>
-                    </div>
-                    
-                    <div class="resource-item resource-item-changed d-flex justify-space-between">
-                        <span class="resource-item-id">diff-id-1</span>
-                        <div>
-                            
-                            <div>- path.to.field: &lt;nil&gt; =&gt; [&#34;value&#34;] </div>
-                            
-                        </div>
-                        <span class="resource-item-type">aws_diff_resource</span>
-                    </div>
-                    
-                </div>
-                
-                
-                <div class="panel" id="three-panel">
-                    <div class="d-flex justify-space-between text--grey pa-1">
-                        <span>Resource id</span>
-                        <span>Resource type</span>
-                    </div>
-                    
-                    <div class="resource-item resource-item-deleted d-flex justify-space-between">
-                        <span class="resource-item-id">deleted-id-1</span>
-                        <span class="resource-item-type">aws_deleted_resource</span>
-                    </div>
-                    
-                    <div class="resource-item resource-item-deleted d-flex justify-space-between">
-                        <span class="resource-item-id">deleted-id-2</span>
-                        <span class="resource-item-type">aws_deleted_resource</span>
-                    </div>
-                    
-                    <div class="resource-item resource-item-deleted d-flex justify-space-between">
-                        <span class="resource-item-id">deleted-id-3</span>
-                        <span class="resource-item-type">aws_deleted_resource</span>
-                    </div>
-                    
-                    <div class="resource-item resource-item-deleted d-flex justify-space-between">
-                        <span class="resource-item-id">deleted-id-4</span>
-                        <span class="resource-item-type">aws_deleted_resource</span>
-                    </div>
-                    
-                    <div class="resource-item resource-item-deleted d-flex justify-space-between">
-                        <span class="resource-item-id">deleted-id-5</span>
-                        <span class="resource-item-type">aws_deleted_resource</span>
-                    </div>
-                    
-                    <div class="resource-item resource-item-deleted d-flex justify-space-between">
-                        <span class="resource-item-id">deleted-id-6</span>
-                        <span class="resource-item-type">aws_deleted_resource</span>
-                    </div>
-                    
-                </div>
-                
-                
-                <div class="panel" id="four-panel">
-                    
-                    
-                    <div class="resource-item resource-item-alerts">
-                        <span class="resource-item-type"></span>
-                        <span>Ignoring aws_vpc from drift calculation: Listing aws_vpc is forbidden.</span>
-                    </div>
-                    
-                    <div class="resource-item resource-item-alerts">
-                        <span class="resource-item-type"></span>
-                        <span>Ignoring aws_sqs from drift calculation: Listing aws_sqs is forbidden.</span>
-                    </div>
-                    
-                    <div class="resource-item resource-item-alerts">
-                        <span class="resource-item-type"></span>
-                        <span>Ignoring aws_sns from drift calculation: Listing aws_sns is forbidden.</span>
-                    </div>
-                    
-                    
-                </div>
                 
             </div>
         </div>
