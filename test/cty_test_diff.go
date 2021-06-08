@@ -56,7 +56,7 @@ func doTestDiff(got []resource.Resource, dirName string, provider terraform.Terr
 		if err != nil {
 			panic(err)
 		}
-		decodedResources, err := deserializer.Deserialize(ty, decodedJson.AsValueSlice())
+		decodedResources, err := deserializer.Deserialize(resource.ResourceType(ty), decodedJson.AsValueSlice())
 		if err != nil {
 			panic(err)
 		}

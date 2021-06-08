@@ -15,7 +15,7 @@ func NewDeserializer(factory ResourceFactory) *Deserializer {
 	return &Deserializer{factory}
 }
 
-func (s *Deserializer) Deserialize(ty string, rawList []cty.Value) ([]Resource, error) {
+func (s *Deserializer) Deserialize(ty ResourceType, rawList []cty.Value) ([]Resource, error) {
 	resources := make([]Resource, 0)
 	for _, rawResource := range rawList {
 		rawResource := rawResource
@@ -27,7 +27,7 @@ func (s *Deserializer) Deserialize(ty string, rawList []cty.Value) ([]Resource, 
 			return nil, err
 		}
 
-		res := s.factory.CreateAbstractResource(ty, rawResource.GetAttr("id").AsString(), attrs)
+		res := s.factory.CreateAbstractResource(ty.String(), rawResource.GetAttr("id").AsString(), attrs)
 		resources = append(resources, res)
 	}
 	return resources, nil

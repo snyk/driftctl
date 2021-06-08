@@ -31,12 +31,16 @@ func NewDBSubnetGroupSupplier(provider *AWSTerraformProvider, deserializer *reso
 	}
 }
 
+func (s *DBSubnetGroupSupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsDbSubnetGroupResourceType
+}
+
 func (s *DBSubnetGroupSupplier) Resources() ([]resource.Resource, error) {
 
 	subnetGroups, err := s.client.ListAllDbSubnetGroups()
 
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsDbSubnetGroupResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, subnetGroup := range subnetGroups {
@@ -49,13 +53,13 @@ func (s *DBSubnetGroupSupplier) Resources() ([]resource.Resource, error) {
 	if err != nil {
 		return nil, err
 	}
-	return s.deserializer.Deserialize(aws.AwsDbSubnetGroupResourceType, ctyValues)
+	return s.deserializer.Deserialize(s.SuppliedType(), ctyValues)
 }
 
 func (s *DBSubnetGroupSupplier) readSubnetGroup(subnetGroup rds.DBSubnetGroup) (cty.Value, error) {
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *subnetGroup.DBSubnetGroupName,
-		Ty: aws.AwsDbSubnetGroupResourceType,
+		Ty: s.SuppliedType(),
 	})
 	if err != nil {
 		logrus.Error(err)

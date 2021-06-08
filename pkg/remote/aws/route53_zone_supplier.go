@@ -33,11 +33,15 @@ func NewRoute53ZoneSupplier(provider *AWSTerraformProvider, deserializer *resour
 	}
 }
 
+func (s *Route53ZoneSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsRoute53ZoneResourceType
+}
+
 func (s *Route53ZoneSupplier) Resources() ([]resource.Resource, error) {
 
 	zones, err := s.client.ListAllZones()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsRoute53ZoneResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, hostedZone := range zones {
@@ -51,18 +55,18 @@ func (s *Route53ZoneSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(resourceaws.AwsRoute53ZoneResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *Route53ZoneSupplier) readZone(hostedZone route53.HostedZone) (cty.Value, error) {
 	name := *hostedZone.Name
 
 	zone, err := s.reader.ReadResource(terraform.ReadResourceArgs{
-		Ty: resourceaws.AwsRoute53ZoneResourceType,
+		Ty: s.SuppliedType(),
 		ID: cleanZoneID(*hostedZone.Id),
 	})
 	if err != nil {
-		logrus.Warnf("Error reading %s[%s]: %+v", name, resourceaws.AwsRoute53ZoneResourceType, err)
+		logrus.Warnf("Error reading %s[%s]: %+v", name, s.SuppliedType(), err)
 		return cty.NilVal, err
 	}
 

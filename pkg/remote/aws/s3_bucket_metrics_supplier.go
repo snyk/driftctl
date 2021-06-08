@@ -32,10 +32,14 @@ func NewS3BucketMetricSupplier(provider *AWSTerraformProvider, repository reposi
 	}
 }
 
+func (s *S3BucketMetricSupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsS3BucketMetricResourceType
+}
+
 func (s *S3BucketMetricSupplier) Resources() ([]resource.Resource, error) {
 	buckets, err := s.repository.ListAllBuckets()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, aws.AwsS3BucketMetricResourceType, aws.AwsS3BucketResourceType)
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, s.SuppliedType(), aws.AwsS3BucketResourceType)
 	}
 
 	for _, bucket := range buckets {
@@ -48,7 +52,7 @@ func (s *S3BucketMetricSupplier) Resources() ([]resource.Resource, error) {
 			continue
 		}
 		if err := s.listBucketMetricConfiguration(&bucket, region); err != nil {
-			return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsS3BucketMetricResourceType)
+			return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 		}
 	}
 	ctyVals, err := s.runner.Wait()
@@ -56,7 +60,7 @@ func (s *S3BucketMetricSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(aws.AwsS3BucketMetricResourceType, ctyVals)
+	return s.deserializer.Deserialize(s.SuppliedType(), ctyVals)
 }
 
 func (s *S3BucketMetricSupplier) listBucketMetricConfiguration(bucket *s3.Bucket, region string) error {
@@ -71,7 +75,7 @@ func (s *S3BucketMetricSupplier) listBucketMetricConfiguration(bucket *s3.Bucket
 		s.runner.Run(func() (cty.Value, error) {
 			s3BucketMetric, err := s.reader.ReadResource(
 				terraform.ReadResourceArgs{
-					Ty: aws.AwsS3BucketMetricResourceType,
+					Ty: s.SuppliedType(),
 					ID: id,
 					Attributes: map[string]string{
 						"alias": region,

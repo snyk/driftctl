@@ -30,10 +30,14 @@ func NewIamUserSupplier(provider *AWSTerraformProvider, deserializer *resource.D
 	}
 }
 
+func (s *IamUserSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsIamUserResourceType
+}
+
 func (s *IamUserSupplier) Resources() ([]resource.Resource, error) {
 	users, err := s.repo.ListAllUsers()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamUserResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 	results := make([]cty.Value, 0)
 	if len(users) > 0 {
@@ -48,18 +52,18 @@ func (s *IamUserSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(resourceaws.AwsIamUserResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *IamUserSupplier) readUser(user *iam.User) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
-			Ty: resourceaws.AwsIamUserResourceType,
+			Ty: s.SuppliedType(),
 			ID: *user.UserName,
 		},
 	)
 	if err != nil {
-		logrus.Warnf("Error reading iam user %s[%s]: %+v", *user.UserName, resourceaws.AwsIamUserResourceType, err)
+		logrus.Warnf("Error reading iam user %s[%s]: %+v", *user.UserName, s.SuppliedType(), err)
 		return cty.NilVal, err
 	}
 

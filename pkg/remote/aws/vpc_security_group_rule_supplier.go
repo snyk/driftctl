@@ -75,10 +75,14 @@ func NewVPCSecurityGroupRuleSupplier(provider *AWSTerraformProvider, deserialize
 	}
 }
 
+func (s *VPCSecurityGroupRuleSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsSecurityGroupRuleResourceType
+}
+
 func (s *VPCSecurityGroupRuleSupplier) Resources() ([]resource.Resource, error) {
 	securityGroups, defaultSecurityGroups, err := s.repo.ListAllSecurityGroups()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsSecurityGroupRuleResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 	secGroups := make([]*ec2.SecurityGroup, 0, len(securityGroups)+len(defaultSecurityGroups))
 	secGroups = append(secGroups, securityGroups...)
@@ -97,14 +101,14 @@ func (s *VPCSecurityGroupRuleSupplier) Resources() ([]resource.Resource, error) 
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(resourceaws.AwsSecurityGroupRuleResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *VPCSecurityGroupRuleSupplier) readSecurityGroupRule(rule securityGroupRule) (cty.Value, error) {
 	id := rule.getId()
 
 	resSgRule, err := s.reader.ReadResource(terraform.ReadResourceArgs{
-		Ty: resourceaws.AwsSecurityGroupRuleResourceType,
+		Ty: s.SuppliedType(),
 		ID: id,
 		Attributes: flatmap.Flatten(map[string]interface{}{
 			"type":                     rule.Type,

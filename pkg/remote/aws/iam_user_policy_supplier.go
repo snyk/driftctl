@@ -28,14 +28,18 @@ func NewIamUserPolicySupplier(provider *AWSTerraformProvider, deserializer *reso
 	}
 }
 
+func (s *IamUserPolicySupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsIamUserPolicyResourceType
+}
+
 func (s *IamUserPolicySupplier) Resources() ([]resource.Resource, error) {
 	users, err := s.repo.ListAllUsers()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, resourceaws.AwsIamUserPolicyResourceType, resourceaws.AwsIamUserResourceType)
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, s.SuppliedType(), resourceaws.AwsIamUserResourceType)
 	}
 	policies, err := s.repo.ListAllUserPolicies(users)
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamUserPolicyResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 	results := make([]cty.Value, 0)
 	if len(policies) > 0 {
@@ -50,13 +54,13 @@ func (s *IamUserPolicySupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(resourceaws.AwsIamUserPolicyResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *IamUserPolicySupplier) readUserPolicy(policyName string) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
-			Ty: resourceaws.AwsIamUserPolicyResourceType,
+			Ty: s.SuppliedType(),
 			ID: policyName,
 		},
 	)

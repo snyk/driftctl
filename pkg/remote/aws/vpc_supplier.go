@@ -33,11 +33,15 @@ func NewVPCSupplier(provider *AWSTerraformProvider, deserializer *resource.Deser
 	}
 }
 
+func (s *VPCSupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsVpcResourceType
+}
+
 func (s *VPCSupplier) Resources() ([]resource.Resource, error) {
 	VPCs, defaultVPCs, err := s.repo.ListAllVPCs()
 
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsVpcResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, item := range VPCs {
@@ -70,7 +74,7 @@ func (s *VPCSupplier) Resources() ([]resource.Resource, error) {
 	if err != nil {
 		return nil, err
 	}
-	deserializedVPCs, err := s.deserializer.Deserialize(aws.AwsVpcResourceType, VPCResources)
+	deserializedVPCs, err := s.deserializer.Deserialize(s.SuppliedType(), VPCResources)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +87,7 @@ func (s *VPCSupplier) Resources() ([]resource.Resource, error) {
 }
 
 func (s *VPCSupplier) readVPC(vpc ec2.Vpc) (cty.Value, error) {
-	var Ty resource.ResourceType = aws.AwsVpcResourceType
+	var Ty resource.ResourceType = s.SuppliedType()
 	if vpc.IsDefault != nil && *vpc.IsDefault {
 		Ty = aws.AwsDefaultVpcResourceType
 	}

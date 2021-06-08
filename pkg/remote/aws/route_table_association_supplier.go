@@ -29,10 +29,14 @@ func NewRouteTableAssociationSupplier(provider *AWSTerraformProvider, deserializ
 	}
 }
 
+func (s *RouteTableAssociationSupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsRouteTableAssociationResourceType
+}
+
 func (s *RouteTableAssociationSupplier) Resources() ([]resource.Resource, error) {
 	tables, err := s.repo.ListAllRouteTables()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, aws.AwsRouteTableAssociationResourceType, aws.AwsRouteTableResourceType)
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, s.SuppliedType(), aws.AwsRouteTableResourceType)
 	}
 
 	for _, t := range tables {
@@ -55,7 +59,7 @@ func (s *RouteTableAssociationSupplier) Resources() ([]resource.Resource, error)
 	}
 
 	// Deserialize
-	deserializedRouteTableAssociations, err := s.deserializer.Deserialize(aws.AwsRouteTableAssociationResourceType, routeTableAssociationResources)
+	deserializedRouteTableAssociations, err := s.deserializer.Deserialize(s.SuppliedType(), routeTableAssociationResources)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +68,7 @@ func (s *RouteTableAssociationSupplier) Resources() ([]resource.Resource, error)
 }
 
 func (s *RouteTableAssociationSupplier) readRouteTableAssociation(assoc ec2.RouteTableAssociation) (cty.Value, error) {
-	var Ty resource.ResourceType = aws.AwsRouteTableAssociationResourceType
+	var Ty resource.ResourceType = s.SuppliedType()
 	attributes := map[string]interface{}{
 		"route_table_id": *assoc.RouteTableId,
 	}

@@ -29,10 +29,14 @@ func NewRouteSupplier(provider *AWSTerraformProvider, deserializer *resource.Des
 	}
 }
 
+func (s *RouteSupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsRouteResourceType
+}
+
 func (s *RouteSupplier) Resources() ([]resource.Resource, error) {
 	routeTables, err := s.repo.ListAllRouteTables()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, aws.AwsRouteResourceType, aws.AwsRouteTableResourceType)
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, s.SuppliedType(), aws.AwsRouteTableResourceType)
 	}
 
 	for _, routeTable := range routeTables {
@@ -50,7 +54,7 @@ func (s *RouteSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	deserializedRoutes, err := s.deserializer.Deserialize(aws.AwsRouteResourceType, routeResources)
+	deserializedRoutes, err := s.deserializer.Deserialize(s.SuppliedType(), routeResources)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +63,7 @@ func (s *RouteSupplier) Resources() ([]resource.Resource, error) {
 }
 
 func (s *RouteSupplier) readRoute(tableId string, route ec2.Route) (cty.Value, error) {
-	var Ty resource.ResourceType = aws.AwsRouteResourceType
+	var Ty resource.ResourceType = s.SuppliedType()
 
 	attributes := map[string]interface{}{
 		"route_table_id": tableId,

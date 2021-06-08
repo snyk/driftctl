@@ -32,10 +32,14 @@ func NewS3BucketInventorySupplier(provider *AWSTerraformProvider, repository rep
 	}
 }
 
+func (s *S3BucketInventorySupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsS3BucketInventoryResourceType
+}
+
 func (s *S3BucketInventorySupplier) Resources() ([]resource.Resource, error) {
 	buckets, err := s.repository.ListAllBuckets()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, aws.AwsS3BucketInventoryResourceType, aws.AwsS3BucketResourceType)
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, s.SuppliedType(), aws.AwsS3BucketResourceType)
 	}
 
 	for _, bucket := range buckets {
@@ -48,7 +52,7 @@ func (s *S3BucketInventorySupplier) Resources() ([]resource.Resource, error) {
 			continue
 		}
 		if err := s.listBucketInventoryConfiguration(&bucket, region); err != nil {
-			return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsS3BucketInventoryResourceType)
+			return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 		}
 	}
 	ctyVals, err := s.runner.Wait()
@@ -56,7 +60,7 @@ func (s *S3BucketInventorySupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(aws.AwsS3BucketInventoryResourceType, ctyVals)
+	return s.deserializer.Deserialize(s.SuppliedType(), ctyVals)
 }
 
 func (s *S3BucketInventorySupplier) listBucketInventoryConfiguration(bucket *s3.Bucket, region string) error {
@@ -69,7 +73,7 @@ func (s *S3BucketInventorySupplier) listBucketInventoryConfiguration(bucket *s3.
 		s.runner.Run(func() (cty.Value, error) {
 			s3BucketInventory, err := s.reader.ReadResource(
 				terraform.ReadResourceArgs{
-					Ty: aws.AwsS3BucketInventoryResourceType,
+					Ty: s.SuppliedType(),
 					ID: id,
 					Attributes: map[string]string{
 						"alias": region,

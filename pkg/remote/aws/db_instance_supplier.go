@@ -27,23 +27,27 @@ func NewDBInstanceSupplier(provider *AWSTerraformProvider, deserializer *resourc
 	}
 }
 
+func (s *DBInstanceSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsDbInstanceResourceType
+}
+
 func (s *DBInstanceSupplier) Resources() ([]resource.Resource, error) {
 
 	resourceList, err := s.client.ListAllDBInstances()
 
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsDbInstanceResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, res := range resourceList {
 		id := *res.DBInstanceIdentifier
 		s.runner.Run(func() (cty.Value, error) {
 			completeResource, err := s.reader.ReadResource(terraform.ReadResourceArgs{
-				Ty: resourceaws.AwsDbInstanceResourceType,
+				Ty: s.SuppliedType(),
 				ID: id,
 			})
 			if err != nil {
-				logrus.Warnf("Error reading %s[%s]: %+v", id, resourceaws.AwsDbInstanceResourceType, err)
+				logrus.Warnf("Error reading %s[%s]: %+v", id, s.SuppliedType(), err)
 				return cty.NilVal, err
 			}
 			return *completeResource, nil
@@ -55,5 +59,5 @@ func (s *DBInstanceSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(resourceaws.AwsDbInstanceResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }

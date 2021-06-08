@@ -31,10 +31,14 @@ func NewEC2EbsVolumeSupplier(provider *AWSTerraformProvider, deserializer *resou
 	}
 }
 
+func (s *EC2EbsVolumeSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsEbsVolumeResourceType
+}
+
 func (s *EC2EbsVolumeSupplier) Resources() ([]resource.Resource, error) {
 	volumes, err := s.client.ListAllVolumes()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEbsVolumeResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 	results := make([]cty.Value, 0)
 	if len(volumes) > 0 {
@@ -49,17 +53,17 @@ func (s *EC2EbsVolumeSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(resourceaws.AwsEbsVolumeResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *EC2EbsVolumeSupplier) readEbsVolume(volume ec2.Volume) (cty.Value, error) {
 	id := aws.StringValue(volume.VolumeId)
 	resVolume, err := s.reader.ReadResource(terraform.ReadResourceArgs{
-		Ty: resourceaws.AwsEbsVolumeResourceType,
+		Ty: s.SuppliedType(),
 		ID: id,
 	})
 	if err != nil {
-		logrus.Warnf("Error reading volume %s[%s]: %+v", id, resourceaws.AwsEbsVolumeResourceType, err)
+		logrus.Warnf("Error reading volume %s[%s]: %+v", id, s.SuppliedType(), err)
 		return cty.NilVal, err
 	}
 	return *resVolume, nil

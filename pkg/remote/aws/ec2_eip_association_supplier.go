@@ -28,10 +28,14 @@ func NewEC2EipAssociationSupplier(provider *AWSTerraformProvider, deserializer *
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner())}
 }
 
+func (s *EC2EipAssociationSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsEipAssociationResourceType
+}
+
 func (s *EC2EipAssociationSupplier) Resources() ([]resource.Resource, error) {
 	associationIds, err := s.client.ListAllAddressesAssociation()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEipAssociationResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 	results := make([]cty.Value, 0)
 	if len(associationIds) > 0 {
@@ -46,16 +50,16 @@ func (s *EC2EipAssociationSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(resourceaws.AwsEipAssociationResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *EC2EipAssociationSupplier) readEIPAssociation(assocId string) (cty.Value, error) {
 	resAssoc, err := s.reader.ReadResource(terraform.ReadResourceArgs{
-		Ty: resourceaws.AwsEipAssociationResourceType,
+		Ty: s.SuppliedType(),
 		ID: assocId,
 	})
 	if err != nil {
-		logrus.Warnf("Error reading eip association %s[%s]: %+v", assocId, resourceaws.AwsEipAssociationResourceType, err)
+		logrus.Warnf("Error reading eip association %s[%s]: %+v", assocId, s.SuppliedType(), err)
 		return cty.NilVal, err
 	}
 	return *resAssoc, nil

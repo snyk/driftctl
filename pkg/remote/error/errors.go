@@ -1,6 +1,10 @@
 package error
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/cloudskiff/driftctl/pkg/resource"
+)
 
 type SupplierError struct {
 	err          error
@@ -34,17 +38,17 @@ type ResourceEnumerationError struct {
 	listedTypeError string
 }
 
-func NewResourceEnumerationErrorWithType(error error, supplierType string, listedTypeError string) *ResourceEnumerationError {
+func NewResourceEnumerationErrorWithType(error error, supplierType resource.ResourceType, listedTypeError resource.ResourceType) *ResourceEnumerationError {
 	context := map[string]string{
-		"ListedTypeError": listedTypeError,
+		"ListedTypeError": listedTypeError.String(),
 	}
 	return &ResourceEnumerationError{
-		SupplierError:   *NewSupplierError(error, context, supplierType),
-		listedTypeError: listedTypeError,
+		SupplierError:   *NewSupplierError(error, context, supplierType.String()),
+		listedTypeError: listedTypeError.String(),
 	}
 }
 
-func NewResourceEnumerationError(error error, supplierType string) *ResourceEnumerationError {
+func NewResourceEnumerationError(error error, supplierType resource.ResourceType) *ResourceEnumerationError {
 	return NewResourceEnumerationErrorWithType(error, supplierType, supplierType)
 }
 

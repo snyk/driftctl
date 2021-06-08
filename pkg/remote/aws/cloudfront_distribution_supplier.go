@@ -27,10 +27,14 @@ func NewCloudfrontDistributionSupplier(provider *AWSTerraformProvider, deseriali
 	}
 }
 
+func (s *CloudfrontDistributionSupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsCloudfrontDistributionResourceType
+}
+
 func (s *CloudfrontDistributionSupplier) Resources() ([]resource.Resource, error) {
 	distributions, err := s.client.ListAllDistributions()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsCloudfrontDistributionResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, distribution := range distributions {
@@ -45,13 +49,13 @@ func (s *CloudfrontDistributionSupplier) Resources() ([]resource.Resource, error
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(aws.AwsCloudfrontDistributionResourceType, resources)
+	return s.deserializer.Deserialize(s.SuppliedType(), resources)
 }
 
 func (s *CloudfrontDistributionSupplier) readCloudfrontDistribution(distribution cloudfront.DistributionSummary) (cty.Value, error) {
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *distribution.Id,
-		Ty: aws.AwsCloudfrontDistributionResourceType,
+		Ty: s.SuppliedType(),
 	})
 	if err != nil {
 		logrus.Error(err)

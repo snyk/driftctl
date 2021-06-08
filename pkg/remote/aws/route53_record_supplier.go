@@ -29,16 +29,20 @@ func NewRoute53RecordSupplier(provider *AWSTerraformProvider, deserializer *reso
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner())}
 }
 
+func (s *Route53RecordSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsRoute53RecordResourceType
+}
+
 func (s *Route53RecordSupplier) Resources() ([]resource.Resource, error) {
 
 	zones, err := s.listZones()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, resourceaws.AwsRoute53RecordResourceType, resourceaws.AwsRoute53ZoneResourceType)
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, s.SuppliedType(), resourceaws.AwsRoute53ZoneResourceType)
 	}
 
 	for _, zone := range zones {
 		if err := s.listRecordsForZone(zone[0], zone[1]); err != nil {
-			return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsRoute53RecordResourceType)
+			return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 		}
 	}
 
@@ -46,7 +50,7 @@ func (s *Route53RecordSupplier) Resources() ([]resource.Resource, error) {
 	if err != nil {
 		return nil, err
 	}
-	return s.deserializer.Deserialize(resourceaws.AwsRoute53RecordResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *Route53RecordSupplier) listZones() ([][2]string, error) {
@@ -87,7 +91,7 @@ func (s *Route53RecordSupplier) listRecordsForZone(zoneId string, zoneName strin
 
 			record, err := s.reader.ReadResource(
 				terraform.ReadResourceArgs{
-					Ty: resourceaws.AwsRoute53RecordResourceType,
+					Ty: s.SuppliedType(),
 					ID: strings.Join(vars, "_"),
 				},
 			)

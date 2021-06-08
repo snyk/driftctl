@@ -31,14 +31,18 @@ func NewIamRolePolicyAttachmentSupplier(provider *AWSTerraformProvider, deserial
 	}
 }
 
+func (s *IamRolePolicyAttachmentSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsIamRolePolicyAttachmentResourceType
+}
+
 func (s *IamRolePolicyAttachmentSupplier) Resources() ([]resource.Resource, error) {
 	roles, err := s.repo.ListAllRoles()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, resourceaws.AwsIamRolePolicyAttachmentResourceType, resourceaws.AwsIamRoleResourceType)
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, s.SuppliedType(), resourceaws.AwsIamRoleResourceType)
 	}
 	policyAttachments, err := s.repo.ListAllRolePolicyAttachments(roles)
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamRolePolicyAttachmentResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	results := make([]cty.Value, 0)
@@ -55,13 +59,13 @@ func (s *IamRolePolicyAttachmentSupplier) Resources() ([]resource.Resource, erro
 		}
 	}
 
-	return s.deserializer.Deserialize(resourceaws.AwsIamRolePolicyAttachmentResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *IamRolePolicyAttachmentSupplier) readRolePolicyAttachment(attachedPol *repository.AttachedRolePolicy) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
-			Ty: resourceaws.AwsIamRolePolicyAttachmentResourceType,
+			Ty: s.SuppliedType(),
 			ID: fmt.Sprintf("%s-%s", *attachedPol.PolicyName, attachedPol.RoleName),
 			Attributes: map[string]string{
 				"role":       attachedPol.RoleName,
@@ -71,7 +75,7 @@ func (s *IamRolePolicyAttachmentSupplier) readRolePolicyAttachment(attachedPol *
 	)
 
 	if err != nil {
-		logrus.Warnf("Error reading iam role policy attachment %s[%s]: %+v", attachedPol, resourceaws.AwsIamRolePolicyAttachmentResourceType, err)
+		logrus.Warnf("Error reading iam role policy attachment %s[%s]: %+v", attachedPol, s.SuppliedType(), err)
 		return cty.NilVal, err
 	}
 	return *res, nil

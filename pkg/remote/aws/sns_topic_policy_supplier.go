@@ -29,10 +29,14 @@ func NewSNSTopicPolicySupplier(provider *AWSTerraformProvider, deserializer *res
 	}
 }
 
+func (s *SNSTopicPolicySupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsSnsTopicPolicyResourceType
+}
+
 func (s *SNSTopicPolicySupplier) Resources() ([]resource.Resource, error) {
 	topics, err := s.client.ListAllTopics()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, aws.AwsSnsTopicPolicyResourceType, aws.AwsSnsTopicResourceType)
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, s.SuppliedType(), aws.AwsSnsTopicResourceType)
 	}
 
 	for _, topic := range topics {
@@ -47,13 +51,13 @@ func (s *SNSTopicPolicySupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(aws.AwsSnsTopicPolicyResourceType, retrieve)
+	return s.deserializer.Deserialize(s.SuppliedType(), retrieve)
 }
 
 func (s *SNSTopicPolicySupplier) readTopicPolicy(topic sns.Topic) (cty.Value, error) {
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *topic.TopicArn,
-		Ty: aws.AwsSnsTopicPolicyResourceType,
+		Ty: s.SuppliedType(),
 		Attributes: map[string]string{
 			"topic_arn": *topic.TopicArn,
 		},

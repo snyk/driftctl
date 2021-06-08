@@ -29,10 +29,14 @@ func NewS3BucketNotificationSupplier(provider *AWSTerraformProvider, repository 
 	}
 }
 
+func (s *S3BucketNotificationSupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsS3BucketNotificationResourceType
+}
+
 func (s *S3BucketNotificationSupplier) Resources() ([]resource.Resource, error) {
 	buckets, err := s.repository.ListAllBuckets()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, aws.AwsS3BucketNotificationResourceType, aws.AwsS3BucketResourceType)
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, s.SuppliedType(), aws.AwsS3BucketResourceType)
 	}
 
 	for _, bucket := range buckets {
@@ -46,7 +50,7 @@ func (s *S3BucketNotificationSupplier) Resources() ([]resource.Resource, error) 
 		}
 		s.runner.Run(func() (cty.Value, error) {
 			s3BucketPolicy, err := s.reader.ReadResource(terraform.ReadResourceArgs{
-				Ty: aws.AwsS3BucketNotificationResourceType,
+				Ty: s.SuppliedType(),
 				ID: *bucket.Name,
 				Attributes: map[string]string{
 					"alias": region,
@@ -62,7 +66,7 @@ func (s *S3BucketNotificationSupplier) Resources() ([]resource.Resource, error) 
 	if err != nil {
 		return nil, err
 	}
-	deserializedValues, err := s.deserializer.Deserialize(aws.AwsS3BucketNotificationResourceType, ctyVals)
+	deserializedValues, err := s.deserializer.Deserialize(s.SuppliedType(), ctyVals)
 	results := make([]resource.Resource, 0, len(deserializedValues))
 	if err != nil {
 		return deserializedValues, err

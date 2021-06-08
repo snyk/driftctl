@@ -31,14 +31,18 @@ func NewIamUserPolicyAttachmentSupplier(provider *AWSTerraformProvider, deserial
 	}
 }
 
+func (s *IamUserPolicyAttachmentSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsIamUserPolicyAttachmentResourceType
+}
+
 func (s *IamUserPolicyAttachmentSupplier) Resources() ([]resource.Resource, error) {
 	users, err := s.repo.ListAllUsers()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, resourceaws.AwsIamUserPolicyAttachmentResourceType, resourceaws.AwsIamUserResourceType)
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, s.SuppliedType(), resourceaws.AwsIamUserResourceType)
 	}
 	policyAttachments, err := s.repo.ListAllUserPolicyAttachments(users)
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamUserPolicyAttachmentResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 	results := make([]cty.Value, 0)
 	if len(policyAttachments) > 0 {
@@ -54,13 +58,13 @@ func (s *IamUserPolicyAttachmentSupplier) Resources() ([]resource.Resource, erro
 		}
 	}
 
-	return s.deserializer.Deserialize(resourceaws.AwsIamUserPolicyAttachmentResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *IamUserPolicyAttachmentSupplier) readUserPolicyAttachment(attachedPol *repository.AttachedUserPolicy) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
-			Ty: resourceaws.AwsIamUserPolicyAttachmentResourceType,
+			Ty: s.SuppliedType(),
 			ID: fmt.Sprintf("%s-%s", *attachedPol.PolicyName, attachedPol.UserName),
 			Attributes: map[string]string{
 				"user":       attachedPol.UserName,
@@ -70,7 +74,7 @@ func (s *IamUserPolicyAttachmentSupplier) readUserPolicyAttachment(attachedPol *
 	)
 
 	if err != nil {
-		logrus.Warnf("Error reading iam user policy attachment %s[%s]: %+v", attachedPol, resourceaws.AwsIamUserPolicyAttachmentResourceType, err)
+		logrus.Warnf("Error reading iam user policy attachment %s[%s]: %+v", attachedPol, s.SuppliedType(), err)
 		return cty.NilVal, err
 	}
 	return *res, nil

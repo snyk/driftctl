@@ -28,10 +28,14 @@ func NewLambdaEventSourceMappingSupplier(provider *AWSTerraformProvider, deseria
 	}
 }
 
+func (s *LambdaEventSourceMappingSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsLambdaEventSourceMappingResourceType
+}
+
 func (s *LambdaEventSourceMappingSupplier) Resources() ([]resource.Resource, error) {
 	functions, err := s.client.ListAllLambdaEventSourceMappings()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsLambdaEventSourceMappingResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 	var results []cty.Value
 	for _, function := range functions {
@@ -45,18 +49,18 @@ func (s *LambdaEventSourceMappingSupplier) Resources() ([]resource.Resource, err
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(resourceaws.AwsLambdaEventSourceMappingResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *LambdaEventSourceMappingSupplier) readLambdaEventSourceMapping(sourceMappingConfig lambda.EventSourceMappingConfiguration) (cty.Value, error) {
 	resFunction, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
-			Ty: resourceaws.AwsLambdaEventSourceMappingResourceType,
+			Ty: s.SuppliedType(),
 			ID: *sourceMappingConfig.UUID,
 		},
 	)
 	if err != nil {
-		logrus.Warnf("Error reading %s: %+v", resourceaws.AwsLambdaEventSourceMappingResourceType, err)
+		logrus.Warnf("Error reading %s: %+v", s.SuppliedType(), err)
 		return cty.NilVal, err
 	}
 

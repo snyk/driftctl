@@ -29,10 +29,14 @@ func NewS3BucketPolicySupplier(provider *AWSTerraformProvider, repository reposi
 	}
 }
 
+func (s *S3BucketPolicySupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsS3BucketPolicyResourceType
+}
+
 func (s *S3BucketPolicySupplier) Resources() ([]resource.Resource, error) {
 	buckets, err := s.repository.ListAllBuckets()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, aws.AwsS3BucketPolicyResourceType, aws.AwsS3BucketResourceType)
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, s.SuppliedType(), aws.AwsS3BucketResourceType)
 	}
 
 	for _, bucket := range buckets {
@@ -47,7 +51,7 @@ func (s *S3BucketPolicySupplier) Resources() ([]resource.Resource, error) {
 		s.runner.Run(func() (cty.Value, error) {
 			s3BucketNotification, err := s.reader.ReadResource(
 				terraform.ReadResourceArgs{
-					Ty: aws.AwsS3BucketPolicyResourceType,
+					Ty: s.SuppliedType(),
 					ID: *bucket.Name,
 					Attributes: map[string]string{
 						"alias": region,
@@ -66,7 +70,7 @@ func (s *S3BucketPolicySupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	deserializedValues, err := s.deserializer.Deserialize(aws.AwsS3BucketPolicyResourceType, ctyVals)
+	deserializedValues, err := s.deserializer.Deserialize(s.SuppliedType(), ctyVals)
 	results := make([]resource.Resource, 0, len(deserializedValues))
 	if err != nil {
 		return deserializedValues, err

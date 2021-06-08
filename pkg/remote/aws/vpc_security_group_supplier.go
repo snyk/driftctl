@@ -33,10 +33,14 @@ func NewVPCSecurityGroupSupplier(provider *AWSTerraformProvider, deserializer *r
 	}
 }
 
+func (s *VPCSecurityGroupSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsSecurityGroupResourceType
+}
+
 func (s *VPCSecurityGroupSupplier) Resources() ([]resource.Resource, error) {
 	securityGroups, defaultSecurityGroups, err := s.repo.ListAllSecurityGroups()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsSecurityGroupResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, item := range securityGroups {
@@ -66,7 +70,7 @@ func (s *VPCSecurityGroupSupplier) Resources() ([]resource.Resource, error) {
 	if err != nil {
 		return nil, err
 	}
-	deserializedSecurityGroups, err := s.deserializer.Deserialize(resourceaws.AwsSecurityGroupResourceType, securityGroupResources)
+	deserializedSecurityGroups, err := s.deserializer.Deserialize(s.SuppliedType(), securityGroupResources)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +83,7 @@ func (s *VPCSecurityGroupSupplier) Resources() ([]resource.Resource, error) {
 }
 
 func (s *VPCSecurityGroupSupplier) readSecurityGroup(securityGroup ec2.SecurityGroup) (cty.Value, error) {
-	var Ty resource.ResourceType = resourceaws.AwsSecurityGroupResourceType
+	var Ty resource.ResourceType = s.SuppliedType()
 	if isDefaultSecurityGroup(securityGroup) {
 		Ty = resourceaws.AwsDefaultSecurityGroupResourceType
 	}

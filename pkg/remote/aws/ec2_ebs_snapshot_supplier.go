@@ -31,10 +31,14 @@ func NewEC2EbsSnapshotSupplier(provider *AWSTerraformProvider, deserializer *res
 	}
 }
 
+func (s *EC2EbsSnapshotSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsEbsSnapshotResourceType
+}
+
 func (s *EC2EbsSnapshotSupplier) Resources() ([]resource.Resource, error) {
 	snapshots, err := s.client.ListAllSnapshots()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEbsSnapshotResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 	results := make([]cty.Value, 0)
 	if len(snapshots) > 0 {
@@ -49,17 +53,17 @@ func (s *EC2EbsSnapshotSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(resourceaws.AwsEbsSnapshotResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *EC2EbsSnapshotSupplier) readEbsSnapshot(snapshot ec2.Snapshot) (cty.Value, error) {
 	id := aws.StringValue(snapshot.SnapshotId)
 	resSnapshot, err := s.reader.ReadResource(terraform.ReadResourceArgs{
-		Ty: resourceaws.AwsEbsSnapshotResourceType,
+		Ty: s.SuppliedType(),
 		ID: id,
 	})
 	if err != nil {
-		logrus.Warnf("Error reading snapshot %s[%s]: %+v", id, resourceaws.AwsEbsSnapshotResourceType, err)
+		logrus.Warnf("Error reading snapshot %s[%s]: %+v", id, s.SuppliedType(), err)
 		return cty.NilVal, err
 	}
 	return *resSnapshot, nil

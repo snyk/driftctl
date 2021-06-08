@@ -28,10 +28,14 @@ func NewDynamoDBTableSupplier(provider *AWSTerraformProvider, deserializer *reso
 	}
 }
 
+func (s *DynamoDBTableSupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsDynamodbTableResourceType
+}
+
 func (s *DynamoDBTableSupplier) Resources() ([]resource.Resource, error) {
 	tables, err := s.repository.ListAllTables()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsDynamodbTableResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, table := range tables {
@@ -46,13 +50,13 @@ func (s *DynamoDBTableSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(aws.AwsDynamodbTableResourceType, retrieve)
+	return s.deserializer.Deserialize(s.SuppliedType(), retrieve)
 }
 
 func (s *DynamoDBTableSupplier) readTable(tableName *string) (cty.Value, error) {
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *tableName,
-		Ty: aws.AwsDynamodbTableResourceType,
+		Ty: s.SuppliedType(),
 		Attributes: map[string]string{
 			"table_name": *tableName,
 		},

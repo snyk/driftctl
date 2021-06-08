@@ -27,10 +27,14 @@ func NewSqsQueueSupplier(provider *AWSTerraformProvider, deserializer *resource.
 	}
 }
 
+func (s *SqsQueueSupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsSqsQueueResourceType
+}
+
 func (s *SqsQueueSupplier) Resources() ([]resource.Resource, error) {
 	queues, err := s.client.ListAllQueues()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsSqsQueueResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, queue := range queues {
@@ -45,11 +49,11 @@ func (s *SqsQueueSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(aws.AwsSqsQueueResourceType, resources)
+	return s.deserializer.Deserialize(s.SuppliedType(), resources)
 }
 
 func (s *SqsQueueSupplier) readSqsQueue(queueURL string) (cty.Value, error) {
-	var Ty resource.ResourceType = aws.AwsSqsQueueResourceType
+	var Ty resource.ResourceType = s.SuppliedType()
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: Ty,
 		ID: queueURL,

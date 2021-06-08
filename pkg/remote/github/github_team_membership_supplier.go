@@ -25,10 +25,14 @@ func NewGithubTeamMembershipSupplier(provider *GithubTerraformProvider, reposito
 	}
 }
 
+func (s *GithubTeamMembershipSupplier) SuppliedType() resource.ResourceType {
+	return resourcegithub.GithubTeamMembershipResourceType
+}
+
 func (s GithubTeamMembershipSupplier) Resources() ([]resource.Resource, error) {
 	resourceList, err := s.repository.ListTeamMemberships()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourcegithub.GithubTeamMembershipResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, id := range resourceList {
@@ -43,16 +47,16 @@ func (s GithubTeamMembershipSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(resourcegithub.GithubTeamMembershipResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s GithubTeamMembershipSupplier) readTeamMembership(id string) (cty.Value, error) {
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: id,
-		Ty: resourcegithub.GithubTeamMembershipResourceType,
+		Ty: s.SuppliedType(),
 	})
 	if err != nil {
-		logrus.Warnf("Error reading %s[%s]: %+v", id, resourcegithub.GithubTeamMembershipResourceType, err)
+		logrus.Warnf("Error reading %s[%s]: %+v", id, s.SuppliedType(), err)
 		return cty.NilVal, err
 	}
 	return *val, nil

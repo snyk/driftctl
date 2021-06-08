@@ -44,10 +44,14 @@ func awsIamRoleShouldBeIgnored(roleName string) bool {
 	return ok
 }
 
+func (s *IamRoleSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsIamRoleResourceType
+}
+
 func (s *IamRoleSupplier) Resources() ([]resource.Resource, error) {
 	roles, err := s.repo.ListAllRoles()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamRoleResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 	results := make([]cty.Value, 0)
 	if len(roles) > 0 {
@@ -65,18 +69,18 @@ func (s *IamRoleSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(resourceaws.AwsIamRoleResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *IamRoleSupplier) readRole(resource *iam.Role) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
-			Ty: resourceaws.AwsIamRoleResourceType,
+			Ty: s.SuppliedType(),
 			ID: *resource.RoleName,
 		},
 	)
 	if err != nil {
-		logrus.Warnf("Error reading iam role %s[%s]: %+v", *resource.RoleName, resourceaws.AwsIamRoleResourceType, err)
+		logrus.Warnf("Error reading iam role %s[%s]: %+v", *resource.RoleName, s.SuppliedType(), err)
 		return cty.NilVal, err
 	}
 

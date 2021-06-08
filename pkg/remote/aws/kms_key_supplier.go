@@ -29,10 +29,14 @@ func NewKMSKeySupplier(provider *AWSTerraformProvider, deserializer *resource.De
 	}
 }
 
+func (s *KMSKeySupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsKmsKeyResourceType
+}
+
 func (s *KMSKeySupplier) Resources() ([]resource.Resource, error) {
 	keys, err := s.client.ListAllKeys()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsKmsKeyResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, key := range keys {
@@ -47,13 +51,13 @@ func (s *KMSKeySupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(aws.AwsKmsKeyResourceType, retrieve)
+	return s.deserializer.Deserialize(s.SuppliedType(), retrieve)
 }
 
 func (s *KMSKeySupplier) readKey(key *kms.KeyListEntry) (cty.Value, error) {
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *key.KeyId,
-		Ty: aws.AwsKmsKeyResourceType,
+		Ty: s.SuppliedType(),
 	})
 	if err != nil {
 		logrus.Error(err)

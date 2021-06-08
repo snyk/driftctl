@@ -28,10 +28,14 @@ func NewNatGatewaySupplier(provider *AWSTerraformProvider, deserializer *resourc
 	}
 }
 
+func (s *NatGatewaySupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsNatGatewayResourceType
+}
+
 func (s *NatGatewaySupplier) Resources() ([]resource.Resource, error) {
 	retrievedNatGateways, err := s.repo.ListAllNatGateways()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsNatGatewayResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, gateway := range retrievedNatGateways {
@@ -48,7 +52,7 @@ func (s *NatGatewaySupplier) Resources() ([]resource.Resource, error) {
 	}
 
 	// Deserialize
-	resources, err := s.deserializer.Deserialize(aws.AwsNatGatewayResourceType, natGatewayResources)
+	resources, err := s.deserializer.Deserialize(s.SuppliedType(), natGatewayResources)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +61,7 @@ func (s *NatGatewaySupplier) Resources() ([]resource.Resource, error) {
 }
 
 func (s *NatGatewaySupplier) readNatGateway(gateway ec2.NatGateway) (cty.Value, error) {
-	var Ty resource.ResourceType = aws.AwsNatGatewayResourceType
+	var Ty resource.ResourceType = s.SuppliedType()
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *gateway.NatGatewayId,
 		Ty: Ty,

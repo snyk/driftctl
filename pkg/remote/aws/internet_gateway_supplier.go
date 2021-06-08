@@ -28,10 +28,14 @@ func NewInternetGatewaySupplier(provider *AWSTerraformProvider, deserializer *re
 	}
 }
 
+func (s *InternetGatewaySupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsInternetGatewayResourceType
+}
+
 func (s *InternetGatewaySupplier) Resources() ([]resource.Resource, error) {
 	internetGateways, err := s.repo.ListAllInternetGateways()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsInternetGatewayResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, internetGateway := range internetGateways {
@@ -46,11 +50,11 @@ func (s *InternetGatewaySupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(aws.AwsInternetGatewayResourceType, resources)
+	return s.deserializer.Deserialize(s.SuppliedType(), resources)
 }
 
 func (s *InternetGatewaySupplier) readInternetGateway(internetGateway ec2.InternetGateway) (cty.Value, error) {
-	var Ty resource.ResourceType = aws.AwsInternetGatewayResourceType
+	var Ty resource.ResourceType = s.SuppliedType()
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: Ty,
 		ID: *internetGateway.InternetGatewayId,

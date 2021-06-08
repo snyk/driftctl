@@ -163,7 +163,7 @@ func (r *TerraformStateReader) decode(values map[string][]cty.Value) ([]resource
 		if !resource.IsResourceTypeSupported(ty) {
 			continue
 		}
-		decodedResources, err := r.deserializer.Deserialize(ty, val)
+		decodedResources, err := r.deserializer.Deserialize(resource.ResourceType(ty), val)
 		if err != nil {
 			logrus.WithField("ty", ty).Warnf("Could not read from state: %+v", err)
 			continue

@@ -27,23 +27,27 @@ func NewGithubTeamSupplier(provider *GithubTerraformProvider, repository GithubR
 	}
 }
 
-func (s GithubTeamSupplier) Resources() ([]resource.Resource, error) {
+func (s *GithubTeamSupplier) SuppliedType() resource.ResourceType {
+	return resourcegithub.GithubTeamResourceType
+}
+
+func (s *GithubTeamSupplier) Resources() ([]resource.Resource, error) {
 
 	resourceList, err := s.repository.ListTeams()
 
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourcegithub.GithubTeamResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, team := range resourceList {
 		team := team
 		s.runner.Run(func() (cty.Value, error) {
 			completeResource, err := s.reader.ReadResource(terraform.ReadResourceArgs{
-				Ty: resourcegithub.GithubTeamResourceType,
+				Ty: s.SuppliedType(),
 				ID: fmt.Sprintf("%d", team.DatabaseId),
 			})
 			if err != nil {
-				logrus.Warnf("Error reading %d[%s]: %+v", team.DatabaseId, resourcegithub.GithubTeamResourceType, err)
+				logrus.Warnf("Error reading %d[%s]: %+v", team.DatabaseId, s.SuppliedType(), err)
 				return cty.NilVal, err
 			}
 			return *completeResource, nil
@@ -55,5 +59,5 @@ func (s GithubTeamSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(resourcegithub.GithubTeamResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }

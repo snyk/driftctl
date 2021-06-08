@@ -28,10 +28,14 @@ func NewLambdaFunctionSupplier(provider *AWSTerraformProvider, deserializer *res
 	}
 }
 
+func (s *LambdaFunctionSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsLambdaFunctionResourceType
+}
+
 func (s *LambdaFunctionSupplier) Resources() ([]resource.Resource, error) {
 	functions, err := s.client.ListAllLambdaFunctions()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsLambdaFunctionResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 	results := make([]cty.Value, 0)
 	if len(functions) > 0 {
@@ -46,14 +50,14 @@ func (s *LambdaFunctionSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(resourceaws.AwsLambdaFunctionResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *LambdaFunctionSupplier) readLambda(function lambda.FunctionConfiguration) (cty.Value, error) {
 	name := *function.FunctionName
 	resFunction, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
-			Ty: resourceaws.AwsLambdaFunctionResourceType,
+			Ty: s.SuppliedType(),
 			ID: name,
 			Attributes: map[string]string{
 				"function_name": name,
@@ -61,7 +65,7 @@ func (s *LambdaFunctionSupplier) readLambda(function lambda.FunctionConfiguratio
 		},
 	)
 	if err != nil {
-		logrus.Warnf("Error reading function %s[%s]: %+v", name, resourceaws.AwsLambdaFunctionResourceType, err)
+		logrus.Warnf("Error reading function %s[%s]: %+v", name, s.SuppliedType(), err)
 		return cty.NilVal, err
 	}
 

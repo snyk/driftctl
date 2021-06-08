@@ -31,10 +31,14 @@ func NewEC2EipSupplier(provider *AWSTerraformProvider, repo repository.EC2Reposi
 	}
 }
 
+func (s *EC2EipSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsEipResourceType
+}
+
 func (s *EC2EipSupplier) Resources() ([]resource.Resource, error) {
 	addresses, err := s.client.ListAllAddresses()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEipResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 	results := make([]cty.Value, 0)
 	if len(addresses) > 0 {
@@ -49,17 +53,17 @@ func (s *EC2EipSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(resourceaws.AwsEipResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *EC2EipSupplier) readEIP(address ec2.Address) (cty.Value, error) {
 	id := aws.StringValue(address.AllocationId)
 	resAddress, err := s.reader.ReadResource(terraform.ReadResourceArgs{
-		Ty: resourceaws.AwsEipResourceType,
+		Ty: s.SuppliedType(),
 		ID: id,
 	})
 	if err != nil {
-		logrus.Warnf("Error reading eip %s[%s]: %+v", id, resourceaws.AwsEipResourceType, err)
+		logrus.Warnf("Error reading eip %s[%s]: %+v", id, s.SuppliedType(), err)
 		return cty.NilVal, err
 	}
 	return *resAddress, nil

@@ -35,11 +35,16 @@ func Init(version string, alerter *alerter.Alerter,
 	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.GITHUB, provider)
 
-	supplierLibrary.AddSupplier(NewGithubRepositorySupplier(provider, repository, deserializer))
-	supplierLibrary.AddSupplier(NewGithubTeamSupplier(provider, repository, deserializer))
-	supplierLibrary.AddSupplier(NewGithubMembershipSupplier(provider, repository, deserializer))
-	supplierLibrary.AddSupplier(NewGithubTeamMembershipSupplier(provider, repository, deserializer))
-	supplierLibrary.AddSupplier(NewGithubBranchProtectionSupplier(provider, repository, deserializer))
+	var githubSuppliers []resource.SimpleTypeSupplier
+	githubSuppliers = append(githubSuppliers, NewGithubRepositorySupplier(provider, repository, deserializer))
+	githubSuppliers = append(githubSuppliers, NewGithubTeamSupplier(provider, repository, deserializer))
+	githubSuppliers = append(githubSuppliers, NewGithubMembershipSupplier(provider, repository, deserializer))
+	githubSuppliers = append(githubSuppliers, NewGithubTeamMembershipSupplier(provider, repository, deserializer))
+	githubSuppliers = append(githubSuppliers, NewGithubBranchProtectionSupplier(provider, repository, deserializer))
+
+	for _, supplier := range githubSuppliers {
+		supplierLibrary.AddSupplier(supplier)
+	}
 
 	resourceSchemaRepository.Init(provider.Schema())
 	github.InitResourcesMetadata(resourceSchemaRepository)

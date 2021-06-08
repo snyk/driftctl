@@ -33,11 +33,15 @@ func NewSubnetSupplier(provider *AWSTerraformProvider, deserializer *resource.De
 	}
 }
 
+func (s *SubnetSupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsSubnetResourceType
+}
+
 func (s *SubnetSupplier) Resources() ([]resource.Resource, error) {
 	subnets, defaultSubnets, err := s.repo.ListAllSubnets()
 
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsSubnetResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, item := range subnets {
@@ -70,7 +74,7 @@ func (s *SubnetSupplier) Resources() ([]resource.Resource, error) {
 	if err != nil {
 		return nil, err
 	}
-	deserializedSubnets, err := s.deserializer.Deserialize(aws.AwsSubnetResourceType, subnetResources)
+	deserializedSubnets, err := s.deserializer.Deserialize(s.SuppliedType(), subnetResources)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +87,7 @@ func (s *SubnetSupplier) Resources() ([]resource.Resource, error) {
 }
 
 func (s *SubnetSupplier) readSubnet(subnet ec2.Subnet) (cty.Value, error) {
-	var Ty resource.ResourceType = aws.AwsSubnetResourceType
+	var Ty resource.ResourceType = s.SuppliedType()
 	if subnet.DefaultForAz != nil && *subnet.DefaultForAz {
 		Ty = aws.AwsDefaultSubnetResourceType
 	}

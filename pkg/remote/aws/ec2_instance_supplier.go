@@ -30,10 +30,14 @@ func NewEC2InstanceSupplier(provider *AWSTerraformProvider, deserializer *resour
 	}
 }
 
+func (s *EC2InstanceSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsInstanceResourceType
+}
+
 func (s *EC2InstanceSupplier) Resources() ([]resource.Resource, error) {
 	instances, err := s.client.ListAllInstances()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsInstanceResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	results := make([]cty.Value, 0)
@@ -49,12 +53,12 @@ func (s *EC2InstanceSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(resourceaws.AwsInstanceResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *EC2InstanceSupplier) readInstance(id string) (cty.Value, error) {
 	resInstance, err := s.reader.ReadResource(terraform.ReadResourceArgs{
-		Ty: resourceaws.AwsInstanceResourceType,
+		Ty: s.SuppliedType(),
 		ID: id,
 	})
 	if err != nil {

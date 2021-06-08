@@ -30,10 +30,14 @@ func NewEC2KeyPairSupplier(provider *AWSTerraformProvider, deserializer *resourc
 	}
 }
 
+func (s *EC2KeyPairSupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsKeyPairResourceType
+}
+
 func (s *EC2KeyPairSupplier) Resources() ([]resource.Resource, error) {
 	keyPairs, err := s.client.ListAllKeyPairs()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsKeyPairResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 	results := make([]cty.Value, 0)
 	if len(keyPairs) > 0 {
@@ -48,12 +52,12 @@ func (s *EC2KeyPairSupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(resourceaws.AwsKeyPairResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *EC2KeyPairSupplier) readKeyPair(name string) (cty.Value, error) {
 	resKp, err := s.reader.ReadResource(terraform.ReadResourceArgs{
-		Ty: resourceaws.AwsKeyPairResourceType,
+		Ty: s.SuppliedType(),
 		ID: name,
 	})
 	if err != nil {

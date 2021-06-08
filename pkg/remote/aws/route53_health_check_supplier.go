@@ -29,10 +29,14 @@ func NewRoute53HealthCheckSupplier(provider *AWSTerraformProvider, deserializer 
 	}
 }
 
+func (s *Route53HealthCheckSupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsRoute53HealthCheckResourceType
+}
+
 func (s *Route53HealthCheckSupplier) Resources() ([]resource.Resource, error) {
 	healthChecks, err := s.client.ListAllHealthChecks()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsRoute53HealthCheckResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, healthCheck := range healthChecks {
@@ -47,13 +51,13 @@ func (s *Route53HealthCheckSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(aws.AwsRoute53HealthCheckResourceType, retrieve)
+	return s.deserializer.Deserialize(s.SuppliedType(), retrieve)
 }
 
 func (s *Route53HealthCheckSupplier) readHealthCheck(healthCheck *route53.HealthCheck) (cty.Value, error) {
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *healthCheck.Id,
-		Ty: aws.AwsRoute53HealthCheckResourceType,
+		Ty: s.SuppliedType(),
 	})
 	if err != nil {
 		logrus.Error(err)

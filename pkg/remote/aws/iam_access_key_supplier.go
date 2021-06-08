@@ -30,14 +30,18 @@ func NewIamAccessKeySupplier(provider *AWSTerraformProvider, deserializer *resou
 	}
 }
 
+func (s *IamAccessKeySupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsIamAccessKeyResourceType
+}
+
 func (s *IamAccessKeySupplier) Resources() ([]resource.Resource, error) {
 	users, err := s.repo.ListAllUsers()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, resourceaws.AwsIamAccessKeyResourceType, resourceaws.AwsIamUserResourceType)
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, s.SuppliedType(), resourceaws.AwsIamUserResourceType)
 	}
 	keys, err := s.repo.ListAllAccessKeys(users)
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamAccessKeyResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 	results := make([]cty.Value, 0)
 	if len(keys) > 0 {
@@ -52,13 +56,13 @@ func (s *IamAccessKeySupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(resourceaws.AwsIamAccessKeyResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *IamAccessKeySupplier) readAccessKey(key *iam.AccessKeyMetadata) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
-			Ty: resourceaws.AwsIamAccessKeyResourceType,
+			Ty: s.SuppliedType(),
 			ID: *key.AccessKeyId,
 			Attributes: map[string]string{
 				"user": *key.UserName,
@@ -66,7 +70,7 @@ func (s *IamAccessKeySupplier) readAccessKey(key *iam.AccessKeyMetadata) (cty.Va
 		},
 	)
 	if err != nil {
-		logrus.Warnf("Error reading iam access key %s[%s]: %+v", *key.AccessKeyId, resourceaws.AwsIamAccessKeyResourceType, err)
+		logrus.Warnf("Error reading iam access key %s[%s]: %+v", *key.AccessKeyId, s.SuppliedType(), err)
 		return cty.NilVal, err
 	}
 

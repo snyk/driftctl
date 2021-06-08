@@ -25,23 +25,27 @@ func NewGithubRepositorySupplier(provider *GithubTerraformProvider, repository G
 	}
 }
 
-func (s GithubRepositorySupplier) Resources() ([]resource.Resource, error) {
+func (s *GithubRepositorySupplier) SuppliedType() resource.ResourceType {
+	return resourcegithub.GithubRepositoryResourceType
+}
+
+func (s *GithubRepositorySupplier) Resources() ([]resource.Resource, error) {
 
 	resourceList, err := s.repository.ListRepositories()
 
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourcegithub.GithubRepositoryResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	for _, id := range resourceList {
 		id := id
 		s.runner.Run(func() (cty.Value, error) {
 			completeResource, err := s.reader.ReadResource(terraform.ReadResourceArgs{
-				Ty: resourcegithub.GithubRepositoryResourceType,
+				Ty: s.SuppliedType(),
 				ID: id,
 			})
 			if err != nil {
-				logrus.Warnf("Error reading %s[%s]: %+v", id, resourcegithub.GithubRepositoryResourceType, err)
+				logrus.Warnf("Error reading %s[%s]: %+v", id, s.SuppliedType(), err)
 				return cty.NilVal, err
 			}
 			return *completeResource, nil
@@ -53,5 +57,5 @@ func (s GithubRepositorySupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(resourcegithub.GithubRepositoryResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }

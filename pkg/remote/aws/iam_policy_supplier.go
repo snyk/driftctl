@@ -31,10 +31,14 @@ func NewIamPolicySupplier(provider *AWSTerraformProvider, deserializer *resource
 	}
 }
 
+func (s *IamPolicySupplier) SuppliedType() resource.ResourceType {
+	return resourceaws.AwsIamPolicyResourceType
+}
+
 func (s *IamPolicySupplier) Resources() ([]resource.Resource, error) {
 	policies, err := s.repo.ListAllPolicies()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamPolicyResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 	results := make([]cty.Value, 0)
 	if len(policies) > 0 {
@@ -49,18 +53,18 @@ func (s *IamPolicySupplier) Resources() ([]resource.Resource, error) {
 			return nil, err
 		}
 	}
-	return s.deserializer.Deserialize(resourceaws.AwsIamPolicyResourceType, results)
+	return s.deserializer.Deserialize(s.SuppliedType(), results)
 }
 
 func (s *IamPolicySupplier) readPolicy(resource *iam.Policy) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
-			Ty: resourceaws.AwsIamPolicyResourceType,
+			Ty: s.SuppliedType(),
 			ID: *resource.Arn,
 		},
 	)
 	if err != nil {
-		logrus.Warnf("Error reading iam policy %s[%s]: %+v", *resource.Arn, resourceaws.AwsIamPolicyResourceType, err)
+		logrus.Warnf("Error reading iam policy %s[%s]: %+v", *resource.Arn, s.SuppliedType(), err)
 		return cty.NilVal, err
 	}
 

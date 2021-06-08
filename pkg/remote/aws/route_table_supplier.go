@@ -34,10 +34,14 @@ func NewRouteTableSupplier(provider *AWSTerraformProvider, deserializer *resourc
 	}
 }
 
+func (s *RouteTableSupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsRouteTableResourceType
+}
+
 func (s *RouteTableSupplier) Resources() ([]resource.Resource, error) {
 	results, err := s.repo.ListAllRouteTables()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsRouteTableResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 
 	retrievedDefaultRouteTables := []*ec2.RouteTable{}
@@ -89,7 +93,7 @@ func (s *RouteTableSupplier) Resources() ([]resource.Resource, error) {
 	if err != nil {
 		return nil, err
 	}
-	deserializedRouteTables, err := s.deserializer.Deserialize(aws.AwsRouteTableResourceType, routeTableResources)
+	deserializedRouteTables, err := s.deserializer.Deserialize(s.SuppliedType(), routeTableResources)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +106,7 @@ func (s *RouteTableSupplier) Resources() ([]resource.Resource, error) {
 }
 
 func (s *RouteTableSupplier) readRouteTable(routeTable ec2.RouteTable, isMain bool) (cty.Value, error) {
-	var Ty resource.ResourceType = aws.AwsRouteTableResourceType
+	var Ty resource.ResourceType = s.SuppliedType()
 	attributes := map[string]interface{}{}
 	if isMain {
 		if routeTable.VpcId == nil {

@@ -28,10 +28,14 @@ func NewECRRepositorySupplier(provider *AWSTerraformProvider, deserializer *reso
 	}
 }
 
+func (r *ECRRepositorySupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsEcrRepositoryResourceType
+}
+
 func (r *ECRRepositorySupplier) Resources() ([]resource.Resource, error) {
 	repositories, err := r.client.ListAllRepositories()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsEcrRepositoryResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, r.SuppliedType())
 	}
 
 	for _, repository := range repositories {
@@ -46,13 +50,13 @@ func (r *ECRRepositorySupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return r.deserializer.Deserialize(aws.AwsEcrRepositoryResourceType, retrieve)
+	return r.deserializer.Deserialize(r.SuppliedType(), retrieve)
 }
 
 func (r *ECRRepositorySupplier) readRepository(repository *ecr.Repository) (cty.Value, error) {
 	val, err := r.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *repository.RepositoryName,
-		Ty: aws.AwsEcrRepositoryResourceType,
+		Ty: r.SuppliedType(),
 	})
 	if err != nil {
 		logrus.Error(err)

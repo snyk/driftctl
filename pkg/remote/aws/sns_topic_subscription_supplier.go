@@ -53,10 +53,14 @@ func NewSNSTopicSubscriptionSupplier(provider *AWSTerraformProvider, a alerter.A
 	}
 }
 
+func (s *SNSTopicSubscriptionSupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsSnsTopicSubscriptionResourceType
+}
+
 func (s *SNSTopicSubscriptionSupplier) Resources() ([]resource.Resource, error) {
 	subscriptions, err := s.client.ListAllSubscriptions()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsSnsTopicSubscriptionResourceType)
+		return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 	}
 	for _, subscription := range subscriptions {
 		subscription := subscription
@@ -70,13 +74,13 @@ func (s *SNSTopicSubscriptionSupplier) Resources() ([]resource.Resource, error) 
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(aws.AwsSnsTopicSubscriptionResourceType, retrieve)
+	return s.deserializer.Deserialize(s.SuppliedType(), retrieve)
 }
 
 func (s *SNSTopicSubscriptionSupplier) readTopicSubscription(subscription *sns.Subscription, alertr alerter.AlerterInterface) (cty.Value, error) {
 	if subscription.SubscriptionArn != nil && !arn.IsARN(*subscription.SubscriptionArn) {
 		alertr.SendAlert(
-			fmt.Sprintf("%s.%s", aws.AwsSnsTopicSubscriptionResourceType, *subscription.SubscriptionArn),
+			fmt.Sprintf("%s.%s", s.SuppliedType(), *subscription.SubscriptionArn),
 			&wrongArnTopicAlert{*subscription.SubscriptionArn, subscription.Endpoint},
 		)
 		return cty.NilVal, nil
@@ -84,7 +88,7 @@ func (s *SNSTopicSubscriptionSupplier) readTopicSubscription(subscription *sns.S
 
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: *subscription.SubscriptionArn,
-		Ty: aws.AwsSnsTopicSubscriptionResourceType,
+		Ty: s.SuppliedType(),
 		Attributes: map[string]string{
 			"SubscriptionId": *subscription.SubscriptionArn,
 		},

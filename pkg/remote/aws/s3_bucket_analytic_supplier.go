@@ -32,10 +32,14 @@ func NewS3BucketAnalyticSupplier(provider *AWSTerraformProvider, repository repo
 	}
 }
 
+func (s *S3BucketAnalyticSupplier) SuppliedType() resource.ResourceType {
+	return aws.AwsS3BucketAnalyticsConfigurationResourceType
+}
+
 func (s *S3BucketAnalyticSupplier) Resources() ([]resource.Resource, error) {
 	buckets, err := s.repository.ListAllBuckets()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, aws.AwsS3BucketAnalyticsConfigurationResourceType, aws.AwsS3BucketResourceType)
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, s.SuppliedType(), aws.AwsS3BucketResourceType)
 	}
 
 	for _, bucket := range buckets {
@@ -48,7 +52,7 @@ func (s *S3BucketAnalyticSupplier) Resources() ([]resource.Resource, error) {
 			continue
 		}
 		if err := s.listBucketAnalyticConfiguration(&bucket, region); err != nil {
-			return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsS3BucketAnalyticsConfigurationResourceType)
+			return nil, remoteerror.NewResourceEnumerationError(err, s.SuppliedType())
 		}
 	}
 	ctyVals, err := s.runner.Wait()
@@ -56,7 +60,7 @@ func (s *S3BucketAnalyticSupplier) Resources() ([]resource.Resource, error) {
 		return nil, err
 	}
 
-	return s.deserializer.Deserialize(aws.AwsS3BucketAnalyticsConfigurationResourceType, ctyVals)
+	return s.deserializer.Deserialize(s.SuppliedType(), ctyVals)
 }
 
 func (s *S3BucketAnalyticSupplier) listBucketAnalyticConfiguration(bucket *s3.Bucket, region string) error {
@@ -71,7 +75,7 @@ func (s *S3BucketAnalyticSupplier) listBucketAnalyticConfiguration(bucket *s3.Bu
 		s.runner.Run(func() (cty.Value, error) {
 			s3BucketAnalytic, err := s.reader.ReadResource(
 				terraform.ReadResourceArgs{
-					Ty: aws.AwsS3BucketAnalyticsConfigurationResourceType,
+					Ty: s.SuppliedType(),
 					ID: id,
 					Attributes: map[string]string{
 						"alias": region,
