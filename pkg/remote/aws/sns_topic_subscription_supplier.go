@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -30,6 +31,22 @@ func (p *pendingTopicAlert) Message() string {
 }
 
 func (p *pendingTopicAlert) ShouldIgnoreResource() bool {
+	return false
+}
+
+type wrongArnTopicAlert struct {
+	arn      string
+	endpoint *string
+}
+
+func (p *wrongArnTopicAlert) Message() string {
+	return fmt.Sprintf("%s with incorrect subscription arn (%s) for endpoint \"%s\" will be ignored",
+		aws.AwsSnsTopicSubscriptionResourceType,
+		p.arn,
+		awssdk.StringValue(p.endpoint))
+}
+
+func (p *wrongArnTopicAlert) ShouldIgnoreResource() bool {
 	return false
 }
 
@@ -72,12 +89,22 @@ func (s *SNSTopicSubscriptionSupplier) Resources() ([]resource.Resource, error) 
 }
 
 func (s *SNSTopicSubscriptionSupplier) readTopicSubscription(subscription *sns.Subscription, alertr alerter.AlerterInterface) (cty.Value, error) {
-	if subscription.SubscriptionArn != nil && *subscription.SubscriptionArn == "PendingConfirmation" {
-		alertr.SendAlert(
-			fmt.Sprintf("%s.%s", aws.AwsSnsTopicSubscriptionResourceType, *subscription.SubscriptionArn),
-			&pendingTopicAlert{subscription.Endpoint},
-		)
-		return cty.NilVal, nil
+	if subscription.SubscriptionArn != nil && !arn.IsARN(*subscription.SubscriptionArn) {
+		switch *subscription.SubscriptionArn {
+		case "PendingConfirmation":
+			alertr.SendAlert(
+				fmt.Sprintf("%s.%s", aws.AwsSnsTopicSubscriptionResourceType, *subscription.SubscriptionArn),
+				&pendingTopicAlert{subscription.Endpoint},
+			)
+			return cty.NilVal, nil
+		default:
+			alertr.SendAlert(
+				fmt.Sprintf("%s.%s", aws.AwsSnsTopicSubscriptionResourceType, *subscription.SubscriptionArn),
+				&wrongArnTopicAlert{*subscription.SubscriptionArn, subscription.Endpoint},
+			)
+			return cty.NilVal, nil
+
+		}
 	}
 
 	val, err := s.reader.ReadResource(terraform.ReadResourceArgs{
