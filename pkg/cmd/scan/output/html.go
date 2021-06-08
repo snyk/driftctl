@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"html/template"
+	"math"
 	"os"
 	"strings"
 	"time"
@@ -26,14 +27,15 @@ type HTML struct {
 }
 
 type HTMLTemplateParams struct {
-	ScanDate    string
-	Coverage    int
-	Summary     analyser.Summary
-	Unmanaged   []resource.Resource
-	Differences []analyser.Difference
-	Deleted     []resource.Resource
-	Alerts      alerter.Alerts
-	Stylesheet  template.CSS
+	ScanDate     string
+	Coverage     int
+	Summary      analyser.Summary
+	Unmanaged    []resource.Resource
+	Differences  []analyser.Difference
+	Deleted      []resource.Resource
+	Alerts       alerter.Alerts
+	Stylesheet   template.CSS
+	ScanDuration string
 }
 
 func NewHTML(path string) *HTML {
@@ -92,6 +94,12 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 
 			return fmt.Sprintf("%s %s: %s => %s %s", prefix, strings.Join(ch.Path, "."), prettify(ch.From), prettify(ch.To), suffix)
 		},
+		"rate": func(count int) float64 {
+			if analysis.Summary().TotalResources == 0 {
+				return 0
+			}
+			return math.Round(100 * float64(count) / float64(analysis.Summary().TotalResources))
+		},
 	}
 
 	tmpl, err := template.New("main").Funcs(funcMap).Parse(string(tmplFile))
@@ -100,14 +108,15 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 	}
 
 	data := &HTMLTemplateParams{
-		ScanDate:    time.Now().Format("Jan 02, 2006"),
-		Summary:     analysis.Summary(),
-		Coverage:    analysis.Coverage(),
-		Unmanaged:   analysis.Unmanaged(),
-		Differences: analysis.Differences(),
-		Deleted:     analysis.Deleted(),
-		Alerts:      analysis.Alerts(),
-		Stylesheet:  template.CSS(styleFile),
+		ScanDate:     time.Now().Format("Jan 02, 2006"),
+		Summary:      analysis.Summary(),
+		Coverage:     analysis.Coverage(),
+		Unmanaged:    analysis.Unmanaged(),
+		Differences:  analysis.Differences(),
+		Deleted:      analysis.Deleted(),
+		Alerts:       analysis.Alerts(),
+		Stylesheet:   template.CSS(styleFile),
+		ScanDuration: analysis.Duration.Round(time.Second).String(),
 	}
 
 	err = tmpl.Execute(file, data)

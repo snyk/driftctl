@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"path"
 	"testing"
+	"time"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
@@ -22,11 +23,37 @@ func TestHTML_Write(t *testing.T) {
 		err        error
 	}{
 		{
+			name:       "test html output when there's no resources",
+			goldenfile: "output_empty.html",
+			analysis: func() *analyser.Analysis {
+				a := &analyser.Analysis{}
+				return a
+			},
+			err: nil,
+		},
+		{
+			name:       "test html output when infrastructure is in sync",
+			goldenfile: "output_sync.html",
+			analysis: func() *analyser.Analysis {
+				a := &analyser.Analysis{}
+				a.Duration = 72 * time.Second
+				a.AddManaged(
+					&testresource.FakeResource{
+						Id:   "deleted-id-3",
+						Type: "aws_deleted_resource",
+					},
+				)
+				return a
+			},
+			err: nil,
+		},
+		{
 			name:       "test html output",
 			goldenfile: "output.html",
 
 			analysis: func() *analyser.Analysis {
 				a := fakeAnalysisWithAlerts()
+				a.Duration = 91 * time.Second
 				a.AddDeleted(
 					&testresource.FakeResource{
 						Id:   "deleted-id-3",

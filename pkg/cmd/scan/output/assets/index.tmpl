@@ -4,16 +4,28 @@
     <title>Driftctl scan report</title>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="shortcut icon"
+          href="https://raw.githubusercontent.com/cloudskiff/driftctl-docs/main/static/img/favicon.ico"/>
     <style>{{.Stylesheet}}</style>
 </head>
 <body>
 <div class="container">
     <div class="heading d-flex justify-space-between align-center">
         <div>
-            <h1 class="heading-title">Driftctl scan report</h1>
+            <h1 class="heading-title mb-1">Driftctl scan report</h1>
             <span class="heading-subtitle">Coverage {{.Coverage}}%</span>
         </div>
-        <h2 class="heading-date">{{ .ScanDate }}</h2>
+        <div class="text--right">
+            <h2 class="heading-date mb-1">{{ .ScanDate }}</h2>
+            <span class="heading-subtitle">Scan duration {{.ScanDuration}}</span>
+        </div>
+    </div>
+    <div class="card d-flex justify-space-around mb-2 text--grey">
+        <span>Total resources: {{.Summary.TotalResources}}</span>
+        <span>Managed: {{rate .Summary.TotalManaged}}%</span>
+        <span>Changed: {{.Summary.TotalDrifted}}/{{.Summary.TotalManaged}}</span>
+        <span>Unmanaged: {{rate .Summary.TotalUnmanaged}}%</span>
+        <span>Missing: {{rate .Summary.TotalDeleted}}%</span>
     </div>
     <div class="app-content">
         {{ if (lt .Coverage 100) }}
@@ -56,16 +68,24 @@
             <div class="panels">
                 {{ if (gt (len .Unmanaged) 0) }}
                 <div class="panel" id="one-panel">
+                    <div class="d-flex justify-space-between text--grey pa-1">
+                        <span>Resource id</span>
+                        <span>Resource type</span>
+                    </div>
                     {{range $res := .Unmanaged}}
                     <div class="resource-item resource-item-unmanaged d-flex justify-space-between">
                         <span class="resource-item-id">{{$res.TerraformId}}</span>
-                        <span class="resource-item-type text--bold">{{$res.TerraformType}}</span>
+                        <span class="resource-item-type">{{$res.TerraformType}}</span>
                     </div>
                     {{end}}
                 </div>
                 {{end}}
                 {{ if (gt (len .Differences) 0) }}
                 <div class="panel" id="two-panel">
+                    <div class="d-flex justify-space-between text--grey pa-1">
+                        <span>Resource id</span>
+                        <span>Resource type</span>
+                    </div>
                     {{range $diff := .Differences}}
                     <div class="resource-item resource-item-changed d-flex justify-space-between">
                         <span class="resource-item-id">{{$diff.Res.TerraformId}}</span>
@@ -74,17 +94,21 @@
                             <div>{{ formatChange $change }}</div>
                             {{end}}
                         </div>
-                        <span class="resource-item-type text--bold">{{$diff.Res.TerraformType}}</span>
+                        <span class="resource-item-type">{{$diff.Res.TerraformType}}</span>
                     </div>
                     {{end}}
                 </div>
                 {{end}}
                 {{ if (gt (len .Deleted) 0) }}
                 <div class="panel" id="three-panel">
+                    <div class="d-flex justify-space-between text--grey pa-1">
+                        <span>Resource id</span>
+                        <span>Resource type</span>
+                    </div>
                     {{range $res := .Deleted}}
                     <div class="resource-item resource-item-deleted d-flex justify-space-between">
                         <span class="resource-item-id">{{$res.TerraformId}}</span>
-                        <span class="resource-item-type text--bold">{{$res.TerraformType}}</span>
+                        <span class="resource-item-type">{{$res.TerraformType}}</span>
                     </div>
                     {{end}}
                 </div>
@@ -94,8 +118,8 @@
                     {{range $type, $messages := .Alerts}}
                     {{range $el := $messages}}
                     <div class="resource-item resource-item-alerts">
-                        <span class="resource-item-type text--bold">{{ $type }}</span>
-                        <span>- {{ $el.Message }}</span>
+                        <span class="resource-item-type">{{ $type }}</span>
+                        <span>{{ $el.Message }}</span>
                     </div>
                     {{end}}
                     {{end}}

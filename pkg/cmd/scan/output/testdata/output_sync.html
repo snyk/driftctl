@@ -1,4 +1,12 @@
-/* http://meyerweb.com/eric/tools/css/reset/
+<!doctype html>
+<html>
+<head>
+    <title>Driftctl scan report</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="shortcut icon"
+          href="https://raw.githubusercontent.com/cloudskiff/driftctl-docs/main/static/img/favicon.ico"/>
+    <style>/* http://meyerweb.com/eric/tools/css/reset/
    v2.0 | 20110126
    License: none (public domain)
 */
@@ -302,4 +310,119 @@ h2 {
 
 .empty-message-container {
     color: #747578;
-}
+}</style>
+</head>
+<body>
+<div class="container">
+    <div class="heading d-flex justify-space-between align-center">
+        <div>
+            <h1 class="heading-title mb-1">Driftctl scan report</h1>
+            <span class="heading-subtitle">Coverage 100%</span>
+        </div>
+        <div class="text--right">
+            <h2 class="heading-date mb-1">Jun 08, 2021</h2>
+            <span class="heading-subtitle">Scan duration 1m12s</span>
+        </div>
+    </div>
+    <div class="card d-flex justify-space-around mb-2 text--grey">
+        <span>Total resources: 1</span>
+        <span>Managed: 100%</span>
+        <span>Changed: 0/1</span>
+        <span>Unmanaged: 0%</span>
+        <span>Missing: 0%</span>
+    </div>
+    <div class="app-content">
+        
+        <div class="d-flex justify-center mt-5 mb-5">
+            <h1>Congrats! Your infrastructure is in sync</h1>
+        </div>
+        
+    </div>
+</div>
+</body>
+<script lang="js">
+    const resources = document.querySelectorAll('.resource-item')
+
+    function hideResource(res) {
+        res.classList.add('hide')
+    }
+
+    function displayResource(res) {
+        res.classList.remove('hide')
+    }
+
+    function resourceIdContains(res, query) {
+        const el = res.querySelector('.resource-item-id')
+        if (!el) {
+            return false
+        }
+        return el.innerText.toLowerCase().includes(query.toLowerCase())
+    }
+
+    function resourceTypeEqual(res, type) {
+        const el = res.querySelector('.resource-item-type')
+        if (!el) {
+            return false
+        }
+        return el.innerText === type
+    }
+
+    function refreshCounters() {
+        const counterClassMapping = {
+            '.resource-item-unmanaged': '.resource-count-unmanaged',
+            '.resource-item-changed': '.resource-count-changed',
+            '.resource-item-deleted': '.resource-count-deleted',
+            '.resource-item-alerts': '.resource-count-alerts',
+        }
+
+        for (const resClass in counterClassMapping) {
+            const countEl = document.querySelector(counterClassMapping[resClass])
+            if (!countEl) {
+                continue
+            }
+            countEl.textContent = Array.from(document.querySelectorAll(resClass)).filter(el => !el.classList.contains('hide')).length
+        }
+    }
+
+    function computeEmptyMessage() {
+        const msgEl = document.querySelector('.empty-message-container')
+        const wrapperEl = document.querySelector('.tabs-wrapper')
+        const count = Array.from(resources).filter(el => !el.classList.contains('hide')).length
+        if (count === 0) {
+            msgEl.classList.remove('hide')
+            wrapperEl.classList.add('hide')
+            return
+        }
+        msgEl.classList.add('hide')
+        wrapperEl.classList.remove('hide')
+    }
+
+    function refreshState() {
+        const queryFilterInput = document.querySelector('input[name=resource-id-filter]').value
+        const typeFilterInput = document.querySelector('select[name=resource-type-filter]').value
+
+        for (const res of resources) {
+            const matchId = !queryFilterInput.length || resourceIdContains(res, queryFilterInput)
+            const matchType = !typeFilterInput.length || resourceTypeEqual(res, typeFilterInput)
+
+            if (matchId && matchType) {
+                displayResource(res)
+                continue
+            }
+
+            hideResource(res)
+        }
+
+        refreshCounters()
+        computeEmptyMessage()
+    }
+
+    function resetFilters() {
+        document.querySelector('input[name=resource-id-filter]').value = ""
+        document.querySelector('select[name=resource-type-filter]').value = ""
+        refreshState()
+    }
+
+    refreshState()
+</script>
+</html>
