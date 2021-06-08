@@ -2,7 +2,8 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 
@@ -15,24 +16,23 @@ import (
 type RouteSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       ec2iface.EC2API
+	repo         repository.EC2Repository
 	routeRunner  *terraform.ParallelResourceReader
 }
 
-func NewRouteSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *RouteSupplier {
+func NewRouteSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *RouteSupplier {
 	return &RouteSupplier{
 		provider,
 		deserializer,
-		ec2.New(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *RouteSupplier) Resources() ([]resource.Resource, error) {
-
-	routeTables, err := listRouteTables(s.client, aws.AwsRouteResourceType)
+	routeTables, err := s.repo.ListAllRouteTables()
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, aws.AwsRouteResourceType, aws.AwsRouteTableResourceType)
 	}
 
 	for _, routeTable := range routeTables {

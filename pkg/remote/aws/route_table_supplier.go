@@ -3,10 +3,10 @@ package aws
 import (
 	"errors"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 
@@ -19,26 +19,25 @@ import (
 type RouteTableSupplier struct {
 	reader                  terraform.ResourceReader
 	deserializer            *resource.Deserializer
-	client                  ec2iface.EC2API
+	repo                    repository.EC2Repository
 	defaultRouteTableRunner *terraform.ParallelResourceReader
 	routeTableRunner        *terraform.ParallelResourceReader
 }
 
-func NewRouteTableSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *RouteTableSupplier {
+func NewRouteTableSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *RouteTableSupplier {
 	return &RouteTableSupplier{
 		provider,
 		deserializer,
-		ec2.New(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *RouteTableSupplier) Resources() ([]resource.Resource, error) {
-
-	results, err := listRouteTables(s.client, aws.AwsRouteTableResourceType)
+	results, err := s.repo.ListAllRouteTables()
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsRouteTableResourceType)
 	}
 
 	retrievedDefaultRouteTables := []*ec2.RouteTable{}
@@ -124,21 +123,4 @@ func (s *RouteTableSupplier) readRouteTable(routeTable ec2.RouteTable, isMain bo
 		return cty.NilVal, err
 	}
 	return *val, nil
-}
-
-func listRouteTables(client ec2iface.EC2API, supplierType string) ([]*ec2.RouteTable, error) {
-	var routeTables []*ec2.RouteTable
-	input := ec2.DescribeRouteTablesInput{}
-	err := client.DescribeRouteTablesPages(&input,
-		func(resp *ec2.DescribeRouteTablesOutput, lastPage bool) bool {
-			routeTables = append(routeTables, resp.RouteTables...)
-			return !lastPage
-		},
-	)
-
-	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, supplierType, aws.AwsRouteTableResourceType)
-	}
-
-	return routeTables, nil
 }

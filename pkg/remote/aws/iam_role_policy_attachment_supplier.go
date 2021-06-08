@@ -3,8 +3,7 @@ package aws
 import (
 	"fmt"
 
-	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -19,43 +18,35 @@ import (
 type IamRolePolicyAttachmentSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       iamiface.IAMAPI
+	repo         repository.IAMRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamRolePolicyAttachmentSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *IamRolePolicyAttachmentSupplier {
+func NewIamRolePolicyAttachmentSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.IAMRepository) *IamRolePolicyAttachmentSupplier {
 	return &IamRolePolicyAttachmentSupplier{
 		provider,
 		deserializer,
-		iam.New(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *IamRolePolicyAttachmentSupplier) Resources() ([]resource.Resource, error) {
-	roles, err := listIamRoles(s.client, resourceaws.AwsIamRolePolicyAttachmentResourceType)
+	roles, err := s.repo.ListAllRoles()
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, resourceaws.AwsIamRolePolicyAttachmentResourceType, resourceaws.AwsIamRoleResourceType)
 	}
-	results := make([]cty.Value, 0)
-	if len(roles) > 0 {
-		attachedPolicies := make([]*attachedRolePolicy, 0)
-		for _, role := range roles {
-			roleName := *role.RoleName
-			if awsIamRoleShouldBeIgnored(roleName) {
-				continue
-			}
-			roleAttachmentList, err := listIamRolePoliciesAttachment(roleName, s.client)
-			if err != nil {
-				return nil, err
-			}
-			attachedPolicies = append(attachedPolicies, roleAttachmentList...)
-		}
+	policyAttachments, err := s.repo.ListAllRolePolicyAttachments(roles)
+	if err != nil {
+		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamRolePolicyAttachmentResourceType)
+	}
 
-		for _, attachedPolicy := range attachedPolicies {
+	results := make([]cty.Value, 0)
+	if len(policyAttachments) > 0 {
+		for _, attachedPolicy := range policyAttachments {
 			attached := *attachedPolicy
 			s.runner.Run(func() (cty.Value, error) {
-				return s.readRes(attached)
+				return s.readRolePolicyAttachment(&attached)
 			})
 		}
 		results, err = s.runner.Wait()
@@ -67,7 +58,7 @@ func (s *IamRolePolicyAttachmentSupplier) Resources() ([]resource.Resource, erro
 	return s.deserializer.Deserialize(resourceaws.AwsIamRolePolicyAttachmentResourceType, results)
 }
 
-func (s *IamRolePolicyAttachmentSupplier) readRes(attachedPol attachedRolePolicy) (cty.Value, error) {
+func (s *IamRolePolicyAttachmentSupplier) readRolePolicyAttachment(attachedPol *repository.AttachedRolePolicy) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamRolePolicyAttachmentResourceType,
@@ -84,29 +75,4 @@ func (s *IamRolePolicyAttachmentSupplier) readRes(attachedPol attachedRolePolicy
 		return cty.NilVal, err
 	}
 	return *res, nil
-}
-
-func listIamRolePoliciesAttachment(roleName string, client iamiface.IAMAPI) ([]*attachedRolePolicy, error) {
-	var attachedRolePolicies []*attachedRolePolicy
-	input := &iam.ListAttachedRolePoliciesInput{
-		RoleName: &roleName,
-	}
-	err := client.ListAttachedRolePoliciesPages(input, func(res *iam.ListAttachedRolePoliciesOutput, lastPage bool) bool {
-		for _, policy := range res.AttachedPolicies {
-			attachedRolePolicies = append(attachedRolePolicies, &attachedRolePolicy{
-				AttachedPolicy: *policy,
-				RoleName:       roleName,
-			})
-		}
-		return !lastPage
-	})
-	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, resourceaws.AwsIamRolePolicyAttachmentResourceType, resourceaws.AwsIamRolePolicyResourceType)
-	}
-	return attachedRolePolicies, nil
-}
-
-type attachedRolePolicy struct {
-	iam.AttachedPolicy
-	RoleName string
 }

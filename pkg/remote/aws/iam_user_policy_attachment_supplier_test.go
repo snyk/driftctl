@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -18,10 +18,11 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/iam"
 
-	"github.com/cloudskiff/driftctl/test/goldenfile"
-	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/cloudskiff/driftctl/test/goldenfile"
+	"github.com/cloudskiff/driftctl/test/mocks"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -33,123 +34,118 @@ func TestIamUserPolicyAttachmentSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *awstest.MockFakeIAM)
+		mocks   func(repo *repository.MockIAMRepository)
 		err     error
 	}{
 		{
-			test:    "iam multiples users multiple policies",
-			dirName: "iam_user_policy_attachment_multiple",
-			mocks: func(client *awstest.MockFakeIAM) {
-				client.On("ListUsersPages",
-					&iam.ListUsersInput{},
-					mock.MatchedBy(func(callback func(res *iam.ListUsersOutput, lastPage bool) bool) bool {
-						callback(&iam.ListUsersOutput{Users: []*iam.User{
-							{
-								UserName: aws.String("loadbalancer"),
-							},
-							{
-								UserName: aws.String("loadbalancer2"),
-							},
-							{
-								UserName: aws.String("loadbalancer3"),
-							},
-						}}, true)
-						return true
-					})).Return(nil).Once()
-
-				shouldSkipfirst := false
-				shouldSkipSecond := false
-				shouldSkipThird := false
-
-				client.On("ListAttachedUserPoliciesPages",
-					&iam.ListAttachedUserPoliciesInput{
+			test:    "no iam user policy",
+			dirName: "iam_user_policy_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				users := []*iam.User{
+					{
 						UserName: aws.String("loadbalancer"),
 					},
-					mock.MatchedBy(func(callback func(res *iam.ListAttachedUserPoliciesOutput, lastPage bool) bool) bool {
-						if shouldSkipfirst {
-							return false
-						}
-						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							{
-								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test"),
-								PolicyName: aws.String("test-attach"),
-							},
-							{
-								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test2"),
-								PolicyName: aws.String("test-attach2"),
-							},
-							{
-								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test3"),
-								PolicyName: aws.String("test-attach3"),
-							},
-						}}, false)
-						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							{
-								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test4"),
-								PolicyName: aws.String("test-attach4"),
-							},
-						}}, true)
-						shouldSkipfirst = true
-						return true
-					})).Return(nil).Once()
-
-				client.On("ListAttachedUserPoliciesPages",
-					&iam.ListAttachedUserPoliciesInput{
+				}
+				repo.On("ListAllUsers").Return(users, nil)
+				repo.On("ListAllUserPolicyAttachments", users).Return([]*repository.AttachedUserPolicy{}, nil)
+			},
+			err: nil,
+		},
+		{
+			test:    "iam multiples users multiple policies",
+			dirName: "iam_user_policy_attachment_multiple",
+			mocks: func(repo *repository.MockIAMRepository) {
+				users := []*iam.User{
+					{
+						UserName: aws.String("loadbalancer"),
+					},
+					{
 						UserName: aws.String("loadbalancer2"),
 					},
-					mock.MatchedBy(func(callback func(res *iam.ListAttachedUserPoliciesOutput, lastPage bool) bool) bool {
-						if shouldSkipSecond {
-							return false
-						}
-						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							{
-								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test"),
-								PolicyName: aws.String("test-attach"),
-							},
-							{
-								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test2"),
-								PolicyName: aws.String("test-attach2"),
-							},
-							{
-								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test3"),
-								PolicyName: aws.String("test-attach3"),
-							},
-						}}, false)
-						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							{
-								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test4"),
-								PolicyName: aws.String("test-attach4"),
-							},
-						}}, true)
-						shouldSkipSecond = true
-						return true
-					})).Return(nil).Once()
-
-				client.On("ListAttachedUserPoliciesPages",
-					&iam.ListAttachedUserPoliciesInput{
+					{
 						UserName: aws.String("loadbalancer3"),
 					},
-					mock.MatchedBy(func(callback func(res *iam.ListAttachedUserPoliciesOutput, lastPage bool) bool) bool {
-						if shouldSkipThird {
-							return false
-						}
-						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							{
-								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test"),
-								PolicyName: aws.String("test-attach"),
-							},
-							{
-								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test2"),
-								PolicyName: aws.String("test-attach2"),
-							},
-							{
-								PolicyArn:  aws.String("arn:aws:iam::047081014315:policy/test3"),
-								PolicyName: aws.String("test-attach3"),
-							},
-						}}, false)
-						shouldSkipThird = true
-						return true
-					})).Return(nil).Once()
+				}
+				repo.On("ListAllUsers").Return(users, nil)
+				repo.On("ListAllUserPolicyAttachments", users).Return([]*repository.AttachedUserPolicy{
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test"),
+							PolicyName: aws.String("test-attach"),
+						},
+						UserName: *aws.String("loadbalancer"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test2"),
+							PolicyName: aws.String("test-attach2"),
+						},
+						UserName: *aws.String("loadbalancer"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test3"),
+							PolicyName: aws.String("test-attach3"),
+						},
+						UserName: *aws.String("loadbalancer"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test4"),
+							PolicyName: aws.String("test-attach4"),
+						},
+						UserName: *aws.String("loadbalancer"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test"),
+							PolicyName: aws.String("test-attach"),
+						},
+						UserName: *aws.String("loadbalancer2"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test2"),
+							PolicyName: aws.String("test-attach2"),
+						},
+						UserName: *aws.String("loadbalancer2"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test3"),
+							PolicyName: aws.String("test-attach3"),
+						},
+						UserName: *aws.String("loadbalancer2"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test4"),
+							PolicyName: aws.String("test-attach4"),
+						},
+						UserName: *aws.String("loadbalancer2"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test"),
+							PolicyName: aws.String("test-attach"),
+						},
+						UserName: *aws.String("loadbalancer3"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test2"),
+							PolicyName: aws.String("test-attach2"),
+						},
+						UserName: *aws.String("loadbalancer3"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test3"),
+							PolicyName: aws.String("test-attach3"),
+						},
+						UserName: *aws.String("loadbalancer3"),
+					},
+				}, nil)
 
 			},
 			err: nil,
@@ -157,40 +153,17 @@ func TestIamUserPolicyAttachmentSupplier_Resources(t *testing.T) {
 		{
 			test:    "cannot list user",
 			dirName: "iam_user_policy_empty",
-			mocks: func(client *awstest.MockFakeIAM) {
-				client.On("ListUsersPages",
-					&iam.ListUsersInput{},
-					mock.MatchedBy(func(callback func(res *iam.ListUsersOutput, lastPage bool) bool) bool {
-						return true
-					})).Return(awserr.NewRequestFailure(nil, 403, "")).Once()
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllUsers").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsIamUserPolicyAttachmentResourceType, resourceaws.AwsIamUserResourceType),
 		},
 		{
 			test:    "cannot list user policies attachment",
 			dirName: "iam_user_policy_empty",
-			mocks: func(client *awstest.MockFakeIAM) {
-				client.On("ListUsersPages",
-					&iam.ListUsersInput{},
-					mock.MatchedBy(func(callback func(res *iam.ListUsersOutput, lastPage bool) bool) bool {
-						callback(&iam.ListUsersOutput{Users: []*iam.User{
-							{
-								UserName: aws.String("loadbalancer"),
-							},
-							{
-								UserName: aws.String("loadbalancer2"),
-							},
-							{
-								UserName: aws.String("loadbalancer3"),
-							},
-						}}, true)
-						return true
-					})).Return(nil).Once()
-				client.On("ListAttachedUserPoliciesPages",
-					mock.Anything,
-					mock.MatchedBy(func(callback func(res *iam.ListAttachedUserPoliciesOutput, lastPage bool) bool) bool {
-						return true
-					})).Return(awserr.NewRequestFailure(nil, 403, "")).Once()
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllUsers").Once().Return([]*iam.User{}, nil)
+				repo.On("ListAllUserPolicyAttachments", mock.Anything).Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsIamUserPolicyAttachmentResourceType),
 		},
@@ -211,14 +184,14 @@ func TestIamUserPolicyAttachmentSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewIamUserPolicyAttachmentSupplier(provider, deserializer))
+			supplierLibrary.AddSupplier(NewIamUserPolicyAttachmentSupplier(provider, deserializer, repository.NewIAMRepository(provider.session)))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeIam := awstest.MockFakeIAM{}
+			fakeIam := repository.MockIAMRepository{}
 			c.mocks(&fakeIam)
 
-			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			s := &IamUserPolicyAttachmentSupplier{
 				provider,
 				deserializer,

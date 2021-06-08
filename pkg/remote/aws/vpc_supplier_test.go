@@ -4,8 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -31,66 +32,47 @@ func TestVPCSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *awstest.MockFakeEC2)
+		mocks   func(client *repository.MockEC2Repository)
 		err     error
 	}{
 		{
 			test:    "no VPC",
 			dirName: "vpc_empty",
-			mocks: func(client *awstest.MockFakeEC2) {
-				client.On("DescribeVpcsPages",
-					&ec2.DescribeVpcsInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeVpcsOutput, lastPage bool) bool) bool {
-						callback(&ec2.DescribeVpcsOutput{}, true)
-						return true
-					})).Return(nil)
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllVPCs").Once().Return([]*ec2.Vpc{}, []*ec2.Vpc{}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "mixed default VPC and VPC",
 			dirName: "vpc",
-			mocks: func(client *awstest.MockFakeEC2) {
-				client.On("DescribeVpcsPages",
-					&ec2.DescribeVpcsInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeVpcsOutput, lastPage bool) bool) bool {
-						callback(&ec2.DescribeVpcsOutput{
-							Vpcs: []*ec2.Vpc{
-								{
-									VpcId:     aws.String("vpc-a8c5d4c1"),
-									IsDefault: aws.Bool(true),
-								},
-								{
-									VpcId: aws.String("vpc-0768e1fd0029e3fc3"),
-								},
-								{
-									VpcId:     aws.String("vpc-020b072316a95b97f"),
-									IsDefault: aws.Bool(false),
-								},
-							},
-						}, false)
-						callback(&ec2.DescribeVpcsOutput{
-							Vpcs: []*ec2.Vpc{
-								{
-									VpcId:     aws.String("vpc-02c50896b59598761"),
-									IsDefault: aws.Bool(false),
-								},
-							},
-						}, true)
-						return true
-					})).Return(nil)
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllVPCs").Once().Return([]*ec2.Vpc{
+					{
+						VpcId: aws.String("vpc-0768e1fd0029e3fc3"),
+					},
+					{
+						VpcId:     aws.String("vpc-020b072316a95b97f"),
+						IsDefault: aws.Bool(false),
+					},
+					{
+						VpcId:     aws.String("vpc-02c50896b59598761"),
+						IsDefault: aws.Bool(false),
+					},
+				}, []*ec2.Vpc{
+					{
+						VpcId:     aws.String("vpc-a8c5d4c1"),
+						IsDefault: aws.Bool(true),
+					},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "cannot list VPC",
 			dirName: "vpc_empty",
-			mocks: func(client *awstest.MockFakeEC2) {
-				client.On("DescribeVpcsPages",
-					&ec2.DescribeVpcsInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeVpcsOutput, lastPage bool) bool) bool {
-						return true
-					})).Return(awserr.NewRequestFailure(nil, 403, ""))
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllVPCs").Once().Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsVpcResourceType),
 		},
@@ -111,11 +93,11 @@ func TestVPCSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewVPCSupplier(provider, deserializer))
+			supplierLibrary.AddSupplier(NewVPCSupplier(provider, deserializer, repository.NewEC2Repository(provider.session, cache.New(0))))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeEC2 := awstest.MockFakeEC2{}
+			fakeEC2 := repository.MockEC2Repository{}
 			c.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			s := &VPCSupplier{

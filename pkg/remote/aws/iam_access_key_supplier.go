@@ -2,9 +2,9 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
@@ -17,30 +17,34 @@ import (
 type IamAccessKeySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       iamiface.IAMAPI
+	repo         repository.IAMRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamAccessKeySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *IamAccessKeySupplier {
+func NewIamAccessKeySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.IAMRepository) *IamAccessKeySupplier {
 	return &IamAccessKeySupplier{
 		provider,
 		deserializer,
-		iam.New(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *IamAccessKeySupplier) Resources() ([]resource.Resource, error) {
-	keys, err := listIamAccessKeys(s.client)
+	users, err := s.repo.ListAllUsers()
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, resourceaws.AwsIamAccessKeyResourceType, resourceaws.AwsIamUserResourceType)
+	}
+	keys, err := s.repo.ListAllAccessKeys(users)
+	if err != nil {
+		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamAccessKeyResourceType)
 	}
 	results := make([]cty.Value, 0)
 	if len(keys) > 0 {
 		for _, key := range keys {
 			k := *key
 			s.runner.Run(func() (cty.Value, error) {
-				return s.readRes(&k)
+				return s.readAccessKey(&k)
 			})
 		}
 		results, err = s.runner.Wait()
@@ -51,7 +55,7 @@ func (s *IamAccessKeySupplier) Resources() ([]resource.Resource, error) {
 	return s.deserializer.Deserialize(resourceaws.AwsIamAccessKeyResourceType, results)
 }
 
-func (s *IamAccessKeySupplier) readRes(key *iam.AccessKeyMetadata) (cty.Value, error) {
+func (s *IamAccessKeySupplier) readAccessKey(key *iam.AccessKeyMetadata) (cty.Value, error) {
 	res, err := s.reader.ReadResource(
 		terraform.ReadResourceArgs{
 			Ty: resourceaws.AwsIamAccessKeyResourceType,
@@ -67,26 +71,4 @@ func (s *IamAccessKeySupplier) readRes(key *iam.AccessKeyMetadata) (cty.Value, e
 	}
 
 	return *res, nil
-}
-
-func listIamAccessKeys(client iamiface.IAMAPI) ([]*iam.AccessKeyMetadata, error) {
-	users, err := listIamUsers(client, resourceaws.AwsIamAccessKeyResourceType)
-	if err != nil {
-		return nil, err
-	}
-	var resources []*iam.AccessKeyMetadata
-	for _, user := range users {
-		input := &iam.ListAccessKeysInput{
-			UserName: user.UserName,
-		}
-		err := client.ListAccessKeysPages(input, func(res *iam.ListAccessKeysOutput, lastPage bool) bool {
-			resources = append(resources, res.AccessKeyMetadata...)
-			return !lastPage
-		})
-		if err != nil {
-			return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamAccessKeyResourceType)
-		}
-	}
-
-	return resources, nil
 }

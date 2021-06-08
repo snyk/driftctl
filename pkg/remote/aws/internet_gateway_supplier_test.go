@@ -4,8 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -30,53 +31,37 @@ func TestInternetGatewaySupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *awstest.MockFakeEC2)
+		mocks   func(repo *repository.MockEC2Repository)
 		err     error
 	}{
 		{
 			test:    "no internet gateways",
 			dirName: "internet_gateway_empty",
-			mocks: func(client *awstest.MockFakeEC2) {
-				client.On("DescribeInternetGatewaysPages",
-					&ec2.DescribeInternetGatewaysInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeInternetGatewaysOutput, lastPage bool) bool) bool {
-						callback(&ec2.DescribeInternetGatewaysOutput{}, true)
-						return true
-					})).Return(nil)
+			mocks: func(repo *repository.MockEC2Repository) {
+				repo.On("ListAllInternetGateways").Once().Return([]*ec2.InternetGateway{}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "multiple internet gateways",
 			dirName: "internet_gateway_multiple",
-			mocks: func(client *awstest.MockFakeEC2) {
-				client.On("DescribeInternetGatewaysPages",
-					&ec2.DescribeInternetGatewaysInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeInternetGatewaysOutput, lastPage bool) bool) bool {
-						callback(&ec2.DescribeInternetGatewaysOutput{
-							InternetGateways: []*ec2.InternetGateway{
-								{
-									InternetGatewayId: awssdk.String("igw-0184eb41aadc62d1c"),
-								},
-								{
-									InternetGatewayId: awssdk.String("igw-047b487f5c60fca99"),
-								},
-							},
-						}, true)
-						return true
-					})).Return(nil)
+			mocks: func(repo *repository.MockEC2Repository) {
+				repo.On("ListAllInternetGateways").Once().Return([]*ec2.InternetGateway{
+					{
+						InternetGatewayId: awssdk.String("igw-0184eb41aadc62d1c"),
+					},
+					{
+						InternetGatewayId: awssdk.String("igw-047b487f5c60fca99"),
+					},
+				}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "cannot list internet gateways",
 			dirName: "internet_gateway_empty",
-			mocks: func(client *awstest.MockFakeEC2) {
-				client.On("DescribeInternetGatewaysPages",
-					&ec2.DescribeInternetGatewaysInput{},
-					mock.MatchedBy(func(callback func(res *ec2.DescribeInternetGatewaysOutput, lastPage bool) bool) bool {
-						return true
-					})).Return(awserr.NewRequestFailure(nil, 403, ""))
+			mocks: func(repo *repository.MockEC2Repository) {
+				repo.On("ListAllInternetGateways").Once().Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsInternetGatewayResourceType),
 		},
@@ -97,11 +82,11 @@ func TestInternetGatewaySupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewInternetGatewaySupplier(provider, deserializer))
+			supplierLibrary.AddSupplier(NewInternetGatewaySupplier(provider, deserializer, repository.NewEC2Repository(provider.session, cache.New(0))))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeEC2 := awstest.MockFakeEC2{}
+			fakeEC2 := repository.MockEC2Repository{}
 			c.mocks(&fakeEC2)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			s := &InternetGatewaySupplier{

@@ -4,8 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/aws/aws-sdk-go/service/iam"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -16,12 +17,11 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 
-	"github.com/aws/aws-sdk-go/service/iam"
-
-	"github.com/cloudskiff/driftctl/test/goldenfile"
-	mocks2 "github.com/cloudskiff/driftctl/test/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/cloudskiff/driftctl/test/goldenfile"
+	"github.com/cloudskiff/driftctl/test/mocks"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -33,113 +33,63 @@ func TestIamRolePolicySupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *awstest.MockFakeIAM)
+		mocks   func(repo *repository.MockIAMRepository)
 		err     error
 	}{
 		{
-			test:    "multiples roles without any inline policies",
+			test:    "no iam role policy",
 			dirName: "iam_role_policy_empty",
-			mocks: func(client *awstest.MockFakeIAM) {
-				client.On("ListRolesPages",
-					&iam.ListRolesInput{},
-					mock.MatchedBy(func(callback func(res *iam.ListRolesOutput, lastPage bool) bool) bool {
-						callback(&iam.ListRolesOutput{Roles: []*iam.Role{
-							{
-								RoleName: aws.String("test_role_0"),
-							},
-							{
-								RoleName: aws.String("test_role_1"),
-							},
-						}}, true)
-						return true
-					})).Return(nil)
-				client.On("ListRolePoliciesPages",
-					&iam.ListRolePoliciesInput{
-						RoleName: aws.String("test_role_0"),
+			mocks: func(repo *repository.MockIAMRepository) {
+				roles := []*iam.Role{
+					{
+						RoleName: aws.String("test_role"),
 					},
-					mock.Anything,
-				).Return(nil)
-				client.On("ListRolePoliciesPages",
-					&iam.ListRolePoliciesInput{
-						RoleName: aws.String("test_role_1"),
-					},
-					mock.Anything,
-				).Return(nil)
+				}
+				repo.On("ListAllRoles").Return(roles, nil)
+				repo.On("ListAllRolePolicies", roles).Return([]string{}, nil)
 			},
 			err: nil,
 		},
 		{
-			test:    "iam multiples roles with inline policies",
+			test:    "multiples roles with inline policies",
 			dirName: "iam_role_policy_multiple",
-			mocks: func(client *awstest.MockFakeIAM) {
-				client.On("ListRolesPages",
-					&iam.ListRolesInput{},
-					mock.MatchedBy(func(callback func(res *iam.ListRolesOutput, lastPage bool) bool) bool {
-						callback(&iam.ListRolesOutput{Roles: []*iam.Role{
-							{
-								RoleName: aws.String("test_role_0"),
-							},
-							{
-								RoleName: aws.String("test_role_1"),
-							},
-						}}, true)
-						return true
-					})).Once().Return(nil)
-				firstMockCalled := false
-				client.On("ListRolePoliciesPages",
-					&iam.ListRolePoliciesInput{
+			mocks: func(repo *repository.MockIAMRepository) {
+				roles := []*iam.Role{
+					{
 						RoleName: aws.String("test_role_0"),
 					},
-					mock.MatchedBy(func(callback func(res *iam.ListRolePoliciesOutput, lastPage bool) bool) bool {
-						if firstMockCalled {
-							return false
-						}
-						callback(&iam.ListRolePoliciesOutput{
-							PolicyNames: []*string{
-								aws.String("policy-role0-0"),
-								aws.String("policy-role0-1"),
-							},
-						}, false)
-						callback(&iam.ListRolePoliciesOutput{
-							PolicyNames: []*string{
-								aws.String("policy-role0-2"),
-							},
-						}, true)
-						firstMockCalled = true
-						return true
-					})).Once().Return(nil)
-				client.On("ListRolePoliciesPages",
-					&iam.ListRolePoliciesInput{
+					{
 						RoleName: aws.String("test_role_1"),
 					},
-					mock.MatchedBy(func(callback func(res *iam.ListRolePoliciesOutput, lastPage bool) bool) bool {
-						callback(&iam.ListRolePoliciesOutput{
-							PolicyNames: []*string{
-								aws.String("policy-role1-0"),
-								aws.String("policy-role1-1"),
-							},
-						}, false)
-						callback(&iam.ListRolePoliciesOutput{
-							PolicyNames: []*string{
-								aws.String("policy-role1-2"),
-							},
-						}, true)
-						return true
-					})).Once().Return(nil)
+				}
+				repo.On("ListAllRoles").Return(roles, nil)
+				repo.On("ListAllRolePolicies", roles).Return([]string{
+					*aws.String("test_role_0:policy-role0-0"),
+					*aws.String("test_role_0:policy-role0-1"),
+					*aws.String("test_role_0:policy-role0-2"),
+					*aws.String("test_role_1:policy-role1-0"),
+					*aws.String("test_role_1:policy-role1-1"),
+					*aws.String("test_role_1:policy-role1-2"),
+				}, nil).Once()
 			},
 			err: nil,
 		},
 		{
 			test:    "Cannot list roles",
 			dirName: "iam_role_policy_empty",
-			mocks: func(client *awstest.MockFakeIAM) {
-				client.On("ListRolesPages",
-					&iam.ListRolesInput{},
-					mock.MatchedBy(func(callback func(res *iam.ListRolesOutput, lastPage bool) bool) bool {
-						return true
-					})).Return(awserr.NewRequestFailure(nil, 403, ""))
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllRoles").Once().Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsIamRolePolicyResourceType, resourceaws.AwsIamRoleResourceType),
+		},
+		{
+			test:    "cannot list role policy",
+			dirName: "iam_role_policy_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllRoles").Once().Return([]*iam.Role{}, nil)
+				repo.On("ListAllRolePolicies", mock.Anything).Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsIamRolePolicyResourceType),
 		},
 	}
 	for _, c := range cases {
@@ -158,14 +108,14 @@ func TestIamRolePolicySupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewIamRolePolicySupplier(provider, deserializer))
+			supplierLibrary.AddSupplier(NewIamRolePolicySupplier(provider, deserializer, repository.NewIAMRepository(provider.session)))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeIam := awstest.MockFakeIAM{}
+			fakeIam := repository.MockIAMRepository{}
 			c.mocks(&fakeIam)
 
-			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
+			provider := mocks.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			s := &IamRolePolicySupplier{
 				provider,
 				deserializer,

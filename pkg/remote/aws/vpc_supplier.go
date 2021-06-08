@@ -2,7 +2,7 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -18,37 +18,23 @@ import (
 type VPCSupplier struct {
 	reader           terraform.ResourceReader
 	deserializer     *resource.Deserializer
-	client           ec2iface.EC2API
+	repo             repository.EC2Repository
 	defaultVPCRunner *terraform.ParallelResourceReader
 	vpcRunner        *terraform.ParallelResourceReader
 }
 
-func NewVPCSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *VPCSupplier {
+func NewVPCSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *VPCSupplier {
 	return &VPCSupplier{
 		provider,
 		deserializer,
-		ec2.New(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *VPCSupplier) Resources() ([]resource.Resource, error) {
-	input := ec2.DescribeVpcsInput{}
-	var VPCs []*ec2.Vpc
-	var defaultVPCs []*ec2.Vpc
-	err := s.client.DescribeVpcsPages(&input,
-		func(resp *ec2.DescribeVpcsOutput, lastPage bool) bool {
-			for _, vpc := range resp.Vpcs {
-				if vpc.IsDefault != nil && *vpc.IsDefault {
-					defaultVPCs = append(defaultVPCs, vpc)
-					continue
-				}
-				VPCs = append(VPCs, vpc)
-			}
-			return !lastPage
-		},
-	)
+	VPCs, defaultVPCs, err := s.repo.ListAllVPCs()
 
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsVpcResourceType)
