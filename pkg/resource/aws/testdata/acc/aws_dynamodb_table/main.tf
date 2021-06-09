@@ -16,6 +16,7 @@ resource "aws_dynamodb_table" "simple-dynamo-test" {
 
   timeouts {
     create = "20m"
+    delete = "30m"
   }
 
   attribute {
@@ -62,7 +63,8 @@ resource "aws_dynamodb_table" "global-dynamo-test" {
   stream_view_type = "NEW_AND_OLD_IMAGES"
 
   timeouts {
-    create = "20m"
+    create = "30m"
+    delete = "30m"
   }
 
   attribute {
