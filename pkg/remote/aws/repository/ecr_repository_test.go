@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/ecr"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -44,7 +45,7 @@ func Test_ecrRepository_ListAllRepositories(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*ecr.Repository{
 				{RepositoryName: aws.String("1")},
@@ -58,13 +59,24 @@ func Test_ecrRepository_ListAllRepositories(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := awstest.MockFakeECR{}
 			tt.mocks(&client)
 			r := &ecrRepository{
 				client: &client,
+				cache:  store,
 			}
 			got, err := r.ListAllRepositories()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllRepositories()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*ecr.Repository{}, store.Get("ecrListAllRepositories"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {

@@ -4,11 +4,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/service/kms"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
-
 	"github.com/aws/aws-sdk-go/aws"
-
+	"github.com/aws/aws-sdk-go/service/kms"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/r3labs/diff/v2"
@@ -36,7 +35,7 @@ func Test_KMSRepository_ListAllKeys(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 				client.On("DescribeKey",
 					&kms.DescribeKeyInput{
 						KeyId: aws.String("1"),
@@ -45,7 +44,7 @@ func Test_KMSRepository_ListAllKeys(t *testing.T) {
 						KeyId:      aws.String("1"),
 						KeyManager: aws.String("CUSTOMER"),
 					},
-				}, nil)
+				}, nil).Once()
 				client.On("DescribeKey",
 					&kms.DescribeKeyInput{
 						KeyId: aws.String("2"),
@@ -54,7 +53,7 @@ func Test_KMSRepository_ListAllKeys(t *testing.T) {
 						KeyId:      aws.String("2"),
 						KeyManager: aws.String("AWS"),
 					},
-				}, nil)
+				}, nil).Once()
 				client.On("DescribeKey",
 					&kms.DescribeKeyInput{
 						KeyId: aws.String("3"),
@@ -63,7 +62,7 @@ func Test_KMSRepository_ListAllKeys(t *testing.T) {
 						KeyId:      aws.String("3"),
 						KeyManager: aws.String("AWS"),
 					},
-				}, nil)
+				}, nil).Once()
 			},
 			want: []*kms.KeyListEntry{
 				{KeyId: aws.String("1")},
@@ -72,13 +71,24 @@ func Test_KMSRepository_ListAllKeys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := awstest.MockFakeKMS{}
 			tt.mocks(&client)
 			r := &kmsRepository{
 				client: &client,
+				cache:  store,
 			}
 			got, err := r.ListAllKeys()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllKeys()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*kms.KeyListEntry{}, store.Get("kmsListAllKeys"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -116,7 +126,7 @@ func Test_KMSRepository_ListAllAliases(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*kms.AliasListEntry{
 				{AliasName: aws.String("alias/1")},
@@ -129,13 +139,24 @@ func Test_KMSRepository_ListAllAliases(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := awstest.MockFakeKMS{}
 			tt.mocks(&client)
 			r := &kmsRepository{
 				client: &client,
+				cache:  store,
 			}
 			got, err := r.ListAllAliases()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllAliases()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*kms.AliasListEntry{}, store.Get("kmsListAllAliases"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {

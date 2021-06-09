@@ -4,10 +4,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
-
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/stretchr/testify/mock"
 
@@ -44,7 +44,7 @@ func Test_dynamoDBRepository_ListAllTopics(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*string{
 				aws.String("1"),
@@ -58,13 +58,24 @@ func Test_dynamoDBRepository_ListAllTopics(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := awstest.MockFakeDynamoDB{}
 			tt.mocks(&client)
 			r := &dynamoDBRepository{
 				client: &client,
+				cache:  store,
 			}
 			got, err := r.ListAllTables()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllTables()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*string{}, store.Get("dynamodbListAllTables"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
