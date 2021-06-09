@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	awstest "github.com/cloudskiff/driftctl/test/aws"
-
 	"github.com/stretchr/testify/mock"
 
 	"github.com/r3labs/diff/v2"
@@ -44,7 +44,7 @@ func Test_snsRepository_ListAllTopics(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*sns.Topic{
 				{TopicArn: aws.String("arn1")},
@@ -58,13 +58,24 @@ func Test_snsRepository_ListAllTopics(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &awstest.MockFakeSNS{}
 			tt.mocks(client)
 			r := &snsRepository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllTopics()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllTopics()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*sns.Topic{}, store.Get("snsListAllTopics"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -105,7 +116,7 @@ func Test_snsRepository_ListAllSubscriptions(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*sns.Subscription{
 				{TopicArn: aws.String("arn1"), SubscriptionArn: aws.String("SubArn1")},
@@ -119,13 +130,24 @@ func Test_snsRepository_ListAllSubscriptions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &awstest.MockFakeSNS{}
 			tt.mocks(client)
 			r := &snsRepository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllSubscriptions()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllSubscriptions()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*sns.Subscription{}, store.Get("snsListAllSubscriptions"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {

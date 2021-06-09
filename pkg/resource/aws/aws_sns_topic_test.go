@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/sirupsen/logrus"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
@@ -33,7 +34,7 @@ func TestAcc_AwsSNSTopic(t *testing.T) {
 				},
 				PreExec: func() {
 					err := acceptance.RetryFor(60*time.Second, func(doneCh chan struct{}) error {
-						client := repository.NewSNSClient(awsutils.Session())
+						client := repository.NewSNSClient(awsutils.Session(), cache.New(0))
 						topics, err := client.ListAllTopics()
 						if err != nil {
 							logrus.Warnf("Cannot list topics: %+v", err)
