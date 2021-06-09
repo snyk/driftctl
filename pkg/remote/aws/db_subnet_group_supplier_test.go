@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
@@ -85,7 +86,7 @@ func TestDBSubnetGroupSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewDBInstanceSupplier(provider, deserializer, repository.NewRDSRepository(provider.session)))
+			supplierLibrary.AddSupplier(NewDBInstanceSupplier(provider, deserializer, repository.NewRDSRepository(provider.session, cache.New(0))))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
