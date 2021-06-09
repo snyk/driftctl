@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/aws/aws-sdk-go/service/kms/kmsiface"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 )
 
 type KMSRepository interface {
@@ -15,15 +16,21 @@ type KMSRepository interface {
 
 type kmsRepository struct {
 	client kmsiface.KMSAPI
+	cache  cache.Cache
 }
 
-func NewKMSRepository(session *session.Session) *kmsRepository {
+func NewKMSRepository(session *session.Session, c cache.Cache) *kmsRepository {
 	return &kmsRepository{
 		kms.New(session),
+		c,
 	}
 }
 
 func (r *kmsRepository) ListAllKeys() ([]*kms.KeyListEntry, error) {
+	if v := r.cache.Get("kmsListAllKeys"); v != nil {
+		return v.([]*kms.KeyListEntry), nil
+	}
+
 	var keys []*kms.KeyListEntry
 	input := kms.ListKeysInput{}
 	err := r.client.ListKeysPages(&input,
@@ -39,10 +46,16 @@ func (r *kmsRepository) ListAllKeys() ([]*kms.KeyListEntry, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	r.cache.Put("kmsListAllKeys", customerKeys)
 	return customerKeys, nil
 }
 
 func (r *kmsRepository) ListAllAliases() ([]*kms.AliasListEntry, error) {
+	if v := r.cache.Get("kmsListAllAliases"); v != nil {
+		return v.([]*kms.AliasListEntry), nil
+	}
+
 	var aliases []*kms.AliasListEntry
 	input := kms.ListAliasesInput{}
 	err := r.client.ListAliasesPages(&input,
@@ -54,7 +67,10 @@ func (r *kmsRepository) ListAllAliases() ([]*kms.AliasListEntry, error) {
 	if err != nil {
 		return nil, err
 	}
-	return r.filterAliases(aliases), nil
+
+	result := r.filterAliases(aliases)
+	r.cache.Put("kmsListAllAliases", result)
+	return result, nil
 }
 
 func (r *kmsRepository) filterKeys(keys []*kms.KeyListEntry) ([]*kms.KeyListEntry, error) {
