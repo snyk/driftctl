@@ -59,18 +59,22 @@ func TestSNSTopicSubscriptionSupplier_Resources(t *testing.T) {
 			err: nil,
 		},
 		{
-			test:    "Multiple SNSTopic Subscription with one pending",
+			test:    "Multiple SNSTopic Subscription with one pending and one incorrect",
 			dirName: "sns_topic_subscription_multiple",
 			mocks: func(client *mocks.SNSRepository) {
 				client.On("ListAllSubscriptions").Return([]*sns.Subscription{
 					{SubscriptionArn: aws.String("PendingConfirmation"), Endpoint: aws.String("TEST")},
+					{SubscriptionArn: aws.String("Incorrect"), Endpoint: aws.String("INCORRECT")},
 					{SubscriptionArn: aws.String("arn:aws:sns:us-east-1:526954929923:user-updates-topic2:c0f794c5-a009-4db4-9147-4c55959787fa")},
 					{SubscriptionArn: aws.String("arn:aws:sns:us-east-1:526954929923:user-updates-topic:b6e66147-2b31-4486-8d4b-2a2272264c8e")},
 				}, nil)
 			},
 			alerts: map[string][]alerter.Alert{
 				"aws_sns_topic_subscription.PendingConfirmation": []alerter.Alert{
-					&pendingTopicAlert{aws.String("TEST")},
+					&wrongArnTopicAlert{"PendingConfirmation", aws.String("TEST")},
+				},
+				"aws_sns_topic_subscription.Incorrect": []alerter.Alert{
+					&wrongArnTopicAlert{"Incorrect", aws.String("INCORRECT")},
 				},
 			},
 			err: nil,

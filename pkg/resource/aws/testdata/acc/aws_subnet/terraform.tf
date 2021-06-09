@@ -14,7 +14,7 @@ locals {
 }
 
 resource "aws_vpc" "vpc_for_subnets" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block = "10.100.0.0/16"
     tags = {
         Name: "${local.prefix}-vpc_for_subnets"
     }
@@ -34,7 +34,7 @@ resource "aws_default_subnet" "default-c" {
 
 resource "aws_subnet" "subnet1" {
   vpc_id = aws_vpc.vpc_for_subnets.id
-  cidr_block = "10.0.0.0/24"
+  cidr_block = "10.100.0.0/24"
     timeouts {
         create = "60m"
         delete = "2h"
@@ -46,7 +46,7 @@ resource "aws_subnet" "subnet1" {
 
 resource "aws_subnet" "subnet2" {
   vpc_id = aws_vpc.vpc_for_subnets.id
-  cidr_block = "10.0.1.0/24"
+  cidr_block = "10.100.1.0/24"
     tags = {
         Name: "${local.prefix}-subnet2"
     }
@@ -54,7 +54,7 @@ resource "aws_subnet" "subnet2" {
 
 resource "aws_subnet" "subnet3" {
   vpc_id = aws_vpc.vpc_for_subnets.id
-  cidr_block = "10.0.2.0/24"
+  cidr_block = "10.100.2.0/24"
     tags = {
         Name: "${local.prefix}-subnet3"
     }
