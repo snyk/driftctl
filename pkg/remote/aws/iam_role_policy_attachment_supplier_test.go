@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -143,7 +144,7 @@ func TestIamRolePolicyAttachmentSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewIamRolePolicyAttachmentSupplier(provider, deserializer, repository.NewIAMRepository(provider.session)))
+			supplierLibrary.AddSupplier(NewIamRolePolicyAttachmentSupplier(provider, deserializer, repository.NewIAMRepository(provider.session, cache.New(0))))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
