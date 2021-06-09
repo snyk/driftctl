@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
+	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/fatih/color"
 	"github.com/mattn/go-isatty"
 	"github.com/r3labs/diff/v2"
@@ -33,7 +34,7 @@ func NewConsole() *Console {
 	}
 }
 
-func (c *Console) Write(analysis *analyser.Analysis) error {
+func (c *Console) Write(analysis *analyser.Analysis, _ *terraform.ProviderLibrary) error {
 	if analysis.Summary().TotalDeleted > 0 {
 		fmt.Println("Found missing resources:")
 		deletedByType := groupByType(analysis.Deleted())

@@ -158,7 +158,7 @@ func NewScanCmd() *cobra.Command {
 }
 
 func scanRun(opts *pkg.ScanOptions) error {
-	selectedOutput := output.GetOutput(opts.Output, opts.Quiet)
+	selectedOutput := output.GetOutput(opts.Output, opts.Quiet, opts.To)
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -206,7 +206,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		return err
 	}
 
-	err = selectedOutput.Write(analysis)
+	err = selectedOutput.Write(analysis, providerLibrary)
 	if err != nil {
 		return err
 	}
@@ -342,6 +342,20 @@ func parseOutputFlag(out string) (*output.OutputConfig, error) {
 					),
 				),
 				"Invalid json output '%s'",
+				out,
+			)
+		}
+		options["path"] = opts[0]
+	case output.PlanOutputType:
+		if len(opts) != 1 || opts[0] == "" {
+			return nil, errors.Wrapf(
+				cmderrors.NewUsageError(
+					fmt.Sprintf(
+						"\nMust be of kind: %s",
+						output.Example(output.PlanOutputType),
+					),
+				),
+				"Invalid plan output '%s'",
 				out,
 			)
 		}

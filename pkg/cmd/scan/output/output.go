@@ -5,15 +5,17 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/cloudskiff/driftctl/pkg/output"
+	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
 type Output interface {
-	Write(analysis *analyser.Analysis) error
+	Write(analysis *analyser.Analysis, providerLibrary *terraform.ProviderLibrary) error
 }
 
 var supportedOutputTypes = []string{
 	ConsoleOutputType,
 	JSONOutputType,
+	PlanOutputType,
 }
 
 var supportedOutputExample = map[string]string{
@@ -47,12 +49,14 @@ func IsSupported(key string) bool {
 	return false
 }
 
-func GetOutput(config OutputConfig, quiet bool) Output {
+func GetOutput(config OutputConfig, quiet bool, remote string) Output {
 	output.ChangePrinter(GetPrinter(config, quiet))
 
 	switch config.Key {
 	case JSONOutputType:
 		return NewJSON(config.Options["path"])
+	case PlanOutputType:
+		return NewPlan(config.Options["path"], remote)
 	case ConsoleOutputType:
 		fallthrough
 	default:
@@ -67,6 +71,11 @@ func GetPrinter(config OutputConfig, quiet bool) output.Printer {
 
 	switch config.Key {
 	case JSONOutputType:
+		if isStdOut(config.Options["path"]) {
+			return &output.VoidPrinter{}
+		}
+		fallthrough
+	case PlanOutputType:
 		if isStdOut(config.Options["path"]) {
 			return &output.VoidPrinter{}
 		}
