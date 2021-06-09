@@ -45,8 +45,8 @@ func Init(version string, alerter *alerter.Alerter,
 	snsRepository := repository.NewSNSClient(provider.session)
 	dynamoDBRepository := repository.NewDynamoDBRepository(provider.session)
 	cloudfrontRepository := repository.NewCloudfrontClient(provider.session)
+	ecrRepository := repository.NewECRRepository(provider.session, repositoryCache)
 	kmsRepository := repository.NewKMSRepository(provider.session, repositoryCache)
-	ecrRepository := repository.NewECRRepository(provider.session)
 	iamRepository := repository.NewIAMRepository(provider.session, repositoryCache)
 
 	deserializer := resource.NewDeserializer(factory)
