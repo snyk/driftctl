@@ -22,9 +22,6 @@ type githubConfig struct {
 func NewGithubTerraformProvider(version string, progress output.Progress) (*GithubTerraformProvider, error) {
 	p := &GithubTerraformProvider{}
 	providerKey := "github"
-	if version == "" {
-		version = "4.4.0"
-	}
 	installer, err := tf.NewProviderInstaller(tf.ProviderConfig{
 		Key:     providerKey,
 		Version: version,

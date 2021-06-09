@@ -22,7 +22,9 @@ func Init(version string, alerter *alerter.Alerter,
 	progress output.Progress,
 	resourceSchemaRepository *resource.SchemaRepository,
 	factory resource.ResourceFactory) error {
-
+	if version == "" {
+		version = "4.4.0"
+	}
 	provider, err := NewGithubTerraformProvider(version, progress)
 	if err != nil {
 		return err
@@ -44,7 +46,10 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary.AddSupplier(NewGithubTeamMembershipSupplier(provider, repository, deserializer))
 	supplierLibrary.AddSupplier(NewGithubBranchProtectionSupplier(provider, repository, deserializer))
 
-	resourceSchemaRepository.Init(provider.Schema())
+	err = resourceSchemaRepository.Init(version, provider.Schema())
+	if err != nil {
+		return err
+	}
 	github.InitResourcesMetadata(resourceSchemaRepository)
 
 	return nil

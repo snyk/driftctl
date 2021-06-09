@@ -3,6 +3,7 @@ package resource
 import (
 	"strings"
 
+	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform/configs/configschema"
 	"github.com/hashicorp/terraform/providers"
 	"github.com/sirupsen/logrus"
@@ -14,6 +15,8 @@ type AttributeSchema struct {
 }
 
 type Schema struct {
+	ProviderVersion             *version.Version
+	SchemaVersion               int64
 	Attributes                  map[string]AttributeSchema
 	NormalizeFunc               func(res *AbstractResource)
 	HumanReadableAttributesFunc func(res *AbstractResource) map[string]string
@@ -73,7 +76,11 @@ func (r *SchemaRepository) fetchNestedBlocks(root string, metadata map[string]At
 	}
 }
 
-func (r *SchemaRepository) Init(schema map[string]providers.Schema) {
+func (r *SchemaRepository) Init(v string, schema map[string]providers.Schema) error {
+	providerVersion, err := version.NewVersion(v)
+	if err != nil {
+		return err
+	}
 	for typ, sch := range schema {
 		attributeMetas := map[string]AttributeSchema{}
 		for s, attribute := range sch.Block.Attributes {
@@ -85,9 +92,12 @@ func (r *SchemaRepository) Init(schema map[string]providers.Schema) {
 		r.fetchNestedBlocks("", attributeMetas, sch.Block.BlockTypes)
 
 		r.schemas[typ] = &Schema{
-			Attributes: attributeMetas,
+			ProviderVersion: providerVersion,
+			SchemaVersion:   sch.Version,
+			Attributes:      attributeMetas,
 		}
 	}
+	return nil
 }
 
 func (r *SchemaRepository) UpdateSchema(typ string, schemasMutators map[string]func(attributeSchema *AttributeSchema)) {

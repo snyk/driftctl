@@ -24,7 +24,9 @@ func Init(version string, alerter *alerter.Alerter,
 	progress output.Progress,
 	resourceSchemaRepository *resource.SchemaRepository,
 	factory resource.ResourceFactory) error {
-
+	if version == "" {
+		version = "3.19.0"
+	}
 	provider, err := NewAWSTerraformProvider(version, progress)
 	if err != nil {
 		return err
@@ -100,7 +102,10 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary.AddSupplier(NewKMSAliasSupplier(provider, deserializer, kmsRepository))
 	supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider, deserializer, lambdaRepository))
 
-	resourceSchemaRepository.Init(provider.Schema())
+	err = resourceSchemaRepository.Init(version, provider.Schema())
+	if err != nil {
+		return err
+	}
 	aws.InitResourcesMetadata(resourceSchemaRepository)
 
 	return nil
