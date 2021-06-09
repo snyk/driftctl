@@ -7,6 +7,7 @@ import (
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/cloudskiff/driftctl/pkg/parallel"
@@ -92,7 +93,7 @@ func TestS3BucketSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session))
+			repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session), cache.New(0))
 			supplierLibrary.AddSupplier(NewS3BucketSupplier(provider, repository, deserializer))
 		}
 
