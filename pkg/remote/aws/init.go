@@ -41,7 +41,7 @@ func Init(version string, alerter *alerter.Alerter,
 	route53repository := repository.NewRoute53Repository(provider.session)
 	lambdaRepository := repository.NewLambdaRepository(provider.session)
 	rdsRepository := repository.NewRDSRepository(provider.session)
-	sqsRepository := repository.NewSQSClient(provider.session)
+	sqsRepository := repository.NewSQSClient(provider.session, repositoryCache)
 	snsRepository := repository.NewSNSClient(provider.session)
 	cloudfrontRepository := repository.NewCloudfrontClient(provider.session, repositoryCache)
 	dynamoDBRepository := repository.NewDynamoDBRepository(provider.session, repositoryCache)

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/aws/aws-sdk-go/service/sqs"
@@ -38,7 +39,7 @@ func Test_sqsRepository_ListAllQueues(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*string{
 				awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo"),
@@ -49,13 +50,24 @@ func Test_sqsRepository_ListAllQueues(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &awstest.MockFakeSQS{}
 			tt.mocks(client)
 			r := &sqsRepository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllQueues()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllQueues()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*string{}, store.Get("sqsListAllQueues"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
