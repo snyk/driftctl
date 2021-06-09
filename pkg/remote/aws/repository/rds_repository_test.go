@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/rds"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -39,7 +40,7 @@ func Test_rdsRepository_ListAllDBInstances(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*rds.DBInstance{
 				{DBInstanceIdentifier: aws.String("1")},
@@ -53,13 +54,24 @@ func Test_rdsRepository_ListAllDBInstances(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &MockRDSClient{}
 			tt.mocks(client)
 			r := &rdsRepository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllDBInstances()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllDBInstances()
+				assert.Nil(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*rds.DBInstance{}, store.Get("rdsListAllDBInstances"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -100,7 +112,7 @@ func Test_rdsRepository_ListAllDbSubnetGroups(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*rds.DBSubnetGroup{
 				{DBSubnetGroupName: aws.String("1")},
@@ -114,13 +126,24 @@ func Test_rdsRepository_ListAllDbSubnetGroups(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &MockRDSClient{}
 			tt.mocks(client)
 			r := &rdsRepository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllDbSubnetGroups()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllDbSubnetGroups()
+				assert.Nil(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*rds.DBSubnetGroup{}, store.Get("rdsListAllDbSubnetGroups"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {

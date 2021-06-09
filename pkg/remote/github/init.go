@@ -3,6 +3,7 @@ package github
 import (
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/output"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/github"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -31,7 +32,9 @@ func Init(version string, alerter *alerter.Alerter,
 		return err
 	}
 
-	repository := NewGithubRepository(provider.GetConfig())
+	repositoryCache := cache.New(100)
+
+	repository := NewGithubRepository(provider.GetConfig(), repositoryCache)
 	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.GITHUB, provider)
 

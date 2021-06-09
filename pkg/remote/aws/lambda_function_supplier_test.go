@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
@@ -94,7 +95,7 @@ func TestLambdaFunctionSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewLambdaFunctionSupplier(provider, deserializer, repository.NewLambdaRepository(provider.session)))
+			supplierLibrary.AddSupplier(NewLambdaFunctionSupplier(provider, deserializer, repository.NewLambdaRepository(provider.session, cache.New(0))))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {
