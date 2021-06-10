@@ -206,6 +206,10 @@ h2 {
     background-color: #f9f9f9;
 }
 
+.resource-item.resource-item-changed:hover {
+    background-color: transparent;
+}
+
 .text--bold {
     font-weight: bold;
 }
@@ -302,4 +306,37 @@ h2 {
 
 .empty-message-container {
     color: #747578;
+}
+
+.code-box {
+    padding: 5px;
+    background: #f6f8fa;
+    color: #747578;
+    margin-top: 21px;
+    border-radius: 3px;
+}
+
+.code-box ol {
+    list-style-type: none;
+}
+
+.code-box .code-box-line {
+    padding: 8px;
+    border-radius: 2px;
+    margin: 10px;
+}
+
+span.code-box-line-create {
+    background-color: #22863a1a;
+    color: #22863a;
+    padding: 3px;
+    border-radius: 3px;
+}
+
+span.code-box-line-delete {
+    text-decoration: line-through;
+    background-color: #bf404a17;
+    color: #bf404a;
+    padding: 3px;
+    border-radius: 3px;
 }

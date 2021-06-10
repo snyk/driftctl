@@ -90,15 +90,47 @@ func TestHTML_Write(t *testing.T) {
 					},
 				)
 				a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
-					Id:   "diff-id-1",
+					Id:   "diff-id-2",
 					Type: "aws_diff_resource",
 				}, Changelog: []analyser.Change{
 					{
 						Change: diff.Change{
 							Type: diff.DELETE,
-							Path: []string{"path", "to", "field"},
+							Path: []string{"path", "to", "fields", "0"},
+							From: []string{"value"},
+							To:   nil,
+						},
+					},
+					{
+						Change: diff.Change{
+							Type: diff.DELETE,
+							Path: []string{"path", "to", "fields", "1"},
+							From: []string{"test"},
+							To:   nil,
+						},
+					},
+					{
+						Change: diff.Change{
+							Type: diff.DELETE,
+							Path: []string{"group_id"},
+							From: []string{"a071314398026"},
+							To:   nil,
+						},
+					},
+					{
+						Change: diff.Change{
+							Type: diff.CREATE,
+							Path: []string{"Tags", "Name"},
 							From: nil,
-							To:   []string{"value"},
+							To:   "aws-www-1-root",
+						},
+					},
+					{
+						Change: diff.Change{
+							Type: diff.UPDATE,
+							Path: []string{"InstanceInitiatedShutdownBehavior"},
+							From: "",
+							To:   nil,
 						},
 					},
 				}})

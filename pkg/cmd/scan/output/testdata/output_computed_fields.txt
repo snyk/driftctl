@@ -1,8 +1,8 @@
 Found changed resources:
     - diff-id-1 (aws_diff_resource):
         ~ updated.field: "foobar" => "barfoo" (computed)
-        + new.field: <nil> => "newValue"
-        - a: "oldValue" => <nil> (computed)
+        + new.field: <null> => "newValue"
+        - a: "oldValue" => <null> (computed)
         ~ struct.0.array.0: "foo" => "oof" (computed)
         ~ struct.0.string: "one" => "two" (computed)
 Found 1 resource(s)
