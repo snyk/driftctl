@@ -31,10 +31,6 @@ func (p *ProviderLibrary) Provider(name string) TerraformProvider {
 	return p.providers[name]
 }
 
-func (p *ProviderLibrary) Providers() map[string]TerraformProvider {
-	return p.providers
-}
-
 func (p *ProviderLibrary) Cleanup() {
 	logrus.Debug("Closing providers")
 	for providerKey, provider := range p.providers {

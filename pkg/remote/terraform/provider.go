@@ -217,8 +217,3 @@ func (p *TerraformProvider) Cleanup() {
 		client.Close()
 	}
 }
-
-func (p *TerraformProvider) TerraformProviderSchema() providers.GetSchemaResponse {
-	alias := p.Config.DefaultAlias
-	return p.grpcProviders[alias].GetSchema()
-}

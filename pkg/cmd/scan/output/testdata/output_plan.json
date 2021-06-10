@@ -1,0 +1,53 @@
+{
+	"format_version": "0.1",
+	"planned_values": {
+		"root_module": {
+			"resources": [
+				{
+					"address": "aws_unmanaged_resource.unmanaged-id-1",
+					"type": "aws_unmanaged_resource",
+					"name": "unmanaged-id-1",
+					"values": {
+						"name": "First unmanaged resource"
+					}
+				},
+				{
+					"address": "aws_unmanaged_resource.unmanaged-id-2",
+					"type": "aws_unmanaged_resource",
+					"name": "unmanaged-id-2",
+					"values": {
+						"name": "Second unmanaged resource"
+					}
+				}
+			]
+		}
+	},
+	"resource_changes": [
+		{
+			"address": "aws_unmanaged_resource.unmanaged-id-1",
+			"type": "aws_unmanaged_resource",
+			"name": "unmanaged-id-1",
+			"change": {
+				"actions": [
+					"create"
+				],
+				"after": {
+					"name": "First unmanaged resource"
+				}
+			}
+		},
+		{
+			"address": "aws_unmanaged_resource.unmanaged-id-2",
+			"type": "aws_unmanaged_resource",
+			"name": "unmanaged-id-2",
+			"change": {
+				"actions": [
+					"create"
+				],
+				"after": {
+					"name": "Second unmanaged resource"
+				}
+			}
+		}
+	]
+}

@@ -158,7 +158,7 @@ func NewScanCmd() *cobra.Command {
 }
 
 func scanRun(opts *pkg.ScanOptions) error {
-	selectedOutput := output.GetOutput(opts.Output, opts.Quiet, opts.To)
+	selectedOutput := output.GetOutput(opts.Output, opts.Quiet)
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -206,7 +206,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		return err
 	}
 
-	err = selectedOutput.Write(analysis, providerLibrary)
+	err = selectedOutput.Write(analysis)
 	if err != nil {
 		return err
 	}

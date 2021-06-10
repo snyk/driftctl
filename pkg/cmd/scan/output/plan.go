@@ -2,41 +2,59 @@ package output
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/pkg/remote/aws"
-	"github.com/cloudskiff/driftctl/pkg/remote/github"
-	"github.com/cloudskiff/driftctl/pkg/terraform"
-	"github.com/hashicorp/terraform/addrs"
-	"github.com/hashicorp/terraform/command/jsonplan"
-	"github.com/hashicorp/terraform/configs"
-	"github.com/hashicorp/terraform/configs/configschema"
-	"github.com/hashicorp/terraform/plans"
-	tf "github.com/hashicorp/terraform/terraform"
-	ctyjson "github.com/zclconf/go-cty/cty/json"
+	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
+const FormatVersion = "0.1"
 const PlanOutputType = "plan"
 const PlanOutputExample = "plan://PATH/TO/FILE.json"
 
+type plan struct {
+	FormatVersion   string        `json:"format_version,omitempty"`
+	PlannedValues   plannedValues `json:"planned_values,omitempty"`
+	ResourceChanges []rscChange   `json:"resource_changes,omitempty"`
+}
+
+type plannedValues struct {
+	RootModule module `json:"root_module,omitempty"`
+}
+
+type rscChange struct {
+	Address string `json:"address,omitempty"`
+	Type    string `json:"type,omitempty"`
+	Name    string `json:"name,omitempty"`
+	Change  change `json:"change,omitempty"`
+}
+
+type change struct {
+	Actions []string               `json:"actions,omitempty"`
+	After   map[string]interface{} `json:"after,omitempty"`
+}
+
+type module struct {
+	Resources []rsc `json:"resources,omitempty"`
+}
+
+type rsc struct {
+	Address         string                 `json:"address,omitempty"`
+	Type            string                 `json:"type,omitempty"`
+	Name            string                 `json:"name,omitempty"`
+	AttributeValues map[string]interface{} `json:"values,omitempty"`
+}
+
 type Plan struct {
-	path   string
-	remote string
+	path string
 }
 
-func NewPlan(path, remote string) *Plan {
-	switch remote {
-	case aws.RemoteAWSTerraform:
-		return &Plan{path: path, remote: "aws"}
-	case github.RemoteGithubTerraform:
-		return &Plan{path: path, remote: "github"}
-	default:
-		return &Plan{path: path}
-	}
+func NewPlan(path string) *Plan {
+	return &Plan{path}
 }
 
-func (c *Plan) Write(analysis *analyser.Analysis, providerLibrary *terraform.ProviderLibrary) error {
+func (c *Plan) Write(analysis *analyser.Analysis) error {
 	file := os.Stdout
 	if !isStdOut(c.path) {
 		f, err := os.OpenFile(c.path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
@@ -46,65 +64,10 @@ func (c *Plan) Write(analysis *analyser.Analysis, providerLibrary *terraform.Pro
 		defer f.Close()
 		file = f
 	}
-
-	schemas := &tf.Schemas{
-		Providers: map[addrs.Provider]*tf.ProviderSchema{},
-	}
-
-	for k, p := range providerLibrary.Providers() {
-		resp := p.TerraformProviderSchema()
-		s := &tf.ProviderSchema{
-			Provider:                   resp.Provider.Block,
-			ResourceTypes:              make(map[string]*configschema.Block),
-			ResourceTypeSchemaVersions: make(map[string]uint64),
-		}
-		for t, r := range resp.ResourceTypes {
-			s.ResourceTypes[t] = r.Block
-			s.ResourceTypeSchemaVersions[t] = uint64(r.Version)
-		}
-		schemas.Providers[addrs.NewDefaultProvider(k)] = s
-	}
-
-	var resources []*plans.ResourceInstanceChangeSrc
-	for _, res := range analysis.Unmanaged() {
-		attrs, err := json.Marshal(res.Attributes())
-		if err != nil {
-			return err
-		}
-		schema, _ := schemas.ResourceTypeConfig(addrs.NewDefaultProvider(c.remote), addrs.ManagedResourceMode, res.TerraformType())
-		ty := schema.ImpliedType()
-		ctyVal, err := ctyjson.Unmarshal(attrs, ty)
-		if err != nil {
-			return err
-		}
-		val, err := plans.NewDynamicValue(ctyVal, ty)
-		if err != nil {
-			return err
-		}
-		resources = append(resources, &plans.ResourceInstanceChangeSrc{
-			Addr: addrs.Resource{
-				Mode: addrs.ManagedResourceMode,
-				Type: res.TerraformType(),
-				Name: res.TerraformId(),
-			}.Instance(addrs.IntKey(0)).Absolute(addrs.RootModuleInstance),
-			ProviderAddr: addrs.AbsProviderConfig{
-				Module:   addrs.RootModule,
-				Provider: addrs.NewDefaultProvider(c.remote),
-			},
-			ChangeSrc: plans.ChangeSrc{
-				Action: plans.NoOp,
-				After:  val,
-			},
-		})
-	}
-
-	plan := &plans.Plan{
-		Changes: &plans.Changes{
-			Resources: resources,
-		},
-	}
-
-	jsonPlan, err := jsonplan.Marshal(configs.NewEmptyConfig(), plan, nil, schemas)
+	output := plan{FormatVersion: FormatVersion}
+	output.PlannedValues.RootModule = addPlannedValues(analysis.Unmanaged())
+	output.ResourceChanges = addResourceChanges(analysis.Unmanaged())
+	jsonPlan, err := json.MarshalIndent(output, "", "\t")
 	if err != nil {
 		return err
 	}
@@ -112,4 +75,38 @@ func (c *Plan) Write(analysis *analyser.Analysis, providerLibrary *terraform.Pro
 		return err
 	}
 	return nil
+}
+
+func addPlannedValues(resources []resource.Resource) module {
+	var ret []rsc
+	for _, res := range resources {
+		r := rsc{
+			Address:         fmt.Sprintf("%s.%s", res.TerraformType(), res.TerraformId()),
+			Type:            res.TerraformType(),
+			Name:            res.TerraformId(),
+			AttributeValues: *res.Attributes(),
+		}
+		ret = append(ret, r)
+	}
+	return module{
+		Resources: ret,
+	}
+}
+
+func addResourceChanges(resources []resource.Resource) []rscChange {
+	var ret []rscChange
+	for _, res := range resources {
+		r := rscChange{
+			Address: fmt.Sprintf("%s.%s", res.TerraformType(), res.TerraformId()),
+			Type:    res.TerraformType(),
+			Name:    res.TerraformId(),
+			Change: change{
+				Actions: []string{"create"},
+				After:   *res.Attributes(),
+			},
+		}
+		ret = append(ret, r)
+
+	}
+	return ret
 }

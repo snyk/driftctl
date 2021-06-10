@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
 const JSONOutputType = "json"
@@ -19,7 +18,7 @@ func NewJSON(path string) *JSON {
 	return &JSON{path}
 }
 
-func (c *JSON) Write(analysis *analyser.Analysis, _ *terraform.ProviderLibrary) error {
+func (c *JSON) Write(analysis *analyser.Analysis) error {
 	file := os.Stdout
 	if !isStdOut(c.path) {
 		f, err := os.OpenFile(c.path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
