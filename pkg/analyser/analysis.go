@@ -42,6 +42,7 @@ type Analysis struct {
 	summary     Summary
 	alerts      alerter.Alerts
 	Duration    time.Duration
+	Date        time.Time
 }
 
 type serializableDifference struct {

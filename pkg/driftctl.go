@@ -128,11 +128,12 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	driftIgnore := filter.NewDriftIgnore()
 
 	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState, driftIgnore)
-	analysis.Duration = time.Since(start)
-
 	if err != nil {
 		return nil, err
 	}
+
+	analysis.Duration = time.Since(start)
+	analysis.Date = time.Now()
 
 	return &analysis, nil
 }
