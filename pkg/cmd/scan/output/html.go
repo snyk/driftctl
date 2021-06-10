@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"math"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -99,6 +100,26 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 				return 0
 			}
 			return math.Round(100 * float64(count) / float64(analysis.Summary().TotalResources))
+		},
+		"isInt": func(str string) bool {
+			_, err := strconv.ParseInt(str, 10, 32)
+			if err != nil {
+				return false
+			}
+			return true
+		},
+		"prettify": func(res interface{}) string {
+			return prettify(res)
+		},
+		"sum": func(n ...int) int {
+			total := 0
+			for _, v := range n {
+				total += v
+			}
+			return total
+		},
+		"repeatString": func(s string, count int) template.HTML {
+			return template.HTML(strings.Repeat(s, count))
 		},
 	}
 

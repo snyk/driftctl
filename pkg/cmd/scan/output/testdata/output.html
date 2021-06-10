@@ -214,6 +214,10 @@ h2 {
     background-color: #f9f9f9;
 }
 
+.resource-item.resource-item-changed:hover {
+    background-color: transparent;
+}
+
 .text--bold {
     font-weight: bold;
 }
@@ -310,6 +314,39 @@ h2 {
 
 .empty-message-container {
     color: #747578;
+}
+
+.code-box {
+    padding: 5px;
+    background: #f6f8fa;
+    color: #747578;
+    margin-top: 21px;
+    border-radius: 3px;
+}
+
+.code-box ol {
+    list-style-type: none;
+}
+
+.code-box .code-box-line {
+    padding: 8px;
+    border-radius: 2px;
+    margin: 10px;
+}
+
+span.code-box-line-create {
+    background-color: #22863a1a;
+    color: #22863a;
+    padding: 3px;
+    border-radius: 3px;
+}
+
+span.code-box-line-delete {
+    text-decoration: line-through;
+    background-color: #bf404a17;
+    color: #bf404a;
+    padding: 3px;
+    border-radius: 3px;
 }</style>
 </head>
 <body>
@@ -415,28 +452,300 @@ h2 {
                         <span>Resource type</span>
                     </div>
                     
-                    <div class="resource-item resource-item-changed d-flex justify-space-between">
-                        <span class="resource-item-id">diff-id-1</span>
-                        <div>
-                            
-                            <div>~ updated.field: &#34;foobar&#34; =&gt; &#34;barfoo&#34; </div>
-                            
-                            <div>&#43; new.field: &lt;nil&gt; =&gt; &#34;newValue&#34; </div>
-                            
-                            <div>- a: &#34;oldValue&#34; =&gt; &lt;nil&gt; </div>
-                            
+                    <div class="resource-item resource-item-changed">
+                        <div class="d-flex justify-space-between">
+                            <span class="resource-item-id">diff-id-1</span>
+                            <span class="resource-item-type">aws_diff_resource</span>
                         </div>
-                        <span class="resource-item-type">aws_diff_resource</span>
+                        <div class="code-box mt-2">
+                            <ol>
+                                
+                                <li class="code-box-line">
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        
+                                        
+                                        updated:
+                                        
+
+                                        
+                                        
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        &emsp;
+                                        
+                                        field:
+                                        
+
+                                        
+                                        
+                                        
+
+                                        
+
+                                        
+                                        <span class="code-box-line-delete">&#34;foobar&#34;</span> => <span
+                                            class="code-box-line-create">&#34;barfoo&#34;</span>
+                                        
+                                    </div>
+                                    
+                                    
+                                </li>
+                                
+                                <li class="code-box-line">
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        
+                                        
+                                        new:
+                                        
+
+                                        
+                                        
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        &emsp;
+                                        
+                                        field:
+                                        
+
+                                        
+                                        
+                                        
+
+                                        
+                                        <span class="code-box-line-create">&#34;newValue&#34;</span>
+                                        
+
+                                        
+                                    </div>
+                                    
+                                    
+                                </li>
+                                
+                                <li class="code-box-line">
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        
+                                        
+                                        a:
+                                        
+
+                                        
+                                        
+                                        
+                                        <span class="code-box-line-delete">&#34;oldValue&#34;</span>
+                                        
+
+                                        
+
+                                        
+                                    </div>
+                                    
+                                    
+                                </li>
+                                
+                            </ol>
+                        </div>
                     </div>
                     
-                    <div class="resource-item resource-item-changed d-flex justify-space-between">
-                        <span class="resource-item-id">diff-id-1</span>
-                        <div>
-                            
-                            <div>- path.to.field: &lt;nil&gt; =&gt; [&#34;value&#34;] </div>
-                            
+                    <div class="resource-item resource-item-changed">
+                        <div class="d-flex justify-space-between">
+                            <span class="resource-item-id">diff-id-2</span>
+                            <span class="resource-item-type">aws_diff_resource</span>
                         </div>
-                        <span class="resource-item-type">aws_diff_resource</span>
+                        <div class="code-box mt-2">
+                            <ol>
+                                
+                                <li class="code-box-line">
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        
+                                        
+                                        path:
+                                        
+
+                                        
+                                        
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        &emsp;
+                                        
+                                        to:
+                                        
+
+                                        
+                                        
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        &emsp;&emsp;
+                                        
+                                        fields:
+                                        
+
+                                        
+                                        
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        &emsp;&emsp;&emsp;
+                                        -
+
+                                        
+                                        
+                                        
+                                        <span class="code-box-line-delete">[&#34;value&#34;]</span>
+                                        
+
+                                        
+
+                                        
+                                    </div>
+                                    
+                                    
+                                </li>
+                                
+                                <li class="code-box-line">
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        
+                                        
+                                        path:
+                                        
+
+                                        
+                                        
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        &emsp;
+                                        
+                                        to:
+                                        
+
+                                        
+                                        
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        &emsp;&emsp;
+                                        
+                                        fields:
+                                        
+
+                                        
+                                        
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        &emsp;&emsp;&emsp;
+                                        -
+
+                                        
+                                        
+                                        
+                                        <span class="code-box-line-delete">[&#34;test&#34;]</span>
+                                        
+
+                                        
+
+                                        
+                                    </div>
+                                    
+                                    
+                                </li>
+                                
+                                <li class="code-box-line">
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        
+                                        
+                                        group_id:
+                                        
+
+                                        
+                                        
+                                        
+                                        <span class="code-box-line-delete">[&#34;a071314398026&#34;]</span>
+                                        
+
+                                        
+
+                                        
+                                    </div>
+                                    
+                                    
+                                </li>
+                                
+                                <li class="code-box-line">
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        
+                                        
+                                        Tags:
+                                        
+
+                                        
+                                        
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        &emsp;
+                                        
+                                        Name:
+                                        
+
+                                        
+                                        
+                                        
+
+                                        
+                                        <span class="code-box-line-create">&#34;aws-www-1-root&#34;</span>
+                                        
+
+                                        
+                                    </div>
+                                    
+                                    
+                                </li>
+                                
+                                <li class="code-box-line">
+                                    
+                                    <div style="margin-top:5px;">
+                                        
+                                        
+                                        
+                                        InstanceInitiatedShutdownBehavior:
+                                        
+
+                                        
+                                        
+                                        
+
+                                        
+
+                                        
+                                        <span class="code-box-line-delete">&#34;&#34;</span> => <span
+                                            class="code-box-line-create">&lt;null&gt;</span>
+                                        
+                                    </div>
+                                    
+                                    
+                                </li>
+                                
+                            </ol>
+                        </div>
                     </div>
                     
                 </div>

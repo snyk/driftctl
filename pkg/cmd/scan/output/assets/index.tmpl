@@ -87,14 +87,44 @@
                         <span>Resource type</span>
                     </div>
                     {{range $diff := .Differences}}
-                    <div class="resource-item resource-item-changed d-flex justify-space-between">
-                        <span class="resource-item-id">{{$diff.Res.TerraformId}}</span>
-                        <div>
-                            {{range $change := $diff.Changelog}}
-                            <div>{{ formatChange $change }}</div>
-                            {{end}}
+                    <div class="resource-item resource-item-changed">
+                        <div class="d-flex justify-space-between">
+                            <span class="resource-item-id">{{$diff.Res.TerraformId}}</span>
+                            <span class="resource-item-type">{{$diff.Res.TerraformType}}</span>
                         </div>
-                        <span class="resource-item-type">{{$diff.Res.TerraformType}}</span>
+                        <div class="code-box mt-2">
+                            <ol>
+                                {{range $change := $diff.Changelog}}
+                                <li class="code-box-line">
+                                    {{ range $index, $path := $change.Path }}
+                                    <div style="margin-top:5px;">
+                                        {{/* Add indentation for each YAML field */}}
+                                        {{ repeatString "&emsp;" $index }}
+                                        {{ if eq (isInt .) true }}-{{ else }}
+                                        {{ $path }}:
+                                        {{end}}
+
+                                        {{/* If it's the last path key, display value difference */}}
+                                        {{ if eq (len $change.Path) (sum $index 1) }}
+                                        {{ if eq $change.Type "delete" }}
+                                        <span class="code-box-line-delete">{{ prettify $change.From }}</span>
+                                        {{end}}
+
+                                        {{ if eq $change.Type "create" }}
+                                        <span class="code-box-line-create">{{ prettify $change.To }}</span>
+                                        {{end}}
+
+                                        {{ if eq $change.Type "update" }}
+                                        <span class="code-box-line-delete">{{ prettify $change.From }}</span> => <span
+                                            class="code-box-line-create">{{ prettify $change.To }}</span>
+                                        {{end}}
+                                    </div>
+                                    {{ end }}
+                                    {{end}}
+                                </li>
+                                {{end}}
+                            </ol>
+                        </div>
                     </div>
                     {{end}}
                 </div>
