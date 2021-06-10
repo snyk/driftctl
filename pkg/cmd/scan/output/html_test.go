@@ -27,6 +27,7 @@ func TestHTML_Write(t *testing.T) {
 			goldenfile: "output_empty.html",
 			analysis: func() *analyser.Analysis {
 				a := &analyser.Analysis{}
+				a.Date = time.Date(2021, 06, 10, 0, 0, 0, 0, &time.Location{})
 				return a
 			},
 			err: nil,
@@ -36,6 +37,7 @@ func TestHTML_Write(t *testing.T) {
 			goldenfile: "output_sync.html",
 			analysis: func() *analyser.Analysis {
 				a := &analyser.Analysis{}
+				a.Date = time.Date(2021, 06, 10, 0, 0, 0, 0, &time.Location{})
 				a.Duration = 72 * time.Second
 				a.AddManaged(
 					&testresource.FakeResource{
@@ -53,6 +55,7 @@ func TestHTML_Write(t *testing.T) {
 
 			analysis: func() *analyser.Analysis {
 				a := fakeAnalysisWithAlerts()
+				a.Date = time.Date(2021, 06, 10, 0, 0, 0, 0, &time.Location{})
 				a.Duration = 91 * time.Second
 				a.AddDeleted(
 					&testresource.FakeResource{

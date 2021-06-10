@@ -108,7 +108,7 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 	}
 
 	data := &HTMLTemplateParams{
-		ScanDate:     time.Now().Format("Jan 02, 2006"),
+		ScanDate:     analysis.Date.Format("Jan 02, 2006"),
 		Summary:      analysis.Summary(),
 		Coverage:     analysis.Coverage(),
 		Unmanaged:    analysis.Unmanaged(),
