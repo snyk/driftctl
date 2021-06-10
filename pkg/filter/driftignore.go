@@ -92,6 +92,13 @@ func (r *DriftIgnore) readIgnoreFile() error {
 	return nil
 }
 
+func (r *DriftIgnore) IsTypeIgnored(typ string) bool {
+	strRes := fmt.Sprintf("%s.*", typ)
+
+	_, exists := r.resExclusionWildcardList[strRes]
+	return exists
+}
+
 func (r *DriftIgnore) IsResourceIgnored(res resource.Resource) bool {
 	strRes := fmt.Sprintf("%s.%s", res.TerraformType(), res.TerraformId())
 

@@ -356,3 +356,49 @@ func Test_escapableSplit(t *testing.T) {
 		})
 	}
 }
+
+func TestDriftIgnore_IsTypeIgnored(t *testing.T) {
+	tests := []struct {
+		name  string
+		types []string
+		want  []bool
+	}{
+		{
+			name: "drift_ignore_valid",
+			types: []string{
+				"wildcard_resource",
+				"no_ignored",
+			},
+			want: []bool{
+				true,
+				false,
+			},
+		},
+		{
+			name: "drift_ignore_wildcard",
+			types: []string{
+				"wildcard_resource",
+				"no_ignored",
+			},
+			want: []bool{
+				false,
+				false,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cwd, _ := os.Getwd()
+			defer func() { _ = os.Chdir(cwd) }()
+			if err := os.Chdir(path.Join("testdata", tt.name)); err != nil {
+				t.Fatal(err)
+			}
+			r := NewDriftIgnore()
+			got := make([]bool, 0, len(tt.want))
+			for _, res := range tt.types {
+				got = append(got, r.IsTypeIgnored(res))
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}

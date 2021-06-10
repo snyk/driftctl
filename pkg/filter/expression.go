@@ -7,7 +7,12 @@ import (
 )
 
 func BuildExpression(expressionStr string) (*jmespath.JMESPath, error) {
-	expr, err := jmespath.Compile(fmt.Sprintf("[?%s]", expressionStr))
+	sprintf := fmt.Sprintf("[?%s]", expressionStr)
+
+	parse, _ := jmespath.NewParser().Parse(sprintf)
+	fmt.Println(parse.String())
+
+	expr, err := jmespath.Compile(sprintf)
 	if err != nil {
 		return nil, err
 	}

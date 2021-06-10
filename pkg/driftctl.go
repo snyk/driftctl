@@ -37,6 +37,7 @@ type DriftCTL struct {
 	iacSupplier              resource.Supplier
 	alerter                  alerter.AlerterInterface
 	analyzer                 analyser.Analyzer
+	driftIgnore              *filter.DriftIgnore
 	filter                   *jmespath.JMESPath
 	resourceFactory          resource.ResourceFactory
 	strictMode               bool
@@ -50,6 +51,7 @@ func NewDriftCTL(remoteSupplier resource.Supplier,
 	alerter *alerter.Alerter,
 	resFactory resource.ResourceFactory,
 	opts *ScanOptions,
+	driftIgnore *filter.DriftIgnore,
 	scanProgress globaloutput.Progress,
 	iacProgress globaloutput.Progress,
 	resourceSchemaRepository resource.SchemaRepositoryInterface) *DriftCTL {
@@ -58,6 +60,7 @@ func NewDriftCTL(remoteSupplier resource.Supplier,
 		iacSupplier,
 		alerter,
 		analyser.NewAnalyzer(alerter),
+		driftIgnore,
 		opts.Filter,
 		resFactory,
 		opts.StrictMode,
@@ -111,26 +114,21 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	}
 
 	if d.filter != nil {
-		engine := filter.NewFilterEngine(d.filter)
-		remoteResources, err = engine.Run(remoteResources)
+		filterEngine := filter.NewFilterEngine(d.filter)
+		remoteResources, err = filterEngine.Run(remoteResources)
 		if err != nil {
 			return nil, err
 		}
-		resourcesFromState, err = engine.Run(resourcesFromState)
+		resourcesFromState, err = filterEngine.Run(resourcesFromState)
 		if err != nil {
 			return nil, err
 		}
 	}
-
-	logrus.Debug("Checking for driftignore")
-	driftIgnore := filter.NewDriftIgnore()
-
-	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState, driftIgnore)
-	analysis.Duration = time.Since(start)
-
+	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState, d.driftIgnore)
 	if err != nil {
 		return nil, err
 	}
+	analysis.Duration = time.Since(start)
 
 	return &analysis, nil
 }

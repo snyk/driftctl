@@ -174,7 +174,10 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	resFactory := terraform.NewTerraformResourceFactory(resourceSchemaRepository)
 
-	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, supplierLibrary, scanProgress, resourceSchemaRepository, resFactory)
+	logrus.Debug("Checking for driftignore")
+	driftIgnore := filter.NewDriftIgnore()
+
+	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, supplierLibrary, scanProgress, resourceSchemaRepository, resFactory, driftIgnore)
 	if err != nil {
 		return err
 	}
@@ -193,7 +196,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		return err
 	}
 
-	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, resFactory, opts, scanProgress, iacProgress, resourceSchemaRepository)
+	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, resFactory, opts, driftIgnore, scanProgress, iacProgress, resourceSchemaRepository)
 
 	go func() {
 		<-c

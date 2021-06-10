@@ -97,7 +97,9 @@ func runTest(t *testing.T, cases TestCases) {
 			iacProgress.On("Start").Return().Once()
 			iacProgress.On("Stop").Return().Once()
 
-			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, c.options, scanProgress, iacProgress, repo)
+			driftIgnore := filter.NewDriftIgnore()
+
+			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, c.options, driftIgnore, scanProgress, iacProgress, repo)
 
 			analysis, err := driftctl.Run()
 

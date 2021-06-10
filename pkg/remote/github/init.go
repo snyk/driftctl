@@ -2,6 +2,7 @@ package github
 
 import (
 	"github.com/cloudskiff/driftctl/pkg/alerter"
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -21,10 +22,13 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary *resource.SupplierLibrary,
 	progress output.Progress,
 	resourceSchemaRepository *resource.SchemaRepository,
-	factory resource.ResourceFactory) error {
+	factory resource.ResourceFactory,
+	ignore *filter.DriftIgnore) error {
+
 	if version == "" {
 		version = "4.4.0"
 	}
+
 	provider, err := NewGithubTerraformProvider(version, progress)
 	if err != nil {
 		return err
@@ -48,6 +52,9 @@ func Init(version string, alerter *alerter.Alerter,
 	githubSuppliers = append(githubSuppliers, NewGithubBranchProtectionSupplier(provider, repository, deserializer))
 
 	for _, supplier := range githubSuppliers {
+		if !ignore.IsTypeIgnored(supplier.SuppliedType().String()) {
+			continue
+		}
 		supplierLibrary.AddSupplier(supplier)
 	}
 

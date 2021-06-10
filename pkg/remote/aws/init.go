@@ -2,6 +2,7 @@ package aws
 
 import (
 	"github.com/cloudskiff/driftctl/pkg/alerter"
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
@@ -23,10 +24,13 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary *resource.SupplierLibrary,
 	progress output.Progress,
 	resourceSchemaRepository *resource.SchemaRepository,
-	factory resource.ResourceFactory) error {
+	factory resource.ResourceFactory,
+	ignore *filter.DriftIgnore) error {
+
 	if version == "" {
 		version = "3.19.0"
 	}
+
 	provider, err := NewAWSTerraformProvider(version, progress)
 	if err != nil {
 		return err
@@ -105,6 +109,9 @@ func Init(version string, alerter *alerter.Alerter,
 	awsSuppliers = append(awsSuppliers, NewLambdaEventSourceMappingSupplier(provider, deserializer, lambdaRepository))
 
 	for _, supplier := range awsSuppliers {
+		if !ignore.IsTypeIgnored(supplier.SuppliedType().String()) {
+			continue
+		}
 		supplierLibrary.AddSupplier(supplier)
 	}
 
