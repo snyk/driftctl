@@ -103,10 +103,7 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 		},
 		"isInt": func(str string) bool {
 			_, err := strconv.ParseInt(str, 10, 32)
-			if err != nil {
-				return false
-			}
-			return true
+			return err == nil
 		},
 		"prettify": func(res interface{}) string {
 			return prettify(res)
