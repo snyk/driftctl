@@ -8,7 +8,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/output"
+	"github.com/cloudskiff/driftctl/pkg/resource"
 
 	"github.com/eapache/go-resiliency/retrier"
 	"github.com/hashicorp/terraform/plugin"
@@ -42,15 +44,20 @@ type TerraformProvider struct {
 	Config            TerraformProviderConfig
 	runner            *parallel.ParallelRunner
 	progress          output.Progress
+	driftIgnore       *filter.DriftIgnore
 }
 
-func NewTerraformProvider(installer *tf.ProviderInstaller, config TerraformProviderConfig, progress output.Progress) (*TerraformProvider, error) {
+func NewTerraformProvider(installer *tf.ProviderInstaller,
+	config TerraformProviderConfig,
+	progress output.Progress,
+	driftIgnore *filter.DriftIgnore) (*TerraformProvider, error) {
 	p := TerraformProvider{
 		providerInstaller: installer,
 		runner:            parallel.NewParallelRunner(context.TODO(), 10),
 		grpcProviders:     make(map[string]*plugin.GRPCProvider),
 		Config:            config,
 		progress:          progress,
+		driftIgnore:       driftIgnore,
 	}
 	return &p, nil
 }
@@ -144,8 +151,20 @@ func (p *TerraformProvider) ReadResource(args tf.ReadResourceArgs) (*cty.Value, 
 		"type":  args.Ty,
 		"attrs": args.Attributes,
 	}).Debugf("Reading cloud resource")
-
 	typ := string(args.Ty)
+
+	if p.driftIgnore.IsResourceIgnored(&resource.AbstractResource{
+		Id:   args.ID,
+		Type: typ,
+	}) {
+		logrus.WithFields(logrus.Fields{
+			"id":    args.ID,
+			"type":  args.Ty,
+			"attrs": args.Attributes,
+		}).Debugf("Resource is ignored in drifignore, skipping...")
+		return &cty.NilVal, nil
+	}
+
 	state := &terraform.InstanceState{
 		ID:         args.ID,
 		Attributes: map[string]string{},

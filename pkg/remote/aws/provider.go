@@ -2,6 +2,7 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/cloudskiff/driftctl/pkg/filter"
 
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote/terraform"
@@ -42,7 +43,7 @@ type AWSTerraformProvider struct {
 	session *session.Session
 }
 
-func NewAWSTerraformProvider(version string, progress output.Progress) (*AWSTerraformProvider, error) {
+func NewAWSTerraformProvider(version string, progress output.Progress, driftIgnore *filter.DriftIgnore) (*AWSTerraformProvider, error) {
 	p := &AWSTerraformProvider{}
 	providerKey := "aws"
 	installer, err := tf.NewProviderInstaller(tf.ProviderConfig{
@@ -64,7 +65,7 @@ func NewAWSTerraformProvider(version string, progress output.Progress) (*AWSTerr
 				MaxRetries: 10, // TODO make this configurable
 			}
 		},
-	}, progress)
+	}, progress, driftIgnore)
 	if err != nil {
 		return nil, err
 	}

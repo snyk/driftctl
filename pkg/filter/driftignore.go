@@ -93,9 +93,7 @@ func (r *DriftIgnore) readIgnoreFile() error {
 }
 
 func (r *DriftIgnore) IsTypeIgnored(typ string) bool {
-	strRes := fmt.Sprintf("%s.*", typ)
-
-	_, exists := r.resExclusionWildcardList[strRes]
+	_, exists := r.resExclusionWildcardList[fmt.Sprintf("%s.*", typ)]
 	return exists
 }
 

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
@@ -110,7 +111,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 
 			if shouldUpdate {
 				var err error
-				realProvider, err = aws.NewAWSTerraformProvider("", progress)
+				realProvider, err = aws.NewAWSTerraformProvider("", progress, filter.NewDriftIgnore())
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -195,7 +196,7 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 
 			if shouldUpdate {
 				var err error
-				realProvider, err = github.NewGithubTerraformProvider("", progress)
+				realProvider, err = github.NewGithubTerraformProvider("", progress, filter.NewDriftIgnore())
 				if err != nil {
 					t.Fatal(err)
 				}
