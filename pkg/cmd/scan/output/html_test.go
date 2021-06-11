@@ -97,32 +97,40 @@ func TestHTML_Write(t *testing.T) {
 						Change: diff.Change{
 							Type: diff.DELETE,
 							Path: []string{"path", "to", "fields", "0"},
-							From: []string{"value"},
+							From: "value",
 							To:   nil,
 						},
 					},
 					{
 						Change: diff.Change{
-							Type: diff.DELETE,
+							Type: diff.UPDATE,
 							Path: []string{"path", "to", "fields", "1"},
-							From: []string{"test"},
-							To:   nil,
+							From: 12,
+							To:   "12",
 						},
 					},
 					{
 						Change: diff.Change{
 							Type: diff.DELETE,
-							Path: []string{"group_id"},
+							Path: []string{"group_ids"},
 							From: []string{"a071314398026"},
 							To:   nil,
 						},
 					},
 					{
 						Change: diff.Change{
+							Type: diff.UPDATE,
+							Path: []string{"Policies", "0"},
+							From: testresource.FakeResource{},
+							To:   testresource.FakeResource{Id: "093cd6ba-cf6d-4800-b252-6a50ca8903cd", Type: "aws_iam_policy"},
+						},
+					},
+					{
+						Change: diff.Change{
 							Type: diff.CREATE,
-							Path: []string{"Tags", "Name"},
+							Path: []string{"Tags", "0", "Name"},
 							From: nil,
-							To:   "aws-www-1-root",
+							To:   "test",
 						},
 					},
 					{
@@ -221,6 +229,41 @@ func TestHTML_DistinctResourceTypes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := distinctResourceTypes(tt.resources)
 			assert.Equal(t, tt.value, got)
+		})
+	}
+}
+
+func TestHTML_PrettifyPaths(t *testing.T) {
+	tests := []struct {
+		name     string
+		paths    []string
+		expected string
+	}{
+		{
+			name:     "test simple object",
+			paths:    []string{"path", "to", "field"},
+			expected: "path:<br>&emsp;to:<br>&emsp;&emsp;field:",
+		},
+		{
+			name:     "test object with array of string",
+			paths:    []string{"properties", "tags", "0"},
+			expected: "properties:<br>&emsp;tags:<br>&emsp;&emsp;- ",
+		},
+		{
+			name:     "test object with array of objects",
+			paths:    []string{"path", "to", "0", "field"},
+			expected: "path:<br>&emsp;to:<br>&emsp;&emsp;- field:",
+		},
+		{
+			name:     "test with simple array",
+			paths:    []string{"0", "field"},
+			expected: "- field:",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := prettifyPaths(tt.paths)
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }

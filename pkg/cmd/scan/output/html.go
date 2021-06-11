@@ -1,6 +1,7 @@
 package output
 
 import (
+	"bytes"
 	"embed"
 	"fmt"
 	"html/template"
@@ -76,47 +77,53 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 
 			return distinctResourceTypes(resources)
 		},
-		"formatChange": func(ch analyser.Change) string {
-			prefix := ""
-			suffix := ""
-
-			switch ch.Type {
-			case diff.CREATE:
-				prefix = "+"
-			case diff.UPDATE:
-				prefix = "~"
-			case diff.DELETE:
-				prefix = "-"
-			}
-
-			if ch.Computed {
-				suffix = "(computed)"
-			}
-
-			return fmt.Sprintf("%s %s: %s => %s %s", prefix, strings.Join(ch.Path, "."), prettify(ch.From), prettify(ch.To), suffix)
-		},
 		"rate": func(count int) float64 {
 			if analysis.Summary().TotalResources == 0 {
 				return 0
 			}
 			return math.Round(100 * float64(count) / float64(analysis.Summary().TotalResources))
 		},
-		"isInt": func(str string) bool {
-			_, err := strconv.ParseInt(str, 10, 32)
-			return err == nil
-		},
-		"prettify": func(res interface{}) string {
-			return prettify(res)
-		},
-		"sum": func(n ...int) int {
-			total := 0
-			for _, v := range n {
-				total += v
+		//"prettify": func(res interface{}) string {
+		//	return prettify(res)
+		//},
+		//"prettifyPaths": func(paths []string) template.HTML {
+		//	return template.HTML(prettifyPaths(paths))
+		//},
+		"jsonDiff": func(ch analyser.Changelog) template.HTML {
+			var buf bytes.Buffer
+
+			whiteSpace := "&emsp;"
+			for _, change := range ch {
+				for i, v := range change.Path {
+					if _, err := strconv.Atoi(v); err == nil {
+						change.Path[i] = fmt.Sprintf("[%s]", v)
+					}
+				}
+				path := strings.Join(change.Path, ".")
+
+				switch change.Type {
+				case diff.CREATE:
+					pref := fmt.Sprintf("%s %s:", "+", path)
+					_, _ = fmt.Fprintf(&buf, "%s%s <span class=\"code-box-line-create\">%s</span>", whiteSpace, pref, prettify(change.To))
+				case diff.DELETE:
+					pref := fmt.Sprintf("%s %s:", "-", path)
+					_, _ = fmt.Fprintf(&buf, "%s%s <span class=\"code-box-line-delete\">%s</span>", whiteSpace, pref, prettify(change.From))
+				case diff.UPDATE:
+					prefix := fmt.Sprintf("%s %s:", "~", path)
+					if change.JsonString {
+						_, _ = fmt.Fprintf(&buf, "%s%s<br>%s%s<br>", whiteSpace, prefix, whiteSpace, jsonDiff(change.From, change.To, whiteSpace))
+						continue
+					}
+					_, _ = fmt.Fprintf(&buf, "%s%s <span class=\"code-box-line-delete\">%s</span> => <span class=\"code-box-line-create\">%s</span>", whiteSpace, prefix, prettify(change.From), prettify(change.To))
+				}
+
+				if change.Computed {
+					_, _ = fmt.Fprintf(&buf, " %s", "(computed)")
+				}
+				_, _ = fmt.Fprintf(&buf, "<br>")
 			}
-			return total
-		},
-		"repeatString": func(s string, count int) template.HTML {
-			return template.HTML(strings.Repeat(s, count))
+
+			return template.HTML(buf.String())
 		},
 	}
 
@@ -162,4 +169,30 @@ func distinctResourceTypes(resources []resource.Resource) []string {
 	}
 
 	return types
+}
+
+func prettifyPaths(paths []string) string {
+	content := ""
+	for i, v := range paths {
+		var isArrayKey bool
+
+		// If the previous path is an integer, it means the current path is part of an array
+		if j := i - 1; j >= 0 && len(paths) >= j {
+			_, err := strconv.Atoi(paths[j])
+			isArrayKey = err == nil
+		}
+
+		if i > 0 && !isArrayKey {
+			content += "<br>"
+			content += strings.Repeat("&emsp;", i)
+		}
+
+		if _, err := strconv.Atoi(v); err == nil {
+			content += "- "
+		} else {
+			content += fmt.Sprintf("%s:", v)
+		}
+	}
+
+	return content
 }
