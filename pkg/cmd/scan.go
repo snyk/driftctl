@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	"github.com/cloudskiff/driftctl/pkg/telemetry"
 	"github.com/fatih/color"
 	"github.com/mitchellh/go-homedir"
@@ -31,7 +32,7 @@ import (
 )
 
 func NewScanCmd() *cobra.Command {
-	opts := &pkg.ScanOptions{}
+	opts := &pkg.ScanOptions{Deep: true}
 	opts.BackendOptions = &backend.Options{}
 
 	cmd := &cobra.Command{
@@ -184,8 +185,10 @@ func scanRun(opts *pkg.ScanOptions) error {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
 	alerter := alerter.NewAlerter()
+
 	providerLibrary := terraform.NewProviderLibrary()
 	supplierLibrary := resource.NewSupplierLibrary()
+	remoteLibrary := common.NewRemoteLibrary()
 
 	iacProgress := globaloutput.NewProgress("Scanning states", "Scanned states", true)
 	scanProgress := globaloutput.NewProgress("Scanning resources", "Scanned resources", false)
@@ -194,7 +197,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	resFactory := terraform.NewTerraformResourceFactory(resourceSchemaRepository)
 
-	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, supplierLibrary, scanProgress, resourceSchemaRepository, resFactory, opts.ConfigDir)
+	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, supplierLibrary, remoteLibrary, scanProgress, resourceSchemaRepository, resFactory, opts.ConfigDir)
 	if err != nil {
 		return err
 	}
@@ -206,7 +209,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		logrus.Trace("Exited")
 	}()
 
-	scanner := pkg.NewScanner(supplierLibrary.Suppliers(), alerter)
+	scanner := pkg.NewScanner(supplierLibrary.Suppliers(), remoteLibrary, alerter, pkg.ScannerOptions{Deep: opts.Deep})
 
 	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, resFactory)
 	if err != nil {

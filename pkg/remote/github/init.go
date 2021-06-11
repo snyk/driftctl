@@ -4,6 +4,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/github"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -19,6 +20,7 @@ const RemoteGithubTerraform = "github+tf"
 func Init(version string, alerter *alerter.Alerter,
 	providerLibrary *terraform.ProviderLibrary,
 	supplierLibrary *resource.SupplierLibrary,
+	remoteLibrary *common.RemoteLibrary,
 	progress output.Progress,
 	resourceSchemaRepository *resource.SchemaRepository,
 	factory resource.ResourceFactory,

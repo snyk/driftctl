@@ -6,6 +6,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -21,6 +22,7 @@ const RemoteAWSTerraform = "aws+tf"
 func Init(version string, alerter *alerter.Alerter,
 	providerLibrary *terraform.ProviderLibrary,
 	supplierLibrary *resource.SupplierLibrary,
+	remoteLibrary *common.RemoteLibrary,
 	progress output.Progress,
 	resourceSchemaRepository *resource.SchemaRepository,
 	factory resource.ResourceFactory,
@@ -56,7 +58,9 @@ func Init(version string, alerter *alerter.Alerter,
 	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.AWS, provider)
 
-	supplierLibrary.AddSupplier(NewS3BucketSupplier(provider, s3Repository, deserializer))
+	remoteLibrary.AddEnumerator(NewS3BucketEnumerator(s3Repository, factory, provider.Config))
+	remoteLibrary.AddDetailsFetcher(aws.AwsS3BucketResourceType, NewS3BucketDetailsFetcher(provider, deserializer))
+
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewS3BucketInventorySupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewS3BucketMetricSupplier(provider, s3Repository, deserializer))

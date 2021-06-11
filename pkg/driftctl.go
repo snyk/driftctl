@@ -32,6 +32,7 @@ type ScanOptions struct {
 	ProviderVersion  string
 	ConfigDir        string
 	DriftignorePath  string
+	Deep             bool
 }
 
 type DriftCTL struct {
@@ -58,7 +59,7 @@ func NewDriftCTL(remoteSupplier resource.Supplier,
 		remoteSupplier,
 		iacSupplier,
 		alerter,
-		analyser.NewAnalyzer(alerter),
+		analyser.NewAnalyzer(alerter, analyser.AnalyzerOptions{Deep: opts.Deep}),
 		resFactory,
 		scanProgress,
 		iacProgress,

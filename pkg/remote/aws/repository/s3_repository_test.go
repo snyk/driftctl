@@ -562,7 +562,7 @@ func Test_s3Repository_GetBucketLocation(t *testing.T) {
 			factory := client.MockAwsClientFactoryInterface{}
 			factory.On("GetS3Client", (*aws.Config)(nil)).Return(mockedClient).Once()
 			r := NewS3Repository(&factory, store)
-			got, err := r.GetBucketLocation(tt.bucket)
+			got, err := r.GetBucketLocation(*tt.bucket.Name)
 			factory.AssertExpectations(t)
 			if err != nil && tt.wantErr == "" {
 				t.Fatalf("Unexpected error %+v", err)
@@ -573,7 +573,7 @@ func Test_s3Repository_GetBucketLocation(t *testing.T) {
 
 			if err == nil && tt.want != "" {
 				// Check that results were cached
-				cachedData, err := r.GetBucketLocation(tt.bucket)
+				cachedData, err := r.GetBucketLocation(*tt.bucket.Name)
 				assert.NoError(t, err)
 				assert.Equal(t, got, cachedData)
 				assert.IsType(t, "", store.Get(fmt.Sprintf("s3GetBucketLocation_%s", *tt.bucket.Name)))

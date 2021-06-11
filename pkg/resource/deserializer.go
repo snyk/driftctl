@@ -19,16 +19,23 @@ func (s *Deserializer) Deserialize(ty string, rawList []cty.Value) ([]Resource, 
 	resources := make([]Resource, 0)
 	for _, rawResource := range rawList {
 		rawResource := rawResource
-		var attrs Attributes
-
-		bytes, _ := ctyjson.Marshal(rawResource, rawResource.Type())
-		err := json.Unmarshal(bytes, &attrs)
+		res, err := s.DeserializeOne(ty, rawResource)
 		if err != nil {
 			return nil, err
 		}
-
-		res := s.factory.CreateAbstractResource(ty, rawResource.GetAttr("id").AsString(), attrs)
 		resources = append(resources, res)
 	}
 	return resources, nil
+}
+
+func (s *Deserializer) DeserializeOne(ty string, value cty.Value) (Resource, error) {
+	var attrs Attributes
+
+	bytes, _ := ctyjson.Marshal(value, value.Type())
+	err := json.Unmarshal(bytes, &attrs)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.factory.CreateAbstractResource(ty, value.GetAttr("id").AsString(), attrs), nil
 }

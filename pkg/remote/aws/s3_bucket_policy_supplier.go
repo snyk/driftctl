@@ -37,7 +37,7 @@ func (s *S3BucketPolicySupplier) Resources() ([]resource.Resource, error) {
 
 	for _, bucket := range buckets {
 		bucket := *bucket
-		region, err := s.repository.GetBucketLocation(&bucket)
+		region, err := s.repository.GetBucketLocation(*bucket.Name)
 		if err != nil {
 			return nil, err
 		}
