@@ -329,9 +329,8 @@ h2 {
 }
 
 .code-box .code-box-line {
-    padding: 8px;
-    border-radius: 2px;
     margin: 10px;
+    line-height: 30px;
 }
 
 span.code-box-line-create {
@@ -459,97 +458,27 @@ span.code-box-line-delete {
                         </div>
                         <div class="code-box mt-2">
                             <ol>
-                                
-                                <li class="code-box-line">
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        
-                                        
-                                        updated:
-                                        
+                                <div class="code-box-line">&emsp;~ updated.field: <span class="code-box-line-delete">"foobar"</span> => <span class="code-box-line-create">"barfoo"</span><br>&emsp;+ new.field: <span class="code-box-line-create">"newValue"</span><br>&emsp;- a: <span class="code-box-line-delete">"oldValue"</span><br></div>
 
-                                        
-                                        
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        &emsp;
-                                        
-                                        field:
-                                        
 
-                                        
-                                        
-                                        
 
-                                        
 
-                                        
-                                        <span class="code-box-line-delete">&#34;foobar&#34;</span> => <span
-                                            class="code-box-line-create">&#34;barfoo&#34;</span>
-                                        
-                                    </div>
-                                    
-                                    
-                                </li>
-                                
-                                <li class="code-box-line">
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        
-                                        
-                                        new:
-                                        
 
-                                        
-                                        
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        &emsp;
-                                        
-                                        field:
-                                        
 
-                                        
-                                        
-                                        
 
-                                        
-                                        <span class="code-box-line-create">&#34;newValue&#34;</span>
-                                        
 
-                                        
-                                    </div>
-                                    
-                                    
-                                </li>
-                                
-                                <li class="code-box-line">
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        
-                                        
-                                        a:
-                                        
 
-                                        
-                                        
-                                        
-                                        <span class="code-box-line-delete">&#34;oldValue&#34;</span>
-                                        
 
-                                        
 
-                                        
-                                    </div>
-                                    
-                                    
-                                </li>
-                                
+
+
+
+
+
+
+
+
+
                             </ol>
                         </div>
                     </div>
@@ -561,189 +490,33 @@ span.code-box-line-delete {
                         </div>
                         <div class="code-box mt-2">
                             <ol>
-                                
-                                <li class="code-box-line">
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        
-                                        
-                                        path:
-                                        
+                                <div class="code-box-line">&emsp;- path.to.fields.[0]: <span class="code-box-line-delete">"value"</span><br>&emsp;~ path.to.fields.[1]: <span class="code-box-line-delete">12</span> => <span class="code-box-line-create">"12"</span><br>&emsp;- group_ids: <span class="code-box-line-delete">["a071314398026"]</span><br>&emsp;~ Policies.[0]: <span class="code-box-line-delete">{
+  Id: "",
+  Type: ""
+}</span> => <span class="code-box-line-create">{
+  Id: "093cd6ba-cf6d-4800-b252-6a50ca8903cd",
+  Type: "aws_iam_policy"
+}</span><br>&emsp;+ Tags.[0].Name: <span class="code-box-line-create">"test"</span><br>&emsp;~ InstanceInitiatedShutdownBehavior: <span class="code-box-line-delete">""</span> => <span class="code-box-line-create"><null></span><br></div>
 
-                                        
-                                        
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        &emsp;
-                                        
-                                        to:
-                                        
 
-                                        
-                                        
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        &emsp;&emsp;
-                                        
-                                        fields:
-                                        
 
-                                        
-                                        
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        &emsp;&emsp;&emsp;
-                                        -
 
-                                        
-                                        
-                                        
-                                        <span class="code-box-line-delete">[&#34;value&#34;]</span>
-                                        
 
-                                        
 
-                                        
-                                    </div>
-                                    
-                                    
-                                </li>
-                                
-                                <li class="code-box-line">
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        
-                                        
-                                        path:
-                                        
 
-                                        
-                                        
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        &emsp;
-                                        
-                                        to:
-                                        
 
-                                        
-                                        
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        &emsp;&emsp;
-                                        
-                                        fields:
-                                        
 
-                                        
-                                        
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        &emsp;&emsp;&emsp;
-                                        -
 
-                                        
-                                        
-                                        
-                                        <span class="code-box-line-delete">[&#34;test&#34;]</span>
-                                        
 
-                                        
 
-                                        
-                                    </div>
-                                    
-                                    
-                                </li>
-                                
-                                <li class="code-box-line">
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        
-                                        
-                                        group_id:
-                                        
 
-                                        
-                                        
-                                        
-                                        <span class="code-box-line-delete">[&#34;a071314398026&#34;]</span>
-                                        
 
-                                        
 
-                                        
-                                    </div>
-                                    
-                                    
-                                </li>
-                                
-                                <li class="code-box-line">
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        
-                                        
-                                        Tags:
-                                        
 
-                                        
-                                        
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        &emsp;
-                                        
-                                        Name:
-                                        
 
-                                        
-                                        
-                                        
 
-                                        
-                                        <span class="code-box-line-create">&#34;aws-www-1-root&#34;</span>
-                                        
 
-                                        
-                                    </div>
-                                    
-                                    
-                                </li>
-                                
-                                <li class="code-box-line">
-                                    
-                                    <div style="margin-top:5px;">
-                                        
-                                        
-                                        
-                                        InstanceInitiatedShutdownBehavior:
-                                        
 
-                                        
-                                        
-                                        
-
-                                        
-
-                                        
-                                        <span class="code-box-line-delete">&#34;&#34;</span> => <span
-                                            class="code-box-line-create">&lt;null&gt;</span>
-                                        
-                                    </div>
-                                    
-                                    
-                                </li>
-                                
                             </ol>
                         </div>
                     </div>

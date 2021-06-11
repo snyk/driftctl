@@ -321,9 +321,8 @@ h2 {
 }
 
 .code-box .code-box-line {
-    padding: 8px;
-    border-radius: 2px;
     margin: 10px;
+    line-height: 30px;
 }
 
 span.code-box-line-create {
