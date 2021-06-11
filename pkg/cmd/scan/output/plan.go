@@ -32,6 +32,7 @@ type rscChange struct {
 
 type change struct {
 	Actions []string               `json:"actions,omitempty"`
+	Before  map[string]interface{} `json:"before,omitempty"`
 	After   map[string]interface{} `json:"after,omitempty"`
 }
 
@@ -65,8 +66,8 @@ func (c *Plan) Write(analysis *analyser.Analysis) error {
 		file = f
 	}
 	output := plan{FormatVersion: FormatVersion}
-	output.PlannedValues.RootModule = addPlannedValues(analysis.Unmanaged())
-	output.ResourceChanges = addResourceChanges(analysis.Unmanaged())
+	output.PlannedValues.RootModule = addPlannedValues(analysis)
+	output.ResourceChanges = addResourceChanges(analysis)
 	jsonPlan, err := json.MarshalIndent(output, "", "\t")
 	if err != nil {
 		return err
@@ -77,7 +78,15 @@ func (c *Plan) Write(analysis *analyser.Analysis) error {
 	return nil
 }
 
-func addPlannedValues(resources []resource.Resource) module {
+func addPlannedValues(analysis *analyser.Analysis) module {
+	managedRsc := listRsc(analysis.Managed())
+	unmanagedRsc := listRsc(analysis.Unmanaged())
+	return module{
+		Resources: append(managedRsc, unmanagedRsc...),
+	}
+}
+
+func listRsc(resources []resource.Resource) []rsc {
 	var ret []rsc
 	for _, res := range resources {
 		r := rsc{
@@ -88,12 +97,16 @@ func addPlannedValues(resources []resource.Resource) module {
 		}
 		ret = append(ret, r)
 	}
-	return module{
-		Resources: ret,
-	}
+	return ret
 }
 
-func addResourceChanges(resources []resource.Resource) []rscChange {
+func addResourceChanges(analysis *analyser.Analysis) []rscChange {
+	managedRsc := listRscChange(analysis.Managed(), "no-op")
+	unmanagedRsc := listRscChange(analysis.Unmanaged(), "create")
+	return append(managedRsc, unmanagedRsc...)
+}
+
+func listRscChange(resources []resource.Resource, action string) []rscChange {
 	var ret []rscChange
 	for _, res := range resources {
 		r := rscChange{
@@ -101,9 +114,12 @@ func addResourceChanges(resources []resource.Resource) []rscChange {
 			Type:    res.TerraformType(),
 			Name:    res.TerraformId(),
 			Change: change{
-				Actions: []string{"create"},
+				Actions: []string{action},
 				After:   *res.Attributes(),
 			},
+		}
+		if action == "no-op" {
+			r.Change.Before = *res.Attributes()
 		}
 		ret = append(ret, r)
 

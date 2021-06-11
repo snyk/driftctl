@@ -27,9 +27,9 @@ func TestPlan_Write(t *testing.T) {
 			wantErr:    false,
 		},
 		{
-			name:       "test jsonplan output when in sync",
+			name:       "test jsonplan output when no infra",
 			goldenfile: "output_plan_empty.json",
-			analysis:   fakeAnalysisNoDrift(),
+			analysis:   &analyser.Analysis{},
 			wantErr:    false,
 		},
 	}
