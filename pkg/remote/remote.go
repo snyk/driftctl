@@ -29,12 +29,13 @@ func Activate(remote, version string, alerter *alerter.Alerter,
 	supplierLibrary *resource.SupplierLibrary,
 	progress output.Progress,
 	resourceSchemaRepository *resource.SchemaRepository,
-	factory resource.ResourceFactory) error {
+	factory resource.ResourceFactory,
+	configDir string) error {
 	switch remote {
 	case aws.RemoteAWSTerraform:
-		return aws.Init(version, alerter, providerLibrary, supplierLibrary, progress, resourceSchemaRepository, factory)
+		return aws.Init(version, alerter, providerLibrary, supplierLibrary, progress, resourceSchemaRepository, factory, configDir)
 	case github.RemoteGithubTerraform:
-		return github.Init(version, alerter, providerLibrary, supplierLibrary, progress, resourceSchemaRepository, factory)
+		return github.Init(version, alerter, providerLibrary, supplierLibrary, progress, resourceSchemaRepository, factory, configDir)
 	default:
 		return errors.Errorf("unsupported remote '%s'", remote)
 	}

@@ -23,11 +23,13 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary *resource.SupplierLibrary,
 	progress output.Progress,
 	resourceSchemaRepository *resource.SchemaRepository,
-	factory resource.ResourceFactory) error {
+	factory resource.ResourceFactory,
+	configDir string) error {
+
 	if version == "" {
 		version = "3.19.0"
 	}
-	provider, err := NewAWSTerraformProvider(version, progress)
+    provider, err := NewAWSTerraformProvider(version, progress, configDir)
 	if err != nil {
 		return err
 	}

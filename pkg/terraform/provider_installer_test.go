@@ -9,6 +9,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/mocks"
 	terraformError "github.com/cloudskiff/driftctl/pkg/terraform/error"
+	"github.com/mitchellh/go-homedir"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/stretchr/testify/assert"
@@ -203,4 +204,57 @@ func TestProviderInstallerVersionDoesNotExist(t *testing.T) {
 	_, err := installer.Install()
 
 	assert.Equal("Provider version 666.666.666 does not exist", err.Error())
+}
+
+func TestProviderInstallerWithConfigDirectory(t *testing.T) {
+
+	assert := assert.New(t)
+	fakeTmpHome := t.TempDir()
+
+	expectedSubFolder := fmt.Sprintf("/.driftctl/plugins/%s_%s", runtime.GOOS, runtime.GOARCH)
+
+	config := ProviderConfig{
+		Key:       "aws",
+		Version:   "3.19.0",
+		ConfigDir: fakeTmpHome,
+	}
+
+	mockDownloader := mocks.ProviderDownloaderInterface{}
+	mockDownloader.On("Download", config.GetDownloadUrl(), path.Join(fakeTmpHome, expectedSubFolder)).Return(nil)
+
+	installer, _ := NewProviderInstaller(config)
+	installer.downloader = &mockDownloader
+
+	providerPath, err := installer.Install()
+	mockDownloader.AssertExpectations(t)
+
+	assert.Nil(err)
+	assert.Equal(path.Join(fakeTmpHome, expectedSubFolder, config.GetBinaryName()), providerPath)
+
+}
+
+func TestProviderInstallerWithoutConfigDirectory(t *testing.T) {
+
+	assert := assert.New(t)
+	fakeTmpHome, _ := homedir.Dir()
+
+	expectedSubFolder := fmt.Sprintf("/.driftctl/plugins/%s_%s", runtime.GOOS, runtime.GOARCH)
+
+	config := ProviderConfig{
+		Key:     "aws",
+		Version: "foobar",
+	}
+
+	mockDownloader := mocks.ProviderDownloaderInterface{}
+	mockDownloader.On("Download", config.GetDownloadUrl(), path.Join(fakeTmpHome, expectedSubFolder)).Return(nil)
+
+	installer, _ := NewProviderInstaller(config)
+	installer.downloader = &mockDownloader
+
+	providerPath, err := installer.Install()
+	mockDownloader.AssertExpectations(t)
+
+	assert.Nil(err)
+	assert.Equal(path.Join(fakeTmpHome, expectedSubFolder, config.GetBinaryName()), providerPath)
+
 }

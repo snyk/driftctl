@@ -28,14 +28,17 @@ type ProviderInstaller struct {
 }
 
 func NewProviderInstaller(config ProviderConfig) (*ProviderInstaller, error) {
-	homedir, err := homedir.Dir()
-	if err != nil {
-		homedir = ""
+	if config.ConfigDir == "" {
+		var err error
+		config.ConfigDir, err = homedir.Dir()
+		if err != nil {
+			config.ConfigDir = ""
+		}
 	}
 	return &ProviderInstaller{
 		NewProviderDownloader(),
 		config,
-		homedir,
+		config.ConfigDir,
 	}, nil
 }
 

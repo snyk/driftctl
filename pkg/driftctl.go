@@ -30,6 +30,7 @@ type ScanOptions struct {
 	StrictMode       bool
 	DisableTelemetry bool
 	ProviderVersion  string
+	ConfigDir        string
 }
 
 type DriftCTL struct {
