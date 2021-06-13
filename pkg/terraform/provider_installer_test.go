@@ -9,7 +9,6 @@ import (
 
 	"github.com/cloudskiff/driftctl/mocks"
 	terraformError "github.com/cloudskiff/driftctl/pkg/terraform/error"
-	"github.com/mitchellh/go-homedir"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/stretchr/testify/assert"
@@ -236,7 +235,7 @@ func TestProviderInstallerWithConfigDirectory(t *testing.T) {
 func TestProviderInstallerWithoutConfigDirectory(t *testing.T) {
 
 	assert := assert.New(t)
-	fakeTmpHome, _ := homedir.Dir()
+	fakeTmpHome := os.TempDir()
 
 	expectedSubFolder := fmt.Sprintf("/.driftctl/plugins/%s_%s", runtime.GOOS, runtime.GOARCH)
 

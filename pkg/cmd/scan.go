@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/cloudskiff/driftctl/pkg/telemetry"
+	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -155,9 +156,11 @@ func NewScanCmd() *cobra.Command {
 		false,
 		"Includes cloud provider service-linked roles (disabled by default)",
 	)
+
+	configDir, _ := homedir.Dir()
 	fl.String(
 		"config-dir",
-		"",
+		configDir,
 		".driftctl path to use.\n"+
 			"Default is home directory.\n",
 	)

@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	error2 "github.com/cloudskiff/driftctl/pkg/terraform/error"
-	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -28,13 +27,6 @@ type ProviderInstaller struct {
 }
 
 func NewProviderInstaller(config ProviderConfig) (*ProviderInstaller, error) {
-	if config.ConfigDir == "" {
-		var err error
-		config.ConfigDir, err = homedir.Dir()
-		if err != nil {
-			config.ConfigDir = ""
-		}
-	}
 	return &ProviderInstaller{
 		NewProviderDownloader(),
 		config,
