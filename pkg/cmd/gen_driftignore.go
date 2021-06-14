@@ -28,7 +28,9 @@ func NewGenDriftIgnoreCmd() *cobra.Command {
 				return err
 			}
 
-			fmt.Print(list)
+			if len(list) > 0 {
+				fmt.Printf("\n%s\n", list)
+			}
 
 			return nil
 		},

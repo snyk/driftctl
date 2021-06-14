@@ -14,10 +14,11 @@ import (
 
 func TestGenDriftIgnoreCmd_Input(t *testing.T) {
 	cases := []struct {
-		name   string
-		args   []string
-		output string
-		err    error
+		name            string
+		args            []string
+		output          string
+		existingContent string
+		err             error
 	}{
 		{
 			name:   "test error on invalid input",
@@ -61,6 +62,12 @@ func TestGenDriftIgnoreCmd_Input(t *testing.T) {
 			output: "",
 			err:    errors.New("Error: you must specify an input to parse JSON from. Use driftctl gen-driftignore -i <drifts.json>\nGenerate a JSON file using the output flag: driftctl scan -o json://path/to/drifts.json"),
 		},
+		{
+			name:            "test driftignore content append to existing content",
+			args:            []string{"-i", "./testdata/input_stdin_valid.json"},
+			output:          "./testdata/output_stdin_valid_append.txt",
+			existingContent: "aws_sqs_queue.https://sqs\\.us-east-1\\.amazonaws\\.com/141177182257/queue-6qaidu\\.fifo",
+		},
 	}
 
 	for _, c := range cases {
@@ -71,6 +78,11 @@ func TestGenDriftIgnoreCmd_Input(t *testing.T) {
 			stdout := os.Stdout // keep backup of the real stdout
 			r, w, _ := os.Pipe()
 			os.Stdout = w
+
+			if c.existingContent != "" {
+				_, err := w.WriteString(c.existingContent)
+				assert.Nil(t, err)
+			}
 
 			args := append([]string{"gen-driftignore"}, c.args...)
 
@@ -91,7 +103,7 @@ func TestGenDriftIgnoreCmd_Input(t *testing.T) {
 			}()
 
 			// back to normal state
-			w.Close()
+			assert.Nil(t, w.Close())
 			os.Stdout = stdout // restoring the real stdout
 			result := <-outC
 
