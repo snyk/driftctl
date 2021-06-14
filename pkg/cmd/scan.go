@@ -161,8 +161,7 @@ func NewScanCmd() *cobra.Command {
 	fl.String(
 		"config-dir",
 		configDir,
-		".driftctl path to use.\n"+
-			"Default is home directory.\n",
+		"Directory path that driftctl uses for configuration.\n",
 	)
 
 	return cmd

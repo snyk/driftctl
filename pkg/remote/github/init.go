@@ -21,8 +21,8 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary *resource.SupplierLibrary,
 	progress output.Progress,
 	resourceSchemaRepository *resource.SchemaRepository,
-    factory resource.ResourceFactory,
-    configDir string) error {
+	factory resource.ResourceFactory,
+	configDir string) error {
 	if version == "" {
 		version = "4.4.0"
 	}

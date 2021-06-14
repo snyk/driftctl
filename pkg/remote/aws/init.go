@@ -29,7 +29,7 @@ func Init(version string, alerter *alerter.Alerter,
 	if version == "" {
 		version = "3.19.0"
 	}
-    provider, err := NewAWSTerraformProvider(version, progress, configDir)
+	provider, err := NewAWSTerraformProvider(version, progress, configDir)
 	if err != nil {
 		return err
 	}
