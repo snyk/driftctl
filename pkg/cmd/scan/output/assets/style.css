@@ -255,6 +255,7 @@ h2 {
     color: #747578;
     transition: background-color 200ms;
     border-radius: 3px;
+    font-size: 19px;
 }
 
 .tab:hover {

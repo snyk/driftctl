@@ -55,10 +55,10 @@ func GetOutput(config OutputConfig, quiet bool) Output {
 	switch config.Key {
 	case JSONOutputType:
 		return NewJSON(config.Options["path"])
-	case ConsoleOutputType:
-		fallthrough
 	case HTMLOutputType:
 		return NewHTML(config.Options["path"])
+	case ConsoleOutputType:
+		fallthrough
 	default:
 		return NewConsole()
 	}
