@@ -2,6 +2,7 @@ package aws
 
 import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/hashicorp/go-version"
 )
 
 const AwsInstanceResourceType = "aws_instance"
@@ -10,7 +11,10 @@ func initAwsInstanceMetaData(resourceSchemaRepository resource.SchemaRepositoryI
 	resourceSchemaRepository.SetNormalizeFunc(AwsInstanceResourceType, func(res *resource.AbstractResource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
-		val.SafeDelete([]string{"instance_initiated_shutdown_behavior"})
+
+		if v, _ := version.NewVersion("3.38.0"); res.Schema().ProviderVersion.LessThan(v) {
+			val.SafeDelete([]string{"instance_initiated_shutdown_behavior"})
+		}
 	})
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsInstanceResourceType, func(res *resource.AbstractResource) map[string]string {
 		val := res.Attrs
