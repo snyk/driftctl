@@ -370,14 +370,14 @@ span.code-box-line-delete {
     <div class="app-content">
         
         <div class="d-flex justify-center mb-2">
-            <form id="filter-form" action="#">
+            <div>
                 <input type="text" name="resource-id-filter" placeholder="Search resources..." onkeyup="refreshState()">
                 <select name="resource-type-filter" onchange="refreshState()">
                     <option value="">Resource type</option>
                     
                 </select>
                 <button type="button" onclick="resetFilters()" class="reset-filter-btn">Reset filters</button>
-            </form>
+            </div>
         </div>
 
         <div class="tabs-wrapper">
