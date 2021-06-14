@@ -64,6 +64,7 @@ resource "aws_route_table" "r" {
 
 resource "aws_route_table" "rr" {
   vpc_id = aws_vpc.vpc.id
+  depends_on = [aws_internet_gateway.main]
 
   tags = {
     Name = "rr"
@@ -73,13 +74,11 @@ resource "aws_route_table" "rr" {
 resource "aws_route" "route1" {
   route_table_id = aws_route_table.rr.id
   gateway_id = aws_internet_gateway.main.id
-  depends_on = [aws_internet_gateway.main]
   destination_cidr_block = "1.1.1.1/32"
 }
 
 resource "aws_route" "route_v6" {
   route_table_id = aws_route_table.rr.id
   gateway_id = aws_internet_gateway.main.id
-  depends_on = [aws_internet_gateway.main]
   destination_ipv6_cidr_block = "::/0"
 }
