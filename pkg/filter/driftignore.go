@@ -39,7 +39,19 @@ func (r *DriftIgnore) readIgnoreFile() error {
 	scanner := bufio.NewScanner(file)
 	for lineNumber := 1; scanner.Scan(); lineNumber++ {
 		line := scanner.Text()
+
+		if len(strings.ReplaceAll(line, " ", "")) <= 0 {
+			continue // empty
+		}
+
+		if strings.HasPrefix(line, "#") {
+			continue // this is a comment
+		}
 		lines = append(lines, gitignore.ParsePattern(line, nil))
+		if !strings.HasSuffix(line, "*") {
+			line := fmt.Sprintf("%s.*", line)
+			lines = append(lines, gitignore.ParsePattern(line, nil))
+		}
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -54,7 +66,8 @@ func (r *DriftIgnore) readIgnoreFile() error {
 func (r *DriftIgnore) IsResourceIgnored(res resource.Resource) bool {
 	strRes := fmt.Sprintf("%s.%s", res.TerraformType(), res.TerraformId())
 
-	return r.matcher.Match([]string{strRes}, false)
+	match := r.matcher.Match([]string{strRes}, false)
+	return match
 }
 
 func (r *DriftIgnore) IsFieldIgnored(res resource.Resource, path []string) bool {

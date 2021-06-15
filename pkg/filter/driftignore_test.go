@@ -72,6 +72,10 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 				},
 				&resource2.FakeResource{
 					Type: "wildcard_resource",
+					Id:   "id1/with/slash",
+				},
+				&resource2.FakeResource{
+					Type: "wildcard_resource",
 					Id:   "id1",
 				},
 				&resource2.FakeResource{
@@ -101,6 +105,7 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 			},
 			want: []bool{
 				false,
+				true,
 				true,
 				true,
 				true,
@@ -328,6 +333,76 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 				},
 			},
 			path: "testdata/drift_ignore_fields/.driftignore",
+		},
+		{
+			name: "drift_ignore_all_exclude_field",
+			args: []Args{
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "full_drift_ignored"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "full_drift_ignored"},
+					Path: []string{"foobar"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "partial_drift_ignored"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "partial_drift_ignored"},
+					Path: []string{"foobar"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "resource_type", Id: "id.with.dots"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "resource_type", Id: "id.with.dots"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "resource_type", Id: "idwith\\"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "resource_type", Id: "idwith\\backslashes"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "resource_type", Id: "idwith\\backslashes"},
+					Path: []string{"foobar"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "wildcard_drift_ignored"},
+					Path: []string{"struct", "baz"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "wildcard_drift_ignored"},
+					Path: []string{"struct", "bar"},
+					Want: false,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "endofpath_drift_ignored"},
+					Path: []string{"struct", "baz"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "endofpath_drift_ignored"},
+					Path: []string{"struct", "bar"},
+					Want: false,
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
