@@ -14,6 +14,8 @@ labels: kind/bug
 **Environment**
  - OS:
  - driftctl version:
+ - terraform version:
+ - terraform providers versions: <!-- e.g. aws@3.44.0, github@4.4.0 -->
 
 **How to reproduce**
 <!-- Code and/or minimal config needed to reproduce the problem. -->
