@@ -32,16 +32,16 @@ os_archs=(
     windows/amd64
 )
 
-if [ -n "$OS_ARCH" ]; then
-  os_archs=("$OS_ARCH")
-fi
-
 if [ $ENV != "release" ]; then
     echo "+ Building env: dev"
     # If its dev mode, only build for ourself
     os_archs=("$(go env GOOS)/$(go env GOARCH)")
     # And set version to git commit
     VERSION="${GIT_COMMIT}${GIT_DIRTY}"
+fi
+
+if [ -n "$OS_ARCH" ]; then
+  os_archs=("$OS_ARCH")
 fi
 
 echo "ARCH: ${os_archs[*]}"
