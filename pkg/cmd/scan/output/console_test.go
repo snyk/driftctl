@@ -29,8 +29,31 @@ func TestConsole_Write(t *testing.T) {
 		{
 			name:       "test console output",
 			goldenfile: "output.txt",
-			args:       args{analysis: fakeAnalysis()},
-			wantErr:    false,
+			args: args{analysis: func() *analyser.Analysis {
+				a := fakeAnalysis()
+				a.AddDeleted(
+					&testresource.FakeResource{
+						Id:   "test-id-1",
+						Type: "aws_test_resource",
+					},
+					&testresource.FakeResource{
+						Id:   "test-id-2",
+						Type: "aws_test_resource",
+					},
+				)
+				a.AddUnmanaged(
+					&testresource.FakeResource{
+						Id:   "test-id-1",
+						Type: "aws_testing_resource",
+					},
+					&testresource.FakeResource{
+						Id:   "test-id-2",
+						Type: "aws_resource",
+					},
+				)
+				return a
+			}()},
+			wantErr: false,
 		},
 		{
 			name:       "test console output no drift",
@@ -101,7 +124,7 @@ func TestConsole_Write(t *testing.T) {
 			}()
 
 			// back to normal state
-			w.Close()
+			assert.Nil(t, w.Close())
 			os.Stdout = stdout // restoring the real stdout
 			os.Stderr = stderr
 			out := <-outC

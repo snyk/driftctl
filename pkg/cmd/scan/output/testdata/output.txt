@@ -2,7 +2,14 @@ Found missing resources:
   aws_deleted_resource:
     - deleted-id-1
     - deleted-id-2
+  aws_test_resource:
+    - test-id-1
+    - test-id-2
 Found resources not covered by IaC:
+  aws_resource:
+    - test-id-2
+  aws_testing_resource:
+    - test-id-1
   aws_unmanaged_resource:
     - unmanaged-id-1
     - unmanaged-id-2
@@ -11,9 +18,9 @@ Found changed resources:
         ~ updated.field: "foobar" => "barfoo"
         + new.field: <nil> => "newValue"
         - a: "oldValue" => <nil>
-Found 6 resource(s)
- - 33% coverage
+Found 10 resource(s)
+ - 20% coverage
  - 2 covered by IaC
- - 2 not covered by IaC
- - 2 missing on cloud provider
+ - 4 not covered by IaC
+ - 4 missing on cloud provider
  - 1/2 changed outside of IaC
