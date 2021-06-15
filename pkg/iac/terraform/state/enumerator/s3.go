@@ -56,7 +56,7 @@ func (s *S3Enumerator) Enumerate() ([]string, error) {
 			if aws.Int64Value(metadata.Size) > 0 {
 				key := *metadata.Key
 				if match, _ := doublestar.Match(fullPattern, key); match {
-					files = append(files, filepath.Join(bucket, key))
+					files = append(files, strings.Join([]string{bucket, key}, "/"))
 				}
 			}
 		}
