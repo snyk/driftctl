@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -88,7 +89,7 @@ func TestEventLambdaSourceMappingSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider, deserializer, repository.NewLambdaRepository(provider.session)))
+			supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider, deserializer, repository.NewLambdaRepository(provider.session, cache.New(0))))
 		}
 
 		t.Run(tt.test, func(t *testing.T) {

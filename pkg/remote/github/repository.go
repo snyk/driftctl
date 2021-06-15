@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/oauth2"
 )
@@ -24,9 +25,10 @@ type githubRepository struct {
 	client GithubGraphQLClient
 	ctx    context.Context
 	config githubConfig
+	cache  cache.Cache
 }
 
-func NewGithubRepository(config githubConfig) *githubRepository {
+func NewGithubRepository(config githubConfig, c cache.Cache) *githubRepository {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: config.Token},
@@ -37,16 +39,32 @@ func NewGithubRepository(config githubConfig) *githubRepository {
 		client: githubv4.NewClient(oauthClient),
 		ctx:    context.Background(),
 		config: config,
+		cache:  c,
 	}
 
 	return repo
 }
 
 func (r *githubRepository) ListRepositories() ([]string, error) {
-	if r.config.Organization != "" {
-		return r.listRepoForOrg()
+	if v := r.cache.Get("githubListRepositories"); v != nil {
+		return v.([]string), nil
 	}
-	return r.listRepoForOwner()
+
+	if r.config.Organization != "" {
+		results, err := r.listRepoForOrg()
+		if err != nil {
+			return nil, err
+		}
+		r.cache.Put("githubListRepositories", results)
+		return results, nil
+	}
+
+	results, err := r.listRepoForOwner()
+	if err != nil {
+		return nil, err
+	}
+	r.cache.Put("githubListRepositories", results)
+	return results, nil
 }
 
 type pageInfo struct {
@@ -145,9 +163,14 @@ type Team struct {
 }
 
 func (r githubRepository) ListTeams() ([]Team, error) {
+	if v := r.cache.Get("githubListTeams"); v != nil {
+		return v.([]Team), nil
+	}
+
 	query := listTeamsQuery{}
 	results := make([]Team, 0)
 	if r.config.Organization == "" {
+		r.cache.Put("githubListTeams", results)
 		return results, nil
 	}
 	variables := map[string]interface{}{
@@ -170,6 +193,8 @@ func (r githubRepository) ListTeams() ([]Team, error) {
 		}
 		variables["cursor"] = githubv4.NewString(query.Organization.Teams.PageInfo.EndCursor)
 	}
+
+	r.cache.Put("githubListTeams", results)
 	return results, nil
 }
 
@@ -188,9 +213,14 @@ type listMembership struct {
 }
 
 func (r *githubRepository) ListMembership() ([]string, error) {
+	if v := r.cache.Get("githubListMembership"); v != nil {
+		return v.([]string), nil
+	}
+
 	query := listMembership{}
 	results := make([]string, 0)
 	if r.config.Organization == "" {
+		r.cache.Put("githubListMembership", results)
 		return results, nil
 	}
 	variables := map[string]interface{}{
@@ -210,6 +240,8 @@ func (r *githubRepository) ListMembership() ([]string, error) {
 		}
 		variables["cursor"] = githubv4.NewString(query.Organization.MembersWithRole.PageInfo.EndCursor)
 	}
+
+	r.cache.Put("githubListMembership", results)
 	return results, nil
 }
 
@@ -230,6 +262,10 @@ type listTeamMembershipsQuery struct {
 }
 
 func (r githubRepository) ListTeamMemberships() ([]string, error) {
+	if v := r.cache.Get("githubListTeamMemberships"); v != nil {
+		return v.([]string), nil
+	}
+
 	teamList, err := r.ListTeams()
 	if err != nil {
 		return nil, err
@@ -238,6 +274,7 @@ func (r githubRepository) ListTeamMemberships() ([]string, error) {
 	query := listTeamMembershipsQuery{}
 	results := make([]string, 0)
 	if r.config.Organization == "" {
+		r.cache.Put("githubListTeamMemberships", results)
 		return results, nil
 	}
 	variables := map[string]interface{}{
@@ -261,6 +298,8 @@ func (r githubRepository) ListTeamMemberships() ([]string, error) {
 			variables["cursor"] = query.Organization.Team.Members.PageInfo.EndCursor
 		}
 	}
+
+	r.cache.Put("githubListTeamMemberships", results)
 	return results, nil
 }
 
@@ -279,6 +318,9 @@ type listBranchProtectionQuery struct {
 }
 
 func (r *githubRepository) ListBranchProtection() ([]string, error) {
+	if v := r.cache.Get("githubListBranchProtection"); v != nil {
+		return v.([]string), nil
+	}
 
 	repoList, err := r.ListRepositories()
 	if err != nil {
@@ -313,5 +355,7 @@ func (r *githubRepository) ListBranchProtection() ([]string, error) {
 		}
 
 	}
+
+	r.cache.Put("githubListBranchProtection", results)
 	return results, nil
 }

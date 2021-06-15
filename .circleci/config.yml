@@ -107,11 +107,11 @@ jobs:
       - run:
           name: "Sign release"
           command: |
-            gpg --sign -u security@cloudskiff.com bin/driftctl_SHA256SUMS
+            gpg --output bin/driftctl_SHA256SUMS.gpg -u security@cloudskiff.com --detach-sig bin/driftctl_SHA256SUMS
       - run:
           name: "Verify signature"
           command: |
-            gpg --verify bin/driftctl_SHA256SUMS.gpg
+            gpg --verify bin/driftctl_SHA256SUMS.gpg bin/driftctl_SHA256SUMS
       - persist_to_workspace:
           root: ~/project
           paths:

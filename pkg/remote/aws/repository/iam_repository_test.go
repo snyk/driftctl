@@ -1,11 +1,13 @@
 package repository
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/iam"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/stretchr/testify/mock"
@@ -52,7 +54,7 @@ func Test_IAMRepository_ListAllAccessKeys(t *testing.T) {
 							},
 						}}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 				client.On("ListAccessKeysPages",
 					&iam.ListAccessKeysInput{
 						UserName: aws.String("test-driftctl2"),
@@ -71,7 +73,7 @@ func Test_IAMRepository_ListAllAccessKeys(t *testing.T) {
 							},
 						}}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*iam.AccessKeyMetadata{
 				{
@@ -103,13 +105,26 @@ func Test_IAMRepository_ListAllAccessKeys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(2)
 			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllAccessKeys(tt.users)
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllAccessKeys(tt.users)
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				for _, user := range tt.users {
+					assert.IsType(t, []*iam.AccessKeyMetadata{}, store.Get(fmt.Sprintf("iamListAllAccessKeys_user_%s", *user.UserName)))
+				}
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -153,7 +168,7 @@ func Test_IAMRepository_ListAllUsers(t *testing.T) {
 							},
 						}}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*iam.User{
 				{
@@ -173,13 +188,24 @@ func Test_IAMRepository_ListAllUsers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllUsers()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllUsers()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*iam.User{}, store.Get("iamListAllUsers"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -223,7 +249,7 @@ func Test_IAMRepository_ListAllPolicies(t *testing.T) {
 							},
 						}}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*iam.Policy{
 				{
@@ -243,13 +269,24 @@ func Test_IAMRepository_ListAllPolicies(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllPolicies()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllPolicies()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*iam.Policy{}, store.Get("iamListAllPolicies"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -293,7 +330,7 @@ func Test_IAMRepository_ListAllRoles(t *testing.T) {
 							},
 						}}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*iam.Role{
 				{
@@ -313,13 +350,24 @@ func Test_IAMRepository_ListAllRoles(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllRoles()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllRoles()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*iam.Role{}, store.Get("iamListAllRoles"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -459,13 +507,26 @@ func Test_IAMRepository_ListAllRolePolicyAttachments(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(2)
 			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllRolePolicyAttachments(tt.roles)
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllRolePolicyAttachments(tt.roles)
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				for _, role := range tt.roles {
+					assert.IsType(t, []*AttachedRolePolicy{}, store.Get(fmt.Sprintf("iamListAllRolePolicyAttachments_role_%s", *role.RoleName)))
+				}
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -551,13 +612,26 @@ func Test_IAMRepository_ListAllRolePolicies(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(2)
 			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllRolePolicies(tt.roles)
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllRolePolicies(tt.roles)
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				for _, role := range tt.roles {
+					assert.IsType(t, []string{}, store.Get(fmt.Sprintf("iamListAllRolePolicies_role_%s", *role.RoleName)))
+				}
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -708,13 +782,26 @@ func Test_IAMRepository_ListAllUserPolicyAttachments(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(2)
 			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllUserPolicyAttachments(tt.users)
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllUserPolicyAttachments(tt.users)
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				for _, user := range tt.users {
+					assert.IsType(t, []*AttachedUserPolicy{}, store.Get(fmt.Sprintf("iamListAllUserPolicyAttachments_user_%s", *user.UserName)))
+				}
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {
@@ -797,13 +884,26 @@ func Test_IAMRepository_ListAllUserPolicies(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(2)
 			client := &awstest.MockFakeIAM{}
 			tt.mocks(client)
 			r := &iamRepository{
 				client: client,
+				cache:  store,
 			}
 			got, err := r.ListAllUserPolicies(tt.users)
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllUserPolicies(tt.users)
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				for _, user := range tt.users {
+					assert.IsType(t, []string{}, store.Get(fmt.Sprintf("iamListAllUserPolicies_user_%s", *user.UserName)))
+				}
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {

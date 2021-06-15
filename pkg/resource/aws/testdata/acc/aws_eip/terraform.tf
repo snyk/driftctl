@@ -4,7 +4,7 @@ provider "aws" {
 terraform {
   required_providers {
     aws = {
-      version = "~> 3.19.0"
+      version = "~> 3.44.0"
     }
   }
 }
@@ -32,7 +32,7 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_vpc" "default" {
-    cidr_block           = "10.0.0.0/24"
+    cidr_block           = "10.4.0.0/24"
     tags = {
         Name: "${local.prefix}-default"
     }
@@ -49,7 +49,7 @@ resource "aws_eip_association" "eip_assoc" {
 
 resource "aws_subnet" "tf_test_subnet" {
     vpc_id                  = aws_vpc.default.id
-    cidr_block              = "10.0.0.0/24"
+    cidr_block              = "10.4.0.0/24"
     depends_on = [aws_internet_gateway.gw]
     availability_zone = "us-east-1a"
     tags = {
@@ -61,8 +61,9 @@ resource "aws_instance" "instance" {
     ami           = data.aws_ami.ubuntu.id
     availability_zone = "us-east-1a"
     instance_type     = "t3.micro"
-    private_ip = "10.0.0.12"
+    private_ip = "10.4.0.12"
     subnet_id  = aws_subnet.tf_test_subnet.id
+    depends_on = [aws_internet_gateway.gw]
 }
 
 resource "aws_eip" "example" {

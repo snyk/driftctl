@@ -24,7 +24,9 @@ func Init(version string, alerter *alerter.Alerter,
 	progress output.Progress,
 	resourceSchemaRepository *resource.SchemaRepository,
 	factory resource.ResourceFactory) error {
-
+	if version == "" {
+		version = "3.19.0"
+	}
 	provider, err := NewAWSTerraformProvider(version, progress)
 	if err != nil {
 		return err
@@ -36,18 +38,18 @@ func Init(version string, alerter *alerter.Alerter,
 
 	repositoryCache := cache.New(100)
 
-	s3Repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session))
+	s3Repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session), repositoryCache)
 	ec2repository := repository.NewEC2Repository(provider.session, repositoryCache)
-	route53repository := repository.NewRoute53Repository(provider.session)
-	lambdaRepository := repository.NewLambdaRepository(provider.session)
-	rdsRepository := repository.NewRDSRepository(provider.session)
-	sqsRepository := repository.NewSQSClient(provider.session)
-	snsRepository := repository.NewSNSClient(provider.session)
-	dynamoDBRepository := repository.NewDynamoDBRepository(provider.session)
-	cloudfrontRepository := repository.NewCloudfrontClient(provider.session)
-	kmsRepository := repository.NewKMSRepository(provider.session)
-	ecrRepository := repository.NewECRRepository(provider.session)
-	iamRepository := repository.NewIAMRepository(provider.session)
+	route53repository := repository.NewRoute53Repository(provider.session, repositoryCache)
+	lambdaRepository := repository.NewLambdaRepository(provider.session, repositoryCache)
+	rdsRepository := repository.NewRDSRepository(provider.session, repositoryCache)
+	sqsRepository := repository.NewSQSClient(provider.session, repositoryCache)
+	snsRepository := repository.NewSNSClient(provider.session, repositoryCache)
+	cloudfrontRepository := repository.NewCloudfrontClient(provider.session, repositoryCache)
+	dynamoDBRepository := repository.NewDynamoDBRepository(provider.session, repositoryCache)
+	ecrRepository := repository.NewECRRepository(provider.session, repositoryCache)
+	kmsRepository := repository.NewKMSRepository(provider.session, repositoryCache)
+	iamRepository := repository.NewIAMRepository(provider.session, repositoryCache)
 
 	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.AWS, provider)
@@ -106,7 +108,10 @@ func Init(version string, alerter *alerter.Alerter,
 		supplierLibrary.AddSupplier(supplier)
 	}
 
-	resourceSchemaRepository.Init(provider.Schema())
+	err = resourceSchemaRepository.Init(version, provider.Schema())
+	if err != nil {
+		return err
+	}
 	aws.InitResourcesMetadata(resourceSchemaRepository)
 
 	return nil

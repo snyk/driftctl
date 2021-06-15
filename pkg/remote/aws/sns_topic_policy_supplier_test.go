@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	"github.com/aws/aws-sdk-go/service/sns"
@@ -81,7 +82,7 @@ func TestSNSTopicPolicySupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewSNSTopicSupplier(provider, deserializer, repository.NewSNSClient(provider.session)))
+			supplierLibrary.AddSupplier(NewSNSTopicSupplier(provider, deserializer, repository.NewSNSClient(provider.session, cache.New(0))))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {

@@ -4,10 +4,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/service/cloudfront"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
-
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/cloudfront"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 
 	"github.com/stretchr/testify/mock"
 
@@ -47,7 +47,7 @@ func Test_cloudfrontRepository_ListAllDistributions(t *testing.T) {
 							},
 						}, true)
 						return true
-					})).Return(nil)
+					})).Return(nil).Once()
 			},
 			want: []*cloudfront.DistributionSummary{
 				{Id: aws.String("distribution1")},
@@ -61,13 +61,24 @@ func Test_cloudfrontRepository_ListAllDistributions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
 			client := awstest.MockFakeCloudFront{}
 			tt.mocks(&client)
 			r := &cloudfrontRepository{
 				client: &client,
+				cache:  store,
 			}
 			got, err := r.ListAllDistributions()
 			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllDistributions()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*cloudfront.DistributionSummary{}, store.Get("cloudfrontListAllDistributions"))
+			}
+
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
 			if len(changelog) > 0 {

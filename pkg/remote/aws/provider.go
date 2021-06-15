@@ -45,9 +45,6 @@ type AWSTerraformProvider struct {
 func NewAWSTerraformProvider(version string, progress output.Progress) (*AWSTerraformProvider, error) {
 	p := &AWSTerraformProvider{}
 	providerKey := "aws"
-	if version == "" {
-		version = "3.19.0"
-	}
 	installer, err := tf.NewProviderInstaller(tf.ProviderConfig{
 		Key:     providerKey,
 		Version: version,

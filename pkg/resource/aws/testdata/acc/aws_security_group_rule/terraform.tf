@@ -8,8 +8,16 @@ terraform {
   }
 }
 
+locals {
+    timestamp = formatdate("YYYYMMDDhhmmss", timestamp())
+    prefix = "sgrule-${local.timestamp}"
+}
+
 resource "aws_vpc" "vpc" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block = "10.7.0.0/16"
+  tags = {
+    Name = "${local.prefix}-vpc"
+  }
 }
 
 resource "aws_vpc_endpoint" "s3" {

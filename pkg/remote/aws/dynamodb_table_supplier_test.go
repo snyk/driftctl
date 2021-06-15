@@ -7,6 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
@@ -82,7 +83,7 @@ func TestDynamoDBTableSupplier_Resources(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			supplierLibrary.AddSupplier(NewDynamoDBTableSupplier(provider, deserializer, repository.NewDynamoDBRepository(provider.session)))
+			supplierLibrary.AddSupplier(NewDynamoDBTableSupplier(provider, deserializer, repository.NewDynamoDBRepository(provider.session, cache.New(0))))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {

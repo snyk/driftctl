@@ -26,7 +26,7 @@ func NewIamUserPolicyAttachmentSupplier(provider *AWSTerraformProvider, deserial
 	return &IamUserPolicyAttachmentSupplier{
 		provider,
 		deserializer,
-		repository.NewIAMRepository(provider.session),
+		repo,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }

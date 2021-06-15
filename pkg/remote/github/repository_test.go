@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/mocks"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/pkg/errors"
 	"github.com/shurcooL/githubv4"
 	"github.com/stretchr/testify/assert"
@@ -12,8 +13,6 @@ import (
 )
 
 func TestListRepositoriesForUser_WithError(t *testing.T) {
-	assert := assert.New(t)
-
 	mockedClient := mocks.GithubGraphQLClient{}
 	expectedError := errors.New("test error from graphql")
 	mockedClient.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(expectedError)
@@ -21,16 +20,14 @@ func TestListRepositoriesForUser_WithError(t *testing.T) {
 	r := githubRepository{
 		client: &mockedClient,
 		config: githubConfig{},
+		cache:  cache.New(1),
 	}
 
 	_, err := r.ListRepositories()
-	assert.Equal(expectedError, err)
+	assert.Equal(t, expectedError, err)
 }
 
 func TestListRepositoriesForUser(t *testing.T) {
-
-	assert := assert.New(t)
-
 	mockedClient := mocks.GithubGraphQLClient{}
 	mockedClient.On("Query",
 		mock.Anything,
@@ -55,7 +52,7 @@ func TestListRepositoriesForUser(t *testing.T) {
 		}),
 		map[string]interface{}{
 			"cursor": (*githubv4.String)(nil),
-		}).Return(nil)
+		}).Return(nil).Once()
 
 	mockedClient.On("Query",
 		mock.Anything,
@@ -79,12 +76,14 @@ func TestListRepositoriesForUser(t *testing.T) {
 		}),
 		map[string]interface{}{
 			"cursor": githubv4.NewString("next"),
-		}).Return(nil)
+		}).Return(nil).Once()
 
+	store := cache.New(1)
 	r := githubRepository{
 		client: &mockedClient,
 		ctx:    context.TODO(),
 		config: githubConfig{},
+		cache:  store,
 	}
 
 	repos, err := r.ListRepositories()
@@ -92,17 +91,21 @@ func TestListRepositoriesForUser(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal([]string{
+	assert.Equal(t, []string{
 		"repo1",
 		"repo2",
 		"repo3",
 		"repo4",
 	}, repos)
+
+	// Check that results were cached
+	cachedData, err := r.ListRepositories()
+	assert.NoError(t, err)
+	assert.Equal(t, repos, cachedData)
+	assert.IsType(t, []string{}, store.Get("githubListRepositories"))
 }
 
 func TestListRepositoriesForOrganization_WithError(t *testing.T) {
-	assert := assert.New(t)
-
 	mockedClient := mocks.GithubGraphQLClient{}
 	expectedError := errors.New("test error from graphql")
 	mockedClient.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(expectedError)
@@ -112,15 +115,14 @@ func TestListRepositoriesForOrganization_WithError(t *testing.T) {
 		config: githubConfig{
 			Organization: "testorg",
 		},
+		cache: cache.New(1),
 	}
 
 	_, err := r.ListRepositories()
-	assert.Equal(expectedError, err)
+	assert.Equal(t, expectedError, err)
 }
 
 func TestListRepositoriesForOrganization(t *testing.T) {
-	assert := assert.New(t)
-
 	mockedClient := mocks.GithubGraphQLClient{}
 	mockedClient.On("Query",
 		mock.Anything,
@@ -148,7 +150,7 @@ func TestListRepositoriesForOrganization(t *testing.T) {
 		map[string]interface{}{
 			"org":    (githubv4.String)("testorg"),
 			"cursor": (*githubv4.String)(nil),
-		}).Return(nil)
+		}).Return(nil).Once()
 
 	mockedClient.On("Query",
 		mock.Anything,
@@ -175,14 +177,16 @@ func TestListRepositoriesForOrganization(t *testing.T) {
 		map[string]interface{}{
 			"org":    (githubv4.String)("testorg"),
 			"cursor": githubv4.NewString("next"),
-		}).Return(nil)
+		}).Return(nil).Once()
 
+	store := cache.New(1)
 	r := githubRepository{
 		client: &mockedClient,
 		ctx:    context.TODO(),
 		config: githubConfig{
 			Organization: "testorg",
 		},
+		cache: store,
 	}
 
 	repos, err := r.ListRepositories()
@@ -190,17 +194,21 @@ func TestListRepositoriesForOrganization(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal([]string{
+	assert.Equal(t, []string{
 		"repo1",
 		"repo2",
 		"repo3",
 		"repo4",
 	}, repos)
+
+	// Check that results were cached
+	cachedData, err := r.ListRepositories()
+	assert.NoError(t, err)
+	assert.Equal(t, repos, cachedData)
+	assert.IsType(t, []string{}, store.Get("githubListRepositories"))
 }
 
 func TestListTeams_WithError(t *testing.T) {
-	assert := assert.New(t)
-
 	mockedClient := mocks.GithubGraphQLClient{}
 	expectedError := errors.New("test error from graphql")
 	mockedClient.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(expectedError)
@@ -210,25 +218,22 @@ func TestListTeams_WithError(t *testing.T) {
 		config: githubConfig{
 			Organization: "testorg",
 		},
+		cache: cache.New(1),
 	}
 
 	_, err := r.ListTeams()
-	assert.Equal(expectedError, err)
+	assert.Equal(t, expectedError, err)
 }
 
 func TestListTeams_WithoutOrganization(t *testing.T) {
-	assert := assert.New(t)
-
-	r := githubRepository{}
+	r := githubRepository{cache: cache.New(1)}
 
 	teams, err := r.ListTeams()
-	assert.Nil(err)
-	assert.Equal([]Team{}, teams)
+	assert.Nil(t, err)
+	assert.Equal(t, []Team{}, teams)
 }
 
 func TestListTeams(t *testing.T) {
-	assert := assert.New(t)
-
 	mockedClient := mocks.GithubGraphQLClient{}
 	mockedClient.On("Query",
 		mock.Anything,
@@ -259,7 +264,7 @@ func TestListTeams(t *testing.T) {
 		map[string]interface{}{
 			"login":  (githubv4.String)("testorg"),
 			"cursor": (*githubv4.String)(nil),
-		}).Return(nil)
+		}).Return(nil).Once()
 
 	mockedClient.On("Query",
 		mock.Anything,
@@ -289,14 +294,16 @@ func TestListTeams(t *testing.T) {
 		map[string]interface{}{
 			"login":  (githubv4.String)("testorg"),
 			"cursor": githubv4.NewString("next"),
-		}).Return(nil)
+		}).Return(nil).Once()
 
+	store := cache.New(1)
 	r := githubRepository{
 		client: &mockedClient,
 		ctx:    context.TODO(),
 		config: githubConfig{
 			Organization: "testorg",
 		},
+		cache: store,
 	}
 
 	teams, err := r.ListTeams()
@@ -304,17 +311,21 @@ func TestListTeams(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal([]Team{
+	assert.Equal(t, []Team{
 		{1, "1"},
 		{2, "2"},
 		{3, "3"},
 		{4, "4"},
 	}, teams)
+
+	// Check that results were cached
+	cachedData, err := r.ListTeams()
+	assert.NoError(t, err)
+	assert.Equal(t, teams, cachedData)
+	assert.IsType(t, []Team{}, store.Get("githubListTeams"))
 }
 
 func TestListTeamMemberships_WithTeamListingError(t *testing.T) {
-	assert := assert.New(t)
-
 	mockedClient := mocks.GithubGraphQLClient{}
 	expectedError := errors.New("test error from graphql")
 	mockedClient.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(expectedError)
@@ -324,15 +335,14 @@ func TestListTeamMemberships_WithTeamListingError(t *testing.T) {
 		config: githubConfig{
 			Organization: "testorg",
 		},
+		cache: cache.New(1),
 	}
 
 	_, err := r.ListTeamMemberships()
-	assert.Equal(expectedError, err)
+	assert.Equal(t, expectedError, err)
 }
 
 func TestListTeamMemberships_WithError(t *testing.T) {
-	assert := assert.New(t)
-
 	mockedClient := mocks.GithubGraphQLClient{}
 
 	mockedClient.On("Query",
@@ -369,25 +379,22 @@ func TestListTeamMemberships_WithError(t *testing.T) {
 		config: githubConfig{
 			Organization: "testorg",
 		},
+		cache: cache.New(1),
 	}
 
 	_, err := r.ListTeamMemberships()
-	assert.Equal(expectedError, err)
+	assert.Equal(t, expectedError, err)
 }
 
 func TestListTeamMemberships_WithoutOrganization(t *testing.T) {
-	assert := assert.New(t)
-
-	r := githubRepository{}
+	r := githubRepository{cache: cache.New(1)}
 
 	teams, err := r.ListTeamMemberships()
-	assert.Nil(err)
-	assert.Equal([]string{}, teams)
+	assert.Nil(t, err)
+	assert.Equal(t, []string{}, teams)
 }
 
 func TestListTeamMemberships(t *testing.T) {
-	assert := assert.New(t)
-
 	mockedClient := mocks.GithubGraphQLClient{}
 	mockedClient.On("Query",
 		mock.Anything,
@@ -417,7 +424,7 @@ func TestListTeamMemberships(t *testing.T) {
 		map[string]interface{}{
 			"login":  (githubv4.String)("testorg"),
 			"cursor": (*githubv4.String)(nil),
-		}).Return(nil)
+		}).Return(nil).Once()
 
 	mockedClient.On("Query",
 		mock.Anything,
@@ -446,7 +453,7 @@ func TestListTeamMemberships(t *testing.T) {
 			"login":  (githubv4.String)("testorg"),
 			"cursor": (*githubv4.String)(nil),
 			"slug":   (githubv4.String)("foo"),
-		}).Return(nil)
+		}).Return(nil).Once()
 
 	mockedClient.On("Query",
 		mock.Anything,
@@ -474,7 +481,7 @@ func TestListTeamMemberships(t *testing.T) {
 			"login":  (githubv4.String)("testorg"),
 			"cursor": (githubv4.String)("next"),
 			"slug":   (githubv4.String)("foo"),
-		}).Return(nil)
+		}).Return(nil).Once()
 
 	mockedClient.On("Query",
 		mock.Anything,
@@ -502,14 +509,16 @@ func TestListTeamMemberships(t *testing.T) {
 			"login":  (githubv4.String)("testorg"),
 			"cursor": (*githubv4.String)(nil),
 			"slug":   (githubv4.String)("bar"),
-		}).Return(nil)
+		}).Return(nil).Once()
 
+	store := cache.New(1)
 	r := githubRepository{
 		client: &mockedClient,
 		ctx:    context.TODO(),
 		config: githubConfig{
 			Organization: "testorg",
 		},
+		cache: store,
 	}
 
 	memberships, err := r.ListTeamMemberships()
@@ -517,7 +526,7 @@ func TestListTeamMemberships(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal([]string{
+	assert.Equal(t, []string{
 		"1:user-1",
 		"1:user-2",
 		"1:user-3",
@@ -525,11 +534,15 @@ func TestListTeamMemberships(t *testing.T) {
 		"2:user-5",
 		"2:user-6",
 	}, memberships)
+
+	// Check that results were cached
+	cachedData, err := r.ListTeamMemberships()
+	assert.NoError(t, err)
+	assert.Equal(t, memberships, cachedData)
+	assert.IsType(t, []string{}, store.Get("githubListTeamMemberships"))
 }
 
 func TestListMembership_WithError(t *testing.T) {
-	assert := assert.New(t)
-
 	mockedClient := mocks.GithubGraphQLClient{}
 	expectedError := errors.New("test error from graphql")
 	mockedClient.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(expectedError)
@@ -539,25 +552,22 @@ func TestListMembership_WithError(t *testing.T) {
 		config: githubConfig{
 			Organization: "testorg",
 		},
+		cache: cache.New(1),
 	}
 
 	_, err := r.ListMembership()
-	assert.Equal(expectedError, err)
+	assert.Equal(t, expectedError, err)
 }
 
 func TestListMembership_WithoutOrganization(t *testing.T) {
-	assert := assert.New(t)
-
-	r := githubRepository{}
+	r := githubRepository{cache: cache.New(1)}
 
 	teams, err := r.ListMembership()
-	assert.Nil(err)
-	assert.Equal([]string{}, teams)
+	assert.Nil(t, err)
+	assert.Equal(t, []string{}, teams)
 }
 
 func TestListMembership(t *testing.T) {
-	assert := assert.New(t)
-
 	mockedClient := mocks.GithubGraphQLClient{}
 	mockedClient.On("Query",
 		mock.Anything,
@@ -585,7 +595,7 @@ func TestListMembership(t *testing.T) {
 		map[string]interface{}{
 			"login":  (githubv4.String)("testorg"),
 			"cursor": (*githubv4.String)(nil),
-		}).Return(nil)
+		}).Return(nil).Once()
 
 	mockedClient.On("Query",
 		mock.Anything,
@@ -612,14 +622,16 @@ func TestListMembership(t *testing.T) {
 		map[string]interface{}{
 			"login":  (githubv4.String)("testorg"),
 			"cursor": githubv4.NewString("next"),
-		}).Return(nil)
+		}).Return(nil).Once()
 
+	store := cache.New(1)
 	r := githubRepository{
 		client: &mockedClient,
 		ctx:    context.TODO(),
 		config: githubConfig{
 			Organization: "testorg",
 		},
+		cache: store,
 	}
 
 	teams, err := r.ListMembership()
@@ -627,17 +639,22 @@ func TestListMembership(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal([]string{
+	assert.Equal(t, []string{
 		"testorg:user-admin",
 		"testorg:user-non-admin-1",
 		"testorg:user-non-admin-2",
 		"testorg:user-non-admin-3",
 	}, teams)
+
+	// Check that results were cached
+	cachedData, err := r.ListMembership()
+	assert.NoError(t, err)
+	assert.Equal(t, teams, cachedData)
+	assert.IsType(t, []string{}, store.Get("githubListMembership"))
+
 }
 
 func TestListBranchProtection_WithRepoListingError(t *testing.T) {
-	assert := assert.New(t)
-
 	mockedClient := mocks.GithubGraphQLClient{}
 	expectedError := errors.New("test error from graphql")
 	mockedClient.On("Query",
@@ -672,15 +689,14 @@ func TestListBranchProtection_WithRepoListingError(t *testing.T) {
 		config: githubConfig{
 			Organization: "my-organization",
 		},
+		cache: cache.New(1),
 	}
 
 	_, err := r.ListBranchProtection()
-	assert.Equal(expectedError, err)
+	assert.Equal(t, expectedError, err)
 }
 
 func TestListBranchProtection_WithError(t *testing.T) {
-	assert := assert.New(t)
-
 	mockedClient := mocks.GithubGraphQLClient{}
 	expectedError := errors.New("test error from graphql")
 	mockedClient.On("Query",
@@ -717,15 +733,14 @@ func TestListBranchProtection_WithError(t *testing.T) {
 		config: githubConfig{
 			Organization: "testorg",
 		},
+		cache: cache.New(1),
 	}
 
 	_, err := r.ListBranchProtection()
-	assert.Equal(expectedError, err)
+	assert.Equal(t, expectedError, err)
 }
 
 func TestListBranchProtection(t *testing.T) {
-	assert := assert.New(t)
-
 	mockedClient := mocks.GithubGraphQLClient{}
 
 	mockedClient.On("Query",
@@ -753,7 +768,7 @@ func TestListBranchProtection(t *testing.T) {
 		map[string]interface{}{
 			"org":    (githubv4.String)("my-organization"),
 			"cursor": (*githubv4.String)(nil),
-		}).Return(nil)
+		}).Return(nil).Once()
 
 	mockedClient.On("Query",
 		mock.Anything,
@@ -782,7 +797,7 @@ func TestListBranchProtection(t *testing.T) {
 			"owner":  (githubv4.String)("my-organization"),
 			"name":   (githubv4.String)("repo1"),
 			"cursor": (*githubv4.String)(nil),
-		}).Return(nil)
+		}).Return(nil).Once()
 
 	mockedClient.On("Query",
 		mock.Anything,
@@ -811,7 +826,7 @@ func TestListBranchProtection(t *testing.T) {
 			"owner":  (githubv4.String)("my-organization"),
 			"name":   (githubv4.String)("repo1"),
 			"cursor": (githubv4.String)("nextPage"),
-		}).Return(nil)
+		}).Return(nil).Once()
 
 	mockedClient.On("Query",
 		mock.Anything,
@@ -840,7 +855,7 @@ func TestListBranchProtection(t *testing.T) {
 			"owner":  (githubv4.String)("my-organization"),
 			"name":   (githubv4.String)("repo2"),
 			"cursor": (*githubv4.String)(nil),
-		}).Return(nil)
+		}).Return(nil).Once()
 
 	mockedClient.On("Query",
 		mock.Anything,
@@ -869,14 +884,16 @@ func TestListBranchProtection(t *testing.T) {
 			"owner":  (githubv4.String)("my-organization"),
 			"name":   (githubv4.String)("repo2"),
 			"cursor": (githubv4.String)("nextPage"),
-		}).Return(nil)
+		}).Return(nil).Once()
 
+	store := cache.New(1)
 	r := githubRepository{
 		client: &mockedClient,
 		ctx:    context.TODO(),
 		config: githubConfig{
 			Organization: "my-organization",
 		},
+		cache: store,
 	}
 
 	teams, err := r.ListBranchProtection()
@@ -884,7 +901,7 @@ func TestListBranchProtection(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal([]string{
+	assert.Equal(t, []string{
 		"id1",
 		"id2",
 		"id3",
@@ -894,4 +911,10 @@ func TestListBranchProtection(t *testing.T) {
 		"id7",
 		"id8",
 	}, teams)
+
+	// Check that results were cached
+	cachedData, err := r.ListBranchProtection()
+	assert.NoError(t, err)
+	assert.Equal(t, teams, cachedData)
+	assert.IsType(t, []string{}, store.Get("githubListBranchProtection"))
 }
