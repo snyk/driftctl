@@ -137,6 +137,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 				library:      library,
 				progress:     progress,
 				deserializer: resource.NewDeserializer(factory),
+				ignore:       filter.NewDriftIgnore(),
 			}
 
 			got, err := r.Resources()
@@ -221,6 +222,7 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 				library:      library,
 				progress:     progress,
 				deserializer: resource.NewDeserializer(factory),
+				ignore:       filter.NewDriftIgnore(),
 			}
 
 			got, err := r.Resources()

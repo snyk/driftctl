@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/fatih/color"
 	"github.com/hashicorp/terraform/addrs"
@@ -32,6 +33,7 @@ type TerraformStateReader struct {
 	deserializer   *resource.Deserializer
 	backendOptions *backend.Options
 	progress       output.Progress
+	ignore         *filter.DriftIgnore
 }
 
 func (r *TerraformStateReader) initReader() error {
@@ -39,8 +41,20 @@ func (r *TerraformStateReader) initReader() error {
 	return nil
 }
 
-func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options, progress output.Progress, deserializer *resource.Deserializer) (*TerraformStateReader, error) {
-	reader := TerraformStateReader{library: library, config: config, deserializer: deserializer, backendOptions: backendOpts, progress: progress}
+func NewReader(config config.SupplierConfig,
+	library *terraform.ProviderLibrary,
+	backendOpts *backend.Options,
+	progress output.Progress,
+	deserializer *resource.Deserializer,
+	ignore *filter.DriftIgnore) (*TerraformStateReader, error) {
+	reader := TerraformStateReader{
+		library:        library,
+		config:         config,
+		deserializer:   deserializer,
+		backendOptions: backendOpts,
+		progress:       progress,
+		ignore:         ignore,
+	}
 	err := reader.initReader()
 	if err != nil {
 		return nil, err
@@ -176,10 +190,29 @@ func (r *TerraformStateReader) decode(values map[string][]cty.Value) ([]resource
 
 func (r *TerraformStateReader) Resources() ([]resource.Resource, error) {
 	if r.enumerator == nil {
-		return r.retrieveForState(r.config.Path)
+		resources, err := r.retrieveForState(r.config.Path)
+		if err != nil {
+			return nil, err
+		}
+		return r.preFilter(resources), nil
 	}
 
-	return r.retrieveMultiplesStates()
+	resources, err := r.retrieveMultiplesStates()
+	if err != nil {
+		return nil, err
+	}
+	return r.preFilter(resources), nil
+}
+
+func (r *TerraformStateReader) preFilter(rs []resource.Resource) []resource.Resource {
+	var resources []resource.Resource
+	for _, res := range rs {
+		if r.ignore.IsResourceIgnored(res) {
+			continue
+		}
+		resources = append(resources, res)
+	}
+	return resources
 }
 
 func (r *TerraformStateReader) retrieveForState(path string) ([]resource.Resource, error) {
