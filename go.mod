@@ -8,6 +8,7 @@ require (
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/fatih/color v1.9.0
 	github.com/getsentry/sentry-go v0.10.0
+	github.com/go-git/go-git/v5 v5.1.0 // indirect
 	github.com/hashicorp/go-getter v1.5.1
 	github.com/hashicorp/go-hclog v0.9.2
 	github.com/hashicorp/go-plugin v1.3.0
