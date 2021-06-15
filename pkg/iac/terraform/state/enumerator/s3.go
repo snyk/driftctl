@@ -2,7 +2,6 @@ package enumerator
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -44,7 +43,10 @@ func (s *S3Enumerator) Enumerate() ([]string, error) {
 	bucket := bucketPath[0]
 	prefix, pattern := GlobS3(strings.Join(bucketPath[1:], "/"))
 
-	fullPattern := filepath.Join(prefix, pattern)
+	fullPattern := prefix
+	if pattern != "" {
+		fullPattern = strings.Join([]string{prefix, pattern}, "/")
+	}
 
 	files := make([]string, 0)
 	input := &s3.ListObjectsV2Input{

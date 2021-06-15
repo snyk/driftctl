@@ -25,7 +25,7 @@ func HasMeta(path string) bool {
 
 func splitDirPattern(p string) (base string, pattern string) {
 	base = p
-	sep := string(os.PathSeparator)
+	sep := "/"
 
 	for {
 		if !HasMeta(base) {
