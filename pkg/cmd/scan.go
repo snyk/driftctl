@@ -157,7 +157,10 @@ func NewScanCmd() *cobra.Command {
 		"Includes cloud provider service-linked roles (disabled by default)",
 	)
 
-	configDir, _ := homedir.Dir()
+	configDir, err := homedir.Dir()
+	if err != nil {
+		configDir = os.TempDir()
+	}
 	fl.String(
 		"config-dir",
 		configDir,
