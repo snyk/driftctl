@@ -36,10 +36,10 @@ func NewConsole() *Console {
 func (c *Console) Write(analysis *analyser.Analysis) error {
 	if analysis.Summary().TotalDeleted > 0 {
 		fmt.Println("Found missing resources:")
-		deletedByType := groupByType(analysis.Deleted())
-		for ty, resources := range deletedByType {
+		deletedByType, keys := groupByType(analysis.Deleted())
+		for _, ty := range keys {
 			fmt.Printf("  %s:\n", ty)
-			for _, res := range resources {
+			for _, res := range deletedByType[ty] {
 				humanString := fmt.Sprintf("    - %s", res.TerraformId())
 				if humanAttrs := formatResourceAttributes(res); humanAttrs != "" {
 					humanString += fmt.Sprintf("\n        %s", humanAttrs)
@@ -51,10 +51,10 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 
 	if analysis.Summary().TotalUnmanaged > 0 {
 		fmt.Println("Found resources not covered by IaC:")
-		unmanagedByType := groupByType(analysis.Unmanaged())
-		for ty, resource := range unmanagedByType {
+		unmanagedByType, keys := groupByType(analysis.Unmanaged())
+		for _, ty := range keys {
 			fmt.Printf("  %s:\n", ty)
-			for _, res := range resource {
+			for _, res := range unmanagedByType[ty] {
 				humanString := fmt.Sprintf("    - %s", res.TerraformId())
 				if humanAttrs := formatResourceAttributes(res); humanAttrs != "" {
 					humanString += fmt.Sprintf("\n        %s", humanAttrs)
@@ -174,7 +174,7 @@ func prettify(resource interface{}) string {
 	return awsutil.Prettify(resource)
 }
 
-func groupByType(resources []resource.Resource) map[string][]resource.Resource {
+func groupByType(resources []resource.Resource) (map[string][]resource.Resource, []string) {
 	result := map[string][]resource.Resource{}
 	for _, res := range resources {
 		if result[res.TerraformType()] == nil {
@@ -183,7 +183,14 @@ func groupByType(resources []resource.Resource) map[string][]resource.Resource {
 		}
 		result[res.TerraformType()] = append(result[res.TerraformType()], res)
 	}
-	return result
+
+	keys := make([]string, 0, len(result))
+	for k := range result {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	return result, keys
 }
 
 func jsonDiff(a, b interface{}, prefix string) string {
