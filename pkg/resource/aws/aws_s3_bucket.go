@@ -15,5 +15,6 @@ func initAwsS3BucketMetaData(resourceSchemaRepository resource.SchemaRepositoryI
 	resourceSchemaRepository.SetNormalizeFunc(AwsS3BucketResourceType, func(res *resource.AbstractResource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"force_destroy"})
+		val.SafeDelete([]string{"bucket_prefix"})
 	})
 }
