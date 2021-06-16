@@ -173,6 +173,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "a-vorobiev",
+      "name": "Anton Vorobiev",
+      "avatar_url": "https://avatars.githubusercontent.com/u/197565?v=4",
+      "profile": "https://vorobiev.cloud",
+      "contributions": [
+        "bug"
+      ]
     }
   ]
 }
