@@ -76,9 +76,6 @@ func (p *ProviderInstaller) Install() (string, error) {
 }
 
 func (p ProviderInstaller) getProviderDirectory() string {
-	if p.homeDir == "" {
-		p.homeDir = os.TempDir()
-	}
 	return path.Join(p.homeDir, fmt.Sprintf("/.driftctl/plugins/%s_%s/", runtime.GOOS, runtime.GOARCH))
 }
 
