@@ -58,7 +58,7 @@ Spot discrepancies as they happen: driftctl is a free and open-source CLI that w
 
 **[Installation](https://docs.driftctl.com/installation)**
 
-**[Discord](https://discord.gg/NMCBxtD7Nd)**
+**[Discord](https://discord.gg/7zHQ8r2PgP)**
 
 ---
 
