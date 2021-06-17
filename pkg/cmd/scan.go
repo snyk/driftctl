@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/cloudskiff/driftctl/pkg/telemetry"
+	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -85,6 +86,8 @@ func NewScanCmd() *cobra.Command {
 			opts.Quiet, _ = cmd.Flags().GetBool("quiet")
 			opts.DisableTelemetry, _ = cmd.Flags().GetBool("disable-telemetry")
 
+			opts.ConfigDir, _ = cmd.Flags().GetString("config-dir")
+
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -154,6 +157,16 @@ func NewScanCmd() *cobra.Command {
 		"Includes cloud provider service-linked roles (disabled by default)",
 	)
 
+	configDir, err := homedir.Dir()
+	if err != nil {
+		configDir = os.TempDir()
+	}
+	fl.String(
+		"config-dir",
+		configDir,
+		"Directory path that driftctl uses for configuration.\n",
+	)
+
 	return cmd
 }
 
@@ -174,7 +187,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	resFactory := terraform.NewTerraformResourceFactory(resourceSchemaRepository)
 
-	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, supplierLibrary, scanProgress, resourceSchemaRepository, resFactory)
+	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, supplierLibrary, scanProgress, resourceSchemaRepository, resFactory, opts.ConfigDir)
 	if err != nil {
 		return err
 	}

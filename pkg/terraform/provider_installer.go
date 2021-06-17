@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	error2 "github.com/cloudskiff/driftctl/pkg/terraform/error"
-	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -28,14 +27,10 @@ type ProviderInstaller struct {
 }
 
 func NewProviderInstaller(config ProviderConfig) (*ProviderInstaller, error) {
-	homedir, err := homedir.Dir()
-	if err != nil {
-		homedir = ""
-	}
 	return &ProviderInstaller{
 		NewProviderDownloader(),
 		config,
-		homedir,
+		config.ConfigDir,
 	}, nil
 }
 
@@ -81,9 +76,6 @@ func (p *ProviderInstaller) Install() (string, error) {
 }
 
 func (p ProviderInstaller) getProviderDirectory() string {
-	if p.homeDir == "" {
-		p.homeDir = os.TempDir()
-	}
 	return path.Join(p.homeDir, fmt.Sprintf("/.driftctl/plugins/%s_%s/", runtime.GOOS, runtime.GOARCH))
 }
 

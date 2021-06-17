@@ -19,12 +19,13 @@ type githubConfig struct {
 	Organization string
 }
 
-func NewGithubTerraformProvider(version string, progress output.Progress) (*GithubTerraformProvider, error) {
+func NewGithubTerraformProvider(version string, progress output.Progress, configDir string) (*GithubTerraformProvider, error) {
 	p := &GithubTerraformProvider{}
 	providerKey := "github"
 	installer, err := tf.NewProviderInstaller(tf.ProviderConfig{
-		Key:     providerKey,
-		Version: version,
+		Key:       providerKey,
+		Version:   version,
+		ConfigDir: configDir,
 	})
 	if err != nil {
 		return nil, err

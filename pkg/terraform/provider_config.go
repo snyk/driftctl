@@ -6,8 +6,9 @@ import (
 )
 
 type ProviderConfig struct {
-	Key     string
-	Version string
+	Key       string
+	Version   string
+	ConfigDir string
 }
 
 func (c *ProviderConfig) GetDownloadUrl() string {

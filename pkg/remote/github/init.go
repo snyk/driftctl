@@ -21,11 +21,13 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary *resource.SupplierLibrary,
 	progress output.Progress,
 	resourceSchemaRepository *resource.SchemaRepository,
-	factory resource.ResourceFactory) error {
+	factory resource.ResourceFactory,
+	configDir string) error {
 	if version == "" {
 		version = "4.4.0"
 	}
-	provider, err := NewGithubTerraformProvider(version, progress)
+
+	provider, err := NewGithubTerraformProvider(version, progress, configDir)
 	if err != nil {
 		return err
 	}

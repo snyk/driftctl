@@ -42,12 +42,13 @@ type AWSTerraformProvider struct {
 	session *session.Session
 }
 
-func NewAWSTerraformProvider(version string, progress output.Progress) (*AWSTerraformProvider, error) {
+func NewAWSTerraformProvider(version string, progress output.Progress, configDir string) (*AWSTerraformProvider, error) {
 	p := &AWSTerraformProvider{}
 	providerKey := "aws"
 	installer, err := tf.NewProviderInstaller(tf.ProviderConfig{
-		Key:     providerKey,
-		Version: version,
+		Key:       providerKey,
+		Version:   version,
+		ConfigDir: configDir,
 	})
 	if err != nil {
 		return nil, err
