@@ -1,4 +1,4 @@
-html,body,div,span,h1,h2,p,pre,a,code,img,ul,li,form,label,table,tbody,thead,tr,th,td,header,section,button {
+html, body, div, span, h1, h2, p, pre, a, code, img, ul, li, form, label, table, tbody, thead, tr, th, td, header, section, button {
     border: 0;
     font: inherit;
     margin: 0;
@@ -82,7 +82,7 @@ table {
     width: 100%;
 }
 
-tbody,ul,.table-body {
+tbody, ul, .table-body {
     border-left: 1px solid #ececec;
     border-right: 1px solid #ececec;
     border-top: 1px solid #ececec;
@@ -138,7 +138,7 @@ input[type="reset"] {
     width: 100px;
 }
 
-input[type="search"],select {
+input[type="search"], select {
     border: 1px solid #ececec;
     border-radius: 3px;
     color: #6e7071;
