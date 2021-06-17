@@ -4,13 +4,15 @@
     <title>driftctl Scan Report</title>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link rel="shortcut icon" href="https://raw.githubusercontent.com/cloudskiff/driftctl-docs/main/static/img/favicon.ico"/>
+    <link rel="shortcut icon"
+          href="https://raw.githubusercontent.com/cloudskiff/driftctl-docs/main/static/img/favicon.ico"/>
     <style>{{.Stylesheet}}</style>
 </head>
 <body>
 <div class="container">
     <header>
-        <img src="https://raw.githubusercontent.com/cloudskiff/driftctl-docs/main/static/img/driftctl_dark.svg" width="100px" height="81px" />
+        <img src="https://raw.githubusercontent.com/cloudskiff/driftctl-docs/main/static/img/driftctl_dark.svg"
+             width="100px" height="81px" alt="driftctl logo"/>
         <div>
             <h1>Scan Report</h1>
             <h2>{{ .ScanDate }}</h2>
@@ -65,17 +67,20 @@
                 </button>
                 {{end}}
                 {{if (gt (len .Differences) 0)}}
-                <button type="button" role="tab" aria-selected="false" aria-controls="changed-tab" id="changed" tabindex="-1">
+                <button type="button" role="tab" aria-selected="false" aria-controls="changed-tab" id="changed"
+                        tabindex="-1">
                     Changed Resources (<span data-count="resource-changed">{{len .Differences}}</span>)
                 </button>
                 {{end}}
                 {{if (gt (len .Deleted) 0)}}
-                <button type="button" role="tab" aria-selected="false" aria-controls="missing-tab" id="missing" tabindex="-1">
+                <button type="button" role="tab" aria-selected="false" aria-controls="missing-tab" id="missing"
+                        tabindex="-1">
                     Missing Resources (<span data-count="resource-deleted">{{len .Deleted}}</span>)
                 </button>
                 {{end}}
                 {{if (gt (len .Alerts) 0)}}
-                <button type="button" role="tab" aria-selected="false" aria-controls="alerts-tab" id="alerts" tabindex="-1">
+                <button type="button" role="tab" aria-selected="false" aria-controls="alerts-tab" id="alerts"
+                        tabindex="-1">
                     Alerts (<span data-count="resource-alerts">{{len .Alerts}}</span>)
                 </button>
                 {{end}}
@@ -85,18 +90,18 @@
                 <div tabindex="0" role="tabpanel" id="unmanaged-tab" aria-labelledby="unmanaged">
                     <table>
                         <thead>
-                            <tr class="table-header">
-                                <th>Resource ID</th>
-                                <th>Resource Type</th>
-                            </tr>
+                        <tr class="table-header">
+                            <th>Resource ID</th>
+                            <th>Resource Type</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            {{range $res := .Unmanaged}}
-                            <tr data-kind="resource-unmanaged" class="resource-item row">
-                                <td data-type="resource-id">{{$res.TerraformId}}</td>
-                                <td data-type="resource-type">{{$res.TerraformType}}</td>
-                            </tr>
-                            {{end}}
+                        {{range $res := .Unmanaged}}
+                        <tr data-kind="resource-unmanaged" class="resource-item row">
+                            <td data-type="resource-id">{{$res.TerraformId}}</td>
+                            <td data-type="resource-type">{{$res.TerraformType}}</td>
+                        </tr>
+                        {{end}}
                         </tbody>
                     </table>
                     <div class="empty-panel is-hidden">
@@ -136,18 +141,18 @@
                 <div class="is-hidden" tabindex="0" role="tabpanel" id="missing-tab" aria-labelledby="missing">
                     <table>
                         <thead>
-                            <tr class="table-header">
-                                <th>Resource ID</th>
-                                <th>Resource Type</th>
-                            </tr>
+                        <tr class="table-header">
+                            <th>Resource ID</th>
+                            <th>Resource Type</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            {{range $res := .Deleted}}
-                            <tr data-kind="resource-deleted" class="resource-item row">
-                                <td data-type="resource-id">{{$res.TerraformId}}</td>
-                                <td data-type="resource-type">{{$res.TerraformType}}</td>
-                            </tr>
-                            {{end}}
+                        {{range $res := .Deleted}}
+                        <tr data-kind="resource-deleted" class="resource-item row">
+                            <td data-type="resource-id">{{$res.TerraformId}}</td>
+                            <td data-type="resource-type">{{$res.TerraformType}}</td>
+                        </tr>
+                        {{end}}
                         </tbody>
                     </table>
                     <div class="empty-panel is-hidden">
@@ -275,13 +280,14 @@
     }
 </script>
 <script>
+    // Enhance accessibility
     const tablist = document.querySelector('[role="tablist"]')
     const tabs = document.querySelectorAll('[role="tab"]')
     const panels = document.querySelectorAll('[role="tabpanel"]')
-    const keys = { left: 37, right: 39 }
-    const direction = { 37: -1, 39: 1 }
+    const keys = {left: 37, right: 39}
+    const direction = {37: -1, 39: 1}
 
-    for (i = 0; i < tabs.length; ++i) {
+    for (let i = 0; i < tabs.length; ++i) {
         addListeners(i)
     }
 
@@ -316,7 +322,7 @@
 
     function switchTabOnArrowPress(event) {
         const pressed = event.keyCode
-        for (x = 0; x < tabs.length; x++) {
+        for (let x = 0; x < tabs.length; x++) {
             tabs[x].addEventListener('focus', focusEventHandler)
         }
         if (direction[pressed]) {
@@ -346,12 +352,12 @@
     }
 
     function deactivateTabs() {
-        for (t = 0; t < tabs.length; t++) {
+        for (let t = 0; t < tabs.length; t++) {
             tabs[t].setAttribute('tabindex', '-1')
             tabs[t].setAttribute('aria-selected', 'false')
             tabs[t].removeEventListener('focus', focusEventHandler)
         }
-        for (p = 0; p < panels.length; p++) {
+        for (let p = 0; p < panels.length; p++) {
             panels[p].classList.add('is-hidden')
         }
     }
