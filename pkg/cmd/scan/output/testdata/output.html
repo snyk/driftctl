@@ -412,7 +412,7 @@ input[type="search"], select {
                 
                 <button type="button" role="tab" aria-selected="false" aria-controls="alerts-tab" id="alerts"
                         tabindex="-1">
-                    Alerts (<span data-count="resource-alerts">1</span>)
+                    Alerts (<span data-count="resource-alerts">0</span>)
                 </button>
                 
             </div>
@@ -493,7 +493,7 @@ input[type="search"], select {
 }</span> => <span class="code-box-line-create">{
   Id: "093cd6ba-cf6d-4800-b252-6a50ca8903cd",
   Type: "aws_iam_policy"
-}</span><br>&emsp;+ Tags.[0].Name: <span class="code-box-line-create">"test"</span><br>&emsp;~ InstanceInitiatedShutdownBehavior: <span class="code-box-line-delete">""</span> => <span class="code-box-line-create"><null></span><br></code>
+}</span><br>&emsp;+ Tags.[0].Name: <span class="code-box-line-create">"test"</span><br>&emsp;~ InstanceInitiatedShutdownBehavior: <span class="code-box-line-delete">""</span> => <span class="code-box-line-create">&lt;null&gt;</span><br></code>
                                 </pre>
                             </div>
                             
@@ -676,6 +676,8 @@ input[type="search"], select {
         }
         refreshCounters();
     }
+
+    resetResources()
 </script>
 <script>
     

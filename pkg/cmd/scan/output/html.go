@@ -7,10 +7,12 @@ import (
 	"html/template"
 	"math"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -83,12 +85,6 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 			}
 			return math.Round(100 * float64(count) / float64(analysis.Summary().TotalResources))
 		},
-		//"prettify": func(res interface{}) string {
-		//	return prettify(res)
-		//},
-		//"prettifyPaths": func(paths []string) template.HTML {
-		//	return template.HTML(prettifyPaths(paths))
-		//},
 		"jsonDiff": func(ch analyser.Changelog) template.HTML {
 			var buf bytes.Buffer
 
@@ -114,7 +110,7 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 						_, _ = fmt.Fprintf(&buf, "%s%s<br>%s%s<br>", whiteSpace, prefix, whiteSpace, jsonDiff(change.From, change.To, whiteSpace))
 						continue
 					}
-					_, _ = fmt.Fprintf(&buf, "%s%s <span class=\"code-box-line-delete\">%s</span> => <span class=\"code-box-line-create\">%s</span>", whiteSpace, prefix, prettify(change.From), prettify(change.To))
+					_, _ = fmt.Fprintf(&buf, "%s%s <span class=\"code-box-line-delete\">%s</span> => <span class=\"code-box-line-create\">%s</span>", whiteSpace, prefix, htmlPrettify(change.From), htmlPrettify(change.To))
 				}
 
 				if change.Computed {
@@ -171,28 +167,10 @@ func distinctResourceTypes(resources []resource.Resource) []string {
 	return types
 }
 
-func prettifyPaths(paths []string) string {
-	content := ""
-	for i, v := range paths {
-		var isArrayKey bool
-
-		// If the previous path is an integer, it means the current path is part of an array
-		if j := i - 1; j >= 0 && len(paths) >= j {
-			_, err := strconv.Atoi(paths[j])
-			isArrayKey = err == nil
-		}
-
-		if i > 0 && !isArrayKey {
-			content += "<br>"
-			content += strings.Repeat("&emsp;", i)
-		}
-
-		if _, err := strconv.Atoi(v); err == nil {
-			content += "- "
-		} else {
-			content += fmt.Sprintf("%s:", v)
-		}
+func htmlPrettify(resource interface{}) string {
+	res := reflect.ValueOf(resource)
+	if resource == nil || res.Kind() == reflect.Ptr && res.IsNil() {
+		return "&lt;null&gt;"
 	}
-
-	return content
+	return awsutil.Prettify(resource)
 }

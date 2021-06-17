@@ -232,38 +232,3 @@ func TestHTML_DistinctResourceTypes(t *testing.T) {
 		})
 	}
 }
-
-func TestHTML_PrettifyPaths(t *testing.T) {
-	tests := []struct {
-		name     string
-		paths    []string
-		expected string
-	}{
-		{
-			name:     "test simple object",
-			paths:    []string{"path", "to", "field"},
-			expected: "path:<br>&emsp;to:<br>&emsp;&emsp;field:",
-		},
-		{
-			name:     "test object with array of string",
-			paths:    []string{"properties", "tags", "0"},
-			expected: "properties:<br>&emsp;tags:<br>&emsp;&emsp;- ",
-		},
-		{
-			name:     "test object with array of objects",
-			paths:    []string{"path", "to", "0", "field"},
-			expected: "path:<br>&emsp;to:<br>&emsp;&emsp;- field:",
-		},
-		{
-			name:     "test with simple array",
-			paths:    []string{"0", "field"},
-			expected: "- field:",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := prettifyPaths(tt.paths)
-			assert.Equal(t, tt.expected, got)
-		})
-	}
-}

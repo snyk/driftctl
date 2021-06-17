@@ -81,7 +81,7 @@
                 {{if (gt (len .Alerts) 0)}}
                 <button type="button" role="tab" aria-selected="false" aria-controls="alerts-tab" id="alerts"
                         tabindex="-1">
-                    Alerts (<span data-count="resource-alerts">{{len .Alerts}}</span>)
+                    Alerts (<span data-count="resource-alerts">0</span>)
                 </button>
                 {{end}}
             </div>
@@ -278,6 +278,8 @@
         }
         refreshCounters();
     }
+
+    resetResources()
 </script>
 <script>
     // Enhance accessibility
