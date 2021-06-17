@@ -79,9 +79,10 @@ func runTest(t *testing.T, cases TestCases) {
 			remoteSupplier := &resource.MockSupplier{}
 			remoteSupplier.On("Resources").Return(c.remoteResources, nil)
 
-			resourceFactory := &terraform.MockResourceFactory{}
+			var resourceFactory resource.ResourceFactory = terraform.NewTerraformResourceFactory(repo)
 
 			if c.mocks != nil {
+				resourceFactory = &terraform.MockResourceFactory{}
 				c.mocks(resourceFactory, repo)
 			}
 
@@ -1543,6 +1544,73 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 
 				return &pkg.ScanOptions{Filter: f}
 			}(t),
+		},
+		{
+			name: "test aws role managed policy expander",
+			stateResources: []resource.Resource{
+				&resource.AbstractResource{
+					Id:   "role_with_managed_policy_attr",
+					Type: aws.AwsIamRoleResourceType,
+					Attrs: &resource.Attributes{
+						"name": "role_with_managed_policy_attr",
+						"managed_policy_arns": []interface{}{
+							"arn1",
+							"arn2",
+						},
+					},
+				},
+				&resource.AbstractResource{
+					Id:   "role_with_empty_managed_policy_attribute",
+					Type: aws.AwsIamRoleResourceType,
+					Attrs: &resource.Attributes{
+						"managed_policy_arns": []interface{}{},
+					},
+				},
+				&resource.AbstractResource{
+					Id:    "role_without_managed_policy_attribute",
+					Type:  aws.AwsIamRoleResourceType,
+					Attrs: &resource.Attributes{},
+				},
+			},
+			remoteResources: []resource.Resource{
+				&resource.AbstractResource{
+					Id:   "role_with_managed_policy_attr",
+					Type: aws.AwsIamRoleResourceType,
+					Attrs: &resource.Attributes{
+						"name": "role_with_managed_policy_attr",
+					},
+				},
+				&resource.AbstractResource{
+					Id:   "role_with_managed_policy_attr-arn1",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"policy_arn": "arn1",
+						"roles":      []interface{}{"role_with_managed_policy_attr"},
+					},
+				},
+				&resource.AbstractResource{
+					Id:   "role_with_managed_policy_attr-arn2",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"policy_arn": "arn2",
+						"roles":      []interface{}{"role_with_managed_policy_attr"},
+					},
+				},
+				&resource.AbstractResource{
+					Id:    "role_with_empty_managed_policy_attribute",
+					Type:  aws.AwsIamRoleResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				&resource.AbstractResource{
+					Id:    "role_without_managed_policy_attribute",
+					Type:  aws.AwsIamRoleResourceType,
+					Attrs: &resource.Attributes{},
+				},
+			},
+			assert: func(result *test.ScanResult, err error) {
+				result.AssertInfrastructureIsInSync()
+				result.AssertManagedCount(5)
+			},
 		},
 	}
 

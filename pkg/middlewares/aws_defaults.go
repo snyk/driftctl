@@ -28,7 +28,12 @@ func (m AwsDefaults) awsIamRoleDefaults(remoteResources []resource.Resource) []r
 			continue
 		}
 
-		if match := strings.HasPrefix((*remoteResource.(*resource.AbstractResource).Attrs)["path"].(string), defaultIamRolePathPrefix); match {
+		path := remoteResource.Attributes().GetString("path")
+		if path == nil {
+			continue
+		}
+
+		if match := strings.HasPrefix(*path, defaultIamRolePathPrefix); match {
 			resourcesToIgnore = append(resourcesToIgnore, remoteResource)
 		}
 	}
