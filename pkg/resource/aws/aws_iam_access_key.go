@@ -14,6 +14,7 @@ func initAwsIAMAccessKeyMetaData(resourceSchemaRepository resource.SchemaReposit
 		// We can't detect drift if we cannot retrieve latest value from aws API for fields like secrets, passwords etc ...
 		val.SafeDelete([]string{"secret"})
 		val.SafeDelete([]string{"ses_smtp_password_v4"})
+		val.SafeDelete([]string{"ses_smtp_password"})
 		val.SafeDelete([]string{"encrypted_secret"})
 		val.SafeDelete([]string{"key_fingerprint"})
 		val.SafeDelete([]string{"pgp_key"})
