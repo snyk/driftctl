@@ -156,6 +156,11 @@ func NewScanCmd() *cobra.Command {
 		false,
 		"Includes cloud provider service-linked roles (disabled by default)",
 	)
+	fl.StringVar(&opts.DriftignorePath,
+		"driftignore",
+		".driftignore",
+		"Path to the driftignore file",
+	)
 
 	configDir, err := homedir.Dir()
 	if err != nil {
