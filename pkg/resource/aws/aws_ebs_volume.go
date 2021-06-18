@@ -12,5 +12,6 @@ func initAwsEbsVolumeMetaData(resourceSchemaRepository resource.SchemaRepository
 		val.SafeDelete([]string{"arn"})
 		val.SafeDelete([]string{"outpost_arn"})
 		val.SafeDelete([]string{"snapshot_id"})
+		val.DeleteIfDefault("throughput")
 	})
 }
