@@ -27,6 +27,7 @@ func initAwsRouteMetaData(resourceSchemaRepository resource.SchemaRepositoryInte
 		val.DeleteIfDefault("vpc_peering_connection_id")
 		val.DeleteIfDefault("destination_prefix_list_id")
 		val.DeleteIfDefault("instance_owner_id")
+		val.DeleteIfDefault("carrier_gateway_id")
 	})
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsRouteResourceType, func(res *resource.AbstractResource) map[string]string {
 		val := res.Attrs
