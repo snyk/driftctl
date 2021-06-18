@@ -14,6 +14,34 @@ import (
 	"github.com/r3labs/diff/v2"
 )
 
+func TestAcc_AwsInstance(t *testing.T) {
+	acceptance.Run(t, acceptance.AccTestCase{
+		TerraformVersion: "0.14.9",
+		Paths:            []string{"./testdata/acc/aws_instance_default"},
+		Args: []string{
+			"scan",
+			"--filter",
+			"Type=='aws_instance' || Type=='aws_ebs_volume'",
+			"--tf-provider-version",
+			"3.45.0",
+		},
+		Checks: []acceptance.AccCheck{
+			{
+				Env: map[string]string{
+					"AWS_REGION": "us-east-1",
+				},
+				Check: func(result *test.ScanResult, stdout string, err error) {
+					if err != nil {
+						t.Fatal(err)
+					}
+					result.AssertInfrastructureIsInSync()
+					result.AssertManagedCount(2)
+				},
+			},
+		},
+	})
+}
+
 func TestAcc_AwsInstance_WithBlockDevices(t *testing.T) {
 	var mutatedInstanceId string
 	acceptance.Run(t, acceptance.AccTestCase{
