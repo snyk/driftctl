@@ -102,9 +102,14 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 					Type: "resource_type",
 					Id:   "idwith\\backslashes",
 				},
+				&resource2.FakeResource{
+					Type: "resource_type",
+					Id:   "idwith/slashes",
+				},
 			},
 			want: []bool{
 				false,
+				true,
 				true,
 				true,
 				true,
@@ -190,6 +195,14 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 					Type: "iam_user",
 					Id:   "id\\WithBac*slash***\\*\\",
 				},
+				&resource2.FakeResource{
+					Type: "some_type",
+					Id:   "idwith/slash",
+				},
+				&resource2.FakeResource{
+					Type: "some_type",
+					Id:   "idwith/slash/",
+				},
 			},
 			want: []bool{
 				true,
@@ -199,7 +212,10 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 				true,
 				true,
 				false,
+				false,
+				true,
 			},
+			path: "testdata/drift_ignore_all_exclude/.driftignore",
 		},
 	}
 	for _, tt := range tests {
@@ -403,6 +419,7 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 					Want: false,
 				},
 			},
+			path: "testdata/drift_ignore_all_exclude_field/.driftignore",
 		},
 	}
 	for _, tt := range tests {

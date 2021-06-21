@@ -11,6 +11,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const separator = "_-_"
+
 type DriftIgnore struct {
 	driftignorePath string
 	matcher         gitignore.Matcher
@@ -47,6 +49,8 @@ func (r *DriftIgnore) readIgnoreFile() error {
 		if strings.HasPrefix(line, "#") {
 			continue // this is a comment
 		}
+		line = strings.ReplaceAll(line, "/", separator)
+
 		lines = append(lines, gitignore.ParsePattern(line, nil))
 		if !strings.HasSuffix(line, "*") {
 			line := fmt.Sprintf("%s.*", line)
@@ -64,15 +68,14 @@ func (r *DriftIgnore) readIgnoreFile() error {
 }
 
 func (r *DriftIgnore) IsResourceIgnored(res resource.Resource) bool {
-	strRes := fmt.Sprintf("%s.%s", res.TerraformType(), res.TerraformId())
-
-	match := r.matcher.Match([]string{strRes}, false)
-	return match
+	return r.match(fmt.Sprintf("%s.%s", res.TerraformType(), res.TerraformId()))
 }
 
 func (r *DriftIgnore) IsFieldIgnored(res resource.Resource, path []string) bool {
-	sprintf := fmt.Sprintf("%s.%s", res.TerraformType(), res.TerraformId())
-	p := strings.Join(path, ".")
-	full := strings.Join([]string{sprintf, p}, ".")
-	return r.matcher.Match([]string{full}, false)
+	full := fmt.Sprintf("%s.%s.%s", res.TerraformType(), res.TerraformId(), strings.Join(path, "."))
+	return r.match(full)
+}
+
+func (r *DriftIgnore) match(strRes string) bool {
+	return r.matcher.Match([]string{strings.ReplaceAll(strRes, "/", separator)}, false)
 }

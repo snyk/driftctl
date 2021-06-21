@@ -3,5 +3,6 @@ wildcard_resource.*
 resource_type.id\.with\.dots
 resource_type.idwith\\
 resource_type.idwith\\backslashes
+resource_type.idwith/slashes
 
 # this is a comment
