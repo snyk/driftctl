@@ -86,6 +86,8 @@ tbody, ul, .table-body {
     border-left: 1px solid #ececec;
     border-right: 1px solid #ececec;
     border-top: 1px solid #ececec;
+    border-radius: 3px;
+    display: block;
 }
 
 ul {

@@ -170,7 +170,7 @@ func distinctResourceTypes(resources []resource.Resource) []string {
 func htmlPrettify(resource interface{}) string {
 	res := reflect.ValueOf(resource)
 	if resource == nil || res.Kind() == reflect.Ptr && res.IsNil() {
-		return "&lt;null&gt;"
+		return "null"
 	}
 	return awsutil.Prettify(resource)
 }

@@ -168,7 +168,7 @@ func (c Console) writeSummary(analysis *analyser.Analysis) {
 func prettify(resource interface{}) string {
 	res := reflect.ValueOf(resource)
 	if resource == nil || res.Kind() == reflect.Ptr && res.IsNil() {
-		return "<null>"
+		return "<nil>"
 	}
 
 	return awsutil.Prettify(resource)
