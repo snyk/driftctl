@@ -97,6 +97,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		middlewares.NewAwsSqsQueuePolicyExpander(d.resourceFactory, d.resourceSchemaRepository),
 		middlewares.NewAwsDefaultSqsQueuePolicy(),
 		middlewares.NewAwsSNSTopicPolicyExpander(d.resourceFactory, d.resourceSchemaRepository),
+		middlewares.NewAwsRoleManagedPolicyExpander(d.resourceFactory),
 	)
 
 	if !d.strictMode {
