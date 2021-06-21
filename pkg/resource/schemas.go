@@ -46,7 +46,8 @@ type SchemaRepositoryInterface interface {
 }
 
 type SchemaRepository struct {
-	schemas map[string]*Schema
+	schemas         map[string]*Schema
+	ProviderVersion *version.Version
 }
 
 func NewSchemaRepository() *SchemaRepository {
@@ -81,6 +82,7 @@ func (r *SchemaRepository) Init(v string, schema map[string]providers.Schema) er
 	if err != nil {
 		return err
 	}
+	r.ProviderVersion = providerVersion
 	for typ, sch := range schema {
 		attributeMetas := map[string]AttributeSchema{}
 		for s, attribute := range sch.Block.Attributes {
@@ -92,7 +94,7 @@ func (r *SchemaRepository) Init(v string, schema map[string]providers.Schema) er
 		r.fetchNestedBlocks("", attributeMetas, sch.Block.BlockTypes)
 
 		r.schemas[typ] = &Schema{
-			ProviderVersion: providerVersion,
+			ProviderVersion: r.ProviderVersion,
 			SchemaVersion:   sch.Version,
 			Attributes:      attributeMetas,
 		}

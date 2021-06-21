@@ -58,7 +58,7 @@ clean:
 .PHONY: lint
 lint:
 	@which golangci-lint > /dev/null 2>&1 || (curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | bash -s -- -b $(GOBINPATH) v1.31.0)
-	golangci-lint run -v --timeout=4m
+	golangci-lint run -v --timeout=10m
 
 .PHONY: deps
 deps:

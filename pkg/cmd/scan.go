@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/cloudskiff/driftctl/pkg/telemetry"
+	"github.com/fatih/color"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -232,6 +233,8 @@ func scanRun(opts *pkg.ScanOptions) error {
 	if !opts.DisableTelemetry {
 		telemetry.SendTelemetry(analysis)
 	}
+
+	globaloutput.Printf(color.WhiteString("Provider version used to scan: %s. Use --tf-provider-version to use another version.\n"), resourceSchemaRepository.ProviderVersion.String())
 
 	if !analysis.IsSync() {
 		globaloutput.Printf("\nHint: use gen-driftignore command to generate a .driftignore file based on your drifts\n")
