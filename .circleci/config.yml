@@ -14,23 +14,16 @@ jobs:
             - bin/
   test_acc:
     parameters:
-      force_acc_test:
-        type: boolean
-        default: false
       pattern:
         type: string
     machine:
       image: ubuntu-2004:202010-01
     environment:
-      FORCE_ACC_TEST: << parameters.force_acc_test >>
       ACC_PATTERN: << parameters.pattern >>
       AWS_DEFAULT_REGION: us-east-1
       CHECKPOINT_DISABLE: true # Disable terraform version check
     steps:
       - checkout
-      - run:
-          name: Check if acceptance tests should run
-          command: ./scripts/halt_before_acc.sh
       - go/install:
           version: "1.16.2"
           # Disable cache at it seem to broke go 1.16 installation
@@ -184,8 +177,6 @@ workflows:
           name: "Acceptance tests: << matrix.pattern >>"
           matrix:
             parameters:
-              force_acc_test:
-                - true
               pattern:
                 - TestAcc_Aws
                 - TestAcc_Github_
@@ -210,8 +201,14 @@ workflows:
             branches:
               ignore:
                 - main
+  pullrequest_acc:
+    jobs:
+      - hold:
+          type: approval # presents manual approval button in the UI
       - test_acc:
           name: "Acceptance tests: << matrix.pattern >>"
+          requires:
+            - hold
           matrix:
             parameters:
               pattern:
