@@ -45,6 +45,8 @@ func TestScanCmd_Valid(t *testing.T) {
 		{args: []string{"scan", "--strict"}},
 		{args: []string{"scan", "--tf-provider-version", "1.2.3"}},
 		{args: []string{"scan", "--tf-provider-version", "3.30.2"}},
+		{args: []string{"scan", "--driftignore", "./path/to/driftignore.s3"}},
+		{args: []string{"scan", "--driftignore", ".driftignore"}},
 	}
 
 	for _, tt := range cases {
@@ -85,6 +87,7 @@ func TestScanCmd_Invalid(t *testing.T) {
 		{args: []string{"scan", "--filter", "Type='test'", "--filter", "Type='test2'"}, expected: "Filter flag should be specified only once"},
 		{args: []string{"scan", "--tf-provider-version", ".30.2"}, expected: "Invalid version argument .30.2, expected a valid semver string (e.g. 2.13.4)"},
 		{args: []string{"scan", "--tf-provider-version", "foo"}, expected: "Invalid version argument foo, expected a valid semver string (e.g. 2.13.4)"},
+		{args: []string{"scan", "--driftignore"}, expected: "flag needs an argument: --driftignore"},
 	}
 
 	for _, tt := range cases {

@@ -31,6 +31,7 @@ type ScanOptions struct {
 	DisableTelemetry bool
 	ProviderVersion  string
 	ConfigDir        string
+	DriftignorePath  string
 }
 
 type DriftCTL struct {
@@ -38,12 +39,11 @@ type DriftCTL struct {
 	iacSupplier              resource.Supplier
 	alerter                  alerter.AlerterInterface
 	analyzer                 analyser.Analyzer
-	filter                   *jmespath.JMESPath
 	resourceFactory          resource.ResourceFactory
-	strictMode               bool
 	scanProgress             globaloutput.Progress
 	iacProgress              globaloutput.Progress
 	resourceSchemaRepository resource.SchemaRepositoryInterface
+	opts                     *ScanOptions
 }
 
 func NewDriftCTL(remoteSupplier resource.Supplier,
@@ -59,12 +59,11 @@ func NewDriftCTL(remoteSupplier resource.Supplier,
 		iacSupplier,
 		alerter,
 		analyser.NewAnalyzer(alerter),
-		opts.Filter,
 		resFactory,
-		opts.StrictMode,
 		scanProgress,
 		iacProgress,
 		resourceSchemaRepository,
+		opts,
 	}
 }
 
@@ -100,7 +99,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		middlewares.NewAwsRoleManagedPolicyExpander(d.resourceFactory),
 	)
 
-	if !d.strictMode {
+	if !d.opts.StrictMode {
 		middleware = append(middleware,
 			middlewares.NewAwsDefaults(),
 		)
@@ -112,8 +111,8 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		return nil, err
 	}
 
-	if d.filter != nil {
-		engine := filter.NewFilterEngine(d.filter)
+	if d.opts.Filter != nil {
+		engine := filter.NewFilterEngine(d.opts.Filter)
 		remoteResources, err = engine.Run(remoteResources)
 		if err != nil {
 			return nil, err
@@ -125,7 +124,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	}
 
 	logrus.Debug("Checking for driftignore")
-	driftIgnore := filter.NewDriftIgnore()
+	driftIgnore := filter.NewDriftIgnore(d.opts.DriftignorePath)
 
 	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState, driftIgnore)
 	analysis.Duration = time.Since(start)

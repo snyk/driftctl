@@ -15,13 +15,15 @@ type DriftIgnore struct {
 	resExclusionList         map[string]struct{} // map[type.id] exists to ignore
 	resExclusionWildcardList map[string]struct{} // map[type.id] exists with wildcard to ignore
 	driftExclusionList       map[string][]string // map[type.id] contains path for drift to ignore
+	driftignorePath          string
 }
 
-func NewDriftIgnore() *DriftIgnore {
+func NewDriftIgnore(path string) *DriftIgnore {
 	d := DriftIgnore{
 		resExclusionList:         map[string]struct{}{},
 		resExclusionWildcardList: map[string]struct{}{},
 		driftExclusionList:       map[string][]string{},
+		driftignorePath:          path,
 	}
 	err := d.readIgnoreFile()
 	if err != nil {
@@ -31,7 +33,7 @@ func NewDriftIgnore() *DriftIgnore {
 }
 
 func (r *DriftIgnore) readIgnoreFile() error {
-	file, err := os.Open(".driftignore")
+	file, err := os.Open(r.driftignorePath)
 	if err != nil {
 		return err
 	}
