@@ -2,7 +2,6 @@ package filter
 
 import (
 	"os"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -73,6 +72,10 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 				},
 				&resource2.FakeResource{
 					Type: "wildcard_resource",
+					Id:   "id1/with/slash",
+				},
+				&resource2.FakeResource{
+					Type: "wildcard_resource",
 					Id:   "id1",
 				},
 				&resource2.FakeResource{
@@ -99,9 +102,15 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 					Type: "resource_type",
 					Id:   "idwith\\backslashes",
 				},
+				&resource2.FakeResource{
+					Type: "resource_type",
+					Id:   "idwith/slashes",
+				},
 			},
 			want: []bool{
 				false,
+				true,
+				true,
 				true,
 				true,
 				true,
@@ -154,6 +163,59 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 				true,
 			},
 			path: "testdata/drift_ignore_wildcard/.driftignore",
+		},
+		{
+			name: "drift_ignore_all_exclude",
+			resources: []resource.Resource{
+				&resource2.FakeResource{
+					Type: "type1",
+					Id:   "id1",
+				},
+				&resource2.FakeResource{
+					Type: "type2",
+					Id:   "id1",
+				},
+				&resource2.FakeResource{
+					Type: "type2",
+					Id:   "id11",
+				},
+				&resource2.FakeResource{
+					Type: "type2",
+					Id:   "id2",
+				},
+				&resource2.FakeResource{
+					Type: "type3",
+					Id:   "id100",
+				},
+				&resource2.FakeResource{
+					Type: "type3",
+					Id:   "id101",
+				},
+				&resource2.FakeResource{
+					Type: "iam_user",
+					Id:   "id\\WithBac*slash***\\*\\",
+				},
+				&resource2.FakeResource{
+					Type: "some_type",
+					Id:   "idwith/slash",
+				},
+				&resource2.FakeResource{
+					Type: "some_type",
+					Id:   "idwith/slash/",
+				},
+			},
+			want: []bool{
+				true,
+				true,
+				true,
+				true,
+				true,
+				true,
+				false,
+				false,
+				true,
+			},
+			path: "testdata/drift_ignore_all_exclude/.driftignore",
 		},
 	}
 	for _, tt := range tests {
@@ -288,6 +350,77 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 			},
 			path: "testdata/drift_ignore_fields/.driftignore",
 		},
+		{
+			name: "drift_ignore_all_exclude_field",
+			args: []Args{
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "full_drift_ignored"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "full_drift_ignored"},
+					Path: []string{"foobar"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "partial_drift_ignored"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "partial_drift_ignored"},
+					Path: []string{"foobar"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "resource_type", Id: "id.with.dots"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "resource_type", Id: "id.with.dots"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "resource_type", Id: "idwith\\"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "resource_type", Id: "idwith\\backslashes"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "resource_type", Id: "idwith\\backslashes"},
+					Path: []string{"foobar"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "wildcard_drift_ignored"},
+					Path: []string{"struct", "baz"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "wildcard_drift_ignored"},
+					Path: []string{"struct", "bar"},
+					Want: false,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "endofpath_drift_ignored"},
+					Path: []string{"struct", "baz"},
+					Want: true,
+				},
+				{
+					Res:  &resource2.FakeResource{Type: "res_type", Id: "endofpath_drift_ignored"},
+					Path: []string{"struct", "bar"},
+					Want: false,
+				},
+			},
+			path: "testdata/drift_ignore_all_exclude_field/.driftignore",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -300,62 +433,6 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 				if arg.Want != got {
 					t.Errorf("%s.%s.%s expected %v got %v", arg.Res.TerraformType(), arg.Res.TerraformId(), strings.Join(arg.Path, "."), arg.Want, got)
 				}
-			}
-		})
-	}
-}
-
-func Test_escapableSplit(t *testing.T) {
-	tests := []struct {
-		name string
-		line string
-		want []string
-	}{
-		{
-			name: "Dot at start",
-			line: ".",
-			want: []string{"."},
-		},
-		{
-			name: "Dot at end",
-			line: "test.toto.",
-			want: []string{"test", "toto"},
-		},
-		{
-			name: "wildcard dot",
-			line: "*.subfoobar",
-			want: []string{"*", "subfoobar"},
-		},
-		{
-			name: "text wildcard dot",
-			line: "res*.subfoobar",
-			want: []string{"res*", "subfoobar"},
-		},
-		{
-			name: "missing text multiple wildcard dot",
-			line: "r*s*.s**ub***ob********a*r",
-			want: []string{"r*s*", "s*ub*ob*a*r"},
-		},
-		{
-			name: "prefix wildcard dot",
-			line: "*res.subfoobar",
-			want: []string{"*res", "subfoobar"},
-		},
-		{
-			name: "suffix multiple wildcard dot",
-			line: "res.subfoobar*****",
-			want: []string{"res", "subfoobar*"},
-		},
-		{
-			name: "dot wildcard",
-			line: "res.*",
-			want: []string{"res", "*"},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := readDriftIgnoreLine(tt.line); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("EscapableSplit() = %v, want %v", got, tt.want)
 			}
 		})
 	}
