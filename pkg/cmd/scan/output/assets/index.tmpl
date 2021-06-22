@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>driftctl Scan Report</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="shortcut icon"
+          href="https://raw.githubusercontent.com/cloudskiff/driftctl-docs/main/static/img/favicon.ico"/>
+    <style>{{.Stylesheet}}</style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <img src="https://raw.githubusercontent.com/cloudskiff/driftctl-docs/main/static/img/driftctl_light.svg"
+             width="100px" height="81px" alt="driftctl logo"/>
+        <div>
+            <h1>Scan Report</h1>
+            <h2>{{ .ScanDate }}</h2>
+            <p>Scan Duration: {{.ScanDuration}}</p>
+        </div>
+    </header>
+    <section>
+        <div class="card">
+            <span>Total Resources:</span>
+            <span class="strong">{{.Summary.TotalResources}}</span>
+        </div>
+        <div class="card">
+            <span>Coverage:</span>
+            <span class="strong">{{.Coverage}}%</span>
+        </div>
+        <div class="card">
+            <span>Managed:</span>
+            <span class="strong">{{rate .Summary.TotalManaged}}%</span>
+            <span class="fraction">{{.Summary.TotalManaged}}/{{.Summary.TotalResources}}</span>
+        </div>
+        <div class="card">
+            <span>Unmanaged:</span>
+            <span class="strong">{{rate .Summary.TotalUnmanaged}}%</span>
+            <span class="fraction">{{.Summary.TotalUnmanaged}}/{{.Summary.TotalResources}}</span>
+        </div>
+        <div class="card">
+            <span>Missing:</span>
+            <span class="strong">{{rate .Summary.TotalDeleted}}%</span>
+            <span class="fraction">{{.Summary.TotalDeleted}}/{{.Summary.TotalResources}}</span>
+        </div>
+    </section>
+    <main>
+        {{ if (lt .Coverage 100) }}
+        <form role="search">
+            <label for="search" class="visuallyhidden">Search Resources:</label>
+            <input type="search" id="search" name="search" placeholder="Search Resources...">
+            <label for="select" class="visuallyhidden">Select Resource Type:</label>
+            <select id="select" name="select">
+                <option value="">Resource Type</option>
+                {{ range $type := getResourceTypes }}
+                <option value="{{$type}}">{{ $type }}</option>
+                {{end}}
+            </select>
+            <input type="reset" value="Reset Filters">
+        </form>
+
+        <div class="tabs-wrapper">
+            <div role="tablist" aria-label="List of tabs">
+                {{if (gt (len .Unmanaged) 0)}}
+                <button type="button" role="tab" aria-selected="true" aria-controls="unmanaged-tab" id="unmanaged">
+                    Unmanaged Resources (<span data-count="resource-unmanaged">{{len .Unmanaged}}</span>)
+                </button>
+                {{end}}
+                {{if (gt (len .Differences) 0)}}
+                <button type="button" role="tab" aria-selected="false" aria-controls="changed-tab" id="changed"
+                        tabindex="-1">
+                    Changed Resources (<span data-count="resource-changed">{{len .Differences}}</span>)
+                </button>
+                {{end}}
+                {{if (gt (len .Deleted) 0)}}
+                <button type="button" role="tab" aria-selected="false" aria-controls="missing-tab" id="missing"
+                        tabindex="-1">
+                    Missing Resources (<span data-count="resource-deleted">{{len .Deleted}}</span>)
+                </button>
+                {{end}}
+                {{if (gt (len .Alerts) 0)}}
+                <button type="button" role="tab" aria-selected="false" aria-controls="alerts-tab" id="alerts"
+                        tabindex="-1">
+                    Alerts (<span data-count="resource-alerts">0</span>)
+                </button>
+                {{end}}
+            </div>
+            <div class="panels">
+                {{ if (gt (len .Unmanaged) 0) }}
+                <div tabindex="0" role="tabpanel" id="unmanaged-tab" aria-labelledby="unmanaged">
+                    <table>
+                        <thead>
+                        <tr class="table-header">
+                            <th>Resource ID</th>
+                            <th>Resource Type</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{range $res := .Unmanaged}}
+                        <tr data-kind="resource-unmanaged" class="resource-item row">
+                            <td data-type="resource-id">{{$res.TerraformId}}</td>
+                            <td data-type="resource-type">{{$res.TerraformType}}</td>
+                        </tr>
+                        {{end}}
+                        </tbody>
+                    </table>
+                    <div class="empty-panel is-hidden">
+                        <p>No results matched your filters</p>
+                    </div>
+                </div>
+                {{end}}
+                {{ if (gt (len .Differences) 0) }}
+                <div class="is-hidden" tabindex="0" role="tabpanel" id="changed-tab" aria-labelledby="changed">
+                    <div role="table">
+                        <div role="rowgroup">
+                            <div role="row" class="table-header">
+                                <span role="columnheader">Resource ID</span>
+                                <span role="columnheader">Resource Type</span>
+                            </div>
+                        </div>
+                        <div role="rowgroup" class="table-body">
+                            {{range $diff := .Differences}}
+                            <div role="row" data-kind="resource-changed" class="resource-item">
+                                <div class="row">
+                                    <span role="cell" data-type="resource-id">{{$diff.Res.TerraformId}}</span>
+                                    <span role="cell" data-type="resource-type">{{$diff.Res.TerraformType}}</span>
+                                </div>
+                                <pre class="code-box">
+                                    <code class="code-box-line">{{ jsonDiff $diff.Changelog }}</code>
+                                </pre>
+                            </div>
+                            {{end}}
+                        </div>
+                    </div>
+                    <div class="empty-panel is-hidden">
+                        <p>No results matched your filters</p>
+                    </div>
+                </div>
+                {{end}}
+                {{ if (gt (len .Deleted) 0) }}
+                <div class="is-hidden" tabindex="0" role="tabpanel" id="missing-tab" aria-labelledby="missing">
+                    <table>
+                        <thead>
+                        <tr class="table-header">
+                            <th>Resource ID</th>
+                            <th>Resource Type</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{range $res := .Deleted}}
+                        <tr data-kind="resource-deleted" class="resource-item row">
+                            <td data-type="resource-id">{{$res.TerraformId}}</td>
+                            <td data-type="resource-type">{{$res.TerraformType}}</td>
+                        </tr>
+                        {{end}}
+                        </tbody>
+                    </table>
+                    <div class="empty-panel is-hidden">
+                        <p>No results matched your filters</p>
+                    </div>
+                </div>
+                {{end}}
+                {{ if (gt (len .Alerts) 0) }}
+                <div class="is-hidden" tabindex="0" role="tabpanel" id="alerts-tab" aria-labelledby="alerts">
+                    <ul>
+                        {{range $type, $messages := .Alerts}}
+                        {{range $el := $messages}}
+                        <li data-kind="resource-alerts" class="resource-item">
+                            {{ if $type }}
+                            <span data-type="resource-type">{{ $type }}</span>
+                            {{end}}
+                            <span>{{ $el.Message }}</span>
+                        </li>
+                        {{end}}
+                        {{end}}
+                    </ul>
+                    <div class="empty-panel is-hidden">
+                        <p>No results matched your filters</p>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+        </div>
+        {{else}}
+        <h1 class="congrats">Congrats! Your infrastructure is in sync</h1>
+        {{end}}
+    </main>
+</div>
+<script>
+    const form = document.querySelector("form");
+
+    form.addEventListener("submit", (event) => event.preventDefault());
+
+    const resources = document.querySelectorAll("[data-kind^='resource-']");
+    const searchInput = document.querySelector('[type="search"]');
+    const selectBox = document.querySelector("select");
+    const resetButton = document.querySelector('[type="reset"]');
+
+    searchInput.addEventListener("input", filterResources);
+    selectBox.addEventListener("input", filterResources);
+    resetButton.addEventListener("click", resetResources);
+
+    function refreshPanel(count, el) {
+        const panel = document.getElementById(
+            el.parentElement.getAttribute("aria-controls")
+        );
+        if (!panel) {
+            return;
+        }
+        if (count === 0) {
+            panel.firstElementChild.classList.add("is-hidden");
+            panel.children[1].classList.remove("is-hidden");
+        } else {
+            panel.firstElementChild.classList.remove("is-hidden");
+            panel.children[1].classList.add("is-hidden");
+        }
+    }
+
+    function refreshCounters() {
+        const map = {
+            "[data-kind='resource-unmanaged']": "[data-count='resource-unmanaged']",
+            "[data-kind='resource-changed']": "[data-count='resource-changed']",
+            "[data-kind='resource-deleted']": "[data-count='resource-deleted']",
+            "[data-kind='resource-alerts']": "[data-count='resource-alerts']",
+        };
+        for (const key in map) {
+            const countEl = document.querySelector(map[key]);
+            if (countEl) {
+                const count = Array.from(document.querySelectorAll(key)).filter(
+                    (el) => !el.classList.contains("is-hidden")
+                ).length;
+                countEl.textContent = count;
+                refreshPanel(count, countEl);
+            }
+        }
+    }
+
+    function resourceIdContains(res, id) {
+        if (id === "") {
+            return true;
+        }
+        const el = res.querySelector("[data-type='resource-id']");
+        if (!el) {
+            return false;
+        }
+        return el.innerText.toLowerCase().includes(id.toLowerCase());
+    }
+
+    function resourceTypeEquals(res, type) {
+        if (type === "") {
+            return true;
+        }
+        const el = res.querySelector("[data-type='resource-type']");
+        if (!el) {
+            return false;
+        }
+        return el.innerText === type;
+    }
+
+    function filterResources() {
+        const id = searchInput.value;
+        const type = selectBox.value;
+        for (const res of resources) {
+            const matchId = resourceIdContains(res, id);
+            const matchType = resourceTypeEquals(res, type);
+            if (matchId && matchType) {
+                res.classList.remove("is-hidden");
+            } else {
+                res.classList.add("is-hidden");
+            }
+        }
+        refreshCounters();
+    }
+
+    function resetResources() {
+        for (const res of resources) {
+            res.classList.remove("is-hidden");
+        }
+        refreshCounters();
+    }
+
+    resetResources()
+</script>
+<script>
+    // Enhance accessibility
+    const tablist = document.querySelector('[role="tablist"]')
+    const tabs = document.querySelectorAll('[role="tab"]')
+    const panels = document.querySelectorAll('[role="tabpanel"]')
+    const keys = {left: 37, right: 39}
+    const direction = {37: -1, 39: 1}
+
+    for (let i = 0; i < tabs.length; ++i) {
+        addListeners(i)
+    }
+
+    function addListeners(index) {
+        tabs[index].addEventListener('click', clickEventListener)
+        tabs[index].addEventListener('keyup', keyupEventListener)
+        tabs[index].index = index
+    }
+
+    function clickEventListener(event) {
+        let tab
+        if (event.target.getAttribute("role") === "tab") {
+            tab = event.target
+        } else {
+            tab = event.target.closest("button")
+        }
+        const selected = tab.getAttribute("aria-selected")
+        if (selected === "false") {
+            activateTab(tab, false)
+        }
+    }
+
+    function keyupEventListener(event) {
+        const key = event.keyCode
+        switch (key) {
+            case keys.left:
+            case keys.right:
+                switchTabOnArrowPress(event)
+                break
+        }
+    }
+
+    function switchTabOnArrowPress(event) {
+        const pressed = event.keyCode
+        for (let x = 0; x < tabs.length; x++) {
+            tabs[x].addEventListener('focus', focusEventHandler)
+        }
+        if (direction[pressed]) {
+            const target = event.target
+            if (target.index !== undefined) {
+                if (tabs[target.index + direction[pressed]]) {
+                    tabs[target.index + direction[pressed]].focus()
+                } else if (pressed === keys.left) {
+                    tabs[tabs.length - 1].focus()
+                } else if (pressed === keys.right) {
+                    tabs[0].focus()
+                }
+            }
+        }
+    }
+
+    function activateTab(tab, setFocus) {
+        setFocus = setFocus || true
+        deactivateTabs()
+        tab.removeAttribute('tabindex')
+        tab.setAttribute('aria-selected', 'true')
+        const controls = tab.getAttribute('aria-controls')
+        document.getElementById(controls).classList.remove('is-hidden')
+        if (setFocus) {
+            tab.focus()
+        }
+    }
+
+    function deactivateTabs() {
+        for (let t = 0; t < tabs.length; t++) {
+            tabs[t].setAttribute('tabindex', '-1')
+            tabs[t].setAttribute('aria-selected', 'false')
+            tabs[t].removeEventListener('focus', focusEventHandler)
+        }
+        for (let p = 0; p < panels.length; p++) {
+            panels[p].classList.add('is-hidden')
+        }
+    }
+
+    function focusEventHandler(event) {
+        const target = event.target
+        if (target === document.activeElement) {
+            activateTab(target, false)
+        }
+    }
+</script>
+</body>
+</html>

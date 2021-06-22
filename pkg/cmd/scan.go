@@ -367,6 +367,20 @@ func parseOutputFlag(out string) (*output.OutputConfig, error) {
 			)
 		}
 		options["path"] = opts[0]
+	case output.HTMLOutputType:
+		if len(opts) != 1 || opts[0] == "" {
+			return nil, errors.Wrapf(
+				cmderrors.NewUsageError(
+					fmt.Sprintf(
+						"\nMust be of kind: %s",
+						output.Example(output.HTMLOutputType),
+					),
+				),
+				"Invalid html output '%s'",
+				out,
+			)
+		}
+		options["path"] = opts[0]
 	}
 
 	return &output.OutputConfig{
