@@ -2,7 +2,6 @@ package filter
 
 import (
 	"os"
-	"path"
 	"reflect"
 	"strings"
 	"testing"
@@ -19,6 +18,7 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 		name      string
 		resources []resource.Resource
 		want      []bool
+		path      string
 	}{
 		{
 			name: "drift_ignore_no_file",
@@ -28,10 +28,10 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 					Id:   "id1",
 				},
 			},
-
 			want: []bool{
 				false,
 			},
+			path: "testdata/drift_ignore_no_file/.driftignore",
 		},
 		{
 			name: "drift_ignore_empty",
@@ -44,6 +44,7 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 			want: []bool{
 				false,
 			},
+			path: "testdata/drift_ignore_empty/.driftignore",
 		},
 		{
 			name: "drift_ignore_invalid_lines",
@@ -61,6 +62,7 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 				false,
 				true,
 			},
+			path: "testdata/drift_ignore_invalid_lines/.driftignore",
 		},
 		{
 			name: "drift_ignore_valid",
@@ -108,6 +110,7 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 				true,
 				true,
 			},
+			path: "testdata/drift_ignore_valid/.driftignore",
 		},
 		{
 			name: "drift_ignore_wildcard",
@@ -150,16 +153,15 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 				false,
 				true,
 			},
+			path: "testdata/drift_ignore_wildcard/.driftignore",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cwd, _ := os.Getwd()
 			defer func() { _ = os.Chdir(cwd) }()
-			if err := os.Chdir(path.Join("testdata", tt.name)); err != nil {
-				t.Fatal(err)
-			}
-			r := NewDriftIgnore()
+
+			r := NewDriftIgnore(tt.path)
 			got := make([]bool, 0, len(tt.want))
 			for _, res := range tt.resources {
 				got = append(got, r.IsResourceIgnored(res))
@@ -180,6 +182,7 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 	tests := []struct {
 		name string
 		args []Args
+		path string
 	}{
 		{
 			name: "drift_ignore_no_file",
@@ -196,6 +199,7 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 					Want: false,
 				},
 			},
+			path: "testdata/drift_ignore_no_file/.driftignore",
 		},
 		{
 			name: "drift_ignore_empty",
@@ -211,6 +215,7 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 					Want: false,
 				},
 			},
+			path: "testdata/drift_ignore_empty/.driftignore",
 		},
 		{
 			name: "drift_ignore_fields",
@@ -281,16 +286,15 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 					Want: true,
 				},
 			},
+			path: "testdata/drift_ignore_fields/.driftignore",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cwd, _ := os.Getwd()
 			defer func() { _ = os.Chdir(cwd) }()
-			if err := os.Chdir(path.Join("testdata", tt.name)); err != nil {
-				t.Fatal(err)
-			}
-			r := NewDriftIgnore()
+
+			r := NewDriftIgnore(tt.path)
 			for _, arg := range tt.args {
 				got := r.IsFieldIgnored(arg.Res, arg.Path)
 				if arg.Want != got {

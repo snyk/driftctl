@@ -47,7 +47,10 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 					"size":                 rootBlock["volume_size"],
 					"type":                 rootBlock["volume_type"],
 					"multi_attach_enabled": false,
-					"tags":                 (*instance.Attrs)["volume_tags"],
+					"tags":                 a.volumeTags(instance, rootBlock),
+				}
+				if throughput, exist := rootBlock["throughput"]; exist {
+					data["throughput"] = throughput
 				}
 				newRes := a.resourceFactory.CreateAbstractResource("aws_ebs_volume", rootBlock["volume_id"].(string), data)
 				newStateResources = append(newStateResources, newRes)
@@ -72,7 +75,10 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 					"size":                 blockDevice["volume_size"],
 					"type":                 blockDevice["volume_type"],
 					"multi_attach_enabled": false,
-					"tags":                 (*instance.Attrs)["volume_tags"],
+					"tags":                 a.volumeTags(instance, blockDevice),
+				}
+				if throughput, exist := blockDevice["throughput"]; exist {
+					data["throughput"] = throughput
 				}
 				newRes := a.resourceFactory.CreateAbstractResource("aws_ebs_volume", blockDevice["volume_id"].(string), data)
 				newStateResources = append(newStateResources, newRes)
@@ -100,4 +106,11 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 	*remoteResources = newRemoteResources
 
 	return nil
+}
+
+func (a AwsInstanceBlockDeviceResourceMapper) volumeTags(instance *resource.AbstractResource, blockDevice map[string]interface{}) interface{} {
+	if tags, exist := instance.Attrs.Get("volume_tags"); exist {
+		return tags
+	}
+	return blockDevice["tags"]
 }

@@ -61,6 +61,8 @@ func (a AwsRoleManagedPolicyExpander) Execute(remoteResources, resourcesFromStat
 
 		for _, arn := range managedPolicyArns {
 			arn := arn.(string)
+			id := fmt.Sprintf("%s-%s", *roleName, arn)
+
 			policyAttachmentData := resource.Attributes{
 				"policy_arn": arn,
 				"users":      []interface{}{},
@@ -73,7 +75,19 @@ func (a AwsRoleManagedPolicyExpander) Execute(remoteResources, resourcesFromStat
 				"policy_arn": arn,
 			}).Debug("Expanded managed_policy_arns from role")
 
-			newList = append(newList, a.resourceFactory.CreateAbstractResource(aws.AwsIamPolicyAttachmentResourceType, fmt.Sprintf("%s-%s", *roleName, arn), policyAttachmentData))
+			newRes := a.resourceFactory.CreateAbstractResource(aws.AwsIamPolicyAttachmentResourceType, id, policyAttachmentData)
+
+			alreadyExist := false
+			for _, resInState := range *resourcesFromState {
+				if resource.IsSameResource(resInState, newRes) {
+					alreadyExist = true
+					break
+				}
+			}
+
+			if !alreadyExist {
+				newList = append(newList, newRes)
+			}
 		}
 
 		res.Attributes().SafeDelete([]string{"managed_policy_arns"})

@@ -48,6 +48,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 							"kms_key_id":           "kms",
 							"size":                 8,
 							"type":                 "gp2",
+							"throughput":           125,
 							"tags": map[string]interface{}{
 								"Name": "rootVol",
 							},
@@ -63,6 +64,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 							"availability_zone":    "eu-west-3",
 							"size":                 23,
 							"type":                 "gp2",
+							"throughput":           125,
 							"tags": map[string]interface{}{
 								"Name": "rootVol",
 							},
@@ -96,6 +98,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 									"encrypted":   true,
 									"kms_key_id":  "kms",
 									"volume_size": 8,
+									"throughput":  125,
 									"iops":        1234,
 								},
 							},
@@ -107,6 +110,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 									"encrypted":             true,
 									"delete_on_termination": true,
 									"volume_size":           23,
+									"throughput":            125,
 								},
 							},
 						},
@@ -126,6 +130,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 						"kms_key_id":           "kms",
 						"size":                 8,
 						"type":                 "gp2",
+						"throughput":           125,
 						"tags": map[string]interface{}{
 							"Name": "rootVol",
 						},
@@ -145,6 +150,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 						"availability_zone":    "eu-west-3",
 						"size":                 23,
 						"type":                 "gp2",
+						"throughput":           125,
 						"tags": map[string]interface{}{
 							"Name": "rootVol",
 						},
@@ -152,6 +158,139 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 				}
 				factory.On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "vol-018c5ae89895aca4c"
+				})).Times(1).Return(&bar, nil)
+			},
+			false,
+		},
+		{
+			"Test with tags inside root/ebs block device",
+			struct {
+				expectedResource   *[]resource.Resource
+				resourcesFromState *[]resource.Resource
+			}{
+				expectedResource: &[]resource.Resource{
+					&resource.AbstractResource{
+						Id:   "dummy-instance",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"availability_zone": "eu-west-3",
+						},
+					},
+					&resource.AbstractResource{
+						Id:   "vol-02862d9b39045a3a4",
+						Type: "aws_ebs_volume",
+						Attrs: &resource.Attributes{
+							"id":                   "vol-02862d9b39045a3a4",
+							"encrypted":            true,
+							"multi_attach_enabled": false,
+							"availability_zone":    "eu-west-3",
+							"iops":                 1234,
+							"kms_key_id":           "kms",
+							"size":                 8,
+							"type":                 "gp2",
+							"throughput":           125,
+							"tags": map[string]interface{}{
+								"Name": "rootVol",
+							},
+						},
+					},
+					&resource.AbstractResource{
+						Id:   "vol-018c5ae89895aca4c",
+						Type: "aws_ebs_volume",
+						Attrs: &resource.Attributes{
+							"id":                   "vol-018c5ae89895aca4c",
+							"encrypted":            true,
+							"multi_attach_enabled": false,
+							"availability_zone":    "eu-west-3",
+							"size":                 23,
+							"type":                 "gp2",
+							"throughput":           125,
+							"tags": map[string]interface{}{
+								"Name": "ebsVol",
+							},
+						},
+					},
+				},
+				resourcesFromState: &[]resource.Resource{
+					&resource.AbstractResource{
+						Id:   "dummy-instance",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"availability_zone": "eu-west-3",
+							"root_block_device": []interface{}{
+								map[string]interface{}{
+									"volume_id":   "vol-02862d9b39045a3a4",
+									"volume_type": "gp2",
+									"device_name": "/dev/sda1",
+									"encrypted":   true,
+									"kms_key_id":  "kms",
+									"volume_size": 8,
+									"throughput":  125,
+									"iops":        1234,
+									"tags": map[string]interface{}{
+										"Name": "rootVol",
+									},
+								},
+							},
+							"ebs_block_device": []interface{}{
+								map[string]interface{}{
+									"volume_id":             "vol-018c5ae89895aca4c",
+									"volume_type":           "gp2",
+									"device_name":           "/dev/sdb",
+									"encrypted":             true,
+									"delete_on_termination": true,
+									"volume_size":           23,
+									"throughput":            125,
+									"tags": map[string]interface{}{
+										"Name": "ebsVol",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			func(factory *terraform.MockResourceFactory) {
+				foo := resource.AbstractResource{
+					Id:   "vol-02862d9b39045a3a4",
+					Type: "aws_ebs_volume",
+					Attrs: &resource.Attributes{
+						"id":                   "vol-02862d9b39045a3a4",
+						"encrypted":            true,
+						"multi_attach_enabled": false,
+						"availability_zone":    "eu-west-3",
+						"iops":                 1234,
+						"kms_key_id":           "kms",
+						"size":                 8,
+						"type":                 "gp2",
+						"throughput":           125,
+						"tags": map[string]interface{}{
+							"Name": "rootVol",
+						},
+					},
+				}
+				factory.On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "vol-02862d9b39045a3a4" && len(input["tags"].(map[string]interface{})) == 1
+				})).Times(1).Return(&foo, nil)
+
+				bar := resource.AbstractResource{
+					Id:   "vol-018c5ae89895aca4c",
+					Type: "aws_ebs_volume",
+					Attrs: &resource.Attributes{
+						"id":                   "vol-018c5ae89895aca4c",
+						"encrypted":            true,
+						"multi_attach_enabled": false,
+						"availability_zone":    "eu-west-3",
+						"size":                 23,
+						"type":                 "gp2",
+						"throughput":           125,
+						"tags": map[string]interface{}{
+							"Name": "ebsVol",
+						},
+					},
+				}
+				factory.On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "vol-018c5ae89895aca4c" && len(input["tags"].(map[string]interface{})) == 1
 				})).Times(1).Return(&bar, nil)
 			},
 			false,
