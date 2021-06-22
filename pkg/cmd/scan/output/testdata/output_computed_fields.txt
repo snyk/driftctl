@@ -11,4 +11,4 @@ Found 1 resource(s)
  - 0 not covered by IaC
  - 0 missing on cloud provider
  - 1/1 changed outside of IaC
-You have diffs on computed fields, check the documentation for potential false positive drifts
+You have diffs on computed fields, check the documentation for potential false positive drifts: https://docs.driftctl.com/limitations
