@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/cloudskiff/driftctl/pkg/telemetry"
 	"github.com/fatih/color"
@@ -229,6 +230,8 @@ func scanRun(opts *pkg.ScanOptions) error {
 	if err != nil {
 		return err
 	}
+
+	globaloutput.Printf(color.WhiteString("Done in %s\n", analysis.Duration.Round(time.Second)))
 
 	if !opts.DisableTelemetry {
 		telemetry.SendTelemetry(analysis)
