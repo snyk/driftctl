@@ -48,6 +48,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 							"kms_key_id":           "kms",
 							"size":                 8,
 							"type":                 "gp2",
+							"throughput":           125,
 							"tags": map[string]interface{}{
 								"Name": "rootVol",
 							},
@@ -63,6 +64,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 							"availability_zone":    "eu-west-3",
 							"size":                 23,
 							"type":                 "gp2",
+							"throughput":           125,
 							"tags": map[string]interface{}{
 								"Name": "rootVol",
 							},
@@ -96,6 +98,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 									"encrypted":   true,
 									"kms_key_id":  "kms",
 									"volume_size": 8,
+									"throughput":  125,
 									"iops":        1234,
 								},
 							},
@@ -107,6 +110,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 									"encrypted":             true,
 									"delete_on_termination": true,
 									"volume_size":           23,
+									"throughput":            125,
 								},
 							},
 						},
@@ -126,6 +130,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 						"kms_key_id":           "kms",
 						"size":                 8,
 						"type":                 "gp2",
+						"throughput":           125,
 						"tags": map[string]interface{}{
 							"Name": "rootVol",
 						},
@@ -145,6 +150,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 						"availability_zone":    "eu-west-3",
 						"size":                 23,
 						"type":                 "gp2",
+						"throughput":           125,
 						"tags": map[string]interface{}{
 							"Name": "rootVol",
 						},
