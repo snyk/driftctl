@@ -49,6 +49,9 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 					"multi_attach_enabled": false,
 					"tags":                 (*instance.Attrs)["volume_tags"],
 				}
+				if throughput, exist := rootBlock["throughput"]; exist {
+					data["throughput"] = throughput
+				}
 				newRes := a.resourceFactory.CreateAbstractResource("aws_ebs_volume", rootBlock["volume_id"].(string), data)
 				newStateResources = append(newStateResources, newRes)
 			}
@@ -73,6 +76,9 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 					"type":                 blockDevice["volume_type"],
 					"multi_attach_enabled": false,
 					"tags":                 (*instance.Attrs)["volume_tags"],
+				}
+				if throughput, exist := blockDevice["throughput"]; exist {
+					data["throughput"] = throughput
 				}
 				newRes := a.resourceFactory.CreateAbstractResource("aws_ebs_volume", blockDevice["volume_id"].(string), data)
 				newStateResources = append(newStateResources, newRes)
