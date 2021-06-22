@@ -295,6 +295,53 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 			},
 			false,
 		},
+		{
+			"Should not create ebs volume if there is already one (e.g. inline ebs_block_device)",
+			struct {
+				expectedResource   *[]resource.Resource
+				resourcesFromState *[]resource.Resource
+			}{
+				expectedResource: &[]resource.Resource{
+					&resource.AbstractResource{
+						Id:   "dummy-instance",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"availability_zone": "eu-west-3",
+						},
+					},
+					&resource.AbstractResource{
+						Id:   "vol-02862d9b39045a3a4",
+						Type: "aws_ebs_volume",
+						Attrs: &resource.Attributes{
+							"id": "vol-02862d9b39045a3a4",
+						},
+					},
+				},
+				resourcesFromState: &[]resource.Resource{
+					&resource.AbstractResource{
+						Id:   "vol-02862d9b39045a3a4",
+						Type: "aws_ebs_volume",
+						Attrs: &resource.Attributes{
+							"id": "vol-02862d9b39045a3a4",
+						},
+					},
+					&resource.AbstractResource{
+						Id:   "dummy-instance",
+						Type: "aws_instance",
+						Attrs: &resource.Attributes{
+							"availability_zone": "eu-west-3",
+							"ebs_block_device": []interface{}{
+								map[string]interface{}{
+									"volume_id": "vol-02862d9b39045a3a4",
+								},
+							},
+						},
+					},
+				},
+			},
+			func(factory *terraform.MockResourceFactory) {},
+			false,
+		},
 	}
 	for _, c := range tests {
 		t.Run(c.name, func(tt *testing.T) {
