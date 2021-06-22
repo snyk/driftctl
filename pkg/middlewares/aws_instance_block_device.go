@@ -62,6 +62,9 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 		if ebsBlockDevice, exist := instance.Attrs.Get("ebs_block_device"); exist {
 			for _, blockDevice := range ebsBlockDevice.([]interface{}) {
 				blockDevice := blockDevice.(map[string]interface{})
+				if a.hasBlockDevice(blockDevice, resourcesFromState) {
+					continue
+				}
 				logrus.WithFields(logrus.Fields{
 					"volume":   blockDevice["volume_id"],
 					"instance": instance.TerraformId(),
@@ -113,4 +116,14 @@ func (a AwsInstanceBlockDeviceResourceMapper) volumeTags(instance *resource.Abst
 		return tags
 	}
 	return blockDevice["tags"]
+}
+
+func (a AwsInstanceBlockDeviceResourceMapper) hasBlockDevice(blockDevice map[string]interface{}, resourcesFromState *[]resource.Resource) bool {
+	for _, stateRes := range *resourcesFromState {
+		if stateRes.TerraformType() == aws.AwsEbsVolumeResourceType &&
+			stateRes.TerraformId() == blockDevice["volume_id"] {
+			return true
+		}
+	}
+	return false
 }
