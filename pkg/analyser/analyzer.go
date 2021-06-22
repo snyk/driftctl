@@ -29,7 +29,7 @@ func NewComputedDiffAlert() *ComputedDiffAlert {
 }
 
 func (c *ComputedDiffAlert) Message() string {
-	return "You have diffs on computed fields, check the documentation for potential false positive drifts"
+	return "You have diffs on computed fields, check the documentation for potential false positive drifts: https://docs.driftctl.com/limitations"
 }
 
 func (c *ComputedDiffAlert) ShouldIgnoreResource() bool {

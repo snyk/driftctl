@@ -80,7 +80,7 @@
 	"alerts": {
 		"": [
 			{
-				"message": "You have diffs on computed fields, check the documentation for potential false positive drifts"
+				"message": "You have diffs on computed fields, check the documentation for potential false positive drifts: https://docs.driftctl.com/limitations"
 			}
 		]
 	}
