@@ -1560,6 +1560,14 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 				&resource.AbstractResource{
+					Id:   "role_with_managed_policy_attr-arn2",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"policy_arn": "arn2",
+						"roles":      []interface{}{"role_with_managed_policy_attr"},
+					},
+				},
+				&resource.AbstractResource{
 					Id:   "role_with_empty_managed_policy_attribute",
 					Type: aws.AwsIamRoleResourceType,
 					Attrs: &resource.Attributes{
