@@ -110,7 +110,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 
 			if shouldUpdate {
 				var err error
-				realProvider, err = aws.NewAWSTerraformProvider("", progress, "")
+				realProvider, err = aws.NewAWSTerraformProvider("3.19.0", progress, os.TempDir())
 				if err != nil {
 					t.Fatal(err)
 				}

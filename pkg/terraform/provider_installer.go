@@ -76,7 +76,7 @@ func (p *ProviderInstaller) Install() (string, error) {
 }
 
 func (p ProviderInstaller) getProviderDirectory() string {
-	return path.Join(p.homeDir, fmt.Sprintf("/.driftctl/plugins/%s_%s/", runtime.GOOS, runtime.GOARCH))
+	return path.Join(p.homeDir, fmt.Sprintf(".driftctl/plugins/%s_%s/", runtime.GOOS, runtime.GOARCH))
 }
 
 // Handle postfixes in binary names
