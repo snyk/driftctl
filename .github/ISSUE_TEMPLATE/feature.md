@@ -1,7 +1,7 @@
 ---
 name: 🚀 Feature
 about: RFC and ideas for new features and improvements
-labels: kind/enhancement
+labels: kind/enhancement, need-triage
 
 ---
 
