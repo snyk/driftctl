@@ -61,6 +61,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "Lambda function", dirName: "lambda_function", wantErr: false},
 		{name: "unsupported attribute", dirName: "unsupported_attribute", wantErr: false},
 		{name: "Unsupported provider", dirName: "unsupported_provider", wantErr: false},
+		{name: "Unsupported resource", dirName: "unsupported_resource", wantErr: false},
 		{name: "EC2 instance", dirName: "ec2_instance", wantErr: false},
 		{name: "EC2 key pair", dirName: "ec2_key_pair", wantErr: false},
 		{name: "EC2 ami", dirName: "ec2_ami", wantErr: false},
