@@ -70,6 +70,15 @@ func (r *TerraformStateReader) retrieve() (map[string][]cty.Value, error) {
 		for _, stateRes := range module.Resources {
 			resName := stateRes.Addr.Resource.Name
 			resType := stateRes.Addr.Resource.Type
+
+			if !resource.IsResourceTypeSupported(resType) {
+				logrus.WithFields(logrus.Fields{
+					"name": resName,
+					"type": resType,
+				}).Debug("Ignored unsupported resource from state")
+				continue
+			}
+
 			if stateRes.Addr.Resource.Mode != addrs.ManagedResourceMode {
 				logrus.WithFields(logrus.Fields{
 					"mode": stateRes.Addr.Resource.Mode,
@@ -160,9 +169,6 @@ func (r *TerraformStateReader) decode(values map[string][]cty.Value) ([]resource
 	results := make([]resource.Resource, 0)
 
 	for ty, val := range values {
-		if !resource.IsResourceTypeSupported(ty) {
-			continue
-		}
 		decodedResources, err := r.deserializer.Deserialize(ty, val)
 		if err != nil {
 			logrus.WithField("ty", ty).Warnf("Could not read from state: %+v", err)
