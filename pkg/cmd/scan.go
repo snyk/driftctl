@@ -231,7 +231,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		return err
 	}
 
-	globaloutput.Printf(color.WhiteString("Done in %s\n", analysis.Duration.Round(time.Second)))
+	globaloutput.Printf(color.WhiteString("Scan duration: %s\n", analysis.Duration.Round(time.Second)))
 
 	if !opts.DisableTelemetry {
 		telemetry.SendTelemetry(analysis)
