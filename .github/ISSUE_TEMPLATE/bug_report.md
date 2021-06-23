@@ -1,7 +1,7 @@
 ---
 name: 🐛 Bug Report
 about: Report errors and problems
-labels: kind/bug
+labels: kind/bug, need-triage
 
 ---
 
