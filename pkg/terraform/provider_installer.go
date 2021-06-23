@@ -38,6 +38,27 @@ func (p *ProviderInstaller) Install() (string, error) {
 	providerDir := p.getProviderDirectory()
 	providerPath := p.getBinaryPath()
 
+	_, err := os.Stat(providerDir)
+	if os.IsNotExist(err) {
+		logrus.WithFields(logrus.Fields{
+			"path": providerDir,
+		}).Debug("Provider directory destination not found, creating ...")
+		if err := os.MkdirAll(providerDir, 0755); err != nil {
+			return "", err
+		}
+	}
+
+	isDirectoryWritablePath := path.Join(providerDir, ".is_directory_writable")
+	isDirectoryWritable, err := os.OpenFile(isDirectoryWritablePath, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"path": providerDir,
+		}).Debug("Provider directory destination is not writable")
+		return "", err
+	}
+	defer isDirectoryWritable.Close()
+	defer os.Remove(isDirectoryWritablePath)
+
 	info, err := os.Stat(providerPath)
 
 	if err != nil && os.IsNotExist(err) {
