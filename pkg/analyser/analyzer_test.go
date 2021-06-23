@@ -955,7 +955,7 @@ func TestAnalyze(t *testing.T) {
 			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 			aws.InitResourcesMetadata(repo)
 
-			analyzer := NewAnalyzer(al)
+			analyzer := NewAnalyzer(al, AnalyzerOptions{Deep: true})
 
 			for _, res := range c.cloud {
 				addSchemaToRes(res, repo)

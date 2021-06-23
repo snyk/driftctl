@@ -87,7 +87,7 @@ func runTest(t *testing.T, cases TestCases) {
 			}
 
 			if c.options == nil {
-				c.options = &pkg.ScanOptions{}
+				c.options = &pkg.ScanOptions{Deep: true}
 			}
 
 			scanProgress := &output.MockProgress{}
@@ -140,7 +140,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				result.AssertInfrastructureIsInSync()
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
-				return &pkg.ScanOptions{}
+				return &pkg.ScanOptions{Deep: true}
 			}(t),
 		},
 		{
@@ -152,9 +152,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertDeletedCount(1)
 			},
-			options: func(t *testing.T) *pkg.ScanOptions {
-				return &pkg.ScanOptions{}
-			}(t),
 		},
 		{
 			name:           "we should have unmanaged resource",
@@ -165,9 +162,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			assert: func(result *test.ScanResult, err error) {
 				result.AssertUnmanagedCount(1)
 			},
-			options: func(t *testing.T) *pkg.ScanOptions {
-				return &pkg.ScanOptions{}
-			}(t),
 		},
 		{
 			name: "we should have changes of field update",
@@ -199,9 +193,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Computed: false,
 				})
 			},
-			options: func(t *testing.T) *pkg.ScanOptions {
-				return &pkg.ScanOptions{}
-			}(t),
 		},
 		{
 			name: "we should have changes on computed field",
@@ -235,9 +226,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Computed: true,
 				})
 			},
-			options: func(t *testing.T) *pkg.ScanOptions {
-				return &pkg.ScanOptions{}
-			}(t),
 		},
 		{
 			name: "we should have changes on deleted field",
@@ -271,9 +259,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Computed: false,
 				})
 			},
-			options: func(t *testing.T) *pkg.ScanOptions {
-				return &pkg.ScanOptions{}
-			}(t),
 		},
 		{
 			name: "we should have changes of added field",
@@ -307,9 +292,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Computed: false,
 				})
 			},
-			options: func(t *testing.T) *pkg.ScanOptions {
-				return &pkg.ScanOptions{}
-			}(t),
 		},
 		{
 			name: "we should ignore default AWS IAM role when strict mode is disabled",
@@ -396,6 +378,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{
 					StrictMode: false,
+					Deep:       true,
 				}
 			}(t),
 		},
@@ -484,6 +467,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{
 					StrictMode: true,
+					Deep:       true,
 				}
 			}(t),
 		},
@@ -581,6 +565,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				return &pkg.ScanOptions{
 					Filter:     f,
 					StrictMode: true,
+					Deep:       true,
 				}
 			}(t),
 		},
@@ -617,7 +602,7 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f}
+				return &pkg.ScanOptions{Filter: f, Deep: true}
 			}(t),
 		},
 		{
@@ -646,7 +631,7 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f}
+				return &pkg.ScanOptions{Filter: f, Deep: true}
 			}(t),
 		},
 		{
@@ -677,7 +662,7 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f}
+				return &pkg.ScanOptions{Filter: f, Deep: true}
 			}(t),
 		},
 	}
@@ -751,7 +736,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f}
+				return &pkg.ScanOptions{Filter: f, Deep: true}
 			}(t),
 		},
 		{
@@ -864,7 +849,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f}
+				return &pkg.ScanOptions{Filter: f, Deep: true}
 			}(t),
 		},
 		{
@@ -963,7 +948,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f}
+				return &pkg.ScanOptions{Filter: f, Deep: true}
 			}(t),
 		},
 		{
@@ -1026,7 +1011,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f}
+				return &pkg.ScanOptions{Filter: f, Deep: true}
 			}(t),
 		},
 		{
@@ -1088,7 +1073,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f}
+				return &pkg.ScanOptions{Filter: f, Deep: true}
 			}(t),
 		},
 		{
@@ -1404,7 +1389,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f}
+				return &pkg.ScanOptions{Filter: f, Deep: true}
 			}(t),
 		},
 		{
@@ -1542,7 +1527,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f}
+				return &pkg.ScanOptions{Filter: f, Deep: true}
 			}(t),
 		},
 		{

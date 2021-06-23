@@ -36,8 +36,13 @@ func (c *ComputedDiffAlert) ShouldIgnoreResource() bool {
 	return false
 }
 
+type AnalyzerOptions struct {
+	Deep bool
+}
+
 type Analyzer struct {
 	alerter *alerter.Alerter
+	options AnalyzerOptions
 }
 
 type Filter interface {
@@ -45,8 +50,8 @@ type Filter interface {
 	IsFieldIgnored(res resource.Resource, path []string) bool
 }
 
-func NewAnalyzer(alerter *alerter.Alerter) Analyzer {
-	return Analyzer{alerter}
+func NewAnalyzer(alerter *alerter.Alerter, options AnalyzerOptions) Analyzer {
+	return Analyzer{alerter, options}
 }
 
 func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resource, filter Filter) (Analysis, error) {
@@ -77,6 +82,11 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 		// Remove managed resources, so it will remain only unmanaged ones
 		filteredRemoteResource = removeResourceByIndex(i, filteredRemoteResource)
 		analysis.AddManaged(stateRes)
+
+		// Stop there if we are not in deep mode, we do not want to compute diffs
+		if !a.options.Deep {
+			continue
+		}
 
 		var delta diff.Changelog
 		delta, _ = diff.Diff(stateRes.Attributes(), remoteRes.Attributes())

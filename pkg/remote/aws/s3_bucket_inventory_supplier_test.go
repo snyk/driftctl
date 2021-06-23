@@ -45,7 +45,7 @@ func TestS3BucketInventorySupplier_Resources(t *testing.T) {
 
 				repository.On(
 					"GetBucketLocation",
-					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift")},
+					"bucket-martin-test-drift",
 				).Return(
 					"eu-west-1",
 					nil,
@@ -53,7 +53,7 @@ func TestS3BucketInventorySupplier_Resources(t *testing.T) {
 
 				repository.On(
 					"GetBucketLocation",
-					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift2")},
+					"bucket-martin-test-drift2",
 				).Return(
 					"eu-west-3",
 					nil,
@@ -61,7 +61,7 @@ func TestS3BucketInventorySupplier_Resources(t *testing.T) {
 
 				repository.On(
 					"GetBucketLocation",
-					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift3")},
+					"bucket-martin-test-drift3",
 				).Return(
 					"eu-west-1",
 					nil,
@@ -98,7 +98,7 @@ func TestS3BucketInventorySupplier_Resources(t *testing.T) {
 				)
 				repository.On(
 					"GetBucketLocation",
-					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift")},
+					"bucket-martin-test-drift",
 				).Return(
 					"eu-west-3",
 					nil,

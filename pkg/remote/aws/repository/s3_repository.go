@@ -17,7 +17,7 @@ type S3Repository interface {
 	ListBucketInventoryConfigurations(bucket *s3.Bucket, region string) ([]*s3.InventoryConfiguration, error)
 	ListBucketMetricsConfigurations(bucket *s3.Bucket, region string) ([]*s3.MetricsConfiguration, error)
 	ListBucketAnalyticsConfigurations(bucket *s3.Bucket, region string) ([]*s3.AnalyticsConfiguration, error)
-	GetBucketLocation(bucket *s3.Bucket) (string, error)
+	GetBucketLocation(bucketName string) (string, error)
 }
 
 type s3Repository struct {
@@ -148,19 +148,19 @@ func (s *s3Repository) ListBucketAnalyticsConfigurations(bucket *s3.Bucket, regi
 	return analyticsConfigurationList, nil
 }
 
-func (s *s3Repository) GetBucketLocation(bucket *s3.Bucket) (string, error) {
-	cacheKey := fmt.Sprintf("s3GetBucketLocation_%s", *bucket.Name)
+func (s *s3Repository) GetBucketLocation(bucketName string) (string, error) {
+	cacheKey := fmt.Sprintf("s3GetBucketLocation_%s", bucketName)
 	if v := s.cache.Get(cacheKey); v != nil {
 		return v.(string), nil
 	}
 
-	bucketLocationRequest := s3.GetBucketLocationInput{Bucket: bucket.Name}
+	bucketLocationRequest := s3.GetBucketLocationInput{Bucket: &bucketName}
 	bucketLocationResponse, err := s.clientFactory.GetS3Client(nil).GetBucketLocation(&bucketLocationRequest)
 	if err != nil {
 		awsErr, ok := err.(awserr.Error)
 		if ok && awsErr.Code() == s3.ErrCodeNoSuchBucket {
 			logrus.WithFields(logrus.Fields{
-				"bucket": *bucket.Name,
+				"bucket": bucketName,
 			}).Warning("Unable to retrieve bucket region, this may be an inconsistency in S3 api for fresh deleted bucket, skipping ...")
 			return "", nil
 		}
