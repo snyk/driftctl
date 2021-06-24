@@ -18,5 +18,6 @@ func initAwsLambdaFunctionMetaData(resourceSchemaRepository resource.SchemaRepos
 		val.DeleteIfDefault("package_type")
 		val.DeleteIfDefault("signing_job_arn")
 		val.DeleteIfDefault("signing_profile_version_arn")
+		val.SafeDelete([]string{"source_code_size"})
 	})
 }
