@@ -126,6 +126,108 @@ func TestS3Enumerator_Enumerate(t *testing.T) {
 			want: []string{"bucket-name/a/nested/prefix/state2"},
 		},
 		{
+			name: "test results with simple doublestar glob",
+			config: config.SupplierConfig{
+				Path: "bucket-name/**/*.tfstate",
+			},
+			mocks: func(client *awstest.MockFakeS3) {
+				input := &s3.ListObjectsV2Input{
+					Bucket: awssdk.String("bucket-name"),
+					Prefix: awssdk.String(""),
+				}
+				client.On(
+					"ListObjectsV2Pages",
+					input,
+					mock.MatchedBy(func(callback func(res *s3.ListObjectsV2Output, lastPage bool) bool) bool {
+						callback(&s3.ListObjectsV2Output{
+							Contents: []*s3.Object{
+								{
+									Key:  awssdk.String("a/nested/prefix/1/state1.tfstate"),
+									Size: awssdk.Int64(5),
+								},
+								{
+									Key:  awssdk.String("a/nested/folder1/2/state2.tfstate"),
+									Size: awssdk.Int64(5),
+								},
+								{
+									Key:  awssdk.String("a/nested/prefix/state3.tfstate"),
+									Size: awssdk.Int64(5),
+								},
+							},
+						}, false)
+						callback(&s3.ListObjectsV2Output{
+							Contents: []*s3.Object{
+								{
+									Key:  awssdk.String("a/nested/prefix/4/4/state4.tfstate"),
+									Size: awssdk.Int64(5),
+								},
+								{
+									Key:  awssdk.String("a/nested/state5.tfstate"),
+									Size: awssdk.Int64(5),
+								},
+								{
+									Key:  awssdk.String("a/nested/prefix/state6.tfstate.backup"),
+									Size: awssdk.Int64(5),
+								},
+							},
+						}, true)
+						return true
+					}),
+				).Return(nil)
+			},
+			want: []string{
+				"bucket-name/a/nested/prefix/1/state1.tfstate",
+				"bucket-name/a/nested/folder1/2/state2.tfstate",
+				"bucket-name/a/nested/prefix/state3.tfstate",
+				"bucket-name/a/nested/prefix/4/4/state4.tfstate",
+				"bucket-name/a/nested/state5.tfstate",
+			},
+			err: "",
+		},
+		{
+			name: "test results with glob and prefix after glob",
+			config: config.SupplierConfig{
+				Path: "bucket-name/a/**/b/*.tfstate",
+			},
+			mocks: func(client *awstest.MockFakeS3) {
+				input := &s3.ListObjectsV2Input{
+					Bucket: awssdk.String("bucket-name"),
+					Prefix: awssdk.String("a"),
+				}
+				client.On(
+					"ListObjectsV2Pages",
+					input,
+					mock.MatchedBy(func(callback func(res *s3.ListObjectsV2Output, lastPage bool) bool) bool {
+						callback(&s3.ListObjectsV2Output{
+							Contents: []*s3.Object{
+								{
+									Key:  awssdk.String("a/prefix/b/state1.tfstate"),
+									Size: awssdk.Int64(5),
+								},
+								{
+									Key:  awssdk.String("a/b/state2.tfstate"),
+									Size: awssdk.Int64(5),
+								},
+								{
+									Key:  awssdk.String("a/prefix/state3.tfstate"),
+									Size: awssdk.Int64(5),
+								}, {
+									Key:  awssdk.String("a/prefix/state4.tfstate.backup"),
+									Size: awssdk.Int64(5),
+								},
+							},
+						}, true)
+						return true
+					}),
+				).Return(nil)
+			},
+			want: []string{
+				"bucket-name/a/prefix/b/state1.tfstate",
+				"bucket-name/a/b/state2.tfstate",
+			},
+			err: "",
+		},
+		{
 			name: "test results with glob",
 			config: config.SupplierConfig{
 				Path: "bucket-name/a/nested/prefix/**/*.tfstate",

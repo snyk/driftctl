@@ -11,9 +11,6 @@ import (
 )
 
 func GlobS3(path string) (prefix string, pattern string) {
-	if !HasMeta(path) {
-		return path, ""
-	}
 	prefix, pattern = splitDirPattern(path)
 	return
 }
@@ -23,23 +20,25 @@ func HasMeta(path string) bool {
 	return strings.ContainsAny(path, magicChars)
 }
 
-func splitDirPattern(p string) (base string, pattern string) {
-	base = p
+// Should split a path :
+// - prefix : path part that should not contains glob patterns, that is used in S3 query to filter result
+// - pattern : should contains the glob pattern to be used by doublestar matching library
+func splitDirPattern(p string) (prefix string, pattern string) {
 	sep := "/"
 
-	for {
-		if !HasMeta(base) {
-			break
+	splitPath := strings.Split(p, sep)
+	prefixEnded := false
+	for _, s := range splitPath {
+		if HasMeta(s) || prefixEnded {
+			prefixEnded = true
+			pattern = strings.Join([]string{pattern, s}, sep)
+			continue
 		}
-		if !strings.Contains(base, sep) {
-			return "", base
-		}
-		base = base[:strings.LastIndex(base, sep)]
+
+		prefix = strings.Join([]string{prefix, s}, sep)
+
 	}
-	if len(base) == len(p) {
-		return p, ""
-	}
-	return base, p[len(base)+1:]
+	return strings.Trim(prefix, sep), strings.Trim(pattern, sep)
 }
 
 func Glob(pattern string) ([]string, error) {
