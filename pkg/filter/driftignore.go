@@ -16,6 +16,7 @@ const separator = "_-_"
 type DriftIgnore struct {
 	driftignorePath string
 	matcher         gitignore.Matcher
+	rulesCount      int
 }
 
 func NewDriftIgnore(path string) *DriftIgnore {
@@ -37,7 +38,7 @@ func (r *DriftIgnore) readIgnoreFile() error {
 	}
 	defer file.Close()
 
-	var lines []gitignore.Pattern
+	var patterns []gitignore.Pattern
 	scanner := bufio.NewScanner(file)
 	for lineNumber := 1; scanner.Scan(); lineNumber++ {
 		line := scanner.Text()
@@ -51,18 +52,19 @@ func (r *DriftIgnore) readIgnoreFile() error {
 		}
 		line = strings.ReplaceAll(line, "/", separator)
 
-		lines = append(lines, gitignore.ParsePattern(line, nil))
+		patterns = append(patterns, gitignore.ParsePattern(line, nil))
 		if !strings.HasSuffix(line, "*") {
 			line := fmt.Sprintf("%s.*", line)
-			lines = append(lines, gitignore.ParsePattern(line, nil))
+			patterns = append(patterns, gitignore.ParsePattern(line, nil))
 		}
+		r.rulesCount++
 	}
 
 	if err := scanner.Err(); err != nil {
 		return err
 	}
 
-	r.matcher = gitignore.NewMatcher(lines)
+	r.matcher = gitignore.NewMatcher(patterns)
 
 	return nil
 }
@@ -78,4 +80,8 @@ func (r *DriftIgnore) IsFieldIgnored(res resource.Resource, path []string) bool 
 
 func (r *DriftIgnore) match(strRes string) bool {
 	return r.matcher.Match([]string{strings.ReplaceAll(strRes, "/", separator)}, false)
+}
+
+func (r *DriftIgnore) RulesCount() int {
+	return r.rulesCount
 }

@@ -12,12 +12,13 @@ import (
 )
 
 type telemetry struct {
-	Version        string `json:"version"`
-	Os             string `json:"os"`
-	Arch           string `json:"arch"`
-	TotalResources int    `json:"total_resources"`
-	TotalManaged   int    `json:"total_managed"`
-	Duration       uint   `json:"duration"`
+	Version          string `json:"version"`
+	Os               string `json:"os"`
+	Arch             string `json:"arch"`
+	TotalResources   int    `json:"total_resources"`
+	TotalManaged     int    `json:"total_managed"`
+	Duration         uint   `json:"duration"`
+	IgnoreRulesCount int    `json:"ignore_rules_count"`
 }
 
 func SendTelemetry(analysis *analyser.Analysis) {
@@ -27,12 +28,13 @@ func SendTelemetry(analysis *analyser.Analysis) {
 	}
 
 	t := telemetry{
-		Version:        version.Current(),
-		Os:             runtime.GOOS,
-		Arch:           runtime.GOARCH,
-		TotalResources: analysis.Summary().TotalResources,
-		TotalManaged:   analysis.Summary().TotalManaged,
-		Duration:       uint(analysis.Duration.Seconds() + 0.5),
+		Version:          version.Current(),
+		Os:               runtime.GOOS,
+		Arch:             runtime.GOARCH,
+		TotalResources:   analysis.Summary().TotalResources,
+		TotalManaged:     analysis.Summary().TotalManaged,
+		Duration:         uint(analysis.Duration.Seconds() + 0.5),
+		IgnoreRulesCount: analysis.IgnoreRulesCount,
 	}
 
 	body, err := json.Marshal(t)

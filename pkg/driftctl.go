@@ -135,6 +135,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 
 	analysis.Duration = time.Since(start)
 	analysis.Date = time.Now()
+	analysis.IgnoreRulesCount = driftIgnore.RulesCount()
 
 	return &analysis, nil
 }

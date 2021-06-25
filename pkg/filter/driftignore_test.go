@@ -14,10 +14,11 @@ import (
 
 func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 	tests := []struct {
-		name      string
-		resources []resource.Resource
-		want      []bool
-		path      string
+		name       string
+		resources  []resource.Resource
+		want       []bool
+		path       string
+		rulesCount int
 	}{
 		{
 			name: "drift_ignore_no_file",
@@ -30,7 +31,8 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 			want: []bool{
 				false,
 			},
-			path: "testdata/drift_ignore_no_file/.driftignore",
+			path:       "testdata/drift_ignore_no_file/.driftignore",
+			rulesCount: 0,
 		},
 		{
 			name: "drift_ignore_empty",
@@ -43,7 +45,8 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 			want: []bool{
 				false,
 			},
-			path: "testdata/drift_ignore_empty/.driftignore",
+			path:       "testdata/drift_ignore_empty/.driftignore",
+			rulesCount: 0,
 		},
 		{
 			name: "drift_ignore_invalid_lines",
@@ -61,7 +64,8 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 				false,
 				true,
 			},
-			path: "testdata/drift_ignore_invalid_lines/.driftignore",
+			path:       "testdata/drift_ignore_invalid_lines/.driftignore",
+			rulesCount: 8,
 		},
 		{
 			name: "drift_ignore_valid",
@@ -119,7 +123,8 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 				true,
 				true,
 			},
-			path: "testdata/drift_ignore_valid/.driftignore",
+			path:       "testdata/drift_ignore_valid/.driftignore",
+			rulesCount: 6,
 		},
 		{
 			name: "drift_ignore_wildcard",
@@ -162,7 +167,8 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 				false,
 				true,
 			},
-			path: "testdata/drift_ignore_wildcard/.driftignore",
+			path:       "testdata/drift_ignore_wildcard/.driftignore",
+			rulesCount: 3,
 		},
 		{
 			name: "drift_ignore_all_exclude",
@@ -215,7 +221,8 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 				false,
 				true,
 			},
-			path: "testdata/drift_ignore_all_exclude/.driftignore",
+			path:       "testdata/drift_ignore_all_exclude/.driftignore",
+			rulesCount: 3,
 		},
 	}
 	for _, tt := range tests {
@@ -229,6 +236,7 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 				got = append(got, r.IsResourceIgnored(res))
 			}
 			assert.Equal(t, tt.want, got)
+			assert.Equal(t, tt.rulesCount, r.RulesCount())
 		})
 	}
 }

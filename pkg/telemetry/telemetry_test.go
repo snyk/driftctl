@@ -32,15 +32,17 @@ func TestSendTelemetry(t *testing.T) {
 				a.AddManaged(&resource.FakeResource{})
 				a.AddUnmanaged(&resource.FakeResource{})
 				a.Duration = 123.4 * 1e9 // 123.4 seconds
+				a.IgnoreRulesCount = 24
 				return a
 			}(),
 			expectedBody: &telemetry{
-				Version:        version.Current(),
-				Os:             runtime.GOOS,
-				Arch:           runtime.GOARCH,
-				TotalResources: 2,
-				TotalManaged:   1,
-				Duration:       123,
+				Version:          version.Current(),
+				Os:               runtime.GOOS,
+				Arch:             runtime.GOARCH,
+				TotalResources:   2,
+				TotalManaged:     1,
+				Duration:         123,
+				IgnoreRulesCount: 24,
 			},
 		},
 		{

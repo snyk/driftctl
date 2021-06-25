@@ -35,14 +35,15 @@ type Summary struct {
 }
 
 type Analysis struct {
-	unmanaged   []resource.Resource
-	managed     []resource.Resource
-	deleted     []resource.Resource
-	differences []Difference
-	summary     Summary
-	alerts      alerter.Alerts
-	Duration    time.Duration
-	Date        time.Time
+	unmanaged        []resource.Resource
+	managed          []resource.Resource
+	deleted          []resource.Resource
+	differences      []Difference
+	summary          Summary
+	alerts           alerter.Alerts
+	Duration         time.Duration
+	Date             time.Time
+	IgnoreRulesCount int
 }
 
 type serializableDifference struct {
