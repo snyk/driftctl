@@ -100,7 +100,7 @@ func runTest(t *testing.T, cases TestCases) {
 
 			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, c.options, scanProgress, iacProgress, repo)
 
-			analysis, err := driftctl.Run()
+			analysis, _, err := driftctl.Run()
 
 			c.assert(test.NewScanResult(t, analysis), err)
 			scanProgress.AssertExpectations(t)

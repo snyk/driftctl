@@ -21,7 +21,7 @@ type telemetry struct {
 	IgnoreRulesCount int    `json:"ignore_rules_count"`
 }
 
-func SendTelemetry(analysis *analyser.Analysis) {
+func SendTelemetry(analysis *analyser.Analysis, ignoreRulesCount int) {
 
 	if analysis == nil {
 		return
@@ -34,7 +34,7 @@ func SendTelemetry(analysis *analyser.Analysis) {
 		TotalResources:   analysis.Summary().TotalResources,
 		TotalManaged:     analysis.Summary().TotalManaged,
 		Duration:         uint(analysis.Duration.Seconds() + 0.5),
-		IgnoreRulesCount: analysis.IgnoreRulesCount,
+		IgnoreRulesCount: ignoreRulesCount,
 	}
 
 	body, err := json.Marshal(t)

@@ -68,11 +68,11 @@ func NewDriftCTL(remoteSupplier resource.Supplier,
 	}
 }
 
-func (d DriftCTL) Run() (*analyser.Analysis, error) {
+func (d DriftCTL) Run() (*analyser.Analysis, int, error) {
 	start := time.Now()
 	remoteResources, resourcesFromState, err := d.scan()
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	middleware := middlewares.NewChain(
@@ -110,18 +110,18 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	logrus.Debug("Ready to run middlewares")
 	err = middleware.Execute(&remoteResources, &resourcesFromState)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	if d.opts.Filter != nil {
 		engine := filter.NewFilterEngine(d.opts.Filter)
 		remoteResources, err = engine.Run(remoteResources)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		resourcesFromState, err = engine.Run(resourcesFromState)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 	}
 
@@ -130,14 +130,13 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 
 	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState, driftIgnore)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	analysis.Duration = time.Since(start)
 	analysis.Date = time.Now()
-	analysis.IgnoreRulesCount = driftIgnore.RulesCount()
 
-	return &analysis, nil
+	return &analysis, driftIgnore.RulesCount(), nil
 }
 
 func (d DriftCTL) Stop() {

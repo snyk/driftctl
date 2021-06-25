@@ -224,7 +224,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		ctl.Stop()
 	}()
 
-	analysis, err := ctl.Run()
+	analysis, ignoreRulesCount, err := ctl.Run()
 	if err != nil {
 		return err
 	}
@@ -237,7 +237,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 	globaloutput.Printf(color.WhiteString("Scan duration: %s\n", analysis.Duration.Round(time.Second)))
 
 	if !opts.DisableTelemetry {
-		telemetry.SendTelemetry(analysis)
+		telemetry.SendTelemetry(analysis, ignoreRulesCount)
 	}
 
 	globaloutput.Printf(color.WhiteString("Provider version used to scan: %s. Use --tf-provider-version to use another version.\n"), resourceSchemaRepository.ProviderVersion.String())

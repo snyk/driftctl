@@ -20,10 +20,11 @@ func TestSendTelemetry(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 
 	tests := []struct {
-		name         string
-		analysis     *analyser.Analysis
-		expectedBody *telemetry
-		response     *http.Response
+		name             string
+		analysis         *analyser.Analysis
+		IgnoreRulesCount int
+		expectedBody     *telemetry
+		response         *http.Response
 	}{
 		{
 			name: "valid analysis",
@@ -32,9 +33,9 @@ func TestSendTelemetry(t *testing.T) {
 				a.AddManaged(&resource.FakeResource{})
 				a.AddUnmanaged(&resource.FakeResource{})
 				a.Duration = 123.4 * 1e9 // 123.4 seconds
-				a.IgnoreRulesCount = 24
 				return a
 			}(),
+			IgnoreRulesCount: 24,
 			expectedBody: &telemetry{
 				Version:          version.Current(),
 				Os:               runtime.GOOS,
@@ -93,7 +94,7 @@ func TestSendTelemetry(t *testing.T) {
 					},
 				)
 			}
-			SendTelemetry(tt.analysis)
+			SendTelemetry(tt.analysis, tt.IgnoreRulesCount)
 		})
 	}
 }
