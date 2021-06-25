@@ -16,19 +16,19 @@ type Store interface {
 }
 
 type store struct {
-	m *sync.Mutex
-	s map[string]*bucket
+	m       *sync.Mutex
+	buckets map[string]*bucket
 }
 
 type bucket struct {
-	m *sync.RWMutex
-	s map[string]interface{}
+	m      *sync.RWMutex
+	values map[string]interface{}
 }
 
 func New() Store {
 	return &store{
-		m: &sync.Mutex{},
-		s: map[string]*bucket{},
+		m:       &sync.Mutex{},
+		buckets: map[string]*bucket{},
 	}
 }
 
@@ -36,28 +36,28 @@ func (s store) Bucket(name string) Bucket {
 	s.m.Lock()
 	defer s.m.Unlock()
 
-	if _, ok := s.s[name]; !ok {
-		s.s[name] = &bucket{
-			m: &sync.RWMutex{},
-			s: map[string]interface{}{},
+	if _, ok := s.buckets[name]; !ok {
+		s.buckets[name] = &bucket{
+			m:      &sync.RWMutex{},
+			values: map[string]interface{}{},
 		}
 	}
 
-	return s.s[name]
+	return s.buckets[name]
 }
 
 func (b bucket) Set(key string, value interface{}) {
 	b.m.Lock()
 	defer b.m.Unlock()
-	b.s[key] = value
+	b.values[key] = value
 }
 
 func (b bucket) Get(key string) interface{} {
 	b.m.RLock()
 	defer b.m.RUnlock()
-	return b.s[key]
+	return b.values[key]
 }
 
 func (b bucket) MarshallJSON() ([]byte, error) {
-	return json.Marshal(b.s)
+	return json.Marshal(b.values)
 }
