@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
+	"github.com/cloudskiff/driftctl/pkg/memstore"
 	"github.com/cloudskiff/driftctl/pkg/version"
 	"github.com/cloudskiff/driftctl/test/resource"
 	"github.com/jarcoal/httpmock"
@@ -15,6 +16,14 @@ import (
 )
 
 func TestSendTelemetry(t *testing.T) {
+	type telemetry struct {
+		Version        string `json:"version"`
+		Os             string `json:"os"`
+		Arch           string `json:"arch"`
+		TotalResources int    `json:"total_resources"`
+		TotalManaged   int    `json:"total_managed"`
+		Duration       uint   `json:"duration"`
+	}
 
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
@@ -64,6 +73,17 @@ func TestSendTelemetry(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			s := memstore.New()
+
+			if tt.analysis != nil {
+				s.Bucket(memstore.TelemetryBucket).Set("version", version.Current())
+				s.Bucket(memstore.TelemetryBucket).Set("os", runtime.GOOS)
+				s.Bucket(memstore.TelemetryBucket).Set("arch", runtime.GOARCH)
+				s.Bucket(memstore.TelemetryBucket).Set("total_resources", tt.analysis.Summary().TotalResources)
+				s.Bucket(memstore.TelemetryBucket).Set("total_managed", tt.analysis.Summary().TotalManaged)
+				s.Bucket(memstore.TelemetryBucket).Set("duration", uint(tt.analysis.Duration.Seconds()+0.5))
+			}
+
 			httpmock.Reset()
 			if tt.expectedBody != nil {
 				httpmock.RegisterResponder(
@@ -91,7 +111,7 @@ func TestSendTelemetry(t *testing.T) {
 					},
 				)
 			}
-			SendTelemetry(tt.analysis)
+			SendTelemetry(s)
 		})
 	}
 }

@@ -2,40 +2,14 @@ package telemetry
 
 import (
 	"bytes"
-	"encoding/json"
 	"net/http"
-	"runtime"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/pkg/version"
+	"github.com/cloudskiff/driftctl/pkg/memstore"
 	"github.com/sirupsen/logrus"
 )
 
-type telemetry struct {
-	Version        string `json:"version"`
-	Os             string `json:"os"`
-	Arch           string `json:"arch"`
-	TotalResources int    `json:"total_resources"`
-	TotalManaged   int    `json:"total_managed"`
-	Duration       uint   `json:"duration"`
-}
-
-func SendTelemetry(analysis *analyser.Analysis) {
-
-	if analysis == nil {
-		return
-	}
-
-	t := telemetry{
-		Version:        version.Current(),
-		Os:             runtime.GOOS,
-		Arch:           runtime.GOARCH,
-		TotalResources: analysis.Summary().TotalResources,
-		TotalManaged:   analysis.Summary().TotalManaged,
-		Duration:       uint(analysis.Duration.Seconds() + 0.5),
-	}
-
-	body, err := json.Marshal(t)
+func SendTelemetry(s memstore.Store) {
+	body, err := s.Bucket(memstore.TelemetryBucket).MarshallJSON()
 	if err != nil {
 		logrus.Debug(err)
 		return

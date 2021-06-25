@@ -8,6 +8,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/memstore"
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -98,7 +99,7 @@ func runTest(t *testing.T, cases TestCases) {
 			iacProgress.On("Start").Return().Once()
 			iacProgress.On("Stop").Return().Once()
 
-			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, c.options, scanProgress, iacProgress, repo)
+			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, c.options, scanProgress, iacProgress, repo, memstore.New())
 
 			analysis, err := driftctl.Run()
 
