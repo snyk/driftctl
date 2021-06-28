@@ -13,7 +13,6 @@ import (
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 
@@ -29,13 +28,13 @@ func TestSqsQueueSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.SQSRepository)
+		mocks   func(client *repository.MockSQSRepository)
 		err     error
 	}{
 		{
 			test:    "no sqs queues",
 			dirName: "sqs_queue_empty",
-			mocks: func(client *mocks.SQSRepository) {
+			mocks: func(client *repository.MockSQSRepository) {
 				client.On("ListAllQueues").Return([]*string{}, nil)
 			},
 			err: nil,
@@ -43,7 +42,7 @@ func TestSqsQueueSupplier_Resources(t *testing.T) {
 		{
 			test:    "multiple sqs queues",
 			dirName: "sqs_queue_multiple",
-			mocks: func(client *mocks.SQSRepository) {
+			mocks: func(client *repository.MockSQSRepository) {
 				client.On("ListAllQueues").Return([]*string{
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo"),
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/foo"),
@@ -54,7 +53,7 @@ func TestSqsQueueSupplier_Resources(t *testing.T) {
 		{
 			test:    "cannot list sqs queues",
 			dirName: "sqs_queue_empty",
-			mocks: func(client *mocks.SQSRepository) {
+			mocks: func(client *repository.MockSQSRepository) {
 				client.On("ListAllQueues").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSqsQueueResourceType),
@@ -75,11 +74,11 @@ func TestSqsQueueSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewSqsQueueSupplier(provider, deserializer, repository.NewSQSClient(provider.session, cache.New(0))))
+			supplierLibrary.AddSupplier(NewSqsQueueSupplier(provider, deserializer, repository.NewSQSRepository(provider.session, cache.New(0))))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeSQS := mocks.SQSRepository{}
+			fakeSQS := repository.MockSQSRepository{}
 			c.mocks(&fakeSQS)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			s := &SqsQueueSupplier{

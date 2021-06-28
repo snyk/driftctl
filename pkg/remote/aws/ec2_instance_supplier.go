@@ -17,21 +17,21 @@ import (
 type EC2InstanceSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.EC2Repository
+	repository   repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2InstanceSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *EC2InstanceSupplier {
+func NewEC2InstanceSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.EC2Repository) *EC2InstanceSupplier {
 	return &EC2InstanceSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *EC2InstanceSupplier) Resources() ([]resource.Resource, error) {
-	instances, err := s.client.ListAllInstances()
+	instances, err := s.repository.ListAllInstances()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsInstanceResourceType)
 	}

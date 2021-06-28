@@ -15,29 +15,29 @@ import (
 type ECRRepositorySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.ECRRepository
+	repository   repository.ECRRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewECRRepositorySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.ECRRepository) *ECRRepositorySupplier {
+func NewECRRepositorySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.ECRRepository) *ECRRepositorySupplier {
 	return &ECRRepositorySupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (r *ECRRepositorySupplier) Resources() ([]resource.Resource, error) {
-	repositories, err := r.client.ListAllRepositories()
+	repositories, err := r.repository.ListAllRepositories()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsEcrRepositoryResourceType)
 	}
 
-	for _, repository := range repositories {
-		repository := repository
+	for _, repo := range repositories {
+		repo := repo
 		r.runner.Run(func() (cty.Value, error) {
-			return r.readRepository(repository)
+			return r.readRepository(repo)
 		})
 	}
 

@@ -15,21 +15,21 @@ import (
 type LambdaEventSourceMappingSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.LambdaRepository
+	repository   repository.LambdaRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewLambdaEventSourceMappingSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.LambdaRepository) *LambdaEventSourceMappingSupplier {
+func NewLambdaEventSourceMappingSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.LambdaRepository) *LambdaEventSourceMappingSupplier {
 	return &LambdaEventSourceMappingSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *LambdaEventSourceMappingSupplier) Resources() ([]resource.Resource, error) {
-	functions, err := s.client.ListAllLambdaEventSourceMappings()
+	functions, err := s.repository.ListAllLambdaEventSourceMappings()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsLambdaEventSourceMappingResourceType)
 	}

@@ -15,21 +15,21 @@ import (
 type InternetGatewaySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	repo         repository.EC2Repository
+	repository   repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewInternetGatewaySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *InternetGatewaySupplier {
+func NewInternetGatewaySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.EC2Repository) *InternetGatewaySupplier {
 	return &InternetGatewaySupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *InternetGatewaySupplier) Resources() ([]resource.Resource, error) {
-	internetGateways, err := s.repo.ListAllInternetGateways()
+	internetGateways, err := s.repository.ListAllInternetGateways()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsInternetGatewayResourceType)
 	}

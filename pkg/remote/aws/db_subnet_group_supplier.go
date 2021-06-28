@@ -18,22 +18,22 @@ import (
 type DBSubnetGroupSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.RDSRepository
+	repository   repository.RDSRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewDBSubnetGroupSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.RDSRepository) *DBSubnetGroupSupplier {
+func NewDBSubnetGroupSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.RDSRepository) *DBSubnetGroupSupplier {
 	return &DBSubnetGroupSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *DBSubnetGroupSupplier) Resources() ([]resource.Resource, error) {
 
-	subnetGroups, err := s.client.ListAllDbSubnetGroups()
+	subnetGroups, err := s.repository.ListAllDbSubnetGroups()
 
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsDbSubnetGroupResourceType)

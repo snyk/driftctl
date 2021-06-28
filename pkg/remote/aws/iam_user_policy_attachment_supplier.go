@@ -18,25 +18,25 @@ import (
 type IamUserPolicyAttachmentSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	repo         repository.IAMRepository
+	repository   repository.IAMRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamUserPolicyAttachmentSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.IAMRepository) *IamUserPolicyAttachmentSupplier {
+func NewIamUserPolicyAttachmentSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.IAMRepository) *IamUserPolicyAttachmentSupplier {
 	return &IamUserPolicyAttachmentSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *IamUserPolicyAttachmentSupplier) Resources() ([]resource.Resource, error) {
-	users, err := s.repo.ListAllUsers()
+	users, err := s.repository.ListAllUsers()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, resourceaws.AwsIamUserPolicyAttachmentResourceType, resourceaws.AwsIamUserResourceType)
 	}
-	policyAttachments, err := s.repo.ListAllUserPolicyAttachments(users)
+	policyAttachments, err := s.repository.ListAllUserPolicyAttachments(users)
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamUserPolicyAttachmentResourceType)
 	}

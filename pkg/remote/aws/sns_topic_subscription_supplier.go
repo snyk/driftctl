@@ -38,23 +38,23 @@ func (p *wrongArnTopicAlert) ShouldIgnoreResource() bool {
 type SNSTopicSubscriptionSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.SNSRepository
+	repository   repository.SNSRepository
 	runner       *terraform.ParallelResourceReader
 	alerter      alerter.AlerterInterface
 }
 
-func NewSNSTopicSubscriptionSupplier(provider *AWSTerraformProvider, a alerter.AlerterInterface, deserializer *resource.Deserializer, client repository.SNSRepository) *SNSTopicSubscriptionSupplier {
+func NewSNSTopicSubscriptionSupplier(provider *AWSTerraformProvider, a alerter.AlerterInterface, deserializer *resource.Deserializer, repository repository.SNSRepository) *SNSTopicSubscriptionSupplier {
 	return &SNSTopicSubscriptionSupplier{
 		provider,
 		deserializer,
-		client,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 		a,
 	}
 }
 
 func (s *SNSTopicSubscriptionSupplier) Resources() ([]resource.Resource, error) {
-	subscriptions, err := s.client.ListAllSubscriptions()
+	subscriptions, err := s.repository.ListAllSubscriptions()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsSnsTopicSubscriptionResourceType)
 	}

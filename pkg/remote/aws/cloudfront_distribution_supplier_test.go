@@ -15,7 +15,6 @@ import (
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 
@@ -31,13 +30,13 @@ func TestCloudfrontDistributionSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.CloudfrontRepository)
+		mocks   func(client *repository.MockCloudfrontRepository)
 		err     error
 	}{
 		{
 			test:    "no cloudfront distribution",
 			dirName: "cloudfront_distribution_empty",
-			mocks: func(client *mocks.CloudfrontRepository) {
+			mocks: func(client *repository.MockCloudfrontRepository) {
 				client.On("ListAllDistributions").Return([]*cloudfront.DistributionSummary{}, nil)
 			},
 			err: nil,
@@ -45,7 +44,7 @@ func TestCloudfrontDistributionSupplier_Resources(t *testing.T) {
 		{
 			test:    "one cloudfront distribution",
 			dirName: "cloudfront_distribution_one",
-			mocks: func(client *mocks.CloudfrontRepository) {
+			mocks: func(client *repository.MockCloudfrontRepository) {
 				client.On("ListAllDistributions").Return([]*cloudfront.DistributionSummary{
 					{Id: aws.String("E1M9CNS0XSHI19")},
 				}, nil)
@@ -55,7 +54,7 @@ func TestCloudfrontDistributionSupplier_Resources(t *testing.T) {
 		{
 			test:    "cannot list cloudfront distributions",
 			dirName: "cloudfront_distribution_empty",
-			mocks: func(client *mocks.CloudfrontRepository) {
+			mocks: func(client *repository.MockCloudfrontRepository) {
 				client.On("ListAllDistributions").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsCloudfrontDistributionResourceType),
@@ -77,11 +76,11 @@ func TestCloudfrontDistributionSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewCloudfrontDistributionSupplier(provider, deserializer, repository.NewCloudfrontClient(provider.session, cache.New(0))))
+			supplierLibrary.AddSupplier(NewCloudfrontDistributionSupplier(provider, deserializer, repository.NewCloudfrontRepository(provider.session, cache.New(0))))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeCloudfront := mocks.CloudfrontRepository{}
+			fakeCloudfront := repository.MockCloudfrontRepository{}
 			c.mocks(&fakeCloudfront)
 			provider := testmocks.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			s := &CloudfrontDistributionSupplier{

@@ -15,21 +15,21 @@ import (
 type NatGatewaySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	repo         repository.EC2Repository
+	repository   repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewNatGatewaySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *NatGatewaySupplier {
+func NewNatGatewaySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.EC2Repository) *NatGatewaySupplier {
 	return &NatGatewaySupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *NatGatewaySupplier) Resources() ([]resource.Resource, error) {
-	retrievedNatGateways, err := s.repo.ListAllNatGateways()
+	retrievedNatGateways, err := s.repository.ListAllNatGateways()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsNatGatewayResourceType)
 	}

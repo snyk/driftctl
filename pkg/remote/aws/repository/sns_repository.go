@@ -17,7 +17,7 @@ type snsRepository struct {
 	cache  cache.Cache
 }
 
-func NewSNSClient(session *session.Session, c cache.Cache) *snsRepository {
+func NewSNSRepository(session *session.Session, c cache.Cache) *snsRepository {
 	return &snsRepository{
 		sns.New(session),
 		c,

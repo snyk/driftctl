@@ -24,7 +24,7 @@ func TestAcc_AwsSNSTopicPolicy(t *testing.T) {
 				},
 				PreExec: func() {
 					err := acceptance.RetryFor(60*time.Second, func(doneCh chan struct{}) error {
-						client := repository.NewSNSClient(awsutils.Session(), cache.New(0))
+						client := repository.NewSNSRepository(awsutils.Session(), cache.New(0))
 						topics, err := client.ListAllTopics()
 						if err != nil {
 							logrus.Warnf("Cannot list topics: %+v", err)

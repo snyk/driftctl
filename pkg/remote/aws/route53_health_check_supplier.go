@@ -16,21 +16,21 @@ import (
 type Route53HealthCheckSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.Route53Repository
+	repository   repository.Route53Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewRoute53HealthCheckSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.Route53Repository) *Route53HealthCheckSupplier {
+func NewRoute53HealthCheckSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.Route53Repository) *Route53HealthCheckSupplier {
 	return &Route53HealthCheckSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *Route53HealthCheckSupplier) Resources() ([]resource.Resource, error) {
-	healthChecks, err := s.client.ListAllHealthChecks()
+	healthChecks, err := s.repository.ListAllHealthChecks()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsRoute53HealthCheckResourceType)
 	}

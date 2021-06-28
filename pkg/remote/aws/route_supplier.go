@@ -16,21 +16,21 @@ import (
 type RouteSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	repo         repository.EC2Repository
+	repository   repository.EC2Repository
 	routeRunner  *terraform.ParallelResourceReader
 }
 
-func NewRouteSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *RouteSupplier {
+func NewRouteSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.EC2Repository) *RouteSupplier {
 	return &RouteSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *RouteSupplier) Resources() ([]resource.Resource, error) {
-	routeTables, err := s.repo.ListAllRouteTables()
+	routeTables, err := s.repository.ListAllRouteTables()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, aws.AwsRouteResourceType, aws.AwsRouteTableResourceType)
 	}

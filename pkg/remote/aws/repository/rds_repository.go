@@ -7,10 +7,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 )
 
-type RDSClient interface {
-	rdsiface.RDSAPI
-}
-
 type RDSRepository interface {
 	ListAllDBInstances() ([]*rds.DBInstance, error)
 	ListAllDbSubnetGroups() ([]*rds.DBSubnetGroup, error)

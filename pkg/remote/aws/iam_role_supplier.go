@@ -26,15 +26,15 @@ var iamRoleExclusionList = map[string]struct{}{
 type IamRoleSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	repo         repository.IAMRepository
+	repository   repository.IAMRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamRoleSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.IAMRepository) *IamRoleSupplier {
+func NewIamRoleSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.IAMRepository) *IamRoleSupplier {
 	return &IamRoleSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
@@ -45,7 +45,7 @@ func awsIamRoleShouldBeIgnored(roleName string) bool {
 }
 
 func (s *IamRoleSupplier) Resources() ([]resource.Resource, error) {
-	roles, err := s.repo.ListAllRoles()
+	roles, err := s.repository.ListAllRoles()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamRoleResourceType)
 	}

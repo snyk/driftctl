@@ -16,21 +16,21 @@ import (
 type KMSAliasSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.KMSRepository
+	repository   repository.KMSRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewKMSAliasSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.KMSRepository) *KMSAliasSupplier {
+func NewKMSAliasSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.KMSRepository) *KMSAliasSupplier {
 	return &KMSAliasSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *KMSAliasSupplier) Resources() ([]resource.Resource, error) {
-	aliases, err := s.client.ListAllAliases()
+	aliases, err := s.repository.ListAllAliases()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsKmsAliasResourceType)
 	}

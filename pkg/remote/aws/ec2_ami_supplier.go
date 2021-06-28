@@ -17,21 +17,21 @@ import (
 type EC2AmiSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.EC2Repository
+	repository   repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2AmiSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *EC2AmiSupplier {
+func NewEC2AmiSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.EC2Repository) *EC2AmiSupplier {
 	return &EC2AmiSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *EC2AmiSupplier) Resources() ([]resource.Resource, error) {
-	images, err := s.client.ListAllImages()
+	images, err := s.repository.ListAllImages()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsAmiResourceType)
 	}

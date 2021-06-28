@@ -7,10 +7,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 )
 
-type LambdaClient interface {
-	lambdaiface.LambdaAPI
-}
-
 type LambdaRepository interface {
 	ListAllLambdaFunctions() ([]*lambda.FunctionConfiguration, error)
 	ListAllLambdaEventSourceMappings() ([]*lambda.EventSourceMappingConfiguration, error)

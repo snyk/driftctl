@@ -14,21 +14,21 @@ import (
 type SqsQueueSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.SQSRepository
+	repository   repository.SQSRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewSqsQueueSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, client repository.SQSRepository) *SqsQueueSupplier {
+func NewSqsQueueSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.SQSRepository) *SqsQueueSupplier {
 	return &SqsQueueSupplier{
 		provider,
 		deserializer,
-		client,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *SqsQueueSupplier) Resources() ([]resource.Resource, error) {
-	queues, err := s.client.ListAllQueues()
+	queues, err := s.repository.ListAllQueues()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsSqsQueueResourceType)
 	}

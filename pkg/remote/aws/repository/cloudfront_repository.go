@@ -16,7 +16,7 @@ type cloudfrontRepository struct {
 	cache  cache.Cache
 }
 
-func NewCloudfrontClient(session *session.Session, c cache.Cache) *cloudfrontRepository {
+func NewCloudfrontRepository(session *session.Session, c cache.Cache) *cloudfrontRepository {
 	return &cloudfrontRepository{
 		cloudfront.New(session),
 		c,

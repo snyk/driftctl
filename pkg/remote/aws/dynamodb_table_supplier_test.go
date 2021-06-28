@@ -23,8 +23,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
@@ -34,13 +32,13 @@ func TestDynamoDBTableSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.DynamoDBRepository)
+		mocks   func(client *repository.MockDynamoDBRepository)
 		err     error
 	}{
 		{
 			test:    "no DynamoDB Table",
 			dirName: "dynamodb_table_empty",
-			mocks: func(client *mocks.DynamoDBRepository) {
+			mocks: func(client *repository.MockDynamoDBRepository) {
 				client.On("ListAllTables").Return([]*string{}, nil)
 			},
 			err: nil,
@@ -48,7 +46,7 @@ func TestDynamoDBTableSupplier_Resources(t *testing.T) {
 		{
 			test:    "Multiple DynamoDB Table",
 			dirName: "dynamodb_table_multiple",
-			mocks: func(client *mocks.DynamoDBRepository) {
+			mocks: func(client *repository.MockDynamoDBRepository) {
 				client.On("ListAllTables").Return([]*string{
 					aws.String("GameScores"),
 					aws.String("example"),
@@ -59,7 +57,7 @@ func TestDynamoDBTableSupplier_Resources(t *testing.T) {
 		{
 			test:    "cannot list DynamoDB Table",
 			dirName: "dynamodb_table_list",
-			mocks: func(client *mocks.DynamoDBRepository) {
+			mocks: func(client *repository.MockDynamoDBRepository) {
 				client.On("ListAllTables").Return(nil, awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 400, ""))
 			},
 			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 400, ""), resourceaws.AwsDynamodbTableResourceType),
@@ -87,7 +85,7 @@ func TestDynamoDBTableSupplier_Resources(t *testing.T) {
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeClient := mocks.DynamoDBRepository{}
+			fakeClient := repository.MockDynamoDBRepository{}
 			c.mocks(&fakeClient)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			s := &DynamoDBTableSupplier{
