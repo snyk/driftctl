@@ -227,6 +227,9 @@ func scanRun(opts *pkg.ScanOptions) error {
 	}()
 
 	analysis, err := ctl.Run()
+	if !opts.DisableTelemetry {
+		telemetry.SendTelemetry(store)
+	}
 	if err != nil {
 		return err
 	}
@@ -237,11 +240,6 @@ func scanRun(opts *pkg.ScanOptions) error {
 	}
 
 	globaloutput.Printf(color.WhiteString("Scan duration: %s\n", analysis.Duration.Round(time.Second)))
-
-	if !opts.DisableTelemetry {
-		telemetry.SendTelemetry(store)
-	}
-
 	globaloutput.Printf(color.WhiteString("Provider version used to scan: %s. Use --tf-provider-version to use another version.\n"), resourceSchemaRepository.ProviderVersion.String())
 
 	if !analysis.IsSync() {

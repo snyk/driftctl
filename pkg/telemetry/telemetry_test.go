@@ -85,7 +85,7 @@ func TestSendTelemetry(t *testing.T) {
 				a.Duration = 123.5 * 1e9 // 123.5 seconds
 				return a
 			}(),
-			expectedBody: &telemetry{},
+			expectedBody:   &telemetry{},
 			setStoreValues: func(s memstore.Store, a *analyser.Analysis) {},
 		},
 	}
