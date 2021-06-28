@@ -48,7 +48,7 @@ type DriftCTL struct {
 	iacProgress              globaloutput.Progress
 	resourceSchemaRepository resource.SchemaRepositoryInterface
 	opts                     *ScanOptions
-	s                        memstore.Store
+	store                    memstore.Store
 }
 
 func NewDriftCTL(remoteSupplier resource.Supplier,
@@ -144,12 +144,12 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	analysis.Duration = time.Since(start)
 	analysis.Date = time.Now()
 
-	d.s.Bucket(memstore.TelemetryBucket).Set("version", version.Current())
-	d.s.Bucket(memstore.TelemetryBucket).Set("os", runtime.GOOS)
-	d.s.Bucket(memstore.TelemetryBucket).Set("arch", runtime.GOARCH)
-	d.s.Bucket(memstore.TelemetryBucket).Set("total_resources", analysis.Summary().TotalResources)
-	d.s.Bucket(memstore.TelemetryBucket).Set("total_managed", analysis.Summary().TotalManaged)
-	d.s.Bucket(memstore.TelemetryBucket).Set("duration", uint(analysis.Duration.Seconds()+0.5))
+	d.store.Bucket(memstore.TelemetryBucket).Set("version", version.Current())
+	d.store.Bucket(memstore.TelemetryBucket).Set("os", runtime.GOOS)
+	d.store.Bucket(memstore.TelemetryBucket).Set("arch", runtime.GOARCH)
+	d.store.Bucket(memstore.TelemetryBucket).Set("total_resources", analysis.Summary().TotalResources)
+	d.store.Bucket(memstore.TelemetryBucket).Set("total_managed", analysis.Summary().TotalManaged)
+	d.store.Bucket(memstore.TelemetryBucket).Set("duration", uint(analysis.Duration.Seconds()+0.5))
 
 	return &analysis, nil
 }

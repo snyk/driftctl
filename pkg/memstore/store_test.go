@@ -1,6 +1,7 @@
 package memstore
 
 import (
+	"encoding/json"
 	"sync"
 	"testing"
 
@@ -11,13 +12,13 @@ import (
 func TestStore(t *testing.T) {
 	cases := []struct {
 		name         string
-		bucket       string
+		bucket       BucketName
 		values       map[string]interface{}
 		expectedJSON string
 	}{
 		{
 			name:   "test basic store usage",
-			bucket: "test-bucket-1",
+			bucket: 0,
 			values: map[string]interface{}{
 				"test-value_|)": 13,
 				"duration_key":  "23",
@@ -28,13 +29,13 @@ func TestStore(t *testing.T) {
 		},
 		{
 			name:         "test empty bucket",
-			bucket:       "test-bucket-empty",
+			bucket:       2,
 			values:       map[string]interface{}{},
 			expectedJSON: `{}`,
 		},
 		{
 			name:   "test bucket with nil values",
-			bucket: "test-bucket-empty",
+			bucket: 1,
 			values: map[string]interface{}{
 				"version":         nil,
 				"total_resources": nil,
@@ -56,13 +57,13 @@ func TestStore(t *testing.T) {
 					defer wg.Done()
 					kv.Bucket(tt.bucket).Set(key, val)
 					assert.Equal(t, val, kv.Bucket(tt.bucket).Get(key))
-					assert.Equal(t, nil, kv.Bucket("dummybucketname").Get(key))
+					assert.Equal(t, nil, kv.Bucket(tt.bucket+1).Get(key))
 				}(key, val, &wg)
 			}
 
 			wg.Wait()
 
-			b, err := kv.Bucket(tt.bucket).MarshallJSON()
+			b, err := json.Marshal(kv.Bucket(tt.bucket).Values())
 			assert.Nil(t, err)
 			assert.Equal(t, tt.expectedJSON, string(b))
 		})
