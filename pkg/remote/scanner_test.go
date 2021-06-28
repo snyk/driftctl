@@ -129,7 +129,10 @@ func TestS3Bucket(t *testing.T) {
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
-			test.CtyTestDiff(got, c.dirName, provider, deserializer, shouldUpdate, tt)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsS3BucketResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
 		})
 	}
 }
