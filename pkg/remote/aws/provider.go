@@ -40,13 +40,17 @@ type awsConfig struct {
 type AWSTerraformProvider struct {
 	*terraform.TerraformProvider
 	session *session.Session
+	name    string
+	version string
 }
 
 func NewAWSTerraformProvider(version string, progress output.Progress, configDir string) (*AWSTerraformProvider, error) {
-	p := &AWSTerraformProvider{}
-	providerKey := "aws"
+	p := &AWSTerraformProvider{
+		version: version,
+		name:    "aws",
+	}
 	installer, err := tf.NewProviderInstaller(tf.ProviderConfig{
-		Key:       providerKey,
+		Key:       p.name,
 		Version:   version,
 		ConfigDir: configDir,
 	})
@@ -57,7 +61,7 @@ func NewAWSTerraformProvider(version string, progress output.Progress, configDir
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 	tfProvider, err := terraform.NewTerraformProvider(installer, terraform.TerraformProviderConfig{
-		Name:         providerKey,
+		Name:         p.name,
 		DefaultAlias: *p.session.Config.Region,
 		GetProviderConfig: func(alias string) interface{} {
 			return awsConfig{
@@ -71,4 +75,12 @@ func NewAWSTerraformProvider(version string, progress output.Progress, configDir
 	}
 	p.TerraformProvider = tfProvider
 	return p, err
+}
+
+func (a *AWSTerraformProvider) Name() string {
+	return a.name
+}
+
+func (p *AWSTerraformProvider) Version() string {
+	return p.version
 }

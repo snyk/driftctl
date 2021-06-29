@@ -11,6 +11,8 @@ import (
 
 type GithubTerraformProvider struct {
 	*terraform.TerraformProvider
+	name    string
+	version string
 }
 
 type githubConfig struct {
@@ -20,10 +22,12 @@ type githubConfig struct {
 }
 
 func NewGithubTerraformProvider(version string, progress output.Progress, configDir string) (*GithubTerraformProvider, error) {
-	p := &GithubTerraformProvider{}
-	providerKey := "github"
+	p := &GithubTerraformProvider{
+		version: version,
+		name:    "github",
+	}
 	installer, err := tf.NewProviderInstaller(tf.ProviderConfig{
-		Key:       providerKey,
+		Key:       p.name,
 		Version:   version,
 		ConfigDir: configDir,
 	})
@@ -31,7 +35,7 @@ func NewGithubTerraformProvider(version string, progress output.Progress, config
 		return nil, err
 	}
 	tfProvider, err := terraform.NewTerraformProvider(installer, terraform.TerraformProviderConfig{
-		Name:         providerKey,
+		Name:         p.name,
 		DefaultAlias: p.GetConfig().getDefaultOwner(),
 		GetProviderConfig: func(owner string) interface{} {
 			return githubConfig{
@@ -59,4 +63,12 @@ func (p GithubTerraformProvider) GetConfig() githubConfig {
 		Owner:        os.Getenv("GITHUB_OWNER"),
 		Organization: os.Getenv("GITHUB_ORGANIZATION"),
 	}
+}
+
+func (p *GithubTerraformProvider) Name() string {
+	return p.name
+}
+
+func (p *GithubTerraformProvider) Version() string {
+	return p.version
 }

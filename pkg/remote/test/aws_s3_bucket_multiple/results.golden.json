@@ -1,0 +1,34 @@
+[
+    {
+        "acceleration_status": "",
+        "acl": null,
+        "arn": "arn:aws:s3:::bucket-martin-test-drift2",
+        "bucket": "bucket-martin-test-drift2",
+        "bucket_domain_name": "bucket-martin-test-drift2.s3.amazonaws.com",
+        "bucket_prefix": null,
+        "bucket_regional_domain_name": "bucket-martin-test-drift2.s3.eu-west-3.amazonaws.com",
+        "cors_rule": [],
+        "force_destroy": null,
+        "grant": [],
+        "hosted_zone_id": "Z3R1K369G5AVDG",
+        "id": "bucket-martin-test-drift2",
+        "lifecycle_rule": [],
+        "logging": [],
+        "object_lock_configuration": [],
+        "policy": null,
+        "region": "eu-west-3",
+        "replication_configuration": [],
+        "request_payer": "BucketOwner",
+        "server_side_encryption_configuration": [],
+        "tags": {},
+        "versioning": [
+            {
+                "enabled": false,
+                "mfa_delete": false
+            }
+        ],
+        "website": [],
+        "website_domain": null,
+        "website_endpoint": null
+    }
+]

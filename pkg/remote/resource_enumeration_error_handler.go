@@ -43,7 +43,7 @@ func (e *EnumerationAccessDeniedAlert) GetProviderMessage() string {
 	return message
 }
 
-func HandleResourceEnumerationError(err error, alerter *alerter.Alerter) error {
+func HandleResourceEnumerationError(err error, alerter alerter.AlerterInterface) error {
 	listError, ok := err.(*remoteerror.ResourceEnumerationError)
 	if !ok {
 		return err
