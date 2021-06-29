@@ -37,6 +37,12 @@ func TestEnvProxy(t *testing.T) {
 			initialEnv:  []string{"TEST_DCTL_S3_PROFILE=test_dctl_s3_profile", "TEST_AWS_PROFILE=test_aws_profile"},
 			modifiedEnv: []string{"TEST_DCTL_S3_PROFILE=test_dctl_s3_profile", "TEST_AWS_PROFILE=test_aws_profile"},
 		},
+        {
+            name:        "Without initialEnv",
+            proxyArgs:   []string{"TEST_DCTL_S3_", "TEST_AWS_"},
+            initialEnv:  []string{},
+            modifiedEnv: []string{},
+        },
 	}
 
 	for _, tt := range tests {
