@@ -6,9 +6,9 @@ import (
 )
 
 type EnvProxy struct {
-	varPrefix  string
-	varPattern string
-	DefaultEnv map[string]string
+	fromPrefix string
+	toPrefix   string
+	defaultEnv map[string]string
 }
 
 func NewEnvProxy() *EnvProxy {
@@ -18,35 +18,35 @@ func NewEnvProxy() *EnvProxy {
 		envMap[tmp[0]] = tmp[1]
 	}
 	return &EnvProxy{
-		DefaultEnv: envMap,
+		defaultEnv: envMap,
 	}
 }
 
-func (s *EnvProxy) SetProxy(prefix, pattern string) {
-	s.varPrefix = prefix
-	s.varPattern = pattern
+func (s *EnvProxy) SetProxy(fromPrefix, toPrefix string) {
+	s.fromPrefix = fromPrefix
+	s.toPrefix = toPrefix
 }
 
 func (s *EnvProxy) Apply() {
-	if s.varPrefix == "" || s.varPattern == "" {
+	if s.fromPrefix == "" || s.toPrefix == "" {
 		return
 	}
-	for key, value := range s.DefaultEnv {
-		if strings.HasPrefix(key, s.varPrefix) {
-			key = strings.Replace(key, s.varPrefix, s.varPattern, 1)
+	for key, value := range s.defaultEnv {
+		if strings.HasPrefix(key, s.fromPrefix) {
+			key = strings.Replace(key, s.fromPrefix, s.toPrefix, 1)
 			os.Setenv(key, value)
 		}
 	}
 }
 
 func (s *EnvProxy) Restore() {
-	if s.varPrefix == "" || s.varPattern == "" {
+	if s.fromPrefix == "" || s.toPrefix == "" {
 		return
 	}
-	for key, value := range s.DefaultEnv {
-		if strings.HasPrefix(key, s.varPrefix) {
-			key = strings.Replace(key, s.varPrefix, s.varPattern, 1)
-			value = s.DefaultEnv[key]
+	for key, value := range s.defaultEnv {
+		if strings.HasPrefix(key, s.fromPrefix) {
+			key = strings.Replace(key, s.fromPrefix, s.toPrefix, 1)
+			value = s.defaultEnv[key]
 		}
 		os.Setenv(key, value)
 	}

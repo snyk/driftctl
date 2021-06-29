@@ -4,95 +4,77 @@ import (
 	"os"
 	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
-func TestEnvProxy_Apply(t *testing.T) {
+func TestEnvProxy(t *testing.T) {
 	tests := []struct {
-		name      string
-		proxyArgs []string
-		modifier  bool
+		name        string
+		proxyArgs   []string
+		initialEnv  []string
+		modifiedEnv []string
 	}{
 		{
-			name:      "Without args on SetProxy",
-			proxyArgs: []string{"", ""},
-			modifier:  false,
+			name:        "Without args on SetProxy",
+			proxyArgs:   []string{"", ""},
+			initialEnv:  []string{"TEST_DCTL_S3_PROFILE=test_dctl_s3_profile", "TEST_AWS_PROFILE=test_aws_profile"},
+			modifiedEnv: []string{"TEST_DCTL_S3_PROFILE=test_dctl_s3_profile", "TEST_AWS_PROFILE=test_aws_profile"},
 		},
 		{
-			name:      "With args on SetProxy",
-			proxyArgs: []string{"TEST_DCTL_S3_", "TEST_AWS_"},
-			modifier:  true,
+			name:        "With args on SetProxy",
+			proxyArgs:   []string{"TEST_DCTL_S3_", "TEST_AWS_"},
+			initialEnv:  []string{"TEST_DCTL_S3_PROFILE=test_dctl_s3_profile", "TEST_AWS_PROFILE=test_aws_profile"},
+			modifiedEnv: []string{"TEST_DCTL_S3_PROFILE=test_dctl_s3_profile", "TEST_AWS_PROFILE=test_dctl_s3_profile"},
 		},
 		{
-			name:      "With no pattern on SetProxy",
-			proxyArgs: []string{"TEST_DCTL_S3_", ""},
-			modifier:  false,
+			name:        "Without toPrefix on SetProxy",
+			proxyArgs:   []string{"TEST_DCTL_S3_", ""},
+			initialEnv:  []string{"TEST_DCTL_S3_PROFILE=test_dctl_s3_profile", "TEST_AWS_PROFILE=test_aws_profile"},
+			modifiedEnv: []string{"TEST_DCTL_S3_PROFILE=test_dctl_s3_profile", "TEST_AWS_PROFILE=test_aws_profile"},
 		},
 		{
-			name:      "With no prefix on SetProxy",
-			proxyArgs: []string{"", "TEST_AWS_"},
-			modifier:  false,
+			name:        "Without fromPrefix on SetProxy",
+			proxyArgs:   []string{"", "TEST_AWS_"},
+			initialEnv:  []string{"TEST_DCTL_S3_PROFILE=test_dctl_s3_profile", "TEST_AWS_PROFILE=test_aws_profile"},
+			modifiedEnv: []string{"TEST_DCTL_S3_PROFILE=test_dctl_s3_profile", "TEST_AWS_PROFILE=test_aws_profile"},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Setenv("TEST_DCTL_S3_PROFILE", "dctl_env")
-			os.Setenv("TEST_AWS_PROFILE", "aws_env")
-			expectedEnv := os.Environ()
+
+			for _, value := range tt.initialEnv {
+				tmp := strings.SplitN(value, "=", 2)
+				os.Setenv(tmp[0], tmp[1])
+			}
 
 			envProxy := NewEnvProxy()
 			envProxy.SetProxy(tt.proxyArgs[0], tt.proxyArgs[1])
 
 			envProxy.Apply()
 
-			newEnv := os.Environ()
-			for index, value := range expectedEnv {
-				if tt.modifier && value == "TEST_AWS_PROFILE=aws_env" {
-					expectedEnv[index] = strings.Replace(
-						value,
-						"TEST_AWS_PROFILE=aws_env",
-						"TEST_AWS_PROFILE=dctl_env",
-						1,
-					)
-				}
+			currentEnv := os.Environ()
+			if !compareEnv(currentEnv, tt.modifiedEnv) {
+				t.Errorf("Expected %v, got %v", tt.modifiedEnv, currentEnv)
 			}
 
-			if !assert.Equal(t, newEnv, expectedEnv) {
-				t.Errorf("Expected %v, got %v", expectedEnv, newEnv)
+			envProxy.Restore()
+
+			currentEnv = os.Environ()
+			if !compareEnv(currentEnv, tt.initialEnv) {
+				t.Errorf("Expected %v, got %v", tt.initialEnv, currentEnv)
 			}
 		})
 	}
 }
 
-func TestEnvProxy_Restore(t *testing.T) {
-	tests := []struct {
-		name      string
-		proxyArgs []string
-	}{
-		{
-			name:      "With args on SetProxy",
-			proxyArgs: []string{"TEST_DCTL_S3_", "TEST_AWS_"},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			os.Setenv("TEST_DCTL_S3_PROFILE", "dctl_env")
-			os.Setenv("TEST_AWS_PROFILE", "aws_env")
-			expectedEnv := os.Environ()
-
-			envProxy := NewEnvProxy()
-			envProxy.SetProxy(tt.proxyArgs[0], tt.proxyArgs[1])
-			os.Setenv("TEST_AWS_PROFILE", "new_aws_env")
-
-			envProxy.Restore()
-
-			newEnv := os.Environ()
-			if !assert.Equal(t, newEnv, expectedEnv) {
-				t.Errorf("Expected %v, got %v", expectedEnv, newEnv)
+func compareEnv(currentEnv, testEnv []string) bool {
+	isValid := 0
+	for _, initialValue := range testEnv {
+		for _, value := range currentEnv {
+			if initialValue == value {
+				isValid++
 			}
-		})
+		}
 	}
+	return isValid == len(testEnv)
 }
