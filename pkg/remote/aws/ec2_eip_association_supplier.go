@@ -16,20 +16,20 @@ import (
 type EC2EipAssociationSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.EC2Repository
+	repository   repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2EipAssociationSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *EC2EipAssociationSupplier {
+func NewEC2EipAssociationSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.EC2Repository) *EC2EipAssociationSupplier {
 	return &EC2EipAssociationSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner())}
 }
 
 func (s *EC2EipAssociationSupplier) Resources() ([]resource.Resource, error) {
-	associationIds, err := s.client.ListAllAddressesAssociation()
+	associationIds, err := s.repository.ListAllAddressesAssociation()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEipAssociationResourceType)
 	}

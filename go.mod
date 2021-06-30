@@ -3,7 +3,7 @@ module github.com/cloudskiff/driftctl
 go 1.16
 
 require (
-	github.com/aws/aws-sdk-go v1.34.2
+	github.com/aws/aws-sdk-go v1.38.68
 	github.com/bmatcuk/doublestar/v4 v4.0.1
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/fatih/color v1.9.0
@@ -16,7 +16,7 @@ require (
 	github.com/hashicorp/terraform v0.14.0
 	github.com/hashicorp/terraform-exec v0.12.0
 	github.com/jarcoal/httpmock v1.0.6
-	github.com/jmespath/go-jmespath v0.3.0
+	github.com/jmespath/go-jmespath v0.4.0
 	github.com/joho/godotenv v1.3.0
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mattn/go-isatty v0.0.12

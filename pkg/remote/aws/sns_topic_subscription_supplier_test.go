@@ -25,8 +25,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
@@ -36,14 +34,14 @@ func TestSNSTopicSubscriptionSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.SNSRepository)
+		mocks   func(client *repository.MockSNSRepository)
 		alerts  alerter.Alerts
 		err     error
 	}{
 		{
 			test:    "no SNS Topic Subscription",
 			dirName: "sns_topic_subscription_empty",
-			mocks: func(client *mocks.SNSRepository) {
+			mocks: func(client *repository.MockSNSRepository) {
 				client.On("ListAllSubscriptions").Return([]*sns.Subscription{}, nil)
 			},
 			err: nil,
@@ -51,7 +49,7 @@ func TestSNSTopicSubscriptionSupplier_Resources(t *testing.T) {
 		{
 			test:    "Multiple SNSTopic Subscription",
 			dirName: "sns_topic_subscription_multiple",
-			mocks: func(client *mocks.SNSRepository) {
+			mocks: func(client *repository.MockSNSRepository) {
 				client.On("ListAllSubscriptions").Return([]*sns.Subscription{
 					{SubscriptionArn: aws.String("arn:aws:sns:us-east-1:526954929923:user-updates-topic2:c0f794c5-a009-4db4-9147-4c55959787fa")},
 					{SubscriptionArn: aws.String("arn:aws:sns:us-east-1:526954929923:user-updates-topic:b6e66147-2b31-4486-8d4b-2a2272264c8e")},
@@ -62,7 +60,7 @@ func TestSNSTopicSubscriptionSupplier_Resources(t *testing.T) {
 		{
 			test:    "Multiple SNSTopic Subscription with one pending and one incorrect",
 			dirName: "sns_topic_subscription_multiple",
-			mocks: func(client *mocks.SNSRepository) {
+			mocks: func(client *repository.MockSNSRepository) {
 				client.On("ListAllSubscriptions").Return([]*sns.Subscription{
 					{SubscriptionArn: aws.String("PendingConfirmation"), Endpoint: aws.String("TEST")},
 					{SubscriptionArn: aws.String("Incorrect"), Endpoint: aws.String("INCORRECT")},
@@ -83,7 +81,7 @@ func TestSNSTopicSubscriptionSupplier_Resources(t *testing.T) {
 		{
 			test:    "cannot list SNSTopic subscription",
 			dirName: "sns_topic_subscription_list",
-			mocks: func(client *mocks.SNSRepository) {
+			mocks: func(client *repository.MockSNSRepository) {
 				client.On("ListAllSubscriptions").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSnsTopicSubscriptionResourceType),
@@ -106,12 +104,12 @@ func TestSNSTopicSubscriptionSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewSNSTopicSubscriptionSupplier(provider, a, deserializer, repository.NewSNSClient(provider.session, cache.New(0))))
+			supplierLibrary.AddSupplier(NewSNSTopicSubscriptionSupplier(provider, a, deserializer, repository.NewSNSRepository(provider.session, cache.New(0))))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
 			a := alerter.NewAlerter()
-			fakeClient := mocks.SNSRepository{}
+			fakeClient := repository.MockSNSRepository{}
 			c.mocks(&fakeClient)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			s := &SNSTopicSubscriptionSupplier{

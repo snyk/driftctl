@@ -16,7 +16,7 @@ type sqsRepository struct {
 	cache  cache.Cache
 }
 
-func NewSQSClient(session *session.Session, c cache.Cache) *sqsRepository {
+func NewSQSRepository(session *session.Session, c cache.Cache) *sqsRepository {
 	return &sqsRepository{
 		sqs.New(session),
 		c,

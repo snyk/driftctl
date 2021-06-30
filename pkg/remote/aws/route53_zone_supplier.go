@@ -20,22 +20,22 @@ import (
 type Route53ZoneSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.Route53Repository
+	repository   repository.Route53Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewRoute53ZoneSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.Route53Repository) *Route53ZoneSupplier {
+func NewRoute53ZoneSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.Route53Repository) *Route53ZoneSupplier {
 	return &Route53ZoneSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *Route53ZoneSupplier) Resources() ([]resource.Resource, error) {
 
-	zones, err := s.client.ListAllZones()
+	zones, err := s.repository.ListAllZones()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsRoute53ZoneResourceType)
 	}

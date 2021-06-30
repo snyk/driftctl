@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -19,13 +20,13 @@ func Test_ec2Repository_ListAllImages(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		mocks   func(client *MockEC2Client)
+		mocks   func(client *awstest.MockFakeEC2)
 		want    []*ec2.Image
 		wantErr error
 	}{
 		{
 			name: "List all images",
-			mocks: func(client *MockEC2Client) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeImages",
 					&ec2.DescribeImagesInput{
 						Owners: []*string{
@@ -51,7 +52,7 @@ func Test_ec2Repository_ListAllImages(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(1)
-			client := &MockEC2Client{}
+			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
@@ -83,12 +84,12 @@ func Test_ec2Repository_ListAllImages(t *testing.T) {
 func Test_ec2Repository_ListAllSnapshots(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *MockEC2Client)
+		mocks   func(client *awstest.MockFakeEC2)
 		want    []*ec2.Snapshot
 		wantErr error
 	}{
 		{name: "List with 2 pages",
-			mocks: func(client *MockEC2Client) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeSnapshotsPages",
 					&ec2.DescribeSnapshotsInput{
 						OwnerIds: []*string{
@@ -130,7 +131,7 @@ func Test_ec2Repository_ListAllSnapshots(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(1)
-			client := &MockEC2Client{}
+			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
@@ -162,12 +163,12 @@ func Test_ec2Repository_ListAllSnapshots(t *testing.T) {
 func Test_ec2Repository_ListAllVolumes(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *MockEC2Client)
+		mocks   func(client *awstest.MockFakeEC2)
 		want    []*ec2.Volume
 		wantErr error
 	}{
 		{name: "List with 2 pages",
-			mocks: func(client *MockEC2Client) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeVolumesPages",
 					&ec2.DescribeVolumesInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeVolumesOutput, lastPage bool) bool) bool {
@@ -205,7 +206,7 @@ func Test_ec2Repository_ListAllVolumes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(1)
-			client := &MockEC2Client{}
+			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
@@ -237,13 +238,13 @@ func Test_ec2Repository_ListAllVolumes(t *testing.T) {
 func Test_ec2Repository_ListAllAddresses(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *MockEC2Client)
+		mocks   func(client *awstest.MockFakeEC2)
 		want    []*ec2.Address
 		wantErr error
 	}{
 		{
 			name: "List address",
-			mocks: func(client *MockEC2Client) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeAddresses", &ec2.DescribeAddressesInput{}).
 					Return(&ec2.DescribeAddressesOutput{
 						Addresses: []*ec2.Address{
@@ -265,7 +266,7 @@ func Test_ec2Repository_ListAllAddresses(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(1)
-			client := &MockEC2Client{}
+			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
@@ -297,13 +298,13 @@ func Test_ec2Repository_ListAllAddresses(t *testing.T) {
 func Test_ec2Repository_ListAllAddressesAssociation(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *MockEC2Client)
+		mocks   func(client *awstest.MockFakeEC2)
 		want    []string
 		wantErr error
 	}{
 		{
 			name: "List address",
-			mocks: func(client *MockEC2Client) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeAddresses", &ec2.DescribeAddressesInput{}).
 					Return(&ec2.DescribeAddressesOutput{
 						Addresses: []*ec2.Address{
@@ -325,7 +326,7 @@ func Test_ec2Repository_ListAllAddressesAssociation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(1)
-			client := &MockEC2Client{}
+			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
@@ -357,12 +358,12 @@ func Test_ec2Repository_ListAllAddressesAssociation(t *testing.T) {
 func Test_ec2Repository_ListAllInstances(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *MockEC2Client)
+		mocks   func(client *awstest.MockFakeEC2)
 		want    []*ec2.Instance
 		wantErr error
 	}{
 		{name: "List with 2 pages",
-			mocks: func(client *MockEC2Client) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeInstancesPages",
 					&ec2.DescribeInstancesInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeInstancesOutput, lastPage bool) bool) bool {
@@ -424,7 +425,7 @@ func Test_ec2Repository_ListAllInstances(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(1)
-			client := &MockEC2Client{}
+			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
@@ -455,13 +456,13 @@ func Test_ec2Repository_ListAllInstances(t *testing.T) {
 func Test_ec2Repository_ListAllKeyPairs(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *MockEC2Client)
+		mocks   func(client *awstest.MockFakeEC2)
 		want    []*ec2.KeyPairInfo
 		wantErr error
 	}{
 		{
 			name: "List address",
-			mocks: func(client *MockEC2Client) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeKeyPairs", &ec2.DescribeKeyPairsInput{}).
 					Return(&ec2.DescribeKeyPairsOutput{
 						KeyPairs: []*ec2.KeyPairInfo{
@@ -483,7 +484,7 @@ func Test_ec2Repository_ListAllKeyPairs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(1)
-			client := &MockEC2Client{}
+			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
@@ -515,13 +516,13 @@ func Test_ec2Repository_ListAllKeyPairs(t *testing.T) {
 func Test_ec2Repository_ListAllInternetGateways(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *MockEC2Client)
+		mocks   func(client *awstest.MockFakeEC2)
 		want    []*ec2.InternetGateway
 		wantErr error
 	}{
 		{
 			name: "List only gateways with multiple pages",
-			mocks: func(client *MockEC2Client) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeInternetGatewaysPages",
 					&ec2.DescribeInternetGatewaysInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeInternetGatewaysOutput, lastPage bool) bool) bool {
@@ -567,7 +568,7 @@ func Test_ec2Repository_ListAllInternetGateways(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(1)
-			client := &MockEC2Client{}
+			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
@@ -599,14 +600,14 @@ func Test_ec2Repository_ListAllInternetGateways(t *testing.T) {
 func Test_ec2Repository_ListAllSubnets(t *testing.T) {
 	tests := []struct {
 		name              string
-		mocks             func(client *MockEC2Client)
+		mocks             func(client *awstest.MockFakeEC2)
 		wantSubnet        []*ec2.Subnet
 		wantDefaultSubnet []*ec2.Subnet
 		wantErr           error
 	}{
 		{
 			name: "List with 2 pages",
-			mocks: func(client *MockEC2Client) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeSubnetsPages",
 					&ec2.DescribeSubnetsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeSubnetsOutput, lastPage bool) bool) bool {
@@ -678,7 +679,7 @@ func Test_ec2Repository_ListAllSubnets(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(2)
-			client := &MockEC2Client{}
+			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
@@ -720,13 +721,13 @@ func Test_ec2Repository_ListAllSubnets(t *testing.T) {
 func Test_ec2Repository_ListAllNatGateways(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *MockEC2Client)
+		mocks   func(client *awstest.MockFakeEC2)
 		want    []*ec2.NatGateway
 		wantErr error
 	}{
 		{
 			name: "List only gateways with multiple pages",
-			mocks: func(client *MockEC2Client) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeNatGatewaysPages",
 					&ec2.DescribeNatGatewaysInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeNatGatewaysOutput, lastPage bool) bool) bool {
@@ -772,7 +773,7 @@ func Test_ec2Repository_ListAllNatGateways(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(1)
-			client := &MockEC2Client{}
+			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
@@ -804,13 +805,13 @@ func Test_ec2Repository_ListAllNatGateways(t *testing.T) {
 func Test_ec2Repository_ListAllRouteTables(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *MockEC2Client)
+		mocks   func(client *awstest.MockFakeEC2)
 		want    []*ec2.RouteTable
 		wantErr error
 	}{
 		{
 			name: "List only route with multiple pages",
-			mocks: func(client *MockEC2Client) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeRouteTablesPages",
 					&ec2.DescribeRouteTablesInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeRouteTablesOutput, lastPage bool) bool) bool {
@@ -964,7 +965,7 @@ func Test_ec2Repository_ListAllRouteTables(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(1)
-			client := &MockEC2Client{}
+			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
@@ -996,14 +997,14 @@ func Test_ec2Repository_ListAllRouteTables(t *testing.T) {
 func Test_ec2Repository_ListAllVPCs(t *testing.T) {
 	tests := []struct {
 		name           string
-		mocks          func(client *MockEC2Client)
+		mocks          func(client *awstest.MockFakeEC2)
 		wantVPC        []*ec2.Vpc
 		wantDefaultVPC []*ec2.Vpc
 		wantErr        error
 	}{
 		{
 			name: "mixed default VPC and VPC",
-			mocks: func(client *MockEC2Client) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeVpcsPages",
 					&ec2.DescribeVpcsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeVpcsOutput, lastPage bool) bool) bool {
@@ -1057,7 +1058,7 @@ func Test_ec2Repository_ListAllVPCs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(2)
-			client := &MockEC2Client{}
+			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,
@@ -1099,14 +1100,14 @@ func Test_ec2Repository_ListAllVPCs(t *testing.T) {
 func Test_ec2Repository_ListAllSecurityGroups(t *testing.T) {
 	tests := []struct {
 		name                     string
-		mocks                    func(client *MockEC2Client)
+		mocks                    func(client *awstest.MockFakeEC2)
 		wantSecurityGroup        []*ec2.SecurityGroup
 		wantDefaultSecurityGroup []*ec2.SecurityGroup
 		wantErr                  error
 	}{
 		{
 			name: "List with 1 pages",
-			mocks: func(client *MockEC2Client) {
+			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeSecurityGroupsPages",
 					&ec2.DescribeSecurityGroupsInput{},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeSecurityGroupsOutput, lastPage bool) bool) bool {
@@ -1142,7 +1143,7 @@ func Test_ec2Repository_ListAllSecurityGroups(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(2)
-			client := &MockEC2Client{}
+			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
 				client: client,

@@ -17,21 +17,21 @@ import (
 type EC2KeyPairSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.EC2Repository
+	repository   repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2KeyPairSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *EC2KeyPairSupplier {
+func NewEC2KeyPairSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.EC2Repository) *EC2KeyPairSupplier {
 	return &EC2KeyPairSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *EC2KeyPairSupplier) Resources() ([]resource.Resource, error) {
-	keyPairs, err := s.client.ListAllKeyPairs()
+	keyPairs, err := s.repository.ListAllKeyPairs()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsKeyPairResourceType)
 	}

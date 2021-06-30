@@ -18,21 +18,21 @@ import (
 type EC2EbsSnapshotSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.EC2Repository
+	repository   repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2EbsSnapshotSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *EC2EbsSnapshotSupplier {
+func NewEC2EbsSnapshotSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.EC2Repository) *EC2EbsSnapshotSupplier {
 	return &EC2EbsSnapshotSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *EC2EbsSnapshotSupplier) Resources() ([]resource.Resource, error) {
-	snapshots, err := s.client.ListAllSnapshots()
+	snapshots, err := s.repository.ListAllSnapshots()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEbsSnapshotResourceType)
 	}

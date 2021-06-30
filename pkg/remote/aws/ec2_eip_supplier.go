@@ -18,21 +18,21 @@ import (
 type EC2EipSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.EC2Repository
+	repository   repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2EipSupplier(provider *AWSTerraformProvider, repo repository.EC2Repository, deserializer *resource.Deserializer) *EC2EipSupplier {
+func NewEC2EipSupplier(provider *AWSTerraformProvider, repository repository.EC2Repository, deserializer *resource.Deserializer) *EC2EipSupplier {
 	return &EC2EipSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *EC2EipSupplier) Resources() ([]resource.Resource, error) {
-	addresses, err := s.client.ListAllAddresses()
+	addresses, err := s.repository.ListAllAddresses()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEipResourceType)
 	}

@@ -14,21 +14,21 @@ import (
 type CloudfrontDistributionSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.CloudfrontRepository
+	repository   repository.CloudfrontRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewCloudfrontDistributionSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.CloudfrontRepository) *CloudfrontDistributionSupplier {
+func NewCloudfrontDistributionSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.CloudfrontRepository) *CloudfrontDistributionSupplier {
 	return &CloudfrontDistributionSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *CloudfrontDistributionSupplier) Resources() ([]resource.Resource, error) {
-	distributions, err := s.client.ListAllDistributions()
+	distributions, err := s.repository.ListAllDistributions()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsCloudfrontDistributionResourceType)
 	}

@@ -15,21 +15,21 @@ import (
 type LambdaFunctionSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.LambdaRepository
+	repository   repository.LambdaRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewLambdaFunctionSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.LambdaRepository) *LambdaFunctionSupplier {
+func NewLambdaFunctionSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.LambdaRepository) *LambdaFunctionSupplier {
 	return &LambdaFunctionSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *LambdaFunctionSupplier) Resources() ([]resource.Resource, error) {
-	functions, err := s.client.ListAllLambdaFunctions()
+	functions, err := s.repository.ListAllLambdaFunctions()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsLambdaFunctionResourceType)
 	}

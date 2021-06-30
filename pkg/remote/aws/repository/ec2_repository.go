@@ -24,10 +24,6 @@ type EC2Repository interface {
 	ListAllSecurityGroups() ([]*ec2.SecurityGroup, []*ec2.SecurityGroup, error)
 }
 
-type EC2Client interface {
-	ec2iface.EC2API
-}
-
 type ec2Repository struct {
 	client ec2iface.EC2API
 	cache  cache.Cache

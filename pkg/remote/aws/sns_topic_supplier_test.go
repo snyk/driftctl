@@ -24,8 +24,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/cloudskiff/driftctl/mocks"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/cloudskiff/driftctl/test"
@@ -35,13 +33,13 @@ func TestSNSTopicSupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *mocks.SNSRepository)
+		mocks   func(client *repository.MockSNSRepository)
 		err     error
 	}{
 		{
 			test:    "no SNS Topic",
 			dirName: "sns_topic_empty",
-			mocks: func(client *mocks.SNSRepository) {
+			mocks: func(client *repository.MockSNSRepository) {
 				client.On("ListAllTopics").Return([]*sns.Topic{}, nil)
 			},
 			err: nil,
@@ -49,7 +47,7 @@ func TestSNSTopicSupplier_Resources(t *testing.T) {
 		{
 			test:    "Multiple SNSTopic",
 			dirName: "sns_topic_multiple",
-			mocks: func(client *mocks.SNSRepository) {
+			mocks: func(client *repository.MockSNSRepository) {
 				client.On("ListAllTopics").Return([]*sns.Topic{
 					{TopicArn: aws.String("arn:aws:sns:eu-west-3:526954929923:user-updates-topic")},
 					{TopicArn: aws.String("arn:aws:sns:eu-west-3:526954929923:user-updates-topic2")},
@@ -61,7 +59,7 @@ func TestSNSTopicSupplier_Resources(t *testing.T) {
 		{
 			test:    "cannot list SNSTopic",
 			dirName: "sns_topic_empty",
-			mocks: func(client *mocks.SNSRepository) {
+			mocks: func(client *repository.MockSNSRepository) {
 				client.On("ListAllTopics").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
 			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSnsTopicResourceType),
@@ -83,11 +81,11 @@ func TestSNSTopicSupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewSNSTopicSupplier(provider, deserializer, repository.NewSNSClient(provider.session, cache.New(0))))
+			supplierLibrary.AddSupplier(NewSNSTopicSupplier(provider, deserializer, repository.NewSNSRepository(provider.session, cache.New(0))))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
-			fakeClient := mocks.SNSRepository{}
+			fakeClient := repository.MockSNSRepository{}
 			c.mocks(&fakeClient)
 			provider := mocks2.NewMockedGoldenTFProvider(c.dirName, providerLibrary.Provider(terraform.AWS), shouldUpdate)
 			s := &SNSTopicSupplier{

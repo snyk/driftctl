@@ -16,21 +16,21 @@ import (
 type SNSTopicSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.SNSRepository
+	repository   repository.SNSRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewSNSTopicSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, client repository.SNSRepository) *SNSTopicSupplier {
+func NewSNSTopicSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.SNSRepository) *SNSTopicSupplier {
 	return &SNSTopicSupplier{
 		provider,
 		deserializer,
-		client,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *SNSTopicSupplier) Resources() ([]resource.Resource, error) {
-	topics, err := s.client.ListAllTopics()
+	topics, err := s.repository.ListAllTopics()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsSnsTopicResourceType)
 	}

@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -15,13 +16,13 @@ import (
 func Test_rdsRepository_ListAllDBInstances(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *MockRDSClient)
+		mocks   func(client *awstest.MockFakeRDS)
 		want    []*rds.DBInstance
 		wantErr error
 	}{
 		{
 			name: "List with 2 pages",
-			mocks: func(client *MockRDSClient) {
+			mocks: func(client *awstest.MockFakeRDS) {
 				client.On("DescribeDBInstancesPages",
 					&rds.DescribeDBInstancesInput{},
 					mock.MatchedBy(func(callback func(res *rds.DescribeDBInstancesOutput, lastPage bool) bool) bool {
@@ -55,7 +56,7 @@ func Test_rdsRepository_ListAllDBInstances(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(1)
-			client := &MockRDSClient{}
+			client := &awstest.MockFakeRDS{}
 			tt.mocks(client)
 			r := &rdsRepository{
 				client: client,
@@ -87,13 +88,13 @@ func Test_rdsRepository_ListAllDBInstances(t *testing.T) {
 func Test_rdsRepository_ListAllDbSubnetGroups(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(client *MockRDSClient)
+		mocks   func(client *awstest.MockFakeRDS)
 		want    []*rds.DBSubnetGroup
 		wantErr error
 	}{
 		{
 			name: "List with 2 pages",
-			mocks: func(client *MockRDSClient) {
+			mocks: func(client *awstest.MockFakeRDS) {
 				client.On("DescribeDBSubnetGroupsPages",
 					&rds.DescribeDBSubnetGroupsInput{},
 					mock.MatchedBy(func(callback func(res *rds.DescribeDBSubnetGroupsOutput, lastPage bool) bool) bool {
@@ -127,7 +128,7 @@ func Test_rdsRepository_ListAllDbSubnetGroups(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(1)
-			client := &MockRDSClient{}
+			client := &awstest.MockFakeRDS{}
 			tt.mocks(client)
 			r := &rdsRepository{
 				client: client,

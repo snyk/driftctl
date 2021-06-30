@@ -16,21 +16,21 @@ import (
 type KMSKeySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.KMSRepository
+	repository   repository.KMSRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewKMSKeySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.KMSRepository) *KMSKeySupplier {
+func NewKMSKeySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.KMSRepository) *KMSKeySupplier {
 	return &KMSKeySupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *KMSKeySupplier) Resources() ([]resource.Resource, error) {
-	keys, err := s.client.ListAllKeys()
+	keys, err := s.repository.ListAllKeys()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsKmsKeyResourceType)
 	}

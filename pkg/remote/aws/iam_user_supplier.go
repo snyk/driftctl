@@ -17,21 +17,21 @@ import (
 type IamUserSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	repo         repository.IAMRepository
+	repository   repository.IAMRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamUserSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.IAMRepository) *IamUserSupplier {
+func NewIamUserSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.IAMRepository) *IamUserSupplier {
 	return &IamUserSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *IamUserSupplier) Resources() ([]resource.Resource, error) {
-	users, err := s.repo.ListAllUsers()
+	users, err := s.repository.ListAllUsers()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamUserResourceType)
 	}

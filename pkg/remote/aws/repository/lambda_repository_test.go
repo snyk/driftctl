@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	awstest "github.com/cloudskiff/driftctl/test/aws"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/aws/aws-sdk-go/service/lambda"
@@ -16,13 +17,13 @@ import (
 func Test_lambdaRepository_ListAllLambdaFunctions(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(mock *MockLambdaClient)
+		mocks   func(client *awstest.MockFakeLambda)
 		want    []*lambda.FunctionConfiguration
 		wantErr error
 	}{
 		{
 			name: "List with 2 pages",
-			mocks: func(client *MockLambdaClient) {
+			mocks: func(client *awstest.MockFakeLambda) {
 				client.On("ListFunctionsPages",
 					&lambda.ListFunctionsInput{},
 					mock.MatchedBy(func(callback func(res *lambda.ListFunctionsOutput, lastPage bool) bool) bool {
@@ -61,7 +62,7 @@ func Test_lambdaRepository_ListAllLambdaFunctions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(1)
-			client := &MockLambdaClient{}
+			client := &awstest.MockFakeLambda{}
 			tt.mocks(client)
 			r := &lambdaRepository{
 				client: client,
@@ -93,13 +94,13 @@ func Test_lambdaRepository_ListAllLambdaFunctions(t *testing.T) {
 func Test_lambdaRepository_ListAllLambdaEventSourceMappings(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(mock *MockLambdaClient)
+		mocks   func(mock *awstest.MockFakeLambda)
 		want    []*lambda.EventSourceMappingConfiguration
 		wantErr error
 	}{
 		{
 			name: "List with 2 pages",
-			mocks: func(client *MockLambdaClient) {
+			mocks: func(client *awstest.MockFakeLambda) {
 				client.On("ListEventSourceMappingsPages",
 					&lambda.ListEventSourceMappingsInput{},
 					mock.MatchedBy(func(callback func(res *lambda.ListEventSourceMappingsOutput, lastPage bool) bool) bool {
@@ -138,7 +139,7 @@ func Test_lambdaRepository_ListAllLambdaEventSourceMappings(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := cache.New(1)
-			client := &MockLambdaClient{}
+			client := &awstest.MockFakeLambda{}
 			tt.mocks(client)
 			r := &lambdaRepository{
 				client: client,

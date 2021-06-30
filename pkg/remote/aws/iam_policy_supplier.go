@@ -18,21 +18,21 @@ import (
 type IamPolicySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	repo         repository.IAMRepository
+	repository   repository.IAMRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamPolicySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.IAMRepository) *IamPolicySupplier {
+func NewIamPolicySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.IAMRepository) *IamPolicySupplier {
 	return &IamPolicySupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *IamPolicySupplier) Resources() ([]resource.Resource, error) {
-	policies, err := s.repo.ListAllPolicies()
+	policies, err := s.repository.ListAllPolicies()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamPolicyResourceType)
 	}

@@ -24,7 +24,7 @@ const (
 type VPCSecurityGroupRuleSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	repo         repository.EC2Repository
+	repository   repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
@@ -66,17 +66,17 @@ func toInterfaceSlice(val []string) []interface{} {
 	return res
 }
 
-func NewVPCSecurityGroupRuleSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *VPCSecurityGroupRuleSupplier {
+func NewVPCSecurityGroupRuleSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.EC2Repository) *VPCSecurityGroupRuleSupplier {
 	return &VPCSecurityGroupRuleSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *VPCSecurityGroupRuleSupplier) Resources() ([]resource.Resource, error) {
-	securityGroups, defaultSecurityGroups, err := s.repo.ListAllSecurityGroups()
+	securityGroups, defaultSecurityGroups, err := s.repository.ListAllSecurityGroups()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsSecurityGroupRuleResourceType)
 	}

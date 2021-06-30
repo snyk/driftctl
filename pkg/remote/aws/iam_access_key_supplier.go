@@ -17,25 +17,25 @@ import (
 type IamAccessKeySupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	repo         repository.IAMRepository
+	repository   repository.IAMRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewIamAccessKeySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.IAMRepository) *IamAccessKeySupplier {
+func NewIamAccessKeySupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.IAMRepository) *IamAccessKeySupplier {
 	return &IamAccessKeySupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *IamAccessKeySupplier) Resources() ([]resource.Resource, error) {
-	users, err := s.repo.ListAllUsers()
+	users, err := s.repository.ListAllUsers()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, resourceaws.AwsIamAccessKeyResourceType, resourceaws.AwsIamUserResourceType)
 	}
-	keys, err := s.repo.ListAllAccessKeys(users)
+	keys, err := s.repository.ListAllAccessKeys(users)
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamAccessKeyResourceType)
 	}

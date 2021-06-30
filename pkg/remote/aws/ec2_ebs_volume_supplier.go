@@ -18,21 +18,21 @@ import (
 type EC2EbsVolumeSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.EC2Repository
+	repository   repository.EC2Repository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewEC2EbsVolumeSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.EC2Repository) *EC2EbsVolumeSupplier {
+func NewEC2EbsVolumeSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.EC2Repository) *EC2EbsVolumeSupplier {
 	return &EC2EbsVolumeSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *EC2EbsVolumeSupplier) Resources() ([]resource.Resource, error) {
-	volumes, err := s.client.ListAllVolumes()
+	volumes, err := s.repository.ListAllVolumes()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsEbsVolumeResourceType)
 	}

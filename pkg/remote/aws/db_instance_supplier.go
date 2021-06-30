@@ -14,22 +14,22 @@ import (
 type DBInstanceSupplier struct {
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
-	client       repository.RDSRepository
+	repository   repository.RDSRepository
 	runner       *terraform.ParallelResourceReader
 }
 
-func NewDBInstanceSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repo repository.RDSRepository) *DBInstanceSupplier {
+func NewDBInstanceSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.RDSRepository) *DBInstanceSupplier {
 	return &DBInstanceSupplier{
 		provider,
 		deserializer,
-		repo,
+		repository,
 		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
 	}
 }
 
 func (s *DBInstanceSupplier) Resources() ([]resource.Resource, error) {
 
-	resourceList, err := s.client.ListAllDBInstances()
+	resourceList, err := s.repository.ListAllDBInstances()
 
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsDbInstanceResourceType)
