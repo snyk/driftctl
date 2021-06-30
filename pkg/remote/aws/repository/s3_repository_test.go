@@ -89,6 +89,159 @@ func Test_s3Repository_ListAllBuckets(t *testing.T) {
 	}
 }
 
+func Test_s3Repository_GetBucketNotification(t *testing.T) {
+
+	tests := []struct {
+		name               string
+		bucketName, region string
+		mocks              func(client *awstest.MockFakeS3)
+		want               *s3.NotificationConfiguration
+		wantErr            string
+	}{
+		{
+			name:       "get empty bucket notification",
+			bucketName: "test-bucket",
+			region:     "us-east-1",
+			mocks: func(client *awstest.MockFakeS3) {
+				client.On("GetBucketNotificationConfiguration", &s3.GetBucketNotificationConfigurationRequest{
+					Bucket: aws.String("test-bucket"),
+				}).Return(
+					&s3.NotificationConfiguration{},
+					nil,
+				).Once()
+			},
+			want: nil,
+		},
+		{
+			name:       "get bucket notification with lambda config",
+			bucketName: "test-bucket",
+			region:     "us-east-1",
+			mocks: func(client *awstest.MockFakeS3) {
+				client.On("GetBucketNotificationConfiguration", &s3.GetBucketNotificationConfigurationRequest{
+					Bucket: aws.String("test-bucket"),
+				}).Return(
+					&s3.NotificationConfiguration{
+						LambdaFunctionConfigurations: []*s3.LambdaFunctionConfiguration{
+							{
+								Id: aws.String("test"),
+							},
+						},
+					},
+					nil,
+				).Once()
+			},
+			want: &s3.NotificationConfiguration{
+				LambdaFunctionConfigurations: []*s3.LambdaFunctionConfiguration{
+					{
+						Id: aws.String("test"),
+					},
+				},
+			},
+		},
+		{
+			name:       "get bucket notification with queue config",
+			bucketName: "test-bucket",
+			region:     "us-east-1",
+			mocks: func(client *awstest.MockFakeS3) {
+				client.On("GetBucketNotificationConfiguration", &s3.GetBucketNotificationConfigurationRequest{
+					Bucket: aws.String("test-bucket"),
+				}).Return(
+					&s3.NotificationConfiguration{
+						QueueConfigurations: []*s3.QueueConfiguration{
+							{
+								Id: awssdk.String("test"),
+							},
+						},
+					},
+					nil,
+				).Once()
+			},
+			want: &s3.NotificationConfiguration{
+				QueueConfigurations: []*s3.QueueConfiguration{
+					{
+						Id: awssdk.String("test"),
+					},
+				},
+			},
+		},
+		{
+			name:       "get bucket notification with topic config",
+			bucketName: "test-bucket",
+			region:     "us-east-1",
+			mocks: func(client *awstest.MockFakeS3) {
+				client.On("GetBucketNotificationConfiguration", &s3.GetBucketNotificationConfigurationRequest{
+					Bucket: aws.String("test-bucket"),
+				}).Return(
+					&s3.NotificationConfiguration{
+						TopicConfigurations: []*s3.TopicConfiguration{
+							{
+								Id: awssdk.String("test"),
+							},
+						},
+					},
+					nil,
+				).Once()
+			},
+			want: &s3.NotificationConfiguration{
+				TopicConfigurations: []*s3.TopicConfiguration{
+					{
+						Id: awssdk.String("test"),
+					},
+				},
+			},
+		},
+		{
+			name:       "get bucket location when error",
+			bucketName: "test-bucket",
+			region:     "us-east-1",
+			mocks: func(client *awstest.MockFakeS3) {
+				client.On("GetBucketNotificationConfiguration", &s3.GetBucketNotificationConfigurationRequest{
+					Bucket: aws.String("test-bucket"),
+				}).Return(
+					nil,
+					awserr.New("UnknownError", "aws error", nil),
+				).Once()
+			},
+			wantErr: "Error listing bucket notification configuration test-bucket: UnknownError: aws error",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
+			mockedClient := &awstest.MockFakeS3{}
+			tt.mocks(mockedClient)
+			factory := client.MockAwsClientFactoryInterface{}
+			factory.On("GetS3Client", &aws.Config{Region: &tt.region}).Return(mockedClient).Once()
+			r := NewS3Repository(&factory, store)
+			got, err := r.GetBucketNotification(tt.bucketName, tt.region)
+			factory.AssertExpectations(t)
+			if err != nil && tt.wantErr == "" {
+				t.Fatalf("Unexpected error %+v", err)
+			}
+			if err != nil {
+				assert.Equal(t, tt.wantErr, err.Error())
+			}
+
+			if err == nil && tt.want != nil {
+				// Check that results were cached
+				cachedData, err := r.GetBucketNotification(tt.bucketName, tt.region)
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, &s3.NotificationConfiguration{}, store.Get(fmt.Sprintf("s3GetBucketNotification_%s_%s", tt.bucketName, tt.region)))
+			}
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}
+
 func Test_s3Repository_ListBucketInventoryConfigurations(t *testing.T) {
 	tests := []struct {
 		name  string
