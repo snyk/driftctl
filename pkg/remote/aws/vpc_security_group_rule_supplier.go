@@ -191,43 +191,5 @@ func (s *VPCSecurityGroupRuleSupplier) addSecurityGroupRule(ruleType string, rul
 		}
 		rules = append(rules, r)
 	}
-	// Filter default rules for default security group
-	if sg.GroupName != nil && *sg.GroupName == "default" {
-		results := make([]securityGroupRule, 0, len(rules))
-		for _, r := range rules {
-			r := r
-			if s.isDefaultIngress(&r) || s.isDefaultEgress(&r) {
-				continue
-			}
-			results = append(results, r)
-		}
-		return results
-	}
-
 	return rules
-}
-
-func (s *VPCSecurityGroupRuleSupplier) isDefaultIngress(rule *securityGroupRule) bool {
-	return rule.Type == sgRuleTypeIngress &&
-		rule.FromPort == 0 &&
-		rule.ToPort == 0 &&
-		rule.Protocol == "-1" &&
-		rule.CidrBlocks == nil &&
-		rule.Ipv6CidrBlocks == nil &&
-		rule.PrefixListIds == nil &&
-		rule.SourceSecurityGroupId == "" &&
-		rule.Self
-}
-
-func (s *VPCSecurityGroupRuleSupplier) isDefaultEgress(rule *securityGroupRule) bool {
-	return rule.Type == sgRuleTypeEgress &&
-		rule.FromPort == 0 &&
-		rule.ToPort == 0 &&
-		rule.Protocol == "-1" &&
-		rule.Ipv6CidrBlocks == nil &&
-		rule.PrefixListIds == nil &&
-		rule.SourceSecurityGroupId == "" &&
-		rule.CidrBlocks != nil &&
-		len(rule.CidrBlocks) == 1 &&
-		(rule.CidrBlocks)[0] == "0.0.0.0/0"
 }

@@ -5,4 +5,6 @@ type TerraformProvider interface {
 	SchemaSupplier
 	ResourceReader
 	Cleanup()
+	Name() string
+	Version() string
 }

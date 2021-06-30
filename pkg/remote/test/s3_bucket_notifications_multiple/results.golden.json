@@ -1,0 +1,28 @@
+[
+ {
+  "bucket": "bucket-martin-test-drift2",
+  "id": "bucket-martin-test-drift2",
+  "lambda_function": [
+   {
+    "events": [
+     "s3:ObjectCreated:*"
+    ],
+    "filter_prefix": "AWSLogs/",
+    "filter_suffix": ".log",
+    "id": "tf-s3-lambda-20201103165354926600000001",
+    "lambda_function_arn": "arn:aws:lambda:eu-west-3:526954929923:function:example_lambda_name1"
+   },
+   {
+    "events": [
+     "s3:ObjectCreated:*"
+    ],
+    "filter_prefix": "OtherLogs/",
+    "filter_suffix": ".log",
+    "id": "tf-s3-lambda-20201103165354926600000002",
+    "lambda_function_arn": "arn:aws:lambda:eu-west-3:526954929923:function:example_lambda_name2"
+   }
+  ],
+  "queue": [],
+  "topic": []
+ }
+]

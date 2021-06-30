@@ -209,7 +209,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		logrus.Trace("Exited")
 	}()
 
-	scanner := pkg.NewScanner(supplierLibrary.Suppliers(), remoteLibrary, alerter, pkg.ScannerOptions{Deep: opts.Deep})
+	scanner := remote.NewScanner(supplierLibrary.Suppliers(), remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep})
 
 	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, resFactory)
 	if err != nil {

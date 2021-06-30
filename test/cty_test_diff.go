@@ -74,6 +74,7 @@ func doTestDiff(got []resource.Resource, dirName string, provider terraform.Terr
 	return differ.Diff(got, expectedResources)
 }
 
+// CtyTestDiff Deprecated
 func CtyTestDiff(got []resource.Resource, dirName string, provider terraform.TerraformProvider, deserializer *resource.Deserializer, shouldUpdate bool, t *testing.T) {
 	changelog, err := doTestDiff(got, dirName, provider, deserializer, shouldUpdate)
 	if err != nil {
