@@ -11,7 +11,7 @@ type S3BucketDetailsFetcher struct {
 	deserializer *resource.Deserializer
 }
 
-func NewS3BucketDetailsFetcher(provider *AWSTerraformProvider, deserializer *resource.Deserializer) *S3BucketDetailsFetcher {
+func NewS3BucketDetailsFetcher(provider terraform.ResourceReader, deserializer *resource.Deserializer) *S3BucketDetailsFetcher {
 	return &S3BucketDetailsFetcher{
 		reader:       provider,
 		deserializer: deserializer,

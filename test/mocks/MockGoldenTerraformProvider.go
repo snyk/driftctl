@@ -167,3 +167,11 @@ func getFileNameSuffix(args terraform.ReadResourceArgs) string {
 }
 
 func (p MockedGoldenTFProvider) Cleanup() {}
+
+func (p *MockedGoldenTFProvider) Name() string {
+	return p.realProvider.Name()
+}
+
+func (p *MockedGoldenTFProvider) Version() string {
+	return p.realProvider.Version()
+}

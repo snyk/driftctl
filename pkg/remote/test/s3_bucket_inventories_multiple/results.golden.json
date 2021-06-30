@@ -1,0 +1,56 @@
+[
+ {
+  "bucket": "bucket-martin-test-drift2",
+  "destination": [
+   {
+    "bucket": [
+     {
+      "account_id": "",
+      "bucket_arn": "arn:aws:s3:::bucket-martin-test-drift2",
+      "encryption": [],
+      "format": "ORC",
+      "prefix": ""
+     }
+    ]
+   }
+  ],
+  "enabled": true,
+  "filter": [],
+  "id": "bucket-martin-test-drift2:Inventory_Bucket2",
+  "included_object_versions": "All",
+  "name": "Inventory_Bucket2",
+  "optional_fields": [],
+  "schedule": [
+   {
+    "frequency": "Daily"
+   }
+  ]
+ },
+ {
+  "bucket": "bucket-martin-test-drift2",
+  "destination": [
+   {
+    "bucket": [
+     {
+      "account_id": "",
+      "bucket_arn": "arn:aws:s3:::bucket-martin-test-drift2",
+      "encryption": [],
+      "format": "ORC",
+      "prefix": ""
+     }
+    ]
+   }
+  ],
+  "enabled": true,
+  "filter": [],
+  "id": "bucket-martin-test-drift2:Inventory2_Bucket2",
+  "included_object_versions": "All",
+  "name": "Inventory2_Bucket2",
+  "optional_fields": [],
+  "schedule": [
+   {
+    "frequency": "Daily"
+   }
+  ]
+ }
+]

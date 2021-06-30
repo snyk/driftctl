@@ -9,10 +9,6 @@ type Enumerator interface {
 	Enumerate() ([]resource.Resource, error)
 }
 
-type DetailsFetcher interface {
-	ReadDetails(resource.Resource) (resource.Resource, error)
-}
-
 type RemoteLibrary struct {
 	enumerators     []Enumerator
 	detailsFetchers map[resource.ResourceType]DetailsFetcher

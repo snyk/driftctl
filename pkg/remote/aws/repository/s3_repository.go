@@ -14,6 +14,7 @@ import (
 
 type S3Repository interface {
 	ListAllBuckets() ([]*s3.Bucket, error)
+	GetBucketNotification(bucketName, region string) (*s3.NotificationConfiguration, error)
 	ListBucketInventoryConfigurations(bucket *s3.Bucket, region string) ([]*s3.InventoryConfiguration, error)
 	ListBucketMetricsConfigurations(bucket *s3.Bucket, region string) ([]*s3.MetricsConfiguration, error)
 	ListBucketAnalyticsConfigurations(bucket *s3.Bucket, region string) ([]*s3.AnalyticsConfiguration, error)
@@ -43,6 +44,39 @@ func (s *s3Repository) ListAllBuckets() ([]*s3.Bucket, error) {
 	}
 	s.cache.Put("s3ListAllBuckets", out.Buckets)
 	return out.Buckets, nil
+}
+
+func (s *s3Repository) GetBucketNotification(bucketName, region string) (*s3.NotificationConfiguration, error) {
+	cacheKey := fmt.Sprintf("s3GetBucketNotification_%s_%s", bucketName, region)
+	if v := s.cache.Get(cacheKey); v != nil {
+		return v.(*s3.NotificationConfiguration), nil
+	}
+	bucketNotificationConfig, err := s.clientFactory.
+		GetS3Client(&awssdk.Config{Region: &region}).
+		GetBucketNotificationConfiguration(
+			&s3.GetBucketNotificationConfigurationRequest{Bucket: &bucketName},
+		)
+	if err != nil {
+		return nil, errors.Wrapf(
+			err,
+			"Error listing bucket notification configuration %s",
+			bucketName,
+		)
+	}
+
+	result := bucketNotificationConfig
+	if s.notificationIsEmpty(bucketNotificationConfig) {
+		result = nil
+	}
+
+	s.cache.Put(cacheKey, result)
+	return result, nil
+}
+
+func (s *s3Repository) notificationIsEmpty(notification *s3.NotificationConfiguration) bool {
+	return notification.TopicConfigurations == nil &&
+		notification.QueueConfigurations == nil &&
+		notification.LambdaFunctionConfigurations == nil
 }
 
 func (s *s3Repository) ListBucketInventoryConfigurations(bucket *s3.Bucket, region string) ([]*s3.InventoryConfiguration, error) {
