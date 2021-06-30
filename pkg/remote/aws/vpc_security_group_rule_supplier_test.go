@@ -146,55 +146,6 @@ func TestVPCSecurityGroupRuleSupplier_Resources(t *testing.T) {
 			err: nil,
 		},
 		{
-			test:    "should ignore default security group default rules",
-			dirName: "vpc_security_group_default_rules",
-			mocks: func(client *repository.MockEC2Repository) {
-				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{
-					{
-						GroupId:   aws.String("sg-a74815c8"),
-						GroupName: aws.String("default"),
-						IpPermissions: []*ec2.IpPermission{
-							{
-								IpProtocol: aws.String("-1"),
-								UserIdGroupPairs: []*ec2.UserIdGroupPair{
-									{
-										GroupId: aws.String("sg-a74815c8"),
-									},
-								},
-							},
-							{
-								IpProtocol: aws.String("-1"),
-								IpRanges: []*ec2.IpRange{
-									{
-										CidrIp: aws.String("1.2.0.0/16"),
-									},
-								},
-							},
-						},
-						IpPermissionsEgress: []*ec2.IpPermission{
-							{
-								IpProtocol: aws.String("-1"),
-								IpRanges: []*ec2.IpRange{
-									{
-										CidrIp: aws.String("0.0.0.0/0"),
-									},
-								},
-							},
-							{
-								IpProtocol: aws.String("-1"),
-								IpRanges: []*ec2.IpRange{
-									{
-										CidrIp: aws.String("1.2.3.4/32"),
-									},
-								},
-							},
-						},
-					},
-				}, nil, nil)
-			},
-			err: nil,
-		},
-		{
 			test:    "cannot list security group rules",
 			dirName: "vpc_security_group_rule_empty",
 			mocks: func(client *repository.MockEC2Repository) {

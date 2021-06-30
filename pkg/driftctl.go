@@ -80,6 +80,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		middlewares.NewRoute53DefaultZoneRecordSanitizer(),
 		middlewares.NewS3BucketAcl(),
 		middlewares.NewAwsInstanceBlockDeviceResourceMapper(d.resourceFactory),
+		middlewares.NewAwsDefaultSecurityGroupRule(),
 		middlewares.NewVPCDefaultSecurityGroupSanitizer(),
 		middlewares.NewVPCSecurityGroupRuleSanitizer(d.resourceFactory),
 		middlewares.NewIamPolicyAttachmentTransformer(d.resourceFactory),
