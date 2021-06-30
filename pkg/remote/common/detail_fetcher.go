@@ -26,7 +26,6 @@ func NewGenericDetailFetcher(resType resource.ResourceType, provider terraform.R
 func (f *GenericDetailFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
 	ctyVal, err := f.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: f.resType,
-		// Ty: resource.ResourceType(res.TerraformType()),
 		ID: res.TerraformId(),
 	})
 	if err != nil {
