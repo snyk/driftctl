@@ -73,6 +73,9 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewEC2EipEnumerator(ec2repository, factory, provider.Config))
 	remoteLibrary.AddDetailsFetcher(aws.AwsEipResourceType, common.NewGenericDetailFetcher(aws.AwsEipResourceType, provider, deserializer))
 
+	remoteLibrary.AddEnumerator(NewVPCEnumerator(ec2repository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsVpcResourceType, NewVPCDetailsFetcher(provider, deserializer))
+
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewS3BucketMetricSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewS3BucketPolicySupplier(provider, s3Repository, deserializer))
@@ -95,7 +98,6 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary.AddSupplier(NewIamRolePolicySupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamRolePolicyAttachmentSupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewVPCSecurityGroupRuleSupplier(provider, deserializer, ec2repository))
-	supplierLibrary.AddSupplier(NewVPCSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewSubnetSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewRouteTableSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewRouteSupplier(provider, deserializer, ec2repository))
