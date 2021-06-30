@@ -74,7 +74,10 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsEipResourceType, common.NewGenericDetailFetcher(aws.AwsEipResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewVPCEnumerator(ec2repository, factory))
-	remoteLibrary.AddDetailsFetcher(aws.AwsVpcResourceType, NewVPCDetailsFetcher(provider, deserializer))
+	remoteLibrary.AddDetailsFetcher(aws.AwsVpcResourceType, common.NewGenericDetailFetcher(aws.AwsVpcResourceType, provider, deserializer))
+
+	remoteLibrary.AddEnumerator(NewDefaultVPCEnumerator(ec2repository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsDefaultVpcResourceType, common.NewGenericDetailFetcher(aws.AwsDefaultVpcResourceType, provider, deserializer))
 
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewS3BucketMetricSupplier(provider, s3Repository, deserializer))

@@ -1,7 +1,6 @@
 package aws
 
 import (
-	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
@@ -27,41 +26,23 @@ func (e *VPCEnumerator) SupportedType() resource.ResourceType {
 }
 
 func (e *VPCEnumerator) Enumerate() ([]resource.Resource, error) {
-	VPCs, defaultVPCs, err := e.repo.ListAllVPCs()
+	VPCs, _, err := e.repo.ListAllVPCs()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsVpcResourceType)
 	}
 
-	results := make([]resource.Resource, 0, len(VPCs)+len(defaultVPCs))
+	results := make([]resource.Resource, 0, len(VPCs))
 
 	for _, item := range VPCs {
 		results = append(
 			results,
-			e.readVPC(*item),
-		)
-	}
-
-	for _, item := range defaultVPCs {
-		results = append(
-			results,
-			e.readVPC(*item),
+			e.factory.CreateAbstractResource(
+				string(e.SupportedType()),
+				*item.VpcId,
+				map[string]interface{}{},
+			),
 		)
 	}
 
 	return results, nil
-}
-
-func (e *VPCEnumerator) readVPC(vpc ec2.Vpc) resource.Resource {
-	var Ty = e.SupportedType()
-	if vpc.IsDefault != nil && *vpc.IsDefault {
-		Ty = aws.AwsDefaultVpcResourceType
-	}
-
-	res := e.factory.CreateAbstractResource(
-		string(Ty),
-		*vpc.VpcId,
-		map[string]interface{}{},
-	)
-
-	return res
 }
