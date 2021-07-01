@@ -68,13 +68,14 @@ func Init(version string, alerter *alerter.Alerter,
 
 	remoteLibrary.AddEnumerator(NewEC2EbsVolumeEnumerator(ec2repository, factory, provider.Config))
 	remoteLibrary.AddDetailsFetcher(aws.AwsEbsVolumeResourceType, common.NewGenericDetailFetcher(aws.AwsEbsVolumeResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewEC2EbsSnapshotEnumerator(ec2repository, factory, provider.Config))
+	remoteLibrary.AddDetailsFetcher(aws.AwsEbsSnapshotResourceType, common.NewGenericDetailFetcher(aws.AwsEbsSnapshotResourceType, provider, deserializer))
 
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewS3BucketMetricSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewS3BucketPolicySupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewEC2EipSupplier(provider, ec2repository, deserializer))
 	supplierLibrary.AddSupplier(NewEC2EipAssociationSupplier(provider, deserializer, ec2repository))
-	supplierLibrary.AddSupplier(NewEC2EbsSnapshotSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewRoute53ZoneSupplier(provider, deserializer, route53repository))
 	supplierLibrary.AddSupplier(NewRoute53RecordSupplier(provider, deserializer, route53repository))
 	supplierLibrary.AddSupplier(NewEC2InstanceSupplier(provider, deserializer, ec2repository))
