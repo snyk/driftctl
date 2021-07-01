@@ -56,6 +56,29 @@ func (_m *MockS3Repository) GetBucketNotification(bucketName string, region stri
 	return r0, r1
 }
 
+// GetBucketPolicy provides a mock function with given fields: bucketName, region
+func (_m *MockS3Repository) GetBucketPolicy(bucketName string, region string) (*string, error) {
+	ret := _m.Called(bucketName, region)
+
+	var r0 *string
+	if rf, ok := ret.Get(0).(func(string, string) *string); ok {
+		r0 = rf(bucketName, region)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*string)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(bucketName, region)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListAllBuckets provides a mock function with given fields:
 func (_m *MockS3Repository) ListAllBuckets() ([]*s3.Bucket, error) {
 	ret := _m.Called()

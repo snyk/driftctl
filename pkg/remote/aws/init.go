@@ -97,9 +97,10 @@ func Init(version string, alerter *alerter.Alerter,
 
 	remoteLibrary.AddEnumerator(NewRoute53HealthCheckEnumerator(route53repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsRoute53HealthCheckResourceType, common.NewGenericDetailsFetcher(aws.AwsRoute53HealthCheckResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewS3BucketPolicyEnumerator(s3Repository, factory, provider.Config))
+	remoteLibrary.AddDetailsFetcher(aws.AwsS3BucketPolicyResourceType, NewS3BucketPolicyDetailsFetcher(provider, deserializer))
 
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
-	supplierLibrary.AddSupplier(NewS3BucketPolicySupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewRoute53ZoneSupplier(provider, deserializer, route53repository))
 	supplierLibrary.AddSupplier(NewRoute53RecordSupplier(provider, deserializer, route53repository))
 	supplierLibrary.AddSupplier(NewLambdaFunctionSupplier(provider, deserializer, lambdaRepository))

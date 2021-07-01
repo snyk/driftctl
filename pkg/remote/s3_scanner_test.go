@@ -611,3 +611,153 @@ func TestS3BucketMetrics(t *testing.T) {
 		})
 	}
 }
+
+func TestS3BucketPolicy(t *testing.T) {
+
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockS3Repository)
+		wantErr error
+	}{
+		{
+			test:    "single bucket without policy",
+			dirName: "s3_bucket_policy_no_policy",
+			mocks: func(repository *repository.MockS3Repository) {
+				repository.On(
+					"ListAllBuckets",
+				).Return([]*s3.Bucket{
+					{Name: awssdk.String("dritftctl-test-no-policy")},
+				}, nil)
+
+				repository.On(
+					"GetBucketLocation",
+					"dritftctl-test-no-policy",
+				).Return(
+					"eu-west-3",
+					nil,
+				)
+
+				repository.On(
+					"GetBucketPolicy",
+					"dritftctl-test-no-policy",
+					"eu-west-3",
+				).Return(
+					nil,
+					nil,
+				)
+			},
+		},
+		{
+			test: "multiple bucket with policies", dirName: "s3_bucket_policies_multiple",
+			mocks: func(repository *repository.MockS3Repository) {
+				repository.On(
+					"ListAllBuckets",
+				).Return([]*s3.Bucket{
+					{Name: awssdk.String("bucket-martin-test-drift")},
+					{Name: awssdk.String("bucket-martin-test-drift2")},
+					{Name: awssdk.String("bucket-martin-test-drift3")},
+				}, nil)
+
+				repository.On(
+					"GetBucketLocation",
+					"bucket-martin-test-drift",
+				).Return(
+					"eu-west-1",
+					nil,
+				)
+
+				repository.On(
+					"GetBucketLocation",
+					"bucket-martin-test-drift2",
+				).Return(
+					"eu-west-3",
+					nil,
+				)
+
+				repository.On(
+					"GetBucketLocation",
+					"bucket-martin-test-drift3",
+				).Return(
+					"ap-northeast-1",
+					nil,
+				)
+
+				repository.On(
+					"GetBucketPolicy",
+					"bucket-martin-test-drift2",
+					"eu-west-3",
+				).Return(
+					// The value here not matter, we only want something not empty
+					// to trigger the detail fetcher
+					awssdk.String("foobar"),
+					nil,
+				)
+
+			},
+		},
+		{
+			test: "cannot list bucket", dirName: "s3_bucket_policies_list_bucket",
+			mocks: func(repository *repository.MockS3Repository) {
+				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsS3BucketPolicyResourceType, resourceaws.AwsS3BucketResourceType),
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+	alerter := &mocks.AlerterInterface{}
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			session := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			fakeRepo := &repository.MockS3Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.S3Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewS3BucketPolicyEnumerator(repo, factory, tf.TerraformProviderConfig{
+				Name:         "test",
+				DefaultAlias: "eu-west-3",
+			}))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketPolicyResourceType, aws.NewS3BucketPolicyDetailsFetcher(provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsS3BucketPolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
