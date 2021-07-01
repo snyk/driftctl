@@ -2,6 +2,7 @@ package enumerator
 
 import (
 	"errors"
+	"os"
 	"reflect"
 	"testing"
 
@@ -11,6 +12,52 @@ import (
 	awstest "github.com/cloudskiff/driftctl/test/aws"
 	"github.com/stretchr/testify/mock"
 )
+
+func TestS3Enumerator_NewS3Enumerator(t *testing.T) {
+	tests := []struct {
+		name   string
+		config config.SupplierConfig
+		setEnv map[string]string
+		want   string
+	}{
+		{
+			name: "test with no proxy env var",
+			config: config.SupplierConfig{
+				Key:     "tfstate",
+				Backend: "s3",
+				Path:    "terraform.tfstate",
+			},
+			setEnv: map[string]string{
+				"AWS_DEFAULT_REGION": "us-east-1",
+			},
+			want: "us-east-1",
+		},
+		{
+			name: "test with proxy env var",
+			config: config.SupplierConfig{
+				Key:     "tfstate",
+				Backend: "s3",
+				Path:    "terraform.tfstate",
+			},
+			setEnv: map[string]string{
+				"AWS_DEFAULT_REGION":     "us-east-1",
+				"DCTL_S3_DEFAULT_REGION": "eu-west-3",
+			},
+			want: "eu-west-3",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			for key, value := range tt.setEnv {
+				os.Setenv(key, value)
+			}
+			got := NewS3Enumerator(tt.config).client.(*s3.S3).Config.Region
+			if awssdk.StringValue(got) != tt.want {
+				t.Errorf("NewS3Enumerator().client.Config.Region got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
 
 func TestS3Enumerator_Enumerate(t *testing.T) {
 	tests := []struct {
