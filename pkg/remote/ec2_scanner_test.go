@@ -478,3 +478,93 @@ func TestEC2KeyPair(t *testing.T) {
 		})
 	}
 }
+
+func TestEC2EipAssociation(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockEC2Repository)
+		wantErr error
+	}{
+		{
+			test:    "no eip associations",
+			dirName: "aws_ec2_eip_association_empty",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllAddressesAssociation").Return([]string{}, nil)
+			},
+		},
+		{
+			test:    "single eip association",
+			dirName: "aws_ec2_eip_association_single",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllAddressesAssociation").Return([]string{
+					"eipassoc-0e9a7356e30f0c3d1",
+				}, nil)
+			},
+		},
+		{
+			test:    "cannot list eip associations",
+			dirName: "aws_ec2_eip_association_list",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllAddressesAssociation").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsEipAssociationResourceType),
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+	alerter := &mocks.AlerterInterface{}
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewEC2EipAssociationEnumerator(repo, factory, tf.TerraformProviderConfig{
+				Name:         "test",
+				DefaultAlias: "eu-west-3",
+			}))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEipAssociationResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEipAssociationResourceType, provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsEipAssociationResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}

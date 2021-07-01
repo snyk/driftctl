@@ -60,7 +60,6 @@ func Init(version string, alerter *alerter.Alerter,
 
 	remoteLibrary.AddEnumerator(NewS3BucketEnumerator(s3Repository, factory, provider.Config))
 	remoteLibrary.AddDetailsFetcher(aws.AwsS3BucketResourceType, NewS3BucketDetailsFetcher(provider, deserializer))
-
 	remoteLibrary.AddEnumerator(NewS3BucketInventoryEnumerator(s3Repository, factory, provider.Config))
 	remoteLibrary.AddDetailsFetcher(aws.AwsS3BucketInventoryResourceType, NewS3BucketInventoryDetailsFetcher(provider, deserializer))
 	remoteLibrary.AddEnumerator(NewS3BucketNotificationEnumerator(s3Repository, factory, provider.Config))
@@ -78,10 +77,11 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsAmiResourceType, common.NewGenericDetailsFetcher(aws.AwsAmiResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewEC2KeyPairEnumerator(ec2repository, factory, provider.Config))
 	remoteLibrary.AddDetailsFetcher(aws.AwsKeyPairResourceType, common.NewGenericDetailsFetcher(aws.AwsKeyPairResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewEC2EipAssociationEnumerator(ec2repository, factory, provider.Config))
+	remoteLibrary.AddDetailsFetcher(aws.AwsEipAssociationResourceType, common.NewGenericDetailsFetcher(aws.AwsEipAssociationResourceType, provider, deserializer))
 
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewS3BucketPolicySupplier(provider, s3Repository, deserializer))
-	supplierLibrary.AddSupplier(NewEC2EipAssociationSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewRoute53ZoneSupplier(provider, deserializer, route53repository))
 	supplierLibrary.AddSupplier(NewRoute53RecordSupplier(provider, deserializer, route53repository))
 	supplierLibrary.AddSupplier(NewEC2InstanceSupplier(provider, deserializer, ec2repository))
