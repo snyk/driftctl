@@ -86,6 +86,8 @@ func Init(version string, alerter *alerter.Alerter,
 
 	remoteLibrary.AddEnumerator(NewKMSKeyEnumerator(kmsRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsKmsKeyResourceType, common.NewGenericDetailsFetcher(aws.AwsKmsKeyResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewKMSAliasEnumerator(kmsRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsKmsAliasResourceType, common.NewGenericDetailsFetcher(aws.AwsKmsAliasResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewVPCEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsVpcResourceType, common.NewGenericDetailsFetcher(aws.AwsVpcResourceType, provider, deserializer))
@@ -124,7 +126,6 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary.AddSupplier(NewRoute53HealthCheckSupplier(provider, deserializer, route53repository))
 	supplierLibrary.AddSupplier(NewCloudfrontDistributionSupplier(provider, deserializer, cloudfrontRepository))
 	supplierLibrary.AddSupplier(NewECRRepositorySupplier(provider, deserializer, ecrRepository))
-	supplierLibrary.AddSupplier(NewKMSAliasSupplier(provider, deserializer, kmsRepository))
 	supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider, deserializer, lambdaRepository))
 
 	err = resourceSchemaRepository.Init(version, provider.Schema())
