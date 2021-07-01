@@ -9,21 +9,21 @@ type DetailsFetcher interface {
 	ReadDetails(resource.Resource) (resource.Resource, error)
 }
 
-type GenericDetailFetcher struct {
+type GenericDetailsFetcher struct {
 	resType      resource.ResourceType
 	reader       terraform.ResourceReader
 	deserializer *resource.Deserializer
 }
 
-func NewGenericDetailFetcher(resType resource.ResourceType, provider terraform.ResourceReader, deserializer *resource.Deserializer) *GenericDetailFetcher {
-	return &GenericDetailFetcher{
+func NewGenericDetailsFetcher(resType resource.ResourceType, provider terraform.ResourceReader, deserializer *resource.Deserializer) *GenericDetailsFetcher {
+	return &GenericDetailsFetcher{
 		resType:      resType,
 		reader:       provider,
 		deserializer: deserializer,
 	}
 }
 
-func (f *GenericDetailFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
+func (f *GenericDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
 	ctyVal, err := f.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: f.resType,
 		ID: res.TerraformId(),

@@ -88,7 +88,7 @@ func TestScanGithubTeam(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}))
-			remoteLibrary.AddDetailsFetcher(githubres.GithubTeamResourceType, common.NewGenericDetailFetcher(githubres.GithubTeamResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(githubres.GithubTeamResourceType, common.NewGenericDetailsFetcher(githubres.GithubTeamResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
