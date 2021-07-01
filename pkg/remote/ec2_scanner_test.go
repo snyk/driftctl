@@ -296,3 +296,94 @@ func TestEC2Eip(t *testing.T) {
 		})
 	}
 }
+
+func TestEC2Ami(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockEC2Repository)
+		wantErr error
+	}{
+		{
+			test:    "no amis",
+			dirName: "aws_ec2_ami_empty",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllImages").Return([]*ec2.Image{}, nil)
+			},
+		},
+		{
+			test:    "multiple amis",
+			dirName: "aws_ec2_ami_multiple",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllImages").Return([]*ec2.Image{
+					{ImageId: awssdk.String("ami-03a578b46f4c3081b")},
+					{ImageId: awssdk.String("ami-025962fd8b456731f")},
+				}, nil)
+			},
+		},
+		{
+			test:    "cannot list ami",
+			dirName: "aws_ec2_ami_list",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllImages").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsAmiResourceType),
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+	alerter := &mocks.AlerterInterface{}
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewEC2AmiEnumerator(repo, factory, tf.TerraformProviderConfig{
+				Name:         "test",
+				DefaultAlias: "eu-west-3",
+			}))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsAmiResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsAmiResourceType, provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsAmiResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
