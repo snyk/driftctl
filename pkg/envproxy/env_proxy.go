@@ -11,20 +11,17 @@ type EnvProxy struct {
 	defaultEnv map[string]string
 }
 
-func NewEnvProxy() *EnvProxy {
+func NewEnvProxy(fromPrefix, toPrefix string) *EnvProxy {
 	envMap := map[string]string{}
 	for _, variable := range os.Environ() {
 		tmp := strings.SplitN(variable, "=", 2)
 		envMap[tmp[0]] = tmp[1]
 	}
 	return &EnvProxy{
+		fromPrefix: fromPrefix,
+		toPrefix:   toPrefix,
 		defaultEnv: envMap,
 	}
-}
-
-func (s *EnvProxy) SetProxy(fromPrefix, toPrefix string) {
-	s.fromPrefix = fromPrefix
-	s.toPrefix = toPrefix
 }
 
 func (s *EnvProxy) Apply() {

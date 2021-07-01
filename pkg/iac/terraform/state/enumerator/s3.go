@@ -21,8 +21,7 @@ type S3Enumerator struct {
 }
 
 func NewS3Enumerator(config config.SupplierConfig) *S3Enumerator {
-	envProxy := envproxy.NewEnvProxy()
-	envProxy.SetProxy("DCTL_S3_", "AWS_")
+	envProxy := envproxy.NewEnvProxy("DCTL_S3_", "AWS_")
 	envProxy.Apply()
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
