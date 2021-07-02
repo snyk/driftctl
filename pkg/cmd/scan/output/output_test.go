@@ -324,6 +324,43 @@ func fakeAnalysisWithGithubEnumerationError() *analyser.Analysis {
 	return &a
 }
 
+func fakeAnalysisForJSONPlan() *analyser.Analysis {
+	a := analyser.Analysis{}
+	a.AddUnmanaged(
+		&resource.AbstractResource{
+			Id:   "unmanaged-id-1",
+			Type: "aws_unmanaged_resource",
+			Attrs: &resource.Attributes{
+				"name": "First unmanaged resource",
+			},
+		},
+		&resource.AbstractResource{
+			Id:   "unmanaged-id-2",
+			Type: "aws_unmanaged_resource",
+			Attrs: &resource.Attributes{
+				"name": "Second unmanaged resource",
+			},
+		},
+	)
+	a.AddManaged(
+		&resource.AbstractResource{
+			Id:   "managed-id-1",
+			Type: "aws_managed_resource",
+			Attrs: &resource.Attributes{
+				"name": "First managed resource",
+			},
+		},
+		&resource.AbstractResource{
+			Id:   "managed-id-2",
+			Type: "aws_managed_resource",
+			Attrs: &resource.Attributes{
+				"name": "Second managed resource",
+			},
+		},
+	)
+	return &a
+}
+
 func TestGetPrinter(t *testing.T) {
 	tests := []struct {
 		name  string
@@ -369,6 +406,24 @@ func TestGetPrinter(t *testing.T) {
 			quiet: true,
 			key:   ConsoleOutputType,
 			want:  &output.VoidPrinter{},
+		},
+		{
+			name: "jsonplan file output",
+			path: "/path/to/file",
+			key:  PlanOutputType,
+			want: output.NewConsolePrinter(),
+		},
+		{
+			name: "jsonplan stdout output",
+			path: "stdout",
+			key:  PlanOutputType,
+			want: &output.VoidPrinter{},
+		},
+		{
+			name: "jsonplan /dev/stdout output",
+			path: "/dev/stdout",
+			key:  PlanOutputType,
+			want: &output.VoidPrinter{},
 		},
 	}
 	for _, tt := range tests {
