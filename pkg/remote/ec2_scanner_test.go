@@ -102,7 +102,7 @@ func TestEC2EbsVolume(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsVolumeResourceType, common.NewGenericDetailFetcher(resourceaws.AwsEbsVolumeResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsVolumeResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEbsVolumeResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
@@ -193,7 +193,7 @@ func TestEC2EbsSnapshot(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsSnapshotResourceType, common.NewGenericDetailFetcher(resourceaws.AwsEbsSnapshotResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsSnapshotResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEbsSnapshotResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
@@ -284,7 +284,7 @@ func TestEC2Eip(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEipResourceType, common.NewGenericDetailFetcher(resourceaws.AwsEipResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEipResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEipResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()

@@ -29,8 +29,8 @@ func (r *RemoteLibrary) Enumerators() []Enumerator {
 	return r.enumerators
 }
 
-func (r *RemoteLibrary) AddDetailsFetcher(ty resource.ResourceType, detailFetcher DetailsFetcher) {
-	r.detailsFetchers[ty] = detailFetcher
+func (r *RemoteLibrary) AddDetailsFetcher(ty resource.ResourceType, detailsFetcher DetailsFetcher) {
+	r.detailsFetchers[ty] = detailsFetcher
 }
 
 func (r *RemoteLibrary) GetDetailsFetcher(ty resource.ResourceType) DetailsFetcher {

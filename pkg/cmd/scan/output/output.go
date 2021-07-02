@@ -15,12 +15,14 @@ var supportedOutputTypes = []string{
 	ConsoleOutputType,
 	JSONOutputType,
 	HTMLOutputType,
+	PlanOutputType,
 }
 
 var supportedOutputExample = map[string]string{
 	ConsoleOutputType: ConsoleOutputExample,
 	JSONOutputType:    JSONOutputExample,
 	HTMLOutputType:    HTMLOutputExample,
+	PlanOutputType:    PlanOutputExample,
 }
 
 func SupportedOutputs() []string {
@@ -57,6 +59,8 @@ func GetOutput(config OutputConfig, quiet bool) Output {
 		return NewJSON(config.Options["path"])
 	case HTMLOutputType:
 		return NewHTML(config.Options["path"])
+	case PlanOutputType:
+		return NewPlan(config.Options["path"])
 	case ConsoleOutputType:
 		fallthrough
 	default:
@@ -71,6 +75,11 @@ func GetPrinter(config OutputConfig, quiet bool) output.Printer {
 
 	switch config.Key {
 	case JSONOutputType:
+		if isStdOut(config.Options["path"]) {
+			return &output.VoidPrinter{}
+		}
+		fallthrough
+	case PlanOutputType:
 		if isStdOut(config.Options["path"]) {
 			return &output.VoidPrinter{}
 		}

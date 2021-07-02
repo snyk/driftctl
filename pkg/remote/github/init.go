@@ -45,7 +45,7 @@ func Init(version string, alerter *alerter.Alerter,
 	providerLibrary.AddProvider(terraform.GITHUB, provider)
 
 	remoteLibrary.AddEnumerator(NewGithubTeamEnumerator(repository, factory, provider.Config))
-	remoteLibrary.AddDetailsFetcher(github.GithubTeamResourceType, common.NewGenericDetailFetcher(github.GithubTeamResourceType, provider, deserializer))
+	remoteLibrary.AddDetailsFetcher(github.GithubTeamResourceType, common.NewGenericDetailsFetcher(github.GithubTeamResourceType, provider, deserializer))
 
 	supplierLibrary.AddSupplier(NewGithubRepositorySupplier(provider, repository, deserializer))
 	supplierLibrary.AddSupplier(NewGithubMembershipSupplier(provider, repository, deserializer))
