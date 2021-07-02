@@ -44,7 +44,7 @@ func (p *ProviderInstaller) Install() (string, error) {
 			"path": providerDir,
 		}).Debug("Provider directory destination not found, creating ...")
 		if err := os.MkdirAll(providerDir, 0755); err != nil {
-			return "", err
+			return "", errors.Wrap(err, "can't create configuration directory")
 		}
 	}
 
@@ -54,7 +54,7 @@ func (p *ProviderInstaller) Install() (string, error) {
 		logrus.WithFields(logrus.Fields{
 			"path": providerDir,
 		}).Debug("Provider directory destination is not writable")
-		return "", err
+		return "", errors.Wrap(err, "can't write in configuration directory")
 	}
 	defer isDirectoryWritable.Close()
 	defer os.Remove(isDirectoryWritablePath)
