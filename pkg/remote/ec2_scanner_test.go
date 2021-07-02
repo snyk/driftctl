@@ -1099,3 +1099,225 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 		})
 	}
 }
+
+func TestEC2Subnet(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockEC2Repository)
+		wantErr error
+	}{
+		{
+			test:    "no subnets",
+			dirName: "aws_ec2_subnet_empty",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllSubnets").Return([]*ec2.Subnet{}, []*ec2.Subnet{}, nil)
+			},
+		},
+		{
+			test:    "multiple subnets",
+			dirName: "aws_ec2_subnet_multiple",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllSubnets").Return([]*ec2.Subnet{
+					{
+						SubnetId:     awssdk.String("subnet-05810d3f933925f6d"), // subnet1
+						DefaultForAz: awssdk.Bool(false),
+					},
+					{
+						SubnetId:     awssdk.String("subnet-0b13f1e0eacf67424"), // subnet2
+						DefaultForAz: awssdk.Bool(false),
+					},
+					{
+						SubnetId:     awssdk.String("subnet-0c9b78001fe186e22"), // subnet3
+						DefaultForAz: awssdk.Bool(false),
+					},
+				}, []*ec2.Subnet{
+					{
+						SubnetId:     awssdk.String("subnet-44fe0c65"), // us-east-1a
+						DefaultForAz: awssdk.Bool(true),
+					},
+					{
+						SubnetId:     awssdk.String("subnet-65e16628"), // us-east-1b
+						DefaultForAz: awssdk.Bool(true),
+					},
+					{
+						SubnetId:     awssdk.String("subnet-afa656f0"), // us-east-1c
+						DefaultForAz: awssdk.Bool(true),
+					},
+				}, nil)
+			},
+		},
+		{
+			test:    "cannot list subnets",
+			dirName: "aws_ec2_subnet_list",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllSubnets").Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSubnetResourceType),
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+	alerter := &mocks.AlerterInterface{}
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewEC2SubnetEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSubnetResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSubnetResourceType, provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsSubnetResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
+
+func TestEC2DefaultSubnet(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockEC2Repository)
+		wantErr error
+	}{
+		{
+			test:    "no default subnets",
+			dirName: "aws_ec2_default_subnet_empty",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllSubnets").Return([]*ec2.Subnet{}, []*ec2.Subnet{}, nil)
+			},
+		},
+		{
+			test:    "multiple default subnets",
+			dirName: "aws_ec2_default_subnet_multiple",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllSubnets").Return([]*ec2.Subnet{
+					{
+						SubnetId:     awssdk.String("subnet-05810d3f933925f6d"), // subnet1
+						DefaultForAz: awssdk.Bool(false),
+					},
+					{
+						SubnetId:     awssdk.String("subnet-0b13f1e0eacf67424"), // subnet2
+						DefaultForAz: awssdk.Bool(false),
+					},
+					{
+						SubnetId:     awssdk.String("subnet-0c9b78001fe186e22"), // subnet3
+						DefaultForAz: awssdk.Bool(false),
+					},
+				}, []*ec2.Subnet{
+					{
+						SubnetId:     awssdk.String("subnet-44fe0c65"), // us-east-1a
+						DefaultForAz: awssdk.Bool(true),
+					},
+					{
+						SubnetId:     awssdk.String("subnet-65e16628"), // us-east-1b
+						DefaultForAz: awssdk.Bool(true),
+					},
+					{
+						SubnetId:     awssdk.String("subnet-afa656f0"), // us-east-1c
+						DefaultForAz: awssdk.Bool(true),
+					},
+				}, nil)
+			},
+		},
+		{
+			test:    "cannot list default subnets",
+			dirName: "aws_ec2_default_subnet_list",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllSubnets").Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsDefaultSubnetResourceType),
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+	alerter := &mocks.AlerterInterface{}
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewEC2DefaultSubnetEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultSubnetResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultSubnetResourceType, provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsDefaultSubnetResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
