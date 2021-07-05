@@ -40,15 +40,11 @@ func (e *Route53ZoneSupplier) Enumerate() ([]resource.Resource, error) {
 			results,
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
-				cleanZoneID(*hostedZone.Id),
+				strings.TrimPrefix(*hostedZone.Id, "/hostedzone/"),
 				map[string]interface{}{},
 			),
 		)
 	}
 
 	return results, err
-}
-
-func cleanZoneID(ID string) string {
-	return strings.TrimPrefix(ID, "/hostedzone/")
 }
