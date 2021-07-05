@@ -1,0 +1,26 @@
+[
+ {
+  "gateway_id": null,
+  "id": "rtbassoc-0b4f97ea57490e213",
+  "route_table_id": "rtb-05aa6c5673311a17b",
+  "subnet_id": "subnet-0fd966efd884d0362"
+ },
+ {
+  "gateway_id": null,
+  "id": "rtbassoc-01957791b2cfe6ea4",
+  "route_table_id": "rtb-05aa6c5673311a17b",
+  "subnet_id": "subnet-0e93dbfa2e5dd8282"
+ },
+ {
+  "gateway_id": "igw-0238f6e09185ac954",
+  "id": "rtbassoc-0a79ccacfceb4944b",
+  "route_table_id": "rtb-09df7cc9d16de9f8f",
+  "subnet_id": null
+ },
+ {
+  "gateway_id": null,
+  "id": "rtbassoc-0809598f92dbec03b",
+  "route_table_id": "rtb-05aa6c5673311a17b",
+  "subnet_id": "subnet-05185af647b2eeda3"
+ }
+]
