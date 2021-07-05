@@ -110,12 +110,17 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewRoute53ZoneEnumerator(route53repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsRoute53ZoneResourceType, common.NewGenericDetailsFetcher(aws.AwsRoute53ZoneResourceType, provider, deserializer))
 
+	remoteLibrary.AddEnumerator(NewVPCSecurityGroupEnumerator(ec2repository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsSecurityGroupResourceType, common.NewGenericDetailsFetcher(aws.AwsSecurityGroupResourceType, provider, deserializer))
+
+	remoteLibrary.AddEnumerator(NewVPCDefaultSecurityGroupEnumerator(ec2repository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsDefaultSecurityGroupResourceType, common.NewGenericDetailsFetcher(aws.AwsDefaultSecurityGroupResourceType, provider, deserializer))
+
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewRoute53RecordSupplier(provider, deserializer, route53repository))
 	supplierLibrary.AddSupplier(NewLambdaFunctionSupplier(provider, deserializer, lambdaRepository))
 	supplierLibrary.AddSupplier(NewDBSubnetGroupSupplier(provider, deserializer, rdsRepository))
 	supplierLibrary.AddSupplier(NewDBInstanceSupplier(provider, deserializer, rdsRepository))
-	supplierLibrary.AddSupplier(NewVPCSecurityGroupSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewIamUserSupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamUserPolicySupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamUserPolicyAttachmentSupplier(provider, deserializer, iamRepository))

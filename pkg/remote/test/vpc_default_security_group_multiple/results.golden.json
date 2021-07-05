@@ -1,0 +1,42 @@
+[
+  {
+    "arn": "arn:aws:ec2:eu-west-3:047081014315:security-group/sg-9e0204ff",
+    "description": "default VPC security group",
+    "egress": [
+      {
+        "cidr_blocks": [
+          "0.0.0.0/0"
+        ],
+        "description": "",
+        "from_port": 0,
+        "ipv6_cidr_blocks": [],
+        "prefix_list_ids": [],
+        "protocol": "-1",
+        "security_groups": [],
+        "self": false,
+        "to_port": 0
+      }
+    ],
+    "id": "sg-9e0204ff",
+    "ingress": [
+      {
+        "cidr_blocks": [],
+        "description": "",
+        "from_port": 0,
+        "ipv6_cidr_blocks": [],
+        "prefix_list_ids": [],
+        "protocol": "-1",
+        "security_groups": [],
+        "self": true,
+        "to_port": 0
+      }
+    ],
+    "name": "default",
+    "owner_id": "047081014315",
+    "revoke_rules_on_delete": null,
+    "tags": {
+      "Name": "TOTO"
+    },
+    "vpc_id": "vpc-618f6e09"
+  }
+]
