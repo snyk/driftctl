@@ -13,7 +13,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -98,10 +97,7 @@ func TestEC2EbsVolume(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewEC2EbsVolumeEnumerator(repo, factory, tf.TerraformProviderConfig{
-				Name:         "test",
-				DefaultAlias: "eu-west-3",
-			}))
+			remoteLibrary.AddEnumerator(aws.NewEC2EbsVolumeEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsVolumeResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEbsVolumeResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
@@ -189,10 +185,7 @@ func TestEC2EbsSnapshot(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewEC2EbsSnapshotEnumerator(repo, factory, tf.TerraformProviderConfig{
-				Name:         "test",
-				DefaultAlias: "eu-west-3",
-			}))
+			remoteLibrary.AddEnumerator(aws.NewEC2EbsSnapshotEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsSnapshotResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEbsSnapshotResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
@@ -280,10 +273,7 @@ func TestEC2Eip(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewEC2EipEnumerator(repo, factory, tf.TerraformProviderConfig{
-				Name:         "test",
-				DefaultAlias: "eu-west-3",
-			}))
+			remoteLibrary.AddEnumerator(aws.NewEC2EipEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEipResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEipResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
@@ -371,10 +361,7 @@ func TestEC2Ami(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewEC2AmiEnumerator(repo, factory, tf.TerraformProviderConfig{
-				Name:         "test",
-				DefaultAlias: "eu-west-3",
-			}))
+			remoteLibrary.AddEnumerator(aws.NewEC2AmiEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsAmiResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsAmiResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
@@ -462,10 +449,7 @@ func TestEC2KeyPair(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewEC2KeyPairEnumerator(repo, factory, tf.TerraformProviderConfig{
-				Name:         "test",
-				DefaultAlias: "eu-west-3",
-			}))
+			remoteLibrary.AddEnumerator(aws.NewEC2KeyPairEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsKeyPairResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsKeyPairResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
@@ -552,10 +536,7 @@ func TestEC2EipAssociation(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewEC2EipAssociationEnumerator(repo, factory, tf.TerraformProviderConfig{
-				Name:         "test",
-				DefaultAlias: "eu-west-3",
-			}))
+			remoteLibrary.AddEnumerator(aws.NewEC2EipAssociationEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEipAssociationResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEipAssociationResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
@@ -653,10 +634,7 @@ func TestEC2Instance(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewEC2InstanceEnumerator(repo, factory, tf.TerraformProviderConfig{
-				Name:         "test",
-				DefaultAlias: "eu-west-3",
-			}))
+			remoteLibrary.AddEnumerator(aws.NewEC2InstanceEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsInstanceResourceType, aws.NewEC2InstanceDetailsFetcher(provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
