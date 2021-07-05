@@ -50,7 +50,9 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewGithubRepositoryEnumerator(repository, factory, provider.Config))
 	remoteLibrary.AddDetailsFetcher(github.GithubRepositoryResourceType, common.NewGenericDetailsFetcher(github.GithubRepositoryResourceType, provider, deserializer))
 
-	supplierLibrary.AddSupplier(NewGithubMembershipSupplier(provider, repository, deserializer))
+	remoteLibrary.AddEnumerator(NewGithubMembershipEnumerator(repository, factory))
+	remoteLibrary.AddDetailsFetcher(github.GithubMembershipResourceType, common.NewGenericDetailsFetcher(github.GithubMembershipResourceType, provider, deserializer))
+
 	supplierLibrary.AddSupplier(NewGithubTeamMembershipSupplier(provider, repository, deserializer))
 	supplierLibrary.AddSupplier(NewGithubBranchProtectionSupplier(provider, repository, deserializer))
 
