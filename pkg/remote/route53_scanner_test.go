@@ -115,3 +115,129 @@ func TestRoute53_HealthCheck(t *testing.T) {
 		})
 	}
 }
+
+func TestRoute53_Zone(t *testing.T) {
+
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(*repository.MockRoute53Repository)
+		err     error
+	}{
+		{
+			test:    "no zones",
+			dirName: "route53_zone_empty",
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{},
+					nil,
+				)
+			},
+			err: nil,
+		},
+		{
+			test:    "single zone",
+			dirName: "route53_zone_single",
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{
+						{
+							Id:   awssdk.String("Z08068311RGDXPHF8KE62"),
+							Name: awssdk.String("foo.bar"),
+						},
+					},
+					nil,
+				)
+			},
+			err: nil,
+		},
+		{
+			test:    "multiples zone (test pagination)",
+			dirName: "route53_zone_multiples",
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{
+						{
+							Id:   awssdk.String("Z01809283VH9BBALZHO7B"),
+							Name: awssdk.String("foo-0.com"),
+						},
+						{
+							Id:   awssdk.String("Z01804312AV8PHE3C43AD"),
+							Name: awssdk.String("foo-1.com"),
+						},
+						{
+							Id:   awssdk.String("Z01874941AR1TCGV5K65C"),
+							Name: awssdk.String("foo-2.com"),
+						},
+					},
+					nil,
+				)
+			},
+			err: nil,
+		},
+		{
+			test:    "cannot list zones",
+			dirName: "route53_zone_empty",
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{},
+					awserr.NewRequestFailure(nil, 403, ""),
+				)
+			},
+			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRoute53ZoneResourceType),
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+	alerter := &mocks.AlerterInterface{}
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			session := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			fakeRepo := &repository.MockRoute53Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.Route53Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewRoute53Repository(session, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewRoute53ZoneEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRoute53ZoneResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRoute53ZoneResourceType, provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, c.err, err)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsRoute53ZoneResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
