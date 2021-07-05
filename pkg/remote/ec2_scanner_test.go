@@ -13,7 +13,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -98,10 +97,7 @@ func TestEC2EbsVolume(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewEC2EbsVolumeEnumerator(repo, factory, tf.TerraformProviderConfig{
-				Name:         "test",
-				DefaultAlias: "eu-west-3",
-			}))
+			remoteLibrary.AddEnumerator(aws.NewEC2EbsVolumeEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsVolumeResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEbsVolumeResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
@@ -189,10 +185,7 @@ func TestEC2EbsSnapshot(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewEC2EbsSnapshotEnumerator(repo, factory, tf.TerraformProviderConfig{
-				Name:         "test",
-				DefaultAlias: "eu-west-3",
-			}))
+			remoteLibrary.AddEnumerator(aws.NewEC2EbsSnapshotEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsSnapshotResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEbsSnapshotResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
@@ -280,10 +273,7 @@ func TestEC2Eip(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewEC2EipEnumerator(repo, factory, tf.TerraformProviderConfig{
-				Name:         "test",
-				DefaultAlias: "eu-west-3",
-			}))
+			remoteLibrary.AddEnumerator(aws.NewEC2EipEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEipResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEipResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
@@ -371,10 +361,7 @@ func TestEC2Ami(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewEC2AmiEnumerator(repo, factory, tf.TerraformProviderConfig{
-				Name:         "test",
-				DefaultAlias: "eu-west-3",
-			}))
+			remoteLibrary.AddEnumerator(aws.NewEC2AmiEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsAmiResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsAmiResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
@@ -462,10 +449,7 @@ func TestEC2KeyPair(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewEC2KeyPairEnumerator(repo, factory, tf.TerraformProviderConfig{
-				Name:         "test",
-				DefaultAlias: "eu-west-3",
-			}))
+			remoteLibrary.AddEnumerator(aws.NewEC2KeyPairEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsKeyPairResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsKeyPairResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
@@ -552,10 +536,7 @@ func TestEC2EipAssociation(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewEC2EipAssociationEnumerator(repo, factory, tf.TerraformProviderConfig{
-				Name:         "test",
-				DefaultAlias: "eu-west-3",
-			}))
+			remoteLibrary.AddEnumerator(aws.NewEC2EipAssociationEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEipAssociationResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEipAssociationResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
@@ -653,10 +634,7 @@ func TestEC2Instance(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewEC2InstanceEnumerator(repo, factory, tf.TerraformProviderConfig{
-				Name:         "test",
-				DefaultAlias: "eu-west-3",
-			}))
+			remoteLibrary.AddEnumerator(aws.NewEC2InstanceEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsInstanceResourceType, aws.NewEC2InstanceDetailsFetcher(provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
@@ -666,6 +644,94 @@ func TestEC2Instance(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsInstanceResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
+
+func TestEC2InternetGateway(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockEC2Repository)
+		wantErr error
+	}{
+		{
+			test:    "no internet gateways",
+			dirName: "aws_ec2_internet_gateway_empty",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllInternetGateways").Return([]*ec2.InternetGateway{}, nil)
+			},
+		},
+		{
+			test:    "multiple internet gateways",
+			dirName: "aws_ec2_internet_gateway_multiple",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllInternetGateways").Return([]*ec2.InternetGateway{
+					{InternetGatewayId: awssdk.String("igw-0184eb41aadc62d1c")},
+					{InternetGatewayId: awssdk.String("igw-047b487f5c60fca99")},
+				}, nil)
+			},
+		},
+		{
+			test:    "cannot list internet gateways",
+			dirName: "aws_ec2_internet_gateway_list",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllInternetGateways").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsInternetGatewayResourceType),
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+	alerter := &mocks.AlerterInterface{}
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewEC2InternetGatewayEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsInternetGatewayResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsInternetGatewayResourceType, provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsInternetGatewayResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
 		})
 	}
 }
