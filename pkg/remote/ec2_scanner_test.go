@@ -942,3 +942,160 @@ func TestDefaultVPC(t *testing.T) {
 		})
 	}
 }
+
+func TestEC2RouteTableAssociation(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockEC2Repository)
+		wantErr error
+	}{
+		{
+			test:    "no route table associations (test for nil values)",
+			dirName: "aws_ec2_route_table_association_empty",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{
+					{
+						RouteTableId: awssdk.String("assoc_with_nil"),
+						Associations: []*ec2.RouteTableAssociation{
+							{
+								AssociationState:        nil,
+								GatewayId:               nil,
+								Main:                    nil,
+								RouteTableAssociationId: nil,
+								RouteTableId:            nil,
+								SubnetId:                nil,
+							},
+						},
+					},
+					{RouteTableId: awssdk.String("nil_assoc")},
+				}, nil)
+			},
+		},
+		{
+			test:    "multiple route table associations (mixed subnet and gateway associations)",
+			dirName: "aws_ec2_route_table_association_multiple",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{
+					{
+						RouteTableId: awssdk.String("rtb-05aa6c5673311a17b"), // route
+						Associations: []*ec2.RouteTableAssociation{
+							{ // Should be ignored
+								AssociationState: &ec2.RouteTableAssociationState{
+									State: awssdk.String("disassociated"),
+								},
+								GatewayId: awssdk.String("dummy-id"),
+							},
+							{ // Should be ignored
+								SubnetId:  nil,
+								GatewayId: nil,
+							},
+							{ // assoc_route_subnet1
+								AssociationState: &ec2.RouteTableAssociationState{
+									State: awssdk.String("associated"),
+								},
+								Main:                    awssdk.Bool(false),
+								RouteTableAssociationId: awssdk.String("rtbassoc-0809598f92dbec03b"),
+								RouteTableId:            awssdk.String("rtb-05aa6c5673311a17b"),
+								SubnetId:                awssdk.String("subnet-05185af647b2eeda3"),
+							},
+							{ // assoc_route_subnet
+								AssociationState: &ec2.RouteTableAssociationState{
+									State: awssdk.String("associated"),
+								},
+								Main:                    awssdk.Bool(false),
+								RouteTableAssociationId: awssdk.String("rtbassoc-01957791b2cfe6ea4"),
+								RouteTableId:            awssdk.String("rtb-05aa6c5673311a17b"),
+								SubnetId:                awssdk.String("subnet-0e93dbfa2e5dd8282"),
+							},
+							{ // assoc_route_subnet2
+								AssociationState: &ec2.RouteTableAssociationState{
+									State: awssdk.String("associated"),
+								},
+								GatewayId:               nil,
+								Main:                    awssdk.Bool(false),
+								RouteTableAssociationId: awssdk.String("rtbassoc-0b4f97ea57490e213"),
+								RouteTableId:            awssdk.String("rtb-05aa6c5673311a17b"),
+								SubnetId:                awssdk.String("subnet-0fd966efd884d0362"),
+							},
+						},
+					},
+					{
+						RouteTableId: awssdk.String("rtb-09df7cc9d16de9f8f"), // route2
+						Associations: []*ec2.RouteTableAssociation{
+							{ // assoc_route2_gateway
+								AssociationState: &ec2.RouteTableAssociationState{
+									State: awssdk.String("associated"),
+								},
+								RouteTableAssociationId: awssdk.String("rtbassoc-0a79ccacfceb4944b"),
+								RouteTableId:            awssdk.String("rtb-09df7cc9d16de9f8f"),
+								GatewayId:               awssdk.String("igw-0238f6e09185ac954"),
+							},
+						},
+					},
+				}, nil)
+			},
+		},
+		{
+			test:    "cannot list route table associations",
+			dirName: "aws_ec2_route_table_association_list",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllRouteTables").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRouteTableAssociationResourceType, resourceaws.AwsRouteTableResourceType),
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+	alerter := &mocks.AlerterInterface{}
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewEC2RouteTableAssociationEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteTableAssociationResourceType, aws.NewEC2RouteTableAssociationDetailsFetcher(provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsRouteTableAssociationResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
