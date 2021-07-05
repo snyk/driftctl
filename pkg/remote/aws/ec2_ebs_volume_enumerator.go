@@ -3,22 +3,19 @@ package aws
 import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 )
 
 type EC2EbsVolumeEnumerator struct {
-	repository     repository.EC2Repository
-	factory        resource.ResourceFactory
-	providerConfig tf.TerraformProviderConfig
+	repository repository.EC2Repository
+	factory    resource.ResourceFactory
 }
 
-func NewEC2EbsVolumeEnumerator(repo repository.EC2Repository, factory resource.ResourceFactory, providerConfig tf.TerraformProviderConfig) *EC2EbsVolumeEnumerator {
+func NewEC2EbsVolumeEnumerator(repo repository.EC2Repository, factory resource.ResourceFactory) *EC2EbsVolumeEnumerator {
 	return &EC2EbsVolumeEnumerator{
-		repository:     repo,
-		factory:        factory,
-		providerConfig: providerConfig,
+		repository: repo,
+		factory:    factory,
 	}
 }
 

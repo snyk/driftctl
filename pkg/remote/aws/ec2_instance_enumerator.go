@@ -3,22 +3,19 @@ package aws
 import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 )
 
 type EC2InstanceEnumerator struct {
-	repository     repository.EC2Repository
-	factory        resource.ResourceFactory
-	providerConfig tf.TerraformProviderConfig
+	repository repository.EC2Repository
+	factory    resource.ResourceFactory
 }
 
-func NewEC2InstanceEnumerator(repo repository.EC2Repository, factory resource.ResourceFactory, providerConfig tf.TerraformProviderConfig) *EC2InstanceEnumerator {
+func NewEC2InstanceEnumerator(repo repository.EC2Repository, factory resource.ResourceFactory) *EC2InstanceEnumerator {
 	return &EC2InstanceEnumerator{
-		repository:     repo,
-		factory:        factory,
-		providerConfig: providerConfig,
+		repository: repo,
+		factory:    factory,
 	}
 }
 
