@@ -1,0 +1,50 @@
+[
+  {
+    "child_health_threshold": 0,
+    "child_healthchecks": [],
+    "cloudwatch_alarm_name": null,
+    "cloudwatch_alarm_region": null,
+    "disabled": false,
+    "enable_sni": false,
+    "failure_threshold": 5,
+    "fqdn": "moadib.net",
+    "id": "7001a9df-ded4-4802-9909-668eb80b972b",
+    "insufficient_data_health_status": "",
+    "invert_healthcheck": false,
+    "ip_address": "",
+    "measure_latency": false,
+    "port": 80,
+    "reference_name": null,
+    "regions": [],
+    "request_interval": 30,
+    "resource_path": "/",
+    "search_string": "",
+    "tags": {
+      "Name": "http-moadib-net"
+    },
+    "type": "HTTP"
+  },
+  {
+    "child_health_threshold": 0,
+    "child_healthchecks": [],
+    "cloudwatch_alarm_name": null,
+    "cloudwatch_alarm_region": null,
+    "disabled": false,
+    "enable_sni": true,
+    "failure_threshold": 5,
+    "fqdn": "moadib.net",
+    "id": "84fc318a-2e0d-41d6-b638-280e2f0f4e26",
+    "insufficient_data_health_status": "",
+    "invert_healthcheck": false,
+    "ip_address": "",
+    "measure_latency": false,
+    "port": 443,
+    "reference_name": null,
+    "regions": [],
+    "request_interval": 30,
+    "resource_path": "/",
+    "search_string": "MoAdiB",
+    "tags": {},
+    "type": "HTTPS_STR_MATCH"
+  }
+]

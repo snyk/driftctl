@@ -93,6 +93,9 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewDefaultVPCEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsDefaultVpcResourceType, common.NewGenericDetailsFetcher(aws.AwsDefaultVpcResourceType, provider, deserializer))
 
+	remoteLibrary.AddEnumerator(NewRoute53HealthCheckEnumerator(route53repository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsRoute53HealthCheckResourceType, common.NewGenericDetailsFetcher(aws.AwsRoute53HealthCheckResourceType, provider, deserializer))
+
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewS3BucketPolicySupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewRoute53ZoneSupplier(provider, deserializer, route53repository))
@@ -121,7 +124,6 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary.AddSupplier(NewSNSTopicPolicySupplier(provider, deserializer, snsRepository))
 	supplierLibrary.AddSupplier(NewSNSTopicSubscriptionSupplier(provider, alerter, deserializer, snsRepository))
 	supplierLibrary.AddSupplier(NewDynamoDBTableSupplier(provider, deserializer, dynamoDBRepository))
-	supplierLibrary.AddSupplier(NewRoute53HealthCheckSupplier(provider, deserializer, route53repository))
 	supplierLibrary.AddSupplier(NewCloudfrontDistributionSupplier(provider, deserializer, cloudfrontRepository))
 	supplierLibrary.AddSupplier(NewECRRepositorySupplier(provider, deserializer, ecrRepository))
 	supplierLibrary.AddSupplier(NewKMSAliasSupplier(provider, deserializer, kmsRepository))
