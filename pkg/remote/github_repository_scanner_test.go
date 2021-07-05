@@ -19,30 +19,29 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestScanGithubTeam(t *testing.T) {
+func TestScanGithubRepository(t *testing.T) {
 
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *github.MockGithubRepository)
+		mocks   func(client *github.MockGithubRepository)
 		err     error
 	}{
 		{
-			test:    "no github teams",
-			dirName: "github_teams_empty",
+			test:    "no github repos",
+			dirName: "github_repository_empty",
 			mocks: func(client *github.MockGithubRepository) {
-				client.On("ListTeams").Return([]github.Team{}, nil)
+				client.On("ListRepositories").Return([]string{}, nil)
 			},
 			err: nil,
 		},
 		{
-			test:    "Multiple github teams with parent",
-			dirName: "github_teams_multiple",
+			test:    "Multiple github repos Table",
+			dirName: "github_repository_multiple",
 			mocks: func(client *github.MockGithubRepository) {
-				client.On("ListTeams").Return([]github.Team{
-					{DatabaseId: 4556811}, // github_team.team1
-					{DatabaseId: 4556812}, // github_team.team2
-					{DatabaseId: 4556814}, // github_team.with_parent
+				client.On("ListRepositories").Return([]string{
+					"driftctl",
+					"driftctl-demos",
 				}, nil)
 			},
 			err: nil,
@@ -84,10 +83,10 @@ func TestScanGithubTeam(t *testing.T) {
 				repo = github.NewGithubRepository(realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(github.NewGithubTeamEnumerator(repo, factory, tf.TerraformProviderConfig{
+			remoteLibrary.AddEnumerator(github.NewGithubRepositoryEnumerator(repo, factory, tf.TerraformProviderConfig{
 				Name: "test",
 			}))
-			remoteLibrary.AddDetailsFetcher(githubres.GithubTeamResourceType, common.NewGenericDetailsFetcher(githubres.GithubTeamResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(githubres.GithubRepositoryResourceType, common.NewGenericDetailsFetcher(githubres.GithubRepositoryResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
@@ -95,7 +94,7 @@ func TestScanGithubTeam(t *testing.T) {
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, githubres.GithubTeamResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			test.TestAgainstGoldenFile(got, githubres.GithubRepositoryResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
 		})
 	}
 }
