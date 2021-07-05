@@ -56,7 +56,8 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewGithubTeamMembershipEnumerator(repository, factory))
 	remoteLibrary.AddDetailsFetcher(github.GithubTeamMembershipResourceType, common.NewGenericDetailsFetcher(github.GithubTeamMembershipResourceType, provider, deserializer))
 
-	supplierLibrary.AddSupplier(NewGithubBranchProtectionSupplier(provider, repository, deserializer))
+	remoteLibrary.AddEnumerator(NewGithubBranchProtectionEnumerator(repository, factory))
+	remoteLibrary.AddDetailsFetcher(github.GithubBranchProtectionResourceType, common.NewGenericDetailsFetcher(github.GithubBranchProtectionResourceType, provider, deserializer))
 
 	err = resourceSchemaRepository.Init(version, provider.Schema())
 	if err != nil {
