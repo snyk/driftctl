@@ -4,22 +4,19 @@ import (
 	"fmt"
 
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/github"
 )
 
 type GithubTeamEnumerator struct {
-	repository     GithubRepository
-	factory        resource.ResourceFactory
-	providerConfig tf.TerraformProviderConfig
+	repository GithubRepository
+	factory    resource.ResourceFactory
 }
 
-func NewGithubTeamEnumerator(repo GithubRepository, factory resource.ResourceFactory, providerConfig tf.TerraformProviderConfig) *GithubTeamEnumerator {
+func NewGithubTeamEnumerator(repo GithubRepository, factory resource.ResourceFactory) *GithubTeamEnumerator {
 	return &GithubTeamEnumerator{
-		repository:     repo,
-		factory:        factory,
-		providerConfig: providerConfig,
+		repository: repo,
+		factory:    factory,
 	}
 }
 

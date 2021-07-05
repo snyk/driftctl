@@ -7,7 +7,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	"github.com/cloudskiff/driftctl/pkg/remote/github"
-	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	githubres "github.com/cloudskiff/driftctl/pkg/resource/github"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
@@ -84,9 +83,7 @@ func TestScanGithubTeam(t *testing.T) {
 				repo = github.NewGithubRepository(realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(github.NewGithubTeamEnumerator(repo, factory, tf.TerraformProviderConfig{
-				Name: "test",
-			}))
+			remoteLibrary.AddEnumerator(github.NewGithubTeamEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(githubres.GithubTeamResourceType, common.NewGenericDetailsFetcher(githubres.GithubTeamResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
