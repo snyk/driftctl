@@ -762,7 +762,7 @@ func TestVPC(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewVPCEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsVpcResourceType, common.NewGenericDetailFetcher(resourceaws.AwsVpcResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsVpcResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsVpcResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
@@ -864,7 +864,7 @@ func TestDefaultVPC(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewDefaultVPCEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultVpcResourceType, common.NewGenericDetailFetcher(resourceaws.AwsDefaultVpcResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultVpcResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultVpcResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
