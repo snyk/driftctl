@@ -1,0 +1,20 @@
+[
+ {
+  "arn": "arn:aws:ec2:eu-west-3:047081014315:internet-gateway/igw-047b487f5c60fca99",
+  "id": "igw-047b487f5c60fca99",
+  "owner_id": "047081014315",
+  "tags": {
+   "Name": "foo"
+  },
+  "vpc_id": "vpc-0a41660dc86c8de5e"
+ },
+ {
+  "arn": "arn:aws:ec2:eu-west-3:047081014315:internet-gateway/igw-0184eb41aadc62d1c",
+  "id": "igw-0184eb41aadc62d1c",
+  "owner_id": "047081014315",
+  "tags": {
+   "Name": "main"
+  },
+  "vpc_id": "vpc-0f3ac2b7909b6bedd"
+ }
+]

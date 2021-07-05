@@ -81,6 +81,8 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsEipAssociationResourceType, common.NewGenericDetailsFetcher(aws.AwsEipAssociationResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewEC2InstanceEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsInstanceResourceType, NewEC2InstanceDetailsFetcher(provider, deserializer))
+	remoteLibrary.AddEnumerator(NewEC2InternetGatewayEnumerator(ec2repository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsInternetGatewayResourceType, common.NewGenericDetailsFetcher(aws.AwsInternetGatewayResourceType, provider, deserializer))
 
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewS3BucketPolicySupplier(provider, s3Repository, deserializer))
@@ -105,7 +107,6 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary.AddSupplier(NewRouteSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewRouteTableAssociationSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewNatGatewaySupplier(provider, deserializer, ec2repository))
-	supplierLibrary.AddSupplier(NewInternetGatewaySupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewSqsQueueSupplier(provider, deserializer, sqsRepository))
 	supplierLibrary.AddSupplier(NewSqsQueuePolicySupplier(provider, deserializer, sqsRepository))
 	supplierLibrary.AddSupplier(NewSNSTopicSupplier(provider, deserializer, snsRepository))
