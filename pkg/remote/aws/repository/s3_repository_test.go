@@ -242,6 +242,113 @@ func Test_s3Repository_GetBucketNotification(t *testing.T) {
 	}
 }
 
+func Test_s3Repository_GetBucketPolicy(t *testing.T) {
+
+	tests := []struct {
+		name               string
+		bucketName, region string
+		mocks              func(client *awstest.MockFakeS3)
+		want               *string
+		wantErr            string
+	}{
+		{
+			name:       "get nil bucket policy",
+			bucketName: "test-bucket",
+			region:     "us-east-1",
+			mocks: func(client *awstest.MockFakeS3) {
+				client.On("GetBucketPolicy", &s3.GetBucketPolicyInput{
+					Bucket: aws.String("test-bucket"),
+				}).Return(
+					&s3.GetBucketPolicyOutput{},
+					nil,
+				).Once()
+			},
+			want: nil,
+		},
+		{
+			name:       "get empty bucket policy",
+			bucketName: "test-bucket",
+			region:     "us-east-1",
+			mocks: func(client *awstest.MockFakeS3) {
+				client.On("GetBucketPolicy", &s3.GetBucketPolicyInput{
+					Bucket: aws.String("test-bucket"),
+				}).Return(
+					&s3.GetBucketPolicyOutput{
+						Policy: awssdk.String(""),
+					},
+					nil,
+				).Once()
+			},
+			want: nil,
+		},
+		{
+			name:       "get bucket policy",
+			bucketName: "test-bucket",
+			region:     "us-east-1",
+			mocks: func(client *awstest.MockFakeS3) {
+				client.On("GetBucketPolicy", &s3.GetBucketPolicyInput{
+					Bucket: aws.String("test-bucket"),
+				}).Return(
+					&s3.GetBucketPolicyOutput{
+						Policy: awssdk.String("foobar"),
+					},
+					nil,
+				).Once()
+			},
+			want: awssdk.String("foobar"),
+		},
+		{
+			name:       "get bucket location when error",
+			bucketName: "test-bucket",
+			region:     "us-east-1",
+			mocks: func(client *awstest.MockFakeS3) {
+				client.On("GetBucketPolicy", &s3.GetBucketPolicyInput{
+					Bucket: aws.String("test-bucket"),
+				}).Return(
+					nil,
+					awserr.New("UnknownError", "aws error", nil),
+				).Once()
+			},
+			wantErr: "Error listing bucket policy test-bucket: UnknownError: aws error",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
+			mockedClient := &awstest.MockFakeS3{}
+			tt.mocks(mockedClient)
+			factory := client.MockAwsClientFactoryInterface{}
+			factory.On("GetS3Client", &aws.Config{Region: &tt.region}).Return(mockedClient).Once()
+			r := NewS3Repository(&factory, store)
+			got, err := r.GetBucketPolicy(tt.bucketName, tt.region)
+			factory.AssertExpectations(t)
+			if err != nil && tt.wantErr == "" {
+				t.Fatalf("Unexpected error %+v", err)
+			}
+			if err != nil {
+				assert.Equal(t, tt.wantErr, err.Error())
+			}
+
+			if err == nil && tt.want != nil {
+				// Check that results were cached
+				cachedData, err := r.GetBucketPolicy(tt.bucketName, tt.region)
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, awssdk.String(""), store.Get(fmt.Sprintf("s3GetBucketPolicy_%s_%s", tt.bucketName, tt.region)))
+			}
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}
+
 func Test_s3Repository_ListBucketInventoryConfigurations(t *testing.T) {
 	tests := []struct {
 		name  string
