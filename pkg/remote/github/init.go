@@ -44,10 +44,10 @@ func Init(version string, alerter *alerter.Alerter,
 	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.GITHUB, provider)
 
-	remoteLibrary.AddEnumerator(NewGithubTeamEnumerator(repository, factory, provider.Config))
+	remoteLibrary.AddEnumerator(NewGithubTeamEnumerator(repository, factory))
 	remoteLibrary.AddDetailsFetcher(github.GithubTeamResourceType, common.NewGenericDetailsFetcher(github.GithubTeamResourceType, provider, deserializer))
 
-	remoteLibrary.AddEnumerator(NewGithubRepositoryEnumerator(repository, factory, provider.Config))
+	remoteLibrary.AddEnumerator(NewGithubRepositoryEnumerator(repository, factory))
 	remoteLibrary.AddDetailsFetcher(github.GithubRepositoryResourceType, common.NewGenericDetailsFetcher(github.GithubRepositoryResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewGithubMembershipEnumerator(repository, factory))
@@ -56,7 +56,8 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewGithubTeamMembershipEnumerator(repository, factory))
 	remoteLibrary.AddDetailsFetcher(github.GithubTeamMembershipResourceType, common.NewGenericDetailsFetcher(github.GithubTeamMembershipResourceType, provider, deserializer))
 
-	supplierLibrary.AddSupplier(NewGithubBranchProtectionSupplier(provider, repository, deserializer))
+	remoteLibrary.AddEnumerator(NewGithubBranchProtectionEnumerator(repository, factory))
+	remoteLibrary.AddDetailsFetcher(github.GithubBranchProtectionResourceType, common.NewGenericDetailsFetcher(github.GithubBranchProtectionResourceType, provider, deserializer))
 
 	err = resourceSchemaRepository.Init(version, provider.Schema())
 	if err != nil {

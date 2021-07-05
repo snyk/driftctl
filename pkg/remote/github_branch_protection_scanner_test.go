@@ -18,30 +18,33 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestScanGithubTeam(t *testing.T) {
+func TestScanGithubBranchProtection(t *testing.T) {
 
-	tests := []struct {
+	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *github.MockGithubRepository)
+		mocks   func(client *github.MockGithubRepository)
 		err     error
 	}{
 		{
-			test:    "no github teams",
-			dirName: "github_teams_empty",
+			test:    "no branch protection",
+			dirName: "github_branch_protection_empty",
 			mocks: func(client *github.MockGithubRepository) {
-				client.On("ListTeams").Return([]github.Team{}, nil)
+				client.On("ListBranchProtection").Return([]string{}, nil)
 			},
 			err: nil,
 		},
 		{
-			test:    "Multiple github teams with parent",
-			dirName: "github_teams_multiple",
+			test:    "Multiple branch protections",
+			dirName: "github_branch_protection_multiples",
 			mocks: func(client *github.MockGithubRepository) {
-				client.On("ListTeams").Return([]github.Team{
-					{DatabaseId: 4556811}, // github_team.team1
-					{DatabaseId: 4556812}, // github_team.team2
-					{DatabaseId: 4556814}, // github_team.with_parent
+				client.On("ListBranchProtection").Return([]string{
+					"MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0NzI=", //"repo0:main"
+					"MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0Nzg=", //"repo0:toto"
+					"MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0NzQ=", //"repo1:main"
+					"MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0ODA=", //"repo1:toto"
+					"MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0NzE=", //"repo2:main"
+					"MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0Nzc=", //"repo2:toto"
 				}, nil)
 			},
 			err: nil,
@@ -54,7 +57,7 @@ func TestScanGithubTeam(t *testing.T) {
 	deserializer := resource.NewDeserializer(factory)
 	alerter := &mocks.AlerterInterface{}
 
-	for _, c := range tests {
+	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
@@ -83,8 +86,8 @@ func TestScanGithubTeam(t *testing.T) {
 				repo = github.NewGithubRepository(realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(github.NewGithubTeamEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(githubres.GithubTeamResourceType, common.NewGenericDetailsFetcher(githubres.GithubTeamResourceType, provider, deserializer))
+			remoteLibrary.AddEnumerator(github.NewGithubBranchProtectionEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(githubres.GithubBranchProtectionResourceType, common.NewGenericDetailsFetcher(githubres.GithubBranchProtectionResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
@@ -92,7 +95,7 @@ func TestScanGithubTeam(t *testing.T) {
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, githubres.GithubTeamResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			test.TestAgainstGoldenFile(got, githubres.GithubBranchProtectionResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
 		})
 	}
 }

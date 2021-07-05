@@ -1,43 +1,41 @@
 package github
 
 import (
-	"fmt"
-
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/github"
 )
 
-type GithubTeamEnumerator struct {
+type GithubBranchProtectionEnumerator struct {
 	repository GithubRepository
 	factory    resource.ResourceFactory
 }
 
-func NewGithubTeamEnumerator(repo GithubRepository, factory resource.ResourceFactory) *GithubTeamEnumerator {
-	return &GithubTeamEnumerator{
+func NewGithubBranchProtectionEnumerator(repo GithubRepository, factory resource.ResourceFactory) *GithubBranchProtectionEnumerator {
+	return &GithubBranchProtectionEnumerator{
 		repository: repo,
 		factory:    factory,
 	}
 }
 
-func (g *GithubTeamEnumerator) SupportedType() resource.ResourceType {
-	return github.GithubTeamResourceType
+func (g *GithubBranchProtectionEnumerator) SupportedType() resource.ResourceType {
+	return github.GithubBranchProtectionResourceType
 }
 
-func (g *GithubTeamEnumerator) Enumerate() ([]resource.Resource, error) {
-	resourceList, err := g.repository.ListTeams()
+func (g *GithubBranchProtectionEnumerator) Enumerate() ([]resource.Resource, error) {
+	ids, err := g.repository.ListBranchProtection()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, string(g.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(resourceList))
+	results := make([]resource.Resource, len(ids))
 
-	for _, team := range resourceList {
+	for _, id := range ids {
 		results = append(
 			results,
 			g.factory.CreateAbstractResource(
 				string(g.SupportedType()),
-				fmt.Sprintf("%d", team.DatabaseId),
+				id,
 				map[string]interface{}{},
 			),
 		)
