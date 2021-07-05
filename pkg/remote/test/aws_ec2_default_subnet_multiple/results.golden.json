@@ -1,0 +1,59 @@
+[
+ {
+  "arn": "arn:aws:ec2:us-east-1:929327065333:subnet/subnet-44fe0c65",
+  "assign_ipv6_address_on_creation": false,
+  "availability_zone": "us-east-1a",
+  "availability_zone_id": "use1-az2",
+  "cidr_block": "172.31.80.0/20",
+  "id": "subnet-44fe0c65",
+  "ipv6_cidr_block": "",
+  "ipv6_cidr_block_association_id": "",
+  "map_public_ip_on_launch": true,
+  "outpost_arn": "",
+  "owner_id": "929327065333",
+  "tags": {},
+  "timeouts": {
+   "create": null,
+   "delete": null
+  },
+  "vpc_id": "vpc-41d1d13b"
+ },
+ {
+  "arn": "arn:aws:ec2:us-east-1:929327065333:subnet/subnet-65e16628",
+  "assign_ipv6_address_on_creation": false,
+  "availability_zone": "us-east-1b",
+  "availability_zone_id": "use1-az4",
+  "cidr_block": "172.31.16.0/20",
+  "id": "subnet-65e16628",
+  "ipv6_cidr_block": "",
+  "ipv6_cidr_block_association_id": "",
+  "map_public_ip_on_launch": true,
+  "outpost_arn": "",
+  "owner_id": "929327065333",
+  "tags": {},
+  "timeouts": {
+   "create": null,
+   "delete": null
+  },
+  "vpc_id": "vpc-41d1d13b"
+ },
+ {
+  "arn": "arn:aws:ec2:us-east-1:929327065333:subnet/subnet-afa656f0",
+  "assign_ipv6_address_on_creation": false,
+  "availability_zone": "us-east-1c",
+  "availability_zone_id": "use1-az6",
+  "cidr_block": "172.31.32.0/20",
+  "id": "subnet-afa656f0",
+  "ipv6_cidr_block": "",
+  "ipv6_cidr_block_association_id": "",
+  "map_public_ip_on_launch": true,
+  "outpost_arn": "",
+  "owner_id": "929327065333",
+  "tags": {},
+  "timeouts": {
+   "create": null,
+   "delete": null
+  },
+  "vpc_id": "vpc-41d1d13b"
+ }
+]

@@ -89,6 +89,10 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsDefaultVpcResourceType, common.NewGenericDetailsFetcher(aws.AwsDefaultVpcResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewEC2RouteTableAssociationEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsRouteTableAssociationResourceType, NewEC2RouteTableAssociationDetailsFetcher(provider, deserializer))
+	remoteLibrary.AddEnumerator(NewEC2SubnetEnumerator(ec2repository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsSubnetResourceType, common.NewGenericDetailsFetcher(aws.AwsSubnetResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewEC2DefaultSubnetEnumerator(ec2repository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsDefaultSubnetResourceType, common.NewGenericDetailsFetcher(aws.AwsDefaultSubnetResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewKMSKeyEnumerator(kmsRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsKmsKeyResourceType, common.NewGenericDetailsFetcher(aws.AwsKmsKeyResourceType, provider, deserializer))
@@ -115,7 +119,6 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary.AddSupplier(NewIamRolePolicySupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamRolePolicyAttachmentSupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewVPCSecurityGroupRuleSupplier(provider, deserializer, ec2repository))
-	supplierLibrary.AddSupplier(NewSubnetSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewRouteTableSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewRouteSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewNatGatewaySupplier(provider, deserializer, ec2repository))

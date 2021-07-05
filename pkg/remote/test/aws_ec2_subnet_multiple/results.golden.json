@@ -1,0 +1,59 @@
+[
+ {
+  "arn": "arn:aws:ec2:us-east-1:929327065333:subnet/subnet-05810d3f933925f6d",
+  "assign_ipv6_address_on_creation": false,
+  "availability_zone": "us-east-1d",
+  "availability_zone_id": "use1-az1",
+  "cidr_block": "10.0.0.0/24",
+  "id": "subnet-05810d3f933925f6d",
+  "ipv6_cidr_block": "",
+  "ipv6_cidr_block_association_id": "",
+  "map_public_ip_on_launch": false,
+  "outpost_arn": "",
+  "owner_id": "929327065333",
+  "tags": {},
+  "timeouts": {
+   "create": null,
+   "delete": null
+  },
+  "vpc_id": "vpc-0bf43ac9b5ed243f7"
+ },
+ {
+  "arn": "arn:aws:ec2:us-east-1:929327065333:subnet/subnet-0b13f1e0eacf67424",
+  "assign_ipv6_address_on_creation": false,
+  "availability_zone": "us-east-1e",
+  "availability_zone_id": "use1-az3",
+  "cidr_block": "10.0.1.0/24",
+  "id": "subnet-0b13f1e0eacf67424",
+  "ipv6_cidr_block": "",
+  "ipv6_cidr_block_association_id": "",
+  "map_public_ip_on_launch": false,
+  "outpost_arn": "",
+  "owner_id": "929327065333",
+  "tags": {},
+  "timeouts": {
+   "create": null,
+   "delete": null
+  },
+  "vpc_id": "vpc-0bf43ac9b5ed243f7"
+ },
+ {
+  "arn": "arn:aws:ec2:us-east-1:929327065333:subnet/subnet-0c9b78001fe186e22",
+  "assign_ipv6_address_on_creation": false,
+  "availability_zone": "us-east-1f",
+  "availability_zone_id": "use1-az5",
+  "cidr_block": "10.0.2.0/24",
+  "id": "subnet-0c9b78001fe186e22",
+  "ipv6_cidr_block": "",
+  "ipv6_cidr_block_association_id": "",
+  "map_public_ip_on_launch": false,
+  "outpost_arn": "",
+  "owner_id": "929327065333",
+  "tags": {},
+  "timeouts": {
+   "create": null,
+   "delete": null
+  },
+  "vpc_id": "vpc-0bf43ac9b5ed243f7"
+ }
+]
