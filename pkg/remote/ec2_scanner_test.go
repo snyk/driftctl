@@ -804,7 +804,7 @@ func TestVPC(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			session := session.Must(session.NewSessionWithOptions(session.Options{
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
@@ -833,7 +833,7 @@ func TestVPC(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository.NewEC2Repository(session, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewVPCEnumerator(repo, factory))
@@ -907,7 +907,7 @@ func TestDefaultVPC(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			session := session.Must(session.NewSessionWithOptions(session.Options{
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
@@ -936,7 +936,7 @@ func TestDefaultVPC(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository.NewEC2Repository(session, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewDefaultVPCEnumerator(repo, factory))
@@ -1586,7 +1586,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			session := session.Must(session.NewSessionWithOptions(session.Options{
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
@@ -1615,7 +1615,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository.NewEC2Repository(session, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewVPCSecurityGroupEnumerator(repo, factory))
@@ -1685,7 +1685,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			session := session.Must(session.NewSessionWithOptions(session.Options{
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
@@ -1714,7 +1714,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository.NewEC2Repository(session, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewVPCDefaultSecurityGroupEnumerator(repo, factory))
@@ -1815,6 +1815,161 @@ func TestEC2NatGateway(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsNatGatewayResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
+
+func TestEC2Route(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockEC2Repository)
+		wantErr error
+	}{
+		{
+			// route table with no routes case is not possible
+			// as a default route will always be present in each route table
+			test:    "no routes",
+			dirName: "aws_ec2_route_empty",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{}, nil)
+			},
+		},
+		{
+			test:    "multiple routes (mixed default_route_table and route_table)",
+			dirName: "aws_ec2_route_multiple",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{
+					{
+						RouteTableId: awssdk.String("rtb-096bdfb69309c54c3"), // table1
+						Routes: []*ec2.Route{
+							{
+								DestinationCidrBlock: awssdk.String("10.0.0.0/16"),
+								Origin:               awssdk.String("CreateRouteTable"), // default route
+							},
+							{
+								DestinationCidrBlock: awssdk.String("1.1.1.1/32"),
+								GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
+							},
+							{
+								DestinationIpv6CidrBlock: awssdk.String("::/0"),
+								GatewayId:                awssdk.String("igw-030e74f73bd67f21b"),
+							},
+						},
+					},
+					{
+						RouteTableId: awssdk.String("rtb-0169b0937fd963ddc"), // table2
+						Routes: []*ec2.Route{
+							{
+								DestinationCidrBlock: awssdk.String("10.0.0.0/16"),
+								Origin:               awssdk.String("CreateRouteTable"), // default route
+							},
+							{
+								DestinationCidrBlock: awssdk.String("0.0.0.0/0"),
+								GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
+							},
+							{
+								DestinationIpv6CidrBlock: awssdk.String("::/0"),
+								GatewayId:                awssdk.String("igw-030e74f73bd67f21b"),
+							},
+						},
+					},
+					{
+						RouteTableId: awssdk.String("rtb-02780c485f0be93c5"), // default_table
+						VpcId:        awssdk.String("vpc-09fe5abc2309ba49d"),
+						Associations: []*ec2.RouteTableAssociation{
+							{
+								Main: awssdk.Bool(true),
+							},
+						},
+						Routes: []*ec2.Route{
+							{
+								DestinationCidrBlock: awssdk.String("10.0.0.0/16"),
+								Origin:               awssdk.String("CreateRouteTable"), // default route
+							},
+							{
+								DestinationCidrBlock: awssdk.String("10.1.1.0/24"),
+								GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
+							},
+							{
+								DestinationCidrBlock: awssdk.String("10.1.2.0/24"),
+								GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
+							},
+						},
+					},
+					{
+						RouteTableId: awssdk.String(""), // table3
+						Routes: []*ec2.Route{
+							{
+								DestinationCidrBlock: awssdk.String("10.0.0.0/16"),
+								Origin:               awssdk.String("CreateRouteTable"), // default route
+							},
+						},
+					},
+				}, nil)
+			},
+		},
+		{
+			test:    "cannot list routes",
+			dirName: "aws_ec2_route_list",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllRouteTables").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: nil,
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewEC2RouteEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteResourceType, aws.NewEC2RouteDetailsFetcher(provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsRouteResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
 		})
 	}
 }

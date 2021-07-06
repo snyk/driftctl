@@ -29,8 +29,11 @@ func (s *Deserializer) Deserialize(ty string, rawList []cty.Value) ([]Resource, 
 }
 
 func (s *Deserializer) DeserializeOne(ty string, value cty.Value) (Resource, error) {
-	var attrs Attributes
+	if value.IsNull() {
+		return nil, nil
+	}
 
+	var attrs Attributes
 	bytes, _ := ctyjson.Marshal(value, value.Type())
 	err := json.Unmarshal(bytes, &attrs)
 	if err != nil {
