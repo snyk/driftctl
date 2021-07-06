@@ -67,6 +67,31 @@ func TestNewS3Reader(t *testing.T) {
 	)
 }
 
+func TestNewS3ReaderWithEnvProxy(t *testing.T) {
+	assert := assert.New(t)
+	os.Setenv("AWS_DEFAULT_REGION", "us-east-1")
+	os.Setenv("DCTL_S3_DEFAULT_REGION", "eu-west-3")
+	reader, err := NewS3Reader("sample_bucket/path/to/state.tfstate")
+
+	got := reader.S3Client.(*s3.S3).Config.Region
+	if aws.StringValue(got) != "eu-west-3" {
+		t.Errorf("NewS3Reader().S3Client.Config.Region got = %v, want %v", aws.StringValue(got), "eu-west-3")
+	}
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	assert.Equal(
+		"path/to/state.tfstate",
+		*reader.input.Key,
+	)
+	assert.Equal(
+		"sample_bucket",
+		*reader.input.Bucket,
+	)
+}
+
 func TestS3Backend_ReadWithError(t *testing.T) {
 	assert := assert.New(t)
 	fakeS3 := &awstest.MockFakeS3{}
