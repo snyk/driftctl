@@ -2098,7 +2098,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 			mocks: func(client *repository.MockEC2Repository) {
 				client.On("ListAllSecurityGroups").Once().Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSecurityGroupRuleResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -2106,7 +2106,6 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -2121,6 +2120,8 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
