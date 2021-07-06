@@ -298,6 +298,20 @@ func Test_s3Repository_GetBucketPolicy(t *testing.T) {
 			want: awssdk.String("foobar"),
 		},
 		{
+			name:       "get bucket location on 404",
+			bucketName: "test-bucket",
+			region:     "us-east-1",
+			mocks: func(client *awstest.MockFakeS3) {
+				client.On("GetBucketPolicy", &s3.GetBucketPolicyInput{
+					Bucket: aws.String("test-bucket"),
+				}).Return(
+					nil,
+					awserr.New("NoSuchBucketPolicy", "", nil),
+				).Once()
+			},
+			want: nil,
+		},
+		{
 			name:       "get bucket location when error",
 			bucketName: "test-bucket",
 			region:     "us-east-1",
