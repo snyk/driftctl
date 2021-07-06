@@ -80,7 +80,7 @@ func TestSNSTopicPolicySupplier_Resources(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			supplierLibrary.AddSupplier(NewSNSTopicSupplier(provider, deserializer, repository.NewSNSRepository(provider.session, cache.New(0))))
+			supplierLibrary.AddSupplier(NewSNSTopicPolicySupplier(provider, deserializer, repository.NewSNSRepository(provider.session, cache.New(0))))
 		}
 
 		t.Run(c.test, func(tt *testing.T) {
