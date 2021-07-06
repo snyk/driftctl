@@ -58,6 +58,11 @@ func (s *s3Repository) GetBucketPolicy(bucketName, region string) (*string, erro
 			&s3.GetBucketPolicyInput{Bucket: &bucketName},
 		)
 	if err != nil {
+		if awsErr, ok := err.(awserr.Error); ok {
+			if awsErr.Code() == "NoSuchBucketPolicy" {
+				return nil, nil
+			}
+		}
 		return nil, errors.Wrapf(
 			err,
 			"Error listing bucket policy %s",
