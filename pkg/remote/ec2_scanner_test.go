@@ -1517,3 +1517,199 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 		})
 	}
 }
+
+func TestVpcSecurityGroup(t *testing.T) {
+
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockEC2Repository)
+		wantErr error
+	}{
+		{
+			test:    "no security groups",
+			dirName: "vpc_security_group_empty",
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{}, []*ec2.SecurityGroup{}, nil)
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "with security groups",
+			dirName: "vpc_security_group_multiple",
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{
+					{
+						GroupId:   awssdk.String("sg-0254c038e32f25530"),
+						GroupName: awssdk.String("foo"),
+					},
+				}, []*ec2.SecurityGroup{
+					{
+						GroupId:   awssdk.String("sg-9e0204ff"),
+						GroupName: awssdk.String("default"),
+					},
+				}, nil)
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "cannot list security groups",
+			dirName: "vpc_security_group_empty",
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllSecurityGroups").Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSecurityGroupResourceType),
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+	alerter := &mocks.AlerterInterface{}
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			session := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(session, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewVPCSecurityGroupEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSecurityGroupResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSecurityGroupResourceType, provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsSecurityGroupResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
+
+func TestVpcDefaultSecurityGroup(t *testing.T) {
+
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockEC2Repository)
+		wantErr error
+	}{
+		{
+			test:    "no security groups",
+			dirName: "vpc_default_security_group_empty",
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{}, []*ec2.SecurityGroup{}, nil)
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "with security groups",
+			dirName: "vpc_default_security_group_multiple",
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{
+					{
+						GroupId:   awssdk.String("sg-0254c038e32f25530"),
+						GroupName: awssdk.String("foo"),
+					},
+				}, []*ec2.SecurityGroup{
+					{
+						GroupId:   awssdk.String("sg-9e0204ff"),
+						GroupName: awssdk.String("default"),
+					},
+				}, nil)
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "cannot list security groups",
+			dirName: "vpc_default_security_group_empty",
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllSecurityGroups").Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSecurityGroupResourceType),
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+	alerter := &mocks.AlerterInterface{}
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			session := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(session, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewVPCDefaultSecurityGroupEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultSecurityGroupResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultSecurityGroupResourceType, provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsDefaultSecurityGroupResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
