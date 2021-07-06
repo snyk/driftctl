@@ -243,3 +243,204 @@ func TestRoute53_Zone(t *testing.T) {
 		})
 	}
 }
+
+func TestRoute53_Record(t *testing.T) {
+
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(*repository.MockRoute53Repository)
+		err     error
+	}{
+		{
+			test:    "no records",
+			dirName: "route53_zone_with_no_record",
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{
+						{
+							Id:   awssdk.String("Z1035360GLIB82T1EH2G"),
+							Name: awssdk.String("foo-0.com"),
+						},
+					},
+					nil,
+				)
+				client.On("ListRecordsForZone", "Z1035360GLIB82T1EH2G").Return([]*route53.ResourceRecordSet{}, nil)
+			},
+			err: nil,
+		},
+		{
+			test:    "multiples records in multiples zones",
+			dirName: "route53_record_multiples",
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{
+						{
+							Id:   awssdk.String("Z1035360GLIB82T1EH2G"),
+							Name: awssdk.String("foo-0.com"),
+						},
+						{
+							Id:   awssdk.String("Z10347383HV75H96J919W"),
+							Name: awssdk.String("foo-1.com"),
+						},
+					},
+					nil,
+				)
+				client.On("ListRecordsForZone", "Z1035360GLIB82T1EH2G").Return([]*route53.ResourceRecordSet{
+					{
+						Name: awssdk.String("foo-0.com"),
+						Type: awssdk.String("NS"),
+					},
+					{
+						Name: awssdk.String("test0"),
+						Type: awssdk.String("A"),
+					},
+					{
+						Name: awssdk.String("test1"),
+						Type: awssdk.String("A"),
+					},
+					{
+						Name: awssdk.String("test2"),
+						Type: awssdk.String("A"),
+					},
+					{
+						Name: awssdk.String("test3"),
+						Type: awssdk.String("A"),
+					},
+				}, nil)
+				client.On("ListRecordsForZone", "Z10347383HV75H96J919W").Return([]*route53.ResourceRecordSet{
+					{
+						Name: awssdk.String("test2"),
+						Type: awssdk.String("A"),
+					},
+				}, nil)
+			},
+			err: nil,
+		},
+		{
+			test:    "explicit subdomain records",
+			dirName: "route53_record_explicit_subdomain",
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{
+						{
+							Id:   awssdk.String("Z06486383UC8WYSBZTWFM"),
+							Name: awssdk.String("foo-2.com"),
+						},
+					},
+					nil,
+				)
+				client.On("ListRecordsForZone", "Z06486383UC8WYSBZTWFM").Return([]*route53.ResourceRecordSet{
+					{
+						Name: awssdk.String("test0"),
+						Type: awssdk.String("TXT"),
+					},
+					{
+						Name: awssdk.String("test0"),
+						Type: awssdk.String("A"),
+					},
+					{
+						Name: awssdk.String("test1.foo-2.com"),
+						Type: awssdk.String("TXT"),
+					},
+					{
+						Name: awssdk.String("test1.foo-2.com"),
+						Type: awssdk.String("A"),
+					},
+					{
+						Name: awssdk.String("_test2.foo-2.com"),
+						Type: awssdk.String("TXT"),
+					},
+					{
+						Name: awssdk.String("_test2.foo-2.com"),
+						Type: awssdk.String("A"),
+					},
+				}, nil)
+			},
+			err: nil,
+		},
+		{
+			test:    "cannot list zones",
+			dirName: "route53_zone_with_no_record",
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{},
+					awserr.NewRequestFailure(nil, 403, ""))
+			},
+			err: nil,
+		},
+		{
+			test:    "cannot list records",
+			dirName: "route53_zone_with_no_record",
+			mocks: func(client *repository.MockRoute53Repository) {
+				client.On("ListAllZones").Return(
+					[]*route53.HostedZone{
+						{
+							Id:   awssdk.String("Z06486383UC8WYSBZTWFM"),
+							Name: awssdk.String("foo-2.com"),
+						},
+					},
+					nil)
+				client.On("ListRecordsForZone", "Z06486383UC8WYSBZTWFM").Return(
+					[]*route53.ResourceRecordSet{},
+					awserr.NewRequestFailure(nil, 403, ""))
+
+			},
+			err: nil,
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			session := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
+			fakeRepo := &repository.MockRoute53Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.Route53Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewRoute53Repository(session, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewRoute53RecordEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRoute53RecordResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRoute53RecordResourceType, provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, c.err, err)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsRoute53RecordResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
