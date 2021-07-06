@@ -91,7 +91,9 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsVpcResourceType, common.NewGenericDetailsFetcher(aws.AwsVpcResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewDefaultVPCEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsDefaultVpcResourceType, common.NewGenericDetailsFetcher(aws.AwsDefaultVpcResourceType, provider, deserializer))
-	remoteLibrary.AddEnumerator(NewEC2RouteTableEnumerator(ec2repository, factory))
+    remoteLibrary.AddEnumerator(NewVPCSecurityGroupRuleEnumerator(ec2repository, factory))
+    remoteLibrary.AddDetailsFetcher(aws.AwsSecurityGroupRuleResourceType, common.NewGenericDetailsFetcher(aws.AwsSecurityGroupRuleResourceType, provider, deserializer))
+    remoteLibrary.AddEnumerator(NewEC2RouteTableEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsRouteTableResourceType, common.NewGenericDetailsFetcher(aws.AwsRouteTableResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewEC2DefaultRouteTableEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsDefaultRouteTableResourceType, NewEC2DefaultRouteTableDetailsFetcher(provider, deserializer))
@@ -170,8 +172,6 @@ func Init(version string, alerter *alerter.Alerter,
 
 	remoteLibrary.AddEnumerator(NewECRRepositoryEnumerator(ecrRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsEcrRepositoryResourceType, common.NewGenericDetailsFetcher(aws.AwsEcrRepositoryResourceType, provider, deserializer))
-
-	supplierLibrary.AddSupplier(NewVPCSecurityGroupRuleSupplier(provider, deserializer, ec2repository))
 
 	err = resourceSchemaRepository.Init(version, provider.Schema())
 	if err != nil {
