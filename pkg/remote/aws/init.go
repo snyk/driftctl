@@ -109,6 +109,8 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsRoute53HealthCheckResourceType, common.NewGenericDetailsFetcher(aws.AwsRoute53HealthCheckResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewRoute53ZoneEnumerator(route53repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsRoute53ZoneResourceType, common.NewGenericDetailsFetcher(aws.AwsRoute53ZoneResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewRoute53RecordEnumerator(route53repository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsRoute53RecordResourceType, common.NewGenericDetailsFetcher(aws.AwsRoute53RecordResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewVPCSecurityGroupEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsSecurityGroupResourceType, common.NewGenericDetailsFetcher(aws.AwsSecurityGroupResourceType, provider, deserializer))
@@ -117,7 +119,6 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsDefaultSecurityGroupResourceType, common.NewGenericDetailsFetcher(aws.AwsDefaultSecurityGroupResourceType, provider, deserializer))
 
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
-	supplierLibrary.AddSupplier(NewRoute53RecordSupplier(provider, deserializer, route53repository))
 	supplierLibrary.AddSupplier(NewLambdaFunctionSupplier(provider, deserializer, lambdaRepository))
 	supplierLibrary.AddSupplier(NewDBSubnetGroupSupplier(provider, deserializer, rdsRepository))
 	supplierLibrary.AddSupplier(NewDBInstanceSupplier(provider, deserializer, rdsRepository))
