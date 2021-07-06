@@ -1836,9 +1836,16 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error, store memstore.Store) {
 				result.AssertInfrastructureIsInSync()
 				result.AssertManagedCount(5)
+
+				assert.Equal(t, "dev-dev", store.Bucket(memstore.TelemetryBucket).Get("version"))
+				assert.Equal(t, "linux", store.Bucket(memstore.TelemetryBucket).Get("os"))
+				assert.Equal(t, "amd64", store.Bucket(memstore.TelemetryBucket).Get("arch"))
+				assert.Equal(t, 5, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
+				assert.Equal(t, 5, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
+				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
 			},
 		},
 	}
