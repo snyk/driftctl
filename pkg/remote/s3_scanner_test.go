@@ -11,10 +11,10 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
@@ -76,7 +76,7 @@ func TestS3Bucket(t *testing.T) {
 			mocks: func(repository *repository.MockS3Repository) {
 				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsS3BucketResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -84,7 +84,6 @@ func TestS3Bucket(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -99,6 +98,8 @@ func TestS3Bucket(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.S3Repository = fakeRepo
@@ -198,7 +199,7 @@ func TestS3BucketInventory(t *testing.T) {
 			mocks: func(repository *repository.MockS3Repository) {
 				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsS3BucketInventoryResourceType, resourceaws.AwsS3BucketResourceType),
+			wantErr: nil,
 		},
 		{
 			test: "cannot list bucket inventories", dirName: "s3_bucket_inventories_list_inventories",
@@ -225,7 +226,7 @@ func TestS3BucketInventory(t *testing.T) {
 					awserr.NewRequestFailure(nil, 403, ""),
 				)
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsS3BucketInventoryResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -233,7 +234,6 @@ func TestS3BucketInventory(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -248,6 +248,8 @@ func TestS3BucketInventory(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.S3Repository = fakeRepo
@@ -393,14 +395,14 @@ func TestS3BucketNotification(t *testing.T) {
 				)
 				repository.On("GetBucketNotification", "dritftctl-test-notifications-error", "eu-west-3").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsS3BucketNotificationResourceType),
+			wantErr: nil,
 		},
 		{
 			test: "Cannot list bucket", dirName: "s3_bucket_notifications_list_bucket",
 			mocks: func(repository *repository.MockS3Repository) {
 				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsS3BucketNotificationResourceType, resourceaws.AwsS3BucketResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -408,7 +410,6 @@ func TestS3BucketNotification(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -423,6 +424,8 @@ func TestS3BucketNotification(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.S3Repository = fakeRepo
@@ -522,7 +525,7 @@ func TestS3BucketMetrics(t *testing.T) {
 			mocks: func(repository *repository.MockS3Repository) {
 				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsS3BucketMetricResourceType, resourceaws.AwsS3BucketResourceType),
+			wantErr: nil,
 		},
 		{
 			test: "cannot list metrics", dirName: "s3_bucket_metrics_list_metrics",
@@ -551,7 +554,7 @@ func TestS3BucketMetrics(t *testing.T) {
 				)
 
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsS3BucketMetricResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -559,7 +562,6 @@ func TestS3BucketMetrics(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -574,6 +576,8 @@ func TestS3BucketMetrics(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.S3Repository = fakeRepo
@@ -701,7 +705,7 @@ func TestS3BucketPolicy(t *testing.T) {
 			mocks: func(repository *repository.MockS3Repository) {
 				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsS3BucketPolicyResourceType, resourceaws.AwsS3BucketResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -709,7 +713,6 @@ func TestS3BucketPolicy(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -724,6 +727,8 @@ func TestS3BucketPolicy(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.S3Repository = fakeRepo

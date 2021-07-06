@@ -11,9 +11,9 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -58,7 +58,7 @@ func TestRoute53_HealthCheck(t *testing.T) {
 			mocks: func(client *repository.MockRoute53Repository) {
 				client.On("ListAllHealthChecks").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRoute53HealthCheckResourceType),
+			err: nil,
 		},
 	}
 
@@ -66,7 +66,6 @@ func TestRoute53_HealthCheck(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -81,6 +80,8 @@ func TestRoute53_HealthCheck(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockRoute53Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.Route53Repository = fakeRepo
@@ -184,7 +185,7 @@ func TestRoute53_Zone(t *testing.T) {
 					awserr.NewRequestFailure(nil, 403, ""),
 				)
 			},
-			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRoute53ZoneResourceType),
+			err: nil,
 		},
 	}
 
@@ -192,7 +193,6 @@ func TestRoute53_Zone(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -207,6 +207,8 @@ func TestRoute53_Zone(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockRoute53Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.Route53Repository = fakeRepo
