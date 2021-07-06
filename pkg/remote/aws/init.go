@@ -158,13 +158,15 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewIamUserPolicyEnumerator(iamRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsIamUserPolicyResourceType, common.NewGenericDetailsFetcher(aws.AwsIamUserPolicyResourceType, provider, deserializer))
 
+	remoteLibrary.AddEnumerator(NewECRRepositoryEnumerator(ecrRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsEcrRepositoryResourceType, common.NewGenericDetailsFetcher(aws.AwsEcrRepositoryResourceType, provider, deserializer))
+
 	supplierLibrary.AddSupplier(NewIamUserPolicyAttachmentSupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamAccessKeySupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamRoleSupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamRolePolicySupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamRolePolicyAttachmentSupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewVPCSecurityGroupRuleSupplier(provider, deserializer, ec2repository))
-	supplierLibrary.AddSupplier(NewECRRepositorySupplier(provider, deserializer, ecrRepository))
 
 	err = resourceSchemaRepository.Init(version, provider.Schema())
 	if err != nil {
