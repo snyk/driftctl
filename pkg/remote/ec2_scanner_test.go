@@ -1321,3 +1321,199 @@ func TestEC2DefaultSubnet(t *testing.T) {
 		})
 	}
 }
+
+func TestEC2RouteTable(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockEC2Repository)
+		wantErr error
+	}{
+		{
+			test:    "no route tables",
+			dirName: "aws_ec2_route_table_empty",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{}, nil)
+			},
+		},
+		{
+			test:    "multiple route tables",
+			dirName: "aws_ec2_route_table_multiple",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{
+					{RouteTableId: awssdk.String("rtb-08b7b71af15e183ce")}, // table1
+					{RouteTableId: awssdk.String("rtb-0002ac731f6fdea55")}, // table2
+					{RouteTableId: awssdk.String("rtb-0c55d55593f33fbac")}, // table3
+					{
+						RouteTableId: awssdk.String("rtb-0eabf071c709c0976"), // default_table
+						VpcId:        awssdk.String("vpc-0b4a6b3536da20ecd"),
+						Associations: []*ec2.RouteTableAssociation{
+							{
+								Main: awssdk.Bool(true),
+							},
+						},
+					},
+				}, nil)
+			},
+		},
+		{
+			test:    "cannot list route tables",
+			dirName: "aws_ec2_route_table_list",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllRouteTables").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRouteTableResourceType),
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+	alerter := &mocks.AlerterInterface{}
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewEC2RouteTableEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteTableResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRouteTableResourceType, provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsRouteTableResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
+
+func TestEC2DefaultRouteTable(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockEC2Repository)
+		wantErr error
+	}{
+		{
+			test:    "no default route tables",
+			dirName: "aws_ec2_default_route_table_empty",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{}, nil)
+			},
+		},
+		{
+			test:    "multiple default route tables",
+			dirName: "aws_ec2_default_route_table_single",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{
+					{RouteTableId: awssdk.String("rtb-08b7b71af15e183ce")}, // table1
+					{RouteTableId: awssdk.String("rtb-0002ac731f6fdea55")}, // table2
+					{RouteTableId: awssdk.String("rtb-0c55d55593f33fbac")}, // table3
+					{
+						RouteTableId: awssdk.String("rtb-0eabf071c709c0976"), // default_table
+						VpcId:        awssdk.String("vpc-0b4a6b3536da20ecd"),
+						Associations: []*ec2.RouteTableAssociation{
+							{
+								Main: awssdk.Bool(true),
+							},
+						},
+					},
+				}, nil)
+			},
+		},
+		{
+			test:    "cannot list default route tables",
+			dirName: "aws_ec2_default_route_table_list",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllRouteTables").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsDefaultRouteTableResourceType),
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+	alerter := &mocks.AlerterInterface{}
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewEC2DefaultRouteTableEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultRouteTableResourceType, aws.NewEC2DefaultRouteTableDetailsFetcher(provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsDefaultRouteTableResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
