@@ -103,6 +103,8 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsSecurityGroupResourceType, common.NewGenericDetailsFetcher(aws.AwsSecurityGroupResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewVPCDefaultSecurityGroupEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsDefaultSecurityGroupResourceType, common.NewGenericDetailsFetcher(aws.AwsDefaultSecurityGroupResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewEC2NatGatewayEnumerator(ec2repository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsNatGatewayResourceType, common.NewGenericDetailsFetcher(aws.AwsNatGatewayResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewKMSKeyEnumerator(kmsRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsKmsKeyResourceType, common.NewGenericDetailsFetcher(aws.AwsKmsKeyResourceType, provider, deserializer))
@@ -153,7 +155,6 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary.AddSupplier(NewIamRolePolicyAttachmentSupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewVPCSecurityGroupRuleSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewRouteSupplier(provider, deserializer, ec2repository))
-	supplierLibrary.AddSupplier(NewNatGatewaySupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewECRRepositorySupplier(provider, deserializer, ecrRepository))
 	supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider, deserializer, lambdaRepository))
 
