@@ -12,7 +12,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -21,6 +20,7 @@ import (
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestEC2EbsVolume(t *testing.T) {
@@ -53,7 +53,7 @@ func TestEC2EbsVolume(t *testing.T) {
 			mocks: func(repository *repository.MockEC2Repository) {
 				repository.On("ListAllVolumes").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsEbsVolumeResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -61,7 +61,6 @@ func TestEC2EbsVolume(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -76,6 +75,8 @@ func TestEC2EbsVolume(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -141,7 +142,7 @@ func TestEC2EbsSnapshot(t *testing.T) {
 			mocks: func(repository *repository.MockEC2Repository) {
 				repository.On("ListAllSnapshots").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsEbsSnapshotResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -149,7 +150,6 @@ func TestEC2EbsSnapshot(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -164,6 +164,8 @@ func TestEC2EbsSnapshot(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -229,7 +231,7 @@ func TestEC2Eip(t *testing.T) {
 			mocks: func(repository *repository.MockEC2Repository) {
 				repository.On("ListAllAddresses").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsEipResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -237,7 +239,6 @@ func TestEC2Eip(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -252,6 +253,8 @@ func TestEC2Eip(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -317,7 +320,7 @@ func TestEC2Ami(t *testing.T) {
 			mocks: func(repository *repository.MockEC2Repository) {
 				repository.On("ListAllImages").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsAmiResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -325,7 +328,6 @@ func TestEC2Ami(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -340,6 +342,8 @@ func TestEC2Ami(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -405,7 +409,7 @@ func TestEC2KeyPair(t *testing.T) {
 			mocks: func(repository *repository.MockEC2Repository) {
 				repository.On("ListAllKeyPairs").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsKeyPairResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -413,7 +417,6 @@ func TestEC2KeyPair(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -428,6 +431,8 @@ func TestEC2KeyPair(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -492,7 +497,7 @@ func TestEC2EipAssociation(t *testing.T) {
 			mocks: func(repository *repository.MockEC2Repository) {
 				repository.On("ListAllAddressesAssociation").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsEipAssociationResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -500,7 +505,6 @@ func TestEC2EipAssociation(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -515,6 +519,8 @@ func TestEC2EipAssociation(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -590,7 +596,7 @@ func TestEC2Instance(t *testing.T) {
 			mocks: func(repository *repository.MockEC2Repository) {
 				repository.On("ListAllInstances").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsInstanceResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -598,7 +604,6 @@ func TestEC2Instance(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -613,6 +618,8 @@ func TestEC2Instance(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -678,7 +685,7 @@ func TestEC2InternetGateway(t *testing.T) {
 			mocks: func(repository *repository.MockEC2Repository) {
 				repository.On("ListAllInternetGateways").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsInternetGatewayResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -686,7 +693,6 @@ func TestEC2InternetGateway(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -701,6 +707,8 @@ func TestEC2InternetGateway(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -783,7 +791,7 @@ func TestVPC(t *testing.T) {
 			mocks: func(client *repository.MockEC2Repository) {
 				client.On("ListAllVPCs").Once().Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsVpcResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -791,7 +799,6 @@ func TestVPC(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -806,6 +813,8 @@ func TestVPC(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -885,7 +894,7 @@ func TestDefaultVPC(t *testing.T) {
 			mocks: func(client *repository.MockEC2Repository) {
 				client.On("ListAllVPCs").Once().Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsDefaultVpcResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -893,7 +902,6 @@ func TestDefaultVPC(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -908,6 +916,8 @@ func TestDefaultVPC(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -1042,7 +1052,7 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 			mocks: func(repository *repository.MockEC2Repository) {
 				repository.On("ListAllRouteTables").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRouteTableAssociationResourceType, resourceaws.AwsRouteTableResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -1050,7 +1060,6 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1065,6 +1074,8 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -1153,7 +1164,7 @@ func TestEC2Subnet(t *testing.T) {
 			mocks: func(repository *repository.MockEC2Repository) {
 				repository.On("ListAllSubnets").Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSubnetResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -1161,7 +1172,6 @@ func TestEC2Subnet(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1176,6 +1186,8 @@ func TestEC2Subnet(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -1264,7 +1276,7 @@ func TestEC2DefaultSubnet(t *testing.T) {
 			mocks: func(repository *repository.MockEC2Repository) {
 				repository.On("ListAllSubnets").Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsDefaultSubnetResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -1272,7 +1284,6 @@ func TestEC2DefaultSubnet(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1287,6 +1298,8 @@ func TestEC2DefaultSubnet(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -1362,7 +1375,7 @@ func TestEC2RouteTable(t *testing.T) {
 			mocks: func(repository *repository.MockEC2Repository) {
 				repository.On("ListAllRouteTables").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRouteTableResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -1370,7 +1383,6 @@ func TestEC2RouteTable(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1385,6 +1397,8 @@ func TestEC2RouteTable(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -1460,7 +1474,7 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 			mocks: func(repository *repository.MockEC2Repository) {
 				repository.On("ListAllRouteTables").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsDefaultRouteTableResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -1468,7 +1482,6 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1483,6 +1496,8 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -1558,7 +1573,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 			mocks: func(client *repository.MockEC2Repository) {
 				client.On("ListAllSecurityGroups").Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSecurityGroupResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -1566,7 +1581,6 @@ func TestVpcSecurityGroup(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1581,6 +1595,8 @@ func TestVpcSecurityGroup(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo
@@ -1656,7 +1672,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 			mocks: func(client *repository.MockEC2Repository) {
 				client.On("ListAllSecurityGroups").Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsSecurityGroupResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -1664,7 +1680,6 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1679,6 +1694,8 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.EC2Repository = fakeRepo

@@ -12,7 +12,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -21,6 +20,7 @@ import (
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestKMSKey(t *testing.T) {
@@ -54,7 +54,7 @@ func TestKMSKey(t *testing.T) {
 			mocks: func(repository *repository.MockKMSRepository) {
 				repository.On("ListAllKeys").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsKmsKeyResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -62,7 +62,6 @@ func TestKMSKey(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -77,6 +76,8 @@ func TestKMSKey(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockKMSRepository{}
 			c.mocks(fakeRepo)
 			var repo repository.KMSRepository = fakeRepo
@@ -143,7 +144,7 @@ func TestKMSAlias(t *testing.T) {
 			mocks: func(repository *repository.MockKMSRepository) {
 				repository.On("ListAllAliases").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
 			},
-			wantErr: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsKmsAliasResourceType),
+			wantErr: nil,
 		},
 	}
 
@@ -151,7 +152,6 @@ func TestKMSAlias(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -166,6 +166,8 @@ func TestKMSAlias(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockKMSRepository{}
 			c.mocks(fakeRepo)
 			var repo repository.KMSRepository = fakeRepo

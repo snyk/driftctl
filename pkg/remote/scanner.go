@@ -88,6 +88,10 @@ func (s *Scanner) scan() ([]resource.Resource, error) {
 		s.enumeratorRunner.Run(func() (interface{}, error) {
 			resources, err := enumerator.Enumerate()
 			if err != nil {
+				err := HandleResourceEnumerationError(err, s.alerter)
+				if err == nil {
+					return []resource.Resource{}, nil
+				}
 				return nil, err
 			}
 			for _, resource := range resources {
