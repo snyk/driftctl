@@ -367,7 +367,7 @@ func TestRoute53_Record(t *testing.T) {
 					[]*route53.HostedZone{},
 					awserr.NewRequestFailure(nil, 403, ""))
 			},
-			err: remoteerror.NewResourceEnumerationErrorWithType(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRoute53RecordResourceType, resourceaws.AwsRoute53ZoneResourceType),
+			err: nil,
 		},
 		{
 			test:    "cannot list records",
@@ -386,7 +386,7 @@ func TestRoute53_Record(t *testing.T) {
 					awserr.NewRequestFailure(nil, 403, ""))
 
 			},
-			err: remoteerror.NewResourceEnumerationError(awserr.NewRequestFailure(nil, 403, ""), resourceaws.AwsRoute53RecordResourceType),
+			err: nil,
 		},
 	}
 
@@ -394,7 +394,6 @@ func TestRoute53_Record(t *testing.T) {
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -409,6 +408,8 @@ func TestRoute53_Record(t *testing.T) {
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockRoute53Repository{}
 			c.mocks(fakeRepo)
 			var repo repository.Route53Repository = fakeRepo
