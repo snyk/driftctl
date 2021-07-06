@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/cloudskiff/driftctl/pkg/envproxy"
 	"github.com/pkg/errors"
 
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -33,9 +34,12 @@ func NewS3Reader(path string) (*S3Backend, error) {
 		Key:    &key,
 		Bucket: &bucket,
 	}
+	envProxy := envproxy.NewEnvProxy("DCTL_S3_", "AWS_")
+	envProxy.Apply()
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
+	envProxy.Restore()
 	backend.S3Client = s3.New(sess)
 	return &backend, nil
 }

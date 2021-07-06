@@ -8,16 +8,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+	"github.com/cloudskiff/driftctl/pkg/envproxy"
 	"github.com/pkg/errors"
 
 	"github.com/bmatcuk/doublestar/v4"
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 )
-
-type S3EnumeratorConfig struct {
-	Bucket *string
-	Prefix *string
-}
 
 type S3Enumerator struct {
 	config config.SupplierConfig
@@ -25,9 +21,12 @@ type S3Enumerator struct {
 }
 
 func NewS3Enumerator(config config.SupplierConfig) *S3Enumerator {
+	envProxy := envproxy.NewEnvProxy("DCTL_S3_", "AWS_")
+	envProxy.Apply()
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
+	envProxy.Restore()
 	return &S3Enumerator{
 		config,
 		s3.New(sess),
