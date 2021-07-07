@@ -2,6 +2,7 @@ package repository
 
 import (
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -21,6 +22,45 @@ func Test_KMSRepository_ListAllKeys(t *testing.T) {
 		want    []*kms.KeyListEntry
 		wantErr error
 	}{
+		{
+			name: "List only enabled keys",
+			mocks: func(client *awstest.MockFakeKMS) {
+				client.On("ListKeysPages",
+					&kms.ListKeysInput{},
+					mock.MatchedBy(func(callback func(res *kms.ListKeysOutput, lastPage bool) bool) bool {
+						callback(&kms.ListKeysOutput{
+							Keys: []*kms.KeyListEntry{
+								{KeyId: aws.String("1")},
+								{KeyId: aws.String("2")},
+							},
+						}, true)
+						return true
+					})).Return(nil).Once()
+				client.On("DescribeKey",
+					&kms.DescribeKeyInput{
+						KeyId: aws.String("1"),
+					}).Return(&kms.DescribeKeyOutput{
+					KeyMetadata: &kms.KeyMetadata{
+						KeyId:      aws.String("1"),
+						KeyManager: aws.String("CUSTOMER"),
+						KeyState:   aws.String(kms.KeyStateEnabled),
+					},
+				}, nil).Once()
+				client.On("DescribeKey",
+					&kms.DescribeKeyInput{
+						KeyId: aws.String("2"),
+					}).Return(&kms.DescribeKeyOutput{
+					KeyMetadata: &kms.KeyMetadata{
+						KeyId:      aws.String("2"),
+						KeyManager: aws.String("CUSTOMER"),
+						KeyState:   aws.String(kms.KeyStatePendingDeletion),
+					},
+				}, nil).Once()
+			},
+			want: []*kms.KeyListEntry{
+				{KeyId: aws.String("1")},
+			},
+		},
 		{
 			name: "List only customer keys",
 			mocks: func(client *awstest.MockFakeKMS) {
@@ -43,6 +83,7 @@ func Test_KMSRepository_ListAllKeys(t *testing.T) {
 					KeyMetadata: &kms.KeyMetadata{
 						KeyId:      aws.String("1"),
 						KeyManager: aws.String("CUSTOMER"),
+						KeyState:   aws.String(kms.KeyStateEnabled),
 					},
 				}, nil).Once()
 				client.On("DescribeKey",
@@ -52,6 +93,7 @@ func Test_KMSRepository_ListAllKeys(t *testing.T) {
 					KeyMetadata: &kms.KeyMetadata{
 						KeyId:      aws.String("2"),
 						KeyManager: aws.String("AWS"),
+						KeyState:   aws.String(kms.KeyStateEnabled),
 					},
 				}, nil).Once()
 				client.On("DescribeKey",
@@ -61,6 +103,7 @@ func Test_KMSRepository_ListAllKeys(t *testing.T) {
 					KeyMetadata: &kms.KeyMetadata{
 						KeyId:      aws.String("3"),
 						KeyManager: aws.String("AWS"),
+						KeyState:   aws.String(kms.KeyStateEnabled),
 					},
 				}, nil).Once()
 			},
@@ -75,8 +118,9 @@ func Test_KMSRepository_ListAllKeys(t *testing.T) {
 			client := awstest.MockFakeKMS{}
 			tt.mocks(&client)
 			r := &kmsRepository{
-				client: &client,
-				cache:  store,
+				client:          &client,
+				cache:           store,
+				describeKeyLock: &sync.Mutex{},
 			}
 			got, err := r.ListAllKeys()
 			assert.Equal(t, tt.wantErr, err)
@@ -109,6 +153,35 @@ func Test_KMSRepository_ListAllAliases(t *testing.T) {
 		wantErr error
 	}{
 		{
+			name: "List only aliases for enabled keys",
+			mocks: func(client *awstest.MockFakeKMS) {
+				client.On("ListAliasesPages",
+					&kms.ListAliasesInput{},
+					mock.MatchedBy(func(callback func(res *kms.ListAliasesOutput, lastPage bool) bool) bool {
+						callback(&kms.ListAliasesOutput{
+							Aliases: []*kms.AliasListEntry{
+								{AliasName: aws.String("alias/1"), TargetKeyId: aws.String("key-id-1")},
+								{AliasName: aws.String("alias/2"), TargetKeyId: aws.String("key-id-2")},
+							},
+						}, true)
+						return true
+					})).Return(nil).Once()
+				client.On("DescribeKey", &kms.DescribeKeyInput{KeyId: aws.String("key-id-1")}).Return(&kms.DescribeKeyOutput{
+					KeyMetadata: &kms.KeyMetadata{
+						KeyState: aws.String(kms.KeyStatePendingDeletion),
+					},
+				}, nil)
+				client.On("DescribeKey", &kms.DescribeKeyInput{KeyId: aws.String("key-id-2")}).Return(&kms.DescribeKeyOutput{
+					KeyMetadata: &kms.KeyMetadata{
+						KeyState: aws.String(kms.KeyStateEnabled),
+					},
+				}, nil)
+			},
+			want: []*kms.AliasListEntry{
+				{AliasName: aws.String("alias/2"), TargetKeyId: aws.String("key-id-2")},
+			},
+		},
+		{
 			name: "List only customer aliases",
 			mocks: func(client *awstest.MockFakeKMS) {
 				client.On("ListAliasesPages",
@@ -116,24 +189,29 @@ func Test_KMSRepository_ListAllAliases(t *testing.T) {
 					mock.MatchedBy(func(callback func(res *kms.ListAliasesOutput, lastPage bool) bool) bool {
 						callback(&kms.ListAliasesOutput{
 							Aliases: []*kms.AliasListEntry{
-								{AliasName: aws.String("alias/1")},
-								{AliasName: aws.String("alias/foo/2")},
-								{AliasName: aws.String("alias/aw/3")},
-								{AliasName: aws.String("alias/aws/4")},
-								{AliasName: aws.String("alias/aws/5")},
-								{AliasName: aws.String("alias/awss/6")},
-								{AliasName: aws.String("alias/aws7")},
+								{AliasName: aws.String("alias/1"), TargetKeyId: aws.String("key-id-1")},
+								{AliasName: aws.String("alias/foo/2"), TargetKeyId: aws.String("key-id-2")},
+								{AliasName: aws.String("alias/aw/3"), TargetKeyId: aws.String("key-id-3")},
+								{AliasName: aws.String("alias/aws/4"), TargetKeyId: aws.String("key-id-4")},
+								{AliasName: aws.String("alias/aws/5"), TargetKeyId: aws.String("key-id-5")},
+								{AliasName: aws.String("alias/awss/6"), TargetKeyId: aws.String("key-id-6")},
+								{AliasName: aws.String("alias/aws7"), TargetKeyId: aws.String("key-id-7")},
 							},
 						}, true)
 						return true
 					})).Return(nil).Once()
+				client.On("DescribeKey", mock.Anything).Return(&kms.DescribeKeyOutput{
+					KeyMetadata: &kms.KeyMetadata{
+						KeyState: aws.String(kms.KeyStateEnabled),
+					},
+				}, nil)
 			},
 			want: []*kms.AliasListEntry{
-				{AliasName: aws.String("alias/1")},
-				{AliasName: aws.String("alias/foo/2")},
-				{AliasName: aws.String("alias/aw/3")},
-				{AliasName: aws.String("alias/awss/6")},
-				{AliasName: aws.String("alias/aws7")},
+				{AliasName: aws.String("alias/1"), TargetKeyId: aws.String("key-id-1")},
+				{AliasName: aws.String("alias/foo/2"), TargetKeyId: aws.String("key-id-2")},
+				{AliasName: aws.String("alias/aw/3"), TargetKeyId: aws.String("key-id-3")},
+				{AliasName: aws.String("alias/awss/6"), TargetKeyId: aws.String("key-id-6")},
+				{AliasName: aws.String("alias/aws7"), TargetKeyId: aws.String("key-id-7")},
 			},
 		},
 	}
@@ -143,8 +221,9 @@ func Test_KMSRepository_ListAllAliases(t *testing.T) {
 			client := awstest.MockFakeKMS{}
 			tt.mocks(&client)
 			r := &kmsRepository{
-				client: &client,
-				cache:  store,
+				client:          &client,
+				cache:           store,
+				describeKeyLock: &sync.Mutex{},
 			}
 			got, err := r.ListAllAliases()
 			assert.Equal(t, tt.wantErr, err)

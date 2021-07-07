@@ -3,6 +3,7 @@ package common
 import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/sirupsen/logrus"
 )
 
 type DetailsFetcher interface {
@@ -30,6 +31,13 @@ func (f *GenericDetailsFetcher) ReadDetails(res resource.Resource) (resource.Res
 	})
 	if err != nil {
 		return nil, err
+	}
+	if ctyVal.IsNull() {
+		logrus.WithFields(logrus.Fields{
+			"type": f.resType,
+			"id":   res.TerraformId(),
+		}).Debug("Got null while reading resource details")
+		return nil, nil
 	}
 	deserializedRes, err := f.deserializer.DeserializeOne(string(f.resType), *ctyVal)
 	if err != nil {

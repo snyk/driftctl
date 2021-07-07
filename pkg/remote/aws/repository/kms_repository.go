@@ -1,12 +1,16 @@
 package repository
 
 import (
+	"fmt"
 	"strings"
+	"sync"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/aws/aws-sdk-go/service/kms/kmsiface"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	"github.com/sirupsen/logrus"
 )
 
 type KMSRepository interface {
@@ -15,14 +19,16 @@ type KMSRepository interface {
 }
 
 type kmsRepository struct {
-	client kmsiface.KMSAPI
-	cache  cache.Cache
+	client          kmsiface.KMSAPI
+	cache           cache.Cache
+	describeKeyLock *sync.Mutex
 }
 
 func NewKMSRepository(session *session.Session, c cache.Cache) *kmsRepository {
 	return &kmsRepository{
 		kms.New(session),
 		c,
+		&sync.Mutex{},
 	}
 }
 
@@ -68,19 +74,48 @@ func (r *kmsRepository) ListAllAliases() ([]*kms.AliasListEntry, error) {
 		return nil, err
 	}
 
-	result := r.filterAliases(aliases)
+	result, err := r.filterAliases(aliases)
+	if err != nil {
+		return nil, err
+	}
 	r.cache.Put("kmsListAllAliases", result)
 	return result, nil
+}
+
+func (r *kmsRepository) describeKey(keyId *string) (*kms.DescribeKeyOutput, error) {
+	var results interface{}
+	// Since this method can be call in parallel, we should lock and unlock if we want to be sure to hit the cache
+	r.describeKeyLock.Lock()
+	defer r.describeKeyLock.Unlock()
+	cacheKey := fmt.Sprintf("kmsDescribeKey-%s", *keyId)
+	results = r.cache.Get(cacheKey)
+	if results == nil {
+		var err error
+		results, err = r.client.DescribeKey(&kms.DescribeKeyInput{KeyId: keyId})
+		if err != nil {
+			return nil, err
+		}
+		r.cache.Put(cacheKey, results)
+	}
+	describeKey := results.(*kms.DescribeKeyOutput)
+	if aws.StringValue(describeKey.KeyMetadata.KeyState) == kms.KeyStatePendingDeletion {
+		return nil, nil
+	}
+	return describeKey, nil
 }
 
 func (r *kmsRepository) filterKeys(keys []*kms.KeyListEntry) ([]*kms.KeyListEntry, error) {
 	var customerKeys []*kms.KeyListEntry
 	for _, key := range keys {
-		k, err := r.client.DescribeKey(&kms.DescribeKeyInput{
-			KeyId: key.KeyId,
-		})
+		k, err := r.describeKey(key.KeyId)
 		if err != nil {
 			return nil, err
+		}
+		if k == nil {
+			logrus.WithFields(logrus.Fields{
+				"id": *key.KeyId,
+			}).Debug("Ignored kms key from listing since it is pending from deletion")
+			continue
 		}
 		if k.KeyMetadata.KeyManager != nil && *k.KeyMetadata.KeyManager != "AWS" {
 			customerKeys = append(customerKeys, key)
@@ -89,12 +124,23 @@ func (r *kmsRepository) filterKeys(keys []*kms.KeyListEntry) ([]*kms.KeyListEntr
 	return customerKeys, nil
 }
 
-func (r *kmsRepository) filterAliases(aliases []*kms.AliasListEntry) []*kms.AliasListEntry {
+func (r *kmsRepository) filterAliases(aliases []*kms.AliasListEntry) ([]*kms.AliasListEntry, error) {
 	var customerAliases []*kms.AliasListEntry
 	for _, alias := range aliases {
 		if alias.AliasName != nil && !strings.HasPrefix(*alias.AliasName, "alias/aws/") {
+			k, err := r.describeKey(alias.TargetKeyId)
+			if err != nil {
+				return nil, err
+			}
+			if k == nil {
+				logrus.WithFields(logrus.Fields{
+					"id":    *alias.TargetKeyId,
+					"alias": *alias.AliasName,
+				}).Debug("Ignored kms key alias from listing since it is linked to a pending from deletion key")
+				continue
+			}
 			customerAliases = append(customerAliases, alias)
 		}
 	}
-	return customerAliases
+	return customerAliases, nil
 }
