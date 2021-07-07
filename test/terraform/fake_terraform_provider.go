@@ -28,13 +28,13 @@ func (p *FakeTerraformProvider) ShouldUpdate() {
 	p.shouldUpdate = true
 }
 
-func (m *FakeTerraformProvider) Schema() map[string]providers.Schema {
-	if m.shouldUpdate {
-		schema := m.realProvider.Schema()
-		m.writeSchema(schema)
+func (p *FakeTerraformProvider) Schema() map[string]providers.Schema {
+	if p.shouldUpdate {
+		schema := p.realProvider.Schema()
+		p.writeSchema(schema)
 		return schema
 	}
-	return m.readSchema()
+	return p.readSchema()
 }
 
 func (p *FakeTerraformProvider) WithResponse(response string) *FakeTerraformProvider {
