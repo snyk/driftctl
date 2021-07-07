@@ -35,6 +35,11 @@ type securityGroupRule struct {
 }
 
 func (s *securityGroupRule) getId() string {
+	attrs := s.getAttrs()
+	return resourceaws.CreateSecurityGroupRuleIdHash(&attrs)
+}
+
+func (s *securityGroupRule) getAttrs() resource.Attributes {
 	attrs := resource.Attributes{
 		"type":                     s.Type,
 		"security_group_id":        s.SecurityGroupId,
@@ -48,7 +53,7 @@ func (s *securityGroupRule) getId() string {
 		"prefix_list_ids":          toInterfaceSlice(s.PrefixListIds),
 	}
 
-	return resourceaws.CreateSecurityGroupRuleIdHash(&attrs)
+	return attrs
 }
 
 func toInterfaceSlice(val []string) []interface{} {
@@ -88,18 +93,7 @@ func (e *VPCSecurityGroupRuleEnumerator) Enumerate() ([]resource.Resource, error
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
 				rule.getId(),
-				map[string]interface{}{
-					"type":                     rule.Type,
-					"security_group_id":        rule.SecurityGroupId,
-					"protocol":                 rule.Protocol,
-					"from_port":                rule.FromPort,
-					"to_port":                  rule.ToPort,
-					"self":                     rule.Self,
-					"source_security_group_id": rule.SourceSecurityGroupId,
-					"cidr_blocks":              rule.CidrBlocks,
-					"ipv6_cidr_blocks":         rule.Ipv6CidrBlocks,
-					"prefix_list_ids":          rule.PrefixListIds,
-				},
+				rule.getAttrs(),
 			),
 		)
 	}
