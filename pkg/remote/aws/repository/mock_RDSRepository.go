@@ -35,8 +35,8 @@ func (_m *MockRDSRepository) ListAllDBInstances() ([]*rds.DBInstance, error) {
 	return r0, r1
 }
 
-// ListAllDbSubnetGroups provides a mock function with given fields:
-func (_m *MockRDSRepository) ListAllDbSubnetGroups() ([]*rds.DBSubnetGroup, error) {
+// ListAllDBSubnetGroups provides a mock function with given fields:
+func (_m *MockRDSRepository) ListAllDBSubnetGroups() ([]*rds.DBSubnetGroup, error) {
 	ret := _m.Called()
 
 	var r0 []*rds.DBSubnetGroup

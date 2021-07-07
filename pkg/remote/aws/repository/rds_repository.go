@@ -9,7 +9,7 @@ import (
 
 type RDSRepository interface {
 	ListAllDBInstances() ([]*rds.DBInstance, error)
-	ListAllDbSubnetGroups() ([]*rds.DBSubnetGroup, error)
+	ListAllDBSubnetGroups() ([]*rds.DBSubnetGroup, error)
 }
 
 type rdsRepository struct {
@@ -43,8 +43,8 @@ func (r *rdsRepository) ListAllDBInstances() ([]*rds.DBInstance, error) {
 	return result, nil
 }
 
-func (r *rdsRepository) ListAllDbSubnetGroups() ([]*rds.DBSubnetGroup, error) {
-	if v := r.cache.Get("rdsListAllDbSubnetGroups"); v != nil {
+func (r *rdsRepository) ListAllDBSubnetGroups() ([]*rds.DBSubnetGroup, error) {
+	if v := r.cache.Get("rdsListAllDBSubnetGroups"); v != nil {
 		return v.([]*rds.DBSubnetGroup), nil
 	}
 
@@ -57,6 +57,6 @@ func (r *rdsRepository) ListAllDbSubnetGroups() ([]*rds.DBSubnetGroup, error) {
 		},
 	)
 
-	r.cache.Put("rdsListAllDbSubnetGroups", subnetGroups)
+	r.cache.Put("rdsListAllDBSubnetGroups", subnetGroups)
 	return subnetGroups, err
 }

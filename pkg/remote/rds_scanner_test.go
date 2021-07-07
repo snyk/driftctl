@@ -120,3 +120,92 @@ func TestRDSDBInstance(t *testing.T) {
 		})
 	}
 }
+
+func TestRDSDBSubnetGroup(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockRDSRepository)
+		wantErr error
+	}{
+		{
+			test:    "no db subnet groups",
+			dirName: "aws_rds_db_subnet_group_empty",
+			mocks: func(repository *repository.MockRDSRepository) {
+				repository.On("ListAllDBSubnetGroups").Return([]*rds.DBSubnetGroup{}, nil)
+			},
+		},
+		{
+			test:    "multiple db subnet groups",
+			dirName: "aws_rds_db_subnet_group_multiple",
+			mocks: func(repository *repository.MockRDSRepository) {
+				repository.On("ListAllDBSubnetGroups").Return([]*rds.DBSubnetGroup{
+					{DBSubnetGroupName: awssdk.String("foo")},
+					{DBSubnetGroupName: awssdk.String("bar")},
+				}, nil)
+			},
+		},
+		{
+			test:    "cannot list db subnet groups",
+			dirName: "aws_rds_db_subnet_group_list",
+			mocks: func(repository *repository.MockRDSRepository) {
+				repository.On("ListAllDBSubnetGroups").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: nil,
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
+			fakeRepo := &repository.MockRDSRepository{}
+			c.mocks(fakeRepo)
+			var repo repository.RDSRepository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewRDSRepository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewRDSDBSubnetGroupEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDbSubnetGroupResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDbSubnetGroupResourceType, provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsDbSubnetGroupResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}

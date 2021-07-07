@@ -85,7 +85,7 @@ func Test_rdsRepository_ListAllDBInstances(t *testing.T) {
 	}
 }
 
-func Test_rdsRepository_ListAllDbSubnetGroups(t *testing.T) {
+func Test_rdsRepository_ListAllDBSubnetGroups(t *testing.T) {
 	tests := []struct {
 		name    string
 		mocks   func(client *awstest.MockFakeRDS)
@@ -134,15 +134,15 @@ func Test_rdsRepository_ListAllDbSubnetGroups(t *testing.T) {
 				client: client,
 				cache:  store,
 			}
-			got, err := r.ListAllDbSubnetGroups()
+			got, err := r.ListAllDBSubnetGroups()
 			assert.Equal(t, tt.wantErr, err)
 
 			if err == nil {
 				// Check that results were cached
-				cachedData, err := r.ListAllDbSubnetGroups()
+				cachedData, err := r.ListAllDBSubnetGroups()
 				assert.Nil(t, err)
 				assert.Equal(t, got, cachedData)
-				assert.IsType(t, []*rds.DBSubnetGroup{}, store.Get("rdsListAllDbSubnetGroups"))
+				assert.IsType(t, []*rds.DBSubnetGroup{}, store.Get("rdsListAllDBSubnetGroups"))
 			}
 
 			changelog, err := diff.Diff(got, tt.want)
