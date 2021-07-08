@@ -99,6 +99,10 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsSubnetResourceType, common.NewGenericDetailsFetcher(aws.AwsSubnetResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewEC2DefaultSubnetEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsDefaultSubnetResourceType, common.NewGenericDetailsFetcher(aws.AwsDefaultSubnetResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewVPCSecurityGroupEnumerator(ec2repository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsSecurityGroupResourceType, common.NewGenericDetailsFetcher(aws.AwsSecurityGroupResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewVPCDefaultSecurityGroupEnumerator(ec2repository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsDefaultSecurityGroupResourceType, common.NewGenericDetailsFetcher(aws.AwsDefaultSecurityGroupResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewKMSKeyEnumerator(kmsRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsKmsKeyResourceType, common.NewGenericDetailsFetcher(aws.AwsKmsKeyResourceType, provider, deserializer))
@@ -112,11 +116,8 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewRoute53RecordEnumerator(route53repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsRoute53RecordResourceType, common.NewGenericDetailsFetcher(aws.AwsRoute53RecordResourceType, provider, deserializer))
 
-	remoteLibrary.AddEnumerator(NewVPCSecurityGroupEnumerator(ec2repository, factory))
-	remoteLibrary.AddDetailsFetcher(aws.AwsSecurityGroupResourceType, common.NewGenericDetailsFetcher(aws.AwsSecurityGroupResourceType, provider, deserializer))
-
-	remoteLibrary.AddEnumerator(NewVPCDefaultSecurityGroupEnumerator(ec2repository, factory))
-	remoteLibrary.AddDetailsFetcher(aws.AwsDefaultSecurityGroupResourceType, common.NewGenericDetailsFetcher(aws.AwsDefaultSecurityGroupResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewCloudfrontDistributionEnumerator(cloudfrontRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsCloudfrontDistributionResourceType, common.NewGenericDetailsFetcher(aws.AwsCloudfrontDistributionResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewSqsQueueEnumerator(sqsRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsSqsQueueResourceType, common.NewGenericDetailsFetcher(aws.AwsSqsQueueResourceType, provider, deserializer))
@@ -146,7 +147,6 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary.AddSupplier(NewRouteSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewNatGatewaySupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewDynamoDBTableSupplier(provider, deserializer, dynamoDBRepository))
-	supplierLibrary.AddSupplier(NewCloudfrontDistributionSupplier(provider, deserializer, cloudfrontRepository))
 	supplierLibrary.AddSupplier(NewECRRepositorySupplier(provider, deserializer, ecrRepository))
 	supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider, deserializer, lambdaRepository))
 
