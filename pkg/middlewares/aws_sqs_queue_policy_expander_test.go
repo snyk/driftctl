@@ -15,7 +15,7 @@ import (
 	"github.com/r3labs/diff/v2"
 )
 
-func TestAwsSqsQueuePolicyExpander_Execute(t *testing.T) {
+func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
 		resourcesFromState []resource.Resource
@@ -224,7 +224,7 @@ func TestAwsSqsQueuePolicyExpander_Execute(t *testing.T) {
 			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 			aws.InitResourcesMetadata(repo)
 
-			m := NewAwsSqsQueuePolicyExpander(factory, repo)
+			m := NewAwsSQSQueuePolicyExpander(factory, repo)
 			err := m.Execute(&[]resource.Resource{}, &tt.resourcesFromState)
 			if err != nil {
 				t.Fatal(err)

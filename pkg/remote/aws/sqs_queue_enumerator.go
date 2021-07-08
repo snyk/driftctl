@@ -9,23 +9,23 @@ import (
 	awssdk "github.com/aws/aws-sdk-go/aws"
 )
 
-type SqsQueueEnumerator struct {
+type SQSQueueEnumerator struct {
 	repository repository.SQSRepository
 	factory    resource.ResourceFactory
 }
 
-func NewSqsQueueEnumerator(repo repository.SQSRepository, factory resource.ResourceFactory) *SqsQueueEnumerator {
-	return &SqsQueueEnumerator{
+func NewSQSQueueEnumerator(repo repository.SQSRepository, factory resource.ResourceFactory) *SQSQueueEnumerator {
+	return &SQSQueueEnumerator{
 		repository: repo,
 		factory:    factory,
 	}
 }
 
-func (e *SqsQueueEnumerator) SupportedType() resource.ResourceType {
+func (e *SQSQueueEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsSqsQueueResourceType
 }
 
-func (e *SqsQueueEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *SQSQueueEnumerator) Enumerate() ([]resource.Resource, error) {
 	queues, err := e.repository.ListAllQueues()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))

@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestSqsQueue(t *testing.T) {
+func TestSQSQueue(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
@@ -99,7 +99,7 @@ func TestSqsQueue(t *testing.T) {
 				repo = repository.NewSQSRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewSqsQueueEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewSQSQueueEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSqsQueueResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSqsQueueResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
