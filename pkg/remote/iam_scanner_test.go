@@ -1,0 +1,123 @@
+package remote
+
+import (
+	"testing"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/iam"
+	"github.com/cloudskiff/driftctl/mocks"
+	remoteaws "github.com/cloudskiff/driftctl/pkg/remote/aws"
+	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	"github.com/cloudskiff/driftctl/pkg/remote/common"
+	"github.com/cloudskiff/driftctl/pkg/resource"
+	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/cloudskiff/driftctl/test"
+	"github.com/cloudskiff/driftctl/test/goldenfile"
+	testresource "github.com/cloudskiff/driftctl/test/resource"
+	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
+
+func TestIamPolicy(t *testing.T) {
+
+	cases := []struct {
+		test    string
+		dirName string
+		mocks   func(repo *repository.MockIAMRepository)
+		wantErr error
+	}{
+		{
+			test:    "no iam custom policies",
+			dirName: "iam_policy_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllPolicies").Once().Return([]*iam.Policy{}, nil)
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "iam multiples custom policies",
+			dirName: "iam_policy_multiple",
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllPolicies").Once().Return([]*iam.Policy{
+					{
+						Arn: aws.String("arn:aws:iam::929327065333:policy/policy-0"),
+					},
+					{
+						Arn: aws.String("arn:aws:iam::929327065333:policy/policy-1"),
+					},
+					{
+						Arn: aws.String("arn:aws:iam::929327065333:policy/policy-2"),
+					},
+				}, nil)
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "cannot list iam custom policies",
+			dirName: "iam_policy_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllPolicies").Once().Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: nil,
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range cases {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
+			fakeRepo := &repository.MockIAMRepository{}
+			c.mocks(fakeRepo)
+			var repo repository.IAMRepository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewIAMRepository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(remoteaws.NewIamPolicyEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamPolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamPolicyResourceType, provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsIamPolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
