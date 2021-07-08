@@ -12,7 +12,7 @@ import (
 	"github.com/cloudskiff/driftctl/test/acceptance"
 )
 
-func TestAcc_AwsSqsQueuePolicy(t *testing.T) {
+func TestAcc_AwsSQSQueuePolicy(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.14.9",
 		Paths:            []string{"./testdata/acc/aws_sqs_queue_policy"},

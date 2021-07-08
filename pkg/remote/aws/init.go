@@ -119,7 +119,7 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewCloudfrontDistributionEnumerator(cloudfrontRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsCloudfrontDistributionResourceType, common.NewGenericDetailsFetcher(aws.AwsCloudfrontDistributionResourceType, provider, deserializer))
 
-	remoteLibrary.AddEnumerator(NewSqsQueueEnumerator(sqsRepository, factory))
+	remoteLibrary.AddEnumerator(NewSQSQueueEnumerator(sqsRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsSqsQueueResourceType, common.NewGenericDetailsFetcher(aws.AwsSqsQueueResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewSQSQueuePolicyEnumerator(sqsRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsSqsQueuePolicyResourceType, common.NewGenericDetailsFetcher(aws.AwsSqsQueuePolicyResourceType, provider, deserializer))

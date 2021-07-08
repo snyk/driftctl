@@ -12,13 +12,13 @@ import (
 // the SDK return an empty policy (e.g. policy = "").
 // We need to ignore those policy from unmanaged resources if they are not managed
 // by IaC.
-type AwsDefaultSqsQueuePolicy struct{}
+type AwsDefaultSQSQueuePolicy struct{}
 
-func NewAwsDefaultSqsQueuePolicy() AwsDefaultSqsQueuePolicy {
-	return AwsDefaultSqsQueuePolicy{}
+func NewAwsDefaultSQSQueuePolicy() AwsDefaultSQSQueuePolicy {
+	return AwsDefaultSQSQueuePolicy{}
 }
 
-func (m AwsDefaultSqsQueuePolicy) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+func (m AwsDefaultSQSQueuePolicy) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
 	newRemoteResources := make([]resource.Resource, 0)
 	for _, res := range *remoteResources {
 		// Ignore all resources other than sqs_queue_policy

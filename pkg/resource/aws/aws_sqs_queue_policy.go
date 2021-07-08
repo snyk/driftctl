@@ -7,7 +7,7 @@ import (
 
 const AwsSqsQueuePolicyResourceType = "aws_sqs_queue_policy"
 
-func initAwsSqsQueuePolicyMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAwsSQSQueuePolicyMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.UpdateSchema(AwsSqsQueuePolicyResourceType, map[string]func(attributeSchema *resource.AttributeSchema){
 		"policy": func(attributeSchema *resource.AttributeSchema) {
 			attributeSchema.JsonString = true
