@@ -2144,7 +2144,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewVPCSecurityGroupRuleEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSecurityGroupRuleResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSecurityGroupRuleResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSecurityGroupRuleResourceType, aws.NewVPCSecurityGroupRuleDetailsFetcher(provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
