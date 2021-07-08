@@ -146,6 +146,8 @@ func Init(version string, alerter *alerter.Alerter,
 
 	remoteLibrary.AddEnumerator(NewLambdaFunctionEnumerator(lambdaRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsLambdaFunctionResourceType, NewLambdaFunctionDetailsFetcher(provider, deserializer))
+	remoteLibrary.AddEnumerator(NewLambdaEventSourceMappingEnumerator(lambdaRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsLambdaEventSourceMappingResourceType, common.NewGenericDetailsFetcher(aws.AwsLambdaEventSourceMappingResourceType, provider, deserializer))
 
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewIamUserSupplier(provider, deserializer, iamRepository))
@@ -158,7 +160,6 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary.AddSupplier(NewVPCSecurityGroupRuleSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewRouteSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewECRRepositorySupplier(provider, deserializer, ecrRepository))
-	supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider, deserializer, lambdaRepository))
 
 	err = resourceSchemaRepository.Init(version, provider.Schema())
 	if err != nil {
