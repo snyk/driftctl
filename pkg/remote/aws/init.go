@@ -144,8 +144,10 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewIamPolicyEnumerator(iamRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsIamPolicyResourceType, common.NewGenericDetailsFetcher(aws.AwsIamPolicyResourceType, provider, deserializer))
 
+	remoteLibrary.AddEnumerator(NewLambdaFunctionEnumerator(lambdaRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsLambdaFunctionResourceType, NewLambdaFunctionDetailsFetcher(provider, deserializer))
+
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
-	supplierLibrary.AddSupplier(NewLambdaFunctionSupplier(provider, deserializer, lambdaRepository))
 	supplierLibrary.AddSupplier(NewIamUserSupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamUserPolicySupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamUserPolicyAttachmentSupplier(provider, deserializer, iamRepository))
