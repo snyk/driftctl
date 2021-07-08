@@ -128,6 +128,8 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsSnsTopicResourceType, NewSNSTopicDetailsFetcher(provider, deserializer))
 	remoteLibrary.AddEnumerator(NewSNSTopicPolicyEnumerator(snsRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsSnsTopicPolicyResourceType, NewSNSTopicPolicyDetailsFetcher(provider, deserializer))
+	remoteLibrary.AddEnumerator(NewSNSTopicSubscriptionEnumerator(snsRepository, factory, alerter))
+	remoteLibrary.AddDetailsFetcher(aws.AwsSnsTopicSubscriptionResourceType, NewSNSTopicSubscriptionDetailsFetcher(provider, deserializer))
 
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewLambdaFunctionSupplier(provider, deserializer, lambdaRepository))
@@ -144,7 +146,6 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary.AddSupplier(NewVPCSecurityGroupRuleSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewRouteSupplier(provider, deserializer, ec2repository))
 	supplierLibrary.AddSupplier(NewNatGatewaySupplier(provider, deserializer, ec2repository))
-	supplierLibrary.AddSupplier(NewSNSTopicSubscriptionSupplier(provider, alerter, deserializer, snsRepository))
 	supplierLibrary.AddSupplier(NewDynamoDBTableSupplier(provider, deserializer, dynamoDBRepository))
 	supplierLibrary.AddSupplier(NewECRRepositorySupplier(provider, deserializer, ecrRepository))
 	supplierLibrary.AddSupplier(NewLambdaEventSourceMappingSupplier(provider, deserializer, lambdaRepository))
