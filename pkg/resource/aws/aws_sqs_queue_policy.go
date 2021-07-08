@@ -5,15 +5,15 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
-const AwsSqsQueuePolicyResourceType = "aws_sqs_queue_policy"
+const AwsSQSQueuePolicyResourceType = "aws_sqs_queue_policy"
 
-func initAwsSqsQueuePolicyMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.UpdateSchema(AwsSqsQueuePolicyResourceType, map[string]func(attributeSchema *resource.AttributeSchema){
+func initAwsSQSQueuePolicyMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.UpdateSchema(AwsSQSQueuePolicyResourceType, map[string]func(attributeSchema *resource.AttributeSchema){
 		"policy": func(attributeSchema *resource.AttributeSchema) {
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetNormalizeFunc(AwsSqsQueuePolicyResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsSQSQueuePolicyResourceType, func(res *resource.AbstractResource) {
 		val := res.Attrs
 		jsonString, err := helpers.NormalizeJsonString((*val)["policy"])
 		if err != nil {

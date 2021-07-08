@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestSqsQueue(t *testing.T) {
+func TestSQSQueue(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
@@ -99,8 +99,8 @@ func TestSqsQueue(t *testing.T) {
 				repo = repository.NewSQSRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewSqsQueueEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSqsQueueResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSqsQueueResourceType, provider, deserializer))
+			remoteLibrary.AddEnumerator(aws.NewSQSQueueEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSQSQueueResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSQSQueueResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
@@ -108,12 +108,12 @@ func TestSqsQueue(t *testing.T) {
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsSqsQueueResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			test.TestAgainstGoldenFile(got, resourceaws.AwsSQSQueueResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
 		})
 	}
 }
 
-func TestSqsQueuePolicySupplier_Resources(t *testing.T) {
+func TestSQSQueuePolicySupplier_Resources(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
@@ -193,8 +193,8 @@ func TestSqsQueuePolicySupplier_Resources(t *testing.T) {
 				repo = repository.NewSQSRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws.NewSqsQueuePolicyEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSqsQueuePolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSqsQueuePolicyResourceType, provider, deserializer))
+			remoteLibrary.AddEnumerator(aws.NewSQSQueuePolicyEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSQSQueuePolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSQSQueuePolicyResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
@@ -202,7 +202,7 @@ func TestSqsQueuePolicySupplier_Resources(t *testing.T) {
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsSqsQueuePolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			test.TestAgainstGoldenFile(got, resourceaws.AwsSQSQueuePolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
 		})
 	}
 }

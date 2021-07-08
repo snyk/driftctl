@@ -1019,7 +1019,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 			stateResources: []resource.Resource{
 				&resource.AbstractResource{
 					Id:   "foo",
-					Type: aws.AwsSqsQueueResourceType,
+					Type: aws.AwsSQSQueueResourceType,
 					Attrs: &resource.Attributes{
 						"id":     "foo",
 						"policy": "{\"policy\":\"bar\"}",
@@ -1029,7 +1029,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 			remoteResources: []resource.Resource{
 				&resource.AbstractResource{
 					Id:   "foo",
-					Type: aws.AwsSqsQueuePolicyResourceType,
+					Type: aws.AwsSQSQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
 						"id":        "foo",
 						"queue_url": "foo",
@@ -1044,13 +1044,13 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					"policy":    "{\"policy\":\"bar\"}",
 				}).Times(1).Return(&resource.AbstractResource{
 					Id:   "foo",
-					Type: aws.AwsSqsQueuePolicyResourceType,
+					Type: aws.AwsSQSQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
 						"id":        "foo",
 						"queue_url": "foo",
 						"policy":    "{\"policy\":\"bar\"}",
 					},
-					Sch: getSchema(repo, aws.AwsSqsQueuePolicyResourceType),
+					Sch: getSchema(repo, aws.AwsSQSQueuePolicyResourceType),
 				}, nil)
 			},
 			assert: func(result *test.ScanResult, err error) {

@@ -118,10 +118,10 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewVPCDefaultSecurityGroupEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsDefaultSecurityGroupResourceType, common.NewGenericDetailsFetcher(aws.AwsDefaultSecurityGroupResourceType, provider, deserializer))
 
-	remoteLibrary.AddEnumerator(NewSqsQueueEnumerator(sqsRepository, factory))
-	remoteLibrary.AddDetailsFetcher(aws.AwsSqsQueueResourceType, common.NewGenericDetailsFetcher(aws.AwsSqsQueueResourceType, provider, deserializer))
-	remoteLibrary.AddEnumerator(NewSqsQueuePolicyEnumerator(sqsRepository, factory))
-	remoteLibrary.AddDetailsFetcher(aws.AwsSqsQueuePolicyResourceType, common.NewGenericDetailsFetcher(aws.AwsSqsQueuePolicyResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewSQSQueueEnumerator(sqsRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsSQSQueueResourceType, common.NewGenericDetailsFetcher(aws.AwsSQSQueueResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewSQSQueuePolicyEnumerator(sqsRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsSQSQueuePolicyResourceType, common.NewGenericDetailsFetcher(aws.AwsSQSQueuePolicyResourceType, provider, deserializer))
 
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewLambdaFunctionSupplier(provider, deserializer, lambdaRepository))

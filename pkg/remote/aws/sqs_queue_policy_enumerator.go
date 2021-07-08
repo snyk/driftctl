@@ -9,26 +9,26 @@ import (
 	awssdk "github.com/aws/aws-sdk-go/aws"
 )
 
-type SqsQueuePolicyEnumerator struct {
+type SQSQueuePolicyEnumerator struct {
 	repository repository.SQSRepository
 	factory    resource.ResourceFactory
 }
 
-func NewSqsQueuePolicyEnumerator(repo repository.SQSRepository, factory resource.ResourceFactory) *SqsQueuePolicyEnumerator {
-	return &SqsQueuePolicyEnumerator{
+func NewSQSQueuePolicyEnumerator(repo repository.SQSRepository, factory resource.ResourceFactory) *SQSQueuePolicyEnumerator {
+	return &SQSQueuePolicyEnumerator{
 		repository: repo,
 		factory:    factory,
 	}
 }
 
-func (e *SqsQueuePolicyEnumerator) SupportedType() resource.ResourceType {
-	return aws.AwsSqsQueuePolicyResourceType
+func (e *SQSQueuePolicyEnumerator) SupportedType() resource.ResourceType {
+	return aws.AwsSQSQueuePolicyResourceType
 }
 
-func (e *SqsQueuePolicyEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *SQSQueuePolicyEnumerator) Enumerate() ([]resource.Resource, error) {
 	queues, err := e.repository.ListAllQueues()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, string(e.SupportedType()), aws.AwsSqsQueueResourceType)
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, string(e.SupportedType()), aws.AwsSQSQueueResourceType)
 	}
 
 	results := make([]resource.Resource, len(queues))

@@ -19,7 +19,7 @@ import (
 	"github.com/cloudskiff/driftctl/test/acceptance/awsutils"
 )
 
-func TestAcc_AwsSqsQueue(t *testing.T) {
+func TestAcc_AwsSQSQueue(t *testing.T) {
 	var mutatedQueue string
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.14.9",
@@ -78,7 +78,7 @@ func TestAcc_AwsSqsQueue(t *testing.T) {
 					result.AssertDriftCountTotal(1)
 					result.AssertResourceHasDrift(
 						mutatedQueue,
-						awsresources.AwsSqsQueueResourceType,
+						awsresources.AwsSQSQueueResourceType,
 						analyser.Change{
 							Change: diff.Change{
 								Type: diff.UPDATE,
