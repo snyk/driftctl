@@ -1,0 +1,46 @@
+[
+ {
+  "arn": "arn:aws:lambda:eu-west-3:526954929923:function:foo",
+  "code_signing_config_arn": "arn:aws:lambda:eu-west-3:526954929923:code-signing-config:csc-0917e36c525bea4d3",
+  "dead_letter_config": [],
+  "description": "",
+  "environment": [],
+  "file_system_config": [],
+  "filename": null,
+  "function_name": "foo",
+  "handler": "lambda.handler",
+  "id": "foo",
+  "image_config": [],
+  "image_uri": "",
+  "invoke_arn": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:526954929923:function:foo/invocations",
+  "kms_key_arn": "",
+  "last_modified": "2020-12-09T13:28:50.319+0000",
+  "layers": [],
+  "memory_size": 128,
+  "package_type": "Zip",
+  "publish": null,
+  "qualified_arn": "arn:aws:lambda:eu-west-3:526954929923:function:foo:$LATEST",
+  "reserved_concurrent_executions": -1,
+  "role": "arn:aws:iam::526954929923:role/iam_for_lambda",
+  "runtime": "nodejs12.x",
+  "s3_bucket": null,
+  "s3_key": null,
+  "s3_object_version": null,
+  "signing_job_arn": "",
+  "signing_profile_version_arn": "",
+  "source_code_hash": "PoaAEeOCmEFZojnrhEJvNzs+jg7/w1lL9GiFYvlM6aw=",
+  "source_code_size": 352,
+  "tags": {},
+  "timeout": 3,
+  "timeouts": {
+   "create": null
+  },
+  "tracing_config": [
+   {
+    "mode": "PassThrough"
+   }
+  ],
+  "version": "$LATEST",
+  "vpc_config": []
+ }
+]
