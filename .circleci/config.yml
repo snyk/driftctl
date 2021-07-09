@@ -22,7 +22,7 @@ jobs:
     environment:
       ACC_PATTERN: << parameters.pattern >>
       AWS_DEFAULT_REGION: us-east-1
-      CHECKPOINT_DISABLE: true # Disable terraform version check
+      CHECKPOINT_DISABLE: 'true' # Disable terraform version check
     steps:
       - checkout
       - go/install:
@@ -64,6 +64,11 @@ jobs:
       - run: make install-tools
       - run: make deps
       - run: make lint
+      - goreleaser/install:
+          version: 0.173.2
+      - run:
+          name: Check GoReleaser config
+          command: ~/bin/goreleaser check
   test:
     docker:
       - image: golang:1.16
@@ -209,13 +214,13 @@ workflows:
           go-version: 1.16.5
           context: driftctl
           requires:
-            - lint
-            - test
+              - lint
+              - test
           filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
+              tags:
+                  only: /^v.*/
+              branches:
+                  ignore: /.*/
       - publish-aur:
           requires:
             - goreleaser/release
