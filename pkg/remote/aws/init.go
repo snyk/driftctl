@@ -121,6 +121,8 @@ func Init(version string, alerter *alerter.Alerter,
 
 	remoteLibrary.AddEnumerator(NewRDSDBInstanceEnumerator(rdsRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsDbInstanceResourceType, common.NewGenericDetailsFetcher(aws.AwsDbInstanceResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewRDSDBSubnetGroupEnumerator(rdsRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsDbSubnetGroupResourceType, common.NewGenericDetailsFetcher(aws.AwsDbSubnetGroupResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewSQSQueueEnumerator(sqsRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsSqsQueueResourceType, common.NewGenericDetailsFetcher(aws.AwsSqsQueueResourceType, provider, deserializer))
@@ -139,7 +141,6 @@ func Init(version string, alerter *alerter.Alerter,
 
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewLambdaFunctionSupplier(provider, deserializer, lambdaRepository))
-	supplierLibrary.AddSupplier(NewDBSubnetGroupSupplier(provider, deserializer, rdsRepository))
 	supplierLibrary.AddSupplier(NewIamUserSupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamUserPolicySupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamUserPolicyAttachmentSupplier(provider, deserializer, iamRepository))
