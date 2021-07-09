@@ -68,6 +68,8 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsS3BucketMetricResourceType, NewS3BucketMetricsDetailsFetcher(provider, deserializer))
 	remoteLibrary.AddEnumerator(NewS3BucketPolicyEnumerator(s3Repository, factory, provider.Config))
 	remoteLibrary.AddDetailsFetcher(aws.AwsS3BucketPolicyResourceType, NewS3BucketPolicyDetailsFetcher(provider, deserializer))
+	remoteLibrary.AddEnumerator(NewS3BucketAnalyticEnumerator(s3Repository, factory, provider.Config))
+	remoteLibrary.AddDetailsFetcher(aws.AwsS3BucketAnalyticsConfigurationResourceType, NewS3BucketAnalyticDetailsFetcher(provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewEC2EbsVolumeEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsEbsVolumeResourceType, common.NewGenericDetailsFetcher(aws.AwsEbsVolumeResourceType, provider, deserializer))
@@ -149,7 +151,6 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewLambdaEventSourceMappingEnumerator(lambdaRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsLambdaEventSourceMappingResourceType, common.NewGenericDetailsFetcher(aws.AwsLambdaEventSourceMappingResourceType, provider, deserializer))
 
-	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewIamUserSupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamUserPolicySupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamUserPolicyAttachmentSupplier(provider, deserializer, iamRepository))
