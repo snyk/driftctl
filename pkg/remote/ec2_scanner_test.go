@@ -1730,3 +1730,91 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 		})
 	}
 }
+
+func TestEC2NatGateway(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockEC2Repository)
+		wantErr error
+	}{
+		{
+			test:    "no nat gateways",
+			dirName: "aws_ec2_nat_gateway_empty",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllNatGateways").Return([]*ec2.NatGateway{}, nil)
+			},
+		},
+		{
+			test:    "single nat gateway",
+			dirName: "aws_ec2_nat_gateway_single",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllNatGateways").Return([]*ec2.NatGateway{
+					{NatGatewayId: awssdk.String("nat-0a5408508b19ef490")},
+				}, nil)
+			},
+		},
+		{
+			test:    "cannot list nat gateways",
+			dirName: "aws_ec2_nat_gateway_list",
+			mocks: func(repository *repository.MockEC2Repository) {
+				repository.On("ListAllNatGateways").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: nil,
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewEC2NatGatewayEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsNatGatewayResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsNatGatewayResourceType, provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsNatGatewayResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
