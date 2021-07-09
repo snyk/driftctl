@@ -139,6 +139,9 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewDynamoDBTableEnumerator(dynamoDBRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsDynamodbTableResourceType, NewDynamoDBTableDetailsFetcher(provider, deserializer))
 
+	remoteLibrary.AddEnumerator(NewIamPolicyEnumerator(iamRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsIamPolicyResourceType, common.NewGenericDetailsFetcher(aws.AwsIamPolicyResourceType, provider, deserializer))
+
 	supplierLibrary.AddSupplier(NewS3BucketAnalyticSupplier(provider, s3Repository, deserializer))
 	supplierLibrary.AddSupplier(NewLambdaFunctionSupplier(provider, deserializer, lambdaRepository))
 	supplierLibrary.AddSupplier(NewIamUserSupplier(provider, deserializer, iamRepository))
@@ -146,7 +149,6 @@ func Init(version string, alerter *alerter.Alerter,
 	supplierLibrary.AddSupplier(NewIamUserPolicyAttachmentSupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamAccessKeySupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamRoleSupplier(provider, deserializer, iamRepository))
-	supplierLibrary.AddSupplier(NewIamPolicySupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamRolePolicySupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamRolePolicyAttachmentSupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewVPCSecurityGroupRuleSupplier(provider, deserializer, ec2repository))
