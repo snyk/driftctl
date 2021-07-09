@@ -1,0 +1,67 @@
+project_name: driftctl
+release:
+    github:
+        owner: cloudskiff
+        name: driftctl
+    draft: false
+    prerelease: auto
+before:
+    hooks:
+        - go mod tidy
+        - go generate ./...
+signs:
+    - signature: "${artifact}.gpg"
+      artifacts: checksum
+      args: [ "--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}" ]
+builds:
+    - id: "driftctl-build"
+      binary: driftctl
+      dir: .
+      env:
+          - CGO_ENABLED=0
+          - GO111MODULE=on
+      goos:
+          - linux
+          - windows
+          - darwin
+      goarch:
+          - amd64
+          - arm
+          - arm64
+          - 386
+      ldflags: "-X github.com/cloudskiff/driftctl/pkg/version.version={{ .Tag }}"
+archives:
+    - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
+      format: binary
+      replacements:
+          armv6: arm
+checksum:
+    name_template: '{{ .ProjectName }}_SHA256SUMS'
+    algorithm: sha256
+snapshot:
+    name_template: "{{ .Tag }}-next"
+dockers:
+    - image_templates:
+          - "cloudskiff/driftctl:latest"
+          - "cloudskiff/driftctl:{{ .Tag }}"
+      dockerfile: Dockerfile_release
+      build_flag_templates:
+          - --label=org.opencontainers.image.title={{ .ProjectName }}
+          - --label=org.opencontainers.image.description={{ .ProjectName }}
+          - --label=org.opencontainers.image.url=https://github.com/cloudskiff/driftctl
+          - --label=org.opencontainers.image.source=https://github.com/cloudskiff/driftctl
+          - --label=org.opencontainers.image.version={{ .Version }}
+          - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
+          - --label=org.opencontainers.image.revision={{ .FullCommit }}
+          - --label=org.opencontainers.image.licenses=MIT
+          - --platform=linux/amd64
+nfpms:
+    - maintainer: CloudSkiff <engineering@cloudskiff.com>
+      description: Detect, track and alert on infrastructure drift
+      homepage: https://github.com/cloudskiff/driftctl
+      license: Apache License 2.0
+      file_name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
+      formats:
+          - deb
+          - rpm
+          - apk
