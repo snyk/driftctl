@@ -23,6 +23,104 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+func TestIamUser(t *testing.T) {
+
+	cases := []struct {
+		test    string
+		dirName string
+		mocks   func(repo *repository.MockIAMRepository)
+		wantErr error
+	}{
+		{
+			test:    "no iam user",
+			dirName: "iam_user_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllUsers").Return([]*iam.User{}, nil)
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "iam multiples users",
+			dirName: "iam_user_multiple",
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllUsers").Return([]*iam.User{
+					{
+						UserName: aws.String("test-driftctl-0"),
+					},
+					{
+						UserName: aws.String("test-driftctl-1"),
+					},
+					{
+						UserName: aws.String("test-driftctl-2"),
+					},
+				}, nil)
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "cannot list iam user",
+			dirName: "iam_user_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllUsers").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: nil,
+		},
+	}
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range cases {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
+			fakeRepo := &repository.MockIAMRepository{}
+			c.mocks(fakeRepo)
+			var repo repository.IAMRepository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewIAMRepository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(remoteaws.NewIamUserEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamUserResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamUserResourceType, provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsIamUserResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
+
 func TestIamPolicy(t *testing.T) {
 
 	cases := []struct {
