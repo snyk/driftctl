@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   go: circleci/go@1.5.0
+  goreleaser: hubci/goreleaser@1.0.0
 jobs:
   build:
     docker:
@@ -83,46 +84,6 @@ jobs:
             ./codecov
       - store_test_results:
           path: ./
-  sign_release:
-    docker:
-      - image: cimg/base:2020.01
-    steps:
-      - attach_workspace:
-          at: ~/project
-      - run:
-          name: "Ensure GnuPG is available"
-          command: gpg --version
-      - run:
-          name: "Import cloudskiff signing key"
-          command: |
-            echo ${SIGNINGKEY} | base64 -d > signingkey
-            gpg --import signingkey
-      - run:
-          name: "Sign release"
-          command: |
-            gpg --output bin/driftctl_SHA256SUMS.gpg -u security@cloudskiff.com --detach-sig bin/driftctl_SHA256SUMS
-      - run:
-          name: "Verify signature"
-          command: |
-            gpg --verify bin/driftctl_SHA256SUMS.gpg bin/driftctl_SHA256SUMS
-      - persist_to_workspace:
-          root: ~/project
-          paths:
-            - bin/
-  release:
-    environment:
-        CIRCLE_PROJECT_USERNAME: cloudskiff
-        CIRCLE_PROJECT_REPONAME: driftctl
-    docker:
-      - image: cibuilds/github:0.13
-    steps:
-      - attach_workspace:
-          at: ~/project
-      - run:
-          name: "Publish Release on GitHub"
-          command: |
-            VERSION=$(./bin/driftctl_linux_amd64 version)
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -n ${VERSION} ${VERSION} ./bin/
   publish-aur:
     environment:
         AUR_GIT: ssh://aur@aur.archlinux.org/driftctl-bin.git
@@ -243,21 +204,13 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
-      - sign_release:
-          context: cloudskiff-signing
-          requires:
-            - build
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
-      - release:
+      - goreleaser/release:
+          version: 0.173.2
+          go-version: 1.16.5
           context: driftctl
           requires:
             - lint
             - test
-            - sign_release
           filters:
             tags:
               only: /^v.*/
@@ -265,7 +218,7 @@ workflows:
               ignore: /.*/
       - publish-aur:
           requires:
-            - release
+            - goreleaser/release
           filters:
             tags:
               only: /^v.*/
@@ -274,7 +227,7 @@ workflows:
       - update-lambda:
           context: driftctl-version-lambda
           requires:
-            - release
+            - goreleaser/release
           filters:
             tags:
               only: /^v.*/

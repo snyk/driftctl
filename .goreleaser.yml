@@ -12,7 +12,7 @@ before:
 signs:
     - signature: "${artifact}.gpg"
       artifacts: checksum
-      args: [ "--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}" ]
+      args: [ "--batch", "-u", "{{ .Env.SIGNINGKEY }}", "--output", "${signature}", "--detach-sign", "${artifact}" ]
 builds:
     - id: "driftctl-build"
       binary: driftctl
@@ -45,6 +45,7 @@ dockers:
           - "cloudskiff/driftctl:latest"
           - "cloudskiff/driftctl:{{ .Tag }}"
       dockerfile: Dockerfile_release
+      skip_push: true
       build_flag_templates:
           - --label=org.opencontainers.image.title={{ .ProjectName }}
           - --label=org.opencontainers.image.description={{ .ProjectName }}
