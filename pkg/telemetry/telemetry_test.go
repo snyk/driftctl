@@ -24,7 +24,7 @@ func TestSendTelemetry(t *testing.T) {
 		analysis       *analyser.Analysis
 		expectedBody   *telemetry
 		response       *http.Response
-		setStoreValues func(memstore.Store, *analyser.Analysis)
+		setStoreValues func(memstore.Bucket, *analyser.Analysis)
 	}{
 		{
 			name: "valid analysis",
@@ -43,13 +43,10 @@ func TestSendTelemetry(t *testing.T) {
 				TotalManaged:   1,
 				Duration:       123,
 			},
-			setStoreValues: func(s memstore.Store, a *analyser.Analysis) {
-				s.Bucket(memstore.TelemetryBucket).Set("version", version.Current())
-				s.Bucket(memstore.TelemetryBucket).Set("os", runtime.GOOS)
-				s.Bucket(memstore.TelemetryBucket).Set("arch", runtime.GOARCH)
-				s.Bucket(memstore.TelemetryBucket).Set("total_resources", a.Summary().TotalResources)
-				s.Bucket(memstore.TelemetryBucket).Set("total_managed", a.Summary().TotalManaged)
-				s.Bucket(memstore.TelemetryBucket).Set("duration", uint(a.Duration.Seconds()+0.5))
+			setStoreValues: func(s memstore.Bucket, a *analyser.Analysis) {
+				s.Set("total_resources", a.Summary().TotalResources)
+				s.Set("total_managed", a.Summary().TotalManaged)
+				s.Set("duration", uint(a.Duration.Seconds()+0.5))
 			},
 		},
 		{
@@ -65,13 +62,10 @@ func TestSendTelemetry(t *testing.T) {
 				Arch:     runtime.GOARCH,
 				Duration: 124,
 			},
-			setStoreValues: func(s memstore.Store, a *analyser.Analysis) {
-				s.Bucket(memstore.TelemetryBucket).Set("version", version.Current())
-				s.Bucket(memstore.TelemetryBucket).Set("os", runtime.GOOS)
-				s.Bucket(memstore.TelemetryBucket).Set("arch", runtime.GOARCH)
-				s.Bucket(memstore.TelemetryBucket).Set("total_resources", a.Summary().TotalResources)
-				s.Bucket(memstore.TelemetryBucket).Set("total_managed", a.Summary().TotalManaged)
-				s.Bucket(memstore.TelemetryBucket).Set("duration", uint(a.Duration.Seconds()+0.5))
+			setStoreValues: func(s memstore.Bucket, a *analyser.Analysis) {
+				s.Set("total_resources", a.Summary().TotalResources)
+				s.Set("total_managed", a.Summary().TotalManaged)
+				s.Set("duration", uint(a.Duration.Seconds()+0.5))
 			},
 		},
 		{
@@ -85,16 +79,20 @@ func TestSendTelemetry(t *testing.T) {
 				a.Duration = 123.5 * 1e9 // 123.5 seconds
 				return a
 			}(),
-			expectedBody:   &telemetry{},
-			setStoreValues: func(s memstore.Store, a *analyser.Analysis) {},
+			expectedBody: &telemetry{
+				Version: version.Current(),
+				Os:      runtime.GOOS,
+				Arch:    runtime.GOARCH,
+			},
+			setStoreValues: func(s memstore.Bucket, a *analyser.Analysis) {},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := memstore.New()
+			store := memstore.New().Bucket(memstore.TelemetryBucket)
 
 			if tt.analysis != nil {
-				tt.setStoreValues(s, tt.analysis)
+				tt.setStoreValues(store, tt.analysis)
 			}
 
 			httpmock.Reset()
@@ -124,7 +122,7 @@ func TestSendTelemetry(t *testing.T) {
 					},
 				)
 			}
-			SendTelemetry(s)
+			SendTelemetry(store)
 		})
 	}
 }

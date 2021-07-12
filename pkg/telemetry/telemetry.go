@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"runtime"
 
 	"github.com/cloudskiff/driftctl/pkg/memstore"
+	"github.com/cloudskiff/driftctl/pkg/version"
 	"github.com/sirupsen/logrus"
 )
 
@@ -18,30 +20,22 @@ type telemetry struct {
 	Duration       uint   `json:"duration"`
 }
 
-func SendTelemetry(s memstore.Store) {
-	t := &telemetry{}
-
-	if val, ok := s.Bucket(memstore.TelemetryBucket).Get("version").(string); ok {
-		t.Version = val
+func SendTelemetry(store memstore.Bucket) {
+	t := &telemetry{
+		Version: version.Current(),
+		Os:      runtime.GOOS,
+		Arch:    runtime.GOARCH,
 	}
 
-	if val, ok := s.Bucket(memstore.TelemetryBucket).Get("os").(string); ok {
-		t.Os = val
-	}
-
-	if val, ok := s.Bucket(memstore.TelemetryBucket).Get("arch").(string); ok {
-		t.Arch = val
-	}
-
-	if val, ok := s.Bucket(memstore.TelemetryBucket).Get("total_resources").(int); ok {
+	if val, ok := store.Get("total_resources").(int); ok {
 		t.TotalResources = val
 	}
 
-	if val, ok := s.Bucket(memstore.TelemetryBucket).Get("total_managed").(int); ok {
+	if val, ok := store.Get("total_managed").(int); ok {
 		t.TotalManaged = val
 	}
 
-	if val, ok := s.Bucket(memstore.TelemetryBucket).Get("duration").(uint); ok {
+	if val, ok := store.Get("duration").(uint); ok {
 		t.Duration = val
 	}
 

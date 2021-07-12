@@ -2,12 +2,10 @@ package pkg
 
 import (
 	"fmt"
-	"runtime"
 	"time"
 
 	"github.com/cloudskiff/driftctl/pkg/memstore"
 	globaloutput "github.com/cloudskiff/driftctl/pkg/output"
-	"github.com/cloudskiff/driftctl/pkg/version"
 	"github.com/jmespath/go-jmespath"
 	"github.com/sirupsen/logrus"
 
@@ -144,9 +142,6 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	analysis.Duration = time.Since(start)
 	analysis.Date = time.Now()
 
-	d.store.Bucket(memstore.TelemetryBucket).Set("version", version.Current())
-	d.store.Bucket(memstore.TelemetryBucket).Set("os", runtime.GOOS)
-	d.store.Bucket(memstore.TelemetryBucket).Set("arch", runtime.GOARCH)
 	d.store.Bucket(memstore.TelemetryBucket).Set("total_resources", analysis.Summary().TotalResources)
 	d.store.Bucket(memstore.TelemetryBucket).Set("total_managed", analysis.Summary().TotalManaged)
 	d.store.Bucket(memstore.TelemetryBucket).Set("duration", uint(analysis.Duration.Seconds()+0.5))
