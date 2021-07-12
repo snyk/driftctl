@@ -642,7 +642,7 @@ func TestEC2Instance(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewEC2InstanceEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsInstanceResourceType, aws.NewEC2InstanceDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsInstanceResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsInstanceResourceType, provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
