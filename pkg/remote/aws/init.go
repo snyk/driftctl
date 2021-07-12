@@ -84,7 +84,7 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewEC2EipAssociationEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsEipAssociationResourceType, common.NewGenericDetailsFetcher(aws.AwsEipAssociationResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewEC2InstanceEnumerator(ec2repository, factory))
-	remoteLibrary.AddDetailsFetcher(aws.AwsInstanceResourceType, NewEC2InstanceDetailsFetcher(provider, deserializer))
+	remoteLibrary.AddDetailsFetcher(aws.AwsInstanceResourceType, common.NewGenericDetailsFetcher(aws.AwsInstanceResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewEC2InternetGatewayEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsInternetGatewayResourceType, common.NewGenericDetailsFetcher(aws.AwsInternetGatewayResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewVPCEnumerator(ec2repository, factory))
