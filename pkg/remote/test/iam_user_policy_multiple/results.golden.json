@@ -1,0 +1,86 @@
+[
+ {
+  "id": "loadbalancer3:test3",
+  "name": "test3",
+  "name_prefix": null,
+  "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "user": "loadbalancer3"
+ },
+ {
+  "id": "loadbalancer2:test22",
+  "name": "test22",
+  "name_prefix": null,
+  "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "user": "loadbalancer2"
+ },
+ {
+  "id": "loadbalancer3:test32",
+  "name": "test32",
+  "name_prefix": null,
+  "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "user": "loadbalancer3"
+ },
+ {
+  "id": "loadbalancer:test3",
+  "name": "test3",
+  "name_prefix": null,
+  "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "user": "loadbalancer"
+ },
+ {
+  "id": "loadbalancer2:test24",
+  "name": "test24",
+  "name_prefix": null,
+  "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "user": "loadbalancer2"
+ },
+ {
+  "id": "loadbalancer2:test2",
+  "name": "test2",
+  "name_prefix": null,
+  "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "user": "loadbalancer2"
+ },
+ {
+  "id": "loadbalancer:test2",
+  "name": "test2",
+  "name_prefix": null,
+  "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "user": "loadbalancer"
+ },
+ {
+  "id": "loadbalancer:test",
+  "name": "test",
+  "name_prefix": null,
+  "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "user": "loadbalancer"
+ },
+ {
+  "id": "loadbalancer2:test23",
+  "name": "test23",
+  "name_prefix": null,
+  "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "user": "loadbalancer2"
+ },
+ {
+  "id": "loadbalancer:test4",
+  "name": "test4",
+  "name_prefix": null,
+  "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "user": "loadbalancer"
+ },
+ {
+  "id": "loadbalancer3:test34",
+  "name": "test34",
+  "name_prefix": null,
+  "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "user": "loadbalancer3"
+ },
+ {
+  "id": "loadbalancer3:test33",
+  "name": "test33",
+  "name_prefix": null,
+  "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+  "user": "loadbalancer3"
+ }
+]
