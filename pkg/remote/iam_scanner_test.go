@@ -456,3 +456,130 @@ func TestIamRole(t *testing.T) {
 		})
 	}
 }
+
+func TestIamAccessKey(t *testing.T) {
+
+	cases := []struct {
+		test    string
+		dirName string
+		mocks   func(repo *repository.MockIAMRepository)
+		wantErr error
+	}{
+		{
+			test:    "no iam access_key",
+			dirName: "iam_access_key_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				users := []*iam.User{
+					{
+						UserName: aws.String("test-driftctl"),
+					},
+				}
+				repo.On("ListAllUsers").Return(users, nil)
+				repo.On("ListAllAccessKeys", users).Return([]*iam.AccessKeyMetadata{}, nil)
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "iam multiples keys for multiples users",
+			dirName: "iam_access_key_multiple",
+			mocks: func(repo *repository.MockIAMRepository) {
+				users := []*iam.User{
+					{
+						UserName: aws.String("test-driftctl"),
+					},
+				}
+				repo.On("ListAllUsers").Return(users, nil)
+				repo.On("ListAllAccessKeys", users).Return([]*iam.AccessKeyMetadata{
+					{
+						AccessKeyId: aws.String("AKIA5QYBVVD223VWU32A"),
+						UserName:    aws.String("test-driftctl"),
+					},
+					{
+						AccessKeyId: aws.String("AKIA5QYBVVD2QYI36UZP"),
+						UserName:    aws.String("test-driftctl"),
+					},
+					{
+						AccessKeyId: aws.String("AKIA5QYBVVD26EJME25D"),
+						UserName:    aws.String("test-driftctl2"),
+					},
+					{
+						AccessKeyId: aws.String("AKIA5QYBVVD2SWDFVVMG"),
+						UserName:    aws.String("test-driftctl2"),
+					},
+				}, nil)
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "Cannot list iam user",
+			dirName: "iam_access_key_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllUsers").Once().Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "Cannot list iam access_key",
+			dirName: "iam_access_key_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllUsers").Once().Return([]*iam.User{}, nil)
+				repo.On("ListAllAccessKeys", mock.Anything).Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: nil,
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range cases {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
+			fakeRepo := &repository.MockIAMRepository{}
+			c.mocks(fakeRepo)
+			var repo repository.IAMRepository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewIAMRepository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(remoteaws.NewIamAccessKeyEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamAccessKeyResourceType, remoteaws.NewIamAccessKeyDetailsFetcher(provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, c.wantErr, err)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsIamAccessKeyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
