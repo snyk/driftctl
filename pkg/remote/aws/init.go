@@ -155,8 +155,9 @@ func Init(version string, alerter *alerter.Alerter,
 
 	remoteLibrary.AddEnumerator(NewIamUserEnumerator(iamRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsIamUserResourceType, common.NewGenericDetailsFetcher(aws.AwsIamUserResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewIamUserPolicyEnumerator(iamRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsIamUserPolicyResourceType, common.NewGenericDetailsFetcher(aws.AwsIamUserPolicyResourceType, provider, deserializer))
 
-	supplierLibrary.AddSupplier(NewIamUserPolicySupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamUserPolicyAttachmentSupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamAccessKeySupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewIamRoleSupplier(provider, deserializer, iamRepository))
