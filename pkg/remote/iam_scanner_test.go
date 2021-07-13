@@ -755,3 +755,205 @@ func TestIamAccessKey(t *testing.T) {
 		})
 	}
 }
+
+func TestIamUserPolicyAttachment(t *testing.T) {
+
+	cases := []struct {
+		test    string
+		dirName string
+		mocks   func(repo *repository.MockIAMRepository)
+		wantErr error
+	}{
+		{
+			test:    "no iam user policy",
+			dirName: "iam_user_policy_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				users := []*iam.User{
+					{
+						UserName: aws.String("loadbalancer"),
+					},
+				}
+				repo.On("ListAllUsers").Return(users, nil)
+				repo.On("ListAllUserPolicyAttachments", users).Return([]*repository.AttachedUserPolicy{}, nil)
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "iam multiples users multiple policies",
+			dirName: "iam_user_policy_attachment_multiple",
+			mocks: func(repo *repository.MockIAMRepository) {
+				users := []*iam.User{
+					{
+						UserName: aws.String("loadbalancer"),
+					},
+					{
+						UserName: aws.String("loadbalancer2"),
+					},
+					{
+						UserName: aws.String("loadbalancer3"),
+					},
+				}
+				repo.On("ListAllUsers").Return(users, nil)
+				repo.On("ListAllUserPolicyAttachments", users).Return([]*repository.AttachedUserPolicy{
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::726421854799:policy/test"),
+							PolicyName: aws.String("test"),
+						},
+						UserName: *aws.String("loadbalancer"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::726421854799:policy/test2"),
+							PolicyName: aws.String("test2"),
+						},
+						UserName: *aws.String("loadbalancer"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::726421854799:policy/test3"),
+							PolicyName: aws.String("test3"),
+						},
+						UserName: *aws.String("loadbalancer"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::726421854799:policy/test4"),
+							PolicyName: aws.String("test4"),
+						},
+						UserName: *aws.String("loadbalancer"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::726421854799:policy/test"),
+							PolicyName: aws.String("test"),
+						},
+						UserName: *aws.String("loadbalancer2"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::726421854799:policy/test2"),
+							PolicyName: aws.String("test2"),
+						},
+						UserName: *aws.String("loadbalancer2"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::726421854799:policy/test3"),
+							PolicyName: aws.String("test3"),
+						},
+						UserName: *aws.String("loadbalancer2"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::726421854799:policy/test4"),
+							PolicyName: aws.String("test4"),
+						},
+						UserName: *aws.String("loadbalancer2"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::726421854799:policy/test"),
+							PolicyName: aws.String("test"),
+						},
+						UserName: *aws.String("loadbalancer3"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::726421854799:policy/test2"),
+							PolicyName: aws.String("test2"),
+						},
+						UserName: *aws.String("loadbalancer3"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::726421854799:policy/test3"),
+							PolicyName: aws.String("test3"),
+						},
+						UserName: *aws.String("loadbalancer3"),
+					},
+					{
+						AttachedPolicy: iam.AttachedPolicy{
+							PolicyArn:  aws.String("arn:aws:iam::726421854799:policy/test4"),
+							PolicyName: aws.String("test4"),
+						},
+						UserName: *aws.String("loadbalancer3"),
+					},
+				}, nil)
+
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "cannot list user",
+			dirName: "iam_user_policy_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllUsers").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "cannot list user policies attachment",
+			dirName: "iam_user_policy_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllUsers").Once().Return([]*iam.User{}, nil)
+				repo.On("ListAllUserPolicyAttachments", mock.Anything).Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: nil,
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range cases {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
+			fakeRepo := &repository.MockIAMRepository{}
+			c.mocks(fakeRepo)
+			var repo repository.IAMRepository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewIAMRepository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(remoteaws.NewIamUserPolicyAttachmentEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamUserPolicyAttachmentResourceType, remoteaws.NewIamUserPolicyAttachmentDetailsFetcher(provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, c.wantErr, err)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsIamUserPolicyAttachmentResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
