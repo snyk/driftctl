@@ -163,14 +163,14 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsIamAccessKeyResourceType, NewIamAccessKeyDetailsFetcher(provider, deserializer))
 	remoteLibrary.AddEnumerator(NewIamRolePolicyAttachmentEnumerator(iamRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsIamRolePolicyAttachmentResourceType, NewIamRolePolicyAttachmentDetailsFetcher(provider, deserializer))
+	remoteLibrary.AddEnumerator(NewIamRolePolicyEnumerator(iamRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsIamRolePolicyResourceType, common.NewGenericDetailsFetcher(aws.AwsIamRolePolicyResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewIamUserPolicyAttachmentEnumerator(iamRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsIamUserPolicyAttachmentResourceType, NewIamUserPolicyAttachmentDetailsFetcher(provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewECRRepositoryEnumerator(ecrRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsEcrRepositoryResourceType, common.NewGenericDetailsFetcher(aws.AwsEcrRepositoryResourceType, provider, deserializer))
 
-	remoteLibrary.AddEnumerator(NewIamUserPolicyAttachmentEnumerator(iamRepository, factory))
-	remoteLibrary.AddDetailsFetcher(aws.AwsIamUserPolicyAttachmentResourceType, NewIamUserPolicyAttachmentDetailsFetcher(provider, deserializer))
-
-	supplierLibrary.AddSupplier(NewIamRolePolicySupplier(provider, deserializer, iamRepository))
 	supplierLibrary.AddSupplier(NewVPCSecurityGroupRuleSupplier(provider, deserializer, ec2repository))
 
 	err = resourceSchemaRepository.Init(version, provider.Schema())

@@ -957,3 +957,123 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 		})
 	}
 }
+
+func TestIamRolePolicy(t *testing.T) {
+
+	cases := []struct {
+		test    string
+		dirName string
+		mocks   func(repo *repository.MockIAMRepository)
+		wantErr error
+	}{
+		{
+			test:    "no iam role policy",
+			dirName: "iam_role_policy_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				roles := []*iam.Role{
+					{
+						RoleName: aws.String("test_role"),
+					},
+				}
+				repo.On("ListAllRoles").Return(roles, nil)
+				repo.On("ListAllRolePolicies", roles).Return([]string{}, nil)
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "multiples roles with inline policies",
+			dirName: "iam_role_policy_multiple",
+			mocks: func(repo *repository.MockIAMRepository) {
+				roles := []*iam.Role{
+					{
+						RoleName: aws.String("test_role_0"),
+					},
+					{
+						RoleName: aws.String("test_role_1"),
+					},
+				}
+				repo.On("ListAllRoles").Return(roles, nil)
+				repo.On("ListAllRolePolicies", roles).Return([]string{
+					*aws.String("test_role_0:policy-role0-0"),
+					*aws.String("test_role_0:policy-role0-1"),
+					*aws.String("test_role_0:policy-role0-2"),
+					*aws.String("test_role_1:policy-role1-0"),
+					*aws.String("test_role_1:policy-role1-1"),
+					*aws.String("test_role_1:policy-role1-2"),
+				}, nil).Once()
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "Cannot list roles",
+			dirName: "iam_role_policy_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllRoles").Once().Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "cannot list role policy",
+			dirName: "iam_role_policy_empty",
+			mocks: func(repo *repository.MockIAMRepository) {
+				repo.On("ListAllRoles").Once().Return([]*iam.Role{}, nil)
+				repo.On("ListAllRolePolicies", mock.Anything).Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: nil,
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range cases {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
+			fakeRepo := &repository.MockIAMRepository{}
+			c.mocks(fakeRepo)
+			var repo repository.IAMRepository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewIAMRepository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(remoteaws.NewIamRolePolicyEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamRolePolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamRolePolicyResourceType, provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsIamRolePolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
