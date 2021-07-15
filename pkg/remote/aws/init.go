@@ -109,6 +109,8 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsNatGatewayResourceType, common.NewGenericDetailsFetcher(aws.AwsNatGatewayResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewEC2RouteEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsRouteResourceType, NewEC2RouteDetailsFetcher(provider, deserializer))
+	remoteLibrary.AddEnumerator(NewVPCSecurityGroupRuleEnumerator(ec2repository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsSecurityGroupRuleResourceType, common.NewGenericDetailsFetcher(aws.AwsSecurityGroupRuleResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewKMSKeyEnumerator(kmsRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsKmsKeyResourceType, common.NewGenericDetailsFetcher(aws.AwsKmsKeyResourceType, provider, deserializer))
@@ -170,8 +172,6 @@ func Init(version string, alerter *alerter.Alerter,
 
 	remoteLibrary.AddEnumerator(NewECRRepositoryEnumerator(ecrRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsEcrRepositoryResourceType, common.NewGenericDetailsFetcher(aws.AwsEcrRepositoryResourceType, provider, deserializer))
-
-	supplierLibrary.AddSupplier(NewVPCSecurityGroupRuleSupplier(provider, deserializer, ec2repository))
 
 	err = resourceSchemaRepository.Init(version, provider.Schema())
 	if err != nil {

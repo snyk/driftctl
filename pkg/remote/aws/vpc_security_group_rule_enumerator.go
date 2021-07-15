@@ -7,13 +7,8 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
-	"github.com/cloudskiff/driftctl/pkg/terraform"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/hashicorp/terraform/flatmap"
-	"github.com/sirupsen/logrus"
-	"github.com/zclconf/go-cty/cty"
 )
 
 const (
@@ -21,11 +16,9 @@ const (
 	sgRuleTypeEgress  = "egress"
 )
 
-type VPCSecurityGroupRuleSupplier struct {
-	reader       terraform.ResourceReader
-	deserializer *resource.Deserializer
-	repository   repository.EC2Repository
-	runner       *terraform.ParallelResourceReader
+type VPCSecurityGroupRuleEnumerator struct {
+	repository repository.EC2Repository
+	factory    resource.ResourceFactory
 }
 
 type securityGroupRule struct {
@@ -42,6 +35,11 @@ type securityGroupRule struct {
 }
 
 func (s *securityGroupRule) getId() string {
+	attrs := s.getAttrs()
+	return resourceaws.CreateSecurityGroupRuleIdHash(&attrs)
+}
+
+func (s *securityGroupRule) getAttrs() resource.Attributes {
 	attrs := resource.Attributes{
 		"type":                     s.Type,
 		"security_group_id":        s.SecurityGroupId,
@@ -55,7 +53,7 @@ func (s *securityGroupRule) getId() string {
 		"prefix_list_ids":          toInterfaceSlice(s.PrefixListIds),
 	}
 
-	return resourceaws.CreateSecurityGroupRuleIdHash(&attrs)
+	return attrs
 }
 
 func toInterfaceSlice(val []string) []interface{} {
@@ -66,74 +64,51 @@ func toInterfaceSlice(val []string) []interface{} {
 	return res
 }
 
-func NewVPCSecurityGroupRuleSupplier(provider *AWSTerraformProvider, deserializer *resource.Deserializer, repository repository.EC2Repository) *VPCSecurityGroupRuleSupplier {
-	return &VPCSecurityGroupRuleSupplier{
-		provider,
-		deserializer,
+func NewVPCSecurityGroupRuleEnumerator(repository repository.EC2Repository, factory resource.ResourceFactory) *VPCSecurityGroupRuleEnumerator {
+	return &VPCSecurityGroupRuleEnumerator{
 		repository,
-		terraform.NewParallelResourceReader(provider.Runner().SubRunner()),
+		factory,
 	}
 }
 
-func (s *VPCSecurityGroupRuleSupplier) Resources() ([]resource.Resource, error) {
-	securityGroups, defaultSecurityGroups, err := s.repository.ListAllSecurityGroups()
+func (e *VPCSecurityGroupRuleEnumerator) SupportedType() resource.ResourceType {
+	return resourceaws.AwsSecurityGroupRuleResourceType
+}
+
+func (e *VPCSecurityGroupRuleEnumerator) Enumerate() ([]resource.Resource, error) {
+	securityGroups, defaultSecurityGroups, err := e.repository.ListAllSecurityGroups()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsSecurityGroupRuleResourceType)
+		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, string(e.SupportedType()), resourceaws.AwsSecurityGroupResourceType)
 	}
+
 	secGroups := make([]*ec2.SecurityGroup, 0, len(securityGroups)+len(defaultSecurityGroups))
 	secGroups = append(secGroups, securityGroups...)
 	secGroups = append(secGroups, defaultSecurityGroups...)
-	securityGroupsRules := s.listSecurityGroupsRules(secGroups)
-	results := make([]cty.Value, 0)
-	if len(securityGroupsRules) > 0 {
-		for _, securityGroupsRule := range securityGroupsRules {
-			rule := securityGroupsRule
-			s.runner.Run(func() (cty.Value, error) {
-				return s.readSecurityGroupRule(rule)
-			})
-		}
-		results, err = s.runner.Wait()
-		if err != nil {
-			return nil, err
-		}
+	securityGroupsRules := e.listSecurityGroupsRules(secGroups)
+
+	results := make([]resource.Resource, 0, len(securityGroupsRules))
+	for _, rule := range securityGroupsRules {
+		results = append(
+			results,
+			e.factory.CreateAbstractResource(
+				string(e.SupportedType()),
+				rule.getId(),
+				rule.getAttrs(),
+			),
+		)
 	}
-	return s.deserializer.Deserialize(resourceaws.AwsSecurityGroupRuleResourceType, results)
+
+	return results, nil
 }
 
-func (s *VPCSecurityGroupRuleSupplier) readSecurityGroupRule(rule securityGroupRule) (cty.Value, error) {
-	id := rule.getId()
-
-	resSgRule, err := s.reader.ReadResource(terraform.ReadResourceArgs{
-		Ty: resourceaws.AwsSecurityGroupRuleResourceType,
-		ID: id,
-		Attributes: flatmap.Flatten(map[string]interface{}{
-			"type":                     rule.Type,
-			"security_group_id":        rule.SecurityGroupId,
-			"protocol":                 rule.Protocol,
-			"from_port":                rule.FromPort,
-			"to_port":                  rule.ToPort,
-			"self":                     rule.Self,
-			"source_security_group_id": rule.SourceSecurityGroupId,
-			"cidr_blocks":              rule.CidrBlocks,
-			"ipv6_cidr_blocks":         rule.Ipv6CidrBlocks,
-			"prefix_list_ids":          rule.PrefixListIds,
-		}),
-	})
-	if err != nil {
-		logrus.Warnf("Error reading rule from security group %s: %+v", id, err)
-		return cty.NilVal, err
-	}
-	return *resSgRule, nil
-}
-
-func (s *VPCSecurityGroupRuleSupplier) listSecurityGroupsRules(securityGroups []*ec2.SecurityGroup) []securityGroupRule {
+func (e *VPCSecurityGroupRuleEnumerator) listSecurityGroupsRules(securityGroups []*ec2.SecurityGroup) []securityGroupRule {
 	var securityGroupsRules []securityGroupRule
 	for _, sg := range securityGroups {
 		for _, rule := range sg.IpPermissions {
-			securityGroupsRules = append(securityGroupsRules, s.addSecurityGroupRule(sgRuleTypeIngress, rule, sg)...)
+			securityGroupsRules = append(securityGroupsRules, e.addSecurityGroupRule(sgRuleTypeIngress, rule, sg)...)
 		}
 		for _, rule := range sg.IpPermissionsEgress {
-			securityGroupsRules = append(securityGroupsRules, s.addSecurityGroupRule(sgRuleTypeEgress, rule, sg)...)
+			securityGroupsRules = append(securityGroupsRules, e.addSecurityGroupRule(sgRuleTypeEgress, rule, sg)...)
 		}
 	}
 	return securityGroupsRules
@@ -141,7 +116,7 @@ func (s *VPCSecurityGroupRuleSupplier) listSecurityGroupsRules(securityGroups []
 
 // addSecurityGroupRule will iterate through each "Source" as per Aws definition and create a
 // rule with custom attributes
-func (s *VPCSecurityGroupRuleSupplier) addSecurityGroupRule(ruleType string, rule *ec2.IpPermission, sg *ec2.SecurityGroup) []securityGroupRule {
+func (e *VPCSecurityGroupRuleEnumerator) addSecurityGroupRule(ruleType string, rule *ec2.IpPermission, sg *ec2.SecurityGroup) []securityGroupRule {
 	var rules []securityGroupRule
 	for _, groupPair := range rule.UserIdGroupPairs {
 		r := securityGroupRule{

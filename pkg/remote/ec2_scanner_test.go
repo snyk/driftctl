@@ -1973,3 +1973,186 @@ func TestEC2Route(t *testing.T) {
 		})
 	}
 }
+
+func TestVpcSecurityGroupRule(t *testing.T) {
+
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(repository *repository.MockEC2Repository)
+		wantErr error
+	}{
+		{
+			test:    "no security group rules",
+			dirName: "vpc_security_group_rule_empty",
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{
+					{
+						GroupId:             awssdk.String("sg-0254c038e32f25530"),
+						IpPermissions:       []*ec2.IpPermission{},
+						IpPermissionsEgress: []*ec2.IpPermission{},
+					},
+				}, nil, nil)
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "with security group rules",
+			dirName: "vpc_security_group_rule_multiple",
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{
+					{
+						GroupId: awssdk.String("sg-0254c038e32f25530"),
+						IpPermissions: []*ec2.IpPermission{
+							{
+								FromPort:   awssdk.Int64(0),
+								ToPort:     awssdk.Int64(65535),
+								IpProtocol: awssdk.String("tcp"),
+								UserIdGroupPairs: []*ec2.UserIdGroupPair{
+									{
+										GroupId: awssdk.String("sg-0254c038e32f25530"),
+									},
+									{
+										GroupId: awssdk.String("sg-9e0204ff"),
+									},
+								},
+							},
+							{
+								IpProtocol: awssdk.String("-1"),
+								IpRanges: []*ec2.IpRange{
+									{
+										CidrIp: awssdk.String("1.2.0.0/16"),
+									},
+									{
+										CidrIp: awssdk.String("5.6.7.0/24"),
+									},
+								},
+								Ipv6Ranges: []*ec2.Ipv6Range{
+									{
+										CidrIpv6: awssdk.String("::/0"),
+									},
+								},
+							},
+						},
+						IpPermissionsEgress: []*ec2.IpPermission{
+							{
+								IpProtocol: awssdk.String("-1"),
+								IpRanges: []*ec2.IpRange{
+									{
+										CidrIp: awssdk.String("0.0.0.0/0"),
+									},
+								},
+								Ipv6Ranges: []*ec2.Ipv6Range{
+									{
+										CidrIpv6: awssdk.String("::/0"),
+									},
+								},
+							},
+						},
+					},
+					{
+						GroupId: awssdk.String("sg-0cc8b3c3c2851705a"),
+						IpPermissions: []*ec2.IpPermission{
+							{
+								FromPort:   awssdk.Int64(443),
+								ToPort:     awssdk.Int64(443),
+								IpProtocol: awssdk.String("tcp"),
+								IpRanges: []*ec2.IpRange{
+									{
+										CidrIp: awssdk.String("0.0.0.0/0"),
+									},
+								},
+							},
+						},
+						IpPermissionsEgress: []*ec2.IpPermission{
+							{
+								IpProtocol: awssdk.String("-1"),
+								IpRanges: []*ec2.IpRange{
+									{
+										CidrIp: awssdk.String("0.0.0.0/0"),
+									},
+								},
+								Ipv6Ranges: []*ec2.Ipv6Range{
+									{
+										CidrIpv6: awssdk.String("::/0"),
+									},
+								},
+							},
+							{
+								IpProtocol: awssdk.String("5"),
+								IpRanges: []*ec2.IpRange{
+									{
+										CidrIp: awssdk.String("0.0.0.0/0"),
+									},
+								},
+							},
+						},
+					},
+				}, nil, nil)
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "cannot list security group rules",
+			dirName: "vpc_security_group_rule_empty",
+			mocks: func(client *repository.MockEC2Repository) {
+				client.On("ListAllSecurityGroups").Once().Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
+			},
+			wantErr: nil,
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			session := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo)
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(session, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewVPCSecurityGroupRuleEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSecurityGroupRuleResourceType, aws.NewVPCSecurityGroupRuleDetailsFetcher(provider, deserializer))
+
+			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			got, err := s.Resources()
+			assert.Equal(tt, c.wantErr, err)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsSecurityGroupRuleResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
