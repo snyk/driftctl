@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"runtime"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
+	"github.com/cloudskiff/driftctl/pkg/memstore"
 	"github.com/cloudskiff/driftctl/pkg/version"
 	"github.com/sirupsen/logrus"
 )
@@ -20,19 +20,23 @@ type telemetry struct {
 	Duration       uint   `json:"duration"`
 }
 
-func SendTelemetry(analysis *analyser.Analysis) {
-
-	if analysis == nil {
-		return
+func SendTelemetry(store memstore.Bucket) {
+	t := &telemetry{
+		Version: version.Current(),
+		Os:      runtime.GOOS,
+		Arch:    runtime.GOARCH,
 	}
 
-	t := telemetry{
-		Version:        version.Current(),
-		Os:             runtime.GOOS,
-		Arch:           runtime.GOARCH,
-		TotalResources: analysis.Summary().TotalResources,
-		TotalManaged:   analysis.Summary().TotalManaged,
-		Duration:       uint(analysis.Duration.Seconds() + 0.5),
+	if val, ok := store.Get("total_resources").(int); ok {
+		t.TotalResources = val
+	}
+
+	if val, ok := store.Get("total_managed").(int); ok {
+		t.TotalManaged = val
+	}
+
+	if val, ok := store.Get("duration").(uint); ok {
+		t.Duration = val
 	}
 
 	body, err := json.Marshal(t)

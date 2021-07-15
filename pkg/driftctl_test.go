@@ -8,6 +8,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/memstore"
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -16,6 +17,7 @@ import (
 	"github.com/cloudskiff/driftctl/test"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/r3labs/diff/v2"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -30,7 +32,8 @@ type TestCase struct {
 	stateResources  []resource.Resource
 	remoteResources []resource.Resource
 	mocks           func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface)
-	assert          func(result *test.ScanResult, err error)
+	assert          func(t *testing.T, result *test.ScanResult, err error)
+	assertStore     func(*testing.T, memstore.Store)
 	options         *pkg.ScanOptions
 }
 
@@ -98,11 +101,15 @@ func runTest(t *testing.T, cases TestCases) {
 			iacProgress.On("Start").Return().Once()
 			iacProgress.On("Stop").Return().Once()
 
-			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, c.options, scanProgress, iacProgress, repo)
+			store := memstore.New()
+			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, c.options, scanProgress, iacProgress, repo, store)
 
 			analysis, err := driftctl.Run()
 
-			c.assert(test.NewScanResult(t, analysis), err)
+			c.assert(t, test.NewScanResult(t, analysis), err)
+			if c.assertStore != nil {
+				c.assertStore(t, store)
+			}
 			scanProgress.AssertExpectations(t)
 		})
 	}
@@ -124,8 +131,13 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			name:            "analysis duration is set",
 			stateResources:  []resource.Resource{},
 			remoteResources: []resource.Resource{},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.NotZero(result.Duration)
+			},
+			assertStore: func(t *testing.T, store memstore.Store) {
+				assert.Equal(t, 0, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
+				assert.Equal(t, 0, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
+				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
 			},
 		},
 		{
@@ -136,8 +148,13 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			remoteResources: []resource.Resource{
 				&testresource.FakeResource{},
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertInfrastructureIsInSync()
+			},
+			assertStore: func(t *testing.T, store memstore.Store) {
+				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
+				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
+				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{Deep: true}
@@ -149,8 +166,13 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				&testresource.FakeResource{},
 			},
 			remoteResources: []resource.Resource{},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertDeletedCount(1)
+			},
+			assertStore: func(t *testing.T, store memstore.Store) {
+				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
+				assert.Equal(t, 0, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
+				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
 			},
 		},
 		{
@@ -159,8 +181,13 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			remoteResources: []resource.Resource{
 				&testresource.FakeResource{},
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertUnmanagedCount(1)
+			},
+			assertStore: func(t *testing.T, store memstore.Store) {
+				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
+				assert.Equal(t, 0, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
+				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
 			},
 		},
 		{
@@ -181,7 +208,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 				},
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
 				result.AssertResourceHasDrift("fake", "FakeResource", analyser.Change{
 					Change: diff.Change{
@@ -192,6 +219,11 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 					Computed: false,
 				})
+			},
+			assertStore: func(t *testing.T, store memstore.Store) {
+				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
+				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
+				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
 			},
 		},
 		{
@@ -214,7 +246,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 				},
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
 				result.AssertResourceHasDrift("fake", aws.AwsAmiResourceType, analyser.Change{
 					Change: diff.Change{
@@ -225,6 +257,11 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 					Computed: true,
 				})
+			},
+			assertStore: func(t *testing.T, store memstore.Store) {
+				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
+				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
+				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
 			},
 		},
 		{
@@ -247,7 +284,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 				},
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
 				result.AssertResourceHasDrift("fake", "FakeResource", analyser.Change{
 					Change: diff.Change{
@@ -258,6 +295,11 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 					Computed: false,
 				})
+			},
+			assertStore: func(t *testing.T, store memstore.Store) {
+				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
+				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
+				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
 			},
 		},
 		{
@@ -280,7 +322,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 				},
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
 				result.AssertResourceHasDrift("fake", "FakeResource", analyser.Change{
 					Change: diff.Change{
@@ -291,6 +333,11 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 					Computed: false,
 				})
+			},
+			assertStore: func(t *testing.T, store memstore.Store) {
+				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
+				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
+				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
 			},
 		},
 		{
@@ -369,11 +416,16 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 				},
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(2)
 				result.AssertUnmanagedCount(2)
 				result.AssertDeletedCount(0)
 				result.AssertDriftCountTotal(0)
+			},
+			assertStore: func(t *testing.T, store memstore.Store) {
+				assert.Equal(t, 4, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
+				assert.Equal(t, 2, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
+				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{
@@ -458,11 +510,16 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 				},
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(2)
 				result.AssertUnmanagedCount(4)
 				result.AssertDeletedCount(0)
 				result.AssertDriftCountTotal(0)
+			},
+			assertStore: func(t *testing.T, store memstore.Store) {
+				assert.Equal(t, 6, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
+				assert.Equal(t, 2, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
+				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{
@@ -547,13 +604,18 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 				},
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertCoverage(0)
 				result.AssertInfrastructureIsNotSync()
 				result.AssertManagedCount(0)
 				result.AssertUnmanagedCount(1)
 				result.AssertDeletedCount(0)
 				result.AssertDriftCountTotal(0)
+			},
+			assertStore: func(t *testing.T, store memstore.Store) {
+				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
+				assert.Equal(t, 0, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
+				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				filterStr := "Id=='role-test-1'"
@@ -591,7 +653,7 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 					Attrs: &resource.Attributes{},
 				},
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertUnmanagedCount(1)
 				result.AssertResourceUnmanaged("res2", "filtered")
 			},
@@ -620,7 +682,7 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 					Attrs: &resource.Attributes{},
 				},
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertUnmanagedCount(1)
 				result.AssertResourceUnmanaged("res2", "filtered")
 			},
@@ -651,7 +713,7 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 					Attrs: &resource.Attributes{},
 				},
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertUnmanagedCount(1)
 				result.AssertResourceUnmanaged("res1", "filtered")
 			},
@@ -716,7 +778,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					Sch: getSchema(repo, aws.AwsS3BucketPolicyResourceType),
 				})
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
 				result.AssertResourceHasDrift("foo", "aws_s3_bucket_policy", analyser.Change{
 					Change: diff.Change{
@@ -821,7 +883,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					})
 				})).Times(1).Return(&bar, nil)
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(2)
 				result.AssertResourceHasDrift("vol-02862d9b39045a3a4", "aws_ebs_volume", analyser.Change{
 					Change: diff.Change{
@@ -937,7 +999,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				}, nil)
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(2)
 				result.AssertInfrastructureIsInSync()
 			},
@@ -991,7 +1053,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					Sch: getSchema(repo, aws.AwsSnsTopicPolicyResourceType),
 				}, nil)
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
 				result.AssertResourceHasDrift("foo", "aws_sns_topic_policy", analyser.Change{
 					Change: diff.Change{
@@ -1053,7 +1115,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					Sch: getSchema(repo, aws.AwsSqsQueuePolicyResourceType),
 				}, nil)
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
 				result.AssertResourceHasDrift("foo", "aws_sqs_queue_policy", analyser.Change{
 					Change: diff.Change{
@@ -1378,7 +1440,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						})
 					})).Times(1).Return(&rule4, nil)
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(7)
 				result.AssertInfrastructureIsInSync()
 			},
@@ -1516,7 +1578,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				}, nil)
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(2)
 				result.AssertInfrastructureIsInSync()
 			},
@@ -1600,7 +1662,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					Attrs: &resource.Attributes{},
 				},
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertInfrastructureIsInSync()
 				result.AssertManagedCount(5)
 			},
@@ -1679,7 +1741,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			assert: func(result *test.ScanResult, err error) {
+			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertInfrastructureIsInSync()
 				result.AssertManagedCount(5)
 			},

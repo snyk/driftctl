@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cloudskiff/driftctl/pkg/memstore"
 	globaloutput "github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/jmespath/go-jmespath"
 	"github.com/sirupsen/logrus"
@@ -45,6 +46,7 @@ type DriftCTL struct {
 	iacProgress              globaloutput.Progress
 	resourceSchemaRepository resource.SchemaRepositoryInterface
 	opts                     *ScanOptions
+	store                    memstore.Store
 }
 
 func NewDriftCTL(remoteSupplier resource.Supplier,
@@ -54,7 +56,8 @@ func NewDriftCTL(remoteSupplier resource.Supplier,
 	opts *ScanOptions,
 	scanProgress globaloutput.Progress,
 	iacProgress globaloutput.Progress,
-	resourceSchemaRepository resource.SchemaRepositoryInterface) *DriftCTL {
+	resourceSchemaRepository resource.SchemaRepositoryInterface,
+	store memstore.Store) *DriftCTL {
 	return &DriftCTL{
 		remoteSupplier,
 		iacSupplier,
@@ -65,6 +68,7 @@ func NewDriftCTL(remoteSupplier resource.Supplier,
 		iacProgress,
 		resourceSchemaRepository,
 		opts,
+		store,
 	}
 }
 
@@ -137,6 +141,10 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 
 	analysis.Duration = time.Since(start)
 	analysis.Date = time.Now()
+
+	d.store.Bucket(memstore.TelemetryBucket).Set("total_resources", analysis.Summary().TotalResources)
+	d.store.Bucket(memstore.TelemetryBucket).Set("total_managed", analysis.Summary().TotalManaged)
+	d.store.Bucket(memstore.TelemetryBucket).Set("duration", uint(analysis.Duration.Seconds()+0.5))
 
 	return &analysis, nil
 }

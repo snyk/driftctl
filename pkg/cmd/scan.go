@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/cloudskiff/driftctl/pkg/memstore"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	"github.com/cloudskiff/driftctl/pkg/telemetry"
 	"github.com/fatih/color"
@@ -179,6 +180,7 @@ func NewScanCmd() *cobra.Command {
 }
 
 func scanRun(opts *pkg.ScanOptions) error {
+	store := memstore.New()
 	selectedOutput := output.GetOutput(opts.Output, opts.Quiet)
 
 	c := make(chan os.Signal)
@@ -216,7 +218,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		return err
 	}
 
-	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, resFactory, opts, scanProgress, iacProgress, resourceSchemaRepository)
+	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, resFactory, opts, scanProgress, iacProgress, resourceSchemaRepository, store)
 
 	go func() {
 		<-c
@@ -235,12 +237,11 @@ func scanRun(opts *pkg.ScanOptions) error {
 	}
 
 	globaloutput.Printf(color.WhiteString("Scan duration: %s\n", analysis.Duration.Round(time.Second)))
+	globaloutput.Printf(color.WhiteString("Provider version used to scan: %s. Use --tf-provider-version to use another version.\n"), resourceSchemaRepository.ProviderVersion.String())
 
 	if !opts.DisableTelemetry {
-		telemetry.SendTelemetry(analysis)
+		telemetry.SendTelemetry(store.Bucket(memstore.TelemetryBucket))
 	}
-
-	globaloutput.Printf(color.WhiteString("Provider version used to scan: %s. Use --tf-provider-version to use another version.\n"), resourceSchemaRepository.ProviderVersion.String())
 
 	if !analysis.IsSync() {
 		globaloutput.Printf("\nHint: use gen-driftignore command to generate a .driftignore file based on your drifts\n")

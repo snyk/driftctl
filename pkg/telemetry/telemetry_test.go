@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
+	"github.com/cloudskiff/driftctl/pkg/memstore"
 	"github.com/cloudskiff/driftctl/pkg/version"
 	"github.com/cloudskiff/driftctl/test/resource"
 	"github.com/jarcoal/httpmock"
@@ -15,15 +16,15 @@ import (
 )
 
 func TestSendTelemetry(t *testing.T) {
-
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
 	tests := []struct {
-		name         string
-		analysis     *analyser.Analysis
-		expectedBody *telemetry
-		response     *http.Response
+		name           string
+		analysis       *analyser.Analysis
+		expectedBody   *telemetry
+		response       *http.Response
+		setStoreValues func(memstore.Bucket, *analyser.Analysis)
 	}{
 		{
 			name: "valid analysis",
@@ -42,6 +43,11 @@ func TestSendTelemetry(t *testing.T) {
 				TotalManaged:   1,
 				Duration:       123,
 			},
+			setStoreValues: func(s memstore.Bucket, a *analyser.Analysis) {
+				s.Set("total_resources", a.Summary().TotalResources)
+				s.Set("total_managed", a.Summary().TotalManaged)
+				s.Set("duration", uint(a.Duration.Seconds()+0.5))
+			},
 		},
 		{
 			name: "valid analysis with round up",
@@ -56,14 +62,39 @@ func TestSendTelemetry(t *testing.T) {
 				Arch:     runtime.GOARCH,
 				Duration: 124,
 			},
+			setStoreValues: func(s memstore.Bucket, a *analyser.Analysis) {
+				s.Set("total_resources", a.Summary().TotalResources)
+				s.Set("total_managed", a.Summary().TotalManaged)
+				s.Set("duration", uint(a.Duration.Seconds()+0.5))
+			},
 		},
 		{
 			name:     "nil analysis",
 			analysis: nil,
 		},
+		{
+			name: "incomplete analysis values",
+			analysis: func() *analyser.Analysis {
+				a := &analyser.Analysis{}
+				a.Duration = 123.5 * 1e9 // 123.5 seconds
+				return a
+			}(),
+			expectedBody: &telemetry{
+				Version: version.Current(),
+				Os:      runtime.GOOS,
+				Arch:    runtime.GOARCH,
+			},
+			setStoreValues: func(s memstore.Bucket, a *analyser.Analysis) {},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			store := memstore.New().Bucket(memstore.TelemetryBucket)
+
+			if tt.analysis != nil {
+				tt.setStoreValues(store, tt.analysis)
+			}
+
 			httpmock.Reset()
 			if tt.expectedBody != nil {
 				httpmock.RegisterResponder(
@@ -91,7 +122,7 @@ func TestSendTelemetry(t *testing.T) {
 					},
 				)
 			}
-			SendTelemetry(tt.analysis)
+			SendTelemetry(store)
 		})
 	}
 }
