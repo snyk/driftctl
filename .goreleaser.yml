@@ -1,4 +1,5 @@
 project_name: driftctl
+dist: bin
 release:
     github:
         owner: cloudskiff
@@ -14,12 +15,11 @@ signs:
       artifacts: checksum
       args: [ "--batch", "-u", "{{ .Env.SIGNINGKEY }}", "--output", "${signature}", "--detach-sign", "${artifact}" ]
 builds:
-    - id: "driftctl-build"
+    - id: "driftctl"
       binary: driftctl
       dir: .
       env:
           - CGO_ENABLED=0
-          - GO111MODULE=on
       goos:
           - linux
           - windows
@@ -29,7 +29,7 @@ builds:
           - arm
           - arm64
           - 386
-      ldflags: "-X github.com/cloudskiff/driftctl/pkg/version.version={{ .Tag }}"
+      ldflags: "-s -w -X github.com/cloudskiff/driftctl/build.env={{ .Env.ENV }} -X github.com/cloudskiff/driftctl/pkg/version.version={{ .Tag }}"
 archives:
     - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
       format: binary

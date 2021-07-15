@@ -5,8 +5,8 @@
 # https://github.com/hashicorp/terraform/blob/83e6703bf77f60660db4465ef50d30c633f800f1/scripts/build.sh
 set -eo pipefail
 
-# By default build for dev
-ENV=${ENV:-"dev"}
+# By default build for release
+ENV=${ENV:-"release"}
 
 # Get the parent directory of where this script is.
 SOURCE="${BASH_SOURCE[0]}"
@@ -24,10 +24,28 @@ fi
 # Check configuration
 goreleaser check
 
+GRFLAGS=""
+
+# We sign every releases using PGP
+# We may not want to do so in dev environments
+if [ -z $SIGNINGKEY ]; then
+    GRFLAGS="--skip-sign ${GRFLAGS}"
+fi
+
+# Only CI system should publish artifacts
+if [ "$CI" != "circleci" ]; then
+    GRFLAGS="--auto-snapshot ${GRFLAGS}"
+    GRFLAGS="--skip-announce ${GRFLAGS}"
+    GRFLAGS="--skip-publish ${GRFLAGS}"
+fi
+
 # Build!
 echo "+ Building using goreleaser ..."
-goreleaser build \
+goreleaser release \
     --rm-dist \
     --parallelism 2 \
-    --snapshot \
-    --single-target
+    ${GRFLAGS}
+
+echo "+ Computing checksums"
+cd bin
+sha256sum $(find . -type f -name "driftctl*") -c driftctl_SHA256SUMS

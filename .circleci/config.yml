@@ -1,14 +1,13 @@
 version: 2.1
 orbs:
   go: circleci/go@1.5.0
-  goreleaser: hubci/goreleaser@1.0.0
 jobs:
   build:
     docker:
       - image: golang:1.16.2
     steps:
       - checkout
-      - run: make release
+      - run: make build
       - persist_to_workspace:
           root: ~/project
           paths:
@@ -64,11 +63,6 @@ jobs:
       - run: make install-tools
       - run: make deps
       - run: make lint
-      - goreleaser/install:
-          version: 0.173.2
-      - run:
-          name: Check GoReleaser config
-          command: ~/bin/goreleaser check
   test:
     docker:
       - image: golang:1.16
@@ -89,6 +83,17 @@ jobs:
             ./codecov
       - store_test_results:
           path: ./
+  release:
+    environment:
+      CI: circleci
+    docker:
+      - image: golang:1.16
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: "Build and publish release"
+          command: make release
   publish-aur:
     environment:
         AUR_GIT: ssh://aur@aur.archlinux.org/driftctl-bin.git
@@ -209,9 +214,7 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
-      - goreleaser/release:
-          version: 0.173.2
-          go-version: 1.16.5
+      - release:
           context: driftctl
           requires:
               - lint
@@ -223,7 +226,7 @@ workflows:
                   ignore: /.*/
       - publish-aur:
           requires:
-            - goreleaser/release
+            - release
           filters:
             tags:
               only: /^v.*/
@@ -232,7 +235,7 @@ workflows:
       - update-lambda:
           context: driftctl-version-lambda
           requires:
-            - goreleaser/release
+            - release
           filters:
             tags:
               only: /^v.*/

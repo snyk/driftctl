@@ -1,3 +1,0 @@
-FROM scratch
-COPY driftctl /usr/bin/driftctl
-ENTRYPOINT ["/usr/bin/driftctl"]
