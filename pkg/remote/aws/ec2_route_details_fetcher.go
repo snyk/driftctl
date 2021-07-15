@@ -26,7 +26,7 @@ func (r *EC2RouteDetailsFetcher) ReadDetails(res resource.Resource) (resource.Re
 		attributes["destination_cidr_block"] = *ipv4
 	}
 	if ipv6 := res.Attributes().GetString("destination_ipv6_cidr_block"); ipv6 != nil && *ipv6 != "" {
-		attributes["destination_cidr_block"] = *ipv6
+		attributes["destination_ipv6_cidr_block"] = *ipv6
 	}
 	ctyVal, err := r.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty:         aws.AwsRouteResourceType,

@@ -1,0 +1,32 @@
+[
+ {
+  "id": "test-policy2-test-role2",
+  "policy_arn": "arn:aws:iam::929327065333:policy/test-policy2",
+  "role": "test-role2"
+ },
+ {
+  "id": "test-policy3-test-role2",
+  "policy_arn": "arn:aws:iam::929327065333:policy/test-policy3",
+  "role": "test-role2"
+ },
+ {
+  "id": "test-policy-test-role2",
+  "policy_arn": "arn:aws:iam::929327065333:policy/test-policy",
+  "role": "test-role2"
+ },
+ {
+  "id": "test-policy3-test-role",
+  "policy_arn": "arn:aws:iam::929327065333:policy/test-policy3",
+  "role": "test-role"
+ },
+ {
+  "id": "test-policy-test-role",
+  "policy_arn": "arn:aws:iam::929327065333:policy/test-policy",
+  "role": "test-role"
+ },
+ {
+  "id": "test-policy2-test-role",
+  "policy_arn": "arn:aws:iam::929327065333:policy/test-policy2",
+  "role": "test-role"
+ }
+]

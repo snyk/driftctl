@@ -29,7 +29,11 @@ func TestAgainstGoldenFile(
 
 	// update golden file
 	if shouldUpdate {
-		ctVal, err := gocty.ToCtyValue(got, ctyType)
+		attributes := make([]*resource.Attributes, 0, len(got))
+		for _, res := range got {
+			attributes = append(attributes, res.Attributes())
+		}
+		ctVal, err := gocty.ToCtyValue(attributes, ctyType)
 		if err != nil {
 			panic(err)
 		}
