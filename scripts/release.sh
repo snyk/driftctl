@@ -45,7 +45,3 @@ goreleaser release \
     --rm-dist \
     --parallelism 2 \
     ${GRFLAGS}
-
-echo "+ Computing checksums"
-cd bin
-sha256sum $(find . -type f -name "driftctl*") -c driftctl_SHA256SUMS
