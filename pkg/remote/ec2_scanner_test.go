@@ -1850,10 +1850,12 @@ func TestEC2Route(t *testing.T) {
 							{
 								DestinationCidrBlock: awssdk.String("1.1.1.1/32"),
 								GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
+								Origin:               awssdk.String("CreateRoute"),
 							},
 							{
 								DestinationIpv6CidrBlock: awssdk.String("::/0"),
 								GatewayId:                awssdk.String("igw-030e74f73bd67f21b"),
+								Origin:                   awssdk.String("CreateRoute"),
 							},
 						},
 					},
@@ -1867,10 +1869,12 @@ func TestEC2Route(t *testing.T) {
 							{
 								DestinationCidrBlock: awssdk.String("0.0.0.0/0"),
 								GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
+								Origin:               awssdk.String("CreateRoute"),
 							},
 							{
 								DestinationIpv6CidrBlock: awssdk.String("::/0"),
 								GatewayId:                awssdk.String("igw-030e74f73bd67f21b"),
+								Origin:                   awssdk.String("CreateRoute"),
 							},
 						},
 					},
@@ -1890,10 +1894,12 @@ func TestEC2Route(t *testing.T) {
 							{
 								DestinationCidrBlock: awssdk.String("10.1.1.0/24"),
 								GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
+								Origin:               awssdk.String("CreateRoute"),
 							},
 							{
 								DestinationCidrBlock: awssdk.String("10.1.2.0/24"),
 								GatewayId:            awssdk.String("igw-030e74f73bd67f21b"),
+								Origin:               awssdk.String("CreateRoute"),
 							},
 						},
 					},
