@@ -6,6 +6,7 @@ import (
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
@@ -139,6 +140,15 @@ func TestSQSQueuePolicy(t *testing.T) {
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/foo"),
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/baz"),
 				}, nil)
+
+				client.On("GetQueueAttributes", mock.Anything).Return(
+					&sqs.GetQueueAttributesOutput{
+						Attributes: map[string]*string{
+							sqs.QueueAttributeNamePolicy: awssdk.String(""),
+						},
+					},
+					nil,
+				)
 			},
 			wantErr: nil,
 		},
