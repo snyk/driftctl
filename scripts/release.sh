@@ -34,7 +34,7 @@ fi
 
 # Only CI system should publish artifacts
 if [ "$CI" != "circleci" ]; then
-    GRFLAGS="--auto-snapshot ${GRFLAGS}"
+    GRFLAGS="--snapshot ${GRFLAGS}"
     GRFLAGS="--skip-announce ${GRFLAGS}"
     GRFLAGS="--skip-publish ${GRFLAGS}"
 fi
