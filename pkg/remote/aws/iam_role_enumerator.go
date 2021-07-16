@@ -54,7 +54,9 @@ func (e *IamRoleEnumerator) Enumerate() ([]resource.Resource, error) {
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
 				*role.RoleName,
-				map[string]interface{}{},
+				map[string]interface{}{
+					"path": *role.Path,
+				},
 			),
 		)
 	}
