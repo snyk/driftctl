@@ -63,8 +63,8 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 
 			}
 		}
+		fmt.Println("Suggested terraform import statement for tracking unmanaged things:")
 		for _, ty := range keys {
-			fmt.Println("Suggested terraform import statement for tracking unmanaged things:")
 			for _, res := range unmanagedByType[ty] {
 				if res.TerraformImportId() != "" {
 					fmt.Printf("terraform import %s.<PLACEHOLDER> %s\n", ty, res.TerraformImportId())
