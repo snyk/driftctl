@@ -34,8 +34,6 @@ type ScanOptions struct {
 	ConfigDir        string
 	DriftignorePath  string
 	Deep             bool
-	// TODO: group them when multiple provider support
-	OutputTerraformImportStatementForUnmanaged bool
 }
 
 type DriftCTL struct {
