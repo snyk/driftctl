@@ -27,6 +27,10 @@ func (d *FakeResource) TerraformType() string {
 	return "FakeResource"
 }
 
+func (d *FakeResource) TerraformImportId() string {
+	return "FakeResourceImportId"
+}
+
 func (d *FakeResource) Attributes() *resource.Attributes {
 	return d.Attrs
 }
@@ -46,6 +50,10 @@ func (d *FakeResourceStringer) TerraformId() string {
 
 func (d *FakeResourceStringer) TerraformType() string {
 	return "FakeResourceStringer"
+}
+
+func (d *FakeResourceStringer) TerraformImportId() string {
+	return "FakeResourceStringerImportId"
 }
 
 func (d *FakeResourceStringer) Attributes() *resource.Attributes {

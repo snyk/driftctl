@@ -13,15 +13,17 @@ import (
 type Resource interface {
 	TerraformId() string
 	TerraformType() string
+	TerraformImportId() string
 	Attributes() *Attributes
 	Schema() *Schema
 }
 
 type AbstractResource struct {
-	Id    string
-	Type  string
-	Attrs *Attributes
-	Sch   *Schema `json:"-" diff:"-"`
+	Id        string
+	Type      string
+	ImportIds *ImportIds
+	Attrs     *Attributes
+	Sch       *Schema `json:"-" diff:"-"`
 }
 
 func (a *AbstractResource) Schema() *Schema {
@@ -34,6 +36,53 @@ func (a *AbstractResource) TerraformId() string {
 
 func (a *AbstractResource) TerraformType() string {
 	return a.Type
+}
+
+func (a *AbstractResource) TerraformImportId() string {
+	// NOTE: Sometime just id, sometime more sophisticated string / ARN, check by type
+	// fmt.Printf("%s %s\n", a.Type, a.Id)
+	importId := ""
+	switch a.Type {
+	case "aws_vpc":
+		importId = a.Id
+	case "aws_subnet":
+		importId = a.Id
+	case "aws_sns_topic_subscription":
+		importId = a.Id
+	case "aws_s3_bucket_policy":
+		importId = a.Id
+	case "aws_iam_access_key":
+		importId = a.Id
+	case "aws_key_pair":
+		importId = a.Id
+	case "aws_iam_policy":
+		importId = a.Id
+	case "aws_iam_role":
+		importId = a.Id
+	case "aws_iam_role_policy":
+		importId = a.Id
+	case "aws_iam_user":
+		importId = a.Id
+	case "aws_s3_bucket":
+		importId = a.Id
+	case "aws_security_group":
+		importId = a.Id
+	case "aws_iam_policy_attachment":
+		// NOTE: terraform not supporting as well
+		// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy_attachment
+		importId = ""
+	case "aws_security_group_rule":
+		importId = ""
+		// TODO:
+		// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule#import
+	case "aws_route":
+		importId = ""
+		// TODO:
+		// importId = a.Attrs["Table"] + "_" + a.Attrs["Destination"]
+		// https: //registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route
+	}
+
+	return importId
 }
 
 func (a *AbstractResource) Attributes() *Attributes {
@@ -59,6 +108,10 @@ func (u *SerializedResource) TerraformId() string {
 
 func (u *SerializedResource) TerraformType() string {
 	return u.Type
+}
+
+func (u *SerializedResource) TerraformImportId() string {
+	return ""
 }
 
 func (u *SerializedResource) Attributes() *Attributes {
@@ -103,6 +156,16 @@ func Sort(res []Resource) []Resource {
 }
 
 type Attributes map[string]interface{}
+
+// NOTE: Extend if supporting multiple sources
+// Example:
+// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc#import
+// {"terraform": "vpc-a01106c2"}
+// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route#import
+// {"terraform": "rtb-656C65616E6F72_pl-0570a1d2d725c16be"}
+// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy#import
+// {"terraform": "arn:aws:iam::123456789012:policy/UsersManageOwnCredentials"}type ImportId map[string]string
+type ImportIds map[string]string
 
 func (a *Attributes) Copy() *Attributes {
 	res := Attributes{}
