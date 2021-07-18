@@ -40,7 +40,6 @@ func (a *AbstractResource) TerraformType() string {
 
 func (a *AbstractResource) TerraformImportId() string {
 	// NOTE: Sometime just id, sometime more sophisticated string / ARN, check by type
-	// fmt.Printf("%s %s\n", a.Type, a.Id)
 	importId := ""
 	switch a.Type {
 	case "aws_vpc":
