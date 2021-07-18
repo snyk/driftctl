@@ -2,6 +2,7 @@ package resource
 
 import (
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"sort"
 	"strconv"
@@ -19,11 +20,10 @@ type Resource interface {
 }
 
 type AbstractResource struct {
-	Id        string
-	Type      string
-	ImportIds *ImportIds
-	Attrs     *Attributes
-	Sch       *Schema `json:"-" diff:"-"`
+	Id    string
+	Type  string
+	Attrs *Attributes
+	Sch   *Schema `json:"-" diff:"-"`
 }
 
 func (a *AbstractResource) Schema() *Schema {
@@ -73,13 +73,28 @@ func (a *AbstractResource) TerraformImportId() string {
 		importId = ""
 	case "aws_security_group_rule":
 		importId = ""
-		// TODO:
+		// TODO: similar to CreateSecurityGroupRuleIdHash , need some custom type handlings maybe
 		// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule#import
 	case "aws_route":
+		// NOTE:
+		// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route
+		// One of the following destination arguments must be supplied:
+		// destination_cidr_block - (Optional) The destination CIDR block.
+		// destination_ipv6_cidr_block - (Optional) The destination IPv6 CIDR block.
+		// destination_prefix_list_id - (Optional) The ID of a managed prefix list destination.
+		_, okDest1 := a.Attrs.Get("destination_cidr_block")
+		_, okDest2 := a.Attrs.Get("destination_ipv6_cidr_block")
+		dest := ""
+		if okDest1 {
+			dest = *a.Attrs.GetString("destination_cidr_block")
+		} else if okDest2 {
+			dest = *a.Attrs.GetString("destination_ipv6_cidr_block")
+		} else {
+			dest = *a.Attrs.GetString("destination_prefix_list_id")
+		}
+		importId = fmt.Sprintf("%s_%s", *a.Attrs.GetString("route_table_id"), dest)
+	default:
 		importId = ""
-		// TODO:
-		// importId = a.Attrs["Table"] + "_" + a.Attrs["Destination"]
-		// https: //registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route
 	}
 
 	return importId
@@ -156,16 +171,6 @@ func Sort(res []Resource) []Resource {
 }
 
 type Attributes map[string]interface{}
-
-// NOTE: Extend if supporting multiple sources
-// Example:
-// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc#import
-// {"terraform": "vpc-a01106c2"}
-// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route#import
-// {"terraform": "rtb-656C65616E6F72_pl-0570a1d2d725c16be"}
-// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy#import
-// {"terraform": "arn:aws:iam::123456789012:policy/UsersManageOwnCredentials"}type ImportId map[string]string
-type ImportIds map[string]string
 
 func (a *Attributes) Copy() *Attributes {
 	res := Attributes{}

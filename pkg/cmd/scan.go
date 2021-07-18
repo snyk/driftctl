@@ -92,8 +92,6 @@ func NewScanCmd() *cobra.Command {
 
 			opts.ConfigDir, _ = cmd.Flags().GetString("config-dir")
 
-			opts.OutputTerraformImportStatementForUnmanaged, _ = cmd.Flags().GetBool("output-tf-import-statement-for-unmanaged")
-
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
