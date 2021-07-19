@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -34,12 +35,18 @@ func (e *SQSQueuePolicyEnumerator) Enumerate() ([]resource.Resource, error) {
 	results := make([]resource.Resource, len(queues))
 
 	for _, queue := range queues {
+		attributes, err := e.repository.GetQueueAttributes(*queue)
+		if err != nil {
+			return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		}
 		results = append(
 			results,
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
 				awssdk.StringValue(queue),
-				map[string]interface{}{},
+				map[string]interface{}{
+					"policy": *attributes.Attributes[sqs.QueueAttributeNamePolicy],
+				},
 			),
 		)
 	}
