@@ -76,7 +76,9 @@ func (e *Route53RecordEnumerator) listRecordsForZone(zoneId string) ([]resource.
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
 				strings.Join(vars, "_"),
-				map[string]interface{}{},
+				map[string]interface{}{
+					"type": rawType,
+				},
 			),
 		)
 	}
