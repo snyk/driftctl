@@ -25,8 +25,8 @@ type securityGroupRule struct {
 	Type                  string
 	SecurityGroupId       string
 	Protocol              string
-	FromPort              int
-	ToPort                int
+	FromPort              float64
+	ToPort                float64
 	Self                  bool
 	SourceSecurityGroupId string
 	CidrBlocks            []string
@@ -44,8 +44,8 @@ func (s *securityGroupRule) getAttrs() resource.Attributes {
 		"type":                     s.Type,
 		"security_group_id":        s.SecurityGroupId,
 		"protocol":                 s.Protocol,
-		"from_port":                float64(s.FromPort),
-		"to_port":                  float64(s.ToPort),
+		"from_port":                s.FromPort,
+		"to_port":                  s.ToPort,
 		"self":                     s.Self,
 		"source_security_group_id": s.SourceSecurityGroupId,
 		"cidr_blocks":              toInterfaceSlice(s.CidrBlocks),
@@ -123,8 +123,8 @@ func (e *VPCSecurityGroupRuleEnumerator) addSecurityGroupRule(ruleType string, r
 			Type:            ruleType,
 			SecurityGroupId: aws.StringValue(sg.GroupId),
 			Protocol:        aws.StringValue(rule.IpProtocol),
-			FromPort:        int(aws.Int64Value(rule.FromPort)),
-			ToPort:          int(aws.Int64Value(rule.ToPort)),
+			FromPort:        float64(aws.Int64Value(rule.FromPort)),
+			ToPort:          float64(aws.Int64Value(rule.ToPort)),
 		}
 		if aws.StringValue(groupPair.GroupId) == aws.StringValue(sg.GroupId) {
 			r.Self = true
@@ -138,8 +138,8 @@ func (e *VPCSecurityGroupRuleEnumerator) addSecurityGroupRule(ruleType string, r
 			Type:            ruleType,
 			SecurityGroupId: aws.StringValue(sg.GroupId),
 			Protocol:        aws.StringValue(rule.IpProtocol),
-			FromPort:        int(aws.Int64Value(rule.FromPort)),
-			ToPort:          int(aws.Int64Value(rule.ToPort)),
+			FromPort:        float64(aws.Int64Value(rule.FromPort)),
+			ToPort:          float64(aws.Int64Value(rule.ToPort)),
 			CidrBlocks:      []string{aws.StringValue(ipRange.CidrIp)},
 		}
 		rules = append(rules, r)
@@ -149,8 +149,8 @@ func (e *VPCSecurityGroupRuleEnumerator) addSecurityGroupRule(ruleType string, r
 			Type:            ruleType,
 			SecurityGroupId: aws.StringValue(sg.GroupId),
 			Protocol:        aws.StringValue(rule.IpProtocol),
-			FromPort:        int(aws.Int64Value(rule.FromPort)),
-			ToPort:          int(aws.Int64Value(rule.ToPort)),
+			FromPort:        float64(aws.Int64Value(rule.FromPort)),
+			ToPort:          float64(aws.Int64Value(rule.ToPort)),
 			Ipv6CidrBlocks:  []string{aws.StringValue(ipRange.CidrIpv6)},
 		}
 		rules = append(rules, r)
@@ -160,8 +160,8 @@ func (e *VPCSecurityGroupRuleEnumerator) addSecurityGroupRule(ruleType string, r
 			Type:            ruleType,
 			SecurityGroupId: aws.StringValue(sg.GroupId),
 			Protocol:        aws.StringValue(rule.IpProtocol),
-			FromPort:        int(aws.Int64Value(rule.FromPort)),
-			ToPort:          int(aws.Int64Value(rule.ToPort)),
+			FromPort:        float64(aws.Int64Value(rule.FromPort)),
+			ToPort:          float64(aws.Int64Value(rule.ToPort)),
 			PrefixListIds:   []string{aws.StringValue(listId.PrefixListId)},
 		}
 		rules = append(rules, r)
