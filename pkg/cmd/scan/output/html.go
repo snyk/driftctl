@@ -83,7 +83,8 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 			if analysis.Summary().TotalResources == 0 {
 				return 0
 			}
-			return math.Round(100 * float64(count) / float64(analysis.Summary().TotalResources))
+			rate := 100 * float64(count) / float64(analysis.Summary().TotalResources)
+			return math.Floor(rate*100) / 100
 		},
 		"jsonDiff": func(ch analyser.Changelog) template.HTML {
 			var buf bytes.Buffer
