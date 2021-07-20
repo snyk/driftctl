@@ -479,15 +479,18 @@ func TestEC2EipAssociation(t *testing.T) {
 			test:    "no eip associations",
 			dirName: "aws_ec2_eip_association_empty",
 			mocks: func(repository *repository.MockEC2Repository) {
-				repository.On("ListAllAddressesAssociation").Return([]string{}, nil)
+				repository.On("ListAllAddressesAssociation").Return([]*ec2.Address{}, nil)
 			},
 		},
 		{
 			test:    "single eip association",
 			dirName: "aws_ec2_eip_association_single",
 			mocks: func(repository *repository.MockEC2Repository) {
-				repository.On("ListAllAddressesAssociation").Return([]string{
-					"eipassoc-0e9a7356e30f0c3d1",
+				repository.On("ListAllAddressesAssociation").Return([]*ec2.Address{
+					{
+						AssociationId: awssdk.String("eipassoc-0e9a7356e30f0c3d1"),
+						AllocationId:  awssdk.String("eipalloc-017d5267e4dda73f1"),
+					},
 				}, nil)
 			},
 		},

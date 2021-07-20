@@ -24,20 +24,22 @@ func (e *EC2EipAssociationEnumerator) SupportedType() resource.ResourceType {
 }
 
 func (e *EC2EipAssociationEnumerator) Enumerate() ([]resource.Resource, error) {
-	associationIds, err := e.repository.ListAllAddressesAssociation()
+	addresses, err := e.repository.ListAllAddressesAssociation()
 	if err != nil {
 		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(associationIds))
+	results := make([]resource.Resource, 0, len(addresses))
 
-	for _, associationId := range associationIds {
+	for _, address := range addresses {
 		results = append(
 			results,
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
-				associationId,
-				map[string]interface{}{},
+				*address.AssociationId,
+				map[string]interface{}{
+					"allocation_id": *address.AllocationId,
+				},
 			),
 		)
 	}

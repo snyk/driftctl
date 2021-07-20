@@ -32,12 +32,20 @@ func (e *EC2NatGatewayEnumerator) Enumerate() ([]resource.Resource, error) {
 	results := make([]resource.Resource, len(natGateways))
 
 	for _, natGateway := range natGateways {
+
+		attrs := map[string]interface{}{}
+		if len(natGateway.NatGatewayAddresses) > 0 {
+			if allocId := natGateway.NatGatewayAddresses[0].AllocationId; allocId != nil {
+				attrs["allocation_id"] = *allocId
+			}
+		}
+
 		results = append(
 			results,
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
 				*natGateway.NatGatewayId,
-				map[string]interface{}{},
+				attrs,
 			),
 		)
 	}
