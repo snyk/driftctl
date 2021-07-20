@@ -13,7 +13,7 @@ type EC2Repository interface {
 	ListAllSnapshots() ([]*ec2.Snapshot, error)
 	ListAllVolumes() ([]*ec2.Volume, error)
 	ListAllAddresses() ([]*ec2.Address, error)
-	ListAllAddressesAssociation() ([]string, error)
+	ListAllAddressesAssociation() ([]*ec2.Address, error)
 	ListAllInstances() ([]*ec2.Instance, error)
 	ListAllKeyPairs() ([]*ec2.KeyPairInfo, error)
 	ListAllInternetGateways() ([]*ec2.InternetGateway, error)
@@ -108,19 +108,20 @@ func (r *ec2Repository) ListAllAddresses() ([]*ec2.Address, error) {
 	return response.Addresses, nil
 }
 
-func (r *ec2Repository) ListAllAddressesAssociation() ([]string, error) {
+func (r *ec2Repository) ListAllAddressesAssociation() ([]*ec2.Address, error) {
 	if v := r.cache.Get("ec2ListAllAddressesAssociation"); v != nil {
-		return v.([]string), nil
+		return v.([]*ec2.Address), nil
 	}
 
-	results := make([]string, 0)
 	addresses, err := r.ListAllAddresses()
 	if err != nil {
 		return nil, err
 	}
+	results := make([]*ec2.Address, 0, len(addresses))
+
 	for _, address := range addresses {
 		if address.AssociationId != nil {
-			results = append(results, aws.StringValue(address.AssociationId))
+			results = append(results, address)
 		}
 	}
 	r.cache.Put("ec2ListAllAddressesAssociation", results)

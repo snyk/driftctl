@@ -299,7 +299,7 @@ func Test_ec2Repository_ListAllAddressesAssociation(t *testing.T) {
 	tests := []struct {
 		name    string
 		mocks   func(client *awstest.MockFakeEC2)
-		want    []string
+		want    []*ec2.Address
 		wantErr error
 	}{
 		{
@@ -315,11 +315,11 @@ func Test_ec2Repository_ListAllAddressesAssociation(t *testing.T) {
 						},
 					}, nil).Once()
 			},
-			want: []string{
-				"1",
-				"2",
-				"3",
-				"4",
+			want: []*ec2.Address{
+				{AssociationId: aws.String("1")},
+				{AssociationId: aws.String("2")},
+				{AssociationId: aws.String("3")},
+				{AssociationId: aws.String("4")},
 			},
 		},
 	}
@@ -340,7 +340,7 @@ func Test_ec2Repository_ListAllAddressesAssociation(t *testing.T) {
 				cachedData, err := r.ListAllAddressesAssociation()
 				assert.NoError(t, err)
 				assert.Equal(t, got, cachedData)
-				assert.IsType(t, []string{}, store.Get("ec2ListAllAddressesAssociation"))
+				assert.IsType(t, []*ec2.Address{}, store.Get("ec2ListAllAddressesAssociation"))
 			}
 
 			changelog, err := diff.Diff(got, tt.want)
