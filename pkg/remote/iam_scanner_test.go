@@ -371,12 +371,15 @@ func TestIamRole(t *testing.T) {
 				repo.On("ListAllRoles").Return([]*iam.Role{
 					{
 						RoleName: aws.String("test_role_0"),
+						Path:     aws.String("/"),
 					},
 					{
 						RoleName: aws.String("test_role_1"),
+						Path:     aws.String("/"),
 					},
 					{
 						RoleName: aws.String("test_role_2"),
+						Path:     aws.String("/"),
 					},
 				}, nil)
 			},
@@ -389,12 +392,15 @@ func TestIamRole(t *testing.T) {
 				repo.On("ListAllRoles").Return([]*iam.Role{
 					{
 						RoleName: aws.String("AWSServiceRoleForOrganizations"),
+						Path:     aws.String("/aws-service-role/organizations.amazonaws.com/"),
 					},
 					{
 						RoleName: aws.String("AWSServiceRoleForSupport"),
+						Path:     aws.String("/aws-service-role/support.amazonaws.com/"),
 					},
 					{
 						RoleName: aws.String("AWSServiceRoleForTrustedAdvisor"),
+						Path:     aws.String("/aws-service-role/trustedadvisor.amazonaws.com/"),
 					},
 				}, nil)
 			},
