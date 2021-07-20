@@ -24,6 +24,7 @@ func TestAcc_AwsInstance(t *testing.T) {
 			"Type=='aws_instance' || Type=='aws_ebs_volume'",
 			"--tf-provider-version",
 			"3.45.0",
+			"--deep",
 		},
 		Checks: []acceptance.AccCheck{
 			{

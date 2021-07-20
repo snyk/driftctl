@@ -112,19 +112,20 @@ func (s *Scanner) scan() ([]resource.Resource, error) {
 		return nil, err
 	}
 
+	if !s.options.Deep {
+		return enumerationResult, nil
+	}
+
 	for _, res := range enumerationResult {
 		res := res
 		s.detailsFetcherRunner.Run(func() (interface{}, error) {
 			fetcher := s.remoteLibrary.GetDetailsFetcher(resource.ResourceType(res.TerraformType()))
 			if fetcher != nil {
-				// If we are in deep mode, retrieve resource details
-				if s.options.Deep {
-					resourceWithDetails, err := fetcher.ReadDetails(res)
-					if err != nil {
-						return nil, err
-					}
-					return []resource.Resource{resourceWithDetails}, nil
+				resourceWithDetails, err := fetcher.ReadDetails(res)
+				if err != nil {
+					return nil, err
 				}
+				return []resource.Resource{resourceWithDetails}, nil
 			}
 			return []resource.Resource{res}, nil
 		})

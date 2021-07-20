@@ -11,7 +11,7 @@ func TestAcc_Aws_EipAssociation(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.14.9",
 		Paths:            []string{"./testdata/acc/aws_eip_association"},
-		Args:             []string{"scan", "--filter", "Type=='aws_eip' || Type=='aws_eip_association'", "--tf-provider-version", "3.44.0"},
+		Args:             []string{"scan", "--filter", "Type=='aws_eip' || Type=='aws_eip_association'", "--tf-provider-version", "3.44.0", "--deep"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

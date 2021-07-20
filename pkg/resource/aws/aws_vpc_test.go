@@ -12,7 +12,7 @@ func TestAcc_AwsVPC(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.14.9",
 		Paths:            []string{"./testdata/acc/aws_vpc"},
-		Args:             []string{"scan", "--filter", "Type=='aws_vpc'"},
+		Args:             []string{"scan", "--filter", "Type=='aws_vpc'", "--deep"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
