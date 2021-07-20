@@ -36,6 +36,7 @@ func (e *EC2RouteEnumerator) Enumerate() ([]resource.Resource, error) {
 			routeId, _ := aws.CalculateRouteID(routeTable.RouteTableId, route.DestinationCidrBlock, route.DestinationIpv6CidrBlock)
 			data := map[string]interface{}{
 				"route_table_id": *routeTable.RouteTableId,
+				"origin":         *route.Origin,
 			}
 			if route.DestinationCidrBlock != nil && *route.DestinationCidrBlock != "" {
 				data["destination_cidr_block"] = *route.DestinationCidrBlock
