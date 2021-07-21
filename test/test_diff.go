@@ -23,7 +23,6 @@ func TestAgainstGoldenFile(
 	shouldUpdate bool,
 	tt *testing.T,
 ) {
-	resGoldenName := "results.golden.json"
 	var expectedResources []resource.Resource
 	ctyType := cty.List(provider.Schema()[ty].Block.ImpliedType())
 
@@ -41,11 +40,11 @@ func TestAgainstGoldenFile(
 		if err != nil {
 			panic(err)
 		}
-		goldenfile.WriteFile(dirName, unm, resGoldenName)
+		goldenfile.WriteFile(dirName, unm, goldenfile.ResultsFilename)
 	}
 
 	// read golden file
-	file := goldenfile.ReadFile(dirName, resGoldenName)
+	file := goldenfile.ReadFile(dirName, goldenfile.ResultsFilename)
 	decodedJson, err := json.Unmarshal(file, ctyType)
 	if err != nil {
 		panic(err)

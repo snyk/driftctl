@@ -140,7 +140,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 			}
 
 			got, err := r.Resources()
-			resGoldenName := "result.golden.json"
+			resGoldenName := goldenfile.ResultsFilename
 			if shouldUpdate {
 				unm, err := json.Marshal(got)
 				if err != nil {
@@ -224,7 +224,7 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 			}
 
 			got, err := r.Resources()
-			resGoldenName := "result.golden.json"
+			resGoldenName := goldenfile.ResultsFilename
 			if shouldUpdate {
 				unm, err := json.Marshal(got)
 				if err != nil {
