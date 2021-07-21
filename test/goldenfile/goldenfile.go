@@ -23,7 +23,7 @@ var Update = flag.String("update", "", "name of test to update")
 func ReadFile(p string, name string) []byte {
 	p = path.Join(GoldenFilePath, p)
 
-	_, err := os.Stat(p)
+	_, err := os.Stat(path.Join(p, ResultsFilename))
 	if os.IsNotExist(err) && name == ResultsFilename {
 		return []byte("[]")
 	}
@@ -49,6 +49,10 @@ func WriteFile(p string, content []byte, name string) {
 	if err != nil {
 		logrus.Error(err)
 	}
+
+	if name == ResultsFilename && string(output) == "[]" {
+	    return
+    }
 
 	if err := ioutil.WriteFile(fmt.Sprintf("%s%c%s", p, os.PathSeparator, sanitizeName(name)), output, os.ModePerm); err != nil {
 		panic(err)
