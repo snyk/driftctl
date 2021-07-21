@@ -51,8 +51,8 @@ func WriteFile(p string, content []byte, name string) {
 	}
 
 	if name == ResultsFilename && string(output) == "[]" {
-	    return
-    }
+		return
+	}
 
 	if err := ioutil.WriteFile(fmt.Sprintf("%s%c%s", p, os.PathSeparator, sanitizeName(name)), output, os.ModePerm); err != nil {
 		panic(err)
