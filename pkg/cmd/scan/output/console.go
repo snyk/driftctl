@@ -140,25 +140,25 @@ func (c Console) writeSummary(analysis *analyser.Analysis) {
 		if analysis.Summary().TotalManaged > 0 {
 			managed = warningWriter.Sprintf("%d", analysis.Summary().TotalManaged)
 		}
-		fmt.Printf(" - %s covered by IaC\n", managed)
-
-		unmanaged := successWriter.Sprintf("0")
-		if analysis.Summary().TotalUnmanaged > 0 {
-			unmanaged = warningWriter.Sprintf("%d", analysis.Summary().TotalUnmanaged)
-		}
-		fmt.Printf(" - %s not covered by IaC\n", unmanaged)
-
-		deleted := successWriter.Sprintf("0")
-		if analysis.Summary().TotalDeleted > 0 {
-			deleted = errorWriter.Sprintf("%d", analysis.Summary().TotalDeleted)
-		}
-		fmt.Printf(" - %s missing on cloud provider\n", deleted)
+		fmt.Printf(" - %s resource(s) managed by terraform\n", managed)
 
 		drifted := successWriter.Sprintf("0")
 		if analysis.Summary().TotalDrifted > 0 {
 			drifted = errorWriter.Sprintf("%d", analysis.Summary().TotalDrifted)
 		}
-		fmt.Printf(" - %s changed outside of IaC\n", boldWriter.Sprintf("%s/%d", drifted, analysis.Summary().TotalManaged))
+		fmt.Printf("     - %s resource(s) out of sync with Terraform state\n", boldWriter.Sprintf("%s/%d", drifted, analysis.Summary().TotalManaged))
+
+		unmanaged := successWriter.Sprintf("0")
+		if analysis.Summary().TotalUnmanaged > 0 {
+			unmanaged = warningWriter.Sprintf("%d", analysis.Summary().TotalUnmanaged)
+		}
+		fmt.Printf(" - %s resource(s) not managed by Terraform\n", unmanaged)
+
+		deleted := successWriter.Sprintf("0")
+		if analysis.Summary().TotalDeleted > 0 {
+			deleted = errorWriter.Sprintf("%d", analysis.Summary().TotalDeleted)
+		}
+		fmt.Printf(" - %s resource(s) found in a Terraform state but missing on the cloud provider\n", deleted)
 	}
 	if analysis.IsSync() {
 		fmt.Println(color.GreenString("Congrats! Your infrastructure is fully in sync."))

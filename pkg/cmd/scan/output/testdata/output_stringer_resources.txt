@@ -12,7 +12,7 @@ Found changed resources:
             ~ Name: "" => "resource with diff"
 Found 3 resource(s)
  - 33% coverage
- - 1 covered by IaC
- - 1 not covered by IaC
- - 1 missing on cloud provider
- - 1/1 changed outside of IaC
+ - 1 resource(s) managed by terraform
+     - 1/1 resource(s) out of sync with Terraform state
+ - 1 resource(s) not managed by Terraform
+ - 1 resource(s) found in a Terraform state but missing on the cloud provider
