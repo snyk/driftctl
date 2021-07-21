@@ -83,6 +83,32 @@ jobs:
             ./codecov
       - store_test_results:
           path: ./
+  sign_release:
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: "Ensure GnuPG is available"
+          command: gpg --version
+      - run:
+          name: "Import cloudskiff signing key"
+          command: |
+            echo ${SIGNINGKEY} | base64 -d > signingkey
+            gpg --import signingkey
+      - run:
+          name: "Sign release"
+          command: |
+            gpg --output bin/driftctl_SHA256SUMS.gpg -u security@cloudskiff.com --detach-sig bin/driftctl_SHA256SUMS
+      - run:
+          name: "Verify signature"
+          command: |
+            gpg --verify bin/driftctl_SHA256SUMS.gpg bin/driftctl_SHA256SUMS
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - bin/
   release:
     environment:
       CI: circleci
@@ -214,16 +240,27 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
+      - sign_release:
+          context: cloudskiff-signing
+          requires:
+            - build
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
       - release:
-          context: driftctl
+          context:
+              - driftctl
+              - cloudskiff-signing
           requires:
               - lint
               - test
           filters:
-              tags:
-                  only: /^v.*/
-              branches:
-                  ignore: /.*/
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
       - publish-aur:
           requires:
             - release

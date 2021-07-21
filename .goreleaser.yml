@@ -8,12 +8,11 @@ release:
     prerelease: auto
 before:
     hooks:
-        - go mod tidy
         - go generate ./...
 signs:
     - signature: "${artifact}.gpg"
       artifacts: checksum
-      args: [ "--batch", "-u", "{{ .Env.SIGNINGKEY }}", "--output", "${signature}", "--detach-sign", "${artifact}" ]
+      args: [ "--batch", "-u", "security@cloudskiff.com", "--output", "${signature}", "--detach-sign", "${artifact}" ]
 builds:
     - id: "driftctl"
       binary: driftctl
@@ -40,13 +39,3 @@ checksum:
     algorithm: sha256
 snapshot:
     name_template: "{{ .Tag }}-next"
-nfpms:
-    - maintainer: CloudSkiff <engineering@cloudskiff.com>
-      description: Detect, track and alert on infrastructure drift
-      homepage: https://github.com/cloudskiff/driftctl
-      license: Apache License 2.0
-      file_name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
-      formats:
-          - deb
-          - rpm
-          - apk

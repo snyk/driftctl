@@ -29,14 +29,14 @@ GRFLAGS=""
 # We sign every releases using PGP
 # We may not want to do so in dev environments
 if [ -z $SIGNINGKEY ]; then
-    GRFLAGS="--skip-sign ${GRFLAGS}"
+    GRFLAGS="--skip-sign"
 fi
 
 # Only CI system should publish artifacts
 if [ "$CI" != "circleci" ]; then
-    GRFLAGS="--snapshot ${GRFLAGS}"
-    GRFLAGS="--skip-announce ${GRFLAGS}"
-    GRFLAGS="--skip-publish ${GRFLAGS}"
+    GRFLAGS="--snapshot"
+    GRFLAGS="--skip-announce"
+    GRFLAGS="--skip-publish"
 fi
 
 # Build!
