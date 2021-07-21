@@ -24,7 +24,7 @@ type ScanOptions struct {
 	Detect           bool
 	From             []config.SupplierConfig
 	To               string
-	Output           output.OutputConfig
+	Output           []output.OutputConfig
 	Filter           *jmespath.JMESPath
 	Quiet            bool
 	BackendOptions   *backend.Options
