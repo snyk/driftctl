@@ -37,6 +37,12 @@ func ReadFile(p string, name string) []byte {
 
 func WriteFile(p string, content []byte, name string) {
 	output := content
+
+	// Avoid creating golden files for empty results
+	if name == ResultsFilename && string(output) == "[]" {
+		return
+	}
+
 	p = path.Join(GoldenFilePath, p)
 	if err := os.MkdirAll(p, os.ModePerm); err != nil {
 		panic(err)
@@ -48,10 +54,6 @@ func WriteFile(p string, content []byte, name string) {
 	}
 	if err != nil {
 		logrus.Error(err)
-	}
-
-	if name == ResultsFilename && string(output) == "[]" {
-		return
 	}
 
 	if err := ioutil.WriteFile(fmt.Sprintf("%s%c%s", p, os.PathSeparator, sanitizeName(name)), output, os.ModePerm); err != nil {
