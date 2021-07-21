@@ -13,12 +13,20 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const GoldenFilePath = "test"
+const (
+	GoldenFilePath  = "test"
+	ResultsFilename = "results.golden.json"
+)
 
 var Update = flag.String("update", "", "name of test to update")
 
 func ReadFile(p string, name string) []byte {
 	p = path.Join(GoldenFilePath, p)
+
+	_, err := os.Stat(p)
+	if os.IsNotExist(err) && name == ResultsFilename {
+		return []byte("[]")
+	}
 
 	content, err := ioutil.ReadFile(fmt.Sprintf("%s%c%s", p, os.PathSeparator, sanitizeName(name)))
 	if err != nil {
