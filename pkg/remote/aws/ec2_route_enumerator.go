@@ -44,6 +44,10 @@ func (e *EC2RouteEnumerator) Enumerate() ([]resource.Resource, error) {
 			if route.DestinationIpv6CidrBlock != nil && *route.DestinationIpv6CidrBlock != "" {
 				data["destination_ipv6_cidr_block"] = *route.DestinationIpv6CidrBlock
 			}
+			if route.GatewayId != nil && *route.GatewayId != "" {
+				data["gateway_id"] = *route.GatewayId
+			}
+
 			results = append(
 				results,
 				e.factory.CreateAbstractResource(
