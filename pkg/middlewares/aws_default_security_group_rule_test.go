@@ -34,6 +34,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"protocol":                 "-1",
 						"security_group_id":        "default-sg",
 						"source_security_group_id": "default-sg",
+						"self":                     true,
 					},
 				},
 				&resource.AbstractResource{
@@ -133,6 +134,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"protocol":                 "-1",
 						"security_group_id":        "default-sg",
 						"source_security_group_id": "default-sg",
+						"self":                     true,
 					},
 				},
 				&resource.AbstractResource{
@@ -203,6 +205,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"protocol":                 "-1",
 						"security_group_id":        "default-sg",
 						"source_security_group_id": "default-sg",
+						"self":                     true,
 					},
 				},
 				&resource.AbstractResource{
@@ -240,6 +243,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"protocol":                 "-1",
 						"security_group_id":        "default-sg",
 						"source_security_group_id": "default-sg",
+						"self":                     true,
 					},
 				},
 				&resource.AbstractResource{
