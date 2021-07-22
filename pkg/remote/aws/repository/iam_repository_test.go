@@ -412,17 +412,17 @@ func Test_IAMRepository_ListAllRolePolicyAttachments(t *testing.T) {
 							return false
 						}
 						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
+							{
 								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy"),
 								PolicyName: aws.String("policy"),
 							},
-							&iam.AttachedPolicy{
+							{
 								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy2"),
 								PolicyName: aws.String("policy2"),
 							},
 						}}, false)
 						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
+							{
 								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy3"),
 								PolicyName: aws.String("policy3"),
 							},
@@ -440,17 +440,17 @@ func Test_IAMRepository_ListAllRolePolicyAttachments(t *testing.T) {
 							return false
 						}
 						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
+							{
 								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy"),
 								PolicyName: aws.String("policy"),
 							},
-							&iam.AttachedPolicy{
+							{
 								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy2"),
 								PolicyName: aws.String("policy2"),
 							},
 						}}, false)
 						callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
+							{
 								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy3"),
 								PolicyName: aws.String("policy3"),
 							},
@@ -544,7 +544,7 @@ func Test_IAMRepository_ListAllRolePolicies(t *testing.T) {
 		name    string
 		roles   []*iam.Role
 		mocks   func(client *awstest.MockFakeIAM)
-		want    []string
+		want    []RolePolicy
 		wantErr error
 	}{
 		{
@@ -600,13 +600,13 @@ func Test_IAMRepository_ListAllRolePolicies(t *testing.T) {
 						return true
 					})).Once().Return(nil)
 			},
-			want: []string{
-				*aws.String("test_role_0:policy-role0-0"),
-				*aws.String("test_role_0:policy-role0-1"),
-				*aws.String("test_role_0:policy-role0-2"),
-				*aws.String("test_role_1:policy-role1-0"),
-				*aws.String("test_role_1:policy-role1-1"),
-				*aws.String("test_role_1:policy-role1-2"),
+			want: []RolePolicy{
+				{Policy: "policy-role0-0", RoleName: "test_role_0"},
+				{Policy: "policy-role0-1", RoleName: "test_role_0"},
+				{Policy: "policy-role0-2", RoleName: "test_role_0"},
+				{Policy: "policy-role1-0", RoleName: "test_role_1"},
+				{Policy: "policy-role1-1", RoleName: "test_role_1"},
+				{Policy: "policy-role1-2", RoleName: "test_role_1"},
 			},
 		},
 	}
@@ -628,7 +628,7 @@ func Test_IAMRepository_ListAllRolePolicies(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, got, cachedData)
 				for _, role := range tt.roles {
-					assert.IsType(t, []string{}, store.Get(fmt.Sprintf("iamListAllRolePolicies_role_%s", *role.RoleName)))
+					assert.IsType(t, []RolePolicy{}, store.Get(fmt.Sprintf("iamListAllRolePolicies_role_%s", *role.RoleName)))
 				}
 			}
 
@@ -670,17 +670,17 @@ func Test_IAMRepository_ListAllUserPolicyAttachments(t *testing.T) {
 					},
 					mock.MatchedBy(func(callback func(res *iam.ListAttachedUserPoliciesOutput, lastPage bool) bool) bool {
 						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
+							{
 								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test"),
 								PolicyName: aws.String("test-attach"),
 							},
-							&iam.AttachedPolicy{
+							{
 								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test2"),
 								PolicyName: aws.String("test-attach2"),
 							},
 						}}, false)
 						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
+							{
 								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test3"),
 								PolicyName: aws.String("test-attach3"),
 							},
@@ -694,17 +694,17 @@ func Test_IAMRepository_ListAllUserPolicyAttachments(t *testing.T) {
 					},
 					mock.MatchedBy(func(callback func(res *iam.ListAttachedUserPoliciesOutput, lastPage bool) bool) bool {
 						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
+							{
 								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test"),
 								PolicyName: aws.String("test-attach"),
 							},
-							&iam.AttachedPolicy{
+							{
 								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test2"),
 								PolicyName: aws.String("test-attach2"),
 							},
 						}}, false)
 						callback(&iam.ListAttachedUserPoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
-							&iam.AttachedPolicy{
+							{
 								PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test3"),
 								PolicyName: aws.String("test-attach3"),
 							},

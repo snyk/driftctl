@@ -16,7 +16,7 @@ type IAMRepository interface {
 	ListAllPolicies() ([]*iam.Policy, error)
 	ListAllRoles() ([]*iam.Role, error)
 	ListAllRolePolicyAttachments([]*iam.Role) ([]*AttachedRolePolicy, error)
-	ListAllRolePolicies([]*iam.Role) ([]string, error)
+	ListAllRolePolicies([]*iam.Role) ([]RolePolicy, error)
 	ListAllUserPolicyAttachments([]*iam.User) ([]*AttachedUserPolicy, error)
 	ListAllUserPolicies([]*iam.User) ([]string, error)
 }
@@ -154,22 +154,22 @@ func (r *iamRepository) ListAllRolePolicyAttachments(roles []*iam.Role) ([]*Atta
 	return resources, nil
 }
 
-func (r *iamRepository) ListAllRolePolicies(roles []*iam.Role) ([]string, error) {
-	var resources []string
+func (r *iamRepository) ListAllRolePolicies(roles []*iam.Role) ([]RolePolicy, error) {
+	var resources []RolePolicy
 	for _, role := range roles {
 		cacheKey := fmt.Sprintf("iamListAllRolePolicies_role_%s", *role.RoleName)
 		if v := r.cache.Get(cacheKey); v != nil {
-			resources = append(resources, v.([]string)...)
+			resources = append(resources, v.([]RolePolicy)...)
 			continue
 		}
 
-		roleResources := make([]string, 0)
+		roleResources := make([]RolePolicy, 0)
 		input := &iam.ListRolePoliciesInput{
 			RoleName: role.RoleName,
 		}
 		err := r.client.ListRolePoliciesPages(input, func(res *iam.ListRolePoliciesOutput, lastPage bool) bool {
 			for _, policy := range res.PolicyNames {
-				roleResources = append(roleResources, fmt.Sprintf("%s:%s", *input.RoleName, *policy))
+				roleResources = append(roleResources, RolePolicy{*policy, *input.RoleName})
 			}
 			return !lastPage
 		})
@@ -255,5 +255,10 @@ type AttachedUserPolicy struct {
 
 type AttachedRolePolicy struct {
 	iam.AttachedPolicy
+	RoleName string
+}
+
+type RolePolicy struct {
+	Policy   string
 	RoleName string
 }

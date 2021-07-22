@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"fmt"
+
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 
@@ -41,8 +43,10 @@ func (e *IamRolePolicyEnumerator) Enumerate() ([]resource.Resource, error) {
 			results,
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
-				policy,
-				map[string]interface{}{},
+				fmt.Sprintf("%s:%s", policy.RoleName, policy.Policy),
+				map[string]interface{}{
+					"role": policy.RoleName,
+				},
 			),
 		)
 	}
