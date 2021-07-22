@@ -20,7 +20,7 @@ func TestAcc_AwsECRRepository(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.14.9",
 		Paths:            []string{"./testdata/acc/aws_ecr_repository"},
-		Args:             []string{"scan", "--filter", "Type=='aws_ecr_repository'"},
+		Args:             []string{"scan", "--filter", "Type=='aws_ecr_repository'", "--deep"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

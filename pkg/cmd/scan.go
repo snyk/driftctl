@@ -33,7 +33,7 @@ import (
 )
 
 func NewScanCmd() *cobra.Command {
-	opts := &pkg.ScanOptions{Deep: true}
+	opts := &pkg.ScanOptions{}
 	opts.BackendOptions = &backend.Options{}
 
 	cmd := &cobra.Command{
@@ -99,6 +99,8 @@ func NewScanCmd() *cobra.Command {
 		},
 	}
 
+	warn := color.New(color.FgYellow, color.Bold).SprintfFunc()
+
 	fl := cmd.Flags()
 	fl.Bool(
 		"quiet",
@@ -159,6 +161,12 @@ func NewScanCmd() *cobra.Command {
 		"strict",
 		false,
 		"Includes cloud provider service-linked roles (disabled by default)",
+	)
+	fl.BoolVar(&opts.Deep,
+		"deep",
+		false,
+		fmt.Sprintf("%s Enable deep mode\n", warn("EXPERIMENTAL:"))+
+			"You should check the documentation for more details: https://docs.driftctl.com/deep-mode\n",
 	)
 	fl.StringVar(&opts.DriftignorePath,
 		"driftignore",

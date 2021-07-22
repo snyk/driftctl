@@ -11,7 +11,7 @@ func TestAcc_AwsLambdaEventSourceMapping(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.14.9",
 		Paths:            []string{"./testdata/acc/aws_lambda_event_source_mapping"},
-		Args:             []string{"scan", "--filter", "Type=='aws_lambda_event_source_mapping'"},
+		Args:             []string{"scan", "--filter", "Type=='aws_lambda_event_source_mapping'", "--deep"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

@@ -43,6 +43,7 @@ func TestScanCmd_Valid(t *testing.T) {
 		{args: []string{"scan", "--tfc-token", "token"}},
 		{args: []string{"scan", "--filter", "Type=='aws_s3_bucket'"}},
 		{args: []string{"scan", "--strict"}},
+		{args: []string{"scan", "--deep"}},
 		{args: []string{"scan", "--tf-provider-version", "1.2.3"}},
 		{args: []string{"scan", "--tf-provider-version", "3.30.2"}},
 		{args: []string{"scan", "--driftignore", "./path/to/driftignore.s3"}},

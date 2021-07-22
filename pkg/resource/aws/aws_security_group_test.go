@@ -11,7 +11,7 @@ func TestAcc_AwsSecurityGroup(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.14.9",
 		Paths:            []string{"./testdata/acc/aws_security_group"},
-		Args:             []string{"scan", "--filter", "Type=='aws_security_group' || Type=='aws_default_security_group'"},
+		Args:             []string{"scan", "--filter", "Type=='aws_security_group' || Type=='aws_default_security_group'", "--deep"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
