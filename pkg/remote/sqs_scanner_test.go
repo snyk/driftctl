@@ -101,7 +101,7 @@ func TestSQSQueue(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewSQSQueueEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSqsQueueResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSqsQueueResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSqsQueueResourceType, aws.NewSQSQueueDetailsFetcher(provider, deserializer))
 
 			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
