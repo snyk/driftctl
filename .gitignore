@@ -1,5 +1,4 @@
-/bin/*
-!/bin/.gitkeep
+/bin
 
 ### Go ###
 # Binaries for programs and plugins

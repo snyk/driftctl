@@ -1,0 +1,41 @@
+project_name: driftctl
+dist: bin
+release:
+    github:
+        owner: cloudskiff
+        name: driftctl
+    draft: false
+    prerelease: auto
+before:
+    hooks:
+        - go generate ./...
+signs:
+    - signature: "${artifact}.gpg"
+      artifacts: checksum
+      args: [ "--batch", "-u", "security@cloudskiff.com", "--output", "${signature}", "--detach-sign", "${artifact}" ]
+builds:
+    - id: "driftctl"
+      binary: driftctl
+      dir: .
+      env:
+          - CGO_ENABLED=0
+      goos:
+          - linux
+          - windows
+          - darwin
+      goarch:
+          - amd64
+          - arm
+          - arm64
+          - 386
+      ldflags: "-s -w -X github.com/cloudskiff/driftctl/build.env={{ .Env.ENV }} -X github.com/cloudskiff/driftctl/pkg/version.version={{ .Tag }}"
+archives:
+    - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
+      format: binary
+      replacements:
+          armv6: arm
+checksum:
+    name_template: '{{ .ProjectName }}_SHA256SUMS'
+    algorithm: sha256
+snapshot:
+    name_template: "{{ .Tag }}-next"

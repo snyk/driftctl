@@ -2,85 +2,44 @@
 #
 # This script builds the application from source for multiple platforms.
 # Inspired from hashicorp/terraform build script
+# https://github.com/hashicorp/terraform/blob/83e6703bf77f60660db4465ef50d30c633f800f1/scripts/build.sh
 set -eo pipefail
 
-echo "Bash: ${BASH_VERSION}"
-
-# By default build for dev
-ENV=${ENV:-"dev"}
-
-# Get the git commit
-GIT_COMMIT=$(git rev-parse HEAD)
-GIT_DIRTY=$(test -n "`git status --porcelain`" && echo "-dev" || true)
-
-# Retrieve
-VERSION=$(git describe --exact-match 2>/dev/null || git rev-parse --short HEAD)
-
-# Inject version number
-LD_FLAGS="-X github.com/cloudskiff/driftctl/pkg/version.version=${VERSION}"
-
-# Reference:
-# https://github.com/golang/go/blob/master/src/go/build/syslist.go
-os_archs=(
-    darwin/amd64
-    darwin/arm64
-    linux/386
-    linux/amd64
-    linux/arm
-    linux/arm64
-    windows/386
-    windows/amd64
-)
-
-if [ $ENV != "release" ]; then
-    echo "+ Building env: dev"
-    # If its dev mode, only build for ourself
-    os_archs=("$(go env GOOS)/$(go env GOARCH)")
-    # And set version to git commit
-    VERSION="${GIT_COMMIT}${GIT_DIRTY}"
+if ! which goreleaser >/dev/null; then
+    echo "+ Installing goreleaser..."
+    go install github.com/goreleaser/goreleaser@v0.173.2
 fi
 
-if [ -n "$OS_ARCH" ]; then
-  os_archs=("$OS_ARCH")
+if [ -z $ENV ]; then
+    echo "Error: ENV variable must be defined"
+    exit 1
 fi
 
-echo "ARCH: ${os_archs[*]}"
+# Check configuration
+goreleaser check
 
-# In release mode we don't want debug information in the binary
-# We also set the build env to release
-if [ $ENV = "release" ]; then
-    echo "+ Building env: release"
-    LD_FLAGS="-s -w -X github.com/cloudskiff/driftctl/build.env=release ${LD_FLAGS}"
+if [ "$ENV" == "dev" ]; then
+    echo "+ Building using goreleaser ..."
+    goreleaser build \
+        --rm-dist \
+        --parallelism 2 \
+        --snapshot \
+        --single-target
+    exit 0
 fi
 
-if ! which gox > /dev/null; then
-    echo "+ Installing gox..."
-    go install github.com/mitchellh/gox@v1.0.0
+GRFLAGS=""
+
+# Only CI system should publish artifacts
+# We may not want to sign artifacts in dev environments
+if [ "$CI" != true ]; then
+    GRFLAGS+="--snapshot "
+    GRFLAGS+="--skip-announce "
+    GRFLAGS+="--skip-publish "
+    GRFLAGS+="--skip-sign "
 fi
 
-# Delete old binaries
-echo "+ Removing old binaries ..."
-rm -f bin/*
-
-# Instruct gox to build statically linked binaries
-export CGO_ENABLED=0
-
-# Ensure all remote modules are downloaded and cached before build so that
-# the concurrent builds launched by gox won't race to redundantly download them.
-go mod download
-
-# Build!
-echo "+ Building with flags: ${LD_FLAGS}"
-osarch="${os_archs[@]}"
-gox \
-    -osarch="$osarch" \
-    -parallel=2 \
-    -ldflags "${LD_FLAGS}" \
-    -output "bin/driftctl_{{.OS}}_{{.Arch}}" \
-    ./
-
-if [ $ENV = "release" ]; then
-  echo "+ Computing checksums"
-  cd bin
-  sha256sum * > driftctl_SHA256SUMS
-fi
+echo "+ Building using goreleaser ..."
+goreleaser release \
+    --rm-dist \
+    ${GRFLAGS}
