@@ -7,8 +7,8 @@ Found changed resources:
         ~ struct.0.string: "one" => "two" (computed)
 Found 1 resource(s)
  - 100% coverage
- - 1 covered by IaC
- - 0 not covered by IaC
- - 0 missing on cloud provider
- - 1/1 changed outside of IaC
+ - 1 resource(s) managed by terraform
+     - 1/1 resource(s) out of sync with Terraform state
+ - 0 resource(s) not managed by Terraform
+ - 0 resource(s) found in a Terraform state but missing on the cloud provider
 You have diffs on computed fields, check the documentation for potential false positive drifts: https://docs.driftctl.com/limitations
