@@ -982,7 +982,7 @@ func TestIamRolePolicy(t *testing.T) {
 					},
 				}
 				repo.On("ListAllRoles").Return(roles, nil)
-				repo.On("ListAllRolePolicies", roles).Return([]string{}, nil)
+				repo.On("ListAllRolePolicies", roles).Return([]repository.RolePolicy{}, nil)
 			},
 			wantErr: nil,
 		},
@@ -999,13 +999,13 @@ func TestIamRolePolicy(t *testing.T) {
 					},
 				}
 				repo.On("ListAllRoles").Return(roles, nil)
-				repo.On("ListAllRolePolicies", roles).Return([]string{
-					*aws.String("test_role_0:policy-role0-0"),
-					*aws.String("test_role_0:policy-role0-1"),
-					*aws.String("test_role_0:policy-role0-2"),
-					*aws.String("test_role_1:policy-role1-0"),
-					*aws.String("test_role_1:policy-role1-1"),
-					*aws.String("test_role_1:policy-role1-2"),
+				repo.On("ListAllRolePolicies", roles).Return([]repository.RolePolicy{
+					{Policy: "policy-role0-0", RoleName: "test_role_0"},
+					{Policy: "policy-role0-1", RoleName: "test_role_0"},
+					{Policy: "policy-role0-2", RoleName: "test_role_0"},
+					{Policy: "policy-role1-0", RoleName: "test_role_1"},
+					{Policy: "policy-role1-1", RoleName: "test_role_1"},
+					{Policy: "policy-role1-2", RoleName: "test_role_1"},
 				}, nil).Once()
 			},
 			wantErr: nil,

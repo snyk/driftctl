@@ -79,9 +79,11 @@ func isDefaultIngress(rule *resource.AbstractResource, remoteResources *[]resour
 	if _, exist := rule.Attrs.Get("prefix_list_ids"); exist {
 		return false
 	}
+	if self := rule.Attrs.GetBool("self"); self == nil || !*self {
+		return false
+	}
 	sgId := rule.Attrs.GetString("security_group_id")
-	sourceSgId := rule.Attrs.GetString("source_security_group_id")
-	if sgId == nil || sourceSgId == nil || *sgId != *sourceSgId {
+	if sgId == nil {
 		return false
 	}
 	return isFromDefaultSecurityGroup(sgId, remoteResources)
