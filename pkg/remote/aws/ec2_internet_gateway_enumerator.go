@@ -34,7 +34,7 @@ func (e *EC2InternetGatewayEnumerator) Enumerate() ([]resource.Resource, error) 
 	for _, internetGateway := range internetGateways {
 		data := map[string]interface{}{}
 		if len(internetGateway.Attachments) > 0 && internetGateway.Attachments[0].VpcId != nil {
-			data["vpc_id"] = internetGateway.Attachments[0].VpcId
+			data["vpc_id"] = *internetGateway.Attachments[0].VpcId
 		}
 		results = append(
 			results,
