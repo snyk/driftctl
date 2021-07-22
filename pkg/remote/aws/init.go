@@ -133,7 +133,7 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsDbSubnetGroupResourceType, common.NewGenericDetailsFetcher(aws.AwsDbSubnetGroupResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewSQSQueueEnumerator(sqsRepository, factory))
-	remoteLibrary.AddDetailsFetcher(aws.AwsSqsQueueResourceType, common.NewGenericDetailsFetcher(aws.AwsSqsQueueResourceType, provider, deserializer))
+	remoteLibrary.AddDetailsFetcher(aws.AwsSqsQueueResourceType, NewSQSQueueDetailsFetcher(provider, deserializer))
 	remoteLibrary.AddEnumerator(NewSQSQueuePolicyEnumerator(sqsRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsSqsQueuePolicyResourceType, common.NewGenericDetailsFetcher(aws.AwsSqsQueuePolicyResourceType, provider, deserializer))
 
