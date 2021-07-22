@@ -59,6 +59,11 @@ func (m AwsDefaults) awsIamRolePolicyDefaults(remoteResources []resource.Resourc
 			}
 		}
 
+		if role == nil {
+			logrus.Warnf("Role for %s role policy not found. Is that supposed to happen ?", remoteResource.TerraformId())
+			continue
+		}
+
 		if match := strings.HasPrefix((*role.Attrs)["path"].(string), defaultIamRolePathPrefix); match {
 			resourcesToIgnore = append(resourcesToIgnore, remoteResource)
 		}
