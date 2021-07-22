@@ -10,13 +10,13 @@ if ! which goreleaser >/dev/null; then
     go install github.com/goreleaser/goreleaser@v0.173.2
 fi
 
-# Check configuration
-goreleaser check
-
 if [ -z $ENV ]; then
     echo "Error: ENV variable must be defined"
     exit 1
 fi
+
+# Check configuration
+goreleaser check
 
 if [ "$ENV" == "dev" ]; then
     echo "+ Building using goreleaser ..."
@@ -30,17 +30,13 @@ fi
 
 GRFLAGS=""
 
-# We sign every releases using PGP
-# We may not want to do so in dev environments
-if [ -z $SIGNINGKEY ]; then
-    GRFLAGS+="--skip-sign "
-fi
-
 # Only CI system should publish artifacts
-if [ "$CI" != "circleci" ]; then
+# We may not want to sign artifacts in dev environments
+if [ "$CI" != true ]; then
     GRFLAGS+="--snapshot "
     GRFLAGS+="--skip-announce "
     GRFLAGS+="--skip-publish "
+    GRFLAGS+="--skip-sign "
 fi
 
 echo ${GRFLAGS}

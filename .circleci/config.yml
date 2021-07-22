@@ -84,13 +84,9 @@ jobs:
       - store_test_results:
           path: ./
   release:
-    environment:
-      CI: circleci
     docker:
       - image: golang:1.16
     steps:
-      - attach_workspace:
-          at: ~/project
       - run:
           name: "Ensure GnuPG is available"
           command: gpg --version
@@ -109,8 +105,6 @@ jobs:
       - image: cimg/base:2020.01
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/project
       # Add ssh private key to allow access to AUR repository
       # This key is bound to user cloudskiff on AUR
       - add_ssh_keys:
