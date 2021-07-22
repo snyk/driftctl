@@ -83,9 +83,11 @@ jobs:
             ./codecov
       - store_test_results:
           path: ./
-  sign_release:
+  release:
+    environment:
+      CI: circleci
     docker:
-      - image: cimg/base:2020.01
+      - image: golang:1.16
     steps:
       - attach_workspace:
           at: ~/project
@@ -97,26 +99,6 @@ jobs:
           command: |
             echo ${SIGNINGKEY} | base64 -d > signingkey
             gpg --import signingkey
-      - run:
-          name: "Sign release"
-          command: |
-            gpg --output bin/driftctl_SHA256SUMS.gpg -u security@cloudskiff.com --detach-sig bin/driftctl_SHA256SUMS
-      - run:
-          name: "Verify signature"
-          command: |
-            gpg --verify bin/driftctl_SHA256SUMS.gpg bin/driftctl_SHA256SUMS
-      - persist_to_workspace:
-          root: ~/project
-          paths:
-            - bin/
-  release:
-    environment:
-      CI: circleci
-    docker:
-      - image: golang:1.16
-    steps:
-      - attach_workspace:
-          at: ~/project
       - run:
           name: "Build and publish release"
           command: make release
@@ -235,15 +217,6 @@ workflows:
             branches:
               ignore: /.*/
       - test:
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
-      - sign_release:
-          context: cloudskiff-signing
-          requires:
-            - build
           filters:
             tags:
               only: /^v.*/
