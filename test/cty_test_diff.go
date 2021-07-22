@@ -35,7 +35,7 @@ func doTestDiff(got []resource.Resource, dirName string, provider terraform.Terr
 
 	expectedResources := []resource.Resource{}
 	for ty, resList := range resources {
-		resGoldenName := "results.golden.json"
+		resGoldenName := goldenfile.ResultsFilename
 		if len(resources) > 1 {
 			resGoldenName = fmt.Sprintf("results.%s.golden.json", ty)
 		}

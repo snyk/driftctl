@@ -32,12 +32,16 @@ func (e *EC2InternetGatewayEnumerator) Enumerate() ([]resource.Resource, error) 
 	results := make([]resource.Resource, len(internetGateways))
 
 	for _, internetGateway := range internetGateways {
+		data := map[string]interface{}{}
+		if len(internetGateway.Attachments) > 0 && internetGateway.Attachments[0].VpcId != nil {
+			data["vpc_id"] = internetGateway.Attachments[0].VpcId
+		}
 		results = append(
 			results,
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
 				*internetGateway.InternetGatewayId,
-				map[string]interface{}{},
+				data,
 			),
 		)
 	}
