@@ -13,10 +13,39 @@ fi
 # Check configuration
 goreleaser check
 
-# Build!
+if [ -z $ENV ]; then
+    echo "Error: ENV variable must be defined"
+    exit 1
+fi
+
+if [ "$ENV" == "dev" ]; then
+    echo "+ Building using goreleaser ..."
+    goreleaser build \
+        --rm-dist \
+        --parallelism 2 \
+        --snapshot \
+        --single-target
+    exit 0
+fi
+
+GRFLAGS=""
+
+# We sign every releases using PGP
+# We may not want to do so in dev environments
+if [ -z $SIGNINGKEY ]; then
+    GRFLAGS+="--skip-sign "
+fi
+
+# Only CI system should publish artifacts
+if [ "$CI" != "circleci" ]; then
+    GRFLAGS+="--snapshot "
+    GRFLAGS+="--skip-announce "
+    GRFLAGS+="--skip-publish "
+fi
+
+echo ${GRFLAGS}
+
 echo "+ Building using goreleaser ..."
-ENV=dev goreleaser build \
+goreleaser release \
     --rm-dist \
-    --parallelism 2 \
-    --snapshot \
-    --single-target
+    ${GRFLAGS}

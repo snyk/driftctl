@@ -21,11 +21,11 @@ all: fmt lint test build
 
 .PHONY: build
 build:
-	./scripts/build.sh
+	ENV=dev ./scripts/build.sh
 
 .PHONY: release
 release:
-	./scripts/release.sh
+	ENV=release ./scripts/build.sh
 
 .PHONY: test
 test: deps
