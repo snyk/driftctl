@@ -39,8 +39,6 @@ if [ "$CI" != true ]; then
     GRFLAGS+="--skip-sign "
 fi
 
-echo ${GRFLAGS}
-
 echo "+ Building using goreleaser ..."
 goreleaser release \
     --rm-dist \

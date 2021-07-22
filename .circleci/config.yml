@@ -2,16 +2,6 @@ version: 2.1
 orbs:
   go: circleci/go@1.5.0
 jobs:
-  build:
-    docker:
-      - image: golang:1.16.2
-    steps:
-      - checkout
-      - run: make build
-      - persist_to_workspace:
-          root: ~/project
-          paths:
-            - bin/
   test_acc:
     parameters:
       pattern:
@@ -98,6 +88,10 @@ jobs:
       - run:
           name: "Build and publish release"
           command: make release
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - bin/driftctl_SHA256SUMS
   publish-aur:
     environment:
         AUR_GIT: ssh://aur@aur.archlinux.org/driftctl-bin.git
@@ -105,6 +99,8 @@ jobs:
       - image: cimg/base:2020.01
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/project
       # Add ssh private key to allow access to AUR repository
       # This key is bound to user cloudskiff on AUR
       - add_ssh_keys:
@@ -198,12 +194,6 @@ workflows:
                 - main
   release:
     jobs:
-      - build:
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
       - lint:
           filters:
             tags:
