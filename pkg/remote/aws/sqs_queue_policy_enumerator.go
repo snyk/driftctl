@@ -32,21 +32,25 @@ func (e *SQSQueuePolicyEnumerator) Enumerate() ([]resource.Resource, error) {
 		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, string(e.SupportedType()), aws.AwsSqsQueueResourceType)
 	}
 
-	results := make([]resource.Resource, len(queues))
+	results := make([]resource.Resource, 0, len(queues))
 
 	for _, queue := range queues {
+		attrs := map[string]interface{}{
+			"policy": "",
+		}
 		attributes, err := e.repository.GetQueueAttributes(*queue)
 		if err != nil {
 			return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		}
+		if attributes.Attributes != nil {
+			attrs["policy"] = *attributes.Attributes[sqs.QueueAttributeNamePolicy]
 		}
 		results = append(
 			results,
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
 				awssdk.StringValue(queue),
-				map[string]interface{}{
-					"policy": *attributes.Attributes[sqs.QueueAttributeNamePolicy],
-				},
+				attrs,
 			),
 		)
 	}
