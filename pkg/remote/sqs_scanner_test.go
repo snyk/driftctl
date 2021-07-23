@@ -153,6 +153,23 @@ func TestSQSQueuePolicy(t *testing.T) {
 			wantErr: nil,
 		},
 		{
+			test:    "multiple sqs queue policies (with nil attributes)",
+			dirName: "sqs_queue_policy_multiple",
+			mocks: func(client *repository.MockSQSRepository) {
+				client.On("ListAllQueues").Return([]*string{
+					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo"),
+					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/foo"),
+					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/baz"),
+				}, nil)
+
+				client.On("GetQueueAttributes", mock.Anything).Return(
+					&sqs.GetQueueAttributesOutput{},
+					nil,
+				)
+			},
+			wantErr: nil,
+		},
+		{
 			test:    "cannot list sqs queues, thus sqs queue policies",
 			dirName: "sqs_queue_policy_empty",
 			mocks: func(client *repository.MockSQSRepository) {
