@@ -5,9 +5,8 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/stretchr/testify/mock"
-
-	"github.com/cloudskiff/driftctl/mocks"
 
 	"github.com/stretchr/testify/assert"
 
@@ -936,16 +935,16 @@ func TestAnalyze(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			filter := &mocks.Filter{}
+			testFilter := &filter.MockFilter{}
 			for _, ignored := range c.ignoredRes {
-				filter.On("IsResourceIgnored", ignored).Return(true)
+				testFilter.On("IsResourceIgnored", ignored).Return(true)
 			}
-			filter.On("IsResourceIgnored", mock.Anything).Return(false)
+			testFilter.On("IsResourceIgnored", mock.Anything).Return(false)
 
 			for _, s := range c.ignoredDrift {
-				filter.On("IsFieldIgnored", s.res, s.path).Return(true)
+				testFilter.On("IsFieldIgnored", s.res, s.path).Return(true)
 			}
-			filter.On("IsFieldIgnored", mock.Anything, mock.Anything).Return(false)
+			testFilter.On("IsFieldIgnored", mock.Anything, mock.Anything).Return(false)
 
 			al := alerter.NewAlerter()
 			if c.alerts != nil {
@@ -955,7 +954,7 @@ func TestAnalyze(t *testing.T) {
 			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 			aws.InitResourcesMetadata(repo)
 
-			analyzer := NewAnalyzer(al, AnalyzerOptions{Deep: true})
+			analyzer := NewAnalyzer(al, AnalyzerOptions{Deep: true}, testFilter)
 
 			for _, res := range c.cloud {
 				addSchemaToRes(res, repo)
@@ -973,7 +972,7 @@ func TestAnalyze(t *testing.T) {
 				addSchemaToRes(drift.res, repo)
 			}
 
-			result, err := analyzer.Analyze(c.cloud, c.iac, filter)
+			result, err := analyzer.Analyze(c.cloud, c.iac)
 
 			if err != nil {
 				t.Error(err)

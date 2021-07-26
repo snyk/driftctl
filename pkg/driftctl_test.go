@@ -101,8 +101,14 @@ func runTest(t *testing.T, cases TestCases) {
 			iacProgress.On("Start").Return().Once()
 			iacProgress.On("Stop").Return().Once()
 
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+			testFilter.On("IsResourceIgnored", mock.Anything).Return(false)
+			testFilter.On("IsFieldIgnored", mock.Anything, mock.Anything).Return(false)
+			analyzer := analyser.NewAnalyzer(testAlerter, analyser.AnalyzerOptions{Deep: c.options.Deep}, testFilter)
+
 			store := memstore.New()
-			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, resourceFactory, c.options, scanProgress, iacProgress, repo, store)
+			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, analyzer, resourceFactory, c.options, scanProgress, iacProgress, repo, store)
 
 			analysis, err := driftctl.Run()
 

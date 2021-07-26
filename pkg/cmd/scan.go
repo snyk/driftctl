@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/cloudskiff/driftctl/pkg/memstore"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	"github.com/cloudskiff/driftctl/pkg/telemetry"
@@ -218,6 +219,9 @@ func scanRun(opts *pkg.ScanOptions) error {
 		logrus.Trace("Exited")
 	}()
 
+	logrus.Debug("Checking for driftignore")
+	driftIgnore := filter.NewDriftIgnore(opts.DriftignorePath)
+
 	scanner := remote.NewScanner(remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep})
 
 	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, resFactory)
@@ -225,7 +229,18 @@ func scanRun(opts *pkg.ScanOptions) error {
 		return err
 	}
 
-	ctl := pkg.NewDriftCTL(scanner, iacSupplier, alerter, resFactory, opts, scanProgress, iacProgress, resourceSchemaRepository, store)
+	ctl := pkg.NewDriftCTL(
+		scanner,
+		iacSupplier,
+		alerter,
+		analyser.NewAnalyzer(alerter, analyser.AnalyzerOptions{Deep: opts.Deep}, driftIgnore),
+		resFactory,
+		opts,
+		scanProgress,
+		iacProgress,
+		resourceSchemaRepository,
+		store,
+	)
 
 	go func() {
 		<-c
