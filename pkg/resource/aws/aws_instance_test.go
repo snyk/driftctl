@@ -48,7 +48,14 @@ func TestAcc_AwsInstance_WithBlockDevices(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.14.9",
 		Paths:            []string{"./testdata/acc/aws_instance"},
-		Args:             []string{"scan", "--filter", "Type=='aws_instance'"},
+		Args: []string{
+			"scan",
+			"--filter",
+			"Type=='aws_instance'",
+			"--tf-provider-version",
+			"3.19.0",
+			"--deep",
+		},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
