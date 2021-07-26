@@ -33,7 +33,7 @@ func (e *EC2RouteEnumerator) Enumerate() ([]resource.Resource, error) {
 
 	for _, routeTable := range routeTables {
 		for _, route := range routeTable.Routes {
-			routeId, _ := aws.CalculateRouteID(routeTable.RouteTableId, route.DestinationCidrBlock, route.DestinationIpv6CidrBlock)
+			routeId := aws.CalculateRouteID(routeTable.RouteTableId, route.DestinationCidrBlock, route.DestinationIpv6CidrBlock, route.DestinationPrefixListId)
 			data := map[string]interface{}{
 				"route_table_id": *routeTable.RouteTableId,
 				"origin":         *route.Origin,
@@ -43,6 +43,9 @@ func (e *EC2RouteEnumerator) Enumerate() ([]resource.Resource, error) {
 			}
 			if route.DestinationIpv6CidrBlock != nil && *route.DestinationIpv6CidrBlock != "" {
 				data["destination_ipv6_cidr_block"] = *route.DestinationIpv6CidrBlock
+			}
+			if route.DestinationPrefixListId != nil && *route.DestinationPrefixListId != "" {
+				data["destination_prefix_list_id"] = *route.DestinationPrefixListId
 			}
 			if route.GatewayId != nil && *route.GatewayId != "" {
 				data["gateway_id"] = *route.GatewayId
