@@ -106,7 +106,7 @@ func TestRoute53_HealthCheck(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewRoute53HealthCheckEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRoute53HealthCheckResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRoute53HealthCheckResourceType, provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {
@@ -233,7 +233,7 @@ func TestRoute53_Zone(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewRoute53ZoneEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRoute53ZoneResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRoute53ZoneResourceType, provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {
@@ -434,7 +434,7 @@ func TestRoute53_Record(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewRoute53RecordEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRoute53RecordResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRoute53RecordResourceType, provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {

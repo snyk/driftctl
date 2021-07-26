@@ -21,7 +21,6 @@ const RemoteAWSTerraform = "aws+tf"
 
 func Init(version string, alerter *alerter.Alerter,
 	providerLibrary *terraform.ProviderLibrary,
-	supplierLibrary *resource.SupplierLibrary,
 	remoteLibrary *common.RemoteLibrary,
 	progress output.Progress,
 	resourceSchemaRepository *resource.SchemaRepository,

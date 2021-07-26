@@ -16,7 +16,6 @@ type ScannerOptions struct {
 }
 
 type Scanner struct {
-	resourceSuppliers    []resource.Supplier
 	enumeratorRunner     *parallel.ParallelRunner
 	detailsFetcherRunner *parallel.ParallelRunner
 	remoteLibrary        *common.RemoteLibrary
@@ -24,9 +23,8 @@ type Scanner struct {
 	options              ScannerOptions
 }
 
-func NewScanner(resourceSuppliers []resource.Supplier, remoteLibrary *common.RemoteLibrary, alerter alerter.AlerterInterface, options ScannerOptions) *Scanner {
+func NewScanner(remoteLibrary *common.RemoteLibrary, alerter alerter.AlerterInterface, options ScannerOptions) *Scanner {
 	return &Scanner{
-		resourceSuppliers:    resourceSuppliers,
 		enumeratorRunner:     parallel.NewParallelRunner(context.TODO(), 10),
 		detailsFetcherRunner: parallel.NewParallelRunner(context.TODO(), 10),
 		remoteLibrary:        remoteLibrary,
@@ -55,31 +53,6 @@ loop:
 		}
 	}
 	return results, runner.Err()
-}
-
-func (s *Scanner) legacyScan() ([]resource.Resource, error) {
-	for _, resourceProvider := range s.resourceSuppliers {
-		supplier := resourceProvider
-		s.enumeratorRunner.Run(func() (interface{}, error) {
-			res, err := supplier.Resources()
-			if err != nil {
-				err := HandleResourceEnumerationError(err, s.alerter)
-				if err == nil {
-					return []resource.Resource{}, nil
-				}
-				return nil, err
-			}
-			for _, resource := range res {
-				logrus.WithFields(logrus.Fields{
-					"id":   resource.TerraformId(),
-					"type": resource.TerraformType(),
-				}).Debug("[DEPRECATED] Found cloud resource")
-			}
-			return res, nil
-		})
-	}
-
-	return s.retrieveRunnerResults(s.enumeratorRunner)
 }
 
 func (s *Scanner) scan() ([]resource.Resource, error) {
@@ -135,20 +108,10 @@ func (s *Scanner) scan() ([]resource.Resource, error) {
 }
 
 func (s *Scanner) Resources() ([]resource.Resource, error) {
-
-	resources, err := s.legacyScan()
+	resources, err := s.scan()
 	if err != nil {
 		return nil, err
 	}
-
-	s.enumeratorRunner = parallel.NewParallelRunner(context.TODO(), 10)
-
-	enumerationResult, err := s.scan()
-	if err != nil {
-		return nil, err
-	}
-	resources = append(resources, enumerationResult...)
-
 	return resources, err
 }
 

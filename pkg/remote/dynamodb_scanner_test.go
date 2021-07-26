@@ -103,7 +103,7 @@ func TestDynamoDBTable(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewDynamoDBTableEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDynamodbTableResourceType, aws.NewDynamoDBTableDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {

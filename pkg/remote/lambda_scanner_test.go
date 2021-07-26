@@ -123,7 +123,7 @@ func TestScanLambdaFunction(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewLambdaFunctionEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsLambdaFunctionResourceType, aws.NewLambdaFunctionDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {
@@ -232,7 +232,7 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewLambdaEventSourceMappingEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsLambdaEventSourceMappingResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsLambdaEventSourceMappingResourceType, provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {

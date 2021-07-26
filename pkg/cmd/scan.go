@@ -197,7 +197,6 @@ func scanRun(opts *pkg.ScanOptions) error {
 	alerter := alerter.NewAlerter()
 
 	providerLibrary := terraform.NewProviderLibrary()
-	supplierLibrary := resource.NewSupplierLibrary()
 	remoteLibrary := common.NewRemoteLibrary()
 
 	iacProgress := globaloutput.NewProgress("Scanning states", "Scanned states", true)
@@ -207,7 +206,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	resFactory := terraform.NewTerraformResourceFactory(resourceSchemaRepository)
 
-	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, supplierLibrary, remoteLibrary, scanProgress, resourceSchemaRepository, resFactory, opts.ConfigDir)
+	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, remoteLibrary, scanProgress, resourceSchemaRepository, resFactory, opts.ConfigDir)
 	if err != nil {
 		return err
 	}
@@ -219,7 +218,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		logrus.Trace("Exited")
 	}()
 
-	scanner := remote.NewScanner(supplierLibrary.Suppliers(), remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep})
+	scanner := remote.NewScanner(remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep})
 
 	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, resFactory)
 	if err != nil {

@@ -85,7 +85,7 @@ func TestScanGithubRepository(t *testing.T) {
 			remoteLibrary.AddEnumerator(github.NewGithubRepositoryEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(githubres.GithubRepositoryResourceType, common.NewGenericDetailsFetcher(githubres.GithubRepositoryResourceType, provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.err)
 			if err != nil {

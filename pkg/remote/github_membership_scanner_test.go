@@ -85,7 +85,7 @@ func TestScanGithubMembership(t *testing.T) {
 			remoteLibrary.AddEnumerator(github.NewGithubMembershipEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(githubres.GithubMembershipResourceType, common.NewGenericDetailsFetcher(githubres.GithubMembershipResourceType, provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.err)
 			if err != nil {

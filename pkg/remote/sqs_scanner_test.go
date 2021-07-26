@@ -103,7 +103,7 @@ func TestSQSQueue(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewSQSQueueEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSqsQueueResourceType, aws.NewSQSQueueDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -223,7 +223,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewSQSQueuePolicyEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSqsQueuePolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSqsQueuePolicyResourceType, provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
