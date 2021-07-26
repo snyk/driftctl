@@ -1,6 +1,7 @@
 package analyser
 
 import (
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/r3labs/diff/v2"
 
@@ -43,24 +44,20 @@ type AnalyzerOptions struct {
 type Analyzer struct {
 	alerter *alerter.Alerter
 	options AnalyzerOptions
+	filter  filter.Filter
 }
 
-type Filter interface {
-	IsResourceIgnored(res resource.Resource) bool
-	IsFieldIgnored(res resource.Resource, path []string) bool
+func NewAnalyzer(alerter *alerter.Alerter, options AnalyzerOptions, filter filter.Filter) *Analyzer {
+	return &Analyzer{alerter, options, filter}
 }
 
-func NewAnalyzer(alerter *alerter.Alerter, options AnalyzerOptions) Analyzer {
-	return Analyzer{alerter, options}
-}
-
-func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resource, filter Filter) (Analysis, error) {
+func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resource) (Analysis, error) {
 	analysis := Analysis{}
 
 	// Iterate on remote resources and filter ignored resources
 	filteredRemoteResource := make([]resource.Resource, 0, len(remoteResources))
 	for _, remoteRes := range remoteResources {
-		if filter.IsResourceIgnored(remoteRes) || a.alerter.IsResourceIgnored(remoteRes) {
+		if a.filter.IsResourceIgnored(remoteRes) || a.alerter.IsResourceIgnored(remoteRes) {
 			continue
 		}
 		filteredRemoteResource = append(filteredRemoteResource, remoteRes)
@@ -70,7 +67,7 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 	for _, stateRes := range resourcesFromState {
 		i, remoteRes, found := findCorrespondingRes(filteredRemoteResource, stateRes)
 
-		if filter.IsResourceIgnored(stateRes) || a.alerter.IsResourceIgnored(stateRes) {
+		if a.filter.IsResourceIgnored(stateRes) || a.alerter.IsResourceIgnored(stateRes) {
 			continue
 		}
 
@@ -97,7 +94,7 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 
 		changelog := make([]Change, 0, len(delta))
 		for _, change := range delta {
-			if filter.IsFieldIgnored(stateRes, change.Path) {
+			if a.filter.IsFieldIgnored(stateRes, change.Path) {
 				continue
 			}
 			c := Change{Change: change}

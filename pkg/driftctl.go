@@ -40,7 +40,7 @@ type DriftCTL struct {
 	remoteSupplier           resource.Supplier
 	iacSupplier              resource.Supplier
 	alerter                  alerter.AlerterInterface
-	analyzer                 analyser.Analyzer
+	analyzer                 *analyser.Analyzer
 	resourceFactory          resource.ResourceFactory
 	scanProgress             globaloutput.Progress
 	iacProgress              globaloutput.Progress
@@ -52,6 +52,7 @@ type DriftCTL struct {
 func NewDriftCTL(remoteSupplier resource.Supplier,
 	iacSupplier resource.Supplier,
 	alerter *alerter.Alerter,
+	analyzer *analyser.Analyzer,
 	resFactory resource.ResourceFactory,
 	opts *ScanOptions,
 	scanProgress globaloutput.Progress,
@@ -62,7 +63,7 @@ func NewDriftCTL(remoteSupplier resource.Supplier,
 		remoteSupplier,
 		iacSupplier,
 		alerter,
-		analyser.NewAnalyzer(alerter, analyser.AnalyzerOptions{Deep: opts.Deep}),
+		analyzer,
 		resFactory,
 		scanProgress,
 		iacProgress,
@@ -131,10 +132,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		}
 	}
 
-	logrus.Debug("Checking for driftignore")
-	driftIgnore := filter.NewDriftIgnore(d.opts.DriftignorePath)
-
-	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState, driftIgnore)
+	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState)
 	if err != nil {
 		return nil, err
 	}
