@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/mocks"
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	"github.com/cloudskiff/driftctl/pkg/remote/github"
@@ -11,6 +12,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	tftest "github.com/cloudskiff/driftctl/test/terraform"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/test"
@@ -86,7 +88,10 @@ func TestScanGithubTeam(t *testing.T) {
 			remoteLibrary.AddEnumerator(github.NewGithubTeamEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(githubres.GithubTeamResourceType, common.NewGenericDetailsFetcher(githubres.GithubTeamResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.err)
 			if err != nil {

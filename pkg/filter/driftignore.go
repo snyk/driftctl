@@ -67,6 +67,10 @@ func (r *DriftIgnore) readIgnoreFile() error {
 	return nil
 }
 
+func (r *DriftIgnore) IsTypeIgnored(ty resource.ResourceType) bool {
+	return r.match(fmt.Sprintf("%s.*", ty))
+}
+
 func (r *DriftIgnore) IsResourceIgnored(res resource.Resource) bool {
 	return r.match(fmt.Sprintf("%s.%s", res.TerraformType(), res.TerraformId()))
 }
