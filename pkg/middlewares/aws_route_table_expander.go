@@ -1,31 +1,12 @@
 package middlewares
 
 import (
-	"fmt"
-
 	"github.com/sirupsen/logrus"
 
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 )
-
-type invalidRouteAlert struct {
-	message string
-}
-
-func newInvalidRouteAlert(awsRouteTableResourceType, tableId string) *invalidRouteAlert {
-	message := fmt.Sprintf("Skipped invalid route found in state for %s.%s", awsRouteTableResourceType, tableId)
-	return &invalidRouteAlert{message}
-}
-
-func (i *invalidRouteAlert) Message() string {
-	return i.message
-}
-
-func (i *invalidRouteAlert) ShouldIgnoreResource() bool {
-	return false
-}
 
 // Explodes routes found in aws_default_route_table.route and aws_route_table.route to dedicated resources
 type AwsRouteTableExpander struct {
@@ -99,15 +80,16 @@ func (m *AwsRouteTableExpander) handleTable(table *resource.AbstractResource, re
 		if route["ipv6_cidr_block"] != nil {
 			ipv6CidrBlock = route["ipv6_cidr_block"].(string)
 		}
-		routeId, err := aws.CalculateRouteID(&table.Id, &cidrBlock, &ipv6CidrBlock)
-		if err != nil {
-			m.alerter.SendAlert(aws.AwsRouteTableResourceType, newInvalidRouteAlert(aws.AwsRouteTableResourceType, table.Id))
-			continue
+		prefixListId := ""
+		if route["destination_prefix_list_id"] != nil {
+			prefixListId = route["destination_prefix_list_id"].(string)
 		}
+		routeId := aws.CalculateRouteID(&table.Id, &cidrBlock, &ipv6CidrBlock, &prefixListId)
 
 		data := map[string]interface{}{
 			"destination_cidr_block":      route["cidr_block"],
 			"destination_ipv6_cidr_block": route["ipv6_cidr_block"],
+			"destination_prefix_list_id":  route["destination_prefix_list_id"],
 			"egress_only_gateway_id":      route["egress_only_gateway_id"],
 			"gateway_id":                  route["gateway_id"],
 			"id":                          routeId,
@@ -152,15 +134,16 @@ func (m *AwsRouteTableExpander) handleDefaultTable(table *resource.AbstractResou
 		if route["ipv6_cidr_block"] != nil {
 			ipv6CidrBlock = route["ipv6_cidr_block"].(string)
 		}
-		routeId, err := aws.CalculateRouteID(&table.Id, &cidrBlock, &ipv6CidrBlock)
-		if err != nil {
-			m.alerter.SendAlert(aws.AwsDefaultRouteTableResourceType, newInvalidRouteAlert(aws.AwsDefaultRouteTableResourceType, table.Id))
-			continue
+		prefixListId := ""
+		if route["destination_prefix_list_id"] != nil {
+			prefixListId = route["destination_prefix_list_id"].(string)
 		}
+		routeId := aws.CalculateRouteID(&table.Id, &cidrBlock, &ipv6CidrBlock, &prefixListId)
 
 		data := map[string]interface{}{
 			"destination_cidr_block":      route["cidr_block"],
 			"destination_ipv6_cidr_block": route["ipv6_cidr_block"],
+			"destination_prefix_list_id":  route["destination_prefix_list_id"],
 			"egress_only_gateway_id":      route["egress_only_gateway_id"],
 			"gateway_id":                  route["gateway_id"],
 			"id":                          routeId,
