@@ -110,7 +110,7 @@ func TestIamUser(t *testing.T) {
 			remoteLibrary.AddEnumerator(remoteaws.NewIamUserEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamUserResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamUserResourceType, provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -238,7 +238,7 @@ func TestIamUserPolicy(t *testing.T) {
 			remoteLibrary.AddEnumerator(remoteaws.NewIamUserPolicyEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamUserPolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamUserPolicyResourceType, provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -337,7 +337,7 @@ func TestIamPolicy(t *testing.T) {
 			remoteLibrary.AddEnumerator(remoteaws.NewIamPolicyEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamPolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamPolicyResourceType, provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -452,7 +452,7 @@ func TestIamRole(t *testing.T) {
 			remoteLibrary.AddEnumerator(remoteaws.NewIamRoleEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamRoleResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamRoleResourceType, provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -624,7 +624,7 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 			remoteLibrary.AddEnumerator(remoteaws.NewIamRolePolicyAttachmentEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamRolePolicyAttachmentResourceType, remoteaws.NewIamRolePolicyAttachmentDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {
@@ -751,7 +751,7 @@ func TestIamAccessKey(t *testing.T) {
 			remoteLibrary.AddEnumerator(remoteaws.NewIamAccessKeyEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamAccessKeyResourceType, remoteaws.NewIamAccessKeyDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -953,7 +953,7 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 			remoteLibrary.AddEnumerator(remoteaws.NewIamUserPolicyAttachmentEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamUserPolicyAttachmentResourceType, remoteaws.NewIamUserPolicyAttachmentDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -1073,7 +1073,7 @@ func TestIamRolePolicy(t *testing.T) {
 			remoteLibrary.AddEnumerator(remoteaws.NewIamRolePolicyEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamRolePolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamRolePolicyResourceType, provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {

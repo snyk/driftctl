@@ -109,7 +109,7 @@ func TestScanSNSTopic(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewSNSTopicEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicResourceType, aws.NewSNSTopicDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {
@@ -202,7 +202,7 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewSNSTopicPolicyEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicPolicyResourceType, aws.NewSNSTopicPolicyDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {
@@ -322,7 +322,7 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewSNSTopicSubscriptionEnumerator(repo, factory, alerter))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicSubscriptionResourceType, aws.NewSNSTopicSubscriptionDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.err)
 			if err != nil {

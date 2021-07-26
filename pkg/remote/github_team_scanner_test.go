@@ -86,7 +86,7 @@ func TestScanGithubTeam(t *testing.T) {
 			remoteLibrary.AddEnumerator(github.NewGithubTeamEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(githubres.GithubTeamResourceType, common.NewGenericDetailsFetcher(githubres.GithubTeamResourceType, provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.err)
 			if err != nil {

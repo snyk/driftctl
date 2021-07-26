@@ -100,7 +100,7 @@ func TestCloudfrontDistribution(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewCloudfrontDistributionEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsCloudfrontDistributionResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsCloudfrontDistributionResourceType, provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {

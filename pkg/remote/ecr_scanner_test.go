@@ -103,7 +103,7 @@ func TestECRRepository(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewECRRepositoryEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEcrRepositoryResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEcrRepositoryResourceType, provider, deserializer))
 
-			s := NewScanner(nil, remoteLibrary, alerter, scanOptions)
+			s := NewScanner(remoteLibrary, alerter, scanOptions)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.err)
 			if err != nil {
