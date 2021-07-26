@@ -1,11 +1,14 @@
 package aws
 
 import (
+	"strings"
+
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/sirupsen/logrus"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 )
@@ -40,6 +43,13 @@ func (e *SQSQueuePolicyEnumerator) Enumerate() ([]resource.Resource, error) {
 		}
 		attributes, err := e.repository.GetQueueAttributes(*queue)
 		if err != nil {
+			if strings.Contains(err.Error(), "NonExistentQueue") {
+				logrus.WithFields(logrus.Fields{
+					"queue": *queue,
+					"type":  aws.AwsSqsQueueResourceType,
+				}).Debugf("Ignoring queue that seems to be already deleted: %+v", err)
+				continue
+			}
 			return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
 		}
 		if attributes.Attributes != nil {
