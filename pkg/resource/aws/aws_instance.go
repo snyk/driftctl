@@ -20,7 +20,7 @@ func initAwsInstanceMetaData(resourceSchemaRepository resource.SchemaRepositoryI
 		val := res.Attrs
 		attrs := make(map[string]string)
 		if tags := val.GetMap("tags"); tags != nil {
-			if name, ok := tags["name"]; ok {
+			if name, ok := tags["Name"]; ok {
 				attrs["Name"] = name.(string)
 			}
 		}
