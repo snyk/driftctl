@@ -132,9 +132,23 @@ func (r *ec2Repository) ListAllInstances() ([]*ec2.Instance, error) {
 	if v := r.cache.Get("ec2ListAllInstances"); v != nil {
 		return v.([]*ec2.Instance), nil
 	}
-
 	var instances []*ec2.Instance
-	input := &ec2.DescribeInstancesInput{}
+	input := &ec2.DescribeInstancesInput{
+		Filters: []*ec2.Filter{
+			{
+				// Ignore terminated state from enumeration since terminated means that instance
+				// has been removed
+				Name: aws.String("instance-state-name"),
+				Values: aws.StringSlice([]string{
+					"pending",
+					"running",
+					"stopping",
+					"shutting-down",
+					"stopped",
+				}),
+			},
+		},
+	}
 	err := r.client.DescribeInstancesPages(input, func(res *ec2.DescribeInstancesOutput, lastPage bool) bool {
 		for _, reservation := range res.Reservations {
 			instances = append(instances, reservation.Instances...)

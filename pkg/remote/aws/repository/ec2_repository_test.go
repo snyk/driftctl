@@ -365,7 +365,20 @@ func Test_ec2Repository_ListAllInstances(t *testing.T) {
 		{name: "List with 2 pages",
 			mocks: func(client *awstest.MockFakeEC2) {
 				client.On("DescribeInstancesPages",
-					&ec2.DescribeInstancesInput{},
+					&ec2.DescribeInstancesInput{
+						Filters: []*ec2.Filter{
+							{
+								Name: aws.String("instance-state-name"),
+								Values: aws.StringSlice([]string{
+									"pending",
+									"running",
+									"stopping",
+									"shutting-down",
+									"stopped",
+								}),
+							},
+						},
+					},
 					mock.MatchedBy(func(callback func(res *ec2.DescribeInstancesOutput, lastPage bool) bool) bool {
 						callback(&ec2.DescribeInstancesOutput{
 							Reservations: []*ec2.Reservation{
