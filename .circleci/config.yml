@@ -88,6 +88,7 @@ jobs:
       - run:
           name: "Build and publish release"
           command: make release
+          no_output_timeout: 30m
       - persist_to_workspace:
           root: ~/project
           paths:
