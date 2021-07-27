@@ -21,7 +21,7 @@ all: fmt lint test build
 
 .PHONY: build
 build:
-	ENV=dev ./scripts/build.sh
+	SINGLE_TARGET=true ./scripts/build.sh
 
 .PHONY: release
 release:

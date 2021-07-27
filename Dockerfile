@@ -5,9 +5,9 @@ ARG ARCH="amd64"
 
 WORKDIR /go/src/app
 COPY go.mod go.sum Makefile ./
-RUN make deps
+RUN go mod download
 COPY . .
-RUN make release
+RUN SINGLE_TARGET=true make release
 
 FROM alpine:3.13
 
