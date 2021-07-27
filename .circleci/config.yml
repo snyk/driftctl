@@ -84,8 +84,7 @@ jobs:
       - run:
           name: "Import cloudskiff signing key"
           command: |
-            echo ${SIGNINGKEY} | base64 -d > signingkey
-            gpg --import signingkey
+            echo ${SIGNINGKEY} | base64 -d | gpg --import
       - run:
           name: "Build and publish release"
           command: make release
