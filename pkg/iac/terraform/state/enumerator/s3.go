@@ -33,6 +33,10 @@ func NewS3Enumerator(config config.SupplierConfig) *S3Enumerator {
 	}
 }
 
+func (s *S3Enumerator) Path() string {
+	return s.config.Path
+}
+
 func (s *S3Enumerator) Enumerate() ([]string, error) {
 	bucketPath := strings.Split(s.config.Path, "/")
 	if len(bucketPath) < 2 {

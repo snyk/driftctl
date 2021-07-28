@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/output"
-	"github.com/fatih/color"
 	"github.com/hashicorp/terraform/addrs"
 	"github.com/hashicorp/terraform/states"
 	"github.com/hashicorp/terraform/states/statefile"
@@ -39,6 +39,7 @@ type TerraformStateReader struct {
 	backendOptions *backend.Options
 	progress       output.Progress
 	filter         filter.Filter
+	alerter        *alerter.Alerter
 }
 
 func (r *TerraformStateReader) initReader() error {
@@ -46,8 +47,8 @@ func (r *TerraformStateReader) initReader() error {
 	return nil
 }
 
-func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options, progress output.Progress, deserializer *resource.Deserializer, filter filter.Filter) (*TerraformStateReader, error) {
-	reader := TerraformStateReader{library: library, config: config, deserializer: deserializer, backendOptions: backendOpts, progress: progress, filter: filter}
+func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options, progress output.Progress, alerter *alerter.Alerter, deserializer *resource.Deserializer, filter filter.Filter) (*TerraformStateReader, error) {
+	reader := TerraformStateReader{library: library, config: config, deserializer: deserializer, backendOptions: backendOpts, progress: progress, alerter: alerter, filter: filter}
 	err := reader.initReader()
 	if err != nil {
 		return nil, err
@@ -229,24 +230,30 @@ func (r *TerraformStateReader) retrieveForState(path string) ([]*resource.Resour
 func (r *TerraformStateReader) retrieveMultiplesStates() ([]*resource.Resource, error) {
 	keys, err := r.enumerator.Enumerate()
 	if err != nil {
+		r.alerter.SendAlert("", NewStateReadingAlert(r.enumerator.Path(), err))
 		return nil, err
 	}
+
 	logrus.WithFields(logrus.Fields{
 		"keys": keys,
 	}).Debug("Enumerated keys")
+
 	results := make([]*resource.Resource, 0)
+	nbAlert := 0
 
 	for _, key := range keys {
 		resources, err := r.retrieveForState(key)
 		if err != nil {
-			if _, ok := err.(*UnsupportedVersionError); ok {
-				color.New(color.Bold, color.FgYellow).Printf("WARNING: %s\n", err)
-				continue
-			}
-
-			return nil, err
+			r.alerter.SendAlert("", NewStateReadingAlert(key, err))
+			nbAlert++
+			continue
 		}
 		results = append(results, resources...)
+	}
+
+	if nbAlert == len(keys) {
+		// all key failed, throw an error
+		return results, errors.Errorf("Files were found but none of them could be read as a Terraform state.")
 	}
 
 	return results, nil

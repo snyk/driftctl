@@ -209,6 +209,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, remoteLibrary, scanProgress, resourceSchemaRepository, resFactory, opts.ConfigDir)
 	if err != nil {
+		WriteAlert(alerter)
 		return err
 	}
 
@@ -224,8 +225,9 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	scanner := remote.NewScanner(remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep}, driftIgnore)
 
-	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, resFactory, driftIgnore)
+	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, alerter, resFactory, driftIgnore)
 	if err != nil {
+		WriteAlert(alerter)
 		return err
 	}
 
@@ -250,6 +252,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	analysis, err := ctl.Run()
 	if err != nil {
+		WriteAlert(alerter)
 		return err
 	}
 
@@ -287,6 +290,10 @@ func scanRun(opts *pkg.ScanOptions) error {
 	}
 
 	return nil
+}
+
+func WriteAlert(alerter *alerter.Alerter) {
+	_ = output.NewConsole().WriteAlerts(alerter.Retrieve())
 }
 
 func parseFromFlag(from []string) ([]config.SupplierConfig, error) {

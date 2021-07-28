@@ -9,7 +9,8 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
+	"github.com/cloudskiff/driftctl/pkg/alerter"
+	remotealerts "github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/fatih/color"
 	"github.com/mattn/go-isatty"
 	"github.com/r3labs/diff/v2"
@@ -160,12 +161,15 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 	}
 
 	c.writeSummary(analysis)
+	return c.WriteAlerts(analysis.Alerts())
+}
 
+func (c *Console) WriteAlerts(alerts alerter.Alerts) error {
 	enumerationErrorMessage := ""
-	for _, a := range analysis.Alerts() {
-		for _, alert := range a {
+	for _, alerts := range alerts {
+		for _, alert := range alerts {
 			fmt.Println(color.YellowString(alert.Message()))
-			if alert, ok := alert.(*alerts.RemoteAccessDeniedAlert); ok && enumerationErrorMessage == "" {
+			if alert, ok := alert.(*remotealerts.RemoteAccessDeniedAlert); ok && enumerationErrorMessage == "" {
 				enumerationErrorMessage = alert.GetProviderMessage()
 			}
 		}
@@ -174,7 +178,6 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 	if enumerationErrorMessage != "" {
 		_, _ = fmt.Fprintf(os.Stderr, "\n%s\n", color.YellowString(enumerationErrorMessage))
 	}
-
 	return nil
 }
 
