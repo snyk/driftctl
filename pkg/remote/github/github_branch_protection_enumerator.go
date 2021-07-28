@@ -25,7 +25,7 @@ func (g *GithubBranchProtectionEnumerator) SupportedType() resource.ResourceType
 func (g *GithubBranchProtectionEnumerator) Enumerate() ([]resource.Resource, error) {
 	ids, err := g.repository.ListBranchProtection()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(g.SupportedType()))
+		return nil, remoteerror.NewResourceScanningError(err, string(g.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(ids))

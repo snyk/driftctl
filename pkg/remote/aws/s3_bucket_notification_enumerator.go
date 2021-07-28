@@ -30,7 +30,7 @@ func (e *S3BucketNotificationEnumerator) SupportedType() resource.ResourceType {
 func (e *S3BucketNotificationEnumerator) Enumerate() ([]resource.Resource, error) {
 	buckets, err := e.repository.ListAllBuckets()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, string(e.SupportedType()), aws.AwsS3BucketResourceType)
+		return nil, remoteerror.NewResourceScanningErrorWithType(err, string(e.SupportedType()), aws.AwsS3BucketResourceType)
 	}
 
 	results := make([]resource.Resource, len(buckets))
@@ -38,7 +38,7 @@ func (e *S3BucketNotificationEnumerator) Enumerate() ([]resource.Resource, error
 	for _, bucket := range buckets {
 		region, err := e.repository.GetBucketLocation(*bucket.Name)
 		if err != nil {
-			return nil, err
+			return nil, remoteerror.NewResourceScanningErrorWithType(err, string(e.SupportedType()), aws.AwsS3BucketResourceType)
 		}
 		if region == "" || region != e.providerConfig.DefaultAlias {
 			logrus.WithFields(logrus.Fields{
@@ -50,7 +50,7 @@ func (e *S3BucketNotificationEnumerator) Enumerate() ([]resource.Resource, error
 
 		notification, err := e.repository.GetBucketNotification(*bucket.Name, region)
 		if err != nil {
-			return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+			return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 		}
 
 		if notification == nil {

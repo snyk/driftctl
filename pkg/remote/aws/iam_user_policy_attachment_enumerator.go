@@ -28,13 +28,13 @@ func (e *IamUserPolicyAttachmentEnumerator) SupportedType() resource.ResourceTyp
 func (e *IamUserPolicyAttachmentEnumerator) Enumerate() ([]resource.Resource, error) {
 	users, err := e.repository.ListAllUsers()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, string(e.SupportedType()), resourceaws.AwsIamUserResourceType)
+		return nil, remoteerror.NewResourceScanningErrorWithType(err, string(e.SupportedType()), resourceaws.AwsIamUserResourceType)
 	}
 
 	results := make([]resource.Resource, 0)
 	policyAttachments, err := e.repository.ListAllUserPolicyAttachments(users)
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 	}
 
 	for _, attachedPol := range policyAttachments {

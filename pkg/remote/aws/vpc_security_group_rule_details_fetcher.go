@@ -1,6 +1,7 @@
 package aws
 
 import (
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -59,7 +60,7 @@ func (r *VPCSecurityGroupRuleDetailsFetcher) ReadDetails(res resource.Resource) 
 		Attributes: flatmap.Flatten(attrs),
 	})
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsSecurityGroupRuleResourceType, *ctyVal)
 	if err != nil {

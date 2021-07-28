@@ -32,7 +32,7 @@ func (e *SQSQueuePolicyEnumerator) SupportedType() resource.ResourceType {
 func (e *SQSQueuePolicyEnumerator) Enumerate() ([]resource.Resource, error) {
 	queues, err := e.repository.ListAllQueues()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, string(e.SupportedType()), aws.AwsSqsQueueResourceType)
+		return nil, remoteerror.NewResourceScanningErrorWithType(err, string(e.SupportedType()), aws.AwsSqsQueueResourceType)
 	}
 
 	results := make([]resource.Resource, 0, len(queues))
@@ -50,7 +50,7 @@ func (e *SQSQueuePolicyEnumerator) Enumerate() ([]resource.Resource, error) {
 				}).Debugf("Ignoring queue that seems to be already deleted: %+v", err)
 				continue
 			}
-			return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+			return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 		}
 		if attributes.Attributes != nil {
 			attrs["policy"] = *attributes.Attributes[sqs.QueueAttributeNamePolicy]

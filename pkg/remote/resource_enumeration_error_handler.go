@@ -12,26 +12,51 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type EnumerationAccessDeniedAlert struct {
-	message  string
-	provider string
+type ScanningPhase int
+
+const (
+	EnumerationPhase ScanningPhase = iota
+	DetailsFetchingPhase
+)
+
+type RemoteAccessDeniedAlert struct {
+	message       string
+	provider      string
+	scanningPhase ScanningPhase
 }
 
-func NewEnumerationAccessDeniedAlert(provider, supplierType, listedTypeError string) *EnumerationAccessDeniedAlert {
-	message := fmt.Sprintf("Ignoring %s from drift calculation: Listing %s is forbidden.", supplierType, listedTypeError)
-	return &EnumerationAccessDeniedAlert{message, provider}
+func NewRemoteAccessDeniedAlert(provider, supplierType, listedTypeError string, scanningPhase ScanningPhase) *RemoteAccessDeniedAlert {
+	var message string
+	switch scanningPhase {
+	case EnumerationPhase:
+		message = fmt.Sprintf("Ignoring %s from drift calculation: Listing %s is forbidden.", supplierType, listedTypeError)
+	case DetailsFetchingPhase:
+		message = fmt.Sprintf("Ignoring %s from drift calculation: Reading details of %s is forbidden.", supplierType, listedTypeError)
+	default:
+		message = fmt.Sprintf("Ignoring %s from drift calculation: %s", supplierType, listedTypeError)
+	}
+	return &RemoteAccessDeniedAlert{message, provider, scanningPhase}
 }
 
-func (e *EnumerationAccessDeniedAlert) Message() string {
+func (e *RemoteAccessDeniedAlert) Message() string {
 	return e.message
 }
 
-func (e *EnumerationAccessDeniedAlert) ShouldIgnoreResource() bool {
+func (e *RemoteAccessDeniedAlert) ShouldIgnoreResource() bool {
 	return true
 }
 
-func (e *EnumerationAccessDeniedAlert) GetProviderMessage() string {
-	message := "It seems that we got access denied exceptions while listing resources.\n"
+func (e *RemoteAccessDeniedAlert) GetProviderMessage() string {
+	var message string
+	switch e.scanningPhase {
+	case DetailsFetchingPhase:
+		message = "It seems that we got access denied exceptions while reading details of resources.\n"
+	case EnumerationPhase:
+		fallthrough
+	default:
+		message = "It seems that we got access denied exceptions while listing resources.\n"
+	}
+
 	switch e.provider {
 	case github.RemoteGithubTerraform:
 		message += "Please be sure that your Github token has the right permissions, check the last up-to-date documentation there: https://docs.driftctl.com/github/policy"
@@ -44,7 +69,7 @@ func (e *EnumerationAccessDeniedAlert) GetProviderMessage() string {
 }
 
 func HandleResourceEnumerationError(err error, alerter alerter.AlerterInterface) error {
-	listError, ok := err.(*remoteerror.ResourceEnumerationError)
+	listError, ok := err.(*remoteerror.ResourceScanningError)
 	if !ok {
 		return err
 	}
@@ -54,6 +79,11 @@ func HandleResourceEnumerationError(err error, alerter alerter.AlerterInterface)
 	reqerr, ok := rootCause.(awserr.RequestFailure)
 	if ok {
 		return handleAWSError(alerter, listError, reqerr)
+	}
+
+	if strings.Contains(rootCause.Error(), "AccessDenied") {
+		sendEnumerationAlert(aws.RemoteAWSTerraform, alerter, listError)
+		return nil
 	}
 
 	if strings.HasPrefix(
@@ -67,7 +97,33 @@ func HandleResourceEnumerationError(err error, alerter alerter.AlerterInterface)
 	return err
 }
 
-func handleAWSError(alerter alerter.AlerterInterface, listError *remoteerror.ResourceEnumerationError, reqerr awserr.RequestFailure) error {
+func HandleResourceDetailsFetchingError(err error, alerter alerter.AlerterInterface) error {
+	listError, ok := err.(*remoteerror.ResourceScanningError)
+	if !ok {
+		return err
+	}
+
+	rootCause := listError.RootCause()
+
+	if strings.HasPrefix(rootCause.Error(), "AccessDeniedException") {
+		sendDetailsFetchingAlert(aws.RemoteAWSTerraform, alerter, listError)
+		return nil
+	}
+
+	if strings.Contains(rootCause.Error(), "AccessDenied") {
+		sendDetailsFetchingAlert(aws.RemoteAWSTerraform, alerter, listError)
+		return nil
+	}
+
+	if strings.Contains(rootCause.Error(), "AuthorizationError") {
+		sendDetailsFetchingAlert(aws.RemoteAWSTerraform, alerter, listError)
+		return nil
+	}
+
+	return err
+}
+
+func handleAWSError(alerter alerter.AlerterInterface, listError *remoteerror.ResourceScanningError, reqerr awserr.RequestFailure) error {
 	if reqerr.StatusCode() == 403 || (reqerr.StatusCode() == 400 && strings.Contains(reqerr.Code(), "AccessDenied")) {
 		sendEnumerationAlert(aws.RemoteAWSTerraform, alerter, listError)
 		return nil
@@ -76,10 +132,18 @@ func handleAWSError(alerter alerter.AlerterInterface, listError *remoteerror.Res
 	return reqerr
 }
 
-func sendEnumerationAlert(provider string, alerter alerter.AlerterInterface, listError *remoteerror.ResourceEnumerationError) {
+func sendEnumerationAlert(provider string, alerter alerter.AlerterInterface, listError *remoteerror.ResourceScanningError) {
 	logrus.WithFields(logrus.Fields{
 		"supplier_type": listError.SupplierType(),
 		"listed_type":   listError.ListedTypeError(),
 	}).Debugf("Got an access denied error")
-	alerter.SendAlert(listError.SupplierType(), NewEnumerationAccessDeniedAlert(provider, listError.SupplierType(), listError.ListedTypeError()))
+	alerter.SendAlert(listError.SupplierType(), NewRemoteAccessDeniedAlert(provider, listError.SupplierType(), listError.ListedTypeError(), EnumerationPhase))
+}
+
+func sendDetailsFetchingAlert(provider string, alerter alerter.AlerterInterface, listError *remoteerror.ResourceScanningError) {
+	logrus.WithFields(logrus.Fields{
+		"supplier_type": listError.SupplierType(),
+		"listed_type":   listError.ListedTypeError(),
+	}).Debugf("Got an access denied error")
+	alerter.SendAlert(listError.SupplierType(), NewRemoteAccessDeniedAlert(provider, listError.SupplierType(), listError.ListedTypeError(), DetailsFetchingPhase))
 }

@@ -1,6 +1,7 @@
 package aws
 
 import (
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -34,7 +35,7 @@ func (r *EC2RouteDetailsFetcher) ReadDetails(res resource.Resource) (resource.Re
 		Attributes: attributes,
 	})
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsRouteResourceType, *ctyVal)
 	if err != nil {

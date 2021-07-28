@@ -26,12 +26,12 @@ func (e *IamAccessKeyEnumerator) SupportedType() resource.ResourceType {
 func (e *IamAccessKeyEnumerator) Enumerate() ([]resource.Resource, error) {
 	users, err := e.repository.ListAllUsers()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, string(e.SupportedType()), resourceaws.AwsIamUserResourceType)
+		return nil, remoteerror.NewResourceScanningErrorWithType(err, string(e.SupportedType()), resourceaws.AwsIamUserResourceType)
 	}
 
 	keys, err := e.repository.ListAllAccessKeys(users)
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, resourceaws.AwsIamAccessKeyResourceType)
+		return nil, remoteerror.NewResourceScanningError(err, resourceaws.AwsIamAccessKeyResourceType)
 	}
 
 	results := make([]resource.Resource, 0)

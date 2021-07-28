@@ -1,6 +1,7 @@
 package aws
 
 import (
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
@@ -30,7 +31,7 @@ func (r *LambdaFunctionDetailsFetcher) ReadDetails(topic resource.Resource) (res
 	})
 	if err != nil {
 		logrus.Error(err)
-		return nil, err
+		return nil, remoteerror.NewResourceScanningError(err, resourceaws.AwsLambdaFunctionResourceType)
 	}
 	return r.deserializer.DeserializeOne(resourceaws.AwsLambdaFunctionResourceType, *val)
 }

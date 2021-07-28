@@ -26,7 +26,7 @@ func (e *EC2InternetGatewayEnumerator) SupportedType() resource.ResourceType {
 func (e *EC2InternetGatewayEnumerator) Enumerate() ([]resource.Resource, error) {
 	internetGateways, err := e.repository.ListAllInternetGateways()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(internetGateways))

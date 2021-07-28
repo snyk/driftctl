@@ -26,7 +26,7 @@ func (e *Route53HealthCheckEnumerator) SupportedType() resource.ResourceType {
 func (e *Route53HealthCheckEnumerator) Enumerate() ([]resource.Resource, error) {
 	healthChecks, err := e.repository.ListAllHealthChecks()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(healthChecks))

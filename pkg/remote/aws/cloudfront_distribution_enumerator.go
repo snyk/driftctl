@@ -26,7 +26,7 @@ func (e *CloudfrontDistributionEnumerator) SupportedType() resource.ResourceType
 func (e *CloudfrontDistributionEnumerator) Enumerate() ([]resource.Resource, error) {
 	distributions, err := e.repository.ListAllDistributions()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(distributions))
