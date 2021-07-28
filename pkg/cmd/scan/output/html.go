@@ -31,15 +31,16 @@ type HTML struct {
 }
 
 type HTMLTemplateParams struct {
-	ScanDate     string
-	Coverage     int
-	Summary      analyser.Summary
-	Unmanaged    []resource.Resource
-	Differences  []analyser.Difference
-	Deleted      []resource.Resource
-	Alerts       alerter.Alerts
-	Stylesheet   template.CSS
-	ScanDuration string
+	ScanDate        string
+	Coverage        int
+	Summary         analyser.Summary
+	Unmanaged       []resource.Resource
+	Differences     []analyser.Difference
+	Deleted         []resource.Resource
+	Alerts          alerter.Alerts
+	Stylesheet      template.CSS
+	ScanDuration    string
+	ProviderVersion string
 }
 
 func NewHTML(path string) *HTML {
@@ -130,15 +131,16 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 	}
 
 	data := &HTMLTemplateParams{
-		ScanDate:     analysis.Date.Format("Jan 02, 2006"),
-		Summary:      analysis.Summary(),
-		Coverage:     analysis.Coverage(),
-		Unmanaged:    analysis.Unmanaged(),
-		Differences:  analysis.Differences(),
-		Deleted:      analysis.Deleted(),
-		Alerts:       analysis.Alerts(),
-		Stylesheet:   template.CSS(styleFile),
-		ScanDuration: analysis.Duration.Round(time.Second).String(),
+		ScanDate:        analysis.Date.Format("Jan 02, 2006"),
+		Coverage:        analysis.Coverage(),
+		Summary:         analysis.Summary(),
+		Unmanaged:       analysis.Unmanaged(),
+		Differences:     analysis.Differences(),
+		Deleted:         analysis.Deleted(),
+		Alerts:          analysis.Alerts(),
+		Stylesheet:      template.CSS(styleFile),
+		ScanDuration:    analysis.Duration.Round(time.Second).String(),
+		ProviderVersion: analysis.ProviderVersion,
 	}
 
 	err = tmpl.Execute(file, data)

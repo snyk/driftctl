@@ -76,5 +76,6 @@
 		}
 	],
 	"coverage": 33,
-	"alerts": null
+	"alerts": null,
+	"ProviderVersion": ""
 }

@@ -62,5 +62,6 @@
 				"message": "This is an alert"
 			}
 		]
-	}
+	},
+	"ProviderVersion": "2.18.5"
 }

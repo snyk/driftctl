@@ -1109,6 +1109,7 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 			&alerter.FakeAlert{Msg: "This is an alert"},
 		},
 	})
+	analysis.ProviderVersion = "2.18.5"
 
 	got, err := json.MarshalIndent(analysis, "", "\t")
 	if err != nil {

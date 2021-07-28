@@ -20,5 +20,6 @@
 				"message": "Ignoring github_team_membership from drift calculation: Listing github_team is forbidden."
 			}
 		]
-	}
+	},
+	"ProviderVersion": ""
 }

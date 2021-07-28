@@ -185,6 +185,11 @@
         <h1 class="congrats">Congrats! Your infrastructure is in sync</h1>
         {{end}}
     </main>
+    <footer>
+        <div>
+            <p>Driftctl scan using provider version {{.ProviderVersion}}</p>
+        </div>
+    </footer>
 </div>
 <script>
     const form = document.querySelector("form");

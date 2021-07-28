@@ -23,5 +23,6 @@
 				"message": "Ignoring aws_sns from drift calculation: Listing aws_sns is forbidden."
 			}
 		]
-	}
+	},
+	"ProviderVersion": ""
 }
