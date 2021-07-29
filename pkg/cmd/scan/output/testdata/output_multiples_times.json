@@ -12,5 +12,6 @@
 	"differences": null,
 	"coverage": 0,
 	"alerts": null,
-	"ProviderVersion": ""
+	"provider_name": "",
+	"provider_version": ""
 }

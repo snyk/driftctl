@@ -63,6 +63,6 @@ func InitFakeSchemaRepository(provider, version string) resource.SchemaRepositor
 		}
 		schema = s
 	}
-	_ = repo.Init("1.0.0", schema)
+	_ = repo.Init("Fake", "1.0.0", schema)
 	return repo
 }

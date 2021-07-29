@@ -40,6 +40,7 @@ type HTMLTemplateParams struct {
 	Alerts          alerter.Alerts
 	Stylesheet      template.CSS
 	ScanDuration    string
+	ProviderName    string
 	ProviderVersion string
 }
 
@@ -140,6 +141,7 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 		Alerts:          analysis.Alerts(),
 		Stylesheet:      template.CSS(styleFile),
 		ScanDuration:    analysis.Duration.Round(time.Second).String(),
+		ProviderName:    analysis.ProviderName,
 		ProviderVersion: analysis.ProviderVersion,
 	}
 

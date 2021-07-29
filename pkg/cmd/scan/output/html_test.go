@@ -28,6 +28,8 @@ func TestHTML_Write(t *testing.T) {
 			analysis: func() *analyser.Analysis {
 				a := &analyser.Analysis{}
 				a.Date = time.Date(2021, 06, 10, 0, 0, 0, 0, &time.Location{})
+				a.ProviderName = "AWS"
+				a.ProviderVersion = "3.19.0"
 				return a
 			},
 			err: nil,
@@ -45,6 +47,8 @@ func TestHTML_Write(t *testing.T) {
 						Type: "aws_deleted_resource",
 					},
 				)
+				a.ProviderName = "AWS"
+				a.ProviderVersion = "3.19.0"
 				return a
 			},
 			err: nil,
@@ -142,7 +146,8 @@ func TestHTML_Write(t *testing.T) {
 						},
 					},
 				}})
-
+				a.ProviderName = "AWS"
+				a.ProviderVersion = "3.19.0"
 				return a
 			},
 			err: nil,

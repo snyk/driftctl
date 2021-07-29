@@ -43,6 +43,7 @@ type Analysis struct {
 	alerts          alerter.Alerts
 	Duration        time.Duration
 	Date            time.Time
+	ProviderName    string
 	ProviderVersion string
 }
 
@@ -59,7 +60,8 @@ type serializableAnalysis struct {
 	Differences     []serializableDifference               `json:"differences"`
 	Coverage        int                                    `json:"coverage"`
 	Alerts          map[string][]alerter.SerializableAlert `json:"alerts"`
-	ProviderVersion string
+	ProviderName    string                                 `json:"provider_name"`
+	ProviderVersion string                                 `json:"provider_version"`
 }
 
 type GenDriftIgnoreOptions struct {
@@ -96,6 +98,7 @@ func (a Analysis) MarshalJSON() ([]byte, error) {
 	}
 	bla.Summary = a.summary
 	bla.Coverage = a.Coverage()
+	bla.ProviderName = a.ProviderName
 	bla.ProviderVersion = a.ProviderVersion
 
 	return json.Marshal(bla)
@@ -143,6 +146,7 @@ func (a *Analysis) UnmarshalJSON(bytes []byte) error {
 			}
 		}
 	}
+	a.ProviderName = bla.ProviderName
 	a.ProviderVersion = bla.ProviderVersion
 	return nil
 }
