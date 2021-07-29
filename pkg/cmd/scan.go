@@ -253,6 +253,9 @@ func scanRun(opts *pkg.ScanOptions) error {
 		return err
 	}
 
+	analysis.ProviderVersion = resourceSchemaRepository.ProviderVersion.String()
+	analysis.ProviderName = resourceSchemaRepository.ProviderName
+
 	err = selectedOutput.Write(analysis)
 	if err != nil {
 		return err

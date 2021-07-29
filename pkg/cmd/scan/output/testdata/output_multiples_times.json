@@ -11,5 +11,7 @@
 	"missing": null,
 	"differences": null,
 	"coverage": 0,
-	"alerts": null
+	"alerts": null,
+	"provider_name": "",
+	"provider_version": ""
 }

@@ -58,7 +58,7 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewGithubBranchProtectionEnumerator(repository, factory))
 	remoteLibrary.AddDetailsFetcher(github.GithubBranchProtectionResourceType, common.NewGenericDetailsFetcher(github.GithubBranchProtectionResourceType, provider, deserializer))
 
-	err = resourceSchemaRepository.Init(version, provider.Schema())
+	err = resourceSchemaRepository.Init(terraform.GITHUB, version, provider.Schema())
 	if err != nil {
 		return err
 	}
