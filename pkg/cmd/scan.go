@@ -259,9 +259,21 @@ func scanRun(opts *pkg.ScanOptions) error {
 	analysis.ProviderVersion = resourceSchemaRepository.ProviderVersion.String()
 	analysis.ProviderName = resourceSchemaRepository.ProviderName
 
+	validOutput := false
 	for _, o := range opts.Output {
 		selectedOutput := output.GetOutput(o, opts.Quiet)
 		err = selectedOutput.Write(analysis)
+		if err != nil {
+			logrus.Errorf("Computing output %s://%s failed: %v", o.Key, o.Options["path"], err.Error())
+			continue
+		}
+		validOutput = true
+	}
+
+	// Fallback to console output if all output failed
+	if !validOutput {
+		logrus.Debug("All outputs failed to compute, fallback to console output")
+		err = output.NewConsole().Write(analysis)
 		if err != nil {
 			return err
 		}

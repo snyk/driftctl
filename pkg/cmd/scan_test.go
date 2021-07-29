@@ -295,6 +295,33 @@ func Test_parseOutputFlag(t *testing.T) {
 			},
 			err: fmt.Errorf("Unsupported output 'invalid': \nValid formats are: console://,html://PATH/TO/FILE.html,json://PATH/TO/FILE.json,plan://PATH/TO/FILE.json"),
 		},
+		{
+			name: "test multiple valid output values",
+			args: args{
+				out: []string{"json://result1.json", "json://result2.json", "json://result3.json"},
+			},
+			want: []output.OutputConfig{
+				{
+					Key: "json",
+					Options: map[string]string{
+						"path": "result1.json",
+					},
+				},
+				{
+					Key: "json",
+					Options: map[string]string{
+						"path": "result2.json",
+					},
+				},
+				{
+					Key: "json",
+					Options: map[string]string{
+						"path": "result3.json",
+					},
+				},
+			},
+			err: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
