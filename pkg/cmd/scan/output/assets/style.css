@@ -36,9 +36,9 @@ h2 {
 header {
     align-items: center;
     display: flex;
-    flex-direction: row;
-    height: 130px;
+    flex-direction: column;
     justify-content: center;
+    padding: 12px 0;
 }
 
 img {
@@ -123,6 +123,7 @@ ul {
     -webkit-animation: fadein .8s;
     animation: fadein .8s;
     width: 100%;
+    overflow: scroll;
 }
 
 [role="tabpanel"].is-hidden {
@@ -202,6 +203,16 @@ input[type="search"], select {
     width: 1280px;
 }
 
+.div-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.div-right {
+    margin: 12px 0;
+}
+
 .empty-panel {
     color: #747578;
     display: flex;
@@ -224,6 +235,12 @@ input[type="search"], select {
 .panels {
     padding: 10px;
     width: 100%;
+}
+
+.provider {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 5px 0;
 }
 
 .resource-item {
@@ -302,8 +319,10 @@ input[type="search"], select {
     }
 
     header {
+        height: 130px;
         padding: 0 50px;
-        justify-content: flex-start;
+        flex-direction: row;
+        justify-content: space-between;
     }
 
     section {

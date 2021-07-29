@@ -18,6 +18,19 @@
             <h2>{{ .ScanDate }}</h2>
             <p>Scan Duration: {{.ScanDuration}}</p>
         </div>
+        <div class="div-left">
+            <img src="https://raw.githubusercontent.com/cloudskiff/driftctl-docs/main/static/img/driftctl_light.svg" width="100px" height="81px" alt="driftctl logo" />
+            <div>
+                <h1>Scan Report</h1>
+                <h2>{{ .ScanDate }}</h2>
+                <p>Scan Duration: {{.ScanDuration}}</p>
+            </div>
+        </div>
+        <div class="div-right">
+            <p class="provider">IaC Source: Terraform</p>
+            <p class="provider">Cloud Provider: AWS</p>
+            <p class="provider">Version: {{.ProviderVersion}}</p>
+        </div>
     </header>
     <section>
         <div class="card">
@@ -185,11 +198,6 @@
         <h1 class="congrats">Congrats! Your infrastructure is in sync</h1>
         {{end}}
     </main>
-    <footer>
-        <div>
-            <p>Driftctl scan using provider version {{.ProviderVersion}}</p>
-        </div>
-    </footer>
 </div>
 <script>
     const form = document.querySelector("form");
