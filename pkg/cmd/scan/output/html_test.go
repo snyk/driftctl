@@ -93,59 +93,65 @@ func TestHTML_Write(t *testing.T) {
 						Type: "aws_unmanaged_resource",
 					},
 				)
-				a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
-					Id:   "diff-id-2",
-					Type: "aws_diff_resource",
-				}, Changelog: []analyser.Change{
-					{
-						Change: diff.Change{
-							Type: diff.DELETE,
-							Path: []string{"path", "to", "fields", "0"},
-							From: "value",
-							To:   nil,
+				a.AddDifference(analyser.Difference{
+					Res: &resource.AbstractResource{
+						Id:   "diff-id-2",
+						Type: "aws_diff_resource",
+						Source: &resource.TerraformStateSource{
+							State:  "tfstate://state.tfstate",
+							Module: "module",
+							Name:   "name",
 						},
-					},
-					{
-						Change: diff.Change{
-							Type: diff.UPDATE,
-							Path: []string{"path", "to", "fields", "1"},
-							From: 12,
-							To:   "12",
+					}, Changelog: []analyser.Change{
+						{
+							Change: diff.Change{
+								Type: diff.DELETE,
+								Path: []string{"path", "to", "fields", "0"},
+								From: "value",
+								To:   nil,
+							},
 						},
-					},
-					{
-						Change: diff.Change{
-							Type: diff.DELETE,
-							Path: []string{"group_ids"},
-							From: []string{"a071314398026"},
-							To:   nil,
+						{
+							Change: diff.Change{
+								Type: diff.UPDATE,
+								Path: []string{"path", "to", "fields", "1"},
+								From: 12,
+								To:   "12",
+							},
 						},
-					},
-					{
-						Change: diff.Change{
-							Type: diff.UPDATE,
-							Path: []string{"Policies", "0"},
-							From: testresource.FakeResource{},
-							To:   testresource.FakeResource{Id: "093cd6ba-cf6d-4800-b252-6a50ca8903cd", Type: "aws_iam_policy"},
+						{
+							Change: diff.Change{
+								Type: diff.DELETE,
+								Path: []string{"group_ids"},
+								From: []string{"a071314398026"},
+								To:   nil,
+							},
 						},
-					},
-					{
-						Change: diff.Change{
-							Type: diff.CREATE,
-							Path: []string{"Tags", "0", "Name"},
-							From: nil,
-							To:   "test",
+						{
+							Change: diff.Change{
+								Type: diff.UPDATE,
+								Path: []string{"Policies", "0"},
+								From: testresource.FakeResource{},
+								To:   testresource.FakeResource{Id: "093cd6ba-cf6d-4800-b252-6a50ca8903cd", Type: "aws_iam_policy"},
+							},
 						},
-					},
-					{
-						Change: diff.Change{
-							Type: diff.UPDATE,
-							Path: []string{"InstanceInitiatedShutdownBehavior"},
-							From: "",
-							To:   nil,
+						{
+							Change: diff.Change{
+								Type: diff.CREATE,
+								Path: []string{"Tags", "0", "Name"},
+								From: nil,
+								To:   "test",
+							},
 						},
-					},
-				}})
+						{
+							Change: diff.Change{
+								Type: diff.UPDATE,
+								Path: []string{"InstanceInitiatedShutdownBehavior"},
+								From: "",
+								To:   nil,
+							},
+						},
+					}})
 				a.ProviderName = "AWS"
 				a.ProviderVersion = "3.19.0"
 				return a

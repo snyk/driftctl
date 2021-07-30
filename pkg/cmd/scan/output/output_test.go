@@ -47,35 +47,41 @@ func fakeAnalysis() *analyser.Analysis {
 			Type: "aws_no_diff_resource",
 		},
 	)
-	a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
+	a.AddDifference(analyser.Difference{Res: &resource.AbstractResource{
 		Id:   "diff-id-1",
 		Type: "aws_diff_resource",
-	}, Changelog: []analyser.Change{
-		{
-			Change: diff.Change{
-				Type: diff.UPDATE,
-				Path: []string{"updated", "field"},
-				From: "foobar",
-				To:   "barfoo",
-			},
+		Source: &resource.TerraformStateSource{
+			State:  "tfstate://state.tfstate",
+			Module: "module",
+			Name:   "name",
 		},
-		{
-			Change: diff.Change{
-				Type: diff.CREATE,
-				Path: []string{"new", "field"},
-				From: nil,
-				To:   "newValue",
+	},
+		Changelog: []analyser.Change{
+			{
+				Change: diff.Change{
+					Type: diff.UPDATE,
+					Path: []string{"updated", "field"},
+					From: "foobar",
+					To:   "barfoo",
+				},
 			},
-		},
-		{
-			Change: diff.Change{
-				Type: diff.DELETE,
-				Path: []string{"a"},
-				From: "oldValue",
-				To:   nil,
+			{
+				Change: diff.Change{
+					Type: diff.CREATE,
+					Path: []string{"new", "field"},
+					From: nil,
+					To:   "newValue",
+				},
 			},
-		},
-	}})
+			{
+				Change: diff.Change{
+					Type: diff.DELETE,
+					Path: []string{"a"},
+					From: "oldValue",
+					To:   nil,
+				},
+			},
+		}})
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
 	return &a
@@ -121,34 +127,48 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 			Type: "aws_diff_resource",
 		},
 	)
-	a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
-		Id:   "diff-id-1",
-		Type: "aws_diff_resource",
-	}, Changelog: []analyser.Change{
-		{
-			JsonString: true,
-			Change: diff.Change{
-				Type: diff.UPDATE,
-				Path: []string{"Json"},
-				From: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Removed\":\"Added\",\"Changed\":[\"oldValue1\", \"oldValue2\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
-				To:   "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Changed\":\"newValue\",\"NewField\":[\"foobar\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
+	a.AddDifference(analyser.Difference{
+		Res: &resource.AbstractResource{
+			Id:   "diff-id-1",
+			Type: "aws_diff_resource",
+			Source: &resource.TerraformStateSource{
+				State:  "tfstate://state.tfstate",
+				Module: "module",
+				Name:   "name",
 			},
 		},
-	}})
-	a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
-		Id:   "diff-id-2",
-		Type: "aws_diff_resource",
-	}, Changelog: []analyser.Change{
-		{
-			JsonString: true,
-			Change: diff.Change{
-				Type: diff.UPDATE,
-				Path: []string{"Json"},
-				From: "{\"foo\":\"bar\"}",
-				To:   "{\"bar\":\"foo\"}",
+		Changelog: []analyser.Change{
+			{
+				JsonString: true,
+				Change: diff.Change{
+					Type: diff.UPDATE,
+					Path: []string{"Json"},
+					From: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Removed\":\"Added\",\"Changed\":[\"oldValue1\", \"oldValue2\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
+					To:   "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Changed\":\"newValue\",\"NewField\":[\"foobar\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
+				},
+			},
+		}})
+	a.AddDifference(analyser.Difference{
+		Res: &resource.AbstractResource{
+			Id:   "diff-id-2",
+			Type: "aws_diff_resource",
+			Source: &resource.TerraformStateSource{
+				State:  "tfstate://state.tfstate",
+				Module: "module",
+				Name:   "name",
 			},
 		},
-	}})
+		Changelog: []analyser.Change{
+			{
+				JsonString: true,
+				Change: diff.Change{
+					Type: diff.UPDATE,
+					Path: []string{"Json"},
+					From: "{\"foo\":\"bar\"}",
+					To:   "{\"bar\":\"foo\"}",
+				},
+			},
+		}})
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
 	return &a
@@ -223,6 +243,11 @@ func fakeAnalysisWithStringerResources() *analyser.Analysis {
 		Attrs: &resource.Attributes{
 			"name": "resource with diff",
 		},
+		Source: &resource.TerraformStateSource{
+			State:  "tfstate://state.tfstate",
+			Module: "module",
+			Name:   "name",
+		},
 	}, Changelog: []analyser.Change{
 		{
 			Change: diff.Change{
@@ -246,64 +271,70 @@ func fakeAnalysisWithComputedFields() *analyser.Analysis {
 			Type: "aws_diff_resource",
 		},
 	)
-	a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
-		Id:   "diff-id-1",
-		Type: "aws_diff_resource",
-	}, Changelog: []analyser.Change{
-		{
-			Change: diff.Change{
-				Type: diff.UPDATE,
-				Path: []string{"updated", "field"},
-				From: "foobar",
-				To:   "barfoo",
+	a.AddDifference(analyser.Difference{
+		Res: &resource.AbstractResource{
+			Id:   "diff-id-1",
+			Type: "aws_diff_resource",
+			Source: &resource.TerraformStateSource{
+				State:  "tfstate://state.tfstate",
+				Module: "module",
+				Name:   "name",
 			},
-			Computed: true,
-		},
-		{
-			Change: diff.Change{
-				Type: diff.CREATE,
-				Path: []string{"new", "field"},
-				From: nil,
-				To:   "newValue",
+		}, Changelog: []analyser.Change{
+			{
+				Change: diff.Change{
+					Type: diff.UPDATE,
+					Path: []string{"updated", "field"},
+					From: "foobar",
+					To:   "barfoo",
+				},
+				Computed: true,
 			},
-		},
-		{
-			Change: diff.Change{
-				Type: diff.DELETE,
-				Path: []string{"a"},
-				From: "oldValue",
-				To:   nil,
-			},
-			Computed: true,
-		},
-		{
-			Change: diff.Change{
-				Type: diff.UPDATE,
-				From: "foo",
-				To:   "oof",
-				Path: []string{
-					"struct",
-					"0",
-					"array",
-					"0",
+			{
+				Change: diff.Change{
+					Type: diff.CREATE,
+					Path: []string{"new", "field"},
+					From: nil,
+					To:   "newValue",
 				},
 			},
-			Computed: true,
-		},
-		{
-			Change: diff.Change{
-				Type: diff.UPDATE,
-				From: "one",
-				To:   "two",
-				Path: []string{
-					"struct",
-					"0",
-					"string",
+			{
+				Change: diff.Change{
+					Type: diff.DELETE,
+					Path: []string{"a"},
+					From: "oldValue",
+					To:   nil,
 				},
+				Computed: true,
 			},
-			Computed: true,
-		},
-	}})
+			{
+				Change: diff.Change{
+					Type: diff.UPDATE,
+					From: "foo",
+					To:   "oof",
+					Path: []string{
+						"struct",
+						"0",
+						"array",
+						"0",
+					},
+				},
+				Computed: true,
+			},
+			{
+				Change: diff.Change{
+					Type: diff.UPDATE,
+					From: "one",
+					To:   "two",
+					Path: []string{
+						"struct",
+						"0",
+						"string",
+					},
+				},
+				Computed: true,
+			},
+		}})
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
 			analyser.NewComputedDiffAlert(),
