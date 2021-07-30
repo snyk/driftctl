@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/cloudskiff/driftctl/mocks"
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
@@ -103,7 +104,10 @@ func TestDynamoDBTable(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewDynamoDBTableEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDynamodbTableResourceType, aws.NewDynamoDBTableDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {

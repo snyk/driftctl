@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/fatih/color"
 	"github.com/hashicorp/terraform/addrs"
@@ -32,6 +33,7 @@ type TerraformStateReader struct {
 	deserializer   *resource.Deserializer
 	backendOptions *backend.Options
 	progress       output.Progress
+	filter         filter.Filter
 }
 
 func (r *TerraformStateReader) initReader() error {
@@ -39,8 +41,8 @@ func (r *TerraformStateReader) initReader() error {
 	return nil
 }
 
-func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options, progress output.Progress, deserializer *resource.Deserializer) (*TerraformStateReader, error) {
-	reader := TerraformStateReader{library: library, config: config, deserializer: deserializer, backendOptions: backendOpts, progress: progress}
+func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options, progress output.Progress, deserializer *resource.Deserializer, filter filter.Filter) (*TerraformStateReader, error) {
+	reader := TerraformStateReader{library: library, config: config, deserializer: deserializer, backendOptions: backendOpts, progress: progress, filter: filter}
 	err := reader.initReader()
 	if err != nil {
 		return nil, err
@@ -76,6 +78,14 @@ func (r *TerraformStateReader) retrieve() (map[string][]cty.Value, error) {
 					"name": resName,
 					"type": resType,
 				}).Debug("Ignored unsupported resource from state")
+				continue
+			}
+
+			if r.filter != nil && r.filter.IsTypeIgnored(resource.ResourceType(resType)) {
+				logrus.WithFields(logrus.Fields{
+					"name": resName,
+					"type": resType,
+				}).Debug("Ignored resource from state since it is ignored in filter")
 				continue
 			}
 

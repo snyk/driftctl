@@ -7,13 +7,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/output"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	resourcegithub "github.com/cloudskiff/driftctl/pkg/resource/github"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
@@ -304,4 +304,31 @@ func TestTerraformStateReader_VersionSupported(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestTerraformStateReader_WithIgnoredResource(t *testing.T) {
+	progress := &output.MockProgress{}
+	progress.On("Inc").Return().Times(1)
+	progress.On("Stop").Return().Times(1)
+
+	provider := mocks.NewMockedGoldenTFProvider("ignored_resources", nil, false)
+	library := terraform.NewProviderLibrary()
+	library.AddProvider(terraform.AWS, provider)
+
+	filter := &filter.MockFilter{}
+	filter.On("IsTypeIgnored", resource.ResourceType("aws_s3_bucket")).Return(true)
+
+	r := &TerraformStateReader{
+		config: config.SupplierConfig{
+			Path: path.Join(goldenfile.GoldenFilePath, "ignored_resources", "terraform.tfstate"),
+		},
+		library:  library,
+		progress: progress,
+		filter:   filter,
+	}
+
+	got, err := r.Resources()
+	filter.AssertExpectations(t)
+	assert.Nil(t, err)
+	assert.Len(t, got, 0)
 }
