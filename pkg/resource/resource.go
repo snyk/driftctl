@@ -17,11 +17,40 @@ type Resource interface {
 	Schema() *Schema
 }
 
+type Source interface {
+	Source() string
+	Namespace() string
+	InternalName() string
+}
+
+type TerraformStateSource struct {
+	State  string
+	Module string
+	Name   string
+}
+
+func NewTerraformStateSource(state, module, name string) *TerraformStateSource {
+	return &TerraformStateSource{state, module, name}
+}
+
+func (s *TerraformStateSource) Source() string {
+	return s.State
+}
+
+func (s *TerraformStateSource) Namespace() string {
+	return s.Module
+}
+
+func (s *TerraformStateSource) InternalName() string {
+	return s.Name
+}
+
 type AbstractResource struct {
-	Id    string
-	Type  string
-	Attrs *Attributes
-	Sch   *Schema `json:"-" diff:"-"`
+	Id     string
+	Type   string
+	Attrs  *Attributes
+	Sch    *Schema `json:"-" diff:"-"`
+	Source Source  `json:"-"`
 }
 
 func (a *AbstractResource) Schema() *Schema {
