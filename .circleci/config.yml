@@ -77,17 +77,18 @@ jobs:
     docker:
       - image: golang:1.16
     steps:
+      - checkout
       - run:
           name: "Ensure GnuPG is available"
           command: gpg --version
       - run:
           name: "Import cloudskiff signing key"
           command: |
-            echo ${SIGNINGKEY} | base64 -d > signingkey
-            gpg --import signingkey
+            echo ${SIGNINGKEY} | base64 -d | gpg --import
       - run:
           name: "Build and publish release"
           command: make release
+          no_output_timeout: 30m
       - persist_to_workspace:
           root: ~/project
           paths:

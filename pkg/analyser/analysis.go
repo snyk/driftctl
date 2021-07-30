@@ -35,14 +35,16 @@ type Summary struct {
 }
 
 type Analysis struct {
-	unmanaged   []resource.Resource
-	managed     []resource.Resource
-	deleted     []resource.Resource
-	differences []Difference
-	summary     Summary
-	alerts      alerter.Alerts
-	Duration    time.Duration
-	Date        time.Time
+	unmanaged       []resource.Resource
+	managed         []resource.Resource
+	deleted         []resource.Resource
+	differences     []Difference
+	summary         Summary
+	alerts          alerter.Alerts
+	Duration        time.Duration
+	Date            time.Time
+	ProviderName    string
+	ProviderVersion string
 }
 
 type serializableDifference struct {
@@ -51,13 +53,15 @@ type serializableDifference struct {
 }
 
 type serializableAnalysis struct {
-	Summary     Summary                                `json:"summary"`
-	Managed     []resource.SerializableResource        `json:"managed"`
-	Unmanaged   []resource.SerializableResource        `json:"unmanaged"`
-	Deleted     []resource.SerializableResource        `json:"missing"`
-	Differences []serializableDifference               `json:"differences"`
-	Coverage    int                                    `json:"coverage"`
-	Alerts      map[string][]alerter.SerializableAlert `json:"alerts"`
+	Summary         Summary                                `json:"summary"`
+	Managed         []resource.SerializableResource        `json:"managed"`
+	Unmanaged       []resource.SerializableResource        `json:"unmanaged"`
+	Deleted         []resource.SerializableResource        `json:"missing"`
+	Differences     []serializableDifference               `json:"differences"`
+	Coverage        int                                    `json:"coverage"`
+	Alerts          map[string][]alerter.SerializableAlert `json:"alerts"`
+	ProviderName    string                                 `json:"provider_name"`
+	ProviderVersion string                                 `json:"provider_version"`
 }
 
 type GenDriftIgnoreOptions struct {
@@ -94,6 +98,8 @@ func (a Analysis) MarshalJSON() ([]byte, error) {
 	}
 	bla.Summary = a.summary
 	bla.Coverage = a.Coverage()
+	bla.ProviderName = a.ProviderName
+	bla.ProviderVersion = a.ProviderVersion
 
 	return json.Marshal(bla)
 }
@@ -140,6 +146,8 @@ func (a *Analysis) UnmarshalJSON(bytes []byte) error {
 			}
 		}
 	}
+	a.ProviderName = bla.ProviderName
+	a.ProviderVersion = bla.ProviderVersion
 	return nil
 }
 

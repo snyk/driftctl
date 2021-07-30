@@ -84,6 +84,10 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 								"cidr_block":      "",
 								"ipv6_cidr_block": "::/0",
 							},
+							map[string]interface{}{
+								"gateway_id":                 "igw-07b7844a8fd17a638",
+								"destination_prefix_list_id": "pl-63a5400a",
+							},
 						},
 					},
 				},
@@ -123,6 +127,18 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 						"instance_owner_id":           "",
 					},
 				},
+				&resource.AbstractResource{
+					Id:   "r-table_from_state3813769586",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":             "table_from_state",
+						"origin":                     "CreateRoute",
+						"gateway_id":                 "igw-07b7844a8fd17a638",
+						"state":                      "active",
+						"destination_prefix_list_id": "pl-63a5400a",
+						"instance_owner_id":          "",
+					},
+				},
 			},
 			mock: func(factory *terraform.MockResourceFactory) {
 				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
@@ -153,6 +169,20 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 						"state":                       "active",
 						"destination_prefix_list_id":  "",
 						"instance_owner_id":           "",
+					},
+				}, nil)
+				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
+					return input["id"] == "r-table_from_state3813769586"
+				})).Times(1).Return(&resource.AbstractResource{
+					Id:   "r-table_from_state3813769586",
+					Type: aws.AwsRouteResourceType,
+					Attrs: &resource.Attributes{
+						"route_table_id":             "table_from_state",
+						"origin":                     "CreateRoute",
+						"gateway_id":                 "igw-07b7844a8fd17a638",
+						"state":                      "active",
+						"destination_prefix_list_id": "pl-63a5400a",
+						"instance_owner_id":          "",
 					},
 				}, nil)
 			},
@@ -466,77 +496,4 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 
 		})
 	}
-}
-
-func TestAwsRouteTableExpander_ExecuteWithInvalidRoutes(t *testing.T) {
-
-	mockedAlerter := &mocks.AlerterInterface{}
-	mockedAlerter.On("SendAlert", aws.AwsRouteTableResourceType, newInvalidRouteAlert(
-		"aws_route_table", "table_from_state",
-	))
-	mockedAlerter.On("SendAlert", aws.AwsDefaultRouteTableResourceType, newInvalidRouteAlert(
-		"aws_default_route_table", "default_table_from_state",
-	))
-
-	input := []resource.Resource{
-		&resource.AbstractResource{
-			Id:   "table_from_state",
-			Type: aws.AwsRouteTableResourceType,
-			Attrs: &resource.Attributes{
-				"route": []interface{}{
-					map[string]interface{}{
-						"gateway_id":      "igw-07b7844a8fd17a638",
-						"cidr_block":      "",
-						"ipv6_cidr_block": "",
-					},
-				},
-			},
-		},
-		&resource.AbstractResource{
-			Id:   "default_table_from_state",
-			Type: aws.AwsDefaultRouteTableResourceType,
-			Attrs: &resource.Attributes{
-				"route": []interface{}{
-					map[string]interface{}{
-						"gateway_id":      "igw-07b7844a8fd17a638",
-						"cidr_block":      "",
-						"ipv6_cidr_block": "",
-					},
-				},
-			},
-		},
-	}
-
-	expected := []resource.Resource{
-		&resource.AbstractResource{
-			Id:    "table_from_state",
-			Type:  aws.AwsRouteTableResourceType,
-			Attrs: &resource.Attributes{},
-		},
-		&resource.AbstractResource{
-			Id:    "default_table_from_state",
-			Type:  aws.AwsDefaultRouteTableResourceType,
-			Attrs: &resource.Attributes{},
-		},
-	}
-
-	factory := &terraform.MockResourceFactory{}
-
-	m := NewAwsRouteTableExpander(mockedAlerter, factory)
-	err := m.Execute(&[]resource.Resource{}, &input)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	changelog, err := diff.Diff(expected, input)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(changelog) > 0 {
-		for _, change := range changelog {
-			t.Errorf("%s got = %v, want %v", strings.Join(change.Path, "."), awsutil.Prettify(change.From), awsutil.Prettify(change.To))
-		}
-	}
-
-	mockedAlerter.AssertExpectations(t)
 }

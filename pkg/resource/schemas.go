@@ -47,6 +47,7 @@ type SchemaRepositoryInterface interface {
 
 type SchemaRepository struct {
 	schemas         map[string]*Schema
+	ProviderName    string
 	ProviderVersion *version.Version
 }
 
@@ -77,12 +78,13 @@ func (r *SchemaRepository) fetchNestedBlocks(root string, metadata map[string]At
 	}
 }
 
-func (r *SchemaRepository) Init(v string, schema map[string]providers.Schema) error {
-	providerVersion, err := version.NewVersion(v)
+func (r *SchemaRepository) Init(providerName, providerVersion string, schema map[string]providers.Schema) error {
+	v, err := version.NewVersion(providerVersion)
 	if err != nil {
 		return err
 	}
-	r.ProviderVersion = providerVersion
+	r.ProviderVersion = v
+	r.ProviderName = providerName
 	for typ, sch := range schema {
 		attributeMetas := map[string]AttributeSchema{}
 		for s, attribute := range sch.Block.Attributes {

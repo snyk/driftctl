@@ -5,7 +5,6 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/hashicorp/terraform/helper/hashcode"
-	"github.com/pkg/errors"
 )
 
 const AwsRouteResourceType = "aws_route"
@@ -41,18 +40,25 @@ func initAwsRouteMetaData(resourceSchemaRepository resource.SchemaRepositoryInte
 		if ipv6 := val.GetString("destination_ipv6_cidr_block"); ipv6 != nil && *ipv6 != "" {
 			attrs["Destination"] = *ipv6
 		}
+		if prefix := val.GetString("destination_prefix_list_id"); prefix != nil && *prefix != "" {
+			attrs["Destination"] = *prefix
+		}
 		return attrs
 	})
 }
 
-func CalculateRouteID(tableId, CidrBlock, Ipv6CidrBlock *string) (string, error) {
+func CalculateRouteID(tableId, CidrBlock, Ipv6CidrBlock, PrefixListId *string) string {
 	if CidrBlock != nil && *CidrBlock != "" {
-		return fmt.Sprintf("r-%s%d", *tableId, hashcode.String(*CidrBlock)), nil
+		return fmt.Sprintf("r-%s%d", *tableId, hashcode.String(*CidrBlock))
 	}
 
 	if Ipv6CidrBlock != nil && *Ipv6CidrBlock != "" {
-		return fmt.Sprintf("r-%s%d", *tableId, hashcode.String(*Ipv6CidrBlock)), nil
+		return fmt.Sprintf("r-%s%d", *tableId, hashcode.String(*Ipv6CidrBlock))
 	}
 
-	return "", errors.Errorf("invalid route detected for table %s", *tableId)
+	if PrefixListId != nil && *PrefixListId != "" {
+		return fmt.Sprintf("r-%s%d", *tableId, hashcode.String(*PrefixListId))
+	}
+
+	return ""
 }

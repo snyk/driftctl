@@ -42,4 +42,5 @@ fi
 echo "+ Building using goreleaser ..."
 goreleaser release \
     --rm-dist \
+    --parallelism 2 \
     ${GRFLAGS}

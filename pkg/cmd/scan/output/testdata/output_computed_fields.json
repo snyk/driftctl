@@ -83,5 +83,7 @@
 				"message": "You have diffs on computed fields, check the documentation for potential false positive drifts: https://docs.driftctl.com/limitations"
 			}
 		]
-	}
+	},
+	"provider_name": "AWS",
+	"provider_version": "3.19.0"
 }

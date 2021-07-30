@@ -62,5 +62,7 @@
 				"message": "This is an alert"
 			}
 		]
-	}
+	},
+	"provider_name": "AWS",
+	"provider_version": "2.18.5"
 }
