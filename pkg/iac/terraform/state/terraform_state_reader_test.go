@@ -43,6 +43,52 @@ func TestReadStateInvalid(t *testing.T) {
 	}
 }
 
+// Check that resource sources are properly set
+func TestTerraformStateReader_Source(t *testing.T) {
+	progress := &output.MockProgress{}
+	progress.On("Inc").Return().Times(1)
+	progress.On("Stop").Return().Times(1)
+
+	provider := mocks.NewMockedGoldenTFProvider("source", nil, false)
+	library := terraform.NewProviderLibrary()
+	library.AddProvider(terraform.AWS, provider)
+
+	repo := testresource.InitFakeSchemaRepository(terraform.AWS, "3.19.0")
+	resourceaws.InitResourcesMetadata(repo)
+
+	factory := terraform.NewTerraformResourceFactory(repo)
+
+	r := &TerraformStateReader{
+		config: config.SupplierConfig{
+			Key:  "tfstate",
+			Path: path.Join(goldenfile.GoldenFilePath, "source", "terraform.tfstate"),
+		},
+		library:      library,
+		progress:     progress,
+		deserializer: resource.NewDeserializer(factory),
+	}
+
+	got, err := r.Resources()
+	assert.Nil(t, err)
+	assert.Len(t, got, 2)
+	for _, res := range got {
+		if res.TerraformType() == resourceaws.AwsS3BucketResourceType {
+			assert.Equal(t, &resource.TerraformStateSource{
+				State:  "tfstate://test/source/terraform.tfstate",
+				Module: "",
+				Name:   "bucket",
+			}, res.(*resource.AbstractResource).Source)
+		}
+		if res.TerraformType() == resourceaws.AwsIamUserResourceType {
+			assert.Equal(t, &resource.TerraformStateSource{
+				State:  "tfstate://test/source/terraform.tfstate",
+				Module: "module.iam_iam-user",
+				Name:   "this_no_pgp",
+			}, res.(*resource.AbstractResource).Source)
+		}
+	}
+}
+
 func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 	tests := []struct {
 		name    string
