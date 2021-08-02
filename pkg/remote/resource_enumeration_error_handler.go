@@ -48,12 +48,10 @@ func (e *RemoteAccessDeniedAlert) ShouldIgnoreResource() bool {
 
 func (e *RemoteAccessDeniedAlert) GetProviderMessage() string {
 	var message string
-	switch e.scanningPhase {
-	case DetailsFetchingPhase:
+	if e.scanningPhase == DetailsFetchingPhase {
 		message = "It seems that we got access denied exceptions while reading details of resources.\n"
-	case EnumerationPhase:
-		fallthrough
-	default:
+	}
+	if e.scanningPhase == EnumerationPhase {
 		message = "It seems that we got access denied exceptions while listing resources.\n"
 	}
 
@@ -105,17 +103,9 @@ func HandleResourceDetailsFetchingError(err error, alerter alerter.AlerterInterf
 
 	rootCause := listError.RootCause()
 
-	if strings.HasPrefix(rootCause.Error(), "AccessDeniedException") {
-		sendDetailsFetchingAlert(aws.RemoteAWSTerraform, alerter, listError)
-		return nil
-	}
-
-	if strings.Contains(rootCause.Error(), "AccessDenied") {
-		sendDetailsFetchingAlert(aws.RemoteAWSTerraform, alerter, listError)
-		return nil
-	}
-
-	if strings.Contains(rootCause.Error(), "AuthorizationError") {
+	if strings.HasPrefix(rootCause.Error(), "AccessDeniedException") ||
+		strings.Contains(rootCause.Error(), "AccessDenied") ||
+		strings.Contains(rootCause.Error(), "AuthorizationError") {
 		sendDetailsFetchingAlert(aws.RemoteAWSTerraform, alerter, listError)
 		return nil
 	}
@@ -132,18 +122,18 @@ func handleAWSError(alerter alerter.AlerterInterface, listError *remoteerror.Res
 	return reqerr
 }
 
-func sendEnumerationAlert(provider string, alerter alerter.AlerterInterface, listError *remoteerror.ResourceScanningError) {
+func sendAlert(provider string, alerter alerter.AlerterInterface, listError *remoteerror.ResourceScanningError, p ScanningPhase) {
 	logrus.WithFields(logrus.Fields{
 		"supplier_type": listError.SupplierType(),
 		"listed_type":   listError.ListedTypeError(),
 	}).Debugf("Got an access denied error")
-	alerter.SendAlert(listError.SupplierType(), NewRemoteAccessDeniedAlert(provider, listError.SupplierType(), listError.ListedTypeError(), EnumerationPhase))
+	alerter.SendAlert(listError.SupplierType(), NewRemoteAccessDeniedAlert(provider, listError.SupplierType(), listError.ListedTypeError(), p))
+}
+
+func sendEnumerationAlert(provider string, alerter alerter.AlerterInterface, listError *remoteerror.ResourceScanningError) {
+	sendAlert(provider, alerter, listError, EnumerationPhase)
 }
 
 func sendDetailsFetchingAlert(provider string, alerter alerter.AlerterInterface, listError *remoteerror.ResourceScanningError) {
-	logrus.WithFields(logrus.Fields{
-		"supplier_type": listError.SupplierType(),
-		"listed_type":   listError.ListedTypeError(),
-	}).Debugf("Got an access denied error")
-	alerter.SendAlert(listError.SupplierType(), NewRemoteAccessDeniedAlert(provider, listError.SupplierType(), listError.ListedTypeError(), DetailsFetchingPhase))
+	sendAlert(provider, alerter, listError, DetailsFetchingPhase)
 }

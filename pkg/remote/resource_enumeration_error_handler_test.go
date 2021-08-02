@@ -148,7 +148,7 @@ func TestHandleAwsDetailsFetchingErrors(t *testing.T) {
 			wantErr:    false,
 		},
 		{
-			name:       "Handle AccessDenied error",
+			name:       "Handle AuthorizationError error",
 			err:        remoteerror.NewResourceScanningError(awserr.NewRequestFailure(awserr.New("test", "error: AuthorizationError", errors.New("")), 403, ""), resourceaws.AwsVpcResourceType),
 			wantAlerts: alerter.Alerts{"aws_vpc": []alerter.Alert{NewRemoteAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_vpc", "aws_vpc", DetailsFetchingPhase)}},
 			wantErr:    false,
