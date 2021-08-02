@@ -40,7 +40,7 @@ func awsIamRoleShouldBeIgnored(roleName string) bool {
 func (e *IamRoleEnumerator) Enumerate() ([]resource.Resource, error) {
 	roles, err := e.repository.ListAllRoles()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, 0)

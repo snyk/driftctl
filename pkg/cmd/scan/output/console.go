@@ -104,7 +104,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 	for _, alerts := range analysis.Alerts() {
 		for _, alert := range alerts {
 			fmt.Println(color.YellowString(alert.Message()))
-			if alert, ok := alert.(*remote.EnumerationAccessDeniedAlert); ok && enumerationErrorMessage == "" {
+			if alert, ok := alert.(*remote.RemoteAccessDeniedAlert); ok && enumerationErrorMessage == "" {
 				enumerationErrorMessage = alert.GetProviderMessage()
 			}
 		}

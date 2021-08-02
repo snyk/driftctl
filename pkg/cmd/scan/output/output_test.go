@@ -85,9 +85,9 @@ func fakeAnalysisWithAlerts() *analyser.Analysis {
 	a := fakeAnalysis()
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
-			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_vpc", "aws_vpc"),
-			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sqs", "aws_sqs"),
-			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sns", "aws_sns"),
+			remote.NewRemoteAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_vpc", "aws_vpc", remote.EnumerationPhase),
+			remote.NewRemoteAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sqs", "aws_sqs", remote.EnumerationPhase),
+			remote.NewRemoteAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sns", "aws_sns", remote.EnumerationPhase),
 		},
 	})
 	a.ProviderVersion = "3.19.0"
@@ -318,9 +318,9 @@ func fakeAnalysisWithAWSEnumerationError() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
-			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_vpc", "aws_vpc"),
-			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sqs", "aws_sqs"),
-			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sns", "aws_sns"),
+			remote.NewRemoteAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_vpc", "aws_vpc", remote.EnumerationPhase),
+			remote.NewRemoteAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sqs", "aws_sqs", remote.EnumerationPhase),
+			remote.NewRemoteAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sns", "aws_sns", remote.EnumerationPhase),
 		},
 	})
 	a.ProviderName = "AWS"
@@ -332,8 +332,8 @@ func fakeAnalysisWithGithubEnumerationError() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
-			remote.NewEnumerationAccessDeniedAlert(github.RemoteGithubTerraform, "github_team", "github_team"),
-			remote.NewEnumerationAccessDeniedAlert(github.RemoteGithubTerraform, "github_team_membership", "github_team"),
+			remote.NewRemoteAccessDeniedAlert(github.RemoteGithubTerraform, "github_team", "github_team", remote.EnumerationPhase),
+			remote.NewRemoteAccessDeniedAlert(github.RemoteGithubTerraform, "github_team_membership", "github_team", remote.EnumerationPhase),
 		},
 	})
 	a.ProviderName = "AWS"

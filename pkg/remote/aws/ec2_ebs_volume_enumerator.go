@@ -26,7 +26,7 @@ func (e *EC2EbsVolumeEnumerator) SupportedType() resource.ResourceType {
 func (e *EC2EbsVolumeEnumerator) Enumerate() ([]resource.Resource, error) {
 	volumes, err := e.repository.ListAllVolumes()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(volumes))

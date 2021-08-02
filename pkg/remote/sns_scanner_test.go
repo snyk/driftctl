@@ -279,7 +279,7 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 			},
 			alerts: map[string][]alerter.Alert{
 				resourceaws.AwsSnsTopicSubscriptionResourceType: {
-					NewEnumerationAccessDeniedAlert("aws+tf", resourceaws.AwsSnsTopicSubscriptionResourceType, resourceaws.AwsSnsTopicSubscriptionResourceType),
+					NewRemoteAccessDeniedAlert("aws+tf", resourceaws.AwsSnsTopicSubscriptionResourceType, resourceaws.AwsSnsTopicSubscriptionResourceType, EnumerationPhase),
 				},
 			},
 			err: nil,

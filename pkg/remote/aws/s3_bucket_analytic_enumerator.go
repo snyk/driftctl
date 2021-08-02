@@ -32,7 +32,7 @@ func (e *S3BucketAnalyticEnumerator) SupportedType() resource.ResourceType {
 func (e *S3BucketAnalyticEnumerator) Enumerate() ([]resource.Resource, error) {
 	buckets, err := e.repository.ListAllBuckets()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, string(e.SupportedType()), aws.AwsS3BucketResourceType)
+		return nil, remoteerror.NewResourceScanningErrorWithType(err, string(e.SupportedType()), aws.AwsS3BucketResourceType)
 	}
 
 	results := make([]resource.Resource, len(buckets))
@@ -40,7 +40,7 @@ func (e *S3BucketAnalyticEnumerator) Enumerate() ([]resource.Resource, error) {
 	for _, bucket := range buckets {
 		region, err := e.repository.GetBucketLocation(*bucket.Name)
 		if err != nil {
-			return nil, err
+			return nil, remoteerror.NewResourceScanningErrorWithType(err, string(e.SupportedType()), aws.AwsS3BucketResourceType)
 		}
 		if region == "" || region != e.providerConfig.DefaultAlias {
 			logrus.WithFields(logrus.Fields{
@@ -52,7 +52,7 @@ func (e *S3BucketAnalyticEnumerator) Enumerate() ([]resource.Resource, error) {
 
 		analyticsConfigurationList, err := e.repository.ListBucketAnalyticsConfigurations(bucket, region)
 		if err != nil {
-			return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+			return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 		}
 
 		for _, analytics := range analyticsConfigurationList {

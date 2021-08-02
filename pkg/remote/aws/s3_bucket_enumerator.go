@@ -30,7 +30,7 @@ func (e *S3BucketEnumerator) SupportedType() resource.ResourceType {
 func (e *S3BucketEnumerator) Enumerate() ([]resource.Resource, error) {
 	buckets, err := e.repository.ListAllBuckets()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(buckets))
@@ -38,7 +38,7 @@ func (e *S3BucketEnumerator) Enumerate() ([]resource.Resource, error) {
 	for _, bucket := range buckets {
 		region, err := e.repository.GetBucketLocation(*bucket.Name)
 		if err != nil {
-			return nil, err
+			return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 		}
 		if region == "" || region != e.providerConfig.DefaultAlias {
 			logrus.WithFields(logrus.Fields{

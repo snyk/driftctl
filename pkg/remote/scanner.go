@@ -76,13 +76,13 @@ func (s *Scanner) scan() ([]resource.Resource, error) {
 				}
 				return nil, err
 			}
-			for _, resource := range resources {
-				if resource == nil {
+			for _, res := range resources {
+				if res == nil {
 					continue
 				}
 				logrus.WithFields(logrus.Fields{
-					"id":   resource.TerraformId(),
-					"type": resource.TerraformType(),
+					"id":   res.TerraformId(),
+					"type": res.TerraformType(),
 				}).Debug("Found cloud resource")
 			}
 			return resources, nil
@@ -102,14 +102,18 @@ func (s *Scanner) scan() ([]resource.Resource, error) {
 		res := res
 		s.detailsFetcherRunner.Run(func() (interface{}, error) {
 			fetcher := s.remoteLibrary.GetDetailsFetcher(resource.ResourceType(res.TerraformType()))
-			if fetcher != nil {
-				resourceWithDetails, err := fetcher.ReadDetails(res)
-				if err != nil {
+			if fetcher == nil {
+				return []resource.Resource{res}, nil
+			}
+
+			resourceWithDetails, err := fetcher.ReadDetails(res)
+			if err != nil {
+				if err := HandleResourceDetailsFetchingError(err, s.alerter); err != nil {
 					return nil, err
 				}
-				return []resource.Resource{resourceWithDetails}, nil
+				return []resource.Resource{}, nil
 			}
-			return []resource.Resource{res}, nil
+			return []resource.Resource{resourceWithDetails}, nil
 		})
 	}
 

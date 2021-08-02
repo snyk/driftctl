@@ -26,7 +26,7 @@ func (e *SNSTopicEnumerator) SupportedType() resource.ResourceType {
 func (e *SNSTopicEnumerator) Enumerate() ([]resource.Resource, error) {
 	topics, err := e.repository.ListAllTopics()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(topics))

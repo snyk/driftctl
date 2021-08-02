@@ -58,7 +58,7 @@ func (e *SNSTopicSubscriptionEnumerator) SupportedType() resource.ResourceType {
 func (e *SNSTopicSubscriptionEnumerator) Enumerate() ([]resource.Resource, error) {
 	allSubscriptions, err := e.repository.ListAllSubscriptions()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(allSubscriptions))

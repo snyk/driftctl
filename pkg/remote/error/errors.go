@@ -29,25 +29,25 @@ func (b *SupplierError) Context() map[string]string {
 	return b.context
 }
 
-type ResourceEnumerationError struct {
+type ResourceScanningError struct {
 	SupplierError
 	listedTypeError string
 }
 
-func NewResourceEnumerationErrorWithType(error error, supplierType string, listedTypeError string) *ResourceEnumerationError {
+func NewResourceScanningErrorWithType(error error, supplierType string, listedTypeError string) *ResourceScanningError {
 	context := map[string]string{
 		"ListedTypeError": listedTypeError,
 	}
-	return &ResourceEnumerationError{
+	return &ResourceScanningError{
 		SupplierError:   *NewSupplierError(error, context, supplierType),
 		listedTypeError: listedTypeError,
 	}
 }
 
-func NewResourceEnumerationError(error error, supplierType string) *ResourceEnumerationError {
-	return NewResourceEnumerationErrorWithType(error, supplierType, supplierType)
+func NewResourceScanningError(error error, supplierType string) *ResourceScanningError {
+	return NewResourceScanningErrorWithType(error, supplierType, supplierType)
 }
 
-func (b *ResourceEnumerationError) ListedTypeError() string {
+func (b *ResourceScanningError) ListedTypeError() string {
 	return b.listedTypeError
 }

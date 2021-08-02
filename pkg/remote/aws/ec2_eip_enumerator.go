@@ -26,7 +26,7 @@ func (e *EC2EipEnumerator) SupportedType() resource.ResourceType {
 func (e *EC2EipEnumerator) Enumerate() ([]resource.Resource, error) {
 	addresses, err := e.repository.ListAllAddresses()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(addresses))

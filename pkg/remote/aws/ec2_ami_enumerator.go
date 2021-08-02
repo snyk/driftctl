@@ -26,7 +26,7 @@ func (e *EC2AmiEnumerator) SupportedType() resource.ResourceType {
 func (e *EC2AmiEnumerator) Enumerate() ([]resource.Resource, error) {
 	images, err := e.repository.ListAllImages()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(images))

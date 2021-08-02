@@ -1,6 +1,7 @@
 package common
 
 import (
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/sirupsen/logrus"
@@ -30,7 +31,7 @@ func (f *GenericDetailsFetcher) ReadDetails(res resource.Resource) (resource.Res
 		ID: res.TerraformId(),
 	})
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType())
 	}
 	if ctyVal.IsNull() {
 		logrus.WithFields(logrus.Fields{

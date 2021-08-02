@@ -27,7 +27,7 @@ func (e *EC2RouteTableEnumerator) SupportedType() resource.ResourceType {
 func (e *EC2RouteTableEnumerator) Enumerate() ([]resource.Resource, error) {
 	routeTables, err := e.repository.ListAllRouteTables()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
 	}
 
 	var results []resource.Resource
