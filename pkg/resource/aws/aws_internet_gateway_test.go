@@ -2,6 +2,7 @@ package aws_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/cloudskiff/driftctl/test"
 	"github.com/cloudskiff/driftctl/test/acceptance"
@@ -12,6 +13,10 @@ func TestAcc_AwsInternetGateway(t *testing.T) {
 		TerraformVersion: "0.14.9",
 		Paths:            []string{"./testdata/acc/aws_internet_gateway"},
 		Args:             []string{"scan", "--filter", "Type=='aws_internet_gateway'", "--deep"},
+		RetryDestroy: acceptance.RetryConfig{
+			Attempts: 3,
+			Delay:    5 * time.Second,
+		},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

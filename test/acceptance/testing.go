@@ -16,6 +16,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	cmderrors "github.com/cloudskiff/driftctl/pkg/cmd/errors"
+	"github.com/eapache/go-resiliency/retrier"
 	"github.com/pkg/errors"
 
 	"github.com/sirupsen/logrus"
@@ -39,6 +40,11 @@ type AccCheck struct {
 	Check    func(result *test.ScanResult, stdout string, err error)
 }
 
+type RetryConfig struct {
+	Attempts uint8
+	Delay    time.Duration
+}
+
 type AccTestCase struct {
 	TerraformVersion           string
 	Paths                      []string
@@ -50,6 +56,7 @@ type AccTestCase struct {
 	originalEnv                []string
 	tf                         map[string]*tfexec.Terraform
 	ShouldRefreshBeforeDestroy bool
+	RetryDestroy               RetryConfig
 }
 
 func (c *AccTestCase) initTerraformExecutor() error {
@@ -203,6 +210,16 @@ func (c *AccTestCase) terraformApply() error {
 }
 
 func (c *AccTestCase) terraformDestroy() error {
+	if c.RetryDestroy.Attempts == 0 {
+		return c.doDestroy()
+	}
+	r := retrier.New(retrier.ConstantBackoff(int(c.RetryDestroy.Attempts), c.RetryDestroy.Delay), nil)
+
+	return r.Run(c.doDestroy)
+
+}
+
+func (c *AccTestCase) doDestroy() error {
 	if c.ShouldRefreshBeforeDestroy {
 		if err := c.terraformRefresh(); err != nil {
 			return err
