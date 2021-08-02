@@ -36,7 +36,6 @@ func Init(version string, alerter *alerter.Alerter,
 	if err != nil {
 		return err
 	}
-
 	repositoryCache := cache.New(100)
 
 	s3Repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session), repositoryCache)

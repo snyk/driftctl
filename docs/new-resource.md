@@ -1,149 +1,215 @@
 # Add new resources
 
+First you need to understand how driftctl scan works. Here you'll find a global overview of the step that compose the scan:
+
+![Diagram](media/generalflow.png)
+
+And here you'll see a more detailed flow of the retrieving resource sequence:
 ![Diagram](media/resource.png)
 
 ## Defining the resource
 
-First step is to implement a new resource. To do that you need to define a go struct representing all fields that need to be monitored for this kind of resource.
+First step would be to add a file under `pkg/resource/<providername>/resourcetype.go`.
+This file will define a const string that will be the resource type identifier in driftctl.
+Optionally, if your resource is to be supported by driftctl experimental deep mode, you can add a function that will be
+applied to this resource when it's created. This allows to prevent useless diff to be displayed.
+You can also add some metadata to fields so they are compared or displayed differently.
 
-You can find several examples in already implemented resources like aws.S3Bucket:
-
+For example this defines the aws_iam_role resource :
 ```go
-type AwsS3Bucket struct {
-	AccelerationStatus       *string           `cty:"acceleration_status"`
-	Acl                      *string           `cty:"acl" diff:"-"`
-	Arn                      *string           `cty:"arn"`
-	Bucket                   *string           `cty:"bucket"`
-...
-```
+const AwsIamRoleResourceType = "aws_iam_role"
 
-Your new type will need to implement `resource.Resource` interface in order for driftctl to retrieve its type and a unique identifier for it.
-
-```go
-type Resource interface {
-	TerraformId() string
-	TerraformType() string
-}
-```
-
-Some resources are read differently by the terraform state reader and the supplier. You can optionally implement `resource.NormalizedResource` to add a normalization step before the comparison is made.
-
-```go
-type NormalizedResource interface {
-	NormalizeForState() (Resource, error)
-	NormalizeForProvider() (Resource, error)
+func initAwsIAMRoleMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+	// assume_role_policy drifts will be displayed as json
+	resourceSchemaRepository.UpdateSchema(AwsIamRoleResourceType, map[string]func(attributeSchema *resource.AttributeSchema){
+		"assume_role_policy": func(attributeSchema *resource.AttributeSchema) {
+			attributeSchema.JsonString = true
+		},
+	})
+	// force_detach_policies should not be compared so it will be removed before the comparison
+	resourceSchemaRepository.SetNormalizeFunc(AwsIamRoleResourceType, func(res *resource.AbstractResource) {
+		val := res.Attrs
+		val.SafeDelete([]string{"force_detach_policies"})
+	})
 }
 ```
 
-For example S3Bucket policy is encoded in json but the formatting (newline and tabs) differs when read using the state reader. S3Bucket implements `resource.NormalizedResource`:
-
+When it's done you'll have to add this function to the metadata initialisation located in `pkg/resource/<providername>/metadatas.go` :
 ```go
-func (s S3Bucket) NormalizeForState() (resource.Resource, error) {
-	err := normalizePolicy(&s)
-	return &s, err
-}
-
-func (s S3Bucket) NormalizeForProvider() (resource.Resource, error) {
-	err := normalizePolicy(&s)
-	return &s, err
-}
-
-func normalizePolicy(s *S3Bucket) error {
-	if s.Policy.Policy != nil {
-		jsonString, err := structure.NormalizeJsonString(*s.Policy.Policy)
-		if err != nil {
-			return err
-		}
-		s.Policy.Policy = &jsonString
-	}
-	return nil
+func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+    initAwsAmiMetaData(resourceSchemaRepository)
 }
 ```
 
-You can implement different normalization for the state representation and the supplier one.
+In order for you new resource to be supported by our terraform state reader you should add it in `pkg/resource/resource_types.go` inside the `supportedTypes` slice.
+```go
+var supportedTypes = map[string]struct{}{
+    "aws_ami":                               {},
+}
+```
 
-## Supplier and Deserializer
+
+All resources inside driftctl are `resource.AbstractResource` except for some unit tests. This struct has an id and a type,
+All the other attributes are represented inside a `map[string]interface`
+
+## Repository, Enumerator and DetailsFetcher
 
 Then you will have to implement two interfaces:
 
-- `resource.supplier` is used to read resources list. It will call the cloud provider SDK to get the list of resources, and
-  the terraform provider to get the details for each of these resources
-- `remote.CTYDeserializer` is used to transform terraform cty output into your resource
+- Repositories are the way we decided to hide direct calls to sdk and pagination logic. It's a common pattern.
+- `remote.comon.Enumerator` is used to read resources list. It will call the cloud provider SDK to get the list of resources.
+  For some resource it could make other call to enrich the resource with needed field when driftctl is used in non deep mode
+- `remote.comon.DetailsFetcher` is used to make a call to terraform provider read resource.
+  This implementation is optional and is only needed if your resource type is to be supported by experimental deep mode.
+  Please also note that it exists a generic implementation as `remote.comon.GenericDetailsFetcher` that can be used with most resource type.
 
-### Supplier
 
-This is used to read resources list. It will call the cloud provider SDK to get the list of resources, and the
-terraform provider to get the details for each of these resources.
-You can use an already implemented resource as example.
+### Repository
+
+This will be the struct that hide all the logic linked to your provider sdk. All provider have different way to implement pagination or to name function in their api.
+Here we will name all listing function `ListAll<ResourceTypeName>` and they all return `[]Resource`.
+
+For aws we decided to split repositories using the amazon logic. So you'll find repositories for EC2, S3 and so on.
+Some provider does not have this grouping logic. Keep in mind that like all our file/struct repositories should not be too big.
+So it might be useful to create a grouping logic.
+
+For our Github implementation the number of listing function was not that heavy so we created a unique repository for everything:
+
+```go
+type GithubRepository interface {
+	ListRepositories() ([]string, error)
+	ListTeams() ([]Team, error)
+	ListMembership() ([]string, error)
+	ListTeamMemberships() ([]string, error)
+	ListBranchProtection() ([]string, error)
+}
+
+type githubRepository struct {
+	client GithubGraphQLClient
+	ctx    context.Context
+	config githubConfig
+	cache  cache.Cache
+}
+
+func NewGithubRepository(config githubConfig, c cache.Cache) *githubRepository {
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: config.Token},
+	)
+	oauthClient := oauth2.NewClient(ctx, ts)
+
+	repo := &githubRepository{
+		client: githubv4.NewClient(oauthClient),
+		ctx:    context.Background(),
+		config: config,
+		cache:  c,
+	}
+
+	return repo
+}
+```
+
+So as you can see this contains the logic to create the github client (it might be created outside the repository if it
+makes sense to share it between multiple repositories). It also get a cache so every request is cached.
+Driftctl sometimes needs to retrieve list of resources more than once, so we cache every request to avoid unnecessary call.
+
+### Enumerator
+
+This is used to read resources list. Enumerator is found in `pkg/remote/<providername>/<type>_enumerator.go`. It will call the cloud provider SDK to get the list of resources.
+
+Note that at this point resources should not be entirely fetched.
+Most of the resource returned by enumerator have empty attributes: they only represent type and terraform id.
+There are exception to this:
+- Sometime, you will need some more information about resources to retrieve them using the provider they should be added to the resource attribute maps.
+- For some more complex cases, middleware needs more information that the id and type and in order to make classic run of driftctl coherent with a run with deep mode activated,
+these informations should be fetched manually by the enumerator using the remote sdk.
+
+
+Note that we use the classic repository to hide calls to the provider sdk.
+You will probably need to at least add a listing function to list you new resource.
+
+You should use an already implemented Enumerator as example.
+
+For example when implementing ec2_instance resource you will need to add a ListAllInstances() function to `repository.EC2Repository`.
+It will be called by the enumerator to retrieve the instances list.
+
 Supplier constructor could use these arguments:
+- an instance of `Repository` that you will use to retrieved information about the resource
+- the global resource factory that should always be used to create a new `resource.Resource`
 
-- an instance of `ParallelRunner` that you will use to parallelize your call to the supplier:
+Enumerator then need to implement:
+- `SupportedType() resource.ResourceType` that will return the constant you defined in the type file at first step
+- `Enumerate() ([]resource.Resource, error)` that will return the resource listing. Note that at this point resources should not be entirely fetched.
+Most of the resource returned by enumerator have empty attributes: they only represent the type, and the terraform id.
 
-```go
-results := make(map[string][]cty.Value)
-for _, bucket := range response.Buckets {
-    b := *bucket
-    s.runner.Run(func() error {
-        return s.readBucket(b, results)
-    })
-}
-if err := s.runner.Wait(); err != nil {
-    return nil, err
-}
-```
-
-- an instance of `terraform.ResourceReader` that you can use to read resource using the supplier:
 
 ```go
-s3Bucket, err := s.reader.ReadResource(aws.AwsS3BucketResourceType, name)
-if err != nil {
-    logrus.Warnf("Error reading bucket %s[%s]: %+v", name, aws.AwsS3BucketResourceType, err)
-    return err
+type EC2InstanceEnumerator struct {
+	repository repository.EC2Repository
+	factory    resource.ResourceFactory
 }
-appendValueIntoMap(results, aws.AwsS3BucketResourceType, s3Bucket)
-```
 
-- an instance of the cloud provider SDK that you will use to retrieve resources list
-
-### Deserializer
-
-The deserializer is used when reading resource from the terraform provider or from the state.
-The interface contains a `Deserialize(values []cty.Value) ([]resource.Resource, error)` method that you'll implement.
-
-You should then deserialize the obtained cty values into your resource and return the list.
-
-Example: [aws_s3_bucket_deserializer.go](https://github.com/cloudskiff/driftctl/blob/main/pkg/resource/aws/deserializer/s3_bucket_deserializer.go)
-
-## Adding your resource
-
-There are two files you are going to edit to make driftctl aware of your new resource.
-
-For the state reader you will need to add your `CTYDeserializer` implementation into `iac/deserializers.go`.
-Just add an instance in the list:
-
-```go
-func Deserializers() []remote.CTYDeserializer {
-	return []remote.CTYDeserializer{
-        aws.NewS3BucketDeserializer(),
-		...
+func NewEC2InstanceEnumerator(repo repository.EC2Repository, factory resource.ResourceFactory) *EC2InstanceEnumerator {
+	return &EC2InstanceEnumerator{
+		repository: repo,
+		factory:    factory,
 	}
 }
-```
 
-Then in the cloud provider's init file (e.g. in `remote/aws/init.go`), add your new implementation for `resource.Supplier`:
+func (e *EC2InstanceEnumerator) SupportedType() resource.ResourceType {
+	return aws.AwsInstanceResourceType
+}
 
-```go
-func Init() error {
-	provider, err := NewTerraFormProvider()
+func (e *EC2InstanceEnumerator) Enumerate() ([]resource.Resource, error) {
+	instances, err := e.repository.ListAllInstances()
 	if err != nil {
-		return err
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	terraform.AddProvider(terraform.AWS, provider)
-	resource.AddSupplier(NewS3BucketSupplier(provider.Runner().SubRunner(), s3.New(provider.session)))
-	...
+	results := make([]resource.Resource, len(instances))
+
+	for _, instance := range instances {
+		results = append(
+			results,
+			e.factory.CreateAbstractResource(
+				string(e.SupportedType()),
+				*instance.InstanceId,
+				map[string]interface{}{},
+			),
+		)
+	}
+
+	return results, err
 }
 ```
+As you can see, listing error are treated in a particular way. Instead of failing and stopping the scan they will be handled, and an alert will be created.
+So please don't forget to wrap these errors inside a NewResourceListingError.
+For some provider error handling is not that coherent, so you might need to check in `pkg/remote/resource_enumeration_error_handler.go` and add a new case for your error.
 
-Don't forget to add unit tests after adding a new resource.
-You can also add acceptance tests if you think it makes sense.
+
+Once the enumerator is written you have to add it to the remote init located in `pkg/remote/<providername>/init.go` :
+```go
+	s3Repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session), repositoryCache)
+    remoteLibrary.AddEnumerator(NewS3BucketEnumerator(s3Repository, factory, provider.Config))
+```
+
+### DetailsFetcher
+
+DetailsFetcher are only used by driftctl experimental deep mode.
+
+This is the component that call terraform provider to retrieve the full attribute for each resource.
+We do not want to reimplement what has already been done in every terraform provider, so you should not call the remote sdk to do this.
+
+If `common.GenericDetailsFetcher` satisfy your needs you should always prefer using it instead of implementing DetailsFetcher in a new struct.
+
+The DetailsFetcher should also be added to `pkg/remote/<providername>/init.go` even if you use the generic version :
+```go
+    remoteLibrary.AddDetailsFetcher(aws.AwsEbsVolumeResourceType, common.NewGenericDetailsFetcher(aws.AwsEbsVolumeResourceType, provider, deserializer))
+```
+
+
+***Don't forget to add unit tests after adding a new resource.***
+
+You can also find example of "integration" tests in pkg/remote/<type>_scanner_test.go
+
+You should also add acceptance tests if you think it makes sense, they are located next to the resource definition described at first step.

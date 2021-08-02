@@ -1,0 +1,26 @@
+@startuml
+hnote across: Retrieve Resources
+Driftctl -> IACSupplier: Resource()
+IACSupplier --> Driftctl: stateResources []Resource
+Driftctl -> RemoteSupplier: Resource()
+RemoteSupplier --> Driftctl: remoteResources []Resource
+
+hnote across: Run Middlewares
+Driftctl --> Driftctl: List Middlewares
+loop on every middleware
+Driftctl -> Middleware: Execute(remoteResources, stateResources)
+Middleware --> Driftctl: remoteResources, stateResources []Resource
+end
+
+hnote across: Run Filters
+Driftctl -> FilterEngine: Run(remoteResources)
+FilterEngine --> Driftctl: remoteResources []Resource
+Driftctl -> FilterEngine: Run(stateResources)
+FilterEngine --> Driftctl: stateResources []Resource
+
+hnote across: Analyze
+Driftctl -> Analyzer: Analyze(remoteResources, stateResources)
+Analyzer --> Driftctl: Analyze
+
+
+@enduml

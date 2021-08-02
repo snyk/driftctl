@@ -2,6 +2,7 @@
 
 This directory contains some documentation about the driftctl codebase, aimed at readers who are interested in making code contributions.
 
+- [Add new remote provider](new-remote-provider.md)
 - [Add new resources](new-resource.md)
 - [Testing](testing.md)
 

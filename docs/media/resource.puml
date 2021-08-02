@@ -1,17 +1,23 @@
 @startuml
 Driftctl -> Scanner: Resource()
-Scanner -> Scanner: List Suppliers
+Scanner -> Scanner: List Enumerators
 loop
-Scanner -> Supplier: Resources()
-Supplier -> RemoteSDK: List resource
-RemoteSDK --> Supplier: []ResourcesIds
-loop
-Supplier -> TerraformProvider: ReadResource()
-TerraformProvider --> Supplier: CTYRessource
-Supplier -> CTYDeserializer: Deserialize()
-CTYDeserializer --> Supplier: Resource
+Scanner -> Enumerator: Enumerate()
+Enumerator -> RemoteSDK: List resource
+RemoteSDK --> Enumerator: []remoteRes
+loop optionaly retrive resource needed attributes
+Enumerator -> RemoteSDK: Retreive needed\nattributes
+RemoteSDK --> Enumerator: Attrs
 end
-Supplier --> Scanner: []Resource
+Enumerator --> Scanner: []Resources with\nlimited attributes
+loop if deepmode
+Scanner -> DetailsFetcher: ReadDetails(res)
+DetailsFetcher -> TerraformProvider: ReadResource()
+TerraformProvider --> DetailsFetcher: CTYValue
+DetailsFetcher -> Deserializer: Deserialize()
+Deserializer -> DetailsFetcher: Resource
+DetailsFetcher -> Scanner: Resource with\nfull attributes
+end
 end
 Scanner --> Driftctl: []Resource
 @enduml

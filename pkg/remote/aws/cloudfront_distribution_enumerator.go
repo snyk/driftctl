@@ -41,6 +41,5 @@ func (e *CloudfrontDistributionEnumerator) Enumerate() ([]*resource.Resource, er
 			),
 		)
 	}
-
 	return results, err
 }
