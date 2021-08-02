@@ -2,6 +2,7 @@ package resource
 
 import (
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"sort"
 	"strconv"
@@ -67,6 +68,13 @@ func (a *AbstractResource) TerraformType() string {
 
 func (a *AbstractResource) Attributes() *Attributes {
 	return a.Attrs
+}
+
+func (a *AbstractResource) SourceString() string {
+	if a.Source.Namespace() == "" {
+		return fmt.Sprintf("%s.%s", a.TerraformType(), a.Source.InternalName())
+	}
+	return fmt.Sprintf("%s.%s.%s", a.Source.Namespace(), a.TerraformType(), a.Source.InternalName())
 }
 
 type ResourceFactory interface {
