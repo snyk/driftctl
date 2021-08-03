@@ -31,7 +31,7 @@ func (r *LambdaFunctionDetailsFetcher) ReadDetails(topic resource.Resource) (res
 	})
 	if err != nil {
 		logrus.Error(err)
-		return nil, remoteerror.NewResourceScanningError(err, resourceaws.AwsLambdaFunctionResourceType)
+		return nil, remoteerror.NewResourceScanningError(err, resourceaws.AwsLambdaFunctionResourceType, topic.TerraformId())
 	}
 	return r.deserializer.DeserializeOne(resourceaws.AwsLambdaFunctionResourceType, *val)
 }

@@ -60,7 +60,7 @@ func (r *VPCSecurityGroupRuleDetailsFetcher) ReadDetails(res resource.Resource) 
 		Attributes: flatmap.Flatten(attrs),
 	})
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType())
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsSecurityGroupRuleResourceType, *ctyVal)
 	if err != nil {

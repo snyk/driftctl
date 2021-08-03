@@ -28,7 +28,7 @@ func (e *DefaultVPCEnumerator) SupportedType() resource.ResourceType {
 func (e *DefaultVPCEnumerator) Enumerate() ([]resource.Resource, error) {
 	_, defaultVPCs, err := e.repo.ListAllVPCs()
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, aws.AwsDefaultVpcResourceType)
+		return nil, remoteerror.NewResourceListingError(err, aws.AwsDefaultVpcResourceType)
 	}
 
 	results := make([]resource.Resource, 0, len(defaultVPCs))

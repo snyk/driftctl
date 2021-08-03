@@ -28,7 +28,7 @@ func (r *S3BucketAnalyticDetailsFetcher) ReadDetails(res resource.Resource) (res
 		},
 	})
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType())
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsS3BucketAnalyticsConfigurationResourceType, *ctyVal)
 	if err != nil {

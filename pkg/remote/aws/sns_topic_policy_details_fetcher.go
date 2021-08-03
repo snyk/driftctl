@@ -31,7 +31,7 @@ func (r *SNSTopicPolicyDetailsFetcher) ReadDetails(topic resource.Resource) (res
 	})
 	if err != nil {
 		logrus.Error(err)
-		return nil, remoteerror.NewResourceScanningError(err, topic.TerraformType())
+		return nil, remoteerror.NewResourceScanningError(err, topic.TerraformType(), topic.TerraformId())
 	}
 	return r.deserializer.DeserializeOne(aws.AwsSnsTopicPolicyResourceType, *val)
 }

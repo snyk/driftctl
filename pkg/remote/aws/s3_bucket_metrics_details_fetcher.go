@@ -28,7 +28,7 @@ func (r *S3BucketMetricsDetailsFetcher) ReadDetails(res resource.Resource) (reso
 		},
 	})
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType())
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsS3BucketMetricResourceType, *ctyVal)
 	if err != nil {

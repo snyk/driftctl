@@ -31,7 +31,7 @@ func (f *GenericDetailsFetcher) ReadDetails(res resource.Resource) (resource.Res
 		ID: res.TerraformId(),
 	})
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType())
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
 	}
 	if ctyVal.IsNull() {
 		logrus.WithFields(logrus.Fields{

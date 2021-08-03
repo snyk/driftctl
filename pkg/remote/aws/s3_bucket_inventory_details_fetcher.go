@@ -28,7 +28,7 @@ func (r *S3BucketInventoryDetailsFetcher) ReadDetails(res resource.Resource) (re
 		},
 	})
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType())
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsS3BucketInventoryResourceType, *ctyVal)
 	if err != nil {

@@ -27,7 +27,7 @@ func (e *IamUserEnumerator) SupportedType() resource.ResourceType {
 func (e *IamUserEnumerator) Enumerate() ([]resource.Resource, error) {
 	users, err := e.repository.ListAllUsers()
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(users))

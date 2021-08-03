@@ -31,7 +31,7 @@ func (r *SNSTopicSubscriptionDetailsFetcher) ReadDetails(res resource.Resource) 
 	})
 	if err != nil {
 		logrus.Error(err)
-		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType())
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsSnsTopicSubscriptionResourceType, *ctyVal)
 	if err != nil {

@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/fatih/color"
 	"github.com/mattn/go-isatty"
 	"github.com/r3labs/diff/v2"
@@ -16,7 +17,6 @@ import (
 	"github.com/yudai/gojsondiff/formatter"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/pkg/remote"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
@@ -117,10 +117,10 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 	c.writeSummary(analysis)
 
 	enumerationErrorMessage := ""
-	for _, alerts := range analysis.Alerts() {
-		for _, alert := range alerts {
+	for _, a := range analysis.Alerts() {
+		for _, alert := range a {
 			fmt.Println(color.YellowString(alert.Message()))
-			if alert, ok := alert.(*remote.RemoteAccessDeniedAlert); ok && enumerationErrorMessage == "" {
+			if alert, ok := alert.(*alerts.RemoteAccessDeniedAlert); ok && enumerationErrorMessage == "" {
 				enumerationErrorMessage = alert.GetProviderMessage()
 			}
 		}

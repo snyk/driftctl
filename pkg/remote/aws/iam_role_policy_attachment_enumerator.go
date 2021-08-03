@@ -29,7 +29,7 @@ func (e *IamRolePolicyAttachmentEnumerator) SupportedType() resource.ResourceTyp
 func (e *IamRolePolicyAttachmentEnumerator) Enumerate() ([]resource.Resource, error) {
 	roles, err := e.repository.ListAllRoles()
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningErrorWithType(err, string(e.SupportedType()), resourceaws.AwsIamRoleResourceType)
+		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), resourceaws.AwsIamRoleResourceType)
 	}
 
 	results := make([]resource.Resource, 0)
@@ -48,7 +48,7 @@ func (e *IamRolePolicyAttachmentEnumerator) Enumerate() ([]resource.Resource, er
 
 	policyAttachments, err := e.repository.ListAllRolePolicyAttachments(rolesNotIgnored)
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	for _, attachedPol := range policyAttachments {
