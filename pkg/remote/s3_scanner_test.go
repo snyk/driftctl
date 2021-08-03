@@ -125,7 +125,7 @@ func TestS3Bucket(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewS3BucketEnumerator(repo, factory, tf.TerraformProviderConfig{
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
-			}))
+			}, alerter))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketResourceType, aws.NewS3BucketDetailsFetcher(provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
@@ -278,7 +278,7 @@ func TestS3BucketInventory(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewS3BucketInventoryEnumerator(repo, factory, tf.TerraformProviderConfig{
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
-			}))
+			}, alerter))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketInventoryResourceType, aws.NewS3BucketInventoryDetailsFetcher(provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
@@ -457,7 +457,7 @@ func TestS3BucketNotification(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewS3BucketNotificationEnumerator(repo, factory, tf.TerraformProviderConfig{
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
-			}))
+			}, alerter))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketNotificationResourceType, aws.NewS3BucketNotificationDetailsFetcher(provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
@@ -612,7 +612,7 @@ func TestS3BucketMetrics(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewS3BucketMetricsEnumerator(repo, factory, tf.TerraformProviderConfig{
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
-			}))
+			}, alerter))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketMetricResourceType, aws.NewS3BucketMetricsDetailsFetcher(provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
@@ -766,7 +766,7 @@ func TestS3BucketPolicy(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewS3BucketPolicyEnumerator(repo, factory, tf.TerraformProviderConfig{
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
-			}))
+			}, alerter))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketPolicyResourceType, aws.NewS3BucketPolicyDetailsFetcher(provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
@@ -923,7 +923,7 @@ func TestS3BucketAnalytic(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewS3BucketAnalyticEnumerator(repo, factory, tf.TerraformProviderConfig{
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
-			}))
+			}, alerter))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, aws.NewS3BucketAnalyticDetailsFetcher(provider, deserializer))
 
 			testFilter := &filter.MockFilter{}

@@ -10,6 +10,7 @@ import (
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
@@ -279,7 +280,7 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 			},
 			alerts: map[string][]alerter.Alert{
 				resourceaws.AwsSnsTopicSubscriptionResourceType: {
-					NewRemoteAccessDeniedAlert("aws+tf", resourceaws.AwsSnsTopicSubscriptionResourceType, resourceaws.AwsSnsTopicSubscriptionResourceType, EnumerationPhase),
+					alerts.NewRemoteAccessDeniedAlert("aws+tf", resourceaws.AwsSnsTopicSubscriptionResourceType, resourceaws.AwsSnsTopicSubscriptionResourceType, alerts.EnumerationPhase),
 				},
 			},
 			err: nil,
