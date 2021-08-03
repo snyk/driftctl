@@ -40,7 +40,12 @@
 		{
 			"res": {
 				"id": "AKIA5QYBVVD25KFXJHYJ",
-				"type": "aws_iam_access_key"
+				"type": "aws_iam_access_key",
+				"source": {
+					"source": "tfstate://terraform.tfstate",
+					"namespace": "module",
+					"internal_name": "my_name"
+				}
 			},
 			"changelog": [
 				{

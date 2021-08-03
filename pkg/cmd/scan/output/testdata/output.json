@@ -40,7 +40,12 @@
 		{
 			"res": {
 				"id": "diff-id-1",
-				"type": "aws_diff_resource"
+				"type": "aws_diff_resource",
+				"source": {
+					"source": "tfstate://state.tfstate",
+					"namespace": "module",
+					"internal_name": "name"
+				}
 			},
 			"changelog": [
 				{
