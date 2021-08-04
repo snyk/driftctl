@@ -10,8 +10,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
-const RemoteGithubTerraform = "github+tf"
-
 /**
  * Initialize remote (configure credentials, launch tf providers and start gRPC clients)
  * Required to use Scanner

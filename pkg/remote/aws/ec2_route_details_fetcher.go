@@ -35,7 +35,7 @@ func (r *EC2RouteDetailsFetcher) ReadDetails(res resource.Resource) (resource.Re
 		Attributes: attributes,
 	})
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType())
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsRouteResourceType, *ctyVal)
 	if err != nil {

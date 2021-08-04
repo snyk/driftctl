@@ -30,7 +30,7 @@ func (e *Route53ZoneSupplier) SupportedType() resource.ResourceType {
 func (e *Route53ZoneSupplier) Enumerate() ([]resource.Resource, error) {
 	zones, err := e.client.ListAllZones()
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(zones))

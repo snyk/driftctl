@@ -26,7 +26,7 @@ func (e *LambdaEventSourceMappingEnumerator) SupportedType() resource.ResourceTy
 func (e *LambdaEventSourceMappingEnumerator) Enumerate() ([]resource.Resource, error) {
 	eventSourceMappings, err := e.repository.ListAllLambdaEventSourceMappings()
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(eventSourceMappings))

@@ -26,7 +26,7 @@ func (e *EC2SubnetEnumerator) SupportedType() resource.ResourceType {
 func (e *EC2SubnetEnumerator) Enumerate() ([]resource.Resource, error) {
 	subnets, _, err := e.repository.ListAllSubnets()
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(subnets))

@@ -28,7 +28,7 @@ func (r *IamAccessKeyDetailsFetcher) ReadDetails(res resource.Resource) (resourc
 		},
 	})
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType())
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsIamAccessKeyResourceType, *ctyVal)
 	if err != nil {

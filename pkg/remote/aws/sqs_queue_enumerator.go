@@ -28,7 +28,7 @@ func (e *SQSQueueEnumerator) SupportedType() resource.ResourceType {
 func (e *SQSQueueEnumerator) Enumerate() ([]resource.Resource, error) {
 	queues, err := e.repository.ListAllQueues()
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(queues))

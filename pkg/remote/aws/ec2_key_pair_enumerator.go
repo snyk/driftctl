@@ -26,7 +26,7 @@ func (e *EC2KeyPairEnumerator) SupportedType() resource.ResourceType {
 func (e *EC2KeyPairEnumerator) Enumerate() ([]resource.Resource, error) {
 	keyPairs, err := e.repository.ListAllKeyPairs()
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(keyPairs))

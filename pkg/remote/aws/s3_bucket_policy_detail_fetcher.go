@@ -28,7 +28,7 @@ func (r *S3BucketPolicyDetailsFetcher) ReadDetails(res resource.Resource) (resou
 		},
 	})
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType())
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsS3BucketPolicyResourceType, *ctyVal)
 	if err != nil {

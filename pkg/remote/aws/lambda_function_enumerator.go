@@ -26,7 +26,7 @@ func (e *LambdaFunctionEnumerator) SupportedType() resource.ResourceType {
 func (e *LambdaFunctionEnumerator) Enumerate() ([]resource.Resource, error) {
 	functions, err := e.repository.ListAllLambdaFunctions()
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(functions))

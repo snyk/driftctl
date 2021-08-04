@@ -8,9 +8,8 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/cloudskiff/driftctl/pkg/output"
-	"github.com/cloudskiff/driftctl/pkg/remote"
-	"github.com/cloudskiff/driftctl/pkg/remote/aws"
-	"github.com/cloudskiff/driftctl/pkg/remote/github"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
+	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/r3labs/diff/v2"
@@ -91,9 +90,9 @@ func fakeAnalysisWithAlerts() *analyser.Analysis {
 	a := fakeAnalysis()
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
-			remote.NewRemoteAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_vpc", "aws_vpc", remote.EnumerationPhase),
-			remote.NewRemoteAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sqs", "aws_sqs", remote.EnumerationPhase),
-			remote.NewRemoteAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sns", "aws_sns", remote.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_vpc", "aws_vpc", alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_sqs", "aws_sqs", alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_sns", "aws_sns", alerts.EnumerationPhase),
 		},
 	})
 	a.ProviderVersion = "3.19.0"
@@ -349,9 +348,9 @@ func fakeAnalysisWithAWSEnumerationError() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
-			remote.NewRemoteAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_vpc", "aws_vpc", remote.EnumerationPhase),
-			remote.NewRemoteAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sqs", "aws_sqs", remote.EnumerationPhase),
-			remote.NewRemoteAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sns", "aws_sns", remote.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_vpc", "aws_vpc", alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_sqs", "aws_sqs", alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_sns", "aws_sns", alerts.EnumerationPhase),
 		},
 	})
 	a.ProviderName = "AWS"
@@ -363,8 +362,8 @@ func fakeAnalysisWithGithubEnumerationError() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
-			remote.NewRemoteAccessDeniedAlert(github.RemoteGithubTerraform, "github_team", "github_team", remote.EnumerationPhase),
-			remote.NewRemoteAccessDeniedAlert(github.RemoteGithubTerraform, "github_team_membership", "github_team", remote.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, "github_team", "github_team", alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, "github_team_membership", "github_team", alerts.EnumerationPhase),
 		},
 	})
 	a.ProviderName = "AWS"

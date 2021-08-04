@@ -28,7 +28,7 @@ func (r *S3BucketNotificationDetailsFetcher) ReadDetails(res resource.Resource) 
 		},
 	})
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType())
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsS3BucketNotificationResourceType, *ctyVal)
 	if err != nil {

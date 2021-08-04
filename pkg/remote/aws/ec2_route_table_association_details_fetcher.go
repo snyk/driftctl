@@ -28,7 +28,7 @@ func (r *EC2RouteTableAssociationDetailsFetcher) ReadDetails(res resource.Resour
 		},
 	})
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType())
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsRouteTableAssociationResourceType, *ctyVal)
 	if err != nil {
