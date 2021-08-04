@@ -33,6 +33,9 @@ if [ "$CI" != true ] && [ "$CMD" == "release" ]; then
     FLAGS+="--skip-announce "
     FLAGS+="--skip-publish "
     FLAGS+="--skip-sign "
+fi
+
+if [ "$CI" != true ]; then
     FLAGS+="--snapshot "
 fi
 
