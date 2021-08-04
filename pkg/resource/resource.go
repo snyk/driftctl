@@ -16,12 +16,19 @@ type Resource interface {
 	TerraformType() string
 	Attributes() *Attributes
 	Schema() *Schema
+	Src() Source
 }
 
 type Source interface {
 	Source() string
 	Namespace() string
 	InternalName() string
+}
+
+type SerializableSource struct {
+	S    string `json:"source"`
+	Ns   string `json:"namespace"`
+	Name string `json:"internal_name"`
 }
 
 type TerraformStateSource struct {
@@ -70,6 +77,10 @@ func (a *AbstractResource) Attributes() *Attributes {
 	return a.Attrs
 }
 
+func (a *AbstractResource) Src() Source {
+	return a.Source
+}
+
 func (a *AbstractResource) SourceString() string {
 	if a.Source.Namespace() == "" {
 		return fmt.Sprintf("%s.%s", a.TerraformType(), a.Source.InternalName())
@@ -86,8 +97,9 @@ type SerializableResource struct {
 }
 
 type SerializedResource struct {
-	Id   string `json:"id"`
-	Type string `json:"type"`
+	Id     string              `json:"id"`
+	Type   string              `json:"type"`
+	Source *SerializableSource `json:"source,omitempty"`
 }
 
 func (u *SerializedResource) TerraformId() string {
@@ -106,6 +118,10 @@ func (u *SerializedResource) Schema() *Schema {
 	return nil
 }
 
+func (u *SerializedResource) Src() Source {
+	return nil
+}
+
 func (s *SerializableResource) UnmarshalJSON(bytes []byte) error {
 	var res *SerializedResource
 
@@ -117,7 +133,15 @@ func (s *SerializableResource) UnmarshalJSON(bytes []byte) error {
 }
 
 func (s SerializableResource) MarshalJSON() ([]byte, error) {
-	return json.Marshal(SerializedResource{Id: s.TerraformId(), Type: s.TerraformType()})
+	var src *SerializableSource
+	if s.Src() != nil {
+		src = &SerializableSource{
+			S:    s.Src().Source(),
+			Ns:   s.Src().Namespace(),
+			Name: s.Src().InternalName(),
+		}
+	}
+	return json.Marshal(SerializedResource{Id: s.TerraformId(), Type: s.TerraformType(), Source: src})
 }
 
 type NormalizedResource interface {

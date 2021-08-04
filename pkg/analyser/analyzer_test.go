@@ -1089,9 +1089,14 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 		},
 	)
 	analysis.AddDifference(Difference{
-		Res: &testresource.FakeResource{
+		Res: &resource.AbstractResource{
 			Id:   "AKIA5QYBVVD25KFXJHYJ",
 			Type: "aws_iam_access_key",
+			Source: &resource.TerraformStateSource{
+				State:  "tfstate://terraform.tfstate",
+				Module: "module",
+				Name:   "my_name",
+			},
 		},
 		Changelog: []Change{
 			{
