@@ -18,7 +18,6 @@ goreleaser check
 
 FLAGS=""
 FLAGS+="--rm-dist "
-FLAGS+="--snapshot "
 FLAGS+="--parallelism 2 "
 
 CMD="release"
@@ -34,6 +33,7 @@ if [ "$CI" != true ] && [ "$CMD" == "release" ]; then
     FLAGS+="--skip-announce "
     FLAGS+="--skip-publish "
     FLAGS+="--skip-sign "
+    FLAGS+="--snapshot "
 fi
 
 CMD="goreleaser ${CMD} ${FLAGS}"
