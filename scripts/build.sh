@@ -18,7 +18,6 @@ goreleaser check
 
 FLAGS=""
 FLAGS+="--rm-dist "
-FLAGS+="--snapshot "
 FLAGS+="--parallelism 2 "
 
 CMD="release"
@@ -30,10 +29,14 @@ fi
 
 # Only CI system should publish artifacts
 # We may not want to sign artifacts in dev environments
-if [ "$CI" == true ] && [ "$CMD" == "release" ]; then
+if [ "$CI" != true ] && [ "$CMD" == "release" ]; then
     FLAGS+="--skip-announce "
     FLAGS+="--skip-publish "
     FLAGS+="--skip-sign "
+fi
+
+if [ "$CI" != true ]; then
+    FLAGS+="--snapshot "
 fi
 
 CMD="goreleaser ${CMD} ${FLAGS}"
