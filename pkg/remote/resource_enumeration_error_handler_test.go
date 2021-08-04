@@ -8,6 +8,8 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	resourcegithub "github.com/cloudskiff/driftctl/pkg/resource/github"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/stretchr/testify/assert"
 
@@ -121,6 +123,45 @@ func TestHandleGithubEnumerationErrors(t *testing.T) {
 	}
 }
 
+func TestHandleGoogleEnumerationErrors(t *testing.T) {
+	tests := []struct {
+		name       string
+		err        error
+		wantAlerts alerter.Alerts
+		wantErr    bool
+	}{
+		{
+			name:       "Handled 403 error",
+			err:        remoteerror.NewResourceListingError(status.Error(codes.PermissionDenied, "useless message"), "google_type"),
+			wantAlerts: alerter.Alerts{"google_type": []alerter.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteGoogleTerraform, "google_type", "google_type", alerts.EnumerationPhase)}},
+			wantErr:    false,
+		},
+		{
+			name:       "Not handled non 403 error",
+			err:        status.Error(codes.Unknown, ""),
+			wantAlerts: map[string][]alerter.Alert{},
+			wantErr:    true,
+		},
+		{
+			name:       "Not Handled error type",
+			err:        errors.New("error"),
+			wantAlerts: map[string][]alerter.Alert{},
+			wantErr:    true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			alertr := alerter.NewAlerter()
+			gotErr := HandleResourceEnumerationError(tt.err, alertr)
+			assert.Equal(t, tt.wantErr, gotErr != nil)
+
+			retrieve := alertr.Retrieve()
+			assert.Equal(t, tt.wantAlerts, retrieve)
+
+		})
+	}
+}
+
 func TestHandleAwsDetailsFetchingErrors(t *testing.T) {
 
 	tests := []struct {
@@ -152,6 +193,62 @@ func TestHandleAwsDetailsFetchingErrors(t *testing.T) {
 			err:        remoteerror.NewResourceListingError(awserr.NewRequestFailure(awserr.New("test", "error: dummy error", errors.New("")), 403, ""), resourceaws.AwsVpcResourceType),
 			wantAlerts: alerter.Alerts{},
 			wantErr:    true,
+		},
+		{
+			name:       "Not Handled error type",
+			err:        errors.New("error"),
+			wantAlerts: map[string][]alerter.Alert{},
+			wantErr:    true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			alertr := alerter.NewAlerter()
+			gotErr := HandleResourceDetailsFetchingError(tt.err, alertr)
+			assert.Equal(t, tt.wantErr, gotErr != nil)
+
+			retrieve := alertr.Retrieve()
+			assert.Equal(t, tt.wantAlerts, retrieve)
+
+		})
+	}
+}
+
+func TestHandleGoogleDetailsFetchingErrors(t *testing.T) {
+
+	tests := []struct {
+		name       string
+		err        error
+		wantAlerts alerter.Alerts
+		wantErr    bool
+	}{
+		{
+			name: "Handle 403 error",
+			err: remoteerror.NewResourceScanningError(
+				errors.New("Error when reading or editing Storage Bucket \"driftctl-unittest-1\": googleapi: Error 403: driftctl@elie-dev.iam.gserviceaccount.com does not have storage.buckets.get access to the Google Cloud Storage bucket., forbidden"),
+				"google_type",
+				"resource_id",
+			),
+			wantAlerts: alerter.Alerts{"google_type.resource_id": []alerter.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteGoogleTerraform, "google_type.resource_id", "google_type", alerts.DetailsFetchingPhase)}},
+			wantErr:    false,
+		},
+		{
+			name: "do not handle google unrelated error",
+			err: remoteerror.NewResourceScanningError(
+				errors.New("this string does not contains g o o g l e a p i string and thus should not be matched"),
+				"google_type",
+				"resource_id",
+			), wantAlerts: alerter.Alerts{},
+			wantErr: true,
+		},
+		{
+			name: "do not handle google error other than 403",
+			err: remoteerror.NewResourceScanningError(
+				errors.New("Error when reading or editing Storage Bucket \"driftctl-unittest-1\": googleapi: Error 404: not found"),
+				"google_type",
+				"resource_id",
+			), wantAlerts: alerter.Alerts{},
+			wantErr: true,
 		},
 		{
 			name:       "Not Handled error type",
@@ -225,6 +322,11 @@ func TestDetailsFetchingAccessDeniedAlert_GetProviderMessage(t *testing.T) {
 			name:     "test for github",
 			provider: common.RemoteGithubTerraform,
 			want:     "It seems that we got access denied exceptions while reading details of resources.\nPlease be sure that your Github token has the right permissions, check the last up-to-date documentation there: https://docs.driftctl.com/github/policy",
+		},
+		{
+			name:     "test for google",
+			provider: common.RemoteGoogleTerraform,
+			want:     "It seems that we got access denied exceptions while reading details of resources.\nPlease ensure that you have configured the required roles, please check our documentation at https://docs.driftctl.com/google/policy",
 		},
 	}
 	for _, tt := range tests {

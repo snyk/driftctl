@@ -57,6 +57,8 @@ func (e *RemoteAccessDeniedAlert) GetProviderMessage() string {
 		message += "Please be sure that your Github token has the right permissions, check the last up-to-date documentation there: https://docs.driftctl.com/github/policy"
 	case common.RemoteAWSTerraform:
 		message += "The latest minimal read-only IAM policy for driftctl is always available here, please update yours: https://docs.driftctl.com/aws/policy"
+	case common.RemoteGoogleTerraform:
+		message += "Please ensure that you have configured the required roles, please check our documentation at https://docs.driftctl.com/google/policy"
 	default:
 		return ""
 	}
