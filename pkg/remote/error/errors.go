@@ -2,52 +2,64 @@ package error
 
 import "fmt"
 
-type SupplierError struct {
-	err          error
-	context      map[string]string
-	supplierType string
+type RemoteError interface {
+	ListedTypeError() string
 }
 
-func NewSupplierError(err error, context map[string]string, supplierType string) *SupplierError {
-	context["SupplierType"] = supplierType
-	return &SupplierError{err: err, context: context, supplierType: supplierType}
-}
-
-func (b *SupplierError) Error() string {
-	return fmt.Sprintf("error in supplier %s: %s", b.supplierType, b.err)
-}
-
-func (b *SupplierError) RootCause() error {
-	return b.err
-}
-
-func (b *SupplierError) SupplierType() string {
-	return b.supplierType
-}
-
-func (b *SupplierError) Context() map[string]string {
-	return b.context
-}
-
-type ResourceEnumerationError struct {
-	SupplierError
+type ResourceScanningError struct {
+	err             error
+	resourceType    string
+	resourceId      string
 	listedTypeError string
 }
 
-func NewResourceEnumerationErrorWithType(error error, supplierType string, listedTypeError string) *ResourceEnumerationError {
-	context := map[string]string{
-		"ListedTypeError": listedTypeError,
+func (b *ResourceScanningError) Error() string {
+	if b.resourceId != "" {
+		return fmt.Sprintf("error scanning resource %s: %s", b.Resource(), b.err)
 	}
-	return &ResourceEnumerationError{
-		SupplierError:   *NewSupplierError(error, context, supplierType),
+	return fmt.Sprintf("error scanning resource type %s: %s", b.Resource(), b.err)
+}
+
+func (b *ResourceScanningError) RootCause() error {
+	return b.err
+}
+
+func (b *ResourceScanningError) ResourceType() string {
+	return b.resourceType
+}
+
+func NewResourceScanningError(error error, resourceType string, resourceId string) *ResourceScanningError {
+	return &ResourceScanningError{
+		err:             error,
+		resourceType:    resourceType,
+		resourceId:      resourceId,
+		listedTypeError: resourceType,
+	}
+}
+
+func NewResourceListingError(error error, resourceType string) *ResourceScanningError {
+	return NewResourceListingErrorWithType(error, resourceType, resourceType)
+}
+
+func NewResourceListingErrorWithType(error error, resourceType, listedTypeError string) *ResourceScanningError {
+	return &ResourceScanningError{
+		err:             error,
+		resourceType:    resourceType,
 		listedTypeError: listedTypeError,
 	}
 }
 
-func NewResourceEnumerationError(error error, supplierType string) *ResourceEnumerationError {
-	return NewResourceEnumerationErrorWithType(error, supplierType, supplierType)
+func (b *ResourceScanningError) ListedTypeError() string {
+	return b.listedTypeError
 }
 
-func (b *ResourceEnumerationError) ListedTypeError() string {
-	return b.listedTypeError
+func (b *ResourceScanningError) Resource() string {
+	if b.resourceId != "" {
+		return fmt.Sprintf("%s.%s", b.resourceType, b.resourceId)
+	}
+	return b.resourceType
+}
+
+func (b *ResourceScanningError) String() string {
+	return fmt.Sprintf("%s.%s (%s)", b.resourceType, b.resourceId, b.listedTypeError)
 }

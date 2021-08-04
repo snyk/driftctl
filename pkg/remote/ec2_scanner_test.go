@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/cloudskiff/driftctl/mocks"
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
@@ -101,7 +102,10 @@ func TestEC2EbsVolume(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewEC2EbsVolumeEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsVolumeResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEbsVolumeResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -190,7 +194,10 @@ func TestEC2EbsSnapshot(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewEC2EbsSnapshotEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsSnapshotResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEbsSnapshotResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -279,7 +286,10 @@ func TestEC2Eip(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewEC2EipEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEipResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEipResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -368,7 +378,10 @@ func TestEC2Ami(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewEC2AmiEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsAmiResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsAmiResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -457,7 +470,10 @@ func TestEC2KeyPair(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewEC2KeyPairEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsKeyPairResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsKeyPairResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -548,7 +564,10 @@ func TestEC2EipAssociation(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewEC2EipAssociationEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEipAssociationResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEipAssociationResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -647,7 +666,10 @@ func TestEC2Instance(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewEC2InstanceEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsInstanceResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsInstanceResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -736,7 +758,10 @@ func TestEC2InternetGateway(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewEC2InternetGatewayEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsInternetGatewayResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsInternetGatewayResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -842,7 +867,10 @@ func TestVPC(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewVPCEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsVpcResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsVpcResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -945,7 +973,10 @@ func TestDefaultVPC(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewDefaultVPCEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultVpcResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultVpcResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1103,7 +1134,10 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewEC2RouteTableAssociationEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteTableAssociationResourceType, aws.NewEC2RouteTableAssociationDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1215,7 +1249,10 @@ func TestEC2Subnet(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewEC2SubnetEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSubnetResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSubnetResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1327,7 +1364,10 @@ func TestEC2DefaultSubnet(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewEC2DefaultSubnetEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultSubnetResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultSubnetResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1426,7 +1466,10 @@ func TestEC2RouteTable(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewEC2RouteTableEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteTableResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRouteTableResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1525,7 +1568,10 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewEC2DefaultRouteTableEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultRouteTableResourceType, aws.NewEC2DefaultRouteTableDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1624,7 +1670,10 @@ func TestVpcSecurityGroup(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewVPCSecurityGroupEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSecurityGroupResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSecurityGroupResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1723,7 +1772,10 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewVPCDefaultSecurityGroupEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultSecurityGroupResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultSecurityGroupResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1811,7 +1863,10 @@ func TestEC2NatGateway(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewEC2NatGatewayEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsNatGatewayResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsNatGatewayResourceType, provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1972,7 +2027,10 @@ func TestEC2Route(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewEC2RouteEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteResourceType, aws.NewEC2RouteDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -2155,7 +2213,10 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewVPCSecurityGroupRuleEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSecurityGroupRuleResourceType, aws.NewVPCSecurityGroupRuleDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {

@@ -26,7 +26,7 @@ func (e *RDSDBInstanceEnumerator) SupportedType() resource.ResourceType {
 func (e *RDSDBInstanceEnumerator) Enumerate() ([]resource.Resource, error) {
 	instances, err := e.repository.ListAllDBInstances()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(instances))

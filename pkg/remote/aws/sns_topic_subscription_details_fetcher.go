@@ -1,6 +1,7 @@
 package aws
 
 import (
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/sirupsen/logrus"
@@ -30,7 +31,7 @@ func (r *SNSTopicSubscriptionDetailsFetcher) ReadDetails(res resource.Resource) 
 	})
 	if err != nil {
 		logrus.Error(err)
-		return nil, err
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsSnsTopicSubscriptionResourceType, *ctyVal)
 	if err != nil {

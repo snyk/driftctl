@@ -27,7 +27,7 @@ func (e *IamPolicyEnumerator) SupportedType() resource.ResourceType {
 func (e *IamPolicyEnumerator) Enumerate() ([]resource.Resource, error) {
 	policies, err := e.repository.ListAllPolicies()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(policies))

@@ -222,9 +222,9 @@ func scanRun(opts *pkg.ScanOptions) error {
 	logrus.Debug("Checking for driftignore")
 	driftIgnore := filter.NewDriftIgnore(opts.DriftignorePath)
 
-	scanner := remote.NewScanner(remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep})
+	scanner := remote.NewScanner(remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep}, driftIgnore)
 
-	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, resFactory)
+	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, resFactory, driftIgnore)
 	if err != nil {
 		return err
 	}
@@ -252,6 +252,9 @@ func scanRun(opts *pkg.ScanOptions) error {
 	if err != nil {
 		return err
 	}
+
+	analysis.ProviderVersion = resourceSchemaRepository.ProviderVersion.String()
+	analysis.ProviderName = resourceSchemaRepository.ProviderName
 
 	err = selectedOutput.Write(analysis)
 	if err != nil {

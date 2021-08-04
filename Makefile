@@ -17,7 +17,7 @@ ACC_PATTERN ?= TestAcc_
 .PHONY: FORCE
 
 .PHONY: all
-all: fmt lint test build
+all: fmt lint test build go.mod
 
 .PHONY: build
 build:
@@ -28,7 +28,7 @@ release:
 	ENV=release ./scripts/build.sh
 
 .PHONY: test
-test: deps
+test:
 	$(GOTEST) --format testname --junitfile unit-tests.xml -- -mod=readonly -coverprofile=cover.out.tmp -coverpkg=.,./pkg/... ./...
 	cat cover.out.tmp | grep -v "mock_" > cover.out
 
@@ -41,7 +41,7 @@ acc:
 	DRIFTCTL_ACC=true $(GOTEST) --format testname --junitfile unit-tests-acc.xml -- -coverprofile=cover-acc.out -test.timeout 2h -coverpkg=./pkg/... -run=$(ACC_PATTERN) ./pkg/...
 
 .PHONY: mocks
-mocks: deps
+mocks:
 	rm -rf mocks
 	mockery --all
 
@@ -59,10 +59,6 @@ clean:
 lint:
 	@which golangci-lint > /dev/null 2>&1 || (curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | bash -s -- -b $(GOBINPATH) v1.31.0)
 	golangci-lint run -v --timeout=10m
-
-.PHONY: deps
-deps:
-	$(GOMOD) download
 
 .PHONY: install-tools
 install-tools:

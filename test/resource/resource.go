@@ -31,9 +31,14 @@ func (d *FakeResource) Attributes() *resource.Attributes {
 	return d.Attrs
 }
 
+func (d *FakeResource) Src() resource.Source {
+	return nil
+}
+
 type FakeResourceStringer struct {
-	Id    string
-	Attrs *resource.Attributes
+	Id     string
+	Attrs  *resource.Attributes
+	Source resource.Source
 }
 
 func (d *FakeResourceStringer) Schema() *resource.Schema {
@@ -52,6 +57,10 @@ func (d *FakeResourceStringer) Attributes() *resource.Attributes {
 	return d.Attrs
 }
 
+func (d *FakeResourceStringer) Src() resource.Source {
+	return d.Source
+}
+
 func InitFakeSchemaRepository(provider, version string) resource.SchemaRepositoryInterface {
 	repo := resource.NewSchemaRepository()
 	schema := make(map[string]providers.Schema)
@@ -63,6 +72,6 @@ func InitFakeSchemaRepository(provider, version string) resource.SchemaRepositor
 		}
 		schema = s
 	}
-	_ = repo.Init("1.0.0", schema)
+	_ = repo.Init("Fake", "1.0.0", schema)
 	return repo
 }

@@ -1,7 +1,10 @@
 package aws
 
 import (
+	"github.com/cloudskiff/driftctl/pkg/alerter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -13,13 +16,15 @@ type S3BucketEnumerator struct {
 	repository     repository.S3Repository
 	factory        resource.ResourceFactory
 	providerConfig tf.TerraformProviderConfig
+	alerter        alerter.AlerterInterface
 }
 
-func NewS3BucketEnumerator(repo repository.S3Repository, factory resource.ResourceFactory, providerConfig tf.TerraformProviderConfig) *S3BucketEnumerator {
+func NewS3BucketEnumerator(repo repository.S3Repository, factory resource.ResourceFactory, providerConfig tf.TerraformProviderConfig, alerter alerter.AlerterInterface) *S3BucketEnumerator {
 	return &S3BucketEnumerator{
 		repository:     repo,
 		factory:        factory,
 		providerConfig: providerConfig,
+		alerter:        alerter,
 	}
 }
 
@@ -30,7 +35,7 @@ func (e *S3BucketEnumerator) SupportedType() resource.ResourceType {
 func (e *S3BucketEnumerator) Enumerate() ([]resource.Resource, error) {
 	buckets, err := e.repository.ListAllBuckets()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(buckets))
@@ -38,7 +43,8 @@ func (e *S3BucketEnumerator) Enumerate() ([]resource.Resource, error) {
 	for _, bucket := range buckets {
 		region, err := e.repository.GetBucketLocation(*bucket.Name)
 		if err != nil {
-			return nil, err
+			alerts.SendEnumerationAlert(common.RemoteAWSTerraform, e.alerter, remoteerror.NewResourceScanningError(err, string(e.SupportedType()), *bucket.Name))
+			continue
 		}
 		if region == "" || region != e.providerConfig.DefaultAlias {
 			logrus.WithFields(logrus.Fields{

@@ -2,6 +2,7 @@ package resource
 
 import (
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"sort"
 	"strconv"
@@ -15,13 +16,49 @@ type Resource interface {
 	TerraformType() string
 	Attributes() *Attributes
 	Schema() *Schema
+	Src() Source
+}
+
+type Source interface {
+	Source() string
+	Namespace() string
+	InternalName() string
+}
+
+type SerializableSource struct {
+	S    string `json:"source"`
+	Ns   string `json:"namespace"`
+	Name string `json:"internal_name"`
+}
+
+type TerraformStateSource struct {
+	State  string
+	Module string
+	Name   string
+}
+
+func NewTerraformStateSource(state, module, name string) *TerraformStateSource {
+	return &TerraformStateSource{state, module, name}
+}
+
+func (s *TerraformStateSource) Source() string {
+	return s.State
+}
+
+func (s *TerraformStateSource) Namespace() string {
+	return s.Module
+}
+
+func (s *TerraformStateSource) InternalName() string {
+	return s.Name
 }
 
 type AbstractResource struct {
-	Id    string
-	Type  string
-	Attrs *Attributes
-	Sch   *Schema `json:"-" diff:"-"`
+	Id     string
+	Type   string
+	Attrs  *Attributes
+	Sch    *Schema `json:"-" diff:"-"`
+	Source Source  `json:"-"`
 }
 
 func (a *AbstractResource) Schema() *Schema {
@@ -40,6 +77,17 @@ func (a *AbstractResource) Attributes() *Attributes {
 	return a.Attrs
 }
 
+func (a *AbstractResource) Src() Source {
+	return a.Source
+}
+
+func (a *AbstractResource) SourceString() string {
+	if a.Source.Namespace() == "" {
+		return fmt.Sprintf("%s.%s", a.TerraformType(), a.Source.InternalName())
+	}
+	return fmt.Sprintf("%s.%s.%s", a.Source.Namespace(), a.TerraformType(), a.Source.InternalName())
+}
+
 type ResourceFactory interface {
 	CreateAbstractResource(ty, id string, data map[string]interface{}) *AbstractResource
 }
@@ -49,8 +97,9 @@ type SerializableResource struct {
 }
 
 type SerializedResource struct {
-	Id   string `json:"id"`
-	Type string `json:"type"`
+	Id     string              `json:"id"`
+	Type   string              `json:"type"`
+	Source *SerializableSource `json:"source,omitempty"`
 }
 
 func (u *SerializedResource) TerraformId() string {
@@ -69,6 +118,10 @@ func (u *SerializedResource) Schema() *Schema {
 	return nil
 }
 
+func (u *SerializedResource) Src() Source {
+	return nil
+}
+
 func (s *SerializableResource) UnmarshalJSON(bytes []byte) error {
 	var res *SerializedResource
 
@@ -80,7 +133,15 @@ func (s *SerializableResource) UnmarshalJSON(bytes []byte) error {
 }
 
 func (s SerializableResource) MarshalJSON() ([]byte, error) {
-	return json.Marshal(SerializedResource{Id: s.TerraformId(), Type: s.TerraformType()})
+	var src *SerializableSource
+	if s.Src() != nil {
+		src = &SerializableSource{
+			S:    s.Src().Source(),
+			Ns:   s.Src().Namespace(),
+			Name: s.Src().InternalName(),
+		}
+	}
+	return json.Marshal(SerializedResource{Id: s.TerraformId(), Type: s.TerraformType(), Source: src})
 }
 
 type NormalizedResource interface {

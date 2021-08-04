@@ -3,7 +3,10 @@ package aws
 import (
 	"fmt"
 
+	"github.com/cloudskiff/driftctl/pkg/alerter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -15,13 +18,15 @@ type S3BucketAnalyticEnumerator struct {
 	repository     repository.S3Repository
 	factory        resource.ResourceFactory
 	providerConfig tf.TerraformProviderConfig
+	alerter        alerter.AlerterInterface
 }
 
-func NewS3BucketAnalyticEnumerator(repo repository.S3Repository, factory resource.ResourceFactory, providerConfig tf.TerraformProviderConfig) *S3BucketAnalyticEnumerator {
+func NewS3BucketAnalyticEnumerator(repo repository.S3Repository, factory resource.ResourceFactory, providerConfig tf.TerraformProviderConfig, alerter alerter.AlerterInterface) *S3BucketAnalyticEnumerator {
 	return &S3BucketAnalyticEnumerator{
 		repository:     repo,
 		factory:        factory,
 		providerConfig: providerConfig,
+		alerter:        alerter,
 	}
 }
 
@@ -32,7 +37,7 @@ func (e *S3BucketAnalyticEnumerator) SupportedType() resource.ResourceType {
 func (e *S3BucketAnalyticEnumerator) Enumerate() ([]resource.Resource, error) {
 	buckets, err := e.repository.ListAllBuckets()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, string(e.SupportedType()), aws.AwsS3BucketResourceType)
+		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), aws.AwsS3BucketResourceType)
 	}
 
 	results := make([]resource.Resource, len(buckets))
@@ -40,7 +45,8 @@ func (e *S3BucketAnalyticEnumerator) Enumerate() ([]resource.Resource, error) {
 	for _, bucket := range buckets {
 		region, err := e.repository.GetBucketLocation(*bucket.Name)
 		if err != nil {
-			return nil, err
+			alerts.SendEnumerationAlert(common.RemoteAWSTerraform, e.alerter, remoteerror.NewResourceScanningError(err, string(e.SupportedType()), *bucket.Name))
+			continue
 		}
 		if region == "" || region != e.providerConfig.DefaultAlias {
 			logrus.WithFields(logrus.Fields{
@@ -52,7 +58,7 @@ func (e *S3BucketAnalyticEnumerator) Enumerate() ([]resource.Resource, error) {
 
 		analyticsConfigurationList, err := e.repository.ListBucketAnalyticsConfigurations(bucket, region)
 		if err != nil {
-			return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+			return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 		}
 
 		for _, analytics := range analyticsConfigurationList {

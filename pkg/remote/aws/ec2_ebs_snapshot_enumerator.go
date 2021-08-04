@@ -26,7 +26,7 @@ func (e *EC2EbsSnapshotEnumerator) SupportedType() resource.ResourceType {
 func (e *EC2EbsSnapshotEnumerator) Enumerate() ([]resource.Resource, error) {
 	snapshots, err := e.repository.ListAllSnapshots()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(snapshots))

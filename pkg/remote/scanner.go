@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cloudskiff/driftctl/pkg/alerter"
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -21,15 +22,17 @@ type Scanner struct {
 	remoteLibrary        *common.RemoteLibrary
 	alerter              alerter.AlerterInterface
 	options              ScannerOptions
+	filter               filter.Filter
 }
 
-func NewScanner(remoteLibrary *common.RemoteLibrary, alerter alerter.AlerterInterface, options ScannerOptions) *Scanner {
+func NewScanner(remoteLibrary *common.RemoteLibrary, alerter alerter.AlerterInterface, options ScannerOptions, filter filter.Filter) *Scanner {
 	return &Scanner{
 		enumeratorRunner:     parallel.NewParallelRunner(context.TODO(), 10),
 		detailsFetcherRunner: parallel.NewParallelRunner(context.TODO(), 10),
 		remoteLibrary:        remoteLibrary,
 		alerter:              alerter,
 		options:              options,
+		filter:               filter,
 	}
 }
 
@@ -57,6 +60,12 @@ loop:
 
 func (s *Scanner) scan() ([]resource.Resource, error) {
 	for _, enumerator := range s.remoteLibrary.Enumerators() {
+		if s.filter.IsTypeIgnored(enumerator.SupportedType()) {
+			logrus.WithFields(logrus.Fields{
+				"type": enumerator.SupportedType(),
+			}).Debug("Ignored enumeration of resources since it is ignored in filter")
+			continue
+		}
 		enumerator := enumerator
 		s.enumeratorRunner.Run(func() (interface{}, error) {
 			resources, err := enumerator.Enumerate()
@@ -67,13 +76,13 @@ func (s *Scanner) scan() ([]resource.Resource, error) {
 				}
 				return nil, err
 			}
-			for _, resource := range resources {
-				if resource == nil {
+			for _, res := range resources {
+				if res == nil {
 					continue
 				}
 				logrus.WithFields(logrus.Fields{
-					"id":   resource.TerraformId(),
-					"type": resource.TerraformType(),
+					"id":   res.TerraformId(),
+					"type": res.TerraformType(),
 				}).Debug("Found cloud resource")
 			}
 			return resources, nil
@@ -93,14 +102,18 @@ func (s *Scanner) scan() ([]resource.Resource, error) {
 		res := res
 		s.detailsFetcherRunner.Run(func() (interface{}, error) {
 			fetcher := s.remoteLibrary.GetDetailsFetcher(resource.ResourceType(res.TerraformType()))
-			if fetcher != nil {
-				resourceWithDetails, err := fetcher.ReadDetails(res)
-				if err != nil {
+			if fetcher == nil {
+				return []resource.Resource{res}, nil
+			}
+
+			resourceWithDetails, err := fetcher.ReadDetails(res)
+			if err != nil {
+				if err := HandleResourceDetailsFetchingError(err, s.alerter); err != nil {
 					return nil, err
 				}
-				return []resource.Resource{resourceWithDetails}, nil
+				return []resource.Resource{}, nil
 			}
-			return []resource.Resource{res}, nil
+			return []resource.Resource{resourceWithDetails}, nil
 		})
 	}
 

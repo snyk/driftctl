@@ -29,6 +29,7 @@ resource "aws_instance" "web" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t3.micro"
   subnet_id     = aws_subnet.subnet-1.id
+  availability_zone = "us-east-1b"
 
   tags = {
     Name = "HelloWorld"
@@ -55,6 +56,7 @@ resource "aws_subnet" "subnet-1" {
   vpc_id                  = aws_vpc.default.id
   cidr_block              = "10.0.0.0/24"
   map_public_ip_on_launch = true
+  availability_zone = "us-east-1b"
 
   depends_on = [aws_internet_gateway.gw]
 }

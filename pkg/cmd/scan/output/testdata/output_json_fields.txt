@@ -1,5 +1,6 @@
 Found changed resources:
-    - diff-id-1 (aws_diff_resource):
+  From tfstate://state.tfstate
+    - diff-id-1 (module.aws_diff_resource.name):
         ~ Json:
             {
    "Statement": [
@@ -20,7 +21,7 @@ Found changed resources:
    "Version": "2012-10-17"
  }
 
-    - diff-id-2 (aws_diff_resource):
+    - diff-id-2 (module.aws_diff_resource.name):
         ~ Json:
             {
 -  "foo": "bar"

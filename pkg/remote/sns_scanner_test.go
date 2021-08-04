@@ -9,6 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/alerter"
+	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
@@ -109,7 +111,10 @@ func TestScanSNSTopic(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewSNSTopicEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicResourceType, aws.NewSNSTopicDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {
@@ -202,7 +207,10 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewSNSTopicPolicyEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicPolicyResourceType, aws.NewSNSTopicPolicyDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {
@@ -272,7 +280,7 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 			},
 			alerts: map[string][]alerter.Alert{
 				resourceaws.AwsSnsTopicSubscriptionResourceType: {
-					NewEnumerationAccessDeniedAlert("aws+tf", resourceaws.AwsSnsTopicSubscriptionResourceType, resourceaws.AwsSnsTopicSubscriptionResourceType),
+					alerts.NewRemoteAccessDeniedAlert("aws+tf", resourceaws.AwsSnsTopicSubscriptionResourceType, resourceaws.AwsSnsTopicSubscriptionResourceType, alerts.EnumerationPhase),
 				},
 			},
 			err: nil,
@@ -322,7 +330,10 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 			remoteLibrary.AddEnumerator(aws.NewSNSTopicSubscriptionEnumerator(repo, factory, alerter))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicSubscriptionResourceType, aws.NewSNSTopicSubscriptionDetailsFetcher(provider, deserializer))
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions)
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.err)
 			if err != nil {

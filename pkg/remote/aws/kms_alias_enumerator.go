@@ -26,7 +26,7 @@ func (e *KMSAliasEnumerator) SupportedType() resource.ResourceType {
 func (e *KMSAliasEnumerator) Enumerate() ([]resource.Resource, error) {
 	aliases, err := e.repository.ListAllAliases()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(aliases))

@@ -26,7 +26,7 @@ func (e *DynamoDBTableEnumerator) SupportedType() resource.ResourceType {
 func (e *DynamoDBTableEnumerator) Enumerate() ([]resource.Resource, error) {
 	tables, err := e.repository.ListAllTables()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(tables))

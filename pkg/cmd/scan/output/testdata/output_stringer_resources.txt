@@ -7,7 +7,8 @@ Found resources not covered by IaC:
     - duysgkfdjfdgfhd
         Name: unmanaged resource
 Found changed resources:
-    - gdsfhgkbn (FakeResourceStringer):
+  From tfstate://state.tfstate
+    - gdsfhgkbn (module.FakeResourceStringer.name):
         Name: resource with diff
             ~ Name: "" => "resource with diff"
 Found 3 resource(s)

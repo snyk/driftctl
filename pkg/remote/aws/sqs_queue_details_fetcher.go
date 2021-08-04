@@ -3,6 +3,7 @@ package aws
 import (
 	"strings"
 
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -35,7 +36,7 @@ func (r *SQSQueueDetailsFetcher) ReadDetails(res resource.Resource) (resource.Re
 			return nil, nil
 		}
 		logrus.Error(err)
-		return nil, err
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsSqsQueueResourceType, *ctyVal)
 	if err != nil {

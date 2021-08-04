@@ -14,7 +14,8 @@ Found resources not covered by IaC:
     - unmanaged-id-1
     - unmanaged-id-2
 Found changed resources:
-    - diff-id-1 (aws_diff_resource):
+  From tfstate://state.tfstate
+    - diff-id-1 (module.aws_diff_resource.name):
         ~ updated.field: "foobar" => "barfoo"
         + new.field: <nil> => "newValue"
         - a: "oldValue" => <nil>

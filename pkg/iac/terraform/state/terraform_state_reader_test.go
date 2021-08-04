@@ -7,13 +7,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/output"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	resourcegithub "github.com/cloudskiff/driftctl/pkg/resource/github"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
@@ -40,6 +40,52 @@ func TestReadStateInvalid(t *testing.T) {
 	state, err := readState("terraform.tfstate", reader)
 	if err == nil || state != nil {
 		t.Errorf("ReadFile invalid state should return error")
+	}
+}
+
+// Check that resource sources are properly set
+func TestTerraformStateReader_Source(t *testing.T) {
+	progress := &output.MockProgress{}
+	progress.On("Inc").Return().Times(1)
+	progress.On("Stop").Return().Times(1)
+
+	provider := mocks.NewMockedGoldenTFProvider("source", nil, false)
+	library := terraform.NewProviderLibrary()
+	library.AddProvider(terraform.AWS, provider)
+
+	repo := testresource.InitFakeSchemaRepository(terraform.AWS, "3.19.0")
+	resourceaws.InitResourcesMetadata(repo)
+
+	factory := terraform.NewTerraformResourceFactory(repo)
+
+	r := &TerraformStateReader{
+		config: config.SupplierConfig{
+			Key:  "tfstate",
+			Path: path.Join(goldenfile.GoldenFilePath, "source", "terraform.tfstate"),
+		},
+		library:      library,
+		progress:     progress,
+		deserializer: resource.NewDeserializer(factory),
+	}
+
+	got, err := r.Resources()
+	assert.Nil(t, err)
+	assert.Len(t, got, 2)
+	for _, res := range got {
+		if res.TerraformType() == resourceaws.AwsS3BucketResourceType {
+			assert.Equal(t, &resource.TerraformStateSource{
+				State:  "tfstate://test/source/terraform.tfstate",
+				Module: "",
+				Name:   "bucket",
+			}, res.(*resource.AbstractResource).Source)
+		}
+		if res.TerraformType() == resourceaws.AwsIamUserResourceType {
+			assert.Equal(t, &resource.TerraformStateSource{
+				State:  "tfstate://test/source/terraform.tfstate",
+				Module: "module.iam_iam-user",
+				Name:   "this_no_pgp",
+			}, res.(*resource.AbstractResource).Source)
+		}
 	}
 }
 
@@ -304,4 +350,31 @@ func TestTerraformStateReader_VersionSupported(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestTerraformStateReader_WithIgnoredResource(t *testing.T) {
+	progress := &output.MockProgress{}
+	progress.On("Inc").Return().Times(1)
+	progress.On("Stop").Return().Times(1)
+
+	provider := mocks.NewMockedGoldenTFProvider("ignored_resources", nil, false)
+	library := terraform.NewProviderLibrary()
+	library.AddProvider(terraform.AWS, provider)
+
+	filter := &filter.MockFilter{}
+	filter.On("IsTypeIgnored", resource.ResourceType("aws_s3_bucket")).Return(true)
+
+	r := &TerraformStateReader{
+		config: config.SupplierConfig{
+			Path: path.Join(goldenfile.GoldenFilePath, "ignored_resources", "terraform.tfstate"),
+		},
+		library:  library,
+		progress: progress,
+		filter:   filter,
+	}
+
+	got, err := r.Resources()
+	filter.AssertExpectations(t)
+	assert.Nil(t, err)
+	assert.Len(t, got, 0)
 }

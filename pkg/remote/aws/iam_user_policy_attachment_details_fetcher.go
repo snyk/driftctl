@@ -1,6 +1,7 @@
 package aws
 
 import (
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -28,7 +29,7 @@ func (r *IamUserPolicyAttachmentDetailsFetcher) ReadDetails(res resource.Resourc
 		},
 	})
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsIamUserPolicyAttachmentResourceType, *ctyVal)
 	if err != nil {

@@ -26,7 +26,7 @@ func (e *ECRRepositoryEnumerator) SupportedType() resource.ResourceType {
 func (e *ECRRepositoryEnumerator) Enumerate() ([]resource.Resource, error) {
 	repos, err := e.repository.ListAllRepositories()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(repos))

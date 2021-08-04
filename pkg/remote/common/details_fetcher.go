@@ -1,6 +1,7 @@
 package common
 
 import (
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/sirupsen/logrus"
@@ -25,12 +26,18 @@ func NewGenericDetailsFetcher(resType resource.ResourceType, provider terraform.
 }
 
 func (f *GenericDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
+	attributes := map[string]string{}
+	if res.Schema().ResolveReadAttributesFunc != nil {
+		abstractResource := res.(*resource.AbstractResource)
+		attributes = res.Schema().ResolveReadAttributesFunc(abstractResource)
+	}
 	ctyVal, err := f.reader.ReadResource(terraform.ReadResourceArgs{
-		Ty: f.resType,
-		ID: res.TerraformId(),
+		Ty:         f.resType,
+		ID:         res.TerraformId(),
+		Attributes: attributes,
 	})
 	if err != nil {
-		return nil, err
+		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
 	}
 	if ctyVal.IsNull() {
 		logrus.WithFields(logrus.Fields{

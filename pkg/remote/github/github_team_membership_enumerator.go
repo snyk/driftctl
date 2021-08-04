@@ -25,7 +25,7 @@ func (g *GithubTeamMembershipEnumerator) SupportedType() resource.ResourceType {
 func (g *GithubTeamMembershipEnumerator) Enumerate() ([]resource.Resource, error) {
 	ids, err := g.repository.ListTeamMemberships()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(g.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(g.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(ids))

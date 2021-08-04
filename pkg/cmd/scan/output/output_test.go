@@ -8,9 +8,8 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/cloudskiff/driftctl/pkg/output"
-	"github.com/cloudskiff/driftctl/pkg/remote"
-	"github.com/cloudskiff/driftctl/pkg/remote/aws"
-	"github.com/cloudskiff/driftctl/pkg/remote/github"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
+	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/r3labs/diff/v2"
@@ -47,35 +46,43 @@ func fakeAnalysis() *analyser.Analysis {
 			Type: "aws_no_diff_resource",
 		},
 	)
-	a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
+	a.AddDifference(analyser.Difference{Res: &resource.AbstractResource{
 		Id:   "diff-id-1",
 		Type: "aws_diff_resource",
-	}, Changelog: []analyser.Change{
-		{
-			Change: diff.Change{
-				Type: diff.UPDATE,
-				Path: []string{"updated", "field"},
-				From: "foobar",
-				To:   "barfoo",
-			},
+		Source: &resource.TerraformStateSource{
+			State:  "tfstate://state.tfstate",
+			Module: "module",
+			Name:   "name",
 		},
-		{
-			Change: diff.Change{
-				Type: diff.CREATE,
-				Path: []string{"new", "field"},
-				From: nil,
-				To:   "newValue",
+	},
+		Changelog: []analyser.Change{
+			{
+				Change: diff.Change{
+					Type: diff.UPDATE,
+					Path: []string{"updated", "field"},
+					From: "foobar",
+					To:   "barfoo",
+				},
 			},
-		},
-		{
-			Change: diff.Change{
-				Type: diff.DELETE,
-				Path: []string{"a"},
-				From: "oldValue",
-				To:   nil,
+			{
+				Change: diff.Change{
+					Type: diff.CREATE,
+					Path: []string{"new", "field"},
+					From: nil,
+					To:   "newValue",
+				},
 			},
-		},
-	}})
+			{
+				Change: diff.Change{
+					Type: diff.DELETE,
+					Path: []string{"a"},
+					From: "oldValue",
+					To:   nil,
+				},
+			},
+		}})
+	a.ProviderName = "AWS"
+	a.ProviderVersion = "3.19.0"
 	return &a
 }
 
@@ -83,11 +90,12 @@ func fakeAnalysisWithAlerts() *analyser.Analysis {
 	a := fakeAnalysis()
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
-			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_vpc", "aws_vpc"),
-			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sqs", "aws_sqs"),
-			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sns", "aws_sns"),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_vpc", "aws_vpc", alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_sqs", "aws_sqs", alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_sns", "aws_sns", alerts.EnumerationPhase),
 		},
 	})
+	a.ProviderVersion = "3.19.0"
 	return a
 }
 
@@ -99,6 +107,8 @@ func fakeAnalysisNoDrift() *analyser.Analysis {
 			Type: "aws_managed_resource",
 		})
 	}
+	a.ProviderName = "AWS"
+	a.ProviderVersion = "3.19.0"
 	return &a
 }
 
@@ -116,34 +126,50 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 			Type: "aws_diff_resource",
 		},
 	)
-	a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
-		Id:   "diff-id-1",
-		Type: "aws_diff_resource",
-	}, Changelog: []analyser.Change{
-		{
-			JsonString: true,
-			Change: diff.Change{
-				Type: diff.UPDATE,
-				Path: []string{"Json"},
-				From: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Removed\":\"Added\",\"Changed\":[\"oldValue1\", \"oldValue2\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
-				To:   "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Changed\":\"newValue\",\"NewField\":[\"foobar\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
+	a.AddDifference(analyser.Difference{
+		Res: &resource.AbstractResource{
+			Id:   "diff-id-1",
+			Type: "aws_diff_resource",
+			Source: &resource.TerraformStateSource{
+				State:  "tfstate://state.tfstate",
+				Module: "module",
+				Name:   "name",
 			},
 		},
-	}})
-	a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
-		Id:   "diff-id-2",
-		Type: "aws_diff_resource",
-	}, Changelog: []analyser.Change{
-		{
-			JsonString: true,
-			Change: diff.Change{
-				Type: diff.UPDATE,
-				Path: []string{"Json"},
-				From: "{\"foo\":\"bar\"}",
-				To:   "{\"bar\":\"foo\"}",
+		Changelog: []analyser.Change{
+			{
+				JsonString: true,
+				Change: diff.Change{
+					Type: diff.UPDATE,
+					Path: []string{"Json"},
+					From: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Removed\":\"Added\",\"Changed\":[\"oldValue1\", \"oldValue2\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
+					To:   "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Changed\":\"newValue\",\"NewField\":[\"foobar\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
+				},
+			},
+		}})
+	a.AddDifference(analyser.Difference{
+		Res: &resource.AbstractResource{
+			Id:   "diff-id-2",
+			Type: "aws_diff_resource",
+			Source: &resource.TerraformStateSource{
+				State:  "tfstate://state.tfstate",
+				Module: "module",
+				Name:   "name",
 			},
 		},
-	}})
+		Changelog: []analyser.Change{
+			{
+				JsonString: true,
+				Change: diff.Change{
+					Type: diff.UPDATE,
+					Path: []string{"Json"},
+					From: "{\"foo\":\"bar\"}",
+					To:   "{\"bar\":\"foo\"}",
+				},
+			},
+		}})
+	a.ProviderName = "AWS"
+	a.ProviderVersion = "3.19.0"
 	return &a
 }
 
@@ -167,6 +193,8 @@ func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 			Attrs: &resource.Attributes{},
 		},
 	)
+	a.ProviderName = "AWS"
+	a.ProviderVersion = "3.19.0"
 	return &a
 }
 
@@ -214,6 +242,11 @@ func fakeAnalysisWithStringerResources() *analyser.Analysis {
 		Attrs: &resource.Attributes{
 			"name": "resource with diff",
 		},
+		Source: &resource.TerraformStateSource{
+			State:  "tfstate://state.tfstate",
+			Module: "module",
+			Name:   "name",
+		},
 	}, Changelog: []analyser.Change{
 		{
 			Change: diff.Change{
@@ -224,6 +257,8 @@ func fakeAnalysisWithStringerResources() *analyser.Analysis {
 			},
 		},
 	}})
+	a.ProviderName = "AWS"
+	a.ProviderVersion = "3.19.0"
 	return &a
 }
 
@@ -235,69 +270,77 @@ func fakeAnalysisWithComputedFields() *analyser.Analysis {
 			Type: "aws_diff_resource",
 		},
 	)
-	a.AddDifference(analyser.Difference{Res: &testresource.FakeResource{
-		Id:   "diff-id-1",
-		Type: "aws_diff_resource",
-	}, Changelog: []analyser.Change{
-		{
-			Change: diff.Change{
-				Type: diff.UPDATE,
-				Path: []string{"updated", "field"},
-				From: "foobar",
-				To:   "barfoo",
+	a.AddDifference(analyser.Difference{
+		Res: &resource.AbstractResource{
+			Id:   "diff-id-1",
+			Type: "aws_diff_resource",
+			Source: &resource.TerraformStateSource{
+				State:  "tfstate://state.tfstate",
+				Module: "module",
+				Name:   "name",
 			},
-			Computed: true,
-		},
-		{
-			Change: diff.Change{
-				Type: diff.CREATE,
-				Path: []string{"new", "field"},
-				From: nil,
-				To:   "newValue",
+		}, Changelog: []analyser.Change{
+			{
+				Change: diff.Change{
+					Type: diff.UPDATE,
+					Path: []string{"updated", "field"},
+					From: "foobar",
+					To:   "barfoo",
+				},
+				Computed: true,
 			},
-		},
-		{
-			Change: diff.Change{
-				Type: diff.DELETE,
-				Path: []string{"a"},
-				From: "oldValue",
-				To:   nil,
-			},
-			Computed: true,
-		},
-		{
-			Change: diff.Change{
-				Type: diff.UPDATE,
-				From: "foo",
-				To:   "oof",
-				Path: []string{
-					"struct",
-					"0",
-					"array",
-					"0",
+			{
+				Change: diff.Change{
+					Type: diff.CREATE,
+					Path: []string{"new", "field"},
+					From: nil,
+					To:   "newValue",
 				},
 			},
-			Computed: true,
-		},
-		{
-			Change: diff.Change{
-				Type: diff.UPDATE,
-				From: "one",
-				To:   "two",
-				Path: []string{
-					"struct",
-					"0",
-					"string",
+			{
+				Change: diff.Change{
+					Type: diff.DELETE,
+					Path: []string{"a"},
+					From: "oldValue",
+					To:   nil,
 				},
+				Computed: true,
 			},
-			Computed: true,
-		},
-	}})
+			{
+				Change: diff.Change{
+					Type: diff.UPDATE,
+					From: "foo",
+					To:   "oof",
+					Path: []string{
+						"struct",
+						"0",
+						"array",
+						"0",
+					},
+				},
+				Computed: true,
+			},
+			{
+				Change: diff.Change{
+					Type: diff.UPDATE,
+					From: "one",
+					To:   "two",
+					Path: []string{
+						"struct",
+						"0",
+						"string",
+					},
+				},
+				Computed: true,
+			},
+		}})
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
 			analyser.NewComputedDiffAlert(),
 		},
 	})
+	a.ProviderName = "AWS"
+	a.ProviderVersion = "3.19.0"
 	return &a
 }
 
@@ -305,11 +348,13 @@ func fakeAnalysisWithAWSEnumerationError() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
-			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_vpc", "aws_vpc"),
-			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sqs", "aws_sqs"),
-			remote.NewEnumerationAccessDeniedAlert(aws.RemoteAWSTerraform, "aws_sns", "aws_sns"),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_vpc", "aws_vpc", alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_sqs", "aws_sqs", alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_sns", "aws_sns", alerts.EnumerationPhase),
 		},
 	})
+	a.ProviderName = "AWS"
+	a.ProviderVersion = "3.19.0"
 	return &a
 }
 
@@ -317,10 +362,12 @@ func fakeAnalysisWithGithubEnumerationError() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
-			remote.NewEnumerationAccessDeniedAlert(github.RemoteGithubTerraform, "github_team", "github_team"),
-			remote.NewEnumerationAccessDeniedAlert(github.RemoteGithubTerraform, "github_team_membership", "github_team"),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, "github_team", "github_team", alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, "github_team_membership", "github_team", alerts.EnumerationPhase),
 		},
 	})
+	a.ProviderName = "AWS"
+	a.ProviderVersion = "3.19.0"
 	return &a
 }
 
@@ -358,6 +405,8 @@ func fakeAnalysisForJSONPlan() *analyser.Analysis {
 			},
 		},
 	)
+	a.ProviderName = "AWS"
+	a.ProviderVersion = "3.19.0"
 	return &a
 }
 

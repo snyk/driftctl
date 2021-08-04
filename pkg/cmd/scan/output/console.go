@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/fatih/color"
 	"github.com/mattn/go-isatty"
 	"github.com/r3labs/diff/v2"
@@ -16,7 +17,6 @@ import (
 	"github.com/yudai/gojsondiff/formatter"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/pkg/remote"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
@@ -65,35 +65,51 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 	}
 
 	if analysis.Summary().TotalDrifted > 0 {
-		fmt.Println("Found changed resources:")
-		for _, difference := range analysis.Differences() {
-			humanString := fmt.Sprintf("    - %s (%s):", difference.Res.TerraformId(), difference.Res.TerraformType())
-			whiteSpace := "        "
-			if humanAttrs := formatResourceAttributes(difference.Res); humanAttrs != "" {
-				humanString += fmt.Sprintf("\n        %s", humanAttrs)
-				whiteSpace = "            "
+
+		groupedBySource := make(map[string][]analyser.Difference)
+		for _, diff := range analysis.Differences() {
+			res := diff.Res.(*resource.AbstractResource)
+			key := res.Source.Source()
+			if _, exist := groupedBySource[key]; !exist {
+				groupedBySource[key] = []analyser.Difference{diff}
+				continue
 			}
-			fmt.Println(humanString)
-			for _, change := range difference.Changelog {
-				path := strings.Join(change.Path, ".")
-				pref := fmt.Sprintf("%s %s:", color.YellowString("~"), path)
-				if change.Type == diff.CREATE {
-					pref = fmt.Sprintf("%s %s:", color.GreenString("+"), path)
-				} else if change.Type == diff.DELETE {
-					pref = fmt.Sprintf("%s %s:", color.RedString("-"), path)
+			groupedBySource[key] = append(groupedBySource[key], diff)
+		}
+
+		fmt.Println("Found changed resources:")
+		for source, differences := range groupedBySource {
+			fmt.Print(color.BlueString("  From %s\n", source))
+			for _, difference := range differences {
+				res := difference.Res.(*resource.AbstractResource)
+				humanString := fmt.Sprintf("    - %s (%s):", res.TerraformId(), res.SourceString())
+				whiteSpace := "        "
+				if humanAttrs := formatResourceAttributes(res); humanAttrs != "" {
+					humanString += fmt.Sprintf("\n        %s", humanAttrs)
+					whiteSpace = "            "
 				}
-				if change.Type == diff.UPDATE {
-					if change.JsonString {
-						prefix := "           "
-						fmt.Printf("%s%s\n%s%s\n", whiteSpace, pref, prefix, jsonDiff(change.From, change.To, prefix))
-						continue
+				fmt.Println(humanString)
+				for _, change := range difference.Changelog {
+					path := strings.Join(change.Path, ".")
+					pref := fmt.Sprintf("%s %s:", color.YellowString("~"), path)
+					if change.Type == diff.CREATE {
+						pref = fmt.Sprintf("%s %s:", color.GreenString("+"), path)
+					} else if change.Type == diff.DELETE {
+						pref = fmt.Sprintf("%s %s:", color.RedString("-"), path)
 					}
+					if change.Type == diff.UPDATE {
+						if change.JsonString {
+							prefix := "           "
+							fmt.Printf("%s%s\n%s%s\n", whiteSpace, pref, prefix, jsonDiff(change.From, change.To, prefix))
+							continue
+						}
+					}
+					fmt.Printf("%s%s %s => %s", whiteSpace, pref, prettify(change.From), prettify(change.To))
+					if change.Computed {
+						fmt.Printf(" %s", color.YellowString("(computed)"))
+					}
+					fmt.Printf("\n")
 				}
-				fmt.Printf("%s%s %s => %s", whiteSpace, pref, prettify(change.From), prettify(change.To))
-				if change.Computed {
-					fmt.Printf(" %s", color.YellowString("(computed)"))
-				}
-				fmt.Printf("\n")
 			}
 		}
 	}
@@ -101,10 +117,10 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 	c.writeSummary(analysis)
 
 	enumerationErrorMessage := ""
-	for _, alerts := range analysis.Alerts() {
-		for _, alert := range alerts {
+	for _, a := range analysis.Alerts() {
+		for _, alert := range a {
 			fmt.Println(color.YellowString(alert.Message()))
-			if alert, ok := alert.(*remote.EnumerationAccessDeniedAlert); ok && enumerationErrorMessage == "" {
+			if alert, ok := alert.(*alerts.RemoteAccessDeniedAlert); ok && enumerationErrorMessage == "" {
 				enumerationErrorMessage = alert.GetProviderMessage()
 			}
 		}

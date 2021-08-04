@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/fatih/color"
 	"github.com/hashicorp/terraform/addrs"
@@ -24,6 +25,11 @@ import (
 
 const TerraformStateReaderSupplier = "tfstate"
 
+type decodedRes struct {
+	source resource.Source
+	val    cty.Value
+}
+
 type TerraformStateReader struct {
 	library        *terraform.ProviderLibrary
 	config         config.SupplierConfig
@@ -32,6 +38,7 @@ type TerraformStateReader struct {
 	deserializer   *resource.Deserializer
 	backendOptions *backend.Options
 	progress       output.Progress
+	filter         filter.Filter
 }
 
 func (r *TerraformStateReader) initReader() error {
@@ -39,8 +46,8 @@ func (r *TerraformStateReader) initReader() error {
 	return nil
 }
 
-func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options, progress output.Progress, deserializer *resource.Deserializer) (*TerraformStateReader, error) {
-	reader := TerraformStateReader{library: library, config: config, deserializer: deserializer, backendOptions: backendOpts, progress: progress}
+func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options, progress output.Progress, deserializer *resource.Deserializer, filter filter.Filter) (*TerraformStateReader, error) {
+	reader := TerraformStateReader{library: library, config: config, deserializer: deserializer, backendOptions: backendOpts, progress: progress, filter: filter}
 	err := reader.initReader()
 	if err != nil {
 		return nil, err
@@ -48,7 +55,7 @@ func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary,
 	return &reader, nil
 }
 
-func (r *TerraformStateReader) retrieve() (map[string][]cty.Value, error) {
+func (r *TerraformStateReader) retrieve() (map[string][]decodedRes, error) {
 	b, err := backend.GetBackend(r.config, r.backendOptions)
 	if err != nil {
 		return nil, err
@@ -61,7 +68,7 @@ func (r *TerraformStateReader) retrieve() (map[string][]cty.Value, error) {
 		return nil, err
 	}
 
-	resMap := make(map[string][]cty.Value)
+	resMap := make(map[string][]decodedRes)
 	for moduleName, module := range state.Modules {
 		logrus.WithFields(logrus.Fields{
 			"module":        moduleName,
@@ -76,6 +83,14 @@ func (r *TerraformStateReader) retrieve() (map[string][]cty.Value, error) {
 					"name": resName,
 					"type": resType,
 				}).Debug("Ignored unsupported resource from state")
+				continue
+			}
+
+			if r.filter != nil && r.filter.IsTypeIgnored(resource.ResourceType(resType)) {
+				logrus.WithFields(logrus.Fields{
+					"name": resName,
+					"type": resType,
+				}).Debug("Ignored resource from state since it is ignored in filter")
 				continue
 			}
 
@@ -123,12 +138,14 @@ func (r *TerraformStateReader) retrieve() (map[string][]cty.Value, error) {
 					}
 				}
 				_, exists := resMap[stateRes.Addr.Resource.Type]
+				val := decodedRes{
+					source: resource.NewTerraformStateSource(r.config.String(), moduleName, resName),
+					val:    decodedVal.Value,
+				}
 				if !exists {
-					resMap[stateRes.Addr.Resource.Type] = []cty.Value{
-						decodedVal.Value,
-					}
+					resMap[stateRes.Addr.Resource.Type] = []decodedRes{val}
 				} else {
-					resMap[stateRes.Addr.Resource.Type] = append(resMap[stateRes.Addr.Resource.Type], decodedVal.Value)
+					resMap[stateRes.Addr.Resource.Type] = append(resMap[stateRes.Addr.Resource.Type], val)
 				}
 			}
 		}
@@ -165,16 +182,24 @@ func (r *TerraformStateReader) convertInstance(instance *states.ResourceInstance
 	return instanceObj, nil
 }
 
-func (r *TerraformStateReader) decode(values map[string][]cty.Value) ([]resource.Resource, error) {
+func (r *TerraformStateReader) decode(valFromState map[string][]decodedRes) ([]resource.Resource, error) {
 	results := make([]resource.Resource, 0)
 
-	for ty, val := range values {
-		decodedResources, err := r.deserializer.Deserialize(ty, val)
-		if err != nil {
-			logrus.WithField("ty", ty).Warnf("Could not read from state: %+v", err)
-			continue
+	for ty, val := range valFromState {
+		for _, stateVal := range val {
+			res, err := r.deserializer.DeserializeOne(ty, stateVal.val)
+			if err != nil {
+				logrus.WithFields(logrus.Fields{
+					"type":  ty,
+					"name":  stateVal.source.InternalName(),
+					"state": stateVal.source.Source(),
+				}).Warnf("Could not read from state: %+v", err)
+				continue
+			}
+			stateResource, _ := res.(*resource.AbstractResource)
+			stateResource.Source = stateVal.source
+			results = append(results, stateResource)
 		}
-		results = append(results, decodedResources...)
 	}
 
 	return results, nil

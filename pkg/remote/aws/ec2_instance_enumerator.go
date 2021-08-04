@@ -26,7 +26,7 @@ func (e *EC2InstanceEnumerator) SupportedType() resource.ResourceType {
 func (e *EC2InstanceEnumerator) Enumerate() ([]resource.Resource, error) {
 	instances, err := e.repository.ListAllInstances()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(instances))

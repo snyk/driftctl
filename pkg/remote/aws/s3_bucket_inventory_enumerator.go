@@ -3,7 +3,10 @@ package aws
 import (
 	"fmt"
 
+	"github.com/cloudskiff/driftctl/pkg/alerter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -15,13 +18,15 @@ type S3BucketInventoryEnumerator struct {
 	repository     repository.S3Repository
 	factory        resource.ResourceFactory
 	providerConfig tf.TerraformProviderConfig
+	alerter        alerter.AlerterInterface
 }
 
-func NewS3BucketInventoryEnumerator(repo repository.S3Repository, factory resource.ResourceFactory, providerConfig tf.TerraformProviderConfig) *S3BucketInventoryEnumerator {
+func NewS3BucketInventoryEnumerator(repo repository.S3Repository, factory resource.ResourceFactory, providerConfig tf.TerraformProviderConfig, alerter alerter.AlerterInterface) *S3BucketInventoryEnumerator {
 	return &S3BucketInventoryEnumerator{
 		repository:     repo,
 		factory:        factory,
 		providerConfig: providerConfig,
+		alerter:        alerter,
 	}
 }
 
@@ -32,7 +37,7 @@ func (e *S3BucketInventoryEnumerator) SupportedType() resource.ResourceType {
 func (e *S3BucketInventoryEnumerator) Enumerate() ([]resource.Resource, error) {
 	buckets, err := e.repository.ListAllBuckets()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationErrorWithType(err, string(e.SupportedType()), aws.AwsS3BucketResourceType)
+		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), aws.AwsS3BucketResourceType)
 	}
 
 	results := make([]resource.Resource, len(buckets))
@@ -40,7 +45,8 @@ func (e *S3BucketInventoryEnumerator) Enumerate() ([]resource.Resource, error) {
 	for _, bucket := range buckets {
 		region, err := e.repository.GetBucketLocation(*bucket.Name)
 		if err != nil {
-			return nil, err
+			alerts.SendEnumerationAlert(common.RemoteAWSTerraform, e.alerter, remoteerror.NewResourceScanningError(err, string(e.SupportedType()), *bucket.Name))
+			continue
 		}
 		if region == "" || region != e.providerConfig.DefaultAlias {
 			logrus.WithFields(logrus.Fields{
@@ -52,7 +58,8 @@ func (e *S3BucketInventoryEnumerator) Enumerate() ([]resource.Resource, error) {
 
 		inventoryConfigurations, err := e.repository.ListBucketInventoryConfigurations(bucket, region)
 		if err != nil {
-			return nil, remoteerror.NewResourceEnumerationError(err, aws.AwsS3BucketInventoryResourceType)
+			// TODO: we should think about a way to ignore just one bucket inventory listing
+			return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 		}
 
 		for _, config := range inventoryConfigurations {

@@ -26,7 +26,7 @@ func (e *RDSDBSubnetGroupEnumerator) SupportedType() resource.ResourceType {
 func (e *RDSDBSubnetGroupEnumerator) Enumerate() ([]resource.Resource, error) {
 	subnetGroups, err := e.repository.ListAllDBSubnetGroups()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(subnetGroups))

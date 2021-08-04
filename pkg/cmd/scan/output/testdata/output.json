@@ -40,7 +40,12 @@
 		{
 			"res": {
 				"id": "diff-id-1",
-				"type": "aws_diff_resource"
+				"type": "aws_diff_resource",
+				"source": {
+					"source": "tfstate://state.tfstate",
+					"namespace": "module",
+					"internal_name": "name"
+				}
 			},
 			"changelog": [
 				{
@@ -76,5 +81,7 @@
 		}
 	],
 	"coverage": 33,
-	"alerts": null
+	"alerts": null,
+	"provider_name": "AWS",
+	"provider_version": "3.19.0"
 }

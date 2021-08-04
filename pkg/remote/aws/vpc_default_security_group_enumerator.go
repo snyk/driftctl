@@ -29,7 +29,7 @@ func (e *VPCDefaultSecurityGroupEnumerator) SupportedType() resource.ResourceTyp
 func (e *VPCDefaultSecurityGroupEnumerator) Enumerate() ([]resource.Resource, error) {
 	_, defaultSecurityGroups, err := e.repository.ListAllSecurityGroups()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, 0, len(defaultSecurityGroups))

@@ -12,8 +12,8 @@ import (
 )
 
 var supportedRemotes = []string{
-	aws.RemoteAWSTerraform,
-	github.RemoteGithubTerraform,
+	common.RemoteAWSTerraform,
+	common.RemoteGithubTerraform,
 }
 
 func IsSupported(remote string) bool {
@@ -33,9 +33,9 @@ func Activate(remote, version string, alerter *alerter.Alerter,
 	factory resource.ResourceFactory,
 	configDir string) error {
 	switch remote {
-	case aws.RemoteAWSTerraform:
+	case common.RemoteAWSTerraform:
 		return aws.Init(version, alerter, providerLibrary, remoteLibrary, progress, resourceSchemaRepository, factory, configDir)
-	case github.RemoteGithubTerraform:
+	case common.RemoteGithubTerraform:
 		return github.Init(version, alerter, providerLibrary, remoteLibrary, progress, resourceSchemaRepository, factory, configDir)
 	default:
 		return errors.Errorf("unsupported remote '%s'", remote)

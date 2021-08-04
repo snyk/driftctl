@@ -10,8 +10,6 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
-const RemoteGithubTerraform = "github+tf"
-
 /**
  * Initialize remote (configure credentials, launch tf providers and start gRPC clients)
  * Required to use Scanner
@@ -58,7 +56,7 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewGithubBranchProtectionEnumerator(repository, factory))
 	remoteLibrary.AddDetailsFetcher(github.GithubBranchProtectionResourceType, common.NewGenericDetailsFetcher(github.GithubBranchProtectionResourceType, provider, deserializer))
 
-	err = resourceSchemaRepository.Init(version, provider.Schema())
+	err = resourceSchemaRepository.Init(terraform.GITHUB, version, provider.Schema())
 	if err != nil {
 		return err
 	}

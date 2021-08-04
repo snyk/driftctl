@@ -1089,9 +1089,14 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 		},
 	)
 	analysis.AddDifference(Difference{
-		Res: &testresource.FakeResource{
+		Res: &resource.AbstractResource{
 			Id:   "AKIA5QYBVVD25KFXJHYJ",
 			Type: "aws_iam_access_key",
+			Source: &resource.TerraformStateSource{
+				State:  "tfstate://terraform.tfstate",
+				Module: "module",
+				Name:   "my_name",
+			},
 		},
 		Changelog: []Change{
 			{
@@ -1109,6 +1114,8 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 			&alerter.FakeAlert{Msg: "This is an alert"},
 		},
 	})
+	analysis.ProviderName = "AWS"
+	analysis.ProviderVersion = "2.18.5"
 
 	got, err := json.MarshalIndent(analysis, "", "\t")
 	if err != nil {
@@ -1191,6 +1198,8 @@ func TestAnalysis_UnmarshalJSON(t *testing.T) {
 				},
 			},
 		},
+		ProviderName:    "AWS",
+		ProviderVersion: "2.18.5",
 	}
 
 	got := Analysis{}

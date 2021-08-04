@@ -26,7 +26,7 @@ func (e *KMSKeyEnumerator) SupportedType() resource.ResourceType {
 func (e *KMSKeyEnumerator) Enumerate() ([]resource.Resource, error) {
 	keys, err := e.repository.ListAllKeys()
 	if err != nil {
-		return nil, remoteerror.NewResourceEnumerationError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(keys))

@@ -1,6 +1,7 @@
 package aws
 
 import (
+	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 
@@ -20,17 +21,17 @@ func NewLambdaFunctionDetailsFetcher(provider terraform.ResourceReader, deserial
 	}
 }
 
-func (r *LambdaFunctionDetailsFetcher) ReadDetails(topic resource.Resource) (resource.Resource, error) {
+func (r *LambdaFunctionDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
 	val, err := r.reader.ReadResource(terraform.ReadResourceArgs{
-		ID: topic.TerraformId(),
+		ID: res.TerraformId(),
 		Ty: resourceaws.AwsLambdaFunctionResourceType,
 		Attributes: map[string]string{
-			"function_name": topic.TerraformId(),
+			"function_name": res.TerraformId(),
 		},
 	})
 	if err != nil {
 		logrus.Error(err)
-		return nil, err
+		return nil, remoteerror.NewResourceScanningError(err, resourceaws.AwsLambdaFunctionResourceType, res.TerraformId())
 	}
 	return r.deserializer.DeserializeOne(resourceaws.AwsLambdaFunctionResourceType, *val)
 }
