@@ -30,7 +30,7 @@ fi
 
 # Only CI system should publish artifacts
 # We may not want to sign artifacts in dev environments
-if [ "$CI" != true ] && [ "$CMD" == "release" ]; then
+if [ "$CI" == true ] && [ "$CMD" == "release" ]; then
     FLAGS+="--skip-announce "
     FLAGS+="--skip-publish "
     FLAGS+="--skip-sign "
