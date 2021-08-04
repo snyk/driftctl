@@ -29,11 +29,6 @@ func (p *FakeTerraformProvider) ShouldUpdate() {
 }
 
 func (p *FakeTerraformProvider) Schema() map[string]providers.Schema {
-	if p.shouldUpdate {
-		schema := p.realProvider.Schema()
-		p.writeSchema(schema)
-		return schema
-	}
 	return p.readSchema()
 }
 
@@ -55,19 +50,8 @@ func (p *FakeTerraformProvider) ReadResource(args terraform.ReadResourceArgs) (*
 	return p.readResource(args)
 }
 
-func (p *FakeTerraformProvider) writeSchema(schema map[string]providers.Schema) {
-	marshal, err := gojson.Marshal(schema)
-	if err != nil {
-		panic(err)
-	}
-	err = test.WriteTestFile(fmt.Sprintf("schemas/%s/%s.json", p.realProvider.Name(), p.realProvider.Version()), marshal)
-	if err != nil {
-		panic(err)
-	}
-}
-
 func (p *FakeTerraformProvider) readSchema() map[string]providers.Schema {
-	content, err := test.ReadTestFile(fmt.Sprintf("schemas/%s/%s.json", p.realProvider.Name(), p.realProvider.Version()))
+	content, err := test.ReadTestFile(fmt.Sprintf("../schemas/%s/%s/schema.json", p.realProvider.Name(), p.realProvider.Version()))
 	if err != nil {
 		panic(err)
 	}
