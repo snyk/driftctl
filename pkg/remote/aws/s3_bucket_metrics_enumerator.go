@@ -37,7 +37,7 @@ func (e *S3BucketMetricsEnumerator) SupportedType() resource.ResourceType {
 func (e *S3BucketMetricsEnumerator) Enumerate() ([]resource.Resource, error) {
 	buckets, err := e.repository.ListAllBuckets()
 	if err != nil {
-		return nil, remoteerror.NewResourceListingErrorWithType(err, aws.AwsS3BucketMetricResourceType, aws.AwsS3BucketResourceType)
+		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), aws.AwsS3BucketResourceType)
 	}
 
 	results := make([]resource.Resource, len(buckets))
@@ -58,7 +58,7 @@ func (e *S3BucketMetricsEnumerator) Enumerate() ([]resource.Resource, error) {
 
 		metricsConfigurationList, err := e.repository.ListBucketMetricsConfigurations(bucket, region)
 		if err != nil {
-			return nil, remoteerror.NewResourceListingError(err, aws.AwsS3BucketMetricResourceType)
+			return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 		}
 
 		for _, metric := range metricsConfigurationList {

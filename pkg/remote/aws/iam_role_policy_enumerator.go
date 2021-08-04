@@ -29,12 +29,12 @@ func (e *IamRolePolicyEnumerator) SupportedType() resource.ResourceType {
 func (e *IamRolePolicyEnumerator) Enumerate() ([]resource.Resource, error) {
 	roles, err := e.repository.ListAllRoles()
 	if err != nil {
-		return nil, remoteerror.NewResourceListingErrorWithType(err, resourceaws.AwsIamRolePolicyResourceType, resourceaws.AwsIamRoleResourceType)
+		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), resourceaws.AwsIamRoleResourceType)
 	}
 
 	policies, err := e.repository.ListAllRolePolicies(roles)
 	if err != nil {
-		return nil, remoteerror.NewResourceListingError(err, resourceaws.AwsIamRolePolicyResourceType)
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, len(policies))

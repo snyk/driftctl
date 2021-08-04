@@ -31,7 +31,7 @@ func (e *IamAccessKeyEnumerator) Enumerate() ([]resource.Resource, error) {
 
 	keys, err := e.repository.ListAllAccessKeys(users)
 	if err != nil {
-		return nil, remoteerror.NewResourceListingError(err, resourceaws.AwsIamAccessKeyResourceType)
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
 	results := make([]resource.Resource, 0)
