@@ -10,37 +10,36 @@ if ! which goreleaser >/dev/null; then
     go install github.com/goreleaser/goreleaser@v0.173.2
 fi
 
-if [ -z $ENV ]; then
-    echo "Error: ENV variable must be defined"
-    exit 1
-fi
+export ENV="${ENV:-dev}"
+SINGLE_TARGET="${SINGLE_TARGET:-false}"
 
 # Check configuration
 goreleaser check
 
-if [ "$ENV" == "dev" ]; then
-    echo "+ Building using goreleaser ..."
-    goreleaser build \
-        --rm-dist \
-        --parallelism 2 \
-        --snapshot \
-        --single-target
-    exit 0
-fi
+FLAGS=""
+FLAGS+="--rm-dist "
+FLAGS+="--snapshot "
+FLAGS+="--parallelism 2 "
 
-GRFLAGS=""
+CMD="release"
+
+if [ "$SINGLE_TARGET" == "true" ]; then
+    CMD="build"
+    FLAGS+="--single-target "
+fi
 
 # Only CI system should publish artifacts
 # We may not want to sign artifacts in dev environments
-if [ "$CI" != true ]; then
-    GRFLAGS+="--snapshot "
-    GRFLAGS+="--skip-announce "
-    GRFLAGS+="--skip-publish "
-    GRFLAGS+="--skip-sign "
+if [ "$CI" != true ] && [ "$CMD" == "release" ]; then
+    FLAGS+="--skip-announce "
+    FLAGS+="--skip-publish "
+    FLAGS+="--skip-sign "
 fi
 
-echo "+ Building using goreleaser ..."
-goreleaser release \
-    --rm-dist \
-    --parallelism 2 \
-    ${GRFLAGS}
+CMD="goreleaser ${CMD} ${FLAGS}"
+
+echo "+ Building using goreleaser"
+echo "+ ENV=${ENV}"
+echo "+ CMD=${CMD}"
+
+$CMD
