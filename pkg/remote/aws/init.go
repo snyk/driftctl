@@ -176,8 +176,10 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsEKSClusterResourceType, NewEKSClusterDetailsFetcher(provider, deserializer, eksRepository))
 
 	remoteLibrary.AddEnumerator(NewAutoScalingGroupsEnumerator(autoscalingRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsAutoScalingGroupResourceType, common.NewGenericDetailsFetcher(aws.AwsAutoScalingGroupResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewElbEnumerator(autoscalingRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsElbResourceType, common.NewGenericDetailsFetcher(aws.AwsElbResourceType, provider, deserializer))
 
 	err = resourceSchemaRepository.Init(terraform.AWS, version, provider.Schema())
 	if err != nil {

@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"encoding/json"
+
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -46,6 +48,19 @@ func (r *EKSClusterDetailsFetcher) ReadDetails(res resource.Resource) (resource.
 	}
 	if val := info.Version; val != nil {
 		attrs["version"] = *val
+	}
+	if val := info.ResourcesVpcConfig; val != nil {
+		attrs["vpc_config"] = map[string]interface{}{
+			// "cluster_security_group_id": *val.ClusterSecurityGroupId,
+			// "endpoint_private_access": *val.EndpointPrivateAccess,
+			// "endpoint_public_access": *val.EndpointPublicAccess,
+			// "public_access_cidrs": val.PublicAccessCidrs,
+			// "subnet_ids": val.SubnetIds,
+			// "vpc_id": *val.VpcId,
+		}
+		if data, err := json.Marshal(val.SecurityGroupIds); err != nil {
+			(attrs["vpc_config"].(map[string]interface{}))["security_group_ids"] = string(data)
+		}
 	}
 	if val := info.KubernetesNetworkConfig; val != nil {
 		attrs["kubernetes_network_config"] = map[string]string{
