@@ -7,7 +7,7 @@ import (
 const AwsLambdaEventSourceMappingResourceType = "aws_lambda_event_source_mapping"
 
 func initAwsLambdaEventSourceMappingMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsLambdaEventSourceMappingResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsLambdaEventSourceMappingResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"state_transition_reason"})
 		val.SafeDelete([]string{"state"})
@@ -16,7 +16,7 @@ func initAwsLambdaEventSourceMappingMetaData(resourceSchemaRepository resource.S
 		val.SafeDelete([]string{"last_processing_result"})
 		val.SafeDelete([]string{"last_modified"})
 	})
-	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsLambdaEventSourceMappingResourceType, func(res *resource.AbstractResource) map[string]string {
+	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsLambdaEventSourceMappingResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)
 		source := val.GetString("event_source_arn")

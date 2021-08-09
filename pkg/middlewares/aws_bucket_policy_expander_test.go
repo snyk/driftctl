@@ -16,9 +16,9 @@ import (
 func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
-		resourcesFromState []resource.Resource
+		resourcesFromState []*resource.Resource
 		mocks              func(*terraform.MockResourceFactory)
-		expected           []resource.Resource
+		expected           []*resource.Resource
 	}{
 		{
 			name: "Inline policy, no aws_s3_bucket_policy attached",
@@ -32,13 +32,13 @@ func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 						"bucket": "foo",
 						"policy": "{\"Id\":\"MYINLINEBUCKETPOLICY\",\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":\"8.8.8.8/32\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-test-policy-like-sqs/*\",\"Sid\":\"IPAllow\"}],\"Version\":\"2012-10-17\"}",
 					},
-				).Once().Return(&resource.AbstractResource{
+				).Once().Return(&resource.Resource{
 					Id:   "foo",
 					Type: aws.AwsS3BucketPolicyResourceType,
 				})
 			},
-			resourcesFromState: []resource.Resource{
-				&resource.AbstractResource{
+			resourcesFromState: []*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsS3BucketResourceType,
 					Attrs: &resource.Attributes{
@@ -47,15 +47,15 @@ func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: []resource.Resource{
-				&resource.AbstractResource{
+			expected: []*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsS3BucketResourceType,
 					Attrs: &resource.Attributes{
 						"bucket": "foo",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "foo",
 					Type: aws.AwsS3BucketPolicyResourceType,
 				},
@@ -73,33 +73,33 @@ func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 						"bucket": "foo",
 						"policy": "{\"Id\":\"MYBUCKETPOLICY\",\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":\"8.8.8.8/32\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-test-policy-like-sqs/*\",\"Sid\":\"IPAllow\"}],\"Version\":\"2012-10-17\"}",
 					},
-				).Once().Return(&resource.AbstractResource{
+				).Once().Return(&resource.Resource{
 					Id:   "foo",
 					Type: aws.AwsS3BucketPolicyResourceType,
 				})
 			},
-			resourcesFromState: []resource.Resource{
-				&resource.AbstractResource{
+			resourcesFromState: []*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsS3BucketResourceType,
 					Attrs: &resource.Attributes{
 						"bucket": "foo",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "foo",
 					Type: aws.AwsS3BucketPolicyResourceType,
 				},
 			},
-			expected: []resource.Resource{
-				&resource.AbstractResource{
+			expected: []*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsS3BucketResourceType,
 					Attrs: &resource.Attributes{
 						"bucket": "foo",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "foo",
 					Type: aws.AwsS3BucketPolicyResourceType,
 				},
@@ -107,8 +107,8 @@ func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 		},
 		{
 			name: "Inline policy and aws_s3_bucket_policy",
-			resourcesFromState: []resource.Resource{
-				&resource.AbstractResource{
+			resourcesFromState: []*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsS3BucketResourceType,
 					Attrs: &resource.Attributes{
@@ -116,7 +116,7 @@ func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 						"policy": awssdk.String("{\"Id\":\"MYINLINEBUCKETPOLICY\",\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":\"8.8.8.8/32\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":\"arn:aws:s3:::bucket-test-policy-like-sqs/*\",\"Sid\":\"IPAllow\"}],\"Version\":\"2012-10-17\"}"),
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "foo",
 					Type: aws.AwsS3BucketPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -125,15 +125,15 @@ func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: []resource.Resource{
-				&resource.AbstractResource{
+			expected: []*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsS3BucketResourceType,
 					Attrs: &resource.Attributes{
 						"bucket": "foo",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "foo",
 					Type: aws.AwsS3BucketPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -145,8 +145,8 @@ func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 		},
 		{
 			name: "empty policy ",
-			resourcesFromState: []resource.Resource{
-				&resource.AbstractResource{
+			resourcesFromState: []*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsS3BucketResourceType,
 					Attrs: &resource.Attributes{
@@ -155,8 +155,8 @@ func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: []resource.Resource{
-				&resource.AbstractResource{
+			expected: []*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsS3BucketResourceType,
 					Attrs: &resource.Attributes{
@@ -176,7 +176,7 @@ func TestAwsBucketPolicyExpander_Execute(t *testing.T) {
 			}
 
 			m := NewAwsBucketPolicyExpander(factory)
-			err := m.Execute(&[]resource.Resource{}, &tt.resourcesFromState)
+			err := m.Execute(&[]*resource.Resource{}, &tt.resourcesFromState)
 			if err != nil {
 				t.Fatal(err)
 			}

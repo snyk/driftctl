@@ -12,14 +12,14 @@ import (
 func TestTagsAllManager_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
-		remoteResources    *[]resource.Resource
-		resourcesFromState *[]resource.Resource
+		remoteResources    *[]*resource.Resource
+		resourcesFromState *[]*resource.Resource
 		wantErr            bool
 	}{
 		{
 			name: "With multiple resources that are tags_all compatible",
-			remoteResources: &[]resource.Resource{
-				&resource.AbstractResource{
+			remoteResources: &[]*resource.Resource{
+				{
 					Id:   "dummy-instance",
 					Type: "aws_instance",
 					Attrs: &resource.Attributes{
@@ -33,7 +33,7 @@ func TestTagsAllManager_Execute(t *testing.T) {
 						},
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "dummy-ebs-volume",
 					Type: "aws_ebs_volume",
 					Attrs: &resource.Attributes{
@@ -48,8 +48,8 @@ func TestTagsAllManager_Execute(t *testing.T) {
 					},
 				},
 			},
-			resourcesFromState: &[]resource.Resource{
-				&resource.AbstractResource{
+			resourcesFromState: &[]*resource.Resource{
+				{
 					Id:   "dummy-instance",
 					Type: "aws_instance",
 					Attrs: &resource.Attributes{
@@ -62,7 +62,7 @@ func TestTagsAllManager_Execute(t *testing.T) {
 						},
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "dummy-ebs-volume",
 					Type: "aws_ebs_volume",
 					Attrs: &resource.Attributes{

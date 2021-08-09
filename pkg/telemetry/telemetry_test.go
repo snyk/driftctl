@@ -9,8 +9,8 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/cloudskiff/driftctl/pkg/memstore"
+	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/version"
-	"github.com/cloudskiff/driftctl/test/resource"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 )
@@ -30,8 +30,8 @@ func TestSendTelemetry(t *testing.T) {
 			name: "valid analysis",
 			analysis: func() *analyser.Analysis {
 				a := &analyser.Analysis{}
-				a.AddManaged(&resource.FakeResource{})
-				a.AddUnmanaged(&resource.FakeResource{})
+				a.AddManaged(&resource.Resource{})
+				a.AddUnmanaged(&resource.Resource{})
 				a.Duration = 123.4 * 1e9 // 123.4 seconds
 				return a
 			}(),

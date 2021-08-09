@@ -18,8 +18,8 @@ func NewAwsBucketPolicyExpander(resourceFactory resource.ResourceFactory) AwsBuc
 	}
 }
 
-func (m AwsBucketPolicyExpander) Execute(_, resourcesFromState *[]resource.Resource) error {
-	newList := make([]resource.Resource, 0)
+func (m AwsBucketPolicyExpander) Execute(_, resourcesFromState *[]*resource.Resource) error {
+	newList := make([]*resource.Resource, 0)
 	for _, res := range *resourcesFromState {
 		// Ignore all resources other than s3_bucket
 		if res.TerraformType() != aws.AwsS3BucketResourceType {
@@ -27,15 +27,14 @@ func (m AwsBucketPolicyExpander) Execute(_, resourcesFromState *[]resource.Resou
 			continue
 		}
 
-		bucket, _ := res.(*resource.AbstractResource)
 		newList = append(newList, res)
 
 		if hasPolicyAttached(res.TerraformId(), resourcesFromState) {
-			bucket.Attrs.SafeDelete([]string{"policy"})
+			res.Attrs.SafeDelete([]string{"policy"})
 			continue
 		}
 
-		err := m.handlePolicy(bucket, &newList)
+		err := m.handlePolicy(res, &newList)
 		if err != nil {
 			return err
 		}
@@ -44,7 +43,7 @@ func (m AwsBucketPolicyExpander) Execute(_, resourcesFromState *[]resource.Resou
 	return nil
 }
 
-func (m *AwsBucketPolicyExpander) handlePolicy(bucket *resource.AbstractResource, results *[]resource.Resource) error {
+func (m *AwsBucketPolicyExpander) handlePolicy(bucket *resource.Resource, results *[]*resource.Resource) error {
 	policyAttr, exist := bucket.Attrs.Get("policy")
 	if !exist || policyAttr == nil || policyAttr == "" {
 		return nil
@@ -71,7 +70,7 @@ func (m *AwsBucketPolicyExpander) handlePolicy(bucket *resource.AbstractResource
 // It is mandatory since it's possible to have a aws_bucket with an inline policy
 // AND a aws_bucket_policy resource at the same time. At the end, on the AWS console,
 // the aws_bucket_policy will be used.
-func hasPolicyAttached(bucket string, resourcesFromState *[]resource.Resource) bool {
+func hasPolicyAttached(bucket string, resourcesFromState *[]*resource.Resource) bool {
 	for _, res := range *resourcesFromState {
 		if res.TerraformType() == aws.AwsS3BucketPolicyResourceType &&
 			res.TerraformId() == bucket {

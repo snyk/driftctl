@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
-	resource2 "github.com/cloudskiff/driftctl/test/resource"
 )
 
 func TestAlerter_Alert(t *testing.T) {
@@ -76,13 +75,13 @@ func TestAlerter_IgnoreResources(t *testing.T) {
 	cases := []struct {
 		name     string
 		alerts   Alerts
-		resource resource.Resource
+		resource *resource.Resource
 		expected bool
 	}{
 		{
 			name:   "TestNoAlerts",
 			alerts: Alerts{},
-			resource: &resource2.FakeResource{
+			resource: &resource.Resource{
 				Type: "fakeres",
 				Id:   "foobar",
 			},
@@ -104,7 +103,7 @@ func TestAlerter_IgnoreResources(t *testing.T) {
 					&FakeAlert{"Should not be ignored", false},
 				},
 			},
-			resource: &resource2.FakeResource{
+			resource: &resource.Resource{
 				Type: "fakeres",
 				Id:   "foobar",
 			},
@@ -123,7 +122,7 @@ func TestAlerter_IgnoreResources(t *testing.T) {
 					&FakeAlert{"Should not be ignored", false},
 				},
 			},
-			resource: &resource2.FakeResource{
+			resource: &resource.Resource{
 				Type: "fakeres",
 				Id:   "foobar",
 			},
@@ -142,7 +141,7 @@ func TestAlerter_IgnoreResources(t *testing.T) {
 					&FakeAlert{"Should not be ignored", false},
 				},
 			},
-			resource: &resource2.FakeResource{
+			resource: &resource.Resource{
 				Type: "other",
 				Id:   "foobaz",
 			},

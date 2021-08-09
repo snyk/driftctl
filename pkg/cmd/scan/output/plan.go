@@ -86,7 +86,7 @@ func addPlannedValues(analysis *analyser.Analysis) module {
 	}
 }
 
-func listRsc(resources []resource.Resource) []rsc {
+func listRsc(resources []*resource.Resource) []rsc {
 	var ret []rsc
 	for _, res := range resources {
 		r := rsc{
@@ -106,7 +106,7 @@ func addResourceChanges(analysis *analyser.Analysis) []rscChange {
 	return append(managedRsc, unmanagedRsc...)
 }
 
-func listRscChange(resources []resource.Resource, action string) []rscChange {
+func listRscChange(resources []*resource.Resource, action string) []rscChange {
 	var ret []rscChange
 	for _, res := range resources {
 		r := rscChange{

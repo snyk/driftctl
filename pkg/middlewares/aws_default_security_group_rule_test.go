@@ -11,20 +11,20 @@ import (
 func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
-		remoteResources    *[]resource.Resource
-		resourcesFromState *[]resource.Resource
-		expected           *[]resource.Resource
+		remoteResources    *[]*resource.Resource
+		resourcesFromState *[]*resource.Resource
+		expected           *[]*resource.Resource
 		wantErr            bool
 	}{
 		{
 			name: "Should ignore default rules if not managed",
-			remoteResources: &[]resource.Resource{
-				&resource.AbstractResource{
+			remoteResources: &[]*resource.Resource{
+				{
 					Id:    "default-sg",
 					Type:  aws.AwsDefaultSecurityGroupResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "default-ingress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -37,7 +37,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"self":                     true,
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "default-egress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -50,7 +50,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"cidr_blocks":       []interface{}{"0.0.0.0/0"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "dummy-ingress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -62,7 +62,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"cidr_blocks":       []interface{}{"1.2.3.4/32"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "dummy-egress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -76,14 +76,14 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 					},
 				},
 			},
-			resourcesFromState: &[]resource.Resource{},
-			expected: &[]resource.Resource{
-				&resource.AbstractResource{
+			resourcesFromState: &[]*resource.Resource{},
+			expected: &[]*resource.Resource{
+				&resource.Resource{
 					Id:    "default-sg",
 					Type:  aws.AwsDefaultSecurityGroupResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "dummy-ingress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -95,7 +95,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"cidr_blocks":       []interface{}{"1.2.3.4/32"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "dummy-egress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -113,18 +113,18 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 		},
 		{
 			name: "Should not ignore default rules if managed",
-			remoteResources: &[]resource.Resource{
-				&resource.AbstractResource{
+			remoteResources: &[]*resource.Resource{
+				&resource.Resource{
 					Id:    "default-sg",
 					Type:  aws.AwsDefaultSecurityGroupResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:    "dummy-sg",
 					Type:  aws.AwsSecurityGroupResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "default-ingress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -137,7 +137,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"self":                     true,
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "default-egress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -150,7 +150,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"cidr_blocks":       []interface{}{"0.0.0.0/0"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "dummy-ingress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -162,7 +162,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"cidr_blocks":       []interface{}{"1.2.3.4/32"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "dummy-egress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -175,7 +175,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"ipv6_cidr_blocks":  []interface{}{"::/0"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "default-egress-2",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -189,13 +189,13 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 					},
 				},
 			},
-			resourcesFromState: &[]resource.Resource{
-				&resource.AbstractResource{
+			resourcesFromState: &[]*resource.Resource{
+				&resource.Resource{
 					Id:    "default-sg",
 					Type:  aws.AwsDefaultSecurityGroupResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "default-ingress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -208,7 +208,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"self":                     true,
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "default-egress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -222,18 +222,18 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: &[]resource.Resource{
-				&resource.AbstractResource{
+			expected: &[]*resource.Resource{
+				&resource.Resource{
 					Id:    "default-sg",
 					Type:  aws.AwsDefaultSecurityGroupResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:    "dummy-sg",
 					Type:  aws.AwsSecurityGroupResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "default-ingress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -246,7 +246,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"self":                     true,
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "default-egress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -259,7 +259,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"cidr_blocks":       []interface{}{"0.0.0.0/0"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "dummy-ingress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -271,7 +271,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"cidr_blocks":       []interface{}{"1.2.3.4/32"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "dummy-egress",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{
@@ -284,7 +284,7 @@ func TestAwsDefaultSecurityGroupRule_Execute(t *testing.T) {
 						"ipv6_cidr_blocks":  []interface{}{"::/0"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "default-egress-2",
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Attrs: &resource.Attributes{

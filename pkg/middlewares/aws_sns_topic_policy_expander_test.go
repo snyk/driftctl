@@ -19,15 +19,15 @@ import (
 func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
-		resourcesFromState *[]resource.Resource
-		expected           *[]resource.Resource
+		resourcesFromState *[]*resource.Resource
+		expected           *[]*resource.Resource
 		mock               func(factory *terraform.MockResourceFactory)
 		wantErr            bool
 	}{
 		{
 			name: "Inline policy no attached policy",
-			resourcesFromState: &[]resource.Resource{
-				&resource.AbstractResource{
+			resourcesFromState: &[]*resource.Resource{
+				{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicResourceType,
 					Attrs: &resource.Attributes{
@@ -37,8 +37,8 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: &[]resource.Resource{
-				&resource.AbstractResource{
+			expected: &[]*resource.Resource{
+				{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicResourceType,
 					Attrs: &resource.Attributes{
@@ -46,7 +46,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 						"id":  "ID",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -61,7 +61,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 					"arn":    "arn",
 					"id":     "ID",
 					"policy": "{\"policy\":\"coucou\"}",
-				}).Once().Return(&resource.AbstractResource{
+				}).Once().Return(&resource.Resource{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -75,8 +75,8 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 		},
 		{
 			name: "No inline policy, attached policy",
-			resourcesFromState: &[]resource.Resource{
-				&resource.AbstractResource{
+			resourcesFromState: &[]*resource.Resource{
+				{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicResourceType,
 					Attrs: &resource.Attributes{
@@ -84,7 +84,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 						"id":  "ID",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -94,8 +94,8 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: &[]resource.Resource{
-				&resource.AbstractResource{
+			expected: &[]*resource.Resource{
+				{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicResourceType,
 					Attrs: &resource.Attributes{
@@ -103,7 +103,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 						"id":  "ID",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -117,8 +117,8 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 		},
 		{
 			name: "inline policy and dup attached policy",
-			resourcesFromState: &[]resource.Resource{
-				&resource.AbstractResource{
+			resourcesFromState: &[]*resource.Resource{
+				{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicResourceType,
 					Attrs: &resource.Attributes{
@@ -127,7 +127,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 						"policy": "{\"policy\":\"coucou\"}",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -137,8 +137,8 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: &[]resource.Resource{
-				&resource.AbstractResource{
+			expected: &[]*resource.Resource{
+				{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicResourceType,
 					Attrs: &resource.Attributes{
@@ -146,7 +146,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 						"id":  "ID",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -160,8 +160,8 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 		},
 		{
 			name: "inline policy and attached policy",
-			resourcesFromState: &[]resource.Resource{
-				&resource.AbstractResource{
+			resourcesFromState: &[]*resource.Resource{
+				{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicResourceType,
 					Attrs: &resource.Attributes{
@@ -170,7 +170,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 						"policy": "{\"policy\":\"coucou\"}",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "ID2",
 					Type: awsresource.AwsSnsTopicPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -180,8 +180,8 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: &[]resource.Resource{
-				&resource.AbstractResource{
+			expected: &[]*resource.Resource{
+				{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicResourceType,
 					Attrs: &resource.Attributes{
@@ -189,7 +189,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 						"id":  "ID",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -198,7 +198,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 						"policy": "{\"policy\":\"coucou\"}",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "ID2",
 					Type: awsresource.AwsSnsTopicPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -211,7 +211,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 			mock: func(factory *terraform.MockResourceFactory) {
 				factory.On("CreateAbstractResource", awsresource.AwsSnsTopicPolicyResourceType, "ID", mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "ID"
-				})).Once().Return(&resource.AbstractResource{
+				})).Once().Return(&resource.Resource{
 					Id:   "ID",
 					Type: awsresource.AwsSnsTopicPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -236,7 +236,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 			awsresource.InitResourcesMetadata(repo)
 
 			m := NewAwsSNSTopicPolicyExpander(factory, repo)
-			if err := m.Execute(&[]resource.Resource{}, tt.resourcesFromState); (err != nil) != tt.wantErr {
+			if err := m.Execute(&[]*resource.Resource{}, tt.resourcesFromState); (err != nil) != tt.wantErr {
 				t.Errorf("Execute() error = %v, wantErr %v", err, tt.wantErr)
 			}
 

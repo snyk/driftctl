@@ -20,9 +20,9 @@ func NewAwsRoleManagedPolicyExpander(resourceFactory resource.ResourceFactory) *
 	return &AwsRoleManagedPolicyExpander{resourceFactory: resourceFactory}
 }
 
-func (a AwsRoleManagedPolicyExpander) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+func (a AwsRoleManagedPolicyExpander) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
 
-	newList := make([]resource.Resource, 0)
+	newList := make([]*resource.Resource, 0)
 	for _, res := range *remoteResources {
 		// Ignore all resources other than iam_role
 		if res.TerraformType() != aws.AwsIamRoleResourceType {
@@ -35,7 +35,7 @@ func (a AwsRoleManagedPolicyExpander) Execute(remoteResources, resourcesFromStat
 	}
 	*remoteResources = newList
 
-	newList = make([]resource.Resource, 0)
+	newList = make([]*resource.Resource, 0)
 	for _, res := range *resourcesFromState {
 		// Ignore all resources other than iam_role
 		if res.TerraformType() != aws.AwsIamRoleResourceType {
@@ -79,7 +79,7 @@ func (a AwsRoleManagedPolicyExpander) Execute(remoteResources, resourcesFromStat
 
 			alreadyExist := false
 			for _, resInState := range *resourcesFromState {
-				if resource.IsSameResource(resInState, newRes) {
+				if resInState.Equal(newRes) {
 					alreadyExist = true
 					break
 				}

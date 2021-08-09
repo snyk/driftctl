@@ -19,7 +19,7 @@ func NewEC2RouteTableAssociationDetailsFetcher(provider terraform.ResourceReader
 	}
 }
 
-func (r *EC2RouteTableAssociationDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
+func (r *EC2RouteTableAssociationDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	ctyVal, err := r.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: aws.AwsRouteTableAssociationResourceType,
 		ID: res.TerraformId(),

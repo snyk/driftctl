@@ -19,7 +19,7 @@ func NewIamAccessKeyDetailsFetcher(provider terraform.ResourceReader, deserializ
 	}
 }
 
-func (r *IamAccessKeyDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
+func (r *IamAccessKeyDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	ctyVal, err := r.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: aws.AwsIamAccessKeyResourceType,
 		ID: res.TerraformId(),

@@ -26,13 +26,13 @@ func (e *VPCSecurityGroupEnumerator) SupportedType() resource.ResourceType {
 	return resourceaws.AwsSecurityGroupResourceType
 }
 
-func (e *VPCSecurityGroupEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *VPCSecurityGroupEnumerator) Enumerate() ([]*resource.Resource, error) {
 	securityGroups, _, err := e.repository.ListAllSecurityGroups()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, 0, len(securityGroups))
+	results := make([]*resource.Resource, 0, len(securityGroups))
 
 	for _, item := range securityGroups {
 		results = append(

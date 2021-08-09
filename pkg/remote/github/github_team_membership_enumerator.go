@@ -22,13 +22,13 @@ func (g *GithubTeamMembershipEnumerator) SupportedType() resource.ResourceType {
 	return github.GithubTeamMembershipResourceType
 }
 
-func (g *GithubTeamMembershipEnumerator) Enumerate() ([]resource.Resource, error) {
+func (g *GithubTeamMembershipEnumerator) Enumerate() ([]*resource.Resource, error) {
 	ids, err := g.repository.ListTeamMemberships()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(g.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(ids))
+	results := make([]*resource.Resource, len(ids))
 
 	for _, id := range ids {
 		results = append(

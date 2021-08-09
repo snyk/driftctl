@@ -27,13 +27,13 @@ func (e *Route53ZoneSupplier) SupportedType() resource.ResourceType {
 	return resourceaws.AwsRoute53ZoneResourceType
 }
 
-func (e *Route53ZoneSupplier) Enumerate() ([]resource.Resource, error) {
+func (e *Route53ZoneSupplier) Enumerate() ([]*resource.Resource, error) {
 	zones, err := e.client.ListAllZones()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(zones))
+	results := make([]*resource.Resource, len(zones))
 
 	for _, hostedZone := range zones {
 		results = append(

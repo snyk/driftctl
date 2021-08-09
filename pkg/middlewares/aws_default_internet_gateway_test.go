@@ -7,39 +7,38 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	resource2 "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/r3labs/diff/v2"
 )
 
 func TestAwsDefaultInternetGateway_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
-		remoteResources    []resource.Resource
-		resourcesFromState []resource.Resource
-		expected           []resource.Resource
+		remoteResources    []*resource.Resource
+		resourcesFromState []*resource.Resource
+		expected           []*resource.Resource
 	}{
 		{
 			"default internet gateway is not ignored when managed by IaC",
-			[]resource.Resource{
-				&resource2.FakeResource{
+			[]*resource.Resource{
+				{
 					Id: "fake",
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-vpc",
 					Type: aws.AwsDefaultVpcResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "dummy-vpc",
 					Type: aws.AwsVpcResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-igw",
 					Type: aws.AwsInternetGatewayResourceType,
 					Attrs: &resource.Attributes{
 						"vpc_id": "default-vpc",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "dummy-igw",
 					Type: aws.AwsInternetGatewayResourceType,
 					Attrs: &resource.Attributes{
@@ -47,8 +46,8 @@ func TestAwsDefaultInternetGateway_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "default-igw",
 					Type: aws.AwsInternetGatewayResourceType,
 					Attrs: &resource.Attributes{
@@ -56,26 +55,26 @@ func TestAwsDefaultInternetGateway_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{
-				&resource2.FakeResource{
+			[]*resource.Resource{
+				{
 					Id: "fake",
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-vpc",
 					Type: aws.AwsDefaultVpcResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "dummy-vpc",
 					Type: aws.AwsVpcResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-igw",
 					Type: aws.AwsInternetGatewayResourceType,
 					Attrs: &resource.Attributes{
 						"vpc_id": "default-vpc",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "dummy-igw",
 					Type: aws.AwsInternetGatewayResourceType,
 					Attrs: &resource.Attributes{
@@ -86,26 +85,26 @@ func TestAwsDefaultInternetGateway_Execute(t *testing.T) {
 		},
 		{
 			"default internet gateway is ignored when not managed by IaC",
-			[]resource.Resource{
-				&resource2.FakeResource{
+			[]*resource.Resource{
+				{
 					Id: "fake",
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-vpc",
 					Type: aws.AwsDefaultVpcResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "dummy-vpc",
 					Type: aws.AwsVpcResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-igw",
 					Type: aws.AwsInternetGatewayResourceType,
 					Attrs: &resource.Attributes{
 						"vpc_id": "default-vpc",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "dummy-igw",
 					Type: aws.AwsInternetGatewayResourceType,
 					Attrs: &resource.Attributes{
@@ -113,20 +112,20 @@ func TestAwsDefaultInternetGateway_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{},
-			[]resource.Resource{
-				&resource2.FakeResource{
+			[]*resource.Resource{},
+			[]*resource.Resource{
+				{
 					Id: "fake",
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-vpc",
 					Type: aws.AwsDefaultVpcResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "dummy-vpc",
 					Type: aws.AwsVpcResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "dummy-igw",
 					Type: aws.AwsInternetGatewayResourceType,
 					Attrs: &resource.Attributes{

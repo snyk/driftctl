@@ -13,8 +13,8 @@ func NewVPCDefaultSecurityGroupSanitizer() VPCDefaultSecurityGroupSanitizer {
 	return VPCDefaultSecurityGroupSanitizer{}
 }
 
-func (m VPCDefaultSecurityGroupSanitizer) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
-	newRemoteResources := make([]resource.Resource, 0)
+func (m VPCDefaultSecurityGroupSanitizer) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
+	newRemoteResources := make([]*resource.Resource, 0)
 
 	for _, remoteResource := range *remoteResources {
 		existInState := false
@@ -26,7 +26,7 @@ func (m VPCDefaultSecurityGroupSanitizer) Execute(remoteResources, resourcesFrom
 		}
 
 		for _, stateResource := range *resourcesFromState {
-			if resource.IsSameResource(remoteResource, stateResource) {
+			if remoteResource.Equal(stateResource) {
 				existInState = true
 				break
 			}

@@ -20,7 +20,7 @@ func NewVPCSecurityGroupRuleDetailsFetcher(provider terraform.ResourceReader, de
 	}
 }
 
-func (r *VPCSecurityGroupRuleDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
+func (r *VPCSecurityGroupRuleDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	attrs := make(map[string]interface{})
 
 	if v, ok := res.Attributes().Get("type"); ok {

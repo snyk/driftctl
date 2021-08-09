@@ -10,11 +10,11 @@ import (
 const GithubBranchProtectionResourceType = "github_branch_protection"
 
 func initGithubBranchProtectionMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(GithubBranchProtectionResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(GithubBranchProtectionResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"repository_id"}) // Terraform provider is always returning nil
 	})
-	resourceSchemaRepository.SetHumanReadableAttributesFunc(GithubBranchProtectionResourceType, func(res *resource.AbstractResource) map[string]string {
+	resourceSchemaRepository.SetHumanReadableAttributesFunc(GithubBranchProtectionResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)
 		pattern := val.GetString("pattern")

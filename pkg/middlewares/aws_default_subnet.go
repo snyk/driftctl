@@ -14,9 +14,9 @@ func NewAwsDefaultSubnet() AwsDefaultSubnet {
 	return AwsDefaultSubnet{}
 }
 
-func (m AwsDefaultSubnet) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+func (m AwsDefaultSubnet) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
 
-	newRemoteResources := make([]resource.Resource, 0)
+	newRemoteResources := make([]*resource.Resource, 0)
 
 	for _, remoteResource := range *remoteResources {
 		existInState := false
@@ -28,7 +28,7 @@ func (m AwsDefaultSubnet) Execute(remoteResources, resourcesFromState *[]resourc
 		}
 
 		for _, stateResource := range *resourcesFromState {
-			if resource.IsSameResource(remoteResource, stateResource) {
+			if remoteResource.Equal(stateResource) {
 				existInState = true
 				break
 			}

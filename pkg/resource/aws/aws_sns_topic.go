@@ -13,7 +13,7 @@ func initSnsTopicMetaData(resourceSchemaRepository resource.SchemaRepositoryInte
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetNormalizeFunc(AwsSnsTopicResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsSnsTopicResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.DeleteIfDefault("sqs_success_feedback_sample_rate")
 		val.DeleteIfDefault("lambda_success_feedback_sample_rate")
@@ -24,7 +24,7 @@ func initSnsTopicMetaData(resourceSchemaRepository resource.SchemaRepositoryInte
 		val.SafeDelete([]string{"name_prefix"})
 		val.SafeDelete([]string{"owner"})
 	})
-	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsSnsTopicResourceType, func(res *resource.AbstractResource) map[string]string {
+	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsSnsTopicResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)
 		if name := val.GetString("name"); name != nil && *name != "" {

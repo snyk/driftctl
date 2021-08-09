@@ -8,7 +8,7 @@ import (
 const AwsInstanceResourceType = "aws_instance"
 
 func initAwsInstanceMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsInstanceResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsInstanceResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 
@@ -16,7 +16,7 @@ func initAwsInstanceMetaData(resourceSchemaRepository resource.SchemaRepositoryI
 			val.SafeDelete([]string{"instance_initiated_shutdown_behavior"})
 		}
 	})
-	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsInstanceResourceType, func(res *resource.AbstractResource) map[string]string {
+	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsInstanceResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)
 		if tags := val.GetMap("tags"); tags != nil {

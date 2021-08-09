@@ -17,11 +17,11 @@ func NewFilterEngine(expr *jmespath.JMESPath) *FilterEngine {
 
 type filtrableResource struct {
 	Attr     interface{}
-	Res      resource.Resource
+	Res      *resource.Resource
 	Type, Id string
 }
 
-func (e *FilterEngine) Run(resources []resource.Resource) ([]resource.Resource, error) {
+func (e *FilterEngine) Run(resources []*resource.Resource) ([]*resource.Resource, error) {
 
 	if e.expr == nil {
 		return nil, errors.New("expression is nil")
@@ -55,7 +55,7 @@ func (e *FilterEngine) Run(resources []resource.Resource) ([]resource.Resource, 
 
 	// Convert back filtered results into a resource list
 	filteredRawList := JMESPathOutput.([]interface{})
-	results := make([]resource.Resource, 0, len(filteredRawList))
+	results := make([]*resource.Resource, 0, len(filteredRawList))
 	for _, elem := range filteredRawList {
 		results = append(results, elem.(filtrableResource).Res)
 	}

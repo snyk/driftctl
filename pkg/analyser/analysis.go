@@ -22,7 +22,7 @@ type Change struct {
 type Changelog []Change
 
 type Difference struct {
-	Res       resource.Resource
+	Res       *resource.Resource
 	Changelog Changelog
 }
 
@@ -35,9 +35,9 @@ type Summary struct {
 }
 
 type Analysis struct {
-	unmanaged       []resource.Resource
-	managed         []resource.Resource
-	deleted         []resource.Resource
+	unmanaged       []*resource.Resource
+	managed         []*resource.Resource
+	deleted         []*resource.Resource
 	differences     []Difference
 	summary         Summary
 	alerts          alerter.Alerts
@@ -74,17 +74,17 @@ type GenDriftIgnoreOptions struct {
 func (a Analysis) MarshalJSON() ([]byte, error) {
 	bla := serializableAnalysis{}
 	for _, m := range a.managed {
-		bla.Managed = append(bla.Managed, resource.SerializableResource{Resource: m})
+		bla.Managed = append(bla.Managed, *resource.NewSerializableResource(m))
 	}
 	for _, u := range a.unmanaged {
-		bla.Unmanaged = append(bla.Unmanaged, resource.SerializableResource{Resource: u})
+		bla.Unmanaged = append(bla.Unmanaged, *resource.NewSerializableResource(u))
 	}
 	for _, d := range a.deleted {
-		bla.Deleted = append(bla.Deleted, resource.SerializableResource{Resource: d})
+		bla.Deleted = append(bla.Deleted, *resource.NewSerializableResource(d))
 	}
 	for _, di := range a.differences {
 		bla.Differences = append(bla.Differences, serializableDifference{
-			Res:       resource.SerializableResource{Resource: di.Res},
+			Res:       *resource.NewSerializableResource(di.Res),
 			Changelog: di.Changelog,
 		})
 	}
@@ -110,28 +110,28 @@ func (a *Analysis) UnmarshalJSON(bytes []byte) error {
 		return err
 	}
 	for _, u := range bla.Unmanaged {
-		a.AddUnmanaged(&resource.SerializedResource{
-			Id:   u.TerraformId(),
-			Type: u.TerraformType(),
+		a.AddUnmanaged(&resource.Resource{
+			Id:   u.Id,
+			Type: u.Type,
 		})
 	}
 	for _, d := range bla.Deleted {
-		a.AddDeleted(&resource.SerializedResource{
-			Id:   d.TerraformId(),
-			Type: d.TerraformType(),
+		a.AddDeleted(&resource.Resource{
+			Id:   d.Id,
+			Type: d.Type,
 		})
 	}
 	for _, m := range bla.Managed {
-		a.AddManaged(&resource.SerializedResource{
-			Id:   m.TerraformId(),
-			Type: m.TerraformType(),
+		a.AddManaged(&resource.Resource{
+			Id:   m.Id,
+			Type: m.Type,
 		})
 	}
 	for _, di := range bla.Differences {
 		a.AddDifference(Difference{
-			Res: &resource.SerializedResource{
-				Id:   di.Res.TerraformId(),
-				Type: di.Res.TerraformType(),
+			Res: &resource.Resource{
+				Id:   di.Res.Id,
+				Type: di.Res.Type,
 			},
 			Changelog: di.Changelog,
 		})
@@ -155,19 +155,19 @@ func (a *Analysis) IsSync() bool {
 	return a.summary.TotalDrifted == 0 && a.summary.TotalUnmanaged == 0 && a.summary.TotalDeleted == 0
 }
 
-func (a *Analysis) AddDeleted(resources ...resource.Resource) {
+func (a *Analysis) AddDeleted(resources ...*resource.Resource) {
 	a.deleted = append(a.deleted, resources...)
 	a.summary.TotalResources += len(resources)
 	a.summary.TotalDeleted += len(resources)
 }
 
-func (a *Analysis) AddUnmanaged(resources ...resource.Resource) {
+func (a *Analysis) AddUnmanaged(resources ...*resource.Resource) {
 	a.unmanaged = append(a.unmanaged, resources...)
 	a.summary.TotalResources += len(resources)
 	a.summary.TotalUnmanaged += len(resources)
 }
 
-func (a *Analysis) AddManaged(resources ...resource.Resource) {
+func (a *Analysis) AddManaged(resources ...*resource.Resource) {
 	a.managed = append(a.managed, resources...)
 	a.summary.TotalResources += len(resources)
 	a.summary.TotalManaged += len(resources)
@@ -189,15 +189,15 @@ func (a *Analysis) Coverage() int {
 	return 0
 }
 
-func (a *Analysis) Managed() []resource.Resource {
+func (a *Analysis) Managed() []*resource.Resource {
 	return a.managed
 }
 
-func (a *Analysis) Unmanaged() []resource.Resource {
+func (a *Analysis) Unmanaged() []*resource.Resource {
 	return a.unmanaged
 }
 
-func (a *Analysis) Deleted() []resource.Resource {
+func (a *Analysis) Deleted() []*resource.Resource {
 	return a.deleted
 }
 
@@ -224,7 +224,7 @@ func (a *Analysis) DriftIgnoreList(opts GenDriftIgnoreOptions) (int, string) {
 
 	resourceCount := 0
 
-	addResources := func(res ...resource.Resource) {
+	addResources := func(res ...*resource.Resource) {
 		for _, r := range res {
 			list = append(list, fmt.Sprintf("%s.%s", r.TerraformType(), escapeKey(r.TerraformId())))
 		}

@@ -23,13 +23,13 @@ func (e *EC2NatGatewayEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsNatGatewayResourceType
 }
 
-func (e *EC2NatGatewayEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *EC2NatGatewayEnumerator) Enumerate() ([]*resource.Resource, error) {
 	natGateways, err := e.repository.ListAllNatGateways()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(natGateways))
+	results := make([]*resource.Resource, len(natGateways))
 
 	for _, natGateway := range natGateways {
 

@@ -6,61 +6,6 @@ import (
 	"github.com/hashicorp/terraform/providers"
 )
 
-type FakeResource struct {
-	Id    string
-	Type  string
-	Attrs *resource.Attributes
-}
-
-func (d *FakeResource) Schema() *resource.Schema {
-	return nil
-}
-
-func (d *FakeResource) TerraformId() string {
-	return d.Id
-}
-
-func (d *FakeResource) TerraformType() string {
-	if d.Type != "" {
-		return d.Type
-	}
-	return "FakeResource"
-}
-
-func (d *FakeResource) Attributes() *resource.Attributes {
-	return d.Attrs
-}
-
-func (d *FakeResource) Src() resource.Source {
-	return nil
-}
-
-type FakeResourceStringer struct {
-	Id     string
-	Attrs  *resource.Attributes
-	Source resource.Source
-}
-
-func (d *FakeResourceStringer) Schema() *resource.Schema {
-	return nil
-}
-
-func (d *FakeResourceStringer) TerraformId() string {
-	return d.Id
-}
-
-func (d *FakeResourceStringer) TerraformType() string {
-	return "FakeResourceStringer"
-}
-
-func (d *FakeResourceStringer) Attributes() *resource.Attributes {
-	return d.Attrs
-}
-
-func (d *FakeResourceStringer) Src() resource.Source {
-	return d.Source
-}
-
 func InitFakeSchemaRepository(provider, version string) resource.SchemaRepositoryInterface {
 	repo := resource.NewSchemaRepository()
 	schema := make(map[string]providers.Schema)

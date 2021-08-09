@@ -75,7 +75,7 @@ func (e *VPCSecurityGroupRuleEnumerator) SupportedType() resource.ResourceType {
 	return resourceaws.AwsSecurityGroupRuleResourceType
 }
 
-func (e *VPCSecurityGroupRuleEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *VPCSecurityGroupRuleEnumerator) Enumerate() ([]*resource.Resource, error) {
 	securityGroups, defaultSecurityGroups, err := e.repository.ListAllSecurityGroups()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), resourceaws.AwsSecurityGroupResourceType)
@@ -86,7 +86,7 @@ func (e *VPCSecurityGroupRuleEnumerator) Enumerate() ([]resource.Resource, error
 	secGroups = append(secGroups, defaultSecurityGroups...)
 	securityGroupsRules := e.listSecurityGroupsRules(secGroups)
 
-	results := make([]resource.Resource, 0, len(securityGroupsRules))
+	results := make([]*resource.Resource, 0, len(securityGroupsRules))
 	for _, rule := range securityGroupsRules {
 		results = append(
 			results,

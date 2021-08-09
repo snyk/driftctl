@@ -32,13 +32,13 @@ func (e *S3BucketPolicyEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsS3BucketPolicyResourceType
 }
 
-func (e *S3BucketPolicyEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *S3BucketPolicyEnumerator) Enumerate() ([]*resource.Resource, error) {
 	buckets, err := e.repository.ListAllBuckets()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), aws.AwsS3BucketResourceType)
 	}
 
-	results := make([]resource.Resource, len(buckets))
+	results := make([]*resource.Resource, len(buckets))
 
 	for _, bucket := range buckets {
 		region, err := e.repository.GetBucketLocation(*bucket.Name)

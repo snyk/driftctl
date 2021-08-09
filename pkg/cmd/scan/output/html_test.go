@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
-	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/assert"
 
@@ -42,7 +41,7 @@ func TestHTML_Write(t *testing.T) {
 				a.Date = time.Date(2021, 06, 10, 0, 0, 0, 0, &time.Location{})
 				a.Duration = 72 * time.Second
 				a.AddManaged(
-					&testresource.FakeResource{
+					&resource.Resource{
 						Id:   "deleted-id-3",
 						Type: "aws_deleted_resource",
 					},
@@ -62,39 +61,39 @@ func TestHTML_Write(t *testing.T) {
 				a.Date = time.Date(2021, 06, 10, 0, 0, 0, 0, &time.Location{})
 				a.Duration = 91 * time.Second
 				a.AddDeleted(
-					&testresource.FakeResource{
+					&resource.Resource{
 						Id:   "deleted-id-3",
 						Type: "aws_deleted_resource",
 					},
-					&testresource.FakeResource{
+					&resource.Resource{
 						Id:   "deleted-id-4",
 						Type: "aws_deleted_resource",
 					},
-					&testresource.FakeResource{
+					&resource.Resource{
 						Id:   "deleted-id-5",
 						Type: "aws_deleted_resource",
 					},
-					&testresource.FakeResource{
+					&resource.Resource{
 						Id:   "deleted-id-6",
 						Type: "aws_deleted_resource",
 					},
 				)
 				a.AddUnmanaged(
-					&testresource.FakeResource{
+					&resource.Resource{
 						Id:   "unmanaged-id-3",
 						Type: "aws_unmanaged_resource",
 					},
-					&testresource.FakeResource{
+					&resource.Resource{
 						Id:   "unmanaged-id-4",
 						Type: "aws_unmanaged_resource",
 					},
-					&testresource.FakeResource{
+					&resource.Resource{
 						Id:   "unmanaged-id-5",
 						Type: "aws_unmanaged_resource",
 					},
 				)
 				a.AddDifference(analyser.Difference{
-					Res: &resource.AbstractResource{
+					Res: &resource.Resource{
 						Id:   "diff-id-2",
 						Type: "aws_diff_resource",
 						Source: &resource.TerraformStateSource{
@@ -131,8 +130,8 @@ func TestHTML_Write(t *testing.T) {
 							Change: diff.Change{
 								Type: diff.UPDATE,
 								Path: []string{"Policies", "0"},
-								From: testresource.FakeResource{},
-								To:   testresource.FakeResource{Id: "093cd6ba-cf6d-4800-b252-6a50ca8903cd", Type: "aws_iam_policy"},
+								From: resource.Resource{},
+								To:   resource.Resource{Id: "093cd6ba-cf6d-4800-b252-6a50ca8903cd", Type: "aws_iam_policy"},
 							},
 						},
 						{
@@ -201,34 +200,34 @@ func TestHTML_Write(t *testing.T) {
 func TestHTML_DistinctResourceTypes(t *testing.T) {
 	tests := []struct {
 		name      string
-		resources []resource.Resource
+		resources []*resource.Resource
 		value     []string
 	}{
 		{
 			name:      "test empty array",
-			resources: []resource.Resource{},
+			resources: []*resource.Resource{},
 			value:     []string{},
 		},
 		{
 			name: "test empty array",
-			resources: []resource.Resource{
-				&testresource.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Id:   "deleted-id-1",
 					Type: "aws_deleted_resource",
 				},
-				&testresource.FakeResource{
+				{
 					Id:   "unmanaged-id-1",
 					Type: "aws_unmanaged_resource",
 				},
-				&testresource.FakeResource{
+				{
 					Id:   "unmanaged-id-2",
 					Type: "aws_unmanaged_resource",
 				},
-				&testresource.FakeResource{
+				{
 					Id:   "diff-id-1",
 					Type: "aws_diff_resource",
 				},
-				&testresource.FakeResource{
+				{
 					Id:   "deleted-id-2",
 					Type: "aws_deleted_resource",
 				},

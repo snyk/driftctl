@@ -6,7 +6,7 @@ import (
 
 type Enumerator interface {
 	SupportedType() resource.ResourceType
-	Enumerate() ([]resource.Resource, error)
+	Enumerate() ([]*resource.Resource, error)
 }
 
 type RemoteLibrary struct {

@@ -10,8 +10,8 @@ import (
 
 func TestAwsInstanceEIP_Execute(t *testing.T) {
 	type args struct {
-		remoteResources    *[]resource.Resource
-		resourcesFromState *[]resource.Resource
+		remoteResources    *[]*resource.Resource
+		resourcesFromState *[]*resource.Resource
 	}
 	tests := []struct {
 		name     string
@@ -21,8 +21,8 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 		{
 			name: "test that public ip and dns are nilled with eip",
 			args: args{
-				remoteResources: &[]resource.Resource{
-					&resource.AbstractResource{
+				remoteResources: &[]*resource.Resource{
+					{
 						Id:   "instance1",
 						Type: "aws_instance",
 						Attrs: &resource.Attributes{
@@ -30,7 +30,7 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 							"public_dns": "dns-of-eip.com",
 						},
 					},
-					&resource.AbstractResource{
+					{
 						Id:   "instance2",
 						Type: "aws_instance",
 						Attrs: &resource.Attributes{
@@ -39,8 +39,8 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 						},
 					},
 				},
-				resourcesFromState: &[]resource.Resource{
-					&resource.AbstractResource{
+				resourcesFromState: &[]*resource.Resource{
+					{
 						Id:   "instance1",
 						Type: "aws_instance",
 						Attrs: &resource.Attributes{
@@ -48,7 +48,7 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 							"public_dns": "example.com",
 						},
 					},
-					&resource.AbstractResource{
+					{
 						Type: aws.AwsEipResourceType,
 						Attrs: &resource.Attributes{
 							"instance": "instance1",
@@ -57,13 +57,13 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 				},
 			},
 			expected: args{
-				remoteResources: &[]resource.Resource{
-					&resource.AbstractResource{
+				remoteResources: &[]*resource.Resource{
+					{
 						Id:    "instance1",
 						Type:  "aws_instance",
 						Attrs: &resource.Attributes{},
 					},
-					&resource.AbstractResource{
+					{
 						Id:   "instance2",
 						Type: "aws_instance",
 						Attrs: &resource.Attributes{
@@ -72,13 +72,13 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 						},
 					},
 				},
-				resourcesFromState: &[]resource.Resource{
-					&resource.AbstractResource{
+				resourcesFromState: &[]*resource.Resource{
+					{
 						Id:    "instance1",
 						Type:  "aws_instance",
 						Attrs: &resource.Attributes{},
 					},
-					&resource.AbstractResource{
+					{
 						Type: aws.AwsEipResourceType,
 						Attrs: &resource.Attributes{
 							"instance": "instance1",
@@ -90,8 +90,8 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 		{
 			name: "test that public ip and dns are nilled when eip association",
 			args: args{
-				remoteResources: &[]resource.Resource{
-					&resource.AbstractResource{
+				remoteResources: &[]*resource.Resource{
+					{
 						Id:   "instance1",
 						Type: "aws_instance",
 						Attrs: &resource.Attributes{
@@ -99,7 +99,7 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 							"public_dns": "dns-of-eip.com",
 						},
 					},
-					&resource.AbstractResource{
+					{
 						Id:   "instance2",
 						Type: "aws_instance",
 						Attrs: &resource.Attributes{
@@ -108,8 +108,8 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 						},
 					},
 				},
-				resourcesFromState: &[]resource.Resource{
-					&resource.AbstractResource{
+				resourcesFromState: &[]*resource.Resource{
+					{
 						Id:   "instance1",
 						Type: "aws_instance",
 						Attrs: &resource.Attributes{
@@ -117,7 +117,7 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 							"public_dns": "example.com",
 						},
 					},
-					&resource.AbstractResource{
+					{
 						Type: aws.AwsEipAssociationResourceType,
 						Attrs: &resource.Attributes{
 							"instance_id": "instance1",
@@ -126,13 +126,13 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 				},
 			},
 			expected: args{
-				remoteResources: &[]resource.Resource{
-					&resource.AbstractResource{
+				remoteResources: &[]*resource.Resource{
+					{
 						Id:    "instance1",
 						Type:  "aws_instance",
 						Attrs: &resource.Attributes{},
 					},
-					&resource.AbstractResource{
+					{
 						Id:   "instance2",
 						Type: "aws_instance",
 						Attrs: &resource.Attributes{
@@ -141,13 +141,13 @@ func TestAwsInstanceEIP_Execute(t *testing.T) {
 						},
 					},
 				},
-				resourcesFromState: &[]resource.Resource{
-					&resource.AbstractResource{
+				resourcesFromState: &[]*resource.Resource{
+					{
 						Id:    "instance1",
 						Type:  "aws_instance",
 						Attrs: &resource.Attributes{},
 					},
-					&resource.AbstractResource{
+					&resource.Resource{
 						Type: aws.AwsEipAssociationResourceType,
 						Attrs: &resource.Attributes{
 							"instance_id": "instance1",

@@ -10,8 +10,8 @@ import (
 
 func TestAwsDefaultVPCShouldBeIgnored(t *testing.T) {
 	middleware := NewAwsDefaultVPC()
-	remoteResources := []resource.Resource{
-		&resource.AbstractResource{
+	remoteResources := []*resource.Resource{
+		{
 			Id:   "foobar",
 			Type: aws.AwsDefaultVpcResourceType,
 			Attrs: &resource.Attributes{
@@ -19,7 +19,7 @@ func TestAwsDefaultVPCShouldBeIgnored(t *testing.T) {
 			},
 		},
 	}
-	stateResources := []resource.Resource{}
+	stateResources := []*resource.Resource{}
 	err := middleware.Execute(&remoteResources, &stateResources)
 
 	if err != nil {
@@ -33,8 +33,8 @@ func TestAwsDefaultVPCShouldBeIgnored(t *testing.T) {
 
 func TestAwsDefaultVPCShouldNotBeIgnoredWhenManaged(t *testing.T) {
 	middleware := NewAwsDefaultVPC()
-	remoteResources := []resource.Resource{
-		&resource.AbstractResource{
+	remoteResources := []*resource.Resource{
+		{
 			Id:   "foobar",
 			Type: aws.AwsDefaultVpcResourceType,
 			Attrs: &resource.Attributes{
@@ -42,8 +42,8 @@ func TestAwsDefaultVPCShouldNotBeIgnoredWhenManaged(t *testing.T) {
 			},
 		},
 	}
-	stateResources := []resource.Resource{
-		&resource.AbstractResource{
+	stateResources := []*resource.Resource{
+		{
 			Id:   "foobar",
 			Type: aws.AwsDefaultVpcResourceType,
 			Attrs: &resource.Attributes{

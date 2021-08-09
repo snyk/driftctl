@@ -7,7 +7,7 @@ import (
 const AwsDbInstanceResourceType = "aws_db_instance"
 
 func initAwsDbInstanceMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsDbInstanceResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsDbInstanceResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"delete_automated_backups"})
 		val.SafeDelete([]string{"final_snapshot_identifier"})

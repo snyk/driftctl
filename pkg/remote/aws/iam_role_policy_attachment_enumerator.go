@@ -26,13 +26,13 @@ func (e *IamRolePolicyAttachmentEnumerator) SupportedType() resource.ResourceTyp
 	return resourceaws.AwsIamRolePolicyAttachmentResourceType
 }
 
-func (e *IamRolePolicyAttachmentEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *IamRolePolicyAttachmentEnumerator) Enumerate() ([]*resource.Resource, error) {
 	roles, err := e.repository.ListAllRoles()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), resourceaws.AwsIamRoleResourceType)
 	}
 
-	results := make([]resource.Resource, 0)
+	results := make([]*resource.Resource, 0)
 	rolesNotIgnored := make([]*iam.Role, 0)
 
 	for _, role := range roles {

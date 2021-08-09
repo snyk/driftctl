@@ -13,32 +13,32 @@ import (
 func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
-		remoteResources    []resource.Resource
-		resourcesFromState []resource.Resource
-		expected           []resource.Resource
+		remoteResources    []*resource.Resource
+		resourcesFromState []*resource.Resource
+		expected           []*resource.Resource
 	}{
 		{
 			"default internet gateway route is not ignored when managed by IaC",
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "default-vpc",
 					Type: aws.AwsDefaultVpcResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-igw",
 					Type: aws.AwsInternetGatewayResourceType,
 					Attrs: &resource.Attributes{
 						"vpc_id": "default-vpc",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-route-table",
 					Type: aws.AwsDefaultRouteTableResourceType,
 					Attrs: &resource.Attributes{
 						"vpc_id": "default-vpc",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-igw-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -46,7 +46,7 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 						"gateway_id":     "default-igw",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "dummy-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -55,8 +55,8 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "default-igw-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -65,26 +65,26 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "default-vpc",
 					Type: aws.AwsDefaultVpcResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-igw",
 					Type: aws.AwsInternetGatewayResourceType,
 					Attrs: &resource.Attributes{
 						"vpc_id": "default-vpc",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-route-table",
 					Type: aws.AwsDefaultRouteTableResourceType,
 					Attrs: &resource.Attributes{
 						"vpc_id": "default-vpc",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-igw-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -92,7 +92,7 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 						"gateway_id":     "default-igw",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "dummy-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -104,26 +104,26 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 		},
 		{
 			"default internet gateway route is ignored when not managed by IaC",
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "default-vpc",
 					Type: aws.AwsDefaultVpcResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-igw",
 					Type: aws.AwsInternetGatewayResourceType,
 					Attrs: &resource.Attributes{
 						"vpc_id": "default-vpc",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-route-table",
 					Type: aws.AwsDefaultRouteTableResourceType,
 					Attrs: &resource.Attributes{
 						"vpc_id": "default-vpc",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-igw-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -132,7 +132,7 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 						"destination_cidr_block": "0.0.0.0/0",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-igw-non-default-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -141,7 +141,7 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 						"destination_cidr_block": "10.0.1.0/24",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-igw-default-ipv6-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -150,7 +150,7 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 						"destination_ipv6_cidr_block": "::/0",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "dummy-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -159,27 +159,27 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{},
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{},
+			[]*resource.Resource{
+				{
 					Id:   "default-vpc",
 					Type: aws.AwsDefaultVpcResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-igw",
 					Type: aws.AwsInternetGatewayResourceType,
 					Attrs: &resource.Attributes{
 						"vpc_id": "default-vpc",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-route-table",
 					Type: aws.AwsDefaultRouteTableResourceType,
 					Attrs: &resource.Attributes{
 						"vpc_id": "default-vpc",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-igw-non-default-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -188,7 +188,7 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 						"destination_cidr_block": "10.0.1.0/24",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-igw-default-ipv6-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -197,7 +197,7 @@ func TestAwsDefaultInternetGatewayRoute_Execute(t *testing.T) {
 						"destination_ipv6_cidr_block": "::/0",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "dummy-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{

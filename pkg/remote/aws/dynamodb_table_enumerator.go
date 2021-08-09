@@ -23,13 +23,13 @@ func (e *DynamoDBTableEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsDynamodbTableResourceType
 }
 
-func (e *DynamoDBTableEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *DynamoDBTableEnumerator) Enumerate() ([]*resource.Resource, error) {
 	tables, err := e.repository.ListAllTables()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(tables))
+	results := make([]*resource.Resource, len(tables))
 
 	for _, table := range tables {
 		results = append(

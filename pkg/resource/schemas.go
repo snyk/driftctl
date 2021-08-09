@@ -18,9 +18,9 @@ type Schema struct {
 	ProviderVersion             *version.Version
 	SchemaVersion               int64
 	Attributes                  map[string]AttributeSchema
-	NormalizeFunc               func(res *AbstractResource)
-	HumanReadableAttributesFunc func(res *AbstractResource) map[string]string
-	ResolveReadAttributesFunc   func(res *AbstractResource) map[string]string
+	NormalizeFunc               func(res *Resource)
+	HumanReadableAttributesFunc func(res *Resource) map[string]string
+	ResolveReadAttributesFunc   func(res *Resource) map[string]string
 }
 
 func (s *Schema) IsComputedField(path []string) bool {
@@ -42,9 +42,9 @@ func (s *Schema) IsJsonStringField(path []string) bool {
 type SchemaRepositoryInterface interface {
 	GetSchema(resourceType string) (*Schema, bool)
 	UpdateSchema(typ string, schemasMutators map[string]func(attributeSchema *AttributeSchema))
-	SetNormalizeFunc(typ string, normalizeFunc func(res *AbstractResource))
-	SetHumanReadableAttributesFunc(typ string, humanReadableAttributesFunc func(res *AbstractResource) map[string]string)
-	SetResolveReadAttributesFunc(typ string, resolveReadAttributesFunc func(res *AbstractResource) map[string]string)
+	SetNormalizeFunc(typ string, normalizeFunc func(res *Resource))
+	SetHumanReadableAttributesFunc(typ string, humanReadableAttributesFunc func(res *Resource) map[string]string)
+	SetResolveReadAttributesFunc(typ string, resolveReadAttributesFunc func(res *Resource) map[string]string)
 }
 
 type SchemaRepository struct {
@@ -119,7 +119,7 @@ func (r *SchemaRepository) UpdateSchema(typ string, schemasMutators map[string]f
 	}
 }
 
-func (r *SchemaRepository) SetNormalizeFunc(typ string, normalizeFunc func(res *AbstractResource)) {
+func (r *SchemaRepository) SetNormalizeFunc(typ string, normalizeFunc func(res *Resource)) {
 	metadata, exist := r.GetSchema(typ)
 	if !exist {
 		logrus.WithFields(logrus.Fields{"type": typ}).Warning("Unable to set normalize func, no schema found")
@@ -128,7 +128,7 @@ func (r *SchemaRepository) SetNormalizeFunc(typ string, normalizeFunc func(res *
 	(*metadata).NormalizeFunc = normalizeFunc
 }
 
-func (r *SchemaRepository) SetHumanReadableAttributesFunc(typ string, humanReadableAttributesFunc func(res *AbstractResource) map[string]string) {
+func (r *SchemaRepository) SetHumanReadableAttributesFunc(typ string, humanReadableAttributesFunc func(res *Resource) map[string]string) {
 	metadata, exist := r.GetSchema(typ)
 	if !exist {
 		logrus.WithFields(logrus.Fields{"type": typ}).Warning("Unable to add human readable attributes, no schema found")
@@ -137,7 +137,7 @@ func (r *SchemaRepository) SetHumanReadableAttributesFunc(typ string, humanReada
 	(*metadata).HumanReadableAttributesFunc = humanReadableAttributesFunc
 }
 
-func (r *SchemaRepository) SetResolveReadAttributesFunc(typ string, resolveReadAttributesFunc func(res *AbstractResource) map[string]string) {
+func (r *SchemaRepository) SetResolveReadAttributesFunc(typ string, resolveReadAttributesFunc func(res *Resource) map[string]string) {
 	metadata, exist := r.GetSchema(typ)
 	if !exist {
 		logrus.WithFields(logrus.Fields{"type": typ}).Warning("Unable to add read resource attributes, no schema found")

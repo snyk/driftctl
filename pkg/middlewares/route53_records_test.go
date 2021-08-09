@@ -10,26 +10,26 @@ import (
 
 func TestDefaultRoute53RecordShouldBeIgnored(t *testing.T) {
 	middleware := NewRoute53DefaultZoneRecordSanitizer()
-	remoteResources := []resource.Resource{
-		&resource.AbstractResource{
+	remoteResources := []*resource.Resource{
+		{
 			Type:  aws.AwsRoute53ZoneResourceType,
 			Attrs: &resource.Attributes{},
 		},
-		&resource.AbstractResource{
+		{
 			Type: aws.AwsRoute53RecordResourceType,
 			Id:   "123_foobar_NS",
 			Attrs: &resource.Attributes{
 				"type": "NS",
 			},
 		},
-		&resource.AbstractResource{
+		{
 			Type: aws.AwsRoute53RecordResourceType,
 			Id:   "123_foobar_SOA",
 			Attrs: &resource.Attributes{
 				"type": "SOA",
 			},
 		},
-		&resource.AbstractResource{
+		{
 			Type: aws.AwsRoute53RecordResourceType,
 			Id:   "123_foobar_A",
 			Attrs: &resource.Attributes{
@@ -37,8 +37,8 @@ func TestDefaultRoute53RecordShouldBeIgnored(t *testing.T) {
 			},
 		},
 	}
-	stateResources := []resource.Resource{
-		&resource.AbstractResource{
+	stateResources := []*resource.Resource{
+		{
 			Type: aws.AwsRoute53RecordResourceType,
 			Id:   "456_barfoo_NS",
 			Attrs: &resource.Attributes{
@@ -55,7 +55,7 @@ func TestDefaultRoute53RecordShouldBeIgnored(t *testing.T) {
 	if len(remoteResources) != 2 {
 		t.Error("Default records were not ignored")
 	}
-	remainingResource := remoteResources[1].(*resource.AbstractResource)
+	remainingResource := remoteResources[1]
 	ty, _ := remainingResource.Attrs.Get("type")
 	if ty != "A" {
 		t.Error("Default record is invalid")
@@ -64,26 +64,26 @@ func TestDefaultRoute53RecordShouldBeIgnored(t *testing.T) {
 
 func TestDefaultRoute53RecordShouldNotBeIgnoredWhenManaged(t *testing.T) {
 	middleware := NewRoute53DefaultZoneRecordSanitizer()
-	remoteResources := []resource.Resource{
-		&resource.AbstractResource{
+	remoteResources := []*resource.Resource{
+		{
 			Type:  aws.AwsRoute53ZoneResourceType,
 			Attrs: &resource.Attributes{},
 		},
-		&resource.AbstractResource{
+		{
 			Type: aws.AwsRoute53RecordResourceType,
 			Id:   "123_foobar_NS",
 			Attrs: &resource.Attributes{
 				"type": "NS",
 			},
 		},
-		&resource.AbstractResource{
+		{
 			Type: aws.AwsRoute53RecordResourceType,
 			Id:   "123_foobar_SOA",
 			Attrs: &resource.Attributes{
 				"type": "SOA",
 			},
 		},
-		&resource.AbstractResource{
+		{
 			Type: aws.AwsRoute53RecordResourceType,
 			Id:   "123_foobar_A",
 			Attrs: &resource.Attributes{
@@ -91,8 +91,8 @@ func TestDefaultRoute53RecordShouldNotBeIgnoredWhenManaged(t *testing.T) {
 			},
 		},
 	}
-	stateResources := []resource.Resource{
-		&resource.AbstractResource{
+	stateResources := []*resource.Resource{
+		{
 			Type: aws.AwsRoute53RecordResourceType,
 			Id:   "123_foobar_NS",
 			Attrs: &resource.Attributes{
@@ -109,13 +109,13 @@ func TestDefaultRoute53RecordShouldNotBeIgnoredWhenManaged(t *testing.T) {
 	if len(remoteResources) != 3 {
 		t.Error("Default records were not ignored")
 	}
-	managedDefaultRecord := remoteResources[1].(*resource.AbstractResource)
+	managedDefaultRecord := remoteResources[1]
 	ty, _ := managedDefaultRecord.Attrs.Get("type")
 	if ty != "NS" {
 		t.Error("Default record is ignored but should not be")
 	}
 
-	ignoredRecord := remoteResources[2].(*resource.AbstractResource)
+	ignoredRecord := remoteResources[2]
 	ty, _ = ignoredRecord.Attrs.Get("type")
 	if ty != "A" {
 		t.Error("Non default record was ignored")

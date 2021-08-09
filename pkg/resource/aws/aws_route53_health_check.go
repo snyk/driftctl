@@ -9,7 +9,7 @@ import (
 const AwsRoute53HealthCheckResourceType = "aws_route53_health_check"
 
 func initAwsRoute53HealthCheckMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsRoute53HealthCheckResourceType, func(res *resource.AbstractResource) map[string]string {
+	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsRoute53HealthCheckResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)
 		if tags := val.GetMap("tags"); tags != nil {

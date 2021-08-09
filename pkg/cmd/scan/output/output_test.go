@@ -11,42 +11,41 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	"github.com/cloudskiff/driftctl/pkg/resource"
-	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/r3labs/diff/v2"
 )
 
 func fakeAnalysis() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddUnmanaged(
-		&testresource.FakeResource{
+		&resource.Resource{
 			Id:   "unmanaged-id-1",
 			Type: "aws_unmanaged_resource",
 		},
-		&testresource.FakeResource{
+		&resource.Resource{
 			Id:   "unmanaged-id-2",
 			Type: "aws_unmanaged_resource",
 		},
 	)
 	a.AddDeleted(
-		&testresource.FakeResource{
+		&resource.Resource{
 			Id:   "deleted-id-1",
 			Type: "aws_deleted_resource",
-		}, &testresource.FakeResource{
+		}, &resource.Resource{
 			Id:   "deleted-id-2",
 			Type: "aws_deleted_resource",
 		},
 	)
 	a.AddManaged(
-		&testresource.FakeResource{
+		&resource.Resource{
 			Id:   "diff-id-1",
 			Type: "aws_diff_resource",
 		},
-		&testresource.FakeResource{
+		&resource.Resource{
 			Id:   "no-diff-id-1",
 			Type: "aws_no_diff_resource",
 		},
 	)
-	a.AddDifference(analyser.Difference{Res: &resource.AbstractResource{
+	a.AddDifference(analyser.Difference{Res: &resource.Resource{
 		Id:   "diff-id-1",
 		Type: "aws_diff_resource",
 		Source: &resource.TerraformStateSource{
@@ -102,7 +101,7 @@ func fakeAnalysisWithAlerts() *analyser.Analysis {
 func fakeAnalysisNoDrift() *analyser.Analysis {
 	a := analyser.Analysis{}
 	for i := 0; i < 5; i++ {
-		a.AddManaged(&testresource.FakeResource{
+		a.AddManaged(&resource.Resource{
 			Id:   "managed-id-" + fmt.Sprintf("%d", i),
 			Type: "aws_managed_resource",
 		})
@@ -115,19 +114,19 @@ func fakeAnalysisNoDrift() *analyser.Analysis {
 func fakeAnalysisWithJsonFields() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddManaged(
-		&testresource.FakeResource{
+		&resource.Resource{
 			Id:   "diff-id-1",
 			Type: "aws_diff_resource",
 		},
 	)
 	a.AddManaged(
-		&testresource.FakeResource{
+		&resource.Resource{
 			Id:   "diff-id-2",
 			Type: "aws_diff_resource",
 		},
 	)
 	a.AddDifference(analyser.Difference{
-		Res: &resource.AbstractResource{
+		Res: &resource.Resource{
 			Id:   "diff-id-1",
 			Type: "aws_diff_resource",
 			Source: &resource.TerraformStateSource{
@@ -148,7 +147,7 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 			},
 		}})
 	a.AddDifference(analyser.Difference{
-		Res: &resource.AbstractResource{
+		Res: &resource.Resource{
 			Id:   "diff-id-2",
 			Type: "aws_diff_resource",
 			Source: &resource.TerraformStateSource{
@@ -176,20 +175,23 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddDeleted(
-		&testresource.FakeResourceStringer{
+		&resource.Resource{
 			Id:    "dfjkgnbsgj",
+			Type:  "FakeResourceStringer",
 			Attrs: &resource.Attributes{},
 		},
 	)
 	a.AddManaged(
-		&testresource.FakeResourceStringer{
+		&resource.Resource{
 			Id:    "usqyfsdbgjsdgjkdfg",
+			Type:  "FakeResourceStringer",
 			Attrs: &resource.Attributes{},
 		},
 	)
 	a.AddUnmanaged(
-		&testresource.FakeResourceStringer{
+		&resource.Resource{
 			Id:    "duysgkfdjfdgfhd",
+			Type:  "FakeResourceStringer",
 			Attrs: &resource.Attributes{},
 		},
 	)
@@ -200,45 +202,45 @@ func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 
 func fakeAnalysisWithStringerResources() *analyser.Analysis {
 	a := analyser.Analysis{}
-	fakeResourceStringerSchema := &resource.Schema{HumanReadableAttributesFunc: func(res *resource.AbstractResource) map[string]string {
+	schema := &resource.Schema{HumanReadableAttributesFunc: func(res *resource.Resource) map[string]string {
 		return map[string]string{
 			"Name": (*res.Attrs)["name"].(string),
 		}
 	}}
 	a.AddDeleted(
-		&resource.AbstractResource{
+		&resource.Resource{
 			Id:   "dfjkgnbsgj",
 			Type: "FakeResourceStringer",
-			Sch:  fakeResourceStringerSchema,
+			Sch:  schema,
 			Attrs: &resource.Attributes{
 				"name": "deleted resource",
 			},
 		},
 	)
 	a.AddManaged(
-		&resource.AbstractResource{
+		&resource.Resource{
 			Id:   "usqyfsdbgjsdgjkdfg",
 			Type: "FakeResourceStringer",
-			Sch:  fakeResourceStringerSchema,
+			Sch:  schema,
 			Attrs: &resource.Attributes{
 				"name": "managed resource",
 			},
 		},
 	)
 	a.AddUnmanaged(
-		&resource.AbstractResource{
+		&resource.Resource{
 			Id:   "duysgkfdjfdgfhd",
 			Type: "FakeResourceStringer",
-			Sch:  fakeResourceStringerSchema,
+			Sch:  schema,
 			Attrs: &resource.Attributes{
 				"name": "unmanaged resource",
 			},
 		},
 	)
-	a.AddDifference(analyser.Difference{Res: &resource.AbstractResource{
+	a.AddDifference(analyser.Difference{Res: &resource.Resource{
 		Id:   "gdsfhgkbn",
 		Type: "FakeResourceStringer",
-		Sch:  fakeResourceStringerSchema,
+		Sch:  schema,
 		Attrs: &resource.Attributes{
 			"name": "resource with diff",
 		},
@@ -265,13 +267,13 @@ func fakeAnalysisWithStringerResources() *analyser.Analysis {
 func fakeAnalysisWithComputedFields() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddManaged(
-		&testresource.FakeResource{
+		&resource.Resource{
 			Id:   "diff-id-1",
 			Type: "aws_diff_resource",
 		},
 	)
 	a.AddDifference(analyser.Difference{
-		Res: &resource.AbstractResource{
+		Res: &resource.Resource{
 			Id:   "diff-id-1",
 			Type: "aws_diff_resource",
 			Source: &resource.TerraformStateSource{
@@ -374,14 +376,14 @@ func fakeAnalysisWithGithubEnumerationError() *analyser.Analysis {
 func fakeAnalysisForJSONPlan() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddUnmanaged(
-		&resource.AbstractResource{
+		&resource.Resource{
 			Id:   "unmanaged-id-1",
 			Type: "aws_unmanaged_resource",
 			Attrs: &resource.Attributes{
 				"name": "First unmanaged resource",
 			},
 		},
-		&resource.AbstractResource{
+		&resource.Resource{
 			Id:   "unmanaged-id-2",
 			Type: "aws_unmanaged_resource",
 			Attrs: &resource.Attributes{
@@ -390,14 +392,14 @@ func fakeAnalysisForJSONPlan() *analyser.Analysis {
 		},
 	)
 	a.AddManaged(
-		&resource.AbstractResource{
+		&resource.Resource{
 			Id:   "managed-id-1",
 			Type: "aws_managed_resource",
 			Attrs: &resource.Attributes{
 				"name": "First managed resource",
 			},
 		},
-		&resource.AbstractResource{
+		&resource.Resource{
 			Id:   "managed-id-2",
 			Type: "aws_managed_resource",
 			Attrs: &resource.Attributes{

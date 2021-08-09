@@ -55,7 +55,7 @@ func CreateSecurityGroupRuleIdHash(attrs *resource.Attributes) string {
 }
 
 func initAwsSecurityGroupRuleMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsSecurityGroupRuleResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsSecurityGroupRuleResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.DeleteIfDefault("security_group_id")
 		val.DeleteIfDefault("source_security_group_id")
@@ -77,7 +77,7 @@ func initAwsSecurityGroupRuleMetaData(resourceSchemaRepository resource.SchemaRe
 		_ = val.SafeSet([]string{"id"}, id)
 		res.Id = id
 	})
-	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsSecurityGroupRuleResourceType, func(res *resource.AbstractResource) map[string]string {
+	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsSecurityGroupRuleResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)
 		if sgID := val.GetString("security_group_id"); sgID != nil && *sgID != "" {

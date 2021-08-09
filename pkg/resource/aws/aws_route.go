@@ -10,7 +10,7 @@ import (
 const AwsRouteResourceType = "aws_route"
 
 func initAwsRouteMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsRouteResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsRouteResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 
@@ -28,7 +28,7 @@ func initAwsRouteMetaData(resourceSchemaRepository resource.SchemaRepositoryInte
 		val.DeleteIfDefault("instance_owner_id")
 		val.DeleteIfDefault("carrier_gateway_id")
 	})
-	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsRouteResourceType, func(res *resource.AbstractResource) map[string]string {
+	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsRouteResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)
 		if rtID := val.GetString("route_table_id"); rtID != nil && *rtID != "" {

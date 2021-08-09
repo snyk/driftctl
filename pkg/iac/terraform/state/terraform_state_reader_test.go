@@ -77,14 +77,14 @@ func TestTerraformStateReader_Source(t *testing.T) {
 				State:  "tfstate://test/source/terraform.tfstate",
 				Module: "",
 				Name:   "bucket",
-			}, res.(*resource.AbstractResource).Source)
+			}, res.Source)
 		}
 		if res.TerraformType() == resourceaws.AwsIamUserResourceType {
 			assert.Equal(t, &resource.TerraformStateSource{
 				State:  "tfstate://test/source/terraform.tfstate",
 				Module: "module.iam_iam-user",
 				Name:   "this_no_pgp",
-			}, res.(*resource.AbstractResource).Source)
+			}, res.Source)
 		}
 	}
 }
@@ -302,7 +302,7 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 	}
 }
 
-func convert(got []resource.Resource) []interface{} {
+func convert(got []*resource.Resource) []interface{} {
 	unm, err := json.Marshal(got)
 	if err != nil {
 		panic(err)

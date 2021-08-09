@@ -21,9 +21,9 @@ func NewAwsRouteTableExpander(alerter alerter.AlerterInterface, resourceFactory 
 	}
 }
 
-func (m AwsRouteTableExpander) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+func (m AwsRouteTableExpander) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
 
-	newList := make([]resource.Resource, 0, len(*resourcesFromState))
+	newList := make([]*resource.Resource, 0, len(*resourcesFromState))
 	for _, res := range *resourcesFromState {
 
 		// Ignore all resources other than (default) routes tables
@@ -33,14 +33,13 @@ func (m AwsRouteTableExpander) Execute(remoteResources, resourcesFromState *[]re
 			continue
 		}
 
-		table, _ := res.(*resource.AbstractResource)
 		newList = append(newList, res)
 
 		var err error
 		if res.TerraformType() == aws.AwsDefaultRouteTableResourceType {
-			err = m.handleDefaultTable(table, &newList, *resourcesFromState)
+			err = m.handleDefaultTable(res, &newList, *resourcesFromState)
 		} else {
-			err = m.handleTable(table, &newList, *resourcesFromState)
+			err = m.handleTable(res, &newList, *resourcesFromState)
 		}
 
 		if err != nil {
@@ -48,16 +47,15 @@ func (m AwsRouteTableExpander) Execute(remoteResources, resourcesFromState *[]re
 		}
 	}
 
-	newRemoteResources := make([]resource.Resource, 0)
+	newRemoteResources := make([]*resource.Resource, 0)
 	for _, remoteRes := range *remoteResources {
 		if remoteRes.TerraformType() != aws.AwsRouteTableResourceType &&
 			remoteRes.TerraformType() != aws.AwsDefaultRouteTableResourceType {
 			newRemoteResources = append(newRemoteResources, remoteRes)
 			continue
 		}
-		table, _ := remoteRes.(*resource.AbstractResource)
-		table.Attrs.SafeDelete([]string{"route"})
-		newRemoteResources = append(newRemoteResources, table)
+		remoteRes.Attrs.SafeDelete([]string{"route"})
+		newRemoteResources = append(newRemoteResources, remoteRes)
 	}
 
 	*resourcesFromState = newList
@@ -65,7 +63,7 @@ func (m AwsRouteTableExpander) Execute(remoteResources, resourcesFromState *[]re
 	return nil
 }
 
-func (m *AwsRouteTableExpander) handleTable(table *resource.AbstractResource, results *[]resource.Resource, resourcesFromState []resource.Resource) error {
+func (m *AwsRouteTableExpander) handleTable(table *resource.Resource, results *[]*resource.Resource, resourcesFromState []*resource.Resource) error {
 	routes, exist := table.Attrs.Get("route")
 	if !exist || routes == nil {
 		return nil
@@ -119,7 +117,7 @@ func (m *AwsRouteTableExpander) handleTable(table *resource.AbstractResource, re
 	return nil
 }
 
-func (m *AwsRouteTableExpander) handleDefaultTable(table *resource.AbstractResource, results *[]resource.Resource, resourcesFromState []resource.Resource) error {
+func (m *AwsRouteTableExpander) handleDefaultTable(table *resource.Resource, results *[]*resource.Resource, resourcesFromState []*resource.Resource) error {
 	routes, exist := table.Attrs.Get("route")
 	if !exist || routes == nil {
 		return nil
@@ -171,7 +169,7 @@ func (m *AwsRouteTableExpander) handleDefaultTable(table *resource.AbstractResou
 	return nil
 }
 
-func (m *AwsRouteTableExpander) routeExists(routeId string, resourcesFromState []resource.Resource) bool {
+func (m *AwsRouteTableExpander) routeExists(routeId string, resourcesFromState []*resource.Resource) bool {
 	for _, res := range resourcesFromState {
 		if res.TerraformType() == aws.AwsRouteResourceType && res.TerraformId() == routeId {
 			return true

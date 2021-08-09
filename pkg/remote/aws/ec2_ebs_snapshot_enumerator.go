@@ -23,13 +23,13 @@ func (e *EC2EbsSnapshotEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsEbsSnapshotResourceType
 }
 
-func (e *EC2EbsSnapshotEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *EC2EbsSnapshotEnumerator) Enumerate() ([]*resource.Resource, error) {
 	snapshots, err := e.repository.ListAllSnapshots()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(snapshots))
+	results := make([]*resource.Resource, len(snapshots))
 
 	for _, snapshot := range snapshots {
 		results = append(

@@ -51,11 +51,11 @@ func NewAnalyzer(alerter *alerter.Alerter, options AnalyzerOptions, filter filte
 	return &Analyzer{alerter, options, filter}
 }
 
-func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resource) (Analysis, error) {
+func (a Analyzer) Analyze(remoteResources, resourcesFromState []*resource.Resource) (Analysis, error) {
 	analysis := Analysis{}
 
 	// Iterate on remote resources and filter ignored resources
-	filteredRemoteResource := make([]resource.Resource, 0, len(remoteResources))
+	filteredRemoteResource := make([]*resource.Resource, 0, len(remoteResources))
 	for _, remoteRes := range remoteResources {
 		if a.filter.IsResourceIgnored(remoteRes) || a.alerter.IsResourceIgnored(remoteRes) {
 			continue
@@ -136,16 +136,16 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []resource.Resourc
 	return analysis, nil
 }
 
-func findCorrespondingRes(resources []resource.Resource, res resource.Resource) (int, resource.Resource, bool) {
+func findCorrespondingRes(resources []*resource.Resource, res *resource.Resource) (int, *resource.Resource, bool) {
 	for i, r := range resources {
-		if resource.IsSameResource(res, r) {
+		if res.Equal(r) {
 			return i, r, true
 		}
 	}
 	return -1, nil, false
 }
 
-func removeResourceByIndex(i int, resources []resource.Resource) []resource.Resource {
+func removeResourceByIndex(i int, resources []*resource.Resource) []*resource.Resource {
 	if i == len(resources)-1 {
 		return resources[:len(resources)-1]
 	}
@@ -154,7 +154,7 @@ func removeResourceByIndex(i int, resources []resource.Resource) []resource.Reso
 
 // hasUnmanagedSecurityGroupRules returns true if we find at least one unmanaged
 // security group rule
-func (a Analyzer) hasUnmanagedSecurityGroupRules(unmanagedResources []resource.Resource) bool {
+func (a Analyzer) hasUnmanagedSecurityGroupRules(unmanagedResources []*resource.Resource) bool {
 	for _, res := range unmanagedResources {
 		if res.TerraformType() == resourceaws.AwsSecurityGroupRuleResourceType {
 			return true

@@ -8,6 +8,7 @@ import (
 	"path"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
@@ -32,21 +33,21 @@ func TestConsole_Write(t *testing.T) {
 			args: args{analysis: func() *analyser.Analysis {
 				a := fakeAnalysis()
 				a.AddDeleted(
-					&testresource.FakeResource{
+					&resource.Resource{
 						Id:   "test-id-1",
 						Type: "aws_test_resource",
 					},
-					&testresource.FakeResource{
+					&resource.Resource{
 						Id:   "test-id-2",
 						Type: "aws_test_resource",
 					},
 				)
 				a.AddUnmanaged(
-					&testresource.FakeResource{
+					&resource.Resource{
 						Id:   "test-id-1",
 						Type: "aws_testing_resource",
 					},
-					&testresource.FakeResource{
+					&resource.Resource{
 						Id:   "test-id-2",
 						Type: "aws_resource",
 					},

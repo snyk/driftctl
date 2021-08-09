@@ -24,13 +24,13 @@ func (e *EC2RouteTableEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsRouteTableResourceType
 }
 
-func (e *EC2RouteTableEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *EC2RouteTableEnumerator) Enumerate() ([]*resource.Resource, error) {
 	routeTables, err := e.repository.ListAllRouteTables()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	var results []resource.Resource
+	var results []*resource.Resource
 
 	for _, routeTable := range routeTables {
 		if !isMainRouteTable(routeTable) {

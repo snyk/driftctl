@@ -23,7 +23,7 @@ func (e *IamAccessKeyEnumerator) SupportedType() resource.ResourceType {
 	return resourceaws.AwsIamAccessKeyResourceType
 }
 
-func (e *IamAccessKeyEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *IamAccessKeyEnumerator) Enumerate() ([]*resource.Resource, error) {
 	users, err := e.repository.ListAllUsers()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), resourceaws.AwsIamUserResourceType)
@@ -34,7 +34,7 @@ func (e *IamAccessKeyEnumerator) Enumerate() ([]resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, 0)
+	results := make([]*resource.Resource, 0)
 	for _, key := range keys {
 		results = append(
 			results,

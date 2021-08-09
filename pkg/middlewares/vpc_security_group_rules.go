@@ -18,8 +18,8 @@ func NewVPCSecurityGroupRuleSanitizer(resourceFactory resource.ResourceFactory) 
 	}
 }
 
-func (m VPCSecurityGroupRuleSanitizer) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
-	newStateResources := make([]resource.Resource, 0)
+func (m VPCSecurityGroupRuleSanitizer) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
+	newStateResources := make([]*resource.Resource, 0)
 
 	for _, stateResource := range *resourcesFromState {
 		// Ignore all resources other than security group rule
@@ -28,27 +28,25 @@ func (m VPCSecurityGroupRuleSanitizer) Execute(remoteResources, resourcesFromSta
 			continue
 		}
 
-		rule, _ := stateResource.(*resource.AbstractResource)
-
-		if rule.Attrs.GetBool("self") != nil && *rule.Attrs.GetBool("self") {
-			_ = rule.Attrs.SafeSet([]string{"source_security_group_id"}, *rule.Attrs.GetString("security_group_id"))
+		if stateResource.Attrs.GetBool("self") != nil && *stateResource.Attrs.GetBool("self") {
+			_ = stateResource.Attrs.SafeSet([]string{"source_security_group_id"}, *stateResource.Attrs.GetString("security_group_id"))
 		}
 
-		if !shouldBeSplit(rule) {
-			rule.Attrs.SafeDelete([]string{"self"})
+		if !shouldBeSplit(stateResource) {
+			stateResource.Attrs.SafeDelete([]string{"self"})
 			newStateResources = append(newStateResources, stateResource)
 			continue
 		}
 
-		if rule.Attrs.GetSlice("cidr_blocks") != nil && len(rule.Attrs.GetSlice("cidr_blocks")) > 0 {
-			for _, ipRange := range rule.Attrs.GetSlice("cidr_blocks") {
-				attrs := rule.Attrs.Copy()
+		if stateResource.Attrs.GetSlice("cidr_blocks") != nil && len(stateResource.Attrs.GetSlice("cidr_blocks")) > 0 {
+			for _, ipRange := range stateResource.Attrs.GetSlice("cidr_blocks") {
+				attrs := stateResource.Attrs.Copy()
 				_ = attrs.SafeSet([]string{"cidr_blocks"}, []interface{}{ipRange})
 				_ = attrs.SafeSet([]string{"ipv6_cidr_blocks"}, []interface{}{})
 				_ = attrs.SafeSet([]string{"prefix_list_ids"}, []interface{}{})
 				res := m.createRule(attrs)
 				logrus.WithFields(logrus.Fields{
-					"formerRuleId": rule.TerraformId(),
+					"formerRuleId": stateResource.TerraformId(),
 					"newRuleId":    res.TerraformId(),
 				}).Debug("Splitting aws_security_group_rule")
 				res.Attrs.SafeDelete([]string{"self"})
@@ -56,15 +54,15 @@ func (m VPCSecurityGroupRuleSanitizer) Execute(remoteResources, resourcesFromSta
 			}
 		}
 
-		if rule.Attrs.GetSlice("ipv6_cidr_blocks") != nil && len(rule.Attrs.GetSlice("ipv6_cidr_blocks")) > 0 {
-			for _, ipRange := range rule.Attrs.GetSlice("ipv6_cidr_blocks") {
-				attrs := rule.Attrs.Copy()
+		if stateResource.Attrs.GetSlice("ipv6_cidr_blocks") != nil && len(stateResource.Attrs.GetSlice("ipv6_cidr_blocks")) > 0 {
+			for _, ipRange := range stateResource.Attrs.GetSlice("ipv6_cidr_blocks") {
+				attrs := stateResource.Attrs.Copy()
 				_ = attrs.SafeSet([]string{"cidr_blocks"}, []interface{}{})
 				_ = attrs.SafeSet([]string{"ipv6_cidr_blocks"}, []interface{}{ipRange})
 				_ = attrs.SafeSet([]string{"prefix_list_ids"}, []interface{}{})
 				res := m.createRule(attrs)
 				logrus.WithFields(logrus.Fields{
-					"formerRuleId": rule.TerraformId(),
+					"formerRuleId": stateResource.TerraformId(),
 					"newRuleId":    res.TerraformId(),
 				}).Debug("Splitting aws_security_group_rule")
 				res.Attrs.SafeDelete([]string{"self"})
@@ -72,15 +70,15 @@ func (m VPCSecurityGroupRuleSanitizer) Execute(remoteResources, resourcesFromSta
 			}
 		}
 
-		if rule.Attrs.GetSlice("prefix_list_ids") != nil && len(rule.Attrs.GetSlice("prefix_list_ids")) > 0 {
-			for _, listId := range rule.Attrs.GetSlice("prefix_list_ids") {
-				attrs := rule.Attrs.Copy()
+		if stateResource.Attrs.GetSlice("prefix_list_ids") != nil && len(stateResource.Attrs.GetSlice("prefix_list_ids")) > 0 {
+			for _, listId := range stateResource.Attrs.GetSlice("prefix_list_ids") {
+				attrs := stateResource.Attrs.Copy()
 				_ = attrs.SafeSet([]string{"cidr_blocks"}, []interface{}{})
 				_ = attrs.SafeSet([]string{"ipv6_cidr_blocks"}, []interface{}{})
 				_ = attrs.SafeSet([]string{"prefix_list_ids"}, []interface{}{listId})
 				res := m.createRule(attrs)
 				logrus.WithFields(logrus.Fields{
-					"formerRuleId": rule.TerraformId(),
+					"formerRuleId": stateResource.TerraformId(),
 					"newRuleId":    res.TerraformId(),
 				}).Debug("Splitting aws_security_group_rule")
 				res.Attrs.SafeDelete([]string{"self"})
@@ -88,15 +86,15 @@ func (m VPCSecurityGroupRuleSanitizer) Execute(remoteResources, resourcesFromSta
 			}
 		}
 
-		if (rule.Attrs.GetBool("self") != nil && *rule.Attrs.GetBool("self")) ||
-			(rule.Attrs.GetString("source_security_group_id") != nil && *rule.Attrs.GetString("source_security_group_id") != "") {
-			attrs := rule.Attrs.Copy()
+		if (stateResource.Attrs.GetBool("self") != nil && *stateResource.Attrs.GetBool("self")) ||
+			(stateResource.Attrs.GetString("source_security_group_id") != nil && *stateResource.Attrs.GetString("source_security_group_id") != "") {
+			attrs := stateResource.Attrs.Copy()
 			_ = attrs.SafeSet([]string{"cidr_blocks"}, []interface{}{})
 			_ = attrs.SafeSet([]string{"ipv6_cidr_blocks"}, []interface{}{})
 			_ = attrs.SafeSet([]string{"prefix_list_ids"}, []interface{}{})
 			res := m.createRule(attrs)
 			logrus.WithFields(logrus.Fields{
-				"formerRuleId": rule.TerraformId(),
+				"formerRuleId": stateResource.TerraformId(),
 				"newRuleId":    res.TerraformId(),
 			}).Debug("Splitting aws_security_group_rule")
 			res.Attrs.SafeDelete([]string{"self"})
@@ -110,14 +108,13 @@ func (m VPCSecurityGroupRuleSanitizer) Execute(remoteResources, resourcesFromSta
 		if res.TerraformType() != resourceaws.AwsSecurityGroupRuleResourceType {
 			continue
 		}
-		rule, _ := res.(*resource.AbstractResource)
-		rule.Attrs.SafeDelete([]string{"self"})
+		res.Attrs.SafeDelete([]string{"self"})
 	}
 
 	return nil
 }
 
-func (m *VPCSecurityGroupRuleSanitizer) createRule(res *resource.Attributes) *resource.AbstractResource {
+func (m *VPCSecurityGroupRuleSanitizer) createRule(res *resource.Attributes) *resource.Resource {
 	id := resourceaws.CreateSecurityGroupRuleIdHash(res)
 	data := map[string]interface{}{
 		"id":                       id,
@@ -137,7 +134,7 @@ func (m *VPCSecurityGroupRuleSanitizer) createRule(res *resource.Attributes) *re
 	return rule
 }
 
-func shouldBeSplit(r *resource.AbstractResource) bool {
+func shouldBeSplit(r *resource.Resource) bool {
 	var i int
 	if r.Attrs.GetSlice("cidr_blocks") != nil && len(r.Attrs.GetSlice("cidr_blocks")) > 0 {
 		i += len(r.Attrs.GetSlice("cidr_blocks"))

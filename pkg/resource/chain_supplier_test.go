@@ -4,9 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/resource"
-	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,26 +12,26 @@ func TestChainSupplier_Resources(t *testing.T) {
 
 	assert := assert.New(t)
 
-	fakeTestSupplier := mocks.Supplier{}
+	fakeTestSupplier := resource.MockSupplier{}
 	fakeTestSupplier.On("Resources").Return(
-		[]resource.Resource{
-			&testresource.FakeResource{
+		[]*resource.Resource{
+			&resource.Resource{
 				Id: "fake-supplier-1_fake-resource-1",
 			},
-			&testresource.FakeResource{
+			&resource.Resource{
 				Id: "fake-supplier-1_fake-resource-2",
 			},
 		},
 		nil,
 	).Once()
 
-	anotherFakeTestSupplier := mocks.Supplier{}
+	anotherFakeTestSupplier := resource.MockSupplier{}
 	anotherFakeTestSupplier.On("Resources").Return(
-		[]resource.Resource{
-			&testresource.FakeResource{
+		[]*resource.Resource{
+			&resource.Resource{
 				Id: "fake-supplier-2_fake-resource-1",
 			},
-			&testresource.FakeResource{
+			&resource.Resource{
 				Id: "fake-supplier-2_fake-resource-2",
 			},
 		},
@@ -59,21 +57,21 @@ func TestChainSupplier_Resources_WithError(t *testing.T) {
 
 	assert := assert.New(t)
 
-	fakeTestSupplier := mocks.Supplier{}
+	fakeTestSupplier := resource.MockSupplier{}
 	fakeTestSupplier.
 		On("Resources").
-		Return([]resource.Resource{
-			&testresource.FakeResource{
+		Return([]*resource.Resource{
+			&resource.Resource{
 				Id: "fake-supplier-1_fake-resource-1",
 			},
-			&testresource.FakeResource{
+			&resource.Resource{
 				Id: "fake-supplier-1_fake-resource-2",
 			},
 		},
 			nil,
 		)
 
-	anotherFakeTestSupplier := mocks.Supplier{}
+	anotherFakeTestSupplier := resource.MockSupplier{}
 	anotherFakeTestSupplier.
 		On("Resources").
 		Return(nil, errors.New("error from another supplier")).

@@ -23,13 +23,13 @@ func (e *SNSTopicPolicyEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsSnsTopicPolicyResourceType
 }
 
-func (e *SNSTopicPolicyEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *SNSTopicPolicyEnumerator) Enumerate() ([]*resource.Resource, error) {
 	topics, err := e.repository.ListAllTopics()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), aws.AwsSnsTopicResourceType)
 	}
 
-	results := make([]resource.Resource, len(topics))
+	results := make([]*resource.Resource, len(topics))
 
 	for _, topic := range topics {
 		results = append(

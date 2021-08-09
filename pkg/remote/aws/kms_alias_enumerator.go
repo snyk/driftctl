@@ -23,13 +23,13 @@ func (e *KMSAliasEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsKmsAliasResourceType
 }
 
-func (e *KMSAliasEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *KMSAliasEnumerator) Enumerate() ([]*resource.Resource, error) {
 	aliases, err := e.repository.ListAllAliases()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(aliases))
+	results := make([]*resource.Resource, len(aliases))
 
 	for _, alias := range aliases {
 		results = append(

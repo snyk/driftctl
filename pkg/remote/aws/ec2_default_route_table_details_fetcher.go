@@ -19,7 +19,7 @@ func NewEC2DefaultRouteTableDetailsFetcher(provider terraform.ResourceReader, de
 	}
 }
 
-func (r *EC2DefaultRouteTableDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
+func (r *EC2DefaultRouteTableDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	ctyVal, err := r.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: aws.AwsDefaultRouteTableResourceType,
 		ID: res.TerraformId(),

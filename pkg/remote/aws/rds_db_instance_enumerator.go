@@ -23,13 +23,13 @@ func (e *RDSDBInstanceEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsDbInstanceResourceType
 }
 
-func (e *RDSDBInstanceEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *RDSDBInstanceEnumerator) Enumerate() ([]*resource.Resource, error) {
 	instances, err := e.repository.ListAllDBInstances()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(instances))
+	results := make([]*resource.Resource, len(instances))
 
 	for _, instance := range instances {
 		results = append(

@@ -12,7 +12,7 @@ func initAwsIAMRoleMetaData(resourceSchemaRepository resource.SchemaRepositoryIn
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetNormalizeFunc(AwsIamRoleResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsIamRoleResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"force_detach_policies"})
 	})

@@ -23,13 +23,13 @@ func (e *RDSDBSubnetGroupEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsDbSubnetGroupResourceType
 }
 
-func (e *RDSDBSubnetGroupEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *RDSDBSubnetGroupEnumerator) Enumerate() ([]*resource.Resource, error) {
 	subnetGroups, err := e.repository.ListAllDBSubnetGroups()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(subnetGroups))
+	results := make([]*resource.Resource, len(subnetGroups))
 
 	for _, subnetGroup := range subnetGroups {
 		results = append(

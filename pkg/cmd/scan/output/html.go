@@ -34,9 +34,9 @@ type HTMLTemplateParams struct {
 	ScanDate        string
 	Coverage        int
 	Summary         analyser.Summary
-	Unmanaged       []resource.Resource
+	Unmanaged       []*resource.Resource
 	Differences     []analyser.Difference
-	Deleted         []resource.Resource
+	Deleted         []*resource.Resource
 	Alerts          alerter.Alerts
 	Stylesheet      template.CSS
 	ScanDuration    string
@@ -71,7 +71,7 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 
 	funcMap := template.FuncMap{
 		"getResourceTypes": func() []string {
-			resources := make([]resource.Resource, 0)
+			resources := make([]*resource.Resource, 0)
 			resources = append(resources, analysis.Unmanaged()...)
 			resources = append(resources, analysis.Deleted()...)
 
@@ -153,7 +153,7 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 	return nil
 }
 
-func distinctResourceTypes(resources []resource.Resource) []string {
+func distinctResourceTypes(resources []*resource.Resource) []string {
 	types := make([]string, 0)
 
 	for _, res := range resources {

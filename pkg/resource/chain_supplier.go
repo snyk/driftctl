@@ -22,7 +22,7 @@ func (r *ChainSupplier) AddSupplier(supplier Supplier) {
 	r.suppliers = append(r.suppliers, supplier)
 }
 
-func (r *ChainSupplier) Resources() ([]Resource, error) {
+func (r *ChainSupplier) Resources() ([]*Resource, error) {
 
 	for _, supplier := range r.suppliers {
 		sup := supplier
@@ -31,7 +31,7 @@ func (r *ChainSupplier) Resources() ([]Resource, error) {
 		})
 	}
 
-	results := make([]Resource, 0)
+	results := make([]*Resource, 0)
 
 ReadLoop:
 	for {
@@ -42,7 +42,7 @@ ReadLoop:
 			}
 			// Type cannot be invalid as return type is enforced
 			// by Supplier interface
-			resources, _ := supplierResult.([]Resource)
+			resources, _ := supplierResult.([]*Resource)
 			results = append(results, resources...)
 		case <-r.runner.DoneChan():
 			break ReadLoop

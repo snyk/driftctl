@@ -71,11 +71,11 @@ func (r *DriftIgnore) IsTypeIgnored(ty resource.ResourceType) bool {
 	return r.match(fmt.Sprintf("%s.*", ty))
 }
 
-func (r *DriftIgnore) IsResourceIgnored(res resource.Resource) bool {
+func (r *DriftIgnore) IsResourceIgnored(res *resource.Resource) bool {
 	return r.match(fmt.Sprintf("%s.%s", res.TerraformType(), res.TerraformId()))
 }
 
-func (r *DriftIgnore) IsFieldIgnored(res resource.Resource, path []string) bool {
+func (r *DriftIgnore) IsFieldIgnored(res *resource.Resource, path []string) bool {
 	full := fmt.Sprintf("%s.%s.%s", res.TerraformType(), res.TerraformId(), strings.Join(path, "."))
 	return r.match(full)
 }

@@ -55,13 +55,13 @@ func (e *SNSTopicSubscriptionEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsSnsTopicSubscriptionResourceType
 }
 
-func (e *SNSTopicSubscriptionEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *SNSTopicSubscriptionEnumerator) Enumerate() ([]*resource.Resource, error) {
 	allSubscriptions, err := e.repository.ListAllSubscriptions()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(allSubscriptions))
+	results := make([]*resource.Resource, len(allSubscriptions))
 
 	for _, subscription := range allSubscriptions {
 		if subscription.SubscriptionArn == nil || !arn.IsARN(*subscription.SubscriptionArn) {

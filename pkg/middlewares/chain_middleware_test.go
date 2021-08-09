@@ -14,7 +14,7 @@ type FakeMiddleware struct {
 	Err  error
 }
 
-func (m FakeMiddleware) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+func (m FakeMiddleware) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
 	callCounters[m.Name]++
 	return m.Err
 }
@@ -31,8 +31,8 @@ func TestChainMiddleware(t *testing.T) {
 	}
 
 	middleware := NewChain(fakeMiddleware1, fakeMiddleware2)
-	remoteResources := []resource.Resource{}
-	stateResources := []resource.Resource{}
+	remoteResources := []*resource.Resource{}
+	stateResources := []*resource.Resource{}
 	err := middleware.Execute(&remoteResources, &stateResources)
 
 	if err != nil {
@@ -62,8 +62,8 @@ func TestChainMiddlewareErrorShouldStopExecution(t *testing.T) {
 	}
 
 	middleware := NewChain(fakeMiddleware1, fakeMiddleware2)
-	remoteResources := []resource.Resource{}
-	stateResources := []resource.Resource{}
+	remoteResources := []*resource.Resource{}
+	stateResources := []*resource.Resource{}
 	err := middleware.Execute(&remoteResources, &stateResources)
 
 	if err == nil {
