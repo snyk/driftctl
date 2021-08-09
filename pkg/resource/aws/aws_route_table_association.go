@@ -5,6 +5,13 @@ import "github.com/cloudskiff/driftctl/pkg/resource"
 const AwsRouteTableAssociationResourceType = "aws_route_table_association"
 
 func initAwsRouteTableAssociationMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+
+	resourceSchemaRepository.SetResolveReadAttributesFunc(AwsRouteTableAssociationResourceType, func(res *resource.Resource) map[string]string {
+		return map[string]string{
+			"route_table_id": *res.Attributes().GetString("route_table_id"),
+		}
+	})
+
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsRouteTableAssociationResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)

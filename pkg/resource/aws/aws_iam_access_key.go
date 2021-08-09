@@ -7,6 +7,13 @@ import (
 const AwsIamAccessKeyResourceType = "aws_iam_access_key"
 
 func initAwsIAMAccessKeyMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+
+	resourceSchemaRepository.SetResolveReadAttributesFunc(AwsIamAccessKeyResourceType, func(res *resource.Resource) map[string]string {
+		return map[string]string{
+			"user": *res.Attributes().GetString("user"),
+		}
+	})
+
 	resourceSchemaRepository.SetNormalizeFunc(AwsIamAccessKeyResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		// As we can't read secrets from aws API once access_key created we need to set

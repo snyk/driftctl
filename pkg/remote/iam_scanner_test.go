@@ -635,7 +635,7 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(remoteaws.NewIamRolePolicyAttachmentEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamRolePolicyAttachmentResourceType, remoteaws.NewIamRolePolicyAttachmentDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamRolePolicyAttachmentResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamRolePolicyAttachmentResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -765,7 +765,7 @@ func TestIamAccessKey(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(remoteaws.NewIamAccessKeyEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamAccessKeyResourceType, remoteaws.NewIamAccessKeyDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamAccessKeyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamAccessKeyResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -970,7 +970,7 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(remoteaws.NewIamUserPolicyAttachmentEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamUserPolicyAttachmentResourceType, remoteaws.NewIamUserPolicyAttachmentDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamUserPolicyAttachmentResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamUserPolicyAttachmentResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1100,7 +1100,7 @@ func TestIamRolePolicy(t *testing.T) {
 
 			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
-			assert.Equal(tt, err, c.wantErr)
+			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
 				return
 			}

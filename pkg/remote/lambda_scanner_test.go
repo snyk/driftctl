@@ -122,7 +122,7 @@ func TestScanLambdaFunction(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewLambdaFunctionEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsLambdaFunctionResourceType, aws.NewLambdaFunctionDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsLambdaFunctionResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsLambdaFunctionResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

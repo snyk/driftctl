@@ -109,7 +109,7 @@ func TestScanSNSTopic(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewSNSTopicEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicResourceType, aws.NewSNSTopicDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSnsTopicResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -205,7 +205,7 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewSNSTopicPolicyEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicPolicyResourceType, aws.NewSNSTopicPolicyDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicPolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSnsTopicPolicyResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -328,7 +328,7 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewSNSTopicSubscriptionEnumerator(repo, factory, alerter))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicSubscriptionResourceType, aws.NewSNSTopicSubscriptionDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicSubscriptionResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSnsTopicSubscriptionResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
