@@ -13,7 +13,7 @@ func initAwsKmsKeyMetaData(resourceSchemaRepository resource.SchemaRepositoryInt
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetNormalizeFunc(AwsKmsKeyResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsKmsKeyResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"deletion_window_in_days"})
 		jsonString, err := helpers.NormalizeJsonString((*val)["policy"])

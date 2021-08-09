@@ -24,13 +24,13 @@ func (e *EC2RouteTableAssociationEnumerator) SupportedType() resource.ResourceTy
 	return aws.AwsRouteTableAssociationResourceType
 }
 
-func (e *EC2RouteTableAssociationEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *EC2RouteTableAssociationEnumerator) Enumerate() ([]*resource.Resource, error) {
 	routeTables, err := e.repository.ListAllRouteTables()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), aws.AwsRouteTableResourceType)
 	}
 
-	var results []resource.Resource
+	var results []*resource.Resource
 
 	for _, routeTable := range routeTables {
 		for _, assoc := range routeTable.Associations {

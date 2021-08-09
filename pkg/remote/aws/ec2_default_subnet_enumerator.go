@@ -23,13 +23,13 @@ func (e *EC2DefaultSubnetEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsDefaultSubnetResourceType
 }
 
-func (e *EC2DefaultSubnetEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *EC2DefaultSubnetEnumerator) Enumerate() ([]*resource.Resource, error) {
 	_, defaultSubnets, err := e.repository.ListAllSubnets()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(defaultSubnets))
+	results := make([]*resource.Resource, len(defaultSubnets))
 
 	for _, subnet := range defaultSubnets {
 		results = append(

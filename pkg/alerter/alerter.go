@@ -57,7 +57,7 @@ func (a *Alerter) SendAlert(key string, alert Alert) {
 	}
 }
 
-func (a *Alerter) IsResourceIgnored(res resource.Resource) bool {
+func (a *Alerter) IsResourceIgnored(res *resource.Resource) bool {
 	alert, alertExists := a.alerts[fmt.Sprintf("%s.%s", res.TerraformType(), res.TerraformId())]
 	wildcardAlert, wildcardAlertExists := a.alerts[res.TerraformType()]
 	shouldIgnoreAlert := a.shouldBeIgnored(alert)

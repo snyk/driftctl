@@ -9,22 +9,22 @@ import (
 
 func TestDefaultVPCSecurityGroupShouldBeIgnored(t *testing.T) {
 	middleware := NewVPCDefaultSecurityGroupSanitizer()
-	remoteResources := []resource.Resource{
-		&resource.AbstractResource{
+	remoteResources := []*resource.Resource{
+		{
 			Id:   "sg-test",
 			Type: aws.AwsSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
 				"name": "test",
 			},
 		},
-		&resource.AbstractResource{
+		{
 			Id:   "sg-foo",
 			Type: aws.AwsSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
 				"name": "foo",
 			},
 		},
-		&resource.AbstractResource{
+		{
 			Id:   "sg-default",
 			Type: aws.AwsDefaultSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
@@ -32,8 +32,8 @@ func TestDefaultVPCSecurityGroupShouldBeIgnored(t *testing.T) {
 			},
 		},
 	}
-	stateResources := []resource.Resource{
-		&resource.AbstractResource{
+	stateResources := []*resource.Resource{
+		{
 			Id:   "sg-bar",
 			Type: aws.AwsSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
@@ -52,22 +52,22 @@ func TestDefaultVPCSecurityGroupShouldBeIgnored(t *testing.T) {
 
 func TestDefaultVPCSecurityGroupShouldNotBeIgnoredWhenManaged(t *testing.T) {
 	middleware := NewVPCDefaultSecurityGroupSanitizer()
-	remoteResources := []resource.Resource{
-		&resource.AbstractResource{
+	remoteResources := []*resource.Resource{
+		{
 			Id:   "sg-test",
 			Type: aws.AwsSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
 				"name": "test",
 			},
 		},
-		&resource.AbstractResource{
+		{
 			Id:   "sg-foo",
 			Type: aws.AwsSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
 				"name": "foo",
 			},
 		},
-		&resource.AbstractResource{
+		{
 			Id:   "sg-default",
 			Type: aws.AwsDefaultSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
@@ -75,8 +75,8 @@ func TestDefaultVPCSecurityGroupShouldNotBeIgnoredWhenManaged(t *testing.T) {
 			},
 		},
 	}
-	stateResources := []resource.Resource{
-		&resource.AbstractResource{
+	stateResources := []*resource.Resource{
+		{
 			Id:   "sg-default",
 			Type: aws.AwsDefaultSecurityGroupResourceType,
 			Attrs: &resource.Attributes{
@@ -91,7 +91,7 @@ func TestDefaultVPCSecurityGroupShouldNotBeIgnoredWhenManaged(t *testing.T) {
 	if len(remoteResources) != 3 {
 		t.Error("Default security group was ignored")
 	}
-	managedDefaultSecurityGroup := remoteResources[2].(*resource.AbstractResource)
+	managedDefaultSecurityGroup := remoteResources[2]
 	if *managedDefaultSecurityGroup.Attrs.GetString("name") != "default" {
 		t.Error("Default security group is ignored when it should not be")
 	}

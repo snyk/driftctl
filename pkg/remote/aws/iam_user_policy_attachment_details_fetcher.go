@@ -19,7 +19,7 @@ func NewIamUserPolicyAttachmentDetailsFetcher(provider terraform.ResourceReader,
 	}
 }
 
-func (r *IamUserPolicyAttachmentDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
+func (r *IamUserPolicyAttachmentDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	ctyVal, err := r.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: aws.AwsIamUserPolicyAttachmentResourceType,
 		ID: res.TerraformId(),

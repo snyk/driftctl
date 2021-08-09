@@ -13,11 +13,11 @@ type MockFilter struct {
 }
 
 // IsFieldIgnored provides a mock function with given fields: res, path
-func (_m *MockFilter) IsFieldIgnored(res resource.Resource, path []string) bool {
+func (_m *MockFilter) IsFieldIgnored(res *resource.Resource, path []string) bool {
 	ret := _m.Called(res, path)
 
 	var r0 bool
-	if rf, ok := ret.Get(0).(func(resource.Resource, []string) bool); ok {
+	if rf, ok := ret.Get(0).(func(*resource.Resource, []string) bool); ok {
 		r0 = rf(res, path)
 	} else {
 		r0 = ret.Get(0).(bool)
@@ -27,11 +27,11 @@ func (_m *MockFilter) IsFieldIgnored(res resource.Resource, path []string) bool 
 }
 
 // IsResourceIgnored provides a mock function with given fields: res
-func (_m *MockFilter) IsResourceIgnored(res resource.Resource) bool {
+func (_m *MockFilter) IsResourceIgnored(res *resource.Resource) bool {
 	ret := _m.Called(res)
 
 	var r0 bool
-	if rf, ok := ret.Get(0).(func(resource.Resource) bool); ok {
+	if rf, ok := ret.Get(0).(func(*resource.Resource) bool); ok {
 		r0 = rf(res)
 	} else {
 		r0 = ret.Get(0).(bool)

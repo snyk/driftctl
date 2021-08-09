@@ -5,7 +5,7 @@ import "github.com/cloudskiff/driftctl/pkg/resource"
 const AwsSecurityGroupResourceType = "aws_security_group"
 
 func initAwsSecurityGroupMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsSecurityGroupResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsSecurityGroupResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"revoke_rules_on_delete"})
 		val.SafeDelete([]string{"timeouts"})

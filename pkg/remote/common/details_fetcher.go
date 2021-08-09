@@ -8,7 +8,7 @@ import (
 )
 
 type DetailsFetcher interface {
-	ReadDetails(resource.Resource) (resource.Resource, error)
+	ReadDetails(*resource.Resource) (*resource.Resource, error)
 }
 
 type GenericDetailsFetcher struct {
@@ -25,11 +25,10 @@ func NewGenericDetailsFetcher(resType resource.ResourceType, provider terraform.
 	}
 }
 
-func (f *GenericDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
+func (f *GenericDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	attributes := map[string]string{}
 	if res.Schema().ResolveReadAttributesFunc != nil {
-		abstractResource := res.(*resource.AbstractResource)
-		attributes = res.Schema().ResolveReadAttributesFunc(abstractResource)
+		attributes = res.Schema().ResolveReadAttributesFunc(res)
 	}
 	ctyVal, err := f.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty:         f.resType,

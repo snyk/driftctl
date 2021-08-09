@@ -23,13 +23,13 @@ func (e *EC2EbsVolumeEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsEbsVolumeResourceType
 }
 
-func (e *EC2EbsVolumeEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *EC2EbsVolumeEnumerator) Enumerate() ([]*resource.Resource, error) {
 	volumes, err := e.repository.ListAllVolumes()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(volumes))
+	results := make([]*resource.Resource, len(volumes))
 
 	for _, volume := range volumes {
 		results = append(

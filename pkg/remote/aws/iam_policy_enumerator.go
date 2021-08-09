@@ -24,13 +24,13 @@ func (e *IamPolicyEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsIamPolicyResourceType
 }
 
-func (e *IamPolicyEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *IamPolicyEnumerator) Enumerate() ([]*resource.Resource, error) {
 	policies, err := e.repository.ListAllPolicies()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(policies))
+	results := make([]*resource.Resource, len(policies))
 
 	for _, policy := range policies {
 		results = append(

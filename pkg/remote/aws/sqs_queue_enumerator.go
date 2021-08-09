@@ -25,13 +25,13 @@ func (e *SQSQueueEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsSqsQueueResourceType
 }
 
-func (e *SQSQueueEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *SQSQueueEnumerator) Enumerate() ([]*resource.Resource, error) {
 	queues, err := e.repository.ListAllQueues()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(queues))
+	results := make([]*resource.Resource, len(queues))
 
 	for _, queue := range queues {
 		results = append(

@@ -19,7 +19,7 @@ func NewEC2RouteDetailsFetcher(provider terraform.ResourceReader, deserializer *
 	}
 }
 
-func (r *EC2RouteDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
+func (r *EC2RouteDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	attributes := map[string]string{
 		"route_table_id": *res.Attributes().GetString("route_table_id"),
 	}

@@ -19,7 +19,7 @@ func NewS3BucketMetricsDetailsFetcher(provider terraform.ResourceReader, deseria
 	}
 }
 
-func (r *S3BucketMetricsDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
+func (r *S3BucketMetricsDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	ctyVal, err := r.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: aws.AwsS3BucketMetricResourceType,
 		ID: res.TerraformId(),

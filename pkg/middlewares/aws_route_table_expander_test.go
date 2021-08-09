@@ -12,20 +12,19 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
-	resource2 "github.com/cloudskiff/driftctl/test/resource"
 )
 
 func TestAwsRouteTableExpander_Execute(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    []resource.Resource
-		expected []resource.Resource
+		input    []*resource.Resource
+		expected []*resource.Resource
 		mock     func(factory *terraform.MockResourceFactory)
 	}{
 		{
 			name: "test with nil route attributes",
-			input: []resource.Resource{
-				&resource.AbstractResource{
+			input: []*resource.Resource{
+				{
 					Id:   "table_from_state",
 					Type: aws.AwsRouteTableResourceType,
 					Attrs: &resource.Attributes{
@@ -33,8 +32,8 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: []resource.Resource{
-				&resource.AbstractResource{
+			expected: []*resource.Resource{
+				{
 					Id:   "table_from_state",
 					Type: aws.AwsRouteTableResourceType,
 					Attrs: &resource.Attributes{
@@ -45,8 +44,8 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 		},
 		{
 			name: "test with empty route attributes",
-			input: []resource.Resource{
-				&resource.AbstractResource{
+			input: []*resource.Resource{
+				{
 					Id:   "table_from_state",
 					Type: aws.AwsRouteTableResourceType,
 					Attrs: &resource.Attributes{
@@ -54,8 +53,8 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: []resource.Resource{
-				&resource.AbstractResource{
+			expected: []*resource.Resource{
+				{
 					Id:    "table_from_state",
 					Type:  aws.AwsRouteTableResourceType,
 					Attrs: &resource.Attributes{},
@@ -64,11 +63,11 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 		},
 		{
 			name: "test route are expanded",
-			input: []resource.Resource{
-				&resource2.FakeResource{
+			input: []*resource.Resource{
+				{
 					Id: "fake_resource",
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "table_from_state",
 					Type: aws.AwsRouteTableResourceType,
 					Attrs: &resource.Attributes{
@@ -92,16 +91,16 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: []resource.Resource{
-				&resource2.FakeResource{
+			expected: []*resource.Resource{
+				{
 					Id: "fake_resource",
 				},
-				&resource.AbstractResource{
+				{
 					Id:    "table_from_state",
 					Type:  aws.AwsRouteTableResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "r-table_from_state1080289494",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -114,7 +113,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 						"instance_owner_id":          "",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "r-table_from_state2750132062",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -127,7 +126,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 						"instance_owner_id":           "",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "r-table_from_state3813769586",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -143,7 +142,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 			mock: func(factory *terraform.MockResourceFactory) {
 				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "r-table_from_state1080289494"
-				})).Times(1).Return(&resource.AbstractResource{
+				})).Times(1).Return(&resource.Resource{
 					Id:   "r-table_from_state1080289494",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -158,7 +157,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 				}, nil)
 				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "r-table_from_state2750132062"
-				})).Times(1).Return(&resource.AbstractResource{
+				})).Times(1).Return(&resource.Resource{
 					Id:   "r-table_from_state2750132062",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -173,7 +172,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 				}, nil)
 				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "r-table_from_state3813769586"
-				})).Times(1).Return(&resource.AbstractResource{
+				})).Times(1).Return(&resource.Resource{
 					Id:   "r-table_from_state3813769586",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -189,11 +188,11 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 		},
 		{
 			name: "test route are expanded on default route tables",
-			input: []resource.Resource{
-				&resource2.FakeResource{
+			input: []*resource.Resource{
+				&resource.Resource{
 					Id: "fake_resource",
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "default_route_table_from_state",
 					Type: aws.AwsDefaultRouteTableResourceType,
 					Attrs: &resource.Attributes{
@@ -213,16 +212,16 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: []resource.Resource{
-				&resource2.FakeResource{
+			expected: []*resource.Resource{
+				&resource.Resource{
 					Id: "fake_resource",
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:    "default_route_table_from_state",
 					Type:  aws.AwsDefaultRouteTableResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "r-default_route_table_from_state1080289494",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -235,7 +234,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 						"instance_owner_id":          "",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "r-default_route_table_from_state2750132062",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -252,7 +251,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 			mock: func(factory *terraform.MockResourceFactory) {
 				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "r-default_route_table_from_state1080289494"
-				})).Times(1).Return(&resource.AbstractResource{
+				})).Times(1).Return(&resource.Resource{
 					Id:   "r-default_route_table_from_state1080289494",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -267,7 +266,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 				}, nil)
 				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "r-default_route_table_from_state2750132062"
-				})).Times(1).Return(&resource.AbstractResource{
+				})).Times(1).Return(&resource.Resource{
 					Id:   "r-default_route_table_from_state2750132062",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -284,11 +283,11 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 		},
 		{
 			"test routes are expanded from default route tables except when they already exist",
-			[]resource.Resource{
-				&resource2.FakeResource{
+			[]*resource.Resource{
+				&resource.Resource{
 					Id: "fake_resource",
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "r-default_route_table_from_state2750132062",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -301,7 +300,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 						"instance_owner_id":           "",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "default_route_table_from_state",
 					Type: aws.AwsDefaultRouteTableResourceType,
 					Attrs: &resource.Attributes{
@@ -321,16 +320,16 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{
-				&resource2.FakeResource{
+			[]*resource.Resource{
+				&resource.Resource{
 					Id: "fake_resource",
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:    "default_route_table_from_state",
 					Type:  aws.AwsDefaultRouteTableResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "r-default_route_table_from_state1080289494",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -343,7 +342,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 						"instance_owner_id":          "",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "r-default_route_table_from_state2750132062",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -360,7 +359,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 			func(factory *terraform.MockResourceFactory) {
 				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "r-default_route_table_from_state1080289494"
-				})).Times(1).Return(&resource.AbstractResource{
+				})).Times(1).Return(&resource.Resource{
 					Id:   "r-default_route_table_from_state1080289494",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -377,11 +376,11 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 		},
 		{
 			"test routes are expanded except when they already exist",
-			[]resource.Resource{
-				&resource2.FakeResource{
+			[]*resource.Resource{
+				&resource.Resource{
 					Id: "fake_resource",
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "r-table_from_state1080289494",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -394,7 +393,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 						"instance_owner_id":          "",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "table_from_state",
 					Type: aws.AwsRouteTableResourceType,
 					Attrs: &resource.Attributes{
@@ -414,16 +413,16 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{
-				&resource2.FakeResource{
+			[]*resource.Resource{
+				&resource.Resource{
 					Id: "fake_resource",
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:    "table_from_state",
 					Type:  aws.AwsRouteTableResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "r-table_from_state1080289494",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -436,7 +435,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 						"instance_owner_id":          "",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "r-table_from_state2750132062",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -453,7 +452,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 			func(factory *terraform.MockResourceFactory) {
 				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "r-table_from_state2750132062"
-				})).Times(1).Return(&resource.AbstractResource{
+				})).Times(1).Return(&resource.Resource{
 					Id:   "r-table_from_state2750132062",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -479,7 +478,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 			}
 
 			m := NewAwsRouteTableExpander(mockedAlerter, factory)
-			err := m.Execute(&[]resource.Resource{}, &tt.input)
+			err := m.Execute(&[]*resource.Resource{}, &tt.input)
 			if err != nil {
 				t.Fatal(err)
 			}

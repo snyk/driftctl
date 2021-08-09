@@ -19,7 +19,7 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 )
 
-func doTestDiff(got []resource.Resource, dirName string, provider terraform.TerraformProvider, deserializer *resource.Deserializer, shouldUpdate bool) (diff.Changelog, error) {
+func doTestDiff(got []*resource.Resource, dirName string, provider terraform.TerraformProvider, deserializer *resource.Deserializer, shouldUpdate bool) (diff.Changelog, error) {
 	resources := make(map[string][]resource.Attributes)
 
 	for _, r := range got {
@@ -33,7 +33,7 @@ func doTestDiff(got []resource.Resource, dirName string, provider terraform.Terr
 		resources[r.TerraformType()] = append(res, *r.Attributes())
 	}
 
-	expectedResources := []resource.Resource{}
+	expectedResources := []*resource.Resource{}
 	for ty, resList := range resources {
 		resGoldenName := goldenfile.ResultsFilename
 		if len(resources) > 1 {
@@ -75,7 +75,7 @@ func doTestDiff(got []resource.Resource, dirName string, provider terraform.Terr
 }
 
 // CtyTestDiff Deprecated
-func CtyTestDiff(got []resource.Resource, dirName string, provider terraform.TerraformProvider, deserializer *resource.Deserializer, shouldUpdate bool, t *testing.T) {
+func CtyTestDiff(got []*resource.Resource, dirName string, provider terraform.TerraformProvider, deserializer *resource.Deserializer, shouldUpdate bool, t *testing.T) {
 	changelog, err := doTestDiff(got, dirName, provider, deserializer, shouldUpdate)
 	if err != nil {
 		panic(err)

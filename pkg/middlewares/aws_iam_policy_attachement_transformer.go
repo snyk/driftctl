@@ -21,14 +21,14 @@ func NewIamPolicyAttachmentTransformer(resourceFactory resource.ResourceFactory)
 	}
 }
 
-func (m IamPolicyAttachmentTransformer) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+func (m IamPolicyAttachmentTransformer) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
 	*remoteResources = m.transform(remoteResources)
 	*resourcesFromState = m.transform(resourcesFromState)
 	return nil
 }
 
-func (m IamPolicyAttachmentTransformer) transform(resources *[]resource.Resource) []resource.Resource {
-	var newResources []resource.Resource
+func (m IamPolicyAttachmentTransformer) transform(resources *[]*resource.Resource) []*resource.Resource {
+	var newResources []*resource.Resource
 	for _, res := range *resources {
 		if res.TerraformType() != aws.AwsIamUserPolicyAttachmentResourceType &&
 			res.TerraformType() != aws.AwsIamRolePolicyAttachmentResourceType {

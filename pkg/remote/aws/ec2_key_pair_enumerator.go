@@ -23,13 +23,13 @@ func (e *EC2KeyPairEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsKeyPairResourceType
 }
 
-func (e *EC2KeyPairEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *EC2KeyPairEnumerator) Enumerate() ([]*resource.Resource, error) {
 	keyPairs, err := e.repository.ListAllKeyPairs()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(keyPairs))
+	results := make([]*resource.Resource, len(keyPairs))
 
 	for _, keyPair := range keyPairs {
 		results = append(

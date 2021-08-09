@@ -29,8 +29,8 @@ type TestProvider struct {
 type TestCase struct {
 	name            string
 	provider        *TestProvider
-	stateResources  []resource.Resource
-	remoteResources []resource.Resource
+	stateResources  []*resource.Resource
+	remoteResources []*resource.Resource
 	mocks           func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface)
 	assert          func(t *testing.T, result *test.ScanResult, err error)
 	assertStore     func(*testing.T, memstore.Store)
@@ -54,30 +54,24 @@ func runTest(t *testing.T, cases TestCases) {
 			testAlerter := alerter.NewAlerter()
 
 			if c.stateResources == nil {
-				c.stateResources = []resource.Resource{}
+				c.stateResources = []*resource.Resource{}
 			}
 
 			for _, res := range c.stateResources {
-				abstractResource, ok := res.(*resource.AbstractResource)
-				if ok {
-					schema, _ := repo.GetSchema(abstractResource.TerraformType())
-					abstractResource.Sch = schema
-				}
+				schema, _ := repo.GetSchema(res.TerraformType())
+				res.Sch = schema
 			}
 
 			stateSupplier := &resource.MockSupplier{}
 			stateSupplier.On("Resources").Return(c.stateResources, nil)
 
 			if c.remoteResources == nil {
-				c.remoteResources = []resource.Resource{}
+				c.remoteResources = []*resource.Resource{}
 			}
 
 			for _, res := range c.remoteResources {
-				abstractResource, ok := res.(*resource.AbstractResource)
-				if ok {
-					schema, _ := repo.GetSchema(abstractResource.TerraformType())
-					abstractResource.Sch = schema
-				}
+				schema, _ := repo.GetSchema(res.TerraformType())
+				res.Sch = schema
 			}
 			remoteSupplier := &resource.MockSupplier{}
 			remoteSupplier.On("Resources").Return(c.remoteResources, nil)
@@ -135,8 +129,8 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 	cases := TestCases{
 		{
 			name:            "analysis duration is set",
-			stateResources:  []resource.Resource{},
-			remoteResources: []resource.Resource{},
+			stateResources:  []*resource.Resource{},
+			remoteResources: []*resource.Resource{},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.NotZero(result.Duration)
 			},
@@ -148,11 +142,11 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "infrastructure should be in sync",
-			stateResources: []resource.Resource{
-				&testresource.FakeResource{},
+			stateResources: []*resource.Resource{
+				&resource.Resource{},
 			},
-			remoteResources: []resource.Resource{
-				&testresource.FakeResource{},
+			remoteResources: []*resource.Resource{
+				&resource.Resource{},
 			},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertInfrastructureIsInSync()
@@ -168,10 +162,10 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should have deleted resource",
-			stateResources: []resource.Resource{
-				&testresource.FakeResource{},
+			stateResources: []*resource.Resource{
+				&resource.Resource{},
 			},
-			remoteResources: []resource.Resource{},
+			remoteResources: []*resource.Resource{},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertDeletedCount(1)
 			},
@@ -183,9 +177,9 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name:           "we should have unmanaged resource",
-			stateResources: []resource.Resource{},
-			remoteResources: []resource.Resource{
-				&testresource.FakeResource{},
+			stateResources: []*resource.Resource{},
+			remoteResources: []*resource.Resource{
+				&resource.Resource{},
 			},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertUnmanagedCount(1)
@@ -198,17 +192,19 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should have changes of field update",
-			stateResources: []resource.Resource{
-				&testresource.FakeResource{
-					Id: "fake",
+			stateResources: []*resource.Resource{
+				&resource.Resource{
+					Id:   "fake",
+					Type: "FakeResource",
 					Attrs: &resource.Attributes{
 						"foobar": "barfoo",
 					},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&testresource.FakeResource{
-					Id: "fake",
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
+					Id:   "fake",
+					Type: "FakeResource",
 					Attrs: &resource.Attributes{
 						"foobar": "foobar",
 					},
@@ -234,8 +230,8 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should have changes on computed field",
-			stateResources: []resource.Resource{
-				&resource.AbstractResource{
+			stateResources: []*resource.Resource{
+				&resource.Resource{
 					Id:   "fake",
 					Type: aws.AwsAmiResourceType,
 					Attrs: &resource.Attributes{
@@ -243,8 +239,8 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&resource.AbstractResource{
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Id:   "fake",
 					Type: aws.AwsAmiResourceType,
 					Attrs: &resource.Attributes{
@@ -272,9 +268,10 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should have changes on deleted field",
-			stateResources: []resource.Resource{
-				&testresource.FakeResource{
-					Id: "fake",
+			stateResources: []*resource.Resource{
+				&resource.Resource{
+					Id:   "fake",
+					Type: "FakeResource",
 					Attrs: &resource.Attributes{
 						"tags": map[string]string{
 							"tag1": "deleted",
@@ -282,9 +279,10 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&testresource.FakeResource{
-					Id: "fake",
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
+					Id:   "fake",
+					Type: "FakeResource",
 					Attrs: &resource.Attributes{
 						"tags": map[string]string{},
 					},
@@ -310,17 +308,19 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should have changes of added field",
-			stateResources: []resource.Resource{
-				&testresource.FakeResource{
-					Id: "fake",
+			stateResources: []*resource.Resource{
+				&resource.Resource{
+					Id:   "fake",
+					Type: "FakeResource",
 					Attrs: &resource.Attributes{
 						"tags": map[string]string{},
 					},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&testresource.FakeResource{
-					Id: "fake",
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
+					Id:   "fake",
+					Type: "FakeResource",
 					Attrs: &resource.Attributes{
 						"tags": map[string]string{
 							"tag1": "added",
@@ -357,7 +357,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 						"policy_arn": "policy-test-1",
 						"roles":      []interface{}{"role-test-1"},
 					},
-				).Once().Return(&resource.AbstractResource{
+				).Once().Return(&resource.Resource{
 					Id:   "role-test-1-policy-test-1",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -366,12 +366,13 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 				})
 			},
-			stateResources: []resource.Resource{
-				&testresource.FakeResource{
+			stateResources: []*resource.Resource{
+				&resource.Resource{
 					Id:    "fake",
+					Type:  "FakeResource",
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "role-policy-test-1",
 					Type: aws.AwsIamPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -379,33 +380,34 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&testresource.FakeResource{
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Id:    "fake",
+					Type:  "FakeResource",
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "role-test-1",
 					Type: aws.AwsIamRoleResourceType,
 					Attrs: &resource.Attributes{
 						"path": "/aws-service-role/test",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "role-policy-test-1",
 					Type: aws.AwsIamRolePolicyResourceType,
 					Attrs: &resource.Attributes{
 						"role": "role-test-1",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "role-policy-test-1",
 					Type: aws.AwsIamPolicyResourceType,
 					Attrs: &resource.Attributes{
 						"arn": "policy-test-1",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "policy-attachment-test-1",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -414,7 +416,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 						"roles":      []interface{}{"role-test-1"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "role-test-2",
 					Type: aws.AwsIamRoleResourceType,
 					Attrs: &resource.Attributes{
@@ -451,7 +453,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 						"policy_arn": "policy-test-1",
 						"roles":      []interface{}{"role-test-1"},
 					},
-				).Once().Return(&resource.AbstractResource{
+				).Once().Return(&resource.Resource{
 					Id:   "role-test-1-policy-test-1",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -460,12 +462,13 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 				})
 			},
-			stateResources: []resource.Resource{
-				&testresource.FakeResource{
+			stateResources: []*resource.Resource{
+				&resource.Resource{
 					Id:    "fake",
+					Type:  "FakeResource",
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "policy-test-1",
 					Type: aws.AwsIamPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -473,33 +476,34 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&testresource.FakeResource{
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Id:    "fake",
+					Type:  "FakeResource",
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "role-test-1",
 					Type: aws.AwsIamRoleResourceType,
 					Attrs: &resource.Attributes{
 						"path": "/aws-service-role/test",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "role-policy-test-1",
 					Type: aws.AwsIamRolePolicyResourceType,
 					Attrs: &resource.Attributes{
 						"role": "role-test-1",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "policy-test-1",
 					Type: aws.AwsIamPolicyResourceType,
 					Attrs: &resource.Attributes{
 						"arn": "policy-test-1",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "policy-attachment-test-1",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -508,7 +512,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 						"roles":      []interface{}{"role-test-1"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "role-test-2",
 					Type: aws.AwsIamRoleResourceType,
 					Attrs: &resource.Attributes{
@@ -545,7 +549,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 						"policy_arn": "policy-test-1",
 						"roles":      []interface{}{"role-test-1"},
 					},
-				).Once().Return(&resource.AbstractResource{
+				).Once().Return(&resource.Resource{
 					Id:   "role-test-1-policy-test-1",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -554,12 +558,13 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 				})
 			},
-			stateResources: []resource.Resource{
-				&testresource.FakeResource{
+			stateResources: []*resource.Resource{
+				&resource.Resource{
 					Id:    "fake",
+					Type:  "FakeResource",
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "policy-test-1",
 					Type: aws.AwsIamPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -567,33 +572,34 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&testresource.FakeResource{
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Id:    "fake",
+					Type:  "FakeResource",
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "role-test-1",
 					Type: aws.AwsIamRoleResourceType,
 					Attrs: &resource.Attributes{
 						"path": "/aws-service-role/test",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "role-policy-test-1",
 					Type: aws.AwsIamRolePolicyResourceType,
 					Attrs: &resource.Attributes{
 						"role": "role-test-1",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "policy-test-1",
 					Type: aws.AwsIamPolicyResourceType,
 					Attrs: &resource.Attributes{
 						"arn": "policy-test-1",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "policy-attachment-test-1",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -602,7 +608,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 						"roles":      []interface{}{"role-test-1"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "role-test-2",
 					Type: aws.AwsIamRoleResourceType,
 					Attrs: &resource.Attributes{
@@ -646,14 +652,14 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 	cases := TestCases{
 		{
 			name:           "test filtering on Type",
-			stateResources: []resource.Resource{},
-			remoteResources: []resource.Resource{
-				&testresource.FakeResource{
+			stateResources: []*resource.Resource{},
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Id:    "res1",
 					Type:  "not-filtered",
 					Attrs: &resource.Attributes{},
 				},
-				&testresource.FakeResource{
+				&resource.Resource{
 					Id:    "res2",
 					Type:  "filtered",
 					Attrs: &resource.Attributes{},
@@ -675,14 +681,14 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 		},
 		{
 			name:           "test filtering on Id",
-			stateResources: []resource.Resource{},
-			remoteResources: []resource.Resource{
-				&testresource.FakeResource{
+			stateResources: []*resource.Resource{},
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Id:    "res1",
 					Type:  "not-filtered",
 					Attrs: &resource.Attributes{},
 				},
-				&testresource.FakeResource{
+				&resource.Resource{
 					Id:    "res2",
 					Type:  "filtered",
 					Attrs: &resource.Attributes{},
@@ -704,16 +710,16 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 		},
 		{
 			name:           "test filtering on attribute",
-			stateResources: []resource.Resource{},
-			remoteResources: []resource.Resource{
-				&testresource.FakeResource{
+			stateResources: []*resource.Resource{},
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Id:   "res1",
 					Type: "filtered",
 					Attrs: &resource.Attributes{
 						"test_field": "value to filter on",
 					},
 				},
-				&testresource.FakeResource{
+				&resource.Resource{
 					Id:    "res2",
 					Type:  "not-filtered",
 					Attrs: &resource.Attributes{},
@@ -742,8 +748,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 	cases := TestCases{
 		{
 			name: "test bucket policy expander middleware",
-			stateResources: []resource.Resource{
-				&resource.AbstractResource{
+			stateResources: []*resource.Resource{
+				&resource.Resource{
 					Id:   "foo",
 					Type: aws.AwsS3BucketResourceType,
 					Attrs: &resource.Attributes{
@@ -752,8 +758,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&resource.AbstractResource{
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Id:   "foo",
 					Type: aws.AwsS3BucketPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -773,7 +779,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"bucket": "foo",
 						"policy": "{\"Id\":\"foo\"}",
 					},
-				).Once().Return(&resource.AbstractResource{
+				).Once().Return(&resource.Resource{
 					Id:   "foo",
 					Type: aws.AwsS3BucketPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -809,8 +815,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 		},
 		{
 			name: "test instance block device middleware",
-			stateResources: []resource.Resource{
-				&resource.AbstractResource{
+			stateResources: []*resource.Resource{
+				&resource.Resource{
 					Id:   "dummy-instance",
 					Type: "aws_instance",
 					Attrs: &resource.Attributes{
@@ -830,8 +836,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&resource.AbstractResource{
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Id:   "vol-018c5ae89895aca4c",
 					Type: "aws_ebs_volume",
 					Attrs: &resource.Attributes{
@@ -840,7 +846,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"availability_zone":    "us-east-1",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "vol-02862d9b39045a3a4",
 					Type: "aws_ebs_volume",
 					Attrs: &resource.Attributes{
@@ -851,7 +857,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				},
 			},
 			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
-				foo := resource.AbstractResource{
+				foo := resource.Resource{
 					Id:   "vol-018c5ae89895aca4c",
 					Type: "aws_ebs_volume",
 					Attrs: &resource.Attributes{
@@ -870,7 +876,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					})
 				})).Times(1).Return(&foo, nil)
 
-				bar := resource.AbstractResource{
+				bar := resource.Resource{
 					Id:   "vol-02862d9b39045a3a4",
 					Type: "aws_ebs_volume",
 					Attrs: &resource.Attributes{
@@ -922,8 +928,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 		},
 		{
 			name: "test route table expander middleware",
-			stateResources: []resource.Resource{
-				&resource.AbstractResource{
+			stateResources: []*resource.Resource{
+				&resource.Resource{
 					Id:   "table",
 					Type: "aws_route_table",
 					Attrs: &resource.Attributes{
@@ -941,8 +947,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&resource.AbstractResource{
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Id:   "r-table1080289494",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -953,7 +959,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"state":                  "active",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "r-table2750132062",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -974,7 +980,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"route_table_id":         "table",
 						"state":                  "active",
 					})
-				})).Times(1).Return(&resource.AbstractResource{
+				})).Times(1).Return(&resource.Resource{
 					Id:   "r-table1080289494",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -993,7 +999,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"route_table_id":              "table",
 						"state":                       "active",
 					})
-				})).Times(1).Return(&resource.AbstractResource{
+				})).Times(1).Return(&resource.Resource{
 					Id:   "r-table2750132062",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -1021,8 +1027,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 		},
 		{
 			name: "test sns topic policy expander middleware",
-			stateResources: []resource.Resource{
-				&resource.AbstractResource{
+			stateResources: []*resource.Resource{
+				&resource.Resource{
 					Id:   "foo",
 					Type: aws.AwsSnsTopicResourceType,
 					Attrs: &resource.Attributes{
@@ -1032,8 +1038,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&resource.AbstractResource{
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Id:   "foo",
 					Type: aws.AwsSnsTopicPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -1048,7 +1054,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					"id":     "foo",
 					"arn":    "arn",
 					"policy": "{\"policy\":\"bar\"}",
-				}).Times(1).Return(&resource.AbstractResource{
+				}).Times(1).Return(&resource.Resource{
 					Id:   "foo",
 					Type: aws.AwsSnsTopicPolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -1084,8 +1090,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 		},
 		{
 			name: "test sqs queue policy expander middleware",
-			stateResources: []resource.Resource{
-				&resource.AbstractResource{
+			stateResources: []*resource.Resource{
+				&resource.Resource{
 					Id:   "foo",
 					Type: aws.AwsSqsQueueResourceType,
 					Attrs: &resource.Attributes{
@@ -1094,8 +1100,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&resource.AbstractResource{
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Id:   "foo",
 					Type: aws.AwsSqsQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -1110,7 +1116,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					"id":        "foo",
 					"queue_url": "foo",
 					"policy":    "{\"policy\":\"bar\"}",
-				}).Times(1).Return(&resource.AbstractResource{
+				}).Times(1).Return(&resource.Resource{
 					Id:   "foo",
 					Type: aws.AwsSqsQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -1146,8 +1152,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 		},
 		{
 			name: "test security group rule sanitizer middleware",
-			stateResources: []resource.Resource{
-				&resource.AbstractResource{
+			stateResources: []*resource.Resource{
+				&resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-3970541193",
 					Attrs: &resource.Attributes{
@@ -1161,7 +1167,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"source_security_group_id": "sg-0254c038e32f25530",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-845917806",
 					Attrs: &resource.Attributes{
@@ -1175,7 +1181,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"ipv6_cidr_blocks":  []interface{}{"::/0"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-294318973",
 					Attrs: &resource.Attributes{
@@ -1188,7 +1194,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"cidr_blocks":       []interface{}{"1.2.0.0/16", "5.6.7.0/24"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-2471889226",
 					Attrs: &resource.Attributes{
@@ -1201,7 +1207,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"prefix_list_ids":   []interface{}{"pl-abb451c2"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-3587309474",
 					Attrs: &resource.Attributes{
@@ -1215,8 +1221,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&resource.AbstractResource{
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-3970541193",
 					Attrs: &resource.Attributes{
@@ -1230,7 +1236,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"source_security_group_id": "sg-0254c038e32f25530",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-1707973622",
 					Attrs: &resource.Attributes{
@@ -1245,7 +1251,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"prefix_list_ids":   []interface{}{},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-2821752134",
 					Attrs: &resource.Attributes{
@@ -1260,7 +1266,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"prefix_list_ids":   []interface{}{},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-2165103420",
 					Attrs: &resource.Attributes{
@@ -1275,7 +1281,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"prefix_list_ids":   []interface{}{},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-2582518759",
 					Attrs: &resource.Attributes{
@@ -1290,7 +1296,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"prefix_list_ids":   []interface{}{},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-2471889226",
 					Attrs: &resource.Attributes{
@@ -1303,7 +1309,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"prefix_list_ids":   []interface{}{"pl-abb451c2"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-3587309474",
 					Attrs: &resource.Attributes{
@@ -1318,7 +1324,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				},
 			},
 			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
-				rule1 := resource.AbstractResource{
+				rule1 := resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-1707973622",
 					Attrs: &resource.Attributes{
@@ -1350,7 +1356,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						})
 					})).Times(1).Return(&rule1, nil)
 
-				rule2 := resource.AbstractResource{
+				rule2 := resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-2821752134",
 					Attrs: &resource.Attributes{
@@ -1382,7 +1388,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						})
 					})).Times(1).Return(&rule2, nil)
 
-				rule3 := resource.AbstractResource{
+				rule3 := resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-2165103420",
 					Attrs: &resource.Attributes{
@@ -1414,7 +1420,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						})
 					})).Times(1).Return(&rule3, nil)
 
-				rule4 := resource.AbstractResource{
+				rule4 := resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-2582518759",
 					Attrs: &resource.Attributes{
@@ -1462,8 +1468,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 		},
 		{
 			name: "test iam_policy_attachment_transformer & iam_policy_attachment_expander middleware",
-			stateResources: []resource.Resource{
-				&resource.AbstractResource{
+			stateResources: []*resource.Resource{
+				&resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-3970541193",
 					Attrs: &resource.Attributes{
@@ -1477,7 +1483,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"source_security_group_id": "sg-0254c038e32f25530",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "iduser1",
 					Type: aws.AwsIamUserPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -1485,7 +1491,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"user":       "user1",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "idrole1",
 					Type: aws.AwsIamRolePolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -1494,8 +1500,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&resource.AbstractResource{
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-3970541193",
 					Attrs: &resource.Attributes{
@@ -1509,7 +1515,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"source_security_group_id": "sg-0254c038e32f25530",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "iduser1",
 					Type: aws.AwsIamUserPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -1517,7 +1523,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"user":       "user1",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "idrole1",
 					Type: aws.AwsIamRolePolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -1533,7 +1539,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					"users":      []interface{}{"user1"},
 					"groups":     []interface{}{},
 					"roles":      []interface{}{},
-				}).Twice().Return(&resource.AbstractResource{
+				}).Twice().Return(&resource.Resource{
 					Id:   "id1",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -1547,7 +1553,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "user1-policy_arn1", map[string]interface{}{
 					"policy_arn": "policy_arn1",
 					"users":      []interface{}{"user1"},
-				}).Twice().Return(&resource.AbstractResource{
+				}).Twice().Return(&resource.Resource{
 					Id:   "user1-policy_arn1",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -1561,7 +1567,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					"users":      []interface{}{},
 					"groups":     []interface{}{},
 					"roles":      []interface{}{"role1"},
-				}).Twice().Return(&resource.AbstractResource{
+				}).Twice().Return(&resource.Resource{
 					Id:   "idrole1",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -1575,7 +1581,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "role1-policy_arn1", map[string]interface{}{
 					"policy_arn": "policy_arn1",
 					"roles":      []interface{}{"role1"},
-				}).Twice().Return(&resource.AbstractResource{
+				}).Twice().Return(&resource.Resource{
 					Id:   "role1-policy_arn1",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -1600,8 +1606,8 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 		},
 		{
 			name: "test aws role managed policy expander",
-			stateResources: []resource.Resource{
-				&resource.AbstractResource{
+			stateResources: []*resource.Resource{
+				&resource.Resource{
 					Id:   "role_with_managed_policy_attr",
 					Type: aws.AwsIamRoleResourceType,
 					Attrs: &resource.Attributes{
@@ -1612,7 +1618,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "role_with_managed_policy_attr-arn2",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -1620,28 +1626,28 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"roles":      []interface{}{"role_with_managed_policy_attr"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "role_with_empty_managed_policy_attribute",
 					Type: aws.AwsIamRoleResourceType,
 					Attrs: &resource.Attributes{
 						"managed_policy_arns": []interface{}{},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:    "role_without_managed_policy_attribute",
 					Type:  aws.AwsIamRoleResourceType,
 					Attrs: &resource.Attributes{},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&resource.AbstractResource{
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Id:   "role_with_managed_policy_attr",
 					Type: aws.AwsIamRoleResourceType,
 					Attrs: &resource.Attributes{
 						"name": "role_with_managed_policy_attr",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "role_with_managed_policy_attr-arn1",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -1649,7 +1655,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"roles":      []interface{}{"role_with_managed_policy_attr"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "role_with_managed_policy_attr-arn2",
 					Type: aws.AwsIamPolicyAttachmentResourceType,
 					Attrs: &resource.Attributes{
@@ -1657,12 +1663,12 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"roles":      []interface{}{"role_with_managed_policy_attr"},
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:    "role_with_empty_managed_policy_attribute",
 					Type:  aws.AwsIamRoleResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:    "role_without_managed_policy_attribute",
 					Type:  aws.AwsIamRoleResourceType,
 					Attrs: &resource.Attributes{},
@@ -1675,25 +1681,25 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 		},
 		{
 			name: "test aws eip association expander middleware",
-			stateResources: []resource.Resource{
-				&resource.AbstractResource{
+			stateResources: []*resource.Resource{
+				&resource.Resource{
 					Id:    "ID",
 					Type:  "ANOTHERTYPE",
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:    "associdpresentinstate",
 					Type:  aws.AwsEipAssociationResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "associdpresentinstate",
 					Type: aws.AwsEipResourceType,
 					Attrs: &resource.Attributes{
 						"association_id": "associdpresentinstate",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "associdNOTpresentinstate",
 					Type: aws.AwsEipResourceType,
 					Attrs: &resource.Attributes{
@@ -1705,25 +1711,25 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			remoteResources: []resource.Resource{
-				&resource.AbstractResource{
+			remoteResources: []*resource.Resource{
+				&resource.Resource{
 					Id:    "ID",
 					Type:  "ANOTHERTYPE",
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:    "associdpresentinstate",
 					Type:  aws.AwsEipAssociationResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "associdpresentinstate",
 					Type: aws.AwsEipResourceType,
 					Attrs: &resource.Attributes{
 						"association_id": "associdpresentinstate",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "associdNOTpresentinstate",
 					Type: aws.AwsEipAssociationResourceType,
 					Attrs: &resource.Attributes{
@@ -1735,7 +1741,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"public_ip":            "publicip",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Id:   "associdNOTpresentinstate",
 					Type: aws.AwsEipResourceType,
 					Attrs: &resource.Attributes{

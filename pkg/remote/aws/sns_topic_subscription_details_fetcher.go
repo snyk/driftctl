@@ -21,7 +21,7 @@ func NewSNSTopicSubscriptionDetailsFetcher(provider terraform.ResourceReader, de
 	}
 }
 
-func (r *SNSTopicSubscriptionDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
+func (r *SNSTopicSubscriptionDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	ctyVal, err := r.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: res.TerraformId(),
 		Ty: aws.AwsSnsTopicSubscriptionResourceType,

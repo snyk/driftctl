@@ -7,7 +7,7 @@ import (
 const AwsLambdaFunctionResourceType = "aws_lambda_function"
 
 func initAwsLambdaFunctionMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsLambdaFunctionResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsLambdaFunctionResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 		val.SafeDelete([]string{"publish"})

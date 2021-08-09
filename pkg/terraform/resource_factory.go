@@ -14,12 +14,12 @@ func NewTerraformResourceFactory(resourceSchemaRepository resource.SchemaReposit
 	}
 }
 
-func (r *TerraformResourceFactory) CreateAbstractResource(ty, id string, data map[string]interface{}) *resource.AbstractResource {
+func (r *TerraformResourceFactory) CreateAbstractResource(ty, id string, data map[string]interface{}) *resource.Resource {
 	attributes := resource.Attributes(data)
 	attributes.SanitizeDefaults()
 
 	schema, _ := r.resourceSchemaRepository.GetSchema(ty)
-	res := resource.AbstractResource{
+	res := resource.Resource{
 		Id:    id,
 		Type:  ty,
 		Attrs: &attributes,

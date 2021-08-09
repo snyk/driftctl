@@ -23,13 +23,13 @@ func (e *EC2EipAssociationEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsEipAssociationResourceType
 }
 
-func (e *EC2EipAssociationEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *EC2EipAssociationEnumerator) Enumerate() ([]*resource.Resource, error) {
 	addresses, err := e.repository.ListAllAddressesAssociation()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, 0, len(addresses))
+	results := make([]*resource.Resource, 0, len(addresses))
 
 	for _, address := range addresses {
 		results = append(

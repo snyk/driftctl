@@ -516,10 +516,12 @@ input[type="search"], select {
                                 <pre class="code-box">
                                     <code class="code-box-line">&emsp;- path.to.fields.[0]: <span class="code-box-line-delete">"value"</span><br>&emsp;~ path.to.fields.[1]: <span class="code-box-line-delete">12</span> => <span class="code-box-line-create">"12"</span><br>&emsp;- group_ids: <span class="code-box-line-delete">["a071314398026"]</span><br>&emsp;~ Policies.[0]: <span class="code-box-line-delete">{
   Id: "",
-  Type: ""
+  Type: "",
+  Source: <nil>
 }</span> => <span class="code-box-line-create">{
   Id: "093cd6ba-cf6d-4800-b252-6a50ca8903cd",
-  Type: "aws_iam_policy"
+  Type: "aws_iam_policy",
+  Source: <nil>
 }</span><br>&emsp;+ Tags.[0].Name: <span class="code-box-line-create">"test"</span><br>&emsp;~ InstanceInitiatedShutdownBehavior: <span class="code-box-line-delete">""</span> => <span class="code-box-line-create">null</span><br></code>
                                 </pre>
                             </div>

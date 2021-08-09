@@ -7,7 +7,7 @@ import (
 const AwsIamAccessKeyResourceType = "aws_iam_access_key"
 
 func initAwsIAMAccessKeyMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsIamAccessKeyResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsIamAccessKeyResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		// As we can't read secrets from aws API once access_key created we need to set
 		// fields retrieved from state to nil to avoid drift
@@ -19,7 +19,7 @@ func initAwsIAMAccessKeyMetaData(resourceSchemaRepository resource.SchemaReposit
 		val.SafeDelete([]string{"key_fingerprint"})
 		val.SafeDelete([]string{"pgp_key"})
 	})
-	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsIamAccessKeyResourceType, func(res *resource.AbstractResource) map[string]string {
+	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsIamAccessKeyResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)
 		if user := val.GetString("user"); user != nil && *user != "" {

@@ -6,7 +6,7 @@ import "github.com/cloudskiff/driftctl/pkg/resource"
 const GithubMembershipResourceType = "github_membership"
 
 func initGithubMembershipMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(GithubMembershipResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(GithubMembershipResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"etag"})
 	})

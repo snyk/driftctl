@@ -22,7 +22,7 @@ func NewSQSQueueDetailsFetcher(provider terraform.ResourceReader, deserializer *
 	}
 }
 
-func (r *SQSQueueDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
+func (r *SQSQueueDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	ctyVal, err := r.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: res.TerraformId(),
 		Ty: aws.AwsSqsQueueResourceType,

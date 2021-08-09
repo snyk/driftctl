@@ -13,8 +13,8 @@ func NewAwsDefaultSecurityGroupRule() AwsDefaultSecurityGroupRule {
 	return AwsDefaultSecurityGroupRule{}
 }
 
-func (m AwsDefaultSecurityGroupRule) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
-	newRemoteResources := make([]resource.Resource, 0)
+func (m AwsDefaultSecurityGroupRule) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
+	newRemoteResources := make([]*resource.Resource, 0)
 
 	for _, remoteResource := range *remoteResources {
 		existInState := false
@@ -25,16 +25,14 @@ func (m AwsDefaultSecurityGroupRule) Execute(remoteResources, resourcesFromState
 			continue
 		}
 
-		rule, _ := remoteResource.(*resource.AbstractResource)
-
 		// Ignore if it's not the default ingress or egress rule
-		if !isDefaultIngress(rule, remoteResources) && !isDefaultEgress(rule, remoteResources) {
+		if !isDefaultIngress(remoteResource, remoteResources) && !isDefaultEgress(remoteResource, remoteResources) {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
 
 		for _, stateResource := range *resourcesFromState {
-			if resource.IsSameResource(remoteResource, stateResource) {
+			if remoteResource.Equal(stateResource) {
 				existInState = true
 				break
 			}
@@ -57,7 +55,7 @@ func (m AwsDefaultSecurityGroupRule) Execute(remoteResources, resourcesFromState
 	return nil
 }
 
-func isDefaultIngress(rule *resource.AbstractResource, remoteResources *[]resource.Resource) bool {
+func isDefaultIngress(rule *resource.Resource, remoteResources *[]*resource.Resource) bool {
 	if ty := rule.Attrs.GetString("type"); ty == nil || *ty != "ingress" {
 		return false
 	}
@@ -89,7 +87,7 @@ func isDefaultIngress(rule *resource.AbstractResource, remoteResources *[]resour
 	return isFromDefaultSecurityGroup(sgId, remoteResources)
 }
 
-func isDefaultEgress(rule *resource.AbstractResource, remoteResources *[]resource.Resource) bool {
+func isDefaultEgress(rule *resource.Resource, remoteResources *[]*resource.Resource) bool {
 	if ty := rule.Attrs.GetString("type"); ty == nil || *ty != "egress" {
 		return false
 	}
@@ -121,7 +119,7 @@ func isDefaultEgress(rule *resource.AbstractResource, remoteResources *[]resourc
 	return isFromDefaultSecurityGroup(sgId, remoteResources)
 }
 
-func isFromDefaultSecurityGroup(sgId *string, remoteResources *[]resource.Resource) bool {
+func isFromDefaultSecurityGroup(sgId *string, remoteResources *[]*resource.Resource) bool {
 	for _, remoteResource := range *remoteResources {
 		if remoteResource.TerraformType() != aws.AwsDefaultSecurityGroupResourceType {
 			continue

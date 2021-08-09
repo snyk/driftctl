@@ -18,9 +18,9 @@ func NewAwsInstanceBlockDeviceResourceMapper(resourceFactory resource.ResourceFa
 	}
 }
 
-func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
 
-	newStateResources := make([]resource.Resource, 0)
+	newStateResources := make([]*resource.Resource, 0)
 	for _, stateRes := range *resourcesFromState {
 
 		// Ignore all resources other than aws_instance
@@ -29,17 +29,15 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 			continue
 		}
 
-		instance, _ := stateRes.(*resource.AbstractResource)
-
-		if rootBlockDevice, exist := instance.Attrs.Get("root_block_device"); exist {
+		if rootBlockDevice, exist := stateRes.Attrs.Get("root_block_device"); exist {
 			for _, rootBlock := range rootBlockDevice.([]interface{}) {
 				rootBlock := rootBlock.(map[string]interface{})
 				logrus.WithFields(logrus.Fields{
 					"volume":   rootBlock["volume_id"],
-					"instance": instance.TerraformId(),
+					"instance": stateRes.TerraformId(),
 				}).Debug("Creating aws_ebs_volume from aws_instance.root_block_device")
 				data := map[string]interface{}{
-					"availability_zone":    (*instance.Attrs)["availability_zone"],
+					"availability_zone":    (*stateRes.Attrs)["availability_zone"],
 					"encrypted":            rootBlock["encrypted"],
 					"id":                   rootBlock["volume_id"],
 					"iops":                 rootBlock["iops"],
@@ -47,7 +45,7 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 					"size":                 rootBlock["volume_size"],
 					"type":                 rootBlock["volume_type"],
 					"multi_attach_enabled": false,
-					"tags":                 a.volumeTags(instance, rootBlock),
+					"tags":                 a.volumeTags(stateRes, rootBlock),
 				}
 				if throughput, exist := rootBlock["throughput"]; exist {
 					data["throughput"] = throughput
@@ -55,11 +53,11 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 				newRes := a.resourceFactory.CreateAbstractResource("aws_ebs_volume", rootBlock["volume_id"].(string), data)
 				newStateResources = append(newStateResources, newRes)
 			}
-			instance.Attrs.SafeDelete([]string{"root_block_device"})
-			instance.Attrs.SafeDelete([]string{"volume_tags"})
+			stateRes.Attrs.SafeDelete([]string{"root_block_device"})
+			stateRes.Attrs.SafeDelete([]string{"volume_tags"})
 		}
 
-		if ebsBlockDevice, exist := instance.Attrs.Get("ebs_block_device"); exist {
+		if ebsBlockDevice, exist := stateRes.Attrs.Get("ebs_block_device"); exist {
 			for _, blockDevice := range ebsBlockDevice.([]interface{}) {
 				blockDevice := blockDevice.(map[string]interface{})
 				if a.hasBlockDevice(blockDevice, resourcesFromState) {
@@ -67,10 +65,10 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 				}
 				logrus.WithFields(logrus.Fields{
 					"volume":   blockDevice["volume_id"],
-					"instance": instance.TerraformId(),
+					"instance": stateRes.TerraformId(),
 				}).Debug("Creating aws_ebs_volume from aws_instance.ebs_block_device")
 				data := map[string]interface{}{
-					"availability_zone":    (*instance.Attrs)["availability_zone"],
+					"availability_zone":    (*stateRes.Attrs)["availability_zone"],
 					"encrypted":            blockDevice["encrypted"],
 					"id":                   blockDevice["volume_id"],
 					"iops":                 blockDevice["iops"],
@@ -78,7 +76,7 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 					"size":                 blockDevice["volume_size"],
 					"type":                 blockDevice["volume_type"],
 					"multi_attach_enabled": false,
-					"tags":                 a.volumeTags(instance, blockDevice),
+					"tags":                 a.volumeTags(stateRes, blockDevice),
 				}
 				if throughput, exist := blockDevice["throughput"]; exist {
 					data["throughput"] = throughput
@@ -86,23 +84,22 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 				newRes := a.resourceFactory.CreateAbstractResource("aws_ebs_volume", blockDevice["volume_id"].(string), data)
 				newStateResources = append(newStateResources, newRes)
 			}
-			instance.Attrs.SafeDelete([]string{"ebs_block_device"})
-			instance.Attrs.SafeDelete([]string{"volume_tags"})
+			stateRes.Attrs.SafeDelete([]string{"ebs_block_device"})
+			stateRes.Attrs.SafeDelete([]string{"volume_tags"})
 		}
-		newStateResources = append(newStateResources, instance)
+		newStateResources = append(newStateResources, stateRes)
 	}
 
-	newRemoteResources := make([]resource.Resource, 0)
+	newRemoteResources := make([]*resource.Resource, 0)
 	for _, remoteRes := range *remoteResources {
 		if remoteRes.TerraformType() != aws.AwsInstanceResourceType {
 			newRemoteResources = append(newRemoteResources, remoteRes)
 			continue
 		}
-		instance, _ := remoteRes.(*resource.AbstractResource)
-		instance.Attrs.SafeDelete([]string{"root_block_device"})
-		instance.Attrs.SafeDelete([]string{"ebs_block_device"})
-		instance.Attrs.SafeDelete([]string{"volume_tags"})
-		newRemoteResources = append(newRemoteResources, instance)
+		remoteRes.Attrs.SafeDelete([]string{"root_block_device"})
+		remoteRes.Attrs.SafeDelete([]string{"ebs_block_device"})
+		remoteRes.Attrs.SafeDelete([]string{"volume_tags"})
+		newRemoteResources = append(newRemoteResources, remoteRes)
 	}
 
 	*resourcesFromState = newStateResources
@@ -111,14 +108,14 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 	return nil
 }
 
-func (a AwsInstanceBlockDeviceResourceMapper) volumeTags(instance *resource.AbstractResource, blockDevice map[string]interface{}) interface{} {
+func (a AwsInstanceBlockDeviceResourceMapper) volumeTags(instance *resource.Resource, blockDevice map[string]interface{}) interface{} {
 	if tags, exist := instance.Attrs.Get("volume_tags"); exist {
 		return tags
 	}
 	return blockDevice["tags"]
 }
 
-func (a AwsInstanceBlockDeviceResourceMapper) hasBlockDevice(blockDevice map[string]interface{}, resourcesFromState *[]resource.Resource) bool {
+func (a AwsInstanceBlockDeviceResourceMapper) hasBlockDevice(blockDevice map[string]interface{}, resourcesFromState *[]*resource.Resource) bool {
 	for _, stateRes := range *resourcesFromState {
 		if stateRes.TerraformType() == aws.AwsEbsVolumeResourceType &&
 			stateRes.TerraformId() == blockDevice["volume_id"] {

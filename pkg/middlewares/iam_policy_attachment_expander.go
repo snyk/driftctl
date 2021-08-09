@@ -18,8 +18,8 @@ func NewIamPolicyAttachmentExpander(resourceFactory resource.ResourceFactory) Ia
 	}
 }
 
-func (m IamPolicyAttachmentExpander) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
-	var newStateResources = make([]resource.Resource, 0)
+func (m IamPolicyAttachmentExpander) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
+	var newStateResources = make([]*resource.Resource, 0)
 
 	for _, stateResource := range *resourcesFromState {
 		// Ignore all resources other than policy attachment
@@ -28,12 +28,10 @@ func (m IamPolicyAttachmentExpander) Execute(remoteResources, resourcesFromState
 			continue
 		}
 
-		policyAttachment := stateResource.(*resource.AbstractResource)
-
-		newStateResources = append(newStateResources, m.expand(policyAttachment)...)
+		newStateResources = append(newStateResources, m.expand(stateResource)...)
 	}
 
-	var newRemoteResources = make([]resource.Resource, 0)
+	var newRemoteResources = make([]*resource.Resource, 0)
 
 	for _, remoteResource := range *remoteResources {
 		// Ignore all resources other than policy attachment
@@ -42,9 +40,7 @@ func (m IamPolicyAttachmentExpander) Execute(remoteResources, resourcesFromState
 			continue
 		}
 
-		policyAttachment := remoteResource.(*resource.AbstractResource)
-
-		newRemoteResources = append(newRemoteResources, m.expand(policyAttachment)...)
+		newRemoteResources = append(newRemoteResources, m.expand(remoteResource)...)
 	}
 
 	*resourcesFromState = newStateResources
@@ -53,8 +49,8 @@ func (m IamPolicyAttachmentExpander) Execute(remoteResources, resourcesFromState
 	return nil
 }
 
-func (m IamPolicyAttachmentExpander) expand(policyAttachment *resource.AbstractResource) []resource.Resource {
-	var newResources []resource.Resource
+func (m IamPolicyAttachmentExpander) expand(policyAttachment *resource.Resource) []*resource.Resource {
+	var newResources []*resource.Resource
 	users := policyAttachment.Attrs.GetSlice("users")
 	// we create one attachment per user
 	for _, user := range users {

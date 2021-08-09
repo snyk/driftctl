@@ -26,7 +26,7 @@ func (e *IamRolePolicyEnumerator) SupportedType() resource.ResourceType {
 	return resourceaws.AwsIamRolePolicyResourceType
 }
 
-func (e *IamRolePolicyEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *IamRolePolicyEnumerator) Enumerate() ([]*resource.Resource, error) {
 	roles, err := e.repository.ListAllRoles()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), resourceaws.AwsIamRoleResourceType)
@@ -37,7 +37,7 @@ func (e *IamRolePolicyEnumerator) Enumerate() ([]resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(policies))
+	results := make([]*resource.Resource, len(policies))
 	for _, policy := range policies {
 		results = append(
 			results,

@@ -24,13 +24,13 @@ func (e *IamUserEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsIamUserResourceType
 }
 
-func (e *IamUserEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *IamUserEnumerator) Enumerate() ([]*resource.Resource, error) {
 	users, err := e.repository.ListAllUsers()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(users))
+	results := make([]*resource.Resource, len(users))
 
 	for _, user := range users {
 		results = append(

@@ -23,7 +23,7 @@ func (e *IamUserPolicyEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsIamUserPolicyResourceType
 }
 
-func (e *IamUserPolicyEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *IamUserPolicyEnumerator) Enumerate() ([]*resource.Resource, error) {
 	users, err := e.repository.ListAllUsers()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), aws.AwsIamUserResourceType)
@@ -33,7 +33,7 @@ func (e *IamUserPolicyEnumerator) Enumerate() ([]resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(userPolicies))
+	results := make([]*resource.Resource, len(userPolicies))
 
 	for _, userPolicy := range userPolicies {
 		results = append(

@@ -5,8 +5,6 @@ import (
 	"reflect"
 	"testing"
 
-	testresource "github.com/cloudskiff/driftctl/test/resource"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
@@ -14,8 +12,8 @@ func TestFilterEngine_Run(t *testing.T) {
 	tests := []struct {
 		name       string
 		expr       string
-		resources  []resource.Resource
-		want       []resource.Resource
+		resources  []*resource.Resource
+		want       []*resource.Resource
 		compileErr error
 		err        error
 	}{
@@ -27,17 +25,17 @@ func TestFilterEngine_Run(t *testing.T) {
 		{
 			name: "filter on type",
 			expr: "Type=='filtered_resource'",
-			resources: []resource.Resource{
-				&testresource.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{},
 				},
-				&testresource.FakeResource{
+				{
 					Attrs: &resource.Attributes{},
 					Type:  "filtered_resource",
 				},
 			},
-			want: []resource.Resource{
-				&testresource.FakeResource{
+			want: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{},
 					Type:  "filtered_resource",
 				},
@@ -46,38 +44,38 @@ func TestFilterEngine_Run(t *testing.T) {
 		{
 			name: "exclude all resource of type",
 			expr: "Type!='filtered_resource'",
-			resources: []resource.Resource{
-				&testresource.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{}},
-				&testresource.FakeResource{
+				{
 					Attrs: &resource.Attributes{},
 					Type:  "filtered_resource",
 				},
-				&testresource.FakeResource{
+				{
 					Attrs: &resource.Attributes{},
 					Type:  "filtered_resource",
 				},
 			},
-			want: []resource.Resource{
-				&testresource.FakeResource{
+			want: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{}},
 			},
 		},
 		{
 			name: "filter on id",
 			expr: "Id=='foobar'",
-			resources: []resource.Resource{
-				&testresource.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{},
 					Id:    "barfoo",
 				},
-				&testresource.FakeResource{
+				{
 					Attrs: &resource.Attributes{},
 					Id:    "foobar",
 				},
 			},
-			want: []resource.Resource{
-				&testresource.FakeResource{
+			want: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{},
 					Id:    "foobar",
 				},
@@ -86,19 +84,19 @@ func TestFilterEngine_Run(t *testing.T) {
 		{
 			name: "filter on id and type",
 			expr: "Id=='foobar' && Type=='filtered_resource'",
-			resources: []resource.Resource{
-				&testresource.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{},
 					Id:    "foobar",
 				},
-				&testresource.FakeResource{
+				{
 					Attrs: &resource.Attributes{},
 					Id:    "foobar",
 					Type:  "filtered_resource",
 				},
 			},
-			want: []resource.Resource{
-				&testresource.FakeResource{
+			want: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{},
 					Id:    "foobar",
 					Type:  "filtered_resource",
@@ -108,17 +106,17 @@ func TestFilterEngine_Run(t *testing.T) {
 		{
 			name: "filter on resource field",
 			expr: "Attr.bar_foo=='filtered'",
-			resources: []resource.Resource{
-				&testresource.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{}},
-				&testresource.FakeResource{
+				{
 					Attrs: &resource.Attributes{
 						"bar_foo": "filtered",
 					},
 				},
 			},
-			want: []resource.Resource{
-				&testresource.FakeResource{
+			want: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{
 						"bar_foo": "filtered",
 					},
@@ -128,19 +126,19 @@ func TestFilterEngine_Run(t *testing.T) {
 		{
 			name: "filter on resource type and field",
 			expr: "Type=='filtered_resource' && Attr.bar_foo=='filtered'",
-			resources: []resource.Resource{
-				&testresource.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{},
 				},
-				&testresource.FakeResource{
+				{
 					Type: "filtered_resource",
 					Attrs: &resource.Attributes{
 						"bar_foo": "filtered",
 					},
 				},
 			},
-			want: []resource.Resource{
-				&testresource.FakeResource{
+			want: []*resource.Resource{
+				{
 					Type: "filtered_resource",
 					Attrs: &resource.Attributes{
 						"bar_foo": "filtered",
@@ -151,8 +149,8 @@ func TestFilterEngine_Run(t *testing.T) {
 		{
 			name: "filter on resource map of native type field",
 			expr: "Attr.tags.foo=='foo'",
-			resources: []resource.Resource{
-				&testresource.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{
 						"tags": map[string]interface{}{
 							"foo": "bar",
@@ -160,7 +158,7 @@ func TestFilterEngine_Run(t *testing.T) {
 						},
 					},
 				},
-				&testresource.FakeResource{
+				{
 					Attrs: &resource.Attributes{
 						"tags": map[string]interface{}{
 							"foo": "foo",
@@ -168,7 +166,7 @@ func TestFilterEngine_Run(t *testing.T) {
 						},
 					},
 				},
-				&testresource.FakeResource{
+				{
 					Attrs: &resource.Attributes{
 						"tags": map[string]interface{}{
 							"foo": "foo",
@@ -177,8 +175,8 @@ func TestFilterEngine_Run(t *testing.T) {
 					},
 				},
 			},
-			want: []resource.Resource{
-				&testresource.FakeResource{
+			want: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{
 						"tags": map[string]interface{}{
 							"foo": "foo",
@@ -186,7 +184,7 @@ func TestFilterEngine_Run(t *testing.T) {
 						},
 					},
 				},
-				&testresource.FakeResource{
+				{
 					Attrs: &resource.Attributes{
 						"tags": map[string]interface{}{
 							"foo": "foo",
@@ -199,8 +197,8 @@ func TestFilterEngine_Run(t *testing.T) {
 		{
 			name: "filter on resource map of custom type field",
 			expr: "Attr.custom_map.test.tag=='foo'",
-			resources: []resource.Resource{
-				&testresource.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{
 						"custom_map": map[string]interface{}{
 							"test": map[string]interface{}{
@@ -209,7 +207,7 @@ func TestFilterEngine_Run(t *testing.T) {
 						},
 					},
 				},
-				&testresource.FakeResource{
+				{
 					Attrs: &resource.Attributes{
 						"custom_map": map[string]interface{}{
 							"test": map[string]interface{}{
@@ -218,7 +216,7 @@ func TestFilterEngine_Run(t *testing.T) {
 						},
 					},
 				},
-				&testresource.FakeResource{
+				{
 					Attrs: &resource.Attributes{
 						"custom_map": map[string]interface{}{
 							"bar": map[string]interface{}{
@@ -228,8 +226,8 @@ func TestFilterEngine_Run(t *testing.T) {
 					},
 				},
 			},
-			want: []resource.Resource{
-				&testresource.FakeResource{
+			want: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{
 						"custom_map": map[string]interface{}{
 							"test": map[string]interface{}{
@@ -243,30 +241,30 @@ func TestFilterEngine_Run(t *testing.T) {
 		{
 			name: "filter on resource field array contains",
 			expr: "Attr.slice[?contains(@, 'd')]",
-			resources: []resource.Resource{
-				&testresource.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{
 						"slice": []string{"a", "b", "c"},
 					},
 				},
-				&testresource.FakeResource{
+				{
 					Attrs: &resource.Attributes{
 						"slice": []string{"a", "b", "c", "d"},
 					},
 				},
-				&testresource.FakeResource{
+				{
 					Attrs: &resource.Attributes{
 						"slice": []string{"d"},
 					},
 				},
 			},
-			want: []resource.Resource{
-				&testresource.FakeResource{
+			want: []*resource.Resource{
+				{
 					Attrs: &resource.Attributes{
 						"slice": []string{"a", "b", "c", "d"},
 					},
 				},
-				&testresource.FakeResource{
+				{
 					Attrs: &resource.Attributes{
 						"slice": []string{"d"},
 					},

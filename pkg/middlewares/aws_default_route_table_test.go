@@ -13,38 +13,38 @@ import (
 func TestAwsDefaultRouteTable_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
-		remoteResources    []resource.Resource
-		resourcesFromState []resource.Resource
-		expected           []resource.Resource
+		remoteResources    []*resource.Resource
+		resourcesFromState []*resource.Resource
+		expected           []*resource.Resource
 	}{
 		{
 			"test that default route tables are not excluded when managed by IaC",
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "non-default-route-table",
 					Type: aws.AwsRouteTableResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-route-table",
 					Type: aws.AwsDefaultRouteTableResourceType,
 				},
 			},
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "non-default-route-table",
 					Type: aws.AwsRouteTableResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-route-table",
 					Type: aws.AwsDefaultRouteTableResourceType,
 				},
 			},
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "non-default-route-table",
 					Type: aws.AwsRouteTableResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-route-table",
 					Type: aws.AwsDefaultRouteTableResourceType,
 				},
@@ -52,24 +52,24 @@ func TestAwsDefaultRouteTable_Execute(t *testing.T) {
 		},
 		{
 			"test that default route tables are excluded when not managed by IaC",
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "non-default-route-table",
 					Type: aws.AwsRouteTableResourceType,
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-route-table",
 					Type: aws.AwsDefaultRouteTableResourceType,
 				},
 			},
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "non-default-route-table",
 					Type: aws.AwsRouteTableResourceType,
 				},
 			},
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "non-default-route-table",
 					Type: aws.AwsRouteTableResourceType,
 				},

@@ -162,7 +162,7 @@ func (d DriftCTL) Stop() {
 	}
 }
 
-func (d DriftCTL) scan() (remoteResources []resource.Resource, resourcesFromState []resource.Resource, err error) {
+func (d DriftCTL) scan() (remoteResources []*resource.Resource, resourcesFromState []*resource.Resource, err error) {
 	logrus.Info("Start reading IaC")
 	d.iacProgress.Start()
 	resourcesFromState, err = d.iacSupplier.Resources()

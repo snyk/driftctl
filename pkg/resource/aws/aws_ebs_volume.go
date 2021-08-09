@@ -7,7 +7,7 @@ import (
 const AwsEbsVolumeResourceType = "aws_ebs_volume"
 
 func initAwsEbsVolumeMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsEbsVolumeResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsEbsVolumeResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"arn"})
 		val.SafeDelete([]string{"outpost_arn"})

@@ -7,7 +7,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	resource2 "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/r3labs/diff/v2"
 )
 
@@ -15,17 +14,17 @@ func TestAwsDefaultRoute_Execute(t *testing.T) {
 
 	tests := []struct {
 		name               string
-		remoteResources    []resource.Resource
-		resourcesFromState []resource.Resource
-		expected           []resource.Resource
+		remoteResources    []*resource.Resource
+		resourcesFromState []*resource.Resource
+		expected           []*resource.Resource
 	}{
 		{
 			"test that default routes are not ignored when managed by IaC",
-			[]resource.Resource{
-				&resource2.FakeResource{
+			[]*resource.Resource{
+				{
 					Id: "fake",
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "a-dummy-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -33,7 +32,7 @@ func TestAwsDefaultRoute_Execute(t *testing.T) {
 						"origin":         "CreateRoute",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-managed-by-IaC",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -42,8 +41,8 @@ func TestAwsDefaultRoute_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "default-managed-by-IaC",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -52,11 +51,11 @@ func TestAwsDefaultRoute_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{
-				&resource2.FakeResource{
+			[]*resource.Resource{
+				{
 					Id: "fake",
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "a-dummy-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -64,7 +63,7 @@ func TestAwsDefaultRoute_Execute(t *testing.T) {
 						"origin":         "CreateRoute",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-managed-by-IaC",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -76,11 +75,11 @@ func TestAwsDefaultRoute_Execute(t *testing.T) {
 		},
 		{
 			"test that default routes are ignored when not managed by IaC",
-			[]resource.Resource{
-				&resource2.FakeResource{
+			[]*resource.Resource{
+				{
 					Id: "fake",
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "a-dummy-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -88,7 +87,7 @@ func TestAwsDefaultRoute_Execute(t *testing.T) {
 						"origin":         "CreateRoute",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "default-managed-by-IaC",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{
@@ -97,12 +96,12 @@ func TestAwsDefaultRoute_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{},
-			[]resource.Resource{
-				&resource2.FakeResource{
+			[]*resource.Resource{},
+			[]*resource.Resource{
+				{
 					Id: "fake",
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "a-dummy-route",
 					Type: aws.AwsRouteResourceType,
 					Attrs: &resource.Attributes{

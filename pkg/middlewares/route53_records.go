@@ -13,9 +13,9 @@ func NewRoute53DefaultZoneRecordSanitizer() Route53DefaultZoneRecordSanitizer {
 	return Route53DefaultZoneRecordSanitizer{}
 }
 
-func (m Route53DefaultZoneRecordSanitizer) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+func (m Route53DefaultZoneRecordSanitizer) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
 
-	newRemoteResources := make([]resource.Resource, 0)
+	newRemoteResources := make([]*resource.Resource, 0)
 
 	// We iterate on remote resource and adding them to a new slice except for default records
 	// added by aws in the zone at creation
@@ -28,15 +28,13 @@ func (m Route53DefaultZoneRecordSanitizer) Execute(remoteResources, resourcesFro
 			continue
 		}
 
-		record, _ := remoteResource.(*resource.AbstractResource)
-
-		if !isDefaultRecord(record) {
+		if !isDefaultRecord(remoteResource) {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
 
 		for _, stateResource := range *resourcesFromState {
-			if resource.IsSameResource(remoteResource, stateResource) {
+			if remoteResource.Equal(stateResource) {
 				existInState = true
 				break
 			}
@@ -61,7 +59,7 @@ func (m Route53DefaultZoneRecordSanitizer) Execute(remoteResources, resourcesFro
 }
 
 // Return true if the record is considered as default one added by aws
-func isDefaultRecord(record *resource.AbstractResource) bool {
+func isDefaultRecord(record *resource.Resource) bool {
 	ty, _ := record.Attrs.Get("type")
 	return ty == "NS" || ty == "SOA"
 }

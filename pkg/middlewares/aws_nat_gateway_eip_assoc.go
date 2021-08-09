@@ -16,8 +16,8 @@ func NewAwsNatGatewayEipAssoc() AwsNatGatewayEipAssoc {
 // It implies that driftctl read a aws_eip_association resource from remote
 // As we cannot use aws_eip_association in terraform to assign an eip to an aws_nat_gateway
 // we should remove this association to ensure we do not output noise in unmanaged resources
-func (a AwsNatGatewayEipAssoc) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
-	newRemoteResources := make([]resource.Resource, 0, len(*remoteResources))
+func (a AwsNatGatewayEipAssoc) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
+	newRemoteResources := make([]*resource.Resource, 0, len(*remoteResources))
 
 	for _, remoteResource := range *remoteResources {
 		// Ignore all resources other than aws_eip_association
@@ -26,15 +26,13 @@ func (a AwsNatGatewayEipAssoc) Execute(remoteResources, resourcesFromState *[]re
 			continue
 		}
 
-		eipAssoc, _ := remoteResource.(*resource.AbstractResource)
 		isAssociatedToNatGateway := false
 
 		// Search for a nat gateway associated with our EIP
 		for _, res := range *remoteResources {
 			if res.TerraformType() == aws.AwsNatGatewayResourceType {
-				gateway, _ := res.(*resource.AbstractResource)
-				allocationId, allocationIdExist := gateway.Attrs.Get("allocation_id")
-				eipAssocAllocId, eipAssocAllocIdExist := eipAssoc.Attrs.Get("allocation_id")
+				allocationId, allocationIdExist := res.Attrs.Get("allocation_id")
+				eipAssocAllocId, eipAssocAllocIdExist := remoteResource.Attrs.Get("allocation_id")
 				if allocationIdExist && eipAssocAllocIdExist &&
 					allocationId == eipAssocAllocId {
 					isAssociatedToNatGateway = true
@@ -51,7 +49,7 @@ func (a AwsNatGatewayEipAssoc) Execute(remoteResources, resourcesFromState *[]re
 			continue
 		}
 
-		newRemoteResources = append(newRemoteResources, eipAssoc)
+		newRemoteResources = append(newRemoteResources, remoteResource)
 	}
 
 	*remoteResources = newRemoteResources

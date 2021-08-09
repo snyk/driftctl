@@ -14,15 +14,15 @@ type MockResourceFactory struct {
 }
 
 // CreateAbstractResource provides a mock function with given fields: ty, id, data
-func (_m *MockResourceFactory) CreateAbstractResource(ty string, id string, data map[string]interface{}) *resource.AbstractResource {
+func (_m *MockResourceFactory) CreateAbstractResource(ty string, id string, data map[string]interface{}) *resource.Resource {
 	ret := _m.Called(ty, id, data)
 
-	var r0 *resource.AbstractResource
-	if rf, ok := ret.Get(0).(func(string, string, map[string]interface{}) *resource.AbstractResource); ok {
+	var r0 *resource.Resource
+	if rf, ok := ret.Get(0).(func(string, string, map[string]interface{}) *resource.Resource); ok {
 		r0 = rf(ty, id, data)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*resource.AbstractResource)
+			r0 = ret.Get(0).(*resource.Resource)
 		}
 	}
 

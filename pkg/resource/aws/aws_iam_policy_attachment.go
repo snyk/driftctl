@@ -7,7 +7,7 @@ import (
 const AwsIamPolicyAttachmentResourceType = "aws_iam_policy_attachment"
 
 func initAwsIAMPolicyAttachmentMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsIamPolicyAttachmentResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsIamPolicyAttachmentResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"name"})
 	})

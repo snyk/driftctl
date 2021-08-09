@@ -7,22 +7,20 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	resource2 "github.com/cloudskiff/driftctl/test/resource"
-
 	"github.com/cloudskiff/driftctl/pkg/resource"
 )
 
 func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 	tests := []struct {
 		name      string
-		resources []resource.Resource
+		resources []*resource.Resource
 		want      []bool
 		path      string
 	}{
 		{
 			name: "drift_ignore_no_file",
-			resources: []resource.Resource{
-				&resource2.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Type: "type1",
 					Id:   "id1",
 				},
@@ -34,8 +32,8 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 		},
 		{
 			name: "drift_ignore_empty",
-			resources: []resource.Resource{
-				&resource2.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Type: "type1",
 					Id:   "id1",
 				},
@@ -47,12 +45,12 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 		},
 		{
 			name: "drift_ignore_invalid_lines",
-			resources: []resource.Resource{
-				&resource2.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Type: "type1",
 					Id:   "id1",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "ignored_resource",
 					Id:   "id2",
 				},
@@ -65,44 +63,44 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 		},
 		{
 			name: "drift_ignore_valid",
-			resources: []resource.Resource{
-				&resource2.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Type: "type1",
 					Id:   "id1",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "wildcard_resource",
 					Id:   "id1/with/slash",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "wildcard_resource",
 					Id:   "id1",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "wildcard_resource",
 					Id:   "id2",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "wildcard_resource",
 					Id:   "id3",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "ignored_resource",
 					Id:   "id2",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "resource_type",
 					Id:   "id.with.dots",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "resource_type",
 					Id:   "idwith\\",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "resource_type",
 					Id:   "idwith\\backslashes",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "resource_type",
 					Id:   "idwith/slashes",
 				},
@@ -123,32 +121,32 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 		},
 		{
 			name: "drift_ignore_wildcard",
-			resources: []resource.Resource{
-				&resource2.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Type: "type1",
 					Id:   "id1",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "type2",
 					Id:   "id1",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "type2",
 					Id:   "id11",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "type2",
 					Id:   "id2",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "type3",
 					Id:   "id100",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "type3",
 					Id:   "id101",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "type4",
 					Id:   "id\\WithBac*slash***\\*\\",
 				},
@@ -166,40 +164,40 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 		},
 		{
 			name: "drift_ignore_all_exclude",
-			resources: []resource.Resource{
-				&resource2.FakeResource{
+			resources: []*resource.Resource{
+				{
 					Type: "type1",
 					Id:   "id1",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "type2",
 					Id:   "id1",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "type2",
 					Id:   "id11",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "type2",
 					Id:   "id2",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "type3",
 					Id:   "id100",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "type3",
 					Id:   "id101",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "iam_user",
 					Id:   "id\\WithBac*slash***\\*\\",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "some_type",
 					Id:   "idwith/slash",
 				},
-				&resource2.FakeResource{
+				{
 					Type: "some_type",
 					Id:   "idwith/slash/",
 				},
@@ -236,7 +234,7 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 
 	type Args struct {
-		Res  resource.Resource
+		Res  *resource.Resource
 		Path []string
 		Want bool
 	}
@@ -251,12 +249,12 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 			args: []Args{
 
 				{
-					Res:  &resource2.FakeResource{Type: "type1", Id: "id1"},
+					Res:  &resource.Resource{Type: "type1", Id: "id1"},
 					Path: []string{"Id"},
 					Want: false,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "type2", Id: "id2"},
+					Res:  &resource.Resource{Type: "type2", Id: "id2"},
 					Path: []string{"Id"},
 					Want: false,
 				},
@@ -267,12 +265,12 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 			name: "drift_ignore_empty",
 			args: []Args{
 				{
-					Res:  &resource2.FakeResource{Type: "type1", Id: "id1"},
+					Res:  &resource.Resource{Type: "type1", Id: "id1"},
 					Path: []string{"Id"},
 					Want: false,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "type2", Id: "id2"},
+					Res:  &resource.Resource{Type: "type2", Id: "id2"},
 					Path: []string{"Id"},
 					Want: false,
 				},
@@ -283,67 +281,67 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 			name: "drift_ignore_fields",
 			args: []Args{
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "full_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "full_drift_ignored"},
 					Path: []string{"json"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "full_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "full_drift_ignored"},
 					Path: []string{"foobar"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "partial_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "partial_drift_ignored"},
 					Path: []string{"json"},
 					Want: false,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "partial_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "partial_drift_ignored"},
 					Path: []string{"foobar"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "resource_type", Id: "id.with.dots"},
+					Res:  &resource.Resource{Type: "resource_type", Id: "id.with.dots"},
 					Path: []string{"json"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "resource_type", Id: "id.with.dots"},
+					Res:  &resource.Resource{Type: "resource_type", Id: "id.with.dots"},
 					Path: []string{"json"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "resource_type", Id: "idwith\\"},
+					Res:  &resource.Resource{Type: "resource_type", Id: "idwith\\"},
 					Path: []string{"json"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "resource_type", Id: "idwith\\backslashes"},
+					Res:  &resource.Resource{Type: "resource_type", Id: "idwith\\backslashes"},
 					Path: []string{"json"},
 					Want: false,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "resource_type", Id: "idwith\\backslashes"},
+					Res:  &resource.Resource{Type: "resource_type", Id: "idwith\\backslashes"},
 					Path: []string{"foobar"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "wildcard_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "wildcard_drift_ignored"},
 					Path: []string{"struct", "baz"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "wildcard_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "wildcard_drift_ignored"},
 					Path: []string{"struct", "bar"},
 					Want: false,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "endofpath_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "endofpath_drift_ignored"},
 					Path: []string{"struct", "baz"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "endofpath_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "endofpath_drift_ignored"},
 					Path: []string{"struct", "bar"},
 					Want: true,
 				},
@@ -354,67 +352,67 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 			name: "drift_ignore_all_exclude_field",
 			args: []Args{
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "full_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "full_drift_ignored"},
 					Path: []string{"json"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "full_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "full_drift_ignored"},
 					Path: []string{"foobar"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "partial_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "partial_drift_ignored"},
 					Path: []string{"json"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "partial_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "partial_drift_ignored"},
 					Path: []string{"foobar"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "resource_type", Id: "id.with.dots"},
+					Res:  &resource.Resource{Type: "resource_type", Id: "id.with.dots"},
 					Path: []string{"json"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "resource_type", Id: "id.with.dots"},
+					Res:  &resource.Resource{Type: "resource_type", Id: "id.with.dots"},
 					Path: []string{"json"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "resource_type", Id: "idwith\\"},
+					Res:  &resource.Resource{Type: "resource_type", Id: "idwith\\"},
 					Path: []string{"json"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "resource_type", Id: "idwith\\backslashes"},
+					Res:  &resource.Resource{Type: "resource_type", Id: "idwith\\backslashes"},
 					Path: []string{"json"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "resource_type", Id: "idwith\\backslashes"},
+					Res:  &resource.Resource{Type: "resource_type", Id: "idwith\\backslashes"},
 					Path: []string{"foobar"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "wildcard_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "wildcard_drift_ignored"},
 					Path: []string{"struct", "baz"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "wildcard_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "wildcard_drift_ignored"},
 					Path: []string{"struct", "bar"},
 					Want: false,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "endofpath_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "endofpath_drift_ignored"},
 					Path: []string{"struct", "baz"},
 					Want: true,
 				},
 				{
-					Res:  &resource2.FakeResource{Type: "res_type", Id: "endofpath_drift_ignored"},
+					Res:  &resource.Resource{Type: "res_type", Id: "endofpath_drift_ignored"},
 					Path: []string{"struct", "bar"},
 					Want: false,
 				},

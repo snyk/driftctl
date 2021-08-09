@@ -18,8 +18,8 @@ func NewAwsDefaultSQSQueuePolicy() AwsDefaultSQSQueuePolicy {
 	return AwsDefaultSQSQueuePolicy{}
 }
 
-func (m AwsDefaultSQSQueuePolicy) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
-	newRemoteResources := make([]resource.Resource, 0)
+func (m AwsDefaultSQSQueuePolicy) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
+	newRemoteResources := make([]*resource.Resource, 0)
 	for _, res := range *remoteResources {
 		// Ignore all resources other than sqs_queue_policy
 		if res.TerraformType() != aws.AwsSqsQueuePolicyResourceType {
@@ -27,20 +27,18 @@ func (m AwsDefaultSQSQueuePolicy) Execute(remoteResources, resourcesFromState *[
 			continue
 		}
 
-		policyRes, _ := res.(*resource.AbstractResource)
-
 		// Ignore all non-default queue policy
-		pol, exists := policyRes.Attrs.Get("policy")
+		pol, exists := res.Attrs.Get("policy")
 		policy := pol.(string)
 		if exists && policy != "" {
-			newRemoteResources = append(newRemoteResources, policyRes)
+			newRemoteResources = append(newRemoteResources, res)
 			continue
 		}
 
 		// Check if queue policy is managed by IaC
 		existInState := false
 		for _, stateResource := range *resourcesFromState {
-			if resource.IsSameResource(res, stateResource) {
+			if res.Equal(stateResource) {
 				existInState = true
 				break
 			}

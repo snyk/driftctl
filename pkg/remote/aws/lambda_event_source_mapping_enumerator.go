@@ -23,13 +23,13 @@ func (e *LambdaEventSourceMappingEnumerator) SupportedType() resource.ResourceTy
 	return resourceaws.AwsLambdaEventSourceMappingResourceType
 }
 
-func (e *LambdaEventSourceMappingEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *LambdaEventSourceMappingEnumerator) Enumerate() ([]*resource.Resource, error) {
 	eventSourceMappings, err := e.repository.ListAllLambdaEventSourceMappings()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(eventSourceMappings))
+	results := make([]*resource.Resource, len(eventSourceMappings))
 
 	for _, eventSourceMapping := range eventSourceMappings {
 		results = append(

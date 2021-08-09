@@ -6,14 +6,14 @@ import "github.com/cloudskiff/driftctl/pkg/resource"
 const GithubTeamResourceType = "github_team"
 
 func initGithubTeamMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(GithubTeamResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(GithubTeamResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		if defaultMaintainer, exist := val.Get("create_default_maintainer"); !exist || defaultMaintainer == nil {
 			(*val)["create_default_maintainer"] = false
 		}
 		val.SafeDelete([]string{"etag"})
 	})
-	resourceSchemaRepository.SetHumanReadableAttributesFunc(GithubTeamResourceType, func(res *resource.AbstractResource) map[string]string {
+	resourceSchemaRepository.SetHumanReadableAttributesFunc(GithubTeamResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)
 		attrs["Id"] = res.TerraformId()

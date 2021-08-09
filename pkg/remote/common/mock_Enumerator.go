@@ -13,15 +13,15 @@ type MockEnumerator struct {
 }
 
 // Enumerate provides a mock function with given fields:
-func (_m *MockEnumerator) Enumerate() ([]resource.Resource, error) {
+func (_m *MockEnumerator) Enumerate() ([]*resource.Resource, error) {
 	ret := _m.Called()
 
-	var r0 []resource.Resource
-	if rf, ok := ret.Get(0).(func() []resource.Resource); ok {
+	var r0 []*resource.Resource
+	if rf, ok := ret.Get(0).(func() []*resource.Resource); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]resource.Resource)
+			r0 = ret.Get(0).([]*resource.Resource)
 		}
 	}
 

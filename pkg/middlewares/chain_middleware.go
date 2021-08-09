@@ -13,7 +13,7 @@ func NewChain(middlewares ...Middleware) Chain {
 	return middlewares
 }
 
-func (c Chain) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+func (c Chain) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
 	for _, middleware := range c {
 		logrus.WithFields(logrus.Fields{
 			"middleware": fmt.Sprintf("%T", middleware),

@@ -19,7 +19,7 @@ func NewS3BucketInventoryDetailsFetcher(provider terraform.ResourceReader, deser
 	}
 }
 
-func (r *S3BucketInventoryDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
+func (r *S3BucketInventoryDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	ctyVal, err := r.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: aws.AwsS3BucketInventoryResourceType,
 		ID: res.TerraformId(),

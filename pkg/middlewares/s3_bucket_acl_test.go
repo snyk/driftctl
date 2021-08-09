@@ -12,19 +12,19 @@ import (
 
 func TestS3BucketAcl_Execute(t *testing.T) {
 	type args struct {
-		remoteResources    *[]resource.Resource
-		resourcesFromState *[]resource.Resource
+		remoteResources    *[]*resource.Resource
+		resourcesFromState *[]*resource.Resource
 	}
 	tests := []struct {
 		name   string
 		args   args
-		assert func(assert *assert.Assertions, remoteResources, resourcesFromState *[]resource.Resource)
+		assert func(assert *assert.Assertions, remoteResources, resourcesFromState *[]*resource.Resource)
 	}{
 		{
 			name: "grant field on remote resource must be reset if acl != private in state resource",
 			args: args{
-				remoteResources: &[]resource.Resource{
-					&resource.AbstractResource{
+				remoteResources: &[]*resource.Resource{
+					{
 						Id:   "testgrant",
 						Type: aws.AwsS3BucketResourceType,
 						Attrs: &resource.Attributes{
@@ -39,11 +39,11 @@ func TestS3BucketAcl_Execute(t *testing.T) {
 						},
 					},
 				},
-				resourcesFromState: &[]resource.Resource{
-					&resource.AbstractResource{
+				resourcesFromState: &[]*resource.Resource{
+					{
 						Type: aws.AwsAmiResourceType,
 					},
-					&resource.AbstractResource{
+					{
 						Id:   "testgrant",
 						Type: aws.AwsS3BucketResourceType,
 						Attrs: &resource.Attributes{
@@ -52,9 +52,9 @@ func TestS3BucketAcl_Execute(t *testing.T) {
 					},
 				},
 			},
-			assert: func(assert *assert.Assertions, remoteResources, resourcesFromState *[]resource.Resource) {
-				remoteRes, _ := (*remoteResources)[0].(*resource.AbstractResource)
-				stateRes, _ := (*resourcesFromState)[1].(*resource.AbstractResource)
+			assert: func(assert *assert.Assertions, remoteResources, resourcesFromState *[]*resource.Resource) {
+				remoteRes := (*remoteResources)[0]
+				stateRes := (*resourcesFromState)[1]
 				_, exist := remoteRes.Attrs.Get("grant")
 				_, stateAclExist := stateRes.Attrs.Get("acl")
 				_, remoteAclExist := remoteRes.Attrs.Get("acl")
@@ -66,8 +66,8 @@ func TestS3BucketAcl_Execute(t *testing.T) {
 		{
 			name: "does not modify grant field on remote resource if acl field is private",
 			args: args{
-				remoteResources: &[]resource.Resource{
-					&resource.AbstractResource{
+				remoteResources: &[]*resource.Resource{
+					{
 						Id:   "testgrant",
 						Type: aws.AwsS3BucketResourceType,
 						Attrs: &resource.Attributes{
@@ -82,11 +82,11 @@ func TestS3BucketAcl_Execute(t *testing.T) {
 						},
 					},
 				},
-				resourcesFromState: &[]resource.Resource{
-					&resource.AbstractResource{
+				resourcesFromState: &[]*resource.Resource{
+					{
 						Type: aws.AwsAmiResourceType,
 					},
-					&resource.AbstractResource{
+					{
 						Id:   "testgrant",
 						Type: aws.AwsS3BucketResourceType,
 						Attrs: &resource.Attributes{
@@ -95,8 +95,8 @@ func TestS3BucketAcl_Execute(t *testing.T) {
 					},
 				},
 			},
-			assert: func(assert *assert.Assertions, remoteResources, resourcesFromState *[]resource.Resource) {
-				s3Bucket, _ := (*remoteResources)[0].(*resource.AbstractResource)
+			assert: func(assert *assert.Assertions, remoteResources, resourcesFromState *[]*resource.Resource) {
+				s3Bucket := (*remoteResources)[0]
 				grantAttr, exist := s3Bucket.Attrs.Get("grant")
 				grant := grantAttr.([]map[string]interface{})
 				assert.True(exist)
@@ -113,8 +113,8 @@ func TestS3BucketAcl_Execute(t *testing.T) {
 		{
 			name: "does not modify grant field on remote resource if acl field is undefined",
 			args: args{
-				remoteResources: &[]resource.Resource{
-					&resource.AbstractResource{
+				remoteResources: &[]*resource.Resource{
+					{
 						Id:   "testgrant",
 						Type: aws.AwsS3BucketResourceType,
 						Attrs: &resource.Attributes{
@@ -129,19 +129,19 @@ func TestS3BucketAcl_Execute(t *testing.T) {
 						},
 					},
 				},
-				resourcesFromState: &[]resource.Resource{
-					&resource.AbstractResource{
+				resourcesFromState: &[]*resource.Resource{
+					{
 						Type: aws.AwsAmiResourceType,
 					},
-					&resource.AbstractResource{
+					{
 						Id:    "testgrant",
 						Type:  aws.AwsS3BucketResourceType,
 						Attrs: &resource.Attributes{},
 					},
 				},
 			},
-			assert: func(assert *assert.Assertions, remoteResources, resourcesFromState *[]resource.Resource) {
-				s3Bucket, _ := (*remoteResources)[0].(*resource.AbstractResource)
+			assert: func(assert *assert.Assertions, remoteResources, resourcesFromState *[]*resource.Resource) {
+				s3Bucket := (*remoteResources)[0]
 				grantAttr, exist := s3Bucket.Attrs.Get("grant")
 				grant := grantAttr.([]map[string]interface{})
 				assert.True(exist)
@@ -158,8 +158,8 @@ func TestS3BucketAcl_Execute(t *testing.T) {
 		{
 			name: "does not modify grant field on remote resource if acl field is empty",
 			args: args{
-				remoteResources: &[]resource.Resource{
-					&resource.AbstractResource{
+				remoteResources: &[]*resource.Resource{
+					{
 						Id:   "testgrant",
 						Type: aws.AwsS3BucketResourceType,
 						Attrs: &resource.Attributes{
@@ -174,11 +174,11 @@ func TestS3BucketAcl_Execute(t *testing.T) {
 						},
 					},
 				},
-				resourcesFromState: &[]resource.Resource{
-					&resource.AbstractResource{
+				resourcesFromState: &[]*resource.Resource{
+					{
 						Type: aws.AwsAmiResourceType,
 					},
-					&resource.AbstractResource{
+					{
 						Id:   "testgrant",
 						Type: aws.AwsS3BucketResourceType,
 						Attrs: &resource.Attributes{
@@ -187,8 +187,8 @@ func TestS3BucketAcl_Execute(t *testing.T) {
 					},
 				},
 			},
-			assert: func(assert *assert.Assertions, remoteResources, resourcesFromState *[]resource.Resource) {
-				s3Bucket, _ := (*remoteResources)[0].(*resource.AbstractResource)
+			assert: func(assert *assert.Assertions, remoteResources, resourcesFromState *[]*resource.Resource) {
+				s3Bucket := (*remoteResources)[0]
 				grantAttr, exist := s3Bucket.Attrs.Get("grant")
 				grant := grantAttr.([]map[string]interface{})
 				assert.True(exist)

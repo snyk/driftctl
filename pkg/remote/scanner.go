@@ -36,8 +36,8 @@ func NewScanner(remoteLibrary *common.RemoteLibrary, alerter alerter.AlerterInte
 	}
 }
 
-func (s *Scanner) retrieveRunnerResults(runner *parallel.ParallelRunner) ([]resource.Resource, error) {
-	results := make([]resource.Resource, 0)
+func (s *Scanner) retrieveRunnerResults(runner *parallel.ParallelRunner) ([]*resource.Resource, error) {
+	results := make([]*resource.Resource, 0)
 loop:
 	for {
 		select {
@@ -46,7 +46,7 @@ loop:
 				break loop
 			}
 
-			for _, res := range resources.([]resource.Resource) {
+			for _, res := range resources.([]*resource.Resource) {
 				if res != nil {
 					results = append(results, res)
 				}
@@ -58,7 +58,7 @@ loop:
 	return results, runner.Err()
 }
 
-func (s *Scanner) scan() ([]resource.Resource, error) {
+func (s *Scanner) scan() ([]*resource.Resource, error) {
 	for _, enumerator := range s.remoteLibrary.Enumerators() {
 		if s.filter.IsTypeIgnored(enumerator.SupportedType()) {
 			logrus.WithFields(logrus.Fields{
@@ -72,7 +72,7 @@ func (s *Scanner) scan() ([]resource.Resource, error) {
 			if err != nil {
 				err := HandleResourceEnumerationError(err, s.alerter)
 				if err == nil {
-					return []resource.Resource{}, nil
+					return []*resource.Resource{}, nil
 				}
 				return nil, err
 			}
@@ -103,7 +103,7 @@ func (s *Scanner) scan() ([]resource.Resource, error) {
 		s.detailsFetcherRunner.Run(func() (interface{}, error) {
 			fetcher := s.remoteLibrary.GetDetailsFetcher(resource.ResourceType(res.TerraformType()))
 			if fetcher == nil {
-				return []resource.Resource{res}, nil
+				return []*resource.Resource{res}, nil
 			}
 
 			resourceWithDetails, err := fetcher.ReadDetails(res)
@@ -111,16 +111,16 @@ func (s *Scanner) scan() ([]resource.Resource, error) {
 				if err := HandleResourceDetailsFetchingError(err, s.alerter); err != nil {
 					return nil, err
 				}
-				return []resource.Resource{}, nil
+				return []*resource.Resource{}, nil
 			}
-			return []resource.Resource{resourceWithDetails}, nil
+			return []*resource.Resource{resourceWithDetails}, nil
 		})
 	}
 
 	return s.retrieveRunnerResults(s.detailsFetcherRunner)
 }
 
-func (s *Scanner) Resources() ([]resource.Resource, error) {
+func (s *Scanner) Resources() ([]*resource.Resource, error) {
 	resources, err := s.scan()
 	if err != nil {
 		return nil, err

@@ -19,7 +19,7 @@ func NewRoute53RecordIDReconcilier() Route53RecordIDReconcilier {
 	return Route53RecordIDReconcilier{}
 }
 
-func (m Route53RecordIDReconcilier) Execute(_, resourcesFromState *[]resource.Resource) error {
+func (m Route53RecordIDReconcilier) Execute(_, resourcesFromState *[]*resource.Resource) error {
 
 	for _, stateResource := range *resourcesFromState {
 
@@ -27,19 +27,17 @@ func (m Route53RecordIDReconcilier) Execute(_, resourcesFromState *[]resource.Re
 			continue
 		}
 
-		record, _ := stateResource.(*resource.AbstractResource)
-
 		vars := []string{
-			(*record.Attrs)["zone_id"].(string),
-			(*record.Attrs)["fqdn"].(string),
-			(*record.Attrs)["type"].(string),
+			(*stateResource.Attrs)["zone_id"].(string),
+			(*stateResource.Attrs)["fqdn"].(string),
+			(*stateResource.Attrs)["type"].(string),
 		}
 		newId := strings.Join(vars, "_")
-		if newId != record.Id {
-			record.Id = newId
-			_ = record.Attrs.SafeSet([]string{"id"}, newId)
+		if newId != stateResource.Id {
+			stateResource.Id = newId
+			_ = stateResource.Attrs.SafeSet([]string{"id"}, newId)
 			logrus.WithFields(logrus.Fields{
-				"old_id": record.TerraformId(),
+				"old_id": stateResource.TerraformId(),
 				"new_id": newId,
 			}).Debug("Normalized route53 record ID")
 		}

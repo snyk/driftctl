@@ -23,13 +23,13 @@ func (e *LambdaFunctionEnumerator) SupportedType() resource.ResourceType {
 	return resourceaws.AwsLambdaFunctionResourceType
 }
 
-func (e *LambdaFunctionEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *LambdaFunctionEnumerator) Enumerate() ([]*resource.Resource, error) {
 	functions, err := e.repository.ListAllLambdaFunctions()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(functions))
+	results := make([]*resource.Resource, len(functions))
 
 	for _, function := range functions {
 		results = append(

@@ -23,13 +23,13 @@ func (e *CloudfrontDistributionEnumerator) SupportedType() resource.ResourceType
 	return aws.AwsCloudfrontDistributionResourceType
 }
 
-func (e *CloudfrontDistributionEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *CloudfrontDistributionEnumerator) Enumerate() ([]*resource.Resource, error) {
 	distributions, err := e.repository.ListAllDistributions()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(distributions))
+	results := make([]*resource.Resource, len(distributions))
 
 	for _, distribution := range distributions {
 		results = append(

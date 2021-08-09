@@ -23,13 +23,13 @@ func (e *EC2InternetGatewayEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsInternetGatewayResourceType
 }
 
-func (e *EC2InternetGatewayEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *EC2InternetGatewayEnumerator) Enumerate() ([]*resource.Resource, error) {
 	internetGateways, err := e.repository.ListAllInternetGateways()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(internetGateways))
+	results := make([]*resource.Resource, len(internetGateways))
 
 	for _, internetGateway := range internetGateways {
 		data := map[string]interface{}{}

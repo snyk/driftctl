@@ -19,8 +19,8 @@ func NewAwsDefaults() AwsDefaults {
 	return AwsDefaults{}
 }
 
-func (m AwsDefaults) awsIamRoleDefaults(remoteResources []resource.Resource) []resource.Resource {
-	resourcesToIgnore := make([]resource.Resource, 0)
+func (m AwsDefaults) awsIamRoleDefaults(remoteResources []*resource.Resource) []*resource.Resource {
+	resourcesToIgnore := make([]*resource.Resource, 0)
 
 	for _, remoteResource := range remoteResources {
 		// Ignore all resources other than iam role
@@ -41,8 +41,8 @@ func (m AwsDefaults) awsIamRoleDefaults(remoteResources []resource.Resource) []r
 	return resourcesToIgnore
 }
 
-func (m AwsDefaults) awsIamRolePolicyDefaults(remoteResources []resource.Resource) []resource.Resource {
-	resourcesToIgnore := make([]resource.Resource, 0)
+func (m AwsDefaults) awsIamRolePolicyDefaults(remoteResources []*resource.Resource) []*resource.Resource {
+	resourcesToIgnore := make([]*resource.Resource, 0)
 
 	for _, remoteResource := range remoteResources {
 		// Ignore all resources other than role policy
@@ -50,11 +50,11 @@ func (m AwsDefaults) awsIamRolePolicyDefaults(remoteResources []resource.Resourc
 			continue
 		}
 
-		var role *resource.AbstractResource
+		var role *resource.Resource
 		for _, res := range remoteResources {
 			if res.TerraformType() == aws.AwsIamRoleResourceType &&
-				res.TerraformId() == (*remoteResource.(*resource.AbstractResource).Attrs)["role"] {
-				role = res.(*resource.AbstractResource)
+				res.TerraformId() == (*remoteResource.Attrs)["role"] {
+				role = res
 				break
 			}
 		}
@@ -72,10 +72,10 @@ func (m AwsDefaults) awsIamRolePolicyDefaults(remoteResources []resource.Resourc
 	return resourcesToIgnore
 }
 
-func (m AwsDefaults) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
-	newRemoteResources := make([]resource.Resource, 0)
-	newResourcesFromState := make([]resource.Resource, 0)
-	resourcesToIgnore := make([]resource.Resource, 0)
+func (m AwsDefaults) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
+	newRemoteResources := make([]*resource.Resource, 0)
+	newResourcesFromState := make([]*resource.Resource, 0)
+	resourcesToIgnore := make([]*resource.Resource, 0)
 
 	resourcesToIgnore = append(resourcesToIgnore, m.awsIamRoleDefaults(*remoteResources)...)
 	resourcesToIgnore = append(resourcesToIgnore, m.awsIamRolePolicyDefaults(*remoteResources)...)
@@ -84,7 +84,7 @@ func (m AwsDefaults) Execute(remoteResources, resourcesFromState *[]resource.Res
 		ignored := false
 
 		for _, resourceToIgnore := range resourcesToIgnore {
-			if resource.IsSameResource(res, resourceToIgnore) {
+			if res.Equal(resourceToIgnore) {
 				ignored = true
 				break
 			}
@@ -105,7 +105,7 @@ func (m AwsDefaults) Execute(remoteResources, resourcesFromState *[]resource.Res
 		ignored := false
 
 		for _, resourceToIgnore := range resourcesToIgnore {
-			if resource.IsSameResource(res, resourceToIgnore) {
+			if res.Equal(resourceToIgnore) {
 				ignored = true
 				break
 			}

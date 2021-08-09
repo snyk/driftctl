@@ -15,7 +15,7 @@ import (
 )
 
 func TestAgainstGoldenFile(
-	got []resource.Resource,
+	got []*resource.Resource,
 	ty string,
 	dirName string,
 	provider terraform.TerraformProvider,
@@ -23,7 +23,7 @@ func TestAgainstGoldenFile(
 	shouldUpdate bool,
 	tt *testing.T,
 ) {
-	var expectedResources []resource.Resource
+	var expectedResources []*resource.Resource
 	ctyType := cty.List(provider.Schema()[ty].Block.ImpliedType())
 
 	// update golden file

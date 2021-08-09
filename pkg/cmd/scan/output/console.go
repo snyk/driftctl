@@ -68,8 +68,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 
 		groupedBySource := make(map[string][]analyser.Difference)
 		for _, diff := range analysis.Differences() {
-			res := diff.Res.(*resource.AbstractResource)
-			key := res.Source.Source()
+			key := diff.Res.Source.Source()
 			if _, exist := groupedBySource[key]; !exist {
 				groupedBySource[key] = []analyser.Difference{diff}
 				continue
@@ -81,10 +80,9 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 		for source, differences := range groupedBySource {
 			fmt.Print(color.BlueString("  From %s\n", source))
 			for _, difference := range differences {
-				res := difference.Res.(*resource.AbstractResource)
-				humanString := fmt.Sprintf("    - %s (%s):", res.TerraformId(), res.SourceString())
+				humanString := fmt.Sprintf("    - %s (%s):", difference.Res.TerraformId(), difference.Res.SourceString())
 				whiteSpace := "        "
-				if humanAttrs := formatResourceAttributes(res); humanAttrs != "" {
+				if humanAttrs := formatResourceAttributes(difference.Res); humanAttrs != "" {
 					humanString += fmt.Sprintf("\n        %s", humanAttrs)
 					whiteSpace = "            "
 				}
@@ -190,11 +188,11 @@ func prettify(resource interface{}) string {
 	return awsutil.Prettify(resource)
 }
 
-func groupByType(resources []resource.Resource) (map[string][]resource.Resource, []string) {
-	result := map[string][]resource.Resource{}
+func groupByType(resources []*resource.Resource) (map[string][]*resource.Resource, []string) {
+	result := map[string][]*resource.Resource{}
 	for _, res := range resources {
 		if result[res.TerraformType()] == nil {
-			result[res.TerraformType()] = []resource.Resource{res}
+			result[res.TerraformType()] = []*resource.Resource{res}
 			continue
 		}
 		result[res.TerraformType()] = append(result[res.TerraformType()], res)
@@ -229,11 +227,11 @@ func jsonDiff(a, b interface{}, prefix string) string {
 	return diffStr
 }
 
-func formatResourceAttributes(res resource.Resource) string {
+func formatResourceAttributes(res *resource.Resource) string {
 	if res.Schema() == nil || res.Schema().HumanReadableAttributesFunc == nil {
 		return ""
 	}
-	attributes := res.Schema().HumanReadableAttributesFunc(res.(*resource.AbstractResource))
+	attributes := res.Schema().HumanReadableAttributesFunc(res)
 	if len(attributes) <= 0 {
 		return ""
 	}

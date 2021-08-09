@@ -7,7 +7,7 @@ import (
 const AwsIamUserResourceType = "aws_iam_user"
 
 func initAwsIAMUserMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsIamUserResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsIamUserResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		permissionsBoundary, exist := val.Get("permissions_boundary")
 		if exist && permissionsBoundary == "" {

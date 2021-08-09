@@ -18,14 +18,14 @@ import (
 func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
-		resourcesFromState []resource.Resource
-		expected           []resource.Resource
+		resourcesFromState []*resource.Resource
+		expected           []*resource.Resource
 		mocks              func(factory *terraform.MockResourceFactory)
 	}{
 		{
 			"Inline policy, no aws_sqs_queue_policy attached",
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsSqsQueueResourceType,
 					Attrs: &resource.Attributes{
@@ -34,15 +34,15 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsSqsQueueResourceType,
 					Attrs: &resource.Attributes{
 						"id": "foo",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "foo",
 					Type: aws.AwsSqsQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -57,7 +57,7 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 					"id":        "foo",
 					"queue_url": "foo",
 					"policy":    "{\"Id\":\"MYINLINESQSPOLICY\",\"Statement\":[{\"Action\":\"sqs:SendMessage\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:sqs:eu-west-3:047081014315:foo\",\"Sid\":\"Stmt1611769527792\"}],\"Version\":\"2012-10-17\"}",
-				}).Once().Return(&resource.AbstractResource{
+				}).Once().Return(&resource.Resource{
 					Id:   "foo",
 					Type: aws.AwsSqsQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -71,15 +71,15 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 		},
 		{
 			"No inline policy, aws_sqs_queue_policy attached",
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsSqsQueueResourceType,
 					Attrs: &resource.Attributes{
 						"id": "foo",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "foo",
 					Type: aws.AwsSqsQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -89,15 +89,15 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsSqsQueueResourceType,
 					Attrs: &resource.Attributes{
 						"id": "foo",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "foo",
 					Type: aws.AwsSqsQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -111,8 +111,8 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 		},
 		{
 			"Inline policy duplicate aws_sqs_queue_policy",
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsSqsQueueResourceType,
 					Attrs: &resource.Attributes{
@@ -120,7 +120,7 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 						"policy": "{\"Id\":\"MYSQSPOLICY\",\"Statement\":[{\"Action\":\"sqs:SendMessage\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:sqs:eu-west-3:047081014315:foo\",\"Sid\":\"Stmt1611769527792\"}],\"Version\":\"2012-10-17\"}",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "foo",
 					Type: aws.AwsSqsQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -130,15 +130,15 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsSqsQueueResourceType,
 					Attrs: &resource.Attributes{
 						"id": "foo",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "foo",
 					Type: aws.AwsSqsQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -152,8 +152,8 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 		},
 		{
 			"Inline policy and aws_sqs_queue_policy",
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsSqsQueueResourceType,
 					Attrs: &resource.Attributes{
@@ -161,7 +161,7 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 						"policy": "{\"Id\":\"MYINLINESQSPOLICY\",\"Statement\":[{\"Action\":\"sqs:SendMessage\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:sqs:eu-west-3:047081014315:foo\",\"Sid\":\"Stmt1611769527792\"}],\"Version\":\"2012-10-17\"}",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "bar",
 					Type: aws.AwsSqsQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -171,15 +171,15 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]resource.Resource{
-				&resource.AbstractResource{
+			[]*resource.Resource{
+				{
 					Id:   "foo",
 					Type: aws.AwsSqsQueueResourceType,
 					Attrs: &resource.Attributes{
 						"id": "foo",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "bar",
 					Type: aws.AwsSqsQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -188,7 +188,7 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 						"policy":    "{\"Id\":\"MYSQSPOLICY\",\"Statement\":[{\"Action\":\"sqs:SendMessage\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Resource\":\"arn:aws:sqs:eu-west-3:047081014315:foo\",\"Sid\":\"Stmt1611769527792\"}],\"Version\":\"2012-10-17\"}",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Id:   "foo",
 					Type: aws.AwsSqsQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -201,7 +201,7 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 			func(factory *terraform.MockResourceFactory) {
 				factory.On("CreateAbstractResource", "aws_sqs_queue_policy", "foo", mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "foo"
-				})).Once().Return(&resource.AbstractResource{
+				})).Once().Return(&resource.Resource{
 					Id:   "foo",
 					Type: aws.AwsSqsQueuePolicyResourceType,
 					Attrs: &resource.Attributes{
@@ -225,7 +225,7 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 			aws.InitResourcesMetadata(repo)
 
 			m := NewAwsSQSQueuePolicyExpander(factory, repo)
-			err := m.Execute(&[]resource.Resource{}, &tt.resourcesFromState)
+			err := m.Execute(&[]*resource.Resource{}, &tt.resourcesFromState)
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -22,13 +22,13 @@ func (g *GithubRepositoryEnumerator) SupportedType() resource.ResourceType {
 	return github.GithubRepositoryResourceType
 }
 
-func (g *GithubRepositoryEnumerator) Enumerate() ([]resource.Resource, error) {
+func (g *GithubRepositoryEnumerator) Enumerate() ([]*resource.Resource, error) {
 	ids, err := g.repository.ListRepositories()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(g.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(ids))
+	results := make([]*resource.Resource, len(ids))
 
 	for _, id := range ids {
 		results = append(

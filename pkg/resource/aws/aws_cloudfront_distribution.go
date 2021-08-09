@@ -7,7 +7,7 @@ import (
 const AwsCloudfrontDistributionResourceType = "aws_cloudfront_distribution"
 
 func initAwsCloudfrontDistributionMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsCloudfrontDistributionResourceType, func(res *resource.AbstractResource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsCloudfrontDistributionResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"etag"})
 		val.SafeDelete([]string{"last_modified_time"})

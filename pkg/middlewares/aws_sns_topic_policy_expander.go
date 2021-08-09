@@ -21,17 +21,16 @@ func NewAwsSNSTopicPolicyExpander(resourceFactory resource.ResourceFactory, reso
 	}
 }
 
-func (m AwsSNSTopicPolicyExpander) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+func (m AwsSNSTopicPolicyExpander) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
 
 	for _, res := range *remoteResources {
 		if res.TerraformType() != aws.AwsSnsTopicResourceType {
 			continue
 		}
-		topic, _ := res.(*resource.AbstractResource)
-		topic.Attrs.SafeDelete([]string{"policy"})
+		res.Attrs.SafeDelete([]string{"policy"})
 	}
 
-	newList := make([]resource.Resource, 0)
+	newList := make([]*resource.Resource, 0)
 	for _, res := range *resourcesFromState {
 		// Ignore all resources other than sns_topic
 		if res.TerraformType() != aws.AwsSnsTopicResourceType {
@@ -39,15 +38,14 @@ func (m AwsSNSTopicPolicyExpander) Execute(remoteResources, resourcesFromState *
 			continue
 		}
 
-		topic, _ := res.(*resource.AbstractResource)
 		newList = append(newList, res)
 
-		if m.hasPolicyAttached(topic, resourcesFromState) {
-			topic.Attrs.SafeDelete([]string{"policy"})
+		if m.hasPolicyAttached(res, resourcesFromState) {
+			res.Attrs.SafeDelete([]string{"policy"})
 			continue
 		}
 
-		err := m.splitPolicy(topic, &newList)
+		err := m.splitPolicy(res, &newList)
 		if err != nil {
 			return err
 		}
@@ -56,7 +54,7 @@ func (m AwsSNSTopicPolicyExpander) Execute(remoteResources, resourcesFromState *
 	return nil
 }
 
-func (m *AwsSNSTopicPolicyExpander) splitPolicy(topic *resource.AbstractResource, results *[]resource.Resource) error {
+func (m *AwsSNSTopicPolicyExpander) splitPolicy(topic *resource.Resource, results *[]*resource.Resource) error {
 	policy, exist := topic.Attrs.Get("policy")
 	if !exist || policy == "" {
 		return nil
@@ -84,7 +82,7 @@ func (m *AwsSNSTopicPolicyExpander) splitPolicy(topic *resource.AbstractResource
 	return nil
 }
 
-func (m *AwsSNSTopicPolicyExpander) hasPolicyAttached(topic *resource.AbstractResource, resourcesFromState *[]resource.Resource) bool {
+func (m *AwsSNSTopicPolicyExpander) hasPolicyAttached(topic *resource.Resource, resourcesFromState *[]*resource.Resource) bool {
 	for _, res := range *resourcesFromState {
 		if res.TerraformType() == aws.AwsSnsTopicPolicyResourceType &&
 			res.TerraformId() == topic.Id {

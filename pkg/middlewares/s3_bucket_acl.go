@@ -14,7 +14,7 @@ func NewS3BucketAcl() S3BucketAcl {
 	return S3BucketAcl{}
 }
 
-func (m S3BucketAcl) Execute(remoteResources, resourcesFromState *[]resource.Resource) error {
+func (m S3BucketAcl) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
 
 	for _, iacResource := range *resourcesFromState {
 		// Ignore all resources other than s3 buckets
@@ -22,27 +22,24 @@ func (m S3BucketAcl) Execute(remoteResources, resourcesFromState *[]resource.Res
 			continue
 		}
 
-		decodedIacResource, _ := iacResource.(*resource.AbstractResource)
-
 		for _, remoteResource := range *remoteResources {
-			if resource.IsSameResource(remoteResource, decodedIacResource) {
-				decodedRemoteResource, _ := remoteResource.(*resource.AbstractResource)
-				aclAttr, exist := decodedIacResource.Attrs.Get("acl")
+			if remoteResource.Equal(iacResource) {
+				aclAttr, exist := iacResource.Attrs.Get("acl")
 				if !exist || aclAttr == nil || aclAttr == "" {
 					break
 				}
 				if aclAttr != "private" {
 					logrus.WithFields(logrus.Fields{
-						"type": decodedRemoteResource.TerraformType(),
-						"id":   decodedRemoteResource.TerraformId(),
+						"type": remoteResource.TerraformType(),
+						"id":   remoteResource.TerraformId(),
 					}).Debug("Found a resource to update")
-					decodedRemoteResource.Attrs.SafeDelete([]string{"grant"})
+					remoteResource.Attrs.SafeDelete([]string{"grant"})
 				}
 				break
 			}
 		}
 
-		decodedIacResource.Attrs.SafeDelete([]string{"acl"})
+		iacResource.Attrs.SafeDelete([]string{"acl"})
 	}
 
 	return nil

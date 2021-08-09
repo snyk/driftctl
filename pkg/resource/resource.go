@@ -1,7 +1,6 @@
 package resource
 
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"sort"
@@ -10,14 +9,6 @@ import (
 
 	"github.com/pkg/errors"
 )
-
-type Resource interface {
-	TerraformId() string
-	TerraformType() string
-	Attributes() *Attributes
-	Schema() *Schema
-	Src() Source
-}
 
 type Source interface {
 	Source() string
@@ -53,7 +44,7 @@ func (s *TerraformStateSource) InternalName() string {
 	return s.Name
 }
 
-type AbstractResource struct {
+type Resource struct {
 	Id     string
 	Type   string
 	Attrs  *Attributes
@@ -61,87 +52,62 @@ type AbstractResource struct {
 	Source Source  `json:"-"`
 }
 
-func (a *AbstractResource) Schema() *Schema {
+func (a *Resource) Schema() *Schema {
 	return a.Sch
 }
 
-func (a *AbstractResource) TerraformId() string {
+func (a *Resource) TerraformId() string {
 	return a.Id
 }
 
-func (a *AbstractResource) TerraformType() string {
+func (a *Resource) TerraformType() string {
 	return a.Type
 }
 
-func (a *AbstractResource) Attributes() *Attributes {
+func (a *Resource) Attributes() *Attributes {
 	return a.Attrs
 }
 
-func (a *AbstractResource) Src() Source {
+func (a *Resource) Src() Source {
 	return a.Source
 }
 
-func (a *AbstractResource) SourceString() string {
+func (a *Resource) SourceString() string {
 	if a.Source.Namespace() == "" {
 		return fmt.Sprintf("%s.%s", a.TerraformType(), a.Source.InternalName())
 	}
 	return fmt.Sprintf("%s.%s.%s", a.Source.Namespace(), a.TerraformType(), a.Source.InternalName())
 }
 
+func (r *Resource) Equal(res *Resource) bool {
+	return r.TerraformId() == res.TerraformId() &&
+		r.TerraformType() == res.TerraformType()
+}
+
 type ResourceFactory interface {
-	CreateAbstractResource(ty, id string, data map[string]interface{}) *AbstractResource
+	CreateAbstractResource(ty, id string, data map[string]interface{}) *Resource
 }
 
 type SerializableResource struct {
-	Resource
-}
-
-type SerializedResource struct {
 	Id     string              `json:"id"`
 	Type   string              `json:"type"`
 	Source *SerializableSource `json:"source,omitempty"`
 }
 
-func (u *SerializedResource) TerraformId() string {
-	return u.Id
-}
-
-func (u *SerializedResource) TerraformType() string {
-	return u.Type
-}
-
-func (u *SerializedResource) Attributes() *Attributes {
-	return nil
-}
-
-func (u *SerializedResource) Schema() *Schema {
-	return nil
-}
-
-func (u *SerializedResource) Src() Source {
-	return nil
-}
-
-func (s *SerializableResource) UnmarshalJSON(bytes []byte) error {
-	var res *SerializedResource
-
-	if err := json.Unmarshal(bytes, &res); err != nil {
-		return err
-	}
-	s.Resource = res
-	return nil
-}
-
-func (s SerializableResource) MarshalJSON() ([]byte, error) {
+func NewSerializableResource(res *Resource) *SerializableResource {
 	var src *SerializableSource
-	if s.Src() != nil {
+	if res.Src() != nil {
 		src = &SerializableSource{
-			S:    s.Src().Source(),
-			Ns:   s.Src().Namespace(),
-			Name: s.Src().InternalName(),
+			S:    res.Src().Source(),
+			Ns:   res.Src().Namespace(),
+			Name: res.Src().InternalName(),
 		}
 	}
-	return json.Marshal(SerializedResource{Id: s.TerraformId(), Type: s.TerraformType(), Source: src})
+	return &SerializableResource{
+		Id:     res.TerraformId(),
+		Type:   res.TerraformType(),
+		Source: src,
+	}
 }
 
 type NormalizedResource interface {
@@ -149,11 +115,7 @@ type NormalizedResource interface {
 	NormalizeForProvider() (Resource, error)
 }
 
-func IsSameResource(rRs, lRs Resource) bool {
-	return rRs.TerraformType() == lRs.TerraformType() && rRs.TerraformId() == lRs.TerraformId()
-}
-
-func Sort(res []Resource) []Resource {
+func Sort(res []*Resource) []*Resource {
 	sort.SliceStable(res, func(i, j int) bool {
 		if res[i].TerraformType() != res[j].TerraformType() {
 			return res[i].TerraformType() < res[j].TerraformType()

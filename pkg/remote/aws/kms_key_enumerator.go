@@ -23,13 +23,13 @@ func (e *KMSKeyEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsKmsKeyResourceType
 }
 
-func (e *KMSKeyEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *KMSKeyEnumerator) Enumerate() ([]*resource.Resource, error) {
 	keys, err := e.repository.ListAllKeys()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(keys))
+	results := make([]*resource.Resource, len(keys))
 
 	for _, key := range keys {
 		results = append(

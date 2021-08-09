@@ -21,7 +21,7 @@ func NewSNSTopicDetailsFetcher(provider terraform.ResourceReader, deserializer *
 	}
 }
 
-func (r *SNSTopicDetailsFetcher) ReadDetails(topic resource.Resource) (resource.Resource, error) {
+func (r *SNSTopicDetailsFetcher) ReadDetails(topic *resource.Resource) (*resource.Resource, error) {
 	val, err := r.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: topic.TerraformId(),
 		Ty: aws.AwsSnsTopicResourceType,

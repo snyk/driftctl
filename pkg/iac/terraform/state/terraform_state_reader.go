@@ -182,8 +182,8 @@ func (r *TerraformStateReader) convertInstance(instance *states.ResourceInstance
 	return instanceObj, nil
 }
 
-func (r *TerraformStateReader) decode(valFromState map[string][]decodedRes) ([]resource.Resource, error) {
-	results := make([]resource.Resource, 0)
+func (r *TerraformStateReader) decode(valFromState map[string][]decodedRes) ([]*resource.Resource, error) {
+	results := make([]*resource.Resource, 0)
 
 	for ty, val := range valFromState {
 		for _, stateVal := range val {
@@ -196,16 +196,15 @@ func (r *TerraformStateReader) decode(valFromState map[string][]decodedRes) ([]r
 				}).Warnf("Could not read from state: %+v", err)
 				continue
 			}
-			stateResource, _ := res.(*resource.AbstractResource)
-			stateResource.Source = stateVal.source
-			results = append(results, stateResource)
+			res.Source = stateVal.source
+			results = append(results, res)
 		}
 	}
 
 	return results, nil
 }
 
-func (r *TerraformStateReader) Resources() ([]resource.Resource, error) {
+func (r *TerraformStateReader) Resources() ([]*resource.Resource, error) {
 	if r.enumerator == nil {
 		return r.retrieveForState(r.config.Path)
 	}
@@ -213,7 +212,7 @@ func (r *TerraformStateReader) Resources() ([]resource.Resource, error) {
 	return r.retrieveMultiplesStates()
 }
 
-func (r *TerraformStateReader) retrieveForState(path string) ([]resource.Resource, error) {
+func (r *TerraformStateReader) retrieveForState(path string) ([]*resource.Resource, error) {
 	r.config.Path = path
 	logrus.WithFields(logrus.Fields{
 		"path":    r.config.Path,
@@ -227,7 +226,7 @@ func (r *TerraformStateReader) retrieveForState(path string) ([]resource.Resourc
 	return r.decode(values)
 }
 
-func (r *TerraformStateReader) retrieveMultiplesStates() ([]resource.Resource, error) {
+func (r *TerraformStateReader) retrieveMultiplesStates() ([]*resource.Resource, error) {
 	keys, err := r.enumerator.Enumerate()
 	if err != nil {
 		return nil, err
@@ -235,7 +234,7 @@ func (r *TerraformStateReader) retrieveMultiplesStates() ([]resource.Resource, e
 	logrus.WithFields(logrus.Fields{
 		"keys": keys,
 	}).Debug("Enumerated keys")
-	results := make([]resource.Resource, 0)
+	results := make([]*resource.Resource, 0)
 
 	for _, key := range keys {
 		resources, err := r.retrieveForState(key)

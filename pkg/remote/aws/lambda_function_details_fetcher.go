@@ -21,7 +21,7 @@ func NewLambdaFunctionDetailsFetcher(provider terraform.ResourceReader, deserial
 	}
 }
 
-func (r *LambdaFunctionDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
+func (r *LambdaFunctionDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	val, err := r.reader.ReadResource(terraform.ReadResourceArgs{
 		ID: res.TerraformId(),
 		Ty: resourceaws.AwsLambdaFunctionResourceType,

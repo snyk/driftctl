@@ -5,7 +5,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/test/resource"
+	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,7 +23,7 @@ func TestStore(t *testing.T) {
 				"test-value_|)": 13,
 				"duration_key":  "23",
 				"null":          nil,
-				"res":           &resource.FakeResource{Id: "id", Type: "type"},
+				"res":           &resource.Resource{Id: "id", Type: "type"},
 			},
 			expectedJSON: `{"duration_key":"23","null":null,"res":{"Id":"id","Type":"type","Attrs":null},"test-value_|)":13}`,
 		},

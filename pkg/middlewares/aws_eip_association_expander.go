@@ -18,8 +18,8 @@ func NewEipAssociationExpander(resourceFactory resource.ResourceFactory) EipAsso
 	return EipAssociationExpander{resourceFactory}
 }
 
-func (m EipAssociationExpander) Execute(_, resourcesFromState *[]resource.Resource) error {
-	var newResources []resource.Resource
+func (m EipAssociationExpander) Execute(_, resourcesFromState *[]*resource.Resource) error {
+	var newResources []*resource.Resource
 	for _, res := range *resourcesFromState {
 		newResources = append(newResources, res)
 
@@ -56,7 +56,7 @@ func (m EipAssociationExpander) Execute(_, resourcesFromState *[]resource.Resour
 	return nil
 }
 
-func (m EipAssociationExpander) haveMatchingEipAssociation(cur resource.Resource, stateRes *[]resource.Resource) bool {
+func (m EipAssociationExpander) haveMatchingEipAssociation(cur *resource.Resource, stateRes *[]*resource.Resource) bool {
 	for _, res := range *stateRes {
 		if res.TerraformType() != aws.AwsEipAssociationResourceType {
 			continue

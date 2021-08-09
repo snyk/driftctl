@@ -19,7 +19,7 @@ func NewDynamoDBTableDetailsFetcher(provider terraform.ResourceReader, deseriali
 	}
 }
 
-func (r *DynamoDBTableDetailsFetcher) ReadDetails(res resource.Resource) (resource.Resource, error) {
+func (r *DynamoDBTableDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	ctyVal, err := r.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty: resource.ResourceType(res.TerraformType()),
 		ID: res.TerraformId(),

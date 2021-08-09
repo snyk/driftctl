@@ -23,13 +23,13 @@ func (e *EC2AmiEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsAmiResourceType
 }
 
-func (e *EC2AmiEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *EC2AmiEnumerator) Enumerate() ([]*resource.Resource, error) {
 	images, err := e.repository.ListAllImages()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, len(images))
+	results := make([]*resource.Resource, len(images))
 
 	for _, image := range images {
 		results = append(

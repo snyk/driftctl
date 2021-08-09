@@ -11,14 +11,14 @@ import (
 func TestRoute53RecordIDReconcilier_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
-		resourcesFromState []resource.Resource
-		expected           []resource.Resource
+		resourcesFromState []*resource.Resource
+		expected           []*resource.Resource
 	}{
 		{
 			name: "test that id are normalized",
-			resourcesFromState: []resource.Resource{
-				&resource.AbstractResource{},
-				&resource.AbstractResource{
+			resourcesFromState: []*resource.Resource{
+				{},
+				{
 					Id:   "1234_toto_TXT",
 					Type: aws.AwsRoute53RecordResourceType,
 					Attrs: &resource.Attributes{
@@ -29,9 +29,9 @@ func TestRoute53RecordIDReconcilier_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: []resource.Resource{
-				&resource.AbstractResource{},
-				&resource.AbstractResource{
+			expected: []*resource.Resource{
+				{},
+				{
 					Id:   "1234_toto.example.com_TXT",
 					Type: aws.AwsRoute53RecordResourceType,
 					Attrs: &resource.Attributes{

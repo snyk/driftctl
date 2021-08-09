@@ -13,30 +13,30 @@ import (
 func TestAwsNatGatewayEipAssoc_Execute(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    []resource.Resource
-		expected []resource.Resource
+		input    []*resource.Resource
+		expected []*resource.Resource
 	}{
 		{
 			name: "test nil values do not crash middleware",
-			input: []resource.Resource{
-				&resource.AbstractResource{
+			input: []*resource.Resource{
+				{
 					Id:    "nat-0a5408508b19ef490",
 					Type:  aws.AwsNatGatewayResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				{
 					Type:  aws.AwsEipAssociationResourceType,
 					Id:    "eipassoc-0d32af6acf31df913",
 					Attrs: &resource.Attributes{},
 				},
 			},
-			expected: []resource.Resource{
-				&resource.AbstractResource{
+			expected: []*resource.Resource{
+				{
 					Id:    "nat-0a5408508b19ef490",
 					Type:  aws.AwsNatGatewayResourceType,
 					Attrs: &resource.Attributes{},
 				},
-				&resource.AbstractResource{
+				{
 					Type:  aws.AwsEipAssociationResourceType,
 					Id:    "eipassoc-0d32af6acf31df913",
 					Attrs: &resource.Attributes{},
@@ -45,34 +45,34 @@ func TestAwsNatGatewayEipAssoc_Execute(t *testing.T) {
 		},
 		{
 			name: "test eip assoc ignored when associated to a nat gateway",
-			input: []resource.Resource{
-				&resource.AbstractResource{
+			input: []*resource.Resource{
+				{
 					Type: aws.AwsNatGatewayResourceType,
 					Attrs: &resource.Attributes{
 						"allocation_id": "eipalloc-0f3e9fff457bb770b",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Type: aws.AwsEipAssociationResourceType,
 					Attrs: &resource.Attributes{
 						"allocation_id": "eipalloc-0f3e9fff457bb770b",
 					},
 				},
-				&resource.AbstractResource{
+				{
 					Type: aws.AwsEipAssociationResourceType,
 					Attrs: &resource.Attributes{
 						"allocation_id": "eipalloc-1234567890",
 					},
 				},
 			},
-			expected: []resource.Resource{
-				&resource.AbstractResource{
+			expected: []*resource.Resource{
+				&resource.Resource{
 					Type: aws.AwsNatGatewayResourceType,
 					Attrs: &resource.Attributes{
 						"allocation_id": "eipalloc-0f3e9fff457bb770b",
 					},
 				},
-				&resource.AbstractResource{
+				&resource.Resource{
 					Type: aws.AwsEipAssociationResourceType,
 					Attrs: &resource.Attributes{
 						"allocation_id": "eipalloc-1234567890",
@@ -84,7 +84,7 @@ func TestAwsNatGatewayEipAssoc_Execute(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			middleware := NewAwsNatGatewayEipAssoc()
-			err := middleware.Execute(&tt.input, &[]resource.Resource{})
+			err := middleware.Execute(&tt.input, &[]*resource.Resource{})
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -15,8 +15,8 @@ func NewDeserializer(factory ResourceFactory) *Deserializer {
 	return &Deserializer{factory}
 }
 
-func (s *Deserializer) Deserialize(ty string, rawList []cty.Value) ([]Resource, error) {
-	resources := make([]Resource, 0)
+func (s *Deserializer) Deserialize(ty string, rawList []cty.Value) ([]*Resource, error) {
+	resources := make([]*Resource, 0)
 	for _, rawResource := range rawList {
 		rawResource := rawResource
 		res, err := s.DeserializeOne(ty, rawResource)
@@ -28,7 +28,7 @@ func (s *Deserializer) Deserialize(ty string, rawList []cty.Value) ([]Resource, 
 	return resources, nil
 }
 
-func (s *Deserializer) DeserializeOne(ty string, value cty.Value) (Resource, error) {
+func (s *Deserializer) DeserializeOne(ty string, value cty.Value) (*Resource, error) {
 	if value.IsNull() {
 		return nil, nil
 	}

@@ -25,13 +25,13 @@ func (e *VPCEnumerator) SupportedType() resource.ResourceType {
 	return aws.AwsVpcResourceType
 }
 
-func (e *VPCEnumerator) Enumerate() ([]resource.Resource, error) {
+func (e *VPCEnumerator) Enumerate() ([]*resource.Resource, error) {
 	VPCs, _, err := e.repo.ListAllVPCs()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]resource.Resource, 0, len(VPCs))
+	results := make([]*resource.Resource, 0, len(VPCs))
 
 	for _, item := range VPCs {
 		results = append(

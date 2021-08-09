@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/test/resource"
+	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,7 +12,7 @@ func BenchmarkCache(b *testing.B) {
 	cache := New(500)
 	for i := 0; i < b.N; i++ {
 		key := fmt.Sprintf("test-key-%d", i)
-		data := make([]*resource.FakeResource, 1024)
+		data := make([]*resource.Resource, 1024)
 		assert.Equal(b, false, cache.Put(key, data))
 		assert.Equal(b, data, cache.Get(key))
 	}
@@ -85,7 +85,7 @@ func TestCache(t *testing.T) {
 			},
 			{
 				"test2",
-				[]resource.FakeResource{},
+				[]*resource.Resource{},
 			},
 		}
 		cache := New(0)
