@@ -41,4 +41,6 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsSQSQueuePolicyMetaData(resourceSchemaRepository)
 	initAwsSecurityGroupRuleMetaData(resourceSchemaRepository)
 	initAwsSecurityGroupMetaData(resourceSchemaRepository)
+	initAwsEKSClusterMetaData(resourceSchemaRepository)
+	initAwsAutoScalingGroupMetaData(resourceSchemaRepository)
 }

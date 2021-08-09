@@ -7,7 +7,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 )
 
-// Remove root_block_device from aws_instance resources and create dedicated aws_ebs_volume resources
+// AwsInstanceBlockDeviceResourceMapper remove root_block_device from aws_instance resources and create dedicated aws_ebs_volume resources
 type AwsInstanceBlockDeviceResourceMapper struct {
 	resourceFactory resource.ResourceFactory
 }

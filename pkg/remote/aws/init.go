@@ -51,6 +51,8 @@ func Init(version string, alerter *alerter.Alerter,
 	ecrRepository := repository.NewECRRepository(provider.session, repositoryCache)
 	kmsRepository := repository.NewKMSRepository(provider.session, repositoryCache)
 	iamRepository := repository.NewIAMRepository(provider.session, repositoryCache)
+	eksRepository := repository.NewEKSRepository(provider.session, repositoryCache)
+	autoscalingRepository := repository.NewAutoScalingRepository(provider.session, repositoryCache)
 
 	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.AWS, provider)
@@ -169,6 +171,13 @@ func Init(version string, alerter *alerter.Alerter,
 
 	remoteLibrary.AddEnumerator(NewECRRepositoryEnumerator(ecrRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsEcrRepositoryResourceType, common.NewGenericDetailsFetcher(aws.AwsEcrRepositoryResourceType, provider, deserializer))
+
+	remoteLibrary.AddEnumerator(NewEKSClusterEnumerator(eksRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsEKSClusterResourceType, NewEKSClusterDetailsFetcher(provider, deserializer, eksRepository))
+
+	remoteLibrary.AddEnumerator(NewAutoScalingGroupsEnumerator(autoscalingRepository, factory))
+
+	remoteLibrary.AddEnumerator(NewElbEnumerator(autoscalingRepository, factory))
 
 	err = resourceSchemaRepository.Init(terraform.AWS, version, provider.Schema())
 	if err != nil {
