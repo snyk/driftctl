@@ -1,16 +1,20 @@
 @startuml
 Driftctl -> Scanner: Resource()
+hnote across: Enumeration phase
 Scanner -> Scanner: List Enumerators
 loop
 Scanner -> Enumerator: Enumerate()
 Enumerator -> RemoteSDK: List resource
 RemoteSDK --> Enumerator: []remoteRes
-loop optionaly retrive resource needed attributes
+alt optionaly retrive resource needed attributes
 Enumerator -> RemoteSDK: Retreive needed\nattributes
 RemoteSDK --> Enumerator: Attrs
 end
-Enumerator --> Scanner: []Resources with\nlimited attributes
-loop if deepmode
+Enumerator --> Scanner: []Resource with\nlimited attributes
+end
+alt if deep mode enabled
+hnote across: Details fetching phase
+loop for each enumerated resource
 Scanner -> DetailsFetcher: ReadDetails(res)
 DetailsFetcher -> TerraformProvider: ReadResource()
 TerraformProvider --> DetailsFetcher: CTYValue

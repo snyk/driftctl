@@ -11,7 +11,9 @@ Inside this directory you will create a `init.go`. First thing to do will be to 
 const RemoteAWSTerraform = "aws+tf"
 ```
 
-You will then create a function to init the provider and all the future resource enumerator. Best way to do would be to copy the function signature from an other provider:
+`+tf` mean that we use terraform to retrieve details of resources, in the future maybe it will exist other way to read resource details.
+
+You will then create a function to init the provider and all the future resource enumerator. The best way to do it would be to copy the function signature from an other provider:
 ```go
 func Init(
 	// Version required by the user
@@ -50,7 +52,7 @@ func Init(
 	// You'll need to create a new cache that will be use to cache fetched resources lists
 	repositoryCache := cache.New(100)
 
-	// Deserializer is used to convert cty value return by terraform provider to driftctl AbstactResource
+	// Deserializer is used to convert cty value return by terraform provider to driftctl Resource
     deserializer := resource.NewDeserializer(factory)
 
     // Adding the provider to the library
@@ -115,6 +117,17 @@ func (p *AWSTerraformProvider) Version() string {
 }
 ```
 
+The config returned in `GetProviderConfig` should be annotated with `cty` tags to be passed to the provider.
+
+```go
+type githubConfig struct {
+	Token        string
+	Owner        string `cty:"owner"`
+	Organization string
+}
+```
+
+
 You are now almost done. You'll need to make driftctl aware of this provider so in `pkg/remote/remote.go` add your new constant in `supportedRemotes`:
 ```go
 var supportedRemotes = []string{
@@ -155,7 +168,7 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 
 And add a call to it in the `remote/<provider>/init.go` you created at first step.
 
-Last step will add to create test for the new resource you will implement.
-Please use TestCreateNewSchema located in `test/schemas/schemas_test.go` to generate a schema file that will be used for the mocked provider.
+You also need to create a test schema for upcoming test.
+Please use `TestCreateNewSchema` located in `test/schemas/schemas_test.go` to generate a schema file that will be used for the mocked provider.
 
-Everything is not ready, you should [start adding new resources](new-resource.md) !
+Everything is now ready, you should [start adding new resources](new-resource.md) !

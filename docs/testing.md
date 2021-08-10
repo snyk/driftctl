@@ -1,7 +1,31 @@
 # Testing
 
-driftctl uses both **unit tests** and **acceptance tests**.
-Acceptance tests are not required, but at least a good unit test coverage is required for a PR to be merged.
+driftctl uses **unit tests**, **functional tests** and **acceptance tests**.
+
+- A **unit test** is a very scoped test that test only a very precise part of code
+  - Pros:
+    - Very quick to develop, run and maintain
+  - Cons:
+    - Does not ensure that we do not break integration with other part of the code
+- A **functional test** cover a larger part of the code than unit tests, but it mock external dependencies
+    - Pros:
+        - Ensure that multiples components works well together
+        - Still quick to develop and run
+    - Cons:
+        - Mocking every external dependencies can be complicated
+        - Can be complicated to maintain since it is not scoped to a precise part of the code
+- An **acceptance test** or **integration test** are the closest of the end-user behavior.
+  - Pros:
+    - Very close to a real product usage
+    - Can cover regressions very efficiently
+  - Cons:
+    - Can be long to develop
+    - They require real world resources
+    - Long execution time
+    - They require a lot of maintenance
+    - Unstable due to third party services (something wrong or inconsistent on cloud provider side will make the test to fail)
+
+**Acceptance tests are not required**, but at least a good unit test coverage is required for a PR to be merged.
 This documentation section's goal is about how we manage our test suite in driftctl.
 
 driftctl uses gotestsum to wrap `go test`, you can install required tools to run test with `make install-tools`.
@@ -12,9 +36,6 @@ To run unit test simply run.
 $ make install-tools
 $ make test
 ```
-
-Before the test suite starts, we run `golangci-lint`.
-If there are any linter issues, you have to fix them first.
 
 For the driftctl team, code coverage is very important as it helps show which part of your code is not covered.
 We kindly ask you to check your coverage to ensure every important part of your code is tested.
@@ -61,7 +82,7 @@ type FakeEC2 interface {
 }
 ```
 
-2. Use mockery to generate a full mocked struct `mockery --name FakeS3 --dir ./test/aws`
+2. Use mockery to generate a full mocked struct `mockery --name FakeEC2 --dir ./test/aws`
 3. Mock a response in your test (list IAM users for example)
 
 ```go
