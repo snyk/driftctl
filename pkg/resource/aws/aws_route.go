@@ -10,6 +10,18 @@ import (
 const AwsRouteResourceType = "aws_route"
 
 func initAwsRouteMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetResolveReadAttributesFunc(AwsRouteResourceType, func(res *resource.Resource) map[string]string {
+		attributes := map[string]string{
+			"route_table_id": *res.Attributes().GetString("route_table_id"),
+		}
+		if ipv4 := res.Attributes().GetString("destination_cidr_block"); ipv4 != nil && *ipv4 != "" {
+			attributes["destination_cidr_block"] = *ipv4
+		}
+		if ipv6 := res.Attributes().GetString("destination_ipv6_cidr_block"); ipv6 != nil && *ipv6 != "" {
+			attributes["destination_ipv6_cidr_block"] = *ipv6
+		}
+		return attributes
+	})
 	resourceSchemaRepository.SetNormalizeFunc(AwsRouteResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})

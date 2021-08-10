@@ -7,6 +7,13 @@ import (
 const AwsLambdaFunctionResourceType = "aws_lambda_function"
 
 func initAwsLambdaFunctionMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+
+	resourceSchemaRepository.SetResolveReadAttributesFunc(AwsLambdaFunctionResourceType, func(res *resource.Resource) map[string]string {
+		return map[string]string{
+			"function_name": res.TerraformId(),
+		}
+	})
+
 	resourceSchemaRepository.SetNormalizeFunc(AwsLambdaFunctionResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})

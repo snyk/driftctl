@@ -1132,14 +1132,14 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewEC2RouteTableAssociationEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteTableAssociationResourceType, aws.NewEC2RouteTableAssociationDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteTableAssociationResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRouteTableAssociationResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
 			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
-			assert.Equal(tt, err, c.wantErr)
+			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
 				return
 			}
@@ -1566,7 +1566,7 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewEC2DefaultRouteTableEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultRouteTableResourceType, aws.NewEC2DefaultRouteTableDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultRouteTableResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultRouteTableResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -2025,7 +2025,7 @@ func TestEC2Route(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewEC2RouteEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteResourceType, aws.NewEC2RouteDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRouteResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -2211,7 +2211,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewVPCSecurityGroupRuleEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSecurityGroupRuleResourceType, aws.NewVPCSecurityGroupRuleDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSecurityGroupRuleResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSecurityGroupRuleResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

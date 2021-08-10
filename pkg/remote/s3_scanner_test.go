@@ -126,7 +126,7 @@ func TestS3Bucket(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketResourceType, aws.NewS3BucketDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsS3BucketResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -279,7 +279,7 @@ func TestS3BucketInventory(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketInventoryResourceType, aws.NewS3BucketInventoryDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketInventoryResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsS3BucketInventoryResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -458,7 +458,7 @@ func TestS3BucketNotification(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketNotificationResourceType, aws.NewS3BucketNotificationDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketNotificationResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsS3BucketNotificationResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -613,7 +613,7 @@ func TestS3BucketMetrics(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketMetricResourceType, aws.NewS3BucketMetricsDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketMetricResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsS3BucketMetricResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -767,7 +767,7 @@ func TestS3BucketPolicy(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketPolicyResourceType, aws.NewS3BucketPolicyDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketPolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsS3BucketPolicyResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -924,7 +924,7 @@ func TestS3BucketAnalytic(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, aws.NewS3BucketAnalyticDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

@@ -102,7 +102,7 @@ func TestDynamoDBTable(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewDynamoDBTableEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDynamodbTableResourceType, aws.NewDynamoDBTableDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDynamodbTableResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDynamodbTableResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
