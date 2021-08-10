@@ -52,12 +52,18 @@ jobs:
       - run: make install-tools
       - run: make lint
   test:
-    docker:
-      - image: golang:1.16
+    machine:
+      image: ubuntu-2004:202107-02
     steps:
       - checkout
-      - run: make install-tools
-      - run: make test
+      - run:
+          name: Run tests
+          command: |
+            docker run\
+              -v$(pwd):/app\
+              -w /app\
+              golang:1.16\
+              bash -c 'make install-tools && make test'
       - run:
           name: Check Codecov
           command: |
