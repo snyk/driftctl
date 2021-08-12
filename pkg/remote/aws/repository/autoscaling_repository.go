@@ -3,7 +3,6 @@ package repository
 import (
 	"fmt"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/autoscaling"
 	"github.com/aws/aws-sdk-go/service/autoscaling/autoscalingiface"
@@ -11,8 +10,8 @@ import (
 )
 
 type AutoScalingRepository interface {
-	DescribeGroups([]*string) ([]*autoscaling.Group, error)
-	DescribeLoadBalancers(string) ([]*autoscaling.LoadBalancerState, error)
+	ListGroups([]*string) ([]*autoscaling.Group, error)
+	ListLoadBalancers(string2 string) ([]*autoscaling.LoadBalancerState, error)
 }
 
 type autoscalingRepository struct {
@@ -27,7 +26,7 @@ func NewAutoScalingRepository(session *session.Session, c cache.Cache) *autoscal
 	}
 }
 
-func (r *autoscalingRepository) DescribeGroups(names []*string) ([]*autoscaling.Group, error) {
+func (r *autoscalingRepository) ListGroups(names []*string) ([]*autoscaling.Group, error) {
 	cacheKey := fmt.Sprintf("autoscalingDescribeGroups_%+v", names)
 	if v := r.cache.Get(cacheKey); v != nil {
 		return v.([]*autoscaling.Group), nil
@@ -45,20 +44,13 @@ func (r *autoscalingRepository) DescribeGroups(names []*string) ([]*autoscaling.
 	return groups.AutoScalingGroups, err
 }
 
-func (r *autoscalingRepository) DescribeLoadBalancers(autoScalingGroupName string) ([]*autoscaling.LoadBalancerState, error) {
-	cacheKey := fmt.Sprintf("autoscalingDescribeLoadBalancers_%s", autoScalingGroupName)
-	if v := r.cache.Get(cacheKey); v != nil {
-		return v.([]*autoscaling.LoadBalancerState), nil
-	}
-
+func (r *autoscalingRepository) ListLoadBalancers(autoScalingGroupName string) ([]*autoscaling.LoadBalancerState, error) {
 	input := &autoscaling.DescribeLoadBalancersInput{
-		AutoScalingGroupName: aws.String(autoScalingGroupName),
+		AutoScalingGroupName: &autoScalingGroupName,
 	}
 	loadBalancers, err := r.client.DescribeLoadBalancers(input)
 	if err != nil {
 		return nil, err
 	}
-
-	r.cache.Put(cacheKey, loadBalancers.LoadBalancers)
 	return loadBalancers.LoadBalancers, err
 }

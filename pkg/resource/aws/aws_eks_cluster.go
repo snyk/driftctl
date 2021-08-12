@@ -10,11 +10,6 @@ func initAwsEKSClusterMetaData(resourceSchemaRepository resource.SchemaRepositor
 	resourceSchemaRepository.SetNormalizeFunc(AwsEKSClusterResourceType, func(res *resource.AbstractResource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"created_at"})
-	})
-	resourceSchemaRepository.SetResolveReadAttributesFunc(AwsEKSClusterResourceType, func(res *resource.AbstractResource) map[string]string {
-		return map[string]string{
-			"id":   res.TerraformId(),
-			"name": res.TerraformId(),
-		}
+		val.SafeDelete([]string{"timeouts"})
 	})
 }

@@ -10,11 +10,11 @@ import (
 )
 
 type ElbEnumerator struct {
-	repo    repository.AutoScalingRepository
+	repo    repository.ELBRepository
 	factory resource.ResourceFactory
 }
 
-func NewElbEnumerator(repo repository.AutoScalingRepository, factory resource.ResourceFactory) *ElbEnumerator {
+func NewElbEnumerator(repo repository.ELBRepository, factory resource.ResourceFactory) *ElbEnumerator {
 	return &ElbEnumerator{
 		repo,
 		factory,
@@ -26,29 +26,21 @@ func (e *ElbEnumerator) SupportedType() resource.ResourceType {
 }
 
 func (e *ElbEnumerator) Enumerate() ([]resource.Resource, error) {
-	groups, err := e.repo.DescribeGroups([]*string{})
+	loadBalancers, err := e.repo.ListLoadBalancers()
 	if err != nil {
-		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), aws.AwsAutoScalingGroupResourceType)
+		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
-
 	results := make([]resource.Resource, 0)
 
-	for _, group := range groups {
-		loadBalancers, err := e.repo.DescribeLoadBalancers(*group.AutoScalingGroupName)
-		if err != nil {
-			return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
-		}
-
-		for _, item := range loadBalancers {
-			results = append(
-				results,
-				e.factory.CreateAbstractResource(
-					string(e.SupportedType()),
-					*item.LoadBalancerName,
-					map[string]interface{}{},
-				),
-			)
-		}
+	for _, item := range loadBalancers {
+		results = append(
+			results,
+			e.factory.CreateAbstractResource(
+				string(e.SupportedType()),
+				*item.LoadBalancerName,
+				map[string]interface{}{},
+			),
+		)
 	}
 
 	return results, nil

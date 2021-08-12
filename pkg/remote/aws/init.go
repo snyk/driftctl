@@ -53,6 +53,7 @@ func Init(version string, alerter *alerter.Alerter,
 	iamRepository := repository.NewIAMRepository(provider.session, repositoryCache)
 	eksRepository := repository.NewEKSRepository(provider.session, repositoryCache)
 	autoscalingRepository := repository.NewAutoScalingRepository(provider.session, repositoryCache)
+	elbRepository := repository.NewELBRepository(provider.session, repositoryCache)
 
 	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.AWS, provider)
@@ -173,12 +174,12 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsEcrRepositoryResourceType, common.NewGenericDetailsFetcher(aws.AwsEcrRepositoryResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewEKSClusterEnumerator(eksRepository, factory))
-	remoteLibrary.AddDetailsFetcher(aws.AwsEKSClusterResourceType, NewEKSClusterDetailsFetcher(provider, deserializer, eksRepository))
+	remoteLibrary.AddDetailsFetcher(aws.AwsEKSClusterResourceType, common.NewGenericDetailsFetcher(aws.AwsEKSClusterResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewAutoScalingGroupsEnumerator(autoscalingRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsAutoScalingGroupResourceType, common.NewGenericDetailsFetcher(aws.AwsAutoScalingGroupResourceType, provider, deserializer))
 
-	remoteLibrary.AddEnumerator(NewElbEnumerator(autoscalingRepository, factory))
+	remoteLibrary.AddEnumerator(NewElbEnumerator(elbRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsElbResourceType, common.NewGenericDetailsFetcher(aws.AwsElbResourceType, provider, deserializer))
 
 	err = resourceSchemaRepository.Init(terraform.AWS, version, provider.Schema())
