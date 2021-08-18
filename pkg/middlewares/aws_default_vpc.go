@@ -22,7 +22,7 @@ func (m AwsDefaultVPC) Execute(remoteResources, resourcesFromState *[]*resource.
 		existInState := false
 
 		// Ignore all resources other than default VPC
-		if remoteResource.TerraformType() != aws.AwsDefaultVpcResourceType {
+		if remoteResource.ResourceType() != aws.AwsDefaultVpcResourceType {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
@@ -40,8 +40,8 @@ func (m AwsDefaultVPC) Execute(remoteResources, resourcesFromState *[]*resource.
 
 		if !existInState {
 			logrus.WithFields(logrus.Fields{
-				"id":   remoteResource.TerraformId(),
-				"type": remoteResource.TerraformType(),
+				"id":   remoteResource.ResourceId(),
+				"type": remoteResource.ResourceType(),
 			}).Debug("Ignoring default VPC as it is not managed by IaC")
 		}
 

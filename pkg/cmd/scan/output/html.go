@@ -177,13 +177,13 @@ func distinctResourceTypes(resources []*resource.Resource) []string {
 	for _, res := range resources {
 		found := false
 		for _, v := range types {
-			if v == res.TerraformType() {
+			if v == res.ResourceType() {
 				found = true
 				break
 			}
 		}
 		if !found {
-			types = append(types, res.TerraformType())
+			types = append(types, res.ResourceType())
 		}
 	}
 

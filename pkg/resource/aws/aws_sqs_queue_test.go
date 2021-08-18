@@ -52,7 +52,7 @@ func TestAcc_AwsSQSQueue(t *testing.T) {
 					}
 					result.AssertInfrastructureIsInSync()
 					result.Equal(2, result.Summary().TotalManaged)
-					mutatedQueue = result.Managed()[0].TerraformId()
+					mutatedQueue = result.Managed()[0].ResourceId()
 				},
 			},
 			{

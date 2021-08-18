@@ -24,7 +24,7 @@ func (m AwsDefaults) awsIamRoleDefaults(remoteResources []*resource.Resource) []
 
 	for _, remoteResource := range remoteResources {
 		// Ignore all resources other than iam role
-		if remoteResource.TerraformType() != aws.AwsIamRoleResourceType {
+		if remoteResource.ResourceType() != aws.AwsIamRoleResourceType {
 			continue
 		}
 
@@ -46,21 +46,21 @@ func (m AwsDefaults) awsIamRolePolicyDefaults(remoteResources []*resource.Resour
 
 	for _, remoteResource := range remoteResources {
 		// Ignore all resources other than role policy
-		if remoteResource.TerraformType() != aws.AwsIamRolePolicyResourceType {
+		if remoteResource.ResourceType() != aws.AwsIamRolePolicyResourceType {
 			continue
 		}
 
 		var role *resource.Resource
 		for _, res := range remoteResources {
-			if res.TerraformType() == aws.AwsIamRoleResourceType &&
-				res.TerraformId() == (*remoteResource.Attrs)["role"] {
+			if res.ResourceType() == aws.AwsIamRoleResourceType &&
+				res.ResourceId() == (*remoteResource.Attrs)["role"] {
 				role = res
 				break
 			}
 		}
 
 		if role == nil {
-			logrus.Warnf("Role for %s role policy not found. Is that supposed to happen ?", remoteResource.TerraformId())
+			logrus.Warnf("Role for %s role policy not found. Is that supposed to happen ?", remoteResource.ResourceId())
 			continue
 		}
 
@@ -96,8 +96,8 @@ func (m AwsDefaults) Execute(remoteResources, resourcesFromState *[]*resource.Re
 		}
 
 		logrus.WithFields(logrus.Fields{
-			"id":   res.TerraformId(),
-			"type": res.TerraformType(),
+			"id":   res.ResourceId(),
+			"type": res.ResourceType(),
 		}).Debug("Ignoring default AWS resource")
 	}
 
@@ -117,8 +117,8 @@ func (m AwsDefaults) Execute(remoteResources, resourcesFromState *[]*resource.Re
 		}
 
 		logrus.WithFields(logrus.Fields{
-			"id":   res.TerraformId(),
-			"type": res.TerraformType(),
+			"id":   res.ResourceId(),
+			"type": res.ResourceType(),
 		}).Debug("Ignoring default AWS resource")
 	}
 

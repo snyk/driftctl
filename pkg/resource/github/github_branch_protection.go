@@ -29,14 +29,14 @@ func initGithubBranchProtectionMetaData(resourceSchemaRepository resource.Schema
 			}
 			if id == "" {
 				attrs["Branch"] = *pattern
-				attrs["Id"] = res.TerraformId()
+				attrs["Id"] = res.ResourceId()
 				return attrs
 			}
 			attrs["Branch"] = *pattern
 			attrs["RepoId"] = id
 			return attrs
 		}
-		attrs["Id"] = res.TerraformId()
+		attrs["Id"] = res.ResourceId()
 		return attrs
 	})
 }

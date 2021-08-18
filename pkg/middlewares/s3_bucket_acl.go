@@ -18,7 +18,7 @@ func (m S3BucketAcl) Execute(remoteResources, resourcesFromState *[]*resource.Re
 
 	for _, iacResource := range *resourcesFromState {
 		// Ignore all resources other than s3 buckets
-		if iacResource.TerraformType() != aws.AwsS3BucketResourceType {
+		if iacResource.ResourceType() != aws.AwsS3BucketResourceType {
 			continue
 		}
 
@@ -30,8 +30,8 @@ func (m S3BucketAcl) Execute(remoteResources, resourcesFromState *[]*resource.Re
 				}
 				if aclAttr != "private" {
 					logrus.WithFields(logrus.Fields{
-						"type": remoteResource.TerraformType(),
-						"id":   remoteResource.TerraformId(),
+						"type": remoteResource.ResourceType(),
+						"id":   remoteResource.ResourceId(),
 					}).Debug("Found a resource to update")
 					remoteResource.Attrs.SafeDelete([]string{"grant"})
 				}

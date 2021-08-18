@@ -1047,7 +1047,7 @@ func TestAnalyze(t *testing.T) {
 }
 
 func addSchemaToRes(res *resource.Resource, repo resource.SchemaRepositoryInterface) {
-	schema, _ := repo.GetSchema(res.TerraformType())
+	schema, _ := repo.GetSchema(res.ResourceType())
 	res.Sch = schema
 }
 

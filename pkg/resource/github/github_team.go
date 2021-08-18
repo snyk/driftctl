@@ -16,7 +16,7 @@ func initGithubTeamMetaData(resourceSchemaRepository resource.SchemaRepositoryIn
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(GithubTeamResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)
-		attrs["Id"] = res.TerraformId()
+		attrs["Id"] = res.ResourceId()
 		if name := val.GetString("name"); name != nil && *name != "" {
 			attrs["Name"] = *name
 		}

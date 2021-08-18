@@ -10,7 +10,7 @@ const AwsSnsTopicSubscriptionResourceType = "aws_sns_topic_subscription"
 func initSnsTopicSubscriptionMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetResolveReadAttributesFunc(AwsSnsTopicSubscriptionResourceType, func(res *resource.Resource) map[string]string {
 		return map[string]string{
-			"SubscriptionId": res.TerraformId(),
+			"SubscriptionId": res.ResourceId(),
 		}
 	})
 

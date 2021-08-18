@@ -24,7 +24,7 @@ func NewAwsSNSTopicPolicyExpander(resourceFactory resource.ResourceFactory, reso
 func (m AwsSNSTopicPolicyExpander) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
 
 	for _, res := range *remoteResources {
-		if res.TerraformType() != aws.AwsSnsTopicResourceType {
+		if res.ResourceType() != aws.AwsSnsTopicResourceType {
 			continue
 		}
 		res.Attrs.SafeDelete([]string{"policy"})
@@ -33,7 +33,7 @@ func (m AwsSNSTopicPolicyExpander) Execute(remoteResources, resourcesFromState *
 	newList := make([]*resource.Resource, 0)
 	for _, res := range *resourcesFromState {
 		// Ignore all resources other than sns_topic
-		if res.TerraformType() != aws.AwsSnsTopicResourceType {
+		if res.ResourceType() != aws.AwsSnsTopicResourceType {
 			newList = append(newList, res)
 			continue
 		}
@@ -75,7 +75,7 @@ func (m *AwsSNSTopicPolicyExpander) splitPolicy(topic *resource.Resource, result
 
 	*results = append(*results, newPolicy)
 	logrus.WithFields(logrus.Fields{
-		"id": newPolicy.TerraformId(),
+		"id": newPolicy.ResourceId(),
 	}).Debug("Created new policy from sns_topic")
 
 	topic.Attrs.SafeDelete([]string{"policy"})
@@ -84,8 +84,8 @@ func (m *AwsSNSTopicPolicyExpander) splitPolicy(topic *resource.Resource, result
 
 func (m *AwsSNSTopicPolicyExpander) hasPolicyAttached(topic *resource.Resource, resourcesFromState *[]*resource.Resource) bool {
 	for _, res := range *resourcesFromState {
-		if res.TerraformType() == aws.AwsSnsTopicPolicyResourceType &&
-			res.TerraformId() == topic.Id {
+		if res.ResourceType() == aws.AwsSnsTopicPolicyResourceType &&
+			res.ResourceId() == topic.Id {
 			return true
 		}
 	}

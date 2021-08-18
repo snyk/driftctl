@@ -23,7 +23,7 @@ func (m Route53RecordIDReconcilier) Execute(_, resourcesFromState *[]*resource.R
 
 	for _, stateResource := range *resourcesFromState {
 
-		if stateResource.TerraformType() != aws.AwsRoute53RecordResourceType {
+		if stateResource.ResourceType() != aws.AwsRoute53RecordResourceType {
 			continue
 		}
 
@@ -37,7 +37,7 @@ func (m Route53RecordIDReconcilier) Execute(_, resourcesFromState *[]*resource.R
 			stateResource.Id = newId
 			_ = stateResource.Attrs.SafeSet([]string{"id"}, newId)
 			logrus.WithFields(logrus.Fields{
-				"old_id": stateResource.TerraformId(),
+				"old_id": stateResource.ResourceId(),
 				"new_id": newId,
 			}).Debug("Normalized route53 record ID")
 		}
