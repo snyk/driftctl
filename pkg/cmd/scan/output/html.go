@@ -3,6 +3,7 @@ package output
 import (
 	"bytes"
 	"embed"
+	"encoding/base64"
 	"fmt"
 	"html/template"
 	"math"
@@ -42,6 +43,8 @@ type HTMLTemplateParams struct {
 	ScanDuration    string
 	ProviderName    string
 	ProviderVersion string
+	LogoSvg         template.HTML
+	FaviconBase64   string
 }
 
 func NewHTML(path string) *HTML {
@@ -65,6 +68,16 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 	}
 
 	styleFile, err := assets.ReadFile("assets/style.css")
+	if err != nil {
+		return err
+	}
+
+	logoSvgFile, err := assets.ReadFile("assets/driftctl_light.svg")
+	if err != nil {
+		return err
+	}
+
+	faviconFile, err := assets.ReadFile("assets/favicon.ico")
 	if err != nil {
 		return err
 	}
@@ -143,6 +156,8 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 		ScanDuration:    analysis.Duration.Round(time.Second).String(),
 		ProviderName:    analysis.ProviderName,
 		ProviderVersion: analysis.ProviderVersion,
+		LogoSvg:         template.HTML(logoSvgFile),
+		FaviconBase64:   base64.StdEncoding.EncodeToString(faviconFile),
 	}
 
 	err = tmpl.Execute(file, data)
