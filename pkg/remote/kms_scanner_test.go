@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
@@ -28,20 +29,20 @@ func TestKMSKey(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *repository.MockKMSRepository)
+		mocks   func(*repository.MockKMSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no keys",
 			dirName: "aws_kms_key_empty",
-			mocks: func(repository *repository.MockKMSRepository) {
+			mocks: func(repository *repository.MockKMSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllKeys").Return([]*kms.KeyListEntry{}, nil)
 			},
 		},
 		{
 			test:    "multiple keys",
 			dirName: "aws_kms_key_multiple",
-			mocks: func(repository *repository.MockKMSRepository) {
+			mocks: func(repository *repository.MockKMSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllKeys").Return([]*kms.KeyListEntry{
 					{KeyId: awssdk.String("8ee21d91-c000-428c-8032-235aac55da36")},
 					{KeyId: awssdk.String("5d765f32-bfdc-4610-b6ab-f82db5d0601b")},
@@ -52,8 +53,10 @@ func TestKMSKey(t *testing.T) {
 		{
 			test:    "cannot list keys",
 			dirName: "aws_kms_key_list",
-			mocks: func(repository *repository.MockKMSRepository) {
+			mocks: func(repository *repository.MockKMSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllKeys").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsKmsKeyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsKmsKeyResourceType, resourceaws.AwsKmsKeyResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -78,9 +81,9 @@ func TestKMSKey(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockKMSRepository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
+
 			var repo repository.KMSRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -113,6 +116,8 @@ func TestKMSKey(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsKmsKeyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }
@@ -121,20 +126,20 @@ func TestKMSAlias(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *repository.MockKMSRepository)
+		mocks   func(*repository.MockKMSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no aliases",
 			dirName: "aws_kms_alias_empty",
-			mocks: func(repository *repository.MockKMSRepository) {
+			mocks: func(repository *repository.MockKMSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllAliases").Return([]*kms.AliasListEntry{}, nil)
 			},
 		},
 		{
 			test:    "multiple aliases",
 			dirName: "aws_kms_alias_multiple",
-			mocks: func(repository *repository.MockKMSRepository) {
+			mocks: func(repository *repository.MockKMSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllAliases").Return([]*kms.AliasListEntry{
 					{AliasName: awssdk.String("alias/foo")},
 					{AliasName: awssdk.String("alias/bar")},
@@ -145,8 +150,10 @@ func TestKMSAlias(t *testing.T) {
 		{
 			test:    "cannot list aliases",
 			dirName: "aws_kms_alias_list",
-			mocks: func(repository *repository.MockKMSRepository) {
+			mocks: func(repository *repository.MockKMSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllAliases").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsKmsAliasResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsKmsAliasResourceType, resourceaws.AwsKmsAliasResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -171,9 +178,9 @@ func TestKMSAlias(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockKMSRepository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
+
 			var repo repository.KMSRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -206,6 +213,8 @@ func TestKMSAlias(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsKmsAliasResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }

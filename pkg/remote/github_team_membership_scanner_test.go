@@ -1,10 +1,12 @@
 package remote
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	"github.com/cloudskiff/driftctl/pkg/remote/github"
@@ -25,13 +27,13 @@ func TestScanGithubTeamMembership(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *github.MockGithubRepository)
+		mocks   func(*github.MockGithubRepository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no github team memberships",
 			dirName: "github_team_membership_empty",
-			mocks: func(client *github.MockGithubRepository) {
+			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListTeamMemberships").Return([]string{}, nil)
 			},
 			err: nil,
@@ -39,11 +41,21 @@ func TestScanGithubTeamMembership(t *testing.T) {
 		{
 			test:    "multiple github team memberships",
 			dirName: "github_team_membership_multiple",
-			mocks: func(client *github.MockGithubRepository) {
+			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListTeamMemberships").Return([]string{
 					"4570529:driftctl-acceptance-tester",
 					"4570529:wbeuil",
 				}, nil)
+			},
+			err: nil,
+		},
+		{
+			test:    "cannot list team membership",
+			dirName: "github_team_membership_empty",
+			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
+				client.On("ListTeamMemberships").Return(nil, errors.New("Your token has not been granted the required scopes to execute this query."))
+
+				alerter.On("SendAlert", githubres.GithubTeamMembershipResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, githubres.GithubTeamMembershipResourceType, githubres.GithubTeamMembershipResourceType, alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -53,7 +65,6 @@ func TestScanGithubTeamMembership(t *testing.T) {
 	githubres.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -64,8 +75,11 @@ func TestScanGithubTeamMembership(t *testing.T) {
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
 			mockedRepo := github.MockGithubRepository{}
-			c.mocks(&mockedRepo)
+			c.mocks(&mockedRepo, alerter)
+
 			var repo github.GithubRepository = &mockedRepo
 
 			realProvider, err := tftest.InitTestGithubProvider(providerLibrary, "4.4.0")
@@ -97,6 +111,8 @@ func TestScanGithubTeamMembership(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, githubres.GithubTeamMembershipResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			mockedRepo.AssertExpectations(tt)
+			alerter.AssertExpectations(tt)
 		})
 	}
 }

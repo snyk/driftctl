@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
@@ -28,13 +29,13 @@ func TestDynamoDBTable(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *repository.MockDynamoDBRepository)
+		mocks   func(*repository.MockDynamoDBRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no DynamoDB Table",
 			dirName: "dynamodb_table_empty",
-			mocks: func(client *repository.MockDynamoDBRepository) {
+			mocks: func(client *repository.MockDynamoDBRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTables").Return([]*string{}, nil)
 			},
 			wantErr: nil,
@@ -42,7 +43,7 @@ func TestDynamoDBTable(t *testing.T) {
 		{
 			test:    "Multiple DynamoDB Table",
 			dirName: "dynamodb_table_multiple",
-			mocks: func(client *repository.MockDynamoDBRepository) {
+			mocks: func(client *repository.MockDynamoDBRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTables").Return([]*string{
 					awssdk.String("GameScores"),
 					awssdk.String("example"),
@@ -53,8 +54,10 @@ func TestDynamoDBTable(t *testing.T) {
 		{
 			test:    "cannot list DynamoDB Table",
 			dirName: "dynamodb_table_list",
-			mocks: func(client *repository.MockDynamoDBRepository) {
+			mocks: func(client *repository.MockDynamoDBRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTables").Return(nil, awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 400, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsDynamodbTableResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsDynamodbTableResourceType, resourceaws.AwsDynamodbTableResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -79,9 +82,9 @@ func TestDynamoDBTable(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockDynamoDBRepository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
+
 			var repo repository.DynamoDBRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -114,6 +117,8 @@ func TestDynamoDBTable(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsDynamodbTableResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }

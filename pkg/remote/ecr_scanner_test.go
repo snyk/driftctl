@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
@@ -28,13 +29,13 @@ func TestECRRepository(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *repository.MockECRRepository)
+		mocks   func(*repository.MockECRRepository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no repository",
 			dirName: "aws_ecr_repository_empty",
-			mocks: func(client *repository.MockECRRepository) {
+			mocks: func(client *repository.MockECRRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllRepositories").Return([]*ecr.Repository{}, nil)
 			},
 			err: nil,
@@ -42,7 +43,7 @@ func TestECRRepository(t *testing.T) {
 		{
 			test:    "multiple repositories",
 			dirName: "aws_ecr_repository_multiple",
-			mocks: func(client *repository.MockECRRepository) {
+			mocks: func(client *repository.MockECRRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllRepositories").Return([]*ecr.Repository{
 					{RepositoryName: awssdk.String("test_ecr")},
 					{RepositoryName: awssdk.String("bar")},
@@ -53,8 +54,10 @@ func TestECRRepository(t *testing.T) {
 		{
 			test:    "cannot list repository",
 			dirName: "aws_ecr_repository_empty",
-			mocks: func(client *repository.MockECRRepository) {
+			mocks: func(client *repository.MockECRRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllRepositories").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsEcrRepositoryResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsEcrRepositoryResourceType, resourceaws.AwsEcrRepositoryResourceType, alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -79,9 +82,9 @@ func TestECRRepository(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockECRRepository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
+
 			var repo repository.ECRRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -114,6 +117,8 @@ func TestECRRepository(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsEcrRepositoryResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }
