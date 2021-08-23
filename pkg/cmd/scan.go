@@ -62,9 +62,6 @@ func NewScanCmd() *cobra.Command {
 			}
 
 			outputFlag, _ := cmd.Flags().GetStringSlice("output")
-			if len(outputFlag) == 0 {
-				outputFlag = append(outputFlag, output.Example(output.ConsoleOutputType))
-			}
 
 			out, err := parseOutputFlags(outputFlag)
 			if err != nil {
@@ -124,7 +121,7 @@ func NewScanCmd() *cobra.Command {
 	fl.StringSliceP(
 		"output",
 		"o",
-		[]string{},
+		[]string{output.Example(output.ConsoleOutputType)},
 		"Output format, by default it will write to the console\n"+
 			"Accepted formats are: "+strings.Join(output.SupportedOutputsExample(), ",")+"\n",
 	)
