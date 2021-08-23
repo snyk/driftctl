@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/route53"
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
@@ -31,13 +32,13 @@ func TestRoute53_HealthCheck(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository.MockRoute53Repository)
+		mocks   func(*repository.MockRoute53Repository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no health check",
 			dirName: "route53_health_check_empty",
-			mocks: func(client *repository.MockRoute53Repository) {
+			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllHealthChecks").Return([]*route53.HealthCheck{}, nil)
 			},
 			err: nil,
@@ -45,7 +46,7 @@ func TestRoute53_HealthCheck(t *testing.T) {
 		{
 			test:    "Multiple health check",
 			dirName: "route53_health_check_multiple",
-			mocks: func(client *repository.MockRoute53Repository) {
+			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllHealthChecks").Return([]*route53.HealthCheck{
 					{Id: awssdk.String("7001a9df-ded4-4802-9909-668eb80b972b")},
 					{Id: awssdk.String("84fc318a-2e0d-41d6-b638-280e2f0f4e26")},
@@ -56,8 +57,10 @@ func TestRoute53_HealthCheck(t *testing.T) {
 		{
 			test:    "cannot list health check",
 			dirName: "route53_health_check_empty",
-			mocks: func(client *repository.MockRoute53Repository) {
+			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllHealthChecks").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsRoute53HealthCheckResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsRoute53HealthCheckResourceType, resourceaws.AwsRoute53HealthCheckResourceType, alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -82,9 +85,9 @@ func TestRoute53_HealthCheck(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockRoute53Repository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
+
 			var repo repository.Route53Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -117,6 +120,8 @@ func TestRoute53_HealthCheck(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsRoute53HealthCheckResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }
@@ -126,13 +131,13 @@ func TestRoute53_Zone(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository.MockRoute53Repository)
+		mocks   func(*repository.MockRoute53Repository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no zones",
 			dirName: "route53_zone_empty",
-			mocks: func(client *repository.MockRoute53Repository) {
+			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{},
 					nil,
@@ -143,7 +148,7 @@ func TestRoute53_Zone(t *testing.T) {
 		{
 			test:    "single zone",
 			dirName: "route53_zone_single",
-			mocks: func(client *repository.MockRoute53Repository) {
+			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{
 						{
@@ -159,7 +164,7 @@ func TestRoute53_Zone(t *testing.T) {
 		{
 			test:    "multiples zone (test pagination)",
 			dirName: "route53_zone_multiples",
-			mocks: func(client *repository.MockRoute53Repository) {
+			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{
 						{
@@ -183,11 +188,13 @@ func TestRoute53_Zone(t *testing.T) {
 		{
 			test:    "cannot list zones",
 			dirName: "route53_zone_empty",
-			mocks: func(client *repository.MockRoute53Repository) {
+			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{},
 					awserr.NewRequestFailure(nil, 403, ""),
 				)
+
+				alerter.On("SendAlert", resourceaws.AwsRoute53ZoneResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsRoute53ZoneResourceType, resourceaws.AwsRoute53ZoneResourceType, alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -212,9 +219,9 @@ func TestRoute53_Zone(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockRoute53Repository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
+
 			var repo repository.Route53Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -247,6 +254,8 @@ func TestRoute53_Zone(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsRoute53ZoneResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }
@@ -256,13 +265,13 @@ func TestRoute53_Record(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository.MockRoute53Repository)
+		mocks   func(*repository.MockRoute53Repository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no records",
 			dirName: "route53_zone_with_no_record",
-			mocks: func(client *repository.MockRoute53Repository) {
+			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{
 						{
@@ -279,7 +288,7 @@ func TestRoute53_Record(t *testing.T) {
 		{
 			test:    "multiples records in multiples zones",
 			dirName: "route53_record_multiples",
-			mocks: func(client *repository.MockRoute53Repository) {
+			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{
 						{
@@ -327,7 +336,7 @@ func TestRoute53_Record(t *testing.T) {
 		{
 			test:    "explicit subdomain records",
 			dirName: "route53_record_explicit_subdomain",
-			mocks: func(client *repository.MockRoute53Repository) {
+			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{
 						{
@@ -369,17 +378,19 @@ func TestRoute53_Record(t *testing.T) {
 		{
 			test:    "cannot list zones",
 			dirName: "route53_zone_with_no_record",
-			mocks: func(client *repository.MockRoute53Repository) {
+			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{},
 					awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsRoute53RecordResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsRoute53RecordResourceType, resourceaws.AwsRoute53ZoneResourceType, alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
 		{
 			test:    "cannot list records",
 			dirName: "route53_zone_with_no_record",
-			mocks: func(client *repository.MockRoute53Repository) {
+			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{
 						{
@@ -392,6 +403,7 @@ func TestRoute53_Record(t *testing.T) {
 					[]*route53.ResourceRecordSet{},
 					awserr.NewRequestFailure(nil, 403, ""))
 
+				alerter.On("SendAlert", resourceaws.AwsRoute53RecordResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsRoute53RecordResourceType, resourceaws.AwsRoute53RecordResourceType, alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -416,9 +428,9 @@ func TestRoute53_Record(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockRoute53Repository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
+
 			var repo repository.Route53Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -451,6 +463,8 @@ func TestRoute53_Record(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsRoute53RecordResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }

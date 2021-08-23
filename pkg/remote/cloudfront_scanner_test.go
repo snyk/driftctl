@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/cloudfront"
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
@@ -28,20 +29,20 @@ func TestCloudfrontDistribution(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *repository.MockCloudfrontRepository)
+		mocks   func(*repository.MockCloudfrontRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no cloudfront distributions",
 			dirName: "aws_cloudfront_distribution_empty",
-			mocks: func(repository *repository.MockCloudfrontRepository) {
+			mocks: func(repository *repository.MockCloudfrontRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDistributions").Return([]*cloudfront.DistributionSummary{}, nil)
 			},
 		},
 		{
 			test:    "single cloudfront distribution",
 			dirName: "aws_cloudfront_distribution_single",
-			mocks: func(repository *repository.MockCloudfrontRepository) {
+			mocks: func(repository *repository.MockCloudfrontRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDistributions").Return([]*cloudfront.DistributionSummary{
 					{Id: awssdk.String("E1M9CNS0XSHI19")},
 				}, nil)
@@ -50,8 +51,10 @@ func TestCloudfrontDistribution(t *testing.T) {
 		{
 			test:    "cannot list cloudfront distributions",
 			dirName: "aws_cloudfront_distribution_list",
-			mocks: func(repository *repository.MockCloudfrontRepository) {
+			mocks: func(repository *repository.MockCloudfrontRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDistributions").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsCloudfrontDistributionResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsCloudfrontDistributionResourceType, resourceaws.AwsCloudfrontDistributionResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -76,9 +79,9 @@ func TestCloudfrontDistribution(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockCloudfrontRepository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
+
 			var repo repository.CloudfrontRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -111,6 +114,8 @@ func TestCloudfrontDistribution(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsCloudfrontDistributionResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }
