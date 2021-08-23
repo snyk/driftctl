@@ -116,6 +116,8 @@ func TestSQSQueue(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsSqsQueueResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			fakeRepo.AssertExpectations(tt)
+			alerter.AssertExpectations(tt)
 		})
 	}
 }
@@ -240,6 +242,8 @@ func TestSQSQueuePolicy(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsSqsQueuePolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			fakeRepo.AssertExpectations(tt)
+			alerter.AssertExpectations(tt)
 		})
 	}
 }
