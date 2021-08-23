@@ -4,15 +4,14 @@
     <title>driftctl Scan Report</title>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link rel="shortcut icon"
-          href="https://raw.githubusercontent.com/cloudskiff/driftctl-docs/main/static/img/favicon.ico"/>
+    <link rel="shortcut icon" type="image/x-icon" href="data:image/x-icon;base64,{{ .FaviconBase64 }}" />
     <style>{{.Stylesheet}}</style>
 </head>
 <body>
 <div class="container">
     <header>
         <div class="div-left">
-            <img src="https://raw.githubusercontent.com/cloudskiff/driftctl-docs/main/static/img/driftctl_light.svg" width="100px" height="81px" alt="driftctl logo" />
+            {{ .LogoSvg }}
             <div>
                 <h1>Scan Report</h1>
                 <h2>{{ .ScanDate }}</h2>
@@ -21,8 +20,7 @@
         </div>
         <div class="div-right">
             <p class="provider">IaC Source: Terraform</p>
-            <p class="provider">Cloud Provider: {{.ProviderName}}</p>
-            <p class="provider">Version: {{.ProviderVersion}}</p>
+            <p class="provider">Cloud Provider: {{.ProviderName}} ({{.ProviderVersion}})</p>
         </div>
     </header>
     <section>
