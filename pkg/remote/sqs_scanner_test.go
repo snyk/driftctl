@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
@@ -28,13 +29,13 @@ func TestSQSQueue(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *repository.MockSQSRepository)
+		mocks   func(*repository.MockSQSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no sqs queues",
 			dirName: "sqs_queue_empty",
-			mocks: func(client *repository.MockSQSRepository) {
+			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{}, nil)
 			},
 			wantErr: nil,
@@ -42,7 +43,7 @@ func TestSQSQueue(t *testing.T) {
 		{
 			test:    "multiple sqs queues",
 			dirName: "sqs_queue_multiple",
-			mocks: func(client *repository.MockSQSRepository) {
+			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo"),
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/foo"),
@@ -53,8 +54,10 @@ func TestSQSQueue(t *testing.T) {
 		{
 			test:    "cannot list sqs queues",
 			dirName: "sqs_queue_empty",
-			mocks: func(client *repository.MockSQSRepository) {
+			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsSqsQueueResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsSqsQueueResourceType, resourceaws.AwsSqsQueueResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -79,9 +82,8 @@ func TestSQSQueue(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockSQSRepository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
 			var repo repository.SQSRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -114,6 +116,8 @@ func TestSQSQueue(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsSqsQueueResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			fakeRepo.AssertExpectations(tt)
+			alerter.AssertExpectations(tt)
 		})
 	}
 }
@@ -122,7 +126,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *repository.MockSQSRepository)
+		mocks   func(*repository.MockSQSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
@@ -130,7 +134,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 			// as a default SQSDefaultPolicy (e.g. policy="") will always be present in each queue
 			test:    "no sqs queue policies",
 			dirName: "sqs_queue_policy_empty",
-			mocks: func(client *repository.MockSQSRepository) {
+			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{}, nil)
 			},
 			wantErr: nil,
@@ -138,7 +142,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 		{
 			test:    "multiple sqs queue policies (default or not)",
 			dirName: "sqs_queue_policy_multiple",
-			mocks: func(client *repository.MockSQSRepository) {
+			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo"),
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/foo"),
@@ -159,7 +163,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 		{
 			test:    "multiple sqs queue policies (with nil attributes)",
 			dirName: "sqs_queue_policy_multiple",
-			mocks: func(client *repository.MockSQSRepository) {
+			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo"),
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/foo"),
@@ -176,8 +180,10 @@ func TestSQSQueuePolicy(t *testing.T) {
 		{
 			test:    "cannot list sqs queues, thus sqs queue policies",
 			dirName: "sqs_queue_policy_empty",
-			mocks: func(client *repository.MockSQSRepository) {
+			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsSqsQueuePolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsSqsQueuePolicyResourceType, resourceaws.AwsSqsQueueResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -202,9 +208,8 @@ func TestSQSQueuePolicy(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockSQSRepository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
 			var repo repository.SQSRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -237,6 +242,8 @@ func TestSQSQueuePolicy(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsSqsQueuePolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			fakeRepo.AssertExpectations(tt)
+			alerter.AssertExpectations(tt)
 		})
 	}
 }
