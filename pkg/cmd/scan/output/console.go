@@ -98,7 +98,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 					if change.Type == diff.UPDATE {
 						if change.JsonString {
 							prefix := "           "
-							fmt.Printf("%s%s\n%s%s\n", whiteSpace, pref, prefix, jsonDiff(change.From, change.To, prefix))
+							fmt.Printf("%s%s\n%s%s\n", whiteSpace, pref, prefix, jsonDiff(change.From, change.To, isatty.IsTerminal(os.Stdout.Fd())))
 							continue
 						}
 					}
@@ -207,22 +207,22 @@ func groupByType(resources []*resource.Resource) (map[string][]*resource.Resourc
 	return result, keys
 }
 
-func jsonDiff(a, b interface{}, prefix string) string {
+func jsonDiff(a, b interface{}, coloring bool) string {
 	aStr := fmt.Sprintf("%s", a)
 	bStr := fmt.Sprintf("%s", b)
 	d := gojsondiff.New()
 	var aJson map[string]interface{}
 	_ = json.Unmarshal([]byte(aStr), &aJson)
-	diff, _ := d.Compare([]byte(aStr), []byte(bStr))
+	result, _ := d.Compare([]byte(aStr), []byte(bStr))
 	f := formatter.NewAsciiFormatter(aJson, formatter.AsciiFormatterConfig{
-		Coloring: isatty.IsTerminal(os.Stdout.Fd()),
+		Coloring: coloring,
 	})
 	// Set foreground green color for added lines and red color for deleted lines
 	formatter.AsciiStyles = map[string]string{
 		"+": "32",
 		"-": "31",
 	}
-	diffStr, _ := f.Format(diff)
+	diffStr, _ := f.Format(result)
 
 	return diffStr
 }
