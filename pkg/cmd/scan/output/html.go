@@ -9,6 +9,7 @@ import (
 	"math"
 	"os"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -123,7 +124,7 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 				case diff.UPDATE:
 					prefix := fmt.Sprintf("%s %s:", "~", path)
 					if change.JsonString {
-						_, _ = fmt.Fprintf(&buf, "%s%s<br>%s%s<br>", whiteSpace, prefix, whiteSpace, jsonDiff(change.From, change.To, whiteSpace))
+						_, _ = fmt.Fprintf(&buf, "%s%s<br>%s%s<br>", whiteSpace, prefix, whiteSpace, jsonDiffHTML(change.From, change.To))
 						continue
 					}
 					_, _ = fmt.Fprintf(&buf, "%s%s <span class=\"code-box-line-delete\">%s</span> => <span class=\"code-box-line-create\">%s</span>", whiteSpace, prefix, htmlPrettify(change.From), htmlPrettify(change.To))
@@ -193,4 +194,16 @@ func htmlPrettify(resource interface{}) string {
 		return "null"
 	}
 	return awsutil.Prettify(resource)
+}
+
+func jsonDiffHTML(a, b interface{}) string {
+	diffStr := jsonDiff(a, b, false)
+
+	re := regexp.MustCompile(`(?m)^(?P<value>(\-)(.*))$`)
+	diffStr = re.ReplaceAllString(diffStr, `<span class="code-box-line-delete">$value</span>`)
+
+	re = regexp.MustCompile(`(?m)^(?P<value>(\+)(.*))$`)
+	diffStr = re.ReplaceAllString(diffStr, `<span class="code-box-line-create">$value</span>`)
+
+	return diffStr
 }

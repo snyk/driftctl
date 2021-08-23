@@ -127,11 +127,12 @@ func TestHTML_Write(t *testing.T) {
 							},
 						},
 						{
+							JsonString: true,
 							Change: diff.Change{
 								Type: diff.UPDATE,
-								Path: []string{"Policies", "0"},
-								From: resource.Resource{},
-								To:   resource.Resource{Id: "093cd6ba-cf6d-4800-b252-6a50ca8903cd", Type: "aws_iam_policy"},
+								Path: []string{"policy"},
+								From: `{"Statement":[{"Action":["s3:GetObjectVersion"],"Effect":"Allow","Principal":"*","Resource":"arn:aws:s3:::tmxxrn.foobar.driftctl-test.com/*","Sid":"PublicRead"}],"Version":"2012-10-17"}`,
+								To:   `{"Statement":[{"Action":["*"],"Effect":"Deny","Principal":"*","Resource":"arn:aws:s3:::tmxxrn.foobar.driftctl-test.com/b/*","Sid":"PublicReadWrite"},{"Effect":"Deny","Sid":"PublicReadWrite"}],"Version":"2021-10-17","Test":[]}`,
 							},
 						},
 						{

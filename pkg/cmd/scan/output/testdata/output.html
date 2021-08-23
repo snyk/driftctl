@@ -518,15 +518,37 @@ input[type="search"], select {
                                     <span role="cell" data-type="resource-type">aws_diff_resource</span>
                                 </div>
                                 <pre class="code-box">
-                                    <code class="code-box-line">&emsp;- path.to.fields.[0]: <span class="code-box-line-delete">"value"</span><br>&emsp;~ path.to.fields.[1]: <span class="code-box-line-delete">12</span> => <span class="code-box-line-create">"12"</span><br>&emsp;- group_ids: <span class="code-box-line-delete">["a071314398026"]</span><br>&emsp;~ Policies.[0]: <span class="code-box-line-delete">{
-  Id: "",
-  Type: "",
-  Source: <nil>
-}</span> => <span class="code-box-line-create">{
-  Id: "093cd6ba-cf6d-4800-b252-6a50ca8903cd",
-  Type: "aws_iam_policy",
-  Source: <nil>
-}</span><br>&emsp;+ Tags.[0].Name: <span class="code-box-line-create">"test"</span><br>&emsp;~ InstanceInitiatedShutdownBehavior: <span class="code-box-line-delete">""</span> => <span class="code-box-line-create">null</span><br></code>
+                                    <code class="code-box-line">&emsp;- path.to.fields.[0]: <span class="code-box-line-delete">"value"</span><br>&emsp;~ path.to.fields.[1]: <span class="code-box-line-delete">12</span> => <span class="code-box-line-create">"12"</span><br>&emsp;- group_ids: <span class="code-box-line-delete">["a071314398026"]</span><br>&emsp;~ policy:<br>&emsp; {
+   "Statement": [
+     {
+       "Action": [
+<span class="code-box-line-delete">-        "s3:GetObjectVersion"</span>
+<span class="code-box-line-create">+        "*"</span>
+       ],
+<span class="code-box-line-delete">-      "Effect": "Allow",</span>
+<span class="code-box-line-create">+      "Effect": "Deny",</span>
+       "Principal": "*",
+<span class="code-box-line-delete">-      "Resource": "arn:aws:s3:::tmxxrn.foobar.driftctl-test.com/*",</span>
+<span class="code-box-line-create">+      "Resource": "arn:aws:s3:::tmxxrn.foobar.driftctl-test.com/b/*",</span>
+<span class="code-box-line-delete">-      "Sid": "PublicRead"</span>
+<span class="code-box-line-create">+      "Sid": "PublicReadWrite"</span>
+     }
+<span class="code-box-line-create">+    {</span>
+<span class="code-box-line-create">+      "Action": [</span>
+<span class="code-box-line-create">+        "*"</span>
+<span class="code-box-line-create">+      ],</span>
+<span class="code-box-line-create">+      "Effect": "Deny",</span>
+<span class="code-box-line-create">+      "Principal": "*",</span>
+<span class="code-box-line-create">+      "Resource": "arn:aws:s3:::tmxxrn.foobar.driftctl-test.com/b/*",</span>
+<span class="code-box-line-create">+      "Sid": "PublicReadWrite"</span>
+<span class="code-box-line-create">+    }</span>
+   ],
+<span class="code-box-line-delete">-  "Version": "2012-10-17"</span>
+<span class="code-box-line-create">+  "Version": "2021-10-17"</span>
+<span class="code-box-line-create">+  "Test": [</span>
+<span class="code-box-line-create">+  ]</span>
+ }
+<br>&emsp;+ Tags.[0].Name: <span class="code-box-line-create">"test"</span><br>&emsp;~ InstanceInitiatedShutdownBehavior: <span class="code-box-line-delete">""</span> => <span class="code-box-line-create">null</span><br></code>
                                 </pre>
                             </div>
                             
