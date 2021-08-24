@@ -49,7 +49,7 @@
         </div>
     </section>
     <main>
-        {{ if (lt .Coverage 100) }}
+        {{ if not .IsSync }}
         <form role="search">
             <label for="search" class="visuallyhidden">Search resources by id:</label>
             <input type="search" id="search" name="search" placeholder="Search resources by id...">
