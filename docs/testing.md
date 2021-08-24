@@ -2,19 +2,19 @@
 
 driftctl uses **unit tests**, **functional tests** and **acceptance tests**.
 
-- A **unit test** is a very scoped test that test only a very precise part of code
+- A **unit test** tests only a very specific part of code
   - Pros:
     - Very quick to develop, run and maintain
   - Cons:
     - Does not ensure that we do not break integration with other part of the code
-- A **functional test** cover a larger part of the code than unit tests, but it mock external dependencies
+- A **functional test** covers a larger part of the code than unit tests, but it mocks external dependencies
     - Pros:
-        - Ensure that multiples components works well together
+        - Ensures that multiple components work well together
         - Still quick to develop and run
     - Cons:
         - Mocking every external dependencies can be complicated
-        - Can be complicated to maintain since it is not scoped to a precise part of the code
-- An **acceptance test** or **integration test** are the closest of the end-user behavior.
+        - Can be complicated to maintain since it is not scoped to a specific part of the code
+- An **acceptance test** or **integration test** is the closest of the end-user behavior
   - Pros:
     - Very close to a real product usage
     - Can cover regressions very efficiently

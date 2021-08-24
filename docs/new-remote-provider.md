@@ -1,19 +1,23 @@
 # Add a new remote provider
 
-A remote provider in Driftctl is a cloud provider like AWS, Github, GCP or Azure.
-Current architecture allows to add a new provider in a few step.
+A remote provider in driftctl represents a cloud provider like AWS, GitHub, GCP or Azure.
+
+Our current architecture allows to add a new provider in a few steps.
 
 ## Declaring the new remote provider
+
 First you need to create a new directory in `pkg/remote/<provider name>`. It will sit next to already implemented one like `pkg/remote/aws`.
 
-Inside this directory you will create a `init.go`. First thing to do will be to define the remote name constant:
+Inside this directory, you will create a `init.go` file in which you will define the remote name constant:
+
 ```go
 const RemoteAWSTerraform = "aws+tf"
 ```
 
-`+tf` mean that we use terraform to retrieve details of resources, in the future maybe it will exist other way to read resource details.
+`+tf` means that we use Terraform to retrieve resource's details, in the future, we may add other ways to read those details.
 
-You will then create a function to init the provider and all the future resource enumerator. The best way to do it would be to copy the function signature from an other provider:
+You will then create a function to initialize the provider and all resource's enumerators. The best way to do it would be to copy the function signature from another provider:
+
 ```go
 func Init(
 	// Version required by the user
@@ -22,37 +26,37 @@ func Init(
 	alerter *alerter.Alerter,
 	// Library that contains all providers
 	providerLibrary *terraform.ProviderLibrary,
-	// Library that contains the enumerators and details fetcher for each supported resources
+	// Library that contains enumerators and details fetchers for each supported resources
 	remoteLibrary *common.RemoteLibrary,
-	// progress display
+	// Progress displayer
 	progress output.Progress,
-	// Repository for all resource schema
+	// Repository for all resource schemas
 	resourceSchemaRepository *resource.SchemaRepository,
 	// Factory used to create driftctl resource
 	factory resource.ResourceFactory,
-	// Drifctl config directory (in which terraform provider is downloaded)
+	// driftctl configuration directory (where Terraform provider is downloaded)
 	configDir string) error {
 
-	// Define the default version of terraform provider to be used. When the user does not require a specific one
+	// You need to define the default version of the Terraform provider when the user does not specify one
 	if version == "" {
 		version = "3.19.0"
 	}
 
-	// This is this actual terraform provider creation
+	// Creation of the Terraform provider
 	provider, err := NewAWSTerraformProvider(version, progress, configDir)
 	if err != nil {
 		return err
 	}
-	// And then initialisation
+	// And then initialization
 	err = provider.Init()
 	if err != nil {
 		return err
 	}
 
-	// You'll need to create a new cache that will be use to cache fetched resources lists
+	// You'll need to create a new cache that will be used to cache fetched lists of resources
 	repositoryCache := cache.New(100)
 
-	// Deserializer is used to convert cty value return by terraform provider to driftctl Resource
+	// Deserializer is used to convert cty value returned by Terraform provider to driftctl Resource
     deserializer := resource.NewDeserializer(factory)
 
     // Adding the provider to the library
@@ -60,10 +64,11 @@ func Init(
 }
 ```
 
-When it's done you'll create a `provider.go` file to contains your terraform provider representation. Again you should looks at other implementation :
+Once done, you'll create a `provider.go` file to contain your Terraform provider representation. Again you should look at other implementation:
+
 ```go
-// Define your actual provider representation, It is required to compose with terraform.TerraformProvider and to have a name and a version
-// Please note that the name should match the real terraform provider name.
+// Define your actual provider representation, it is required to compose with terraform.TerraformProvider, a name and a version
+// Please note that the name should match the real Terraform provider name.
 type AWSTerraformProvider struct {
 	*terraform.TerraformProvider
 	session *session.Session
@@ -77,7 +82,7 @@ func NewAWSTerraformProvider(version string, progress output.Progress, configDir
 		version: version,
 		name:    "aws",
 	}
-	// Use terraformproviderinstaller to retreive the provider if needed
+	// Use Terraform ProviderInstaller to retrieve the provider if needed
 	installer, err := tf.NewProviderInstaller(tf.ProviderConfig{
 		Key:       p.name,
 		Version:   version,
@@ -90,7 +95,7 @@ func NewAWSTerraformProvider(version string, progress output.Progress, configDir
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
-	// Config is dependant on the teraform provider needs.
+	// ProviderConfig is dependent on the Terraform provider needs.
 	tfProvider, err := terraform.NewTerraformProvider(installer, terraform.TerraformProviderConfig{
 		Name:         p.name,
 		DefaultAlias: *p.session.Config.Region,
@@ -117,7 +122,7 @@ func (p *AWSTerraformProvider) Version() string {
 }
 ```
 
-The config returned in `GetProviderConfig` should be annotated with `cty` tags to be passed to the provider.
+The configuration returned in `GetProviderConfig` should be annotated with `cty` tags to be passed to the provider.
 
 ```go
 type githubConfig struct {
@@ -127,15 +132,17 @@ type githubConfig struct {
 }
 ```
 
+You are now almost done. You'll need to make driftctl aware of this provider. Thus, the in `pkg/remote/remote.go` file, add your new constant in `supportedRemotes`:
 
-You are now almost done. You'll need to make driftctl aware of this provider so in `pkg/remote/remote.go` add your new constant in `supportedRemotes`:
 ```go
 var supportedRemotes = []string{
 	aws.RemoteAWSTerraform,
 	github.RemoteGithubTerraform,
 }
 ```
-And don't forget to modify the Activate function to be able to activate your new provider. You'll need to add a new case in the switch:
+
+Don't forget to modify the Activate function. You'll need to add a new case in the switch statement:
+
 ```go
 func Activate(remote, version string, alerter *alerter.Alerter,
 	providerLibrary *terraform.ProviderLibrary,
@@ -155,20 +162,23 @@ func Activate(remote, version string, alerter *alerter.Alerter,
 }
 ```
 
-Your provider is now set up !
+Your provider is now set up!
 
-## Prepare Driftctl to support new resources
+## Prepare driftctl to support new resources
 
-New resource for the just added provider will be located in `pkg/resource/<provider name>`. You should create this directory and the `metadata.go` file.
+Each new resource of the newly added provider will be located in `pkg/resource/<provider name>` directory. You need to create the latter and the `metadatas.go` file inside it.
+
 Inside this file add a new function:
+
 ```go
 func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
 }
 ```
 
-And add a call to it in the `remote/<provider>/init.go` you created at first step.
+Then, add a call to this function in the `remote/<provider>/init.go` file you created in the first step.
 
-You also need to create a test schema for upcoming test.
+You also need to create a test schema for upcoming tests.
+
 Please use `TestCreateNewSchema` located in `test/schemas/schemas_test.go` to generate a schema file that will be used for the mocked provider.
 
-Everything is now ready, you should [start adding new resources](new-resource.md) !
+Everything is now ready, you should [start adding new resources](new-resource.md)!

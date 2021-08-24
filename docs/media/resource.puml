@@ -1,16 +1,16 @@
 @startuml
-Driftctl -> Scanner: Resource()
+driftctl -> Scanner: Resource()
 hnote across: Enumeration phase
 Scanner -> Scanner: List Enumerators
 loop
 Scanner -> Enumerator: Enumerate()
-Enumerator -> RemoteSDK: List resource
+Enumerator -> RemoteSDK: List resources
 RemoteSDK --> Enumerator: []remoteRes
-alt optionaly retrive resource needed attributes
-Enumerator -> RemoteSDK: Retreive needed\nattributes
+alt optionally retrieve resource needed attributes
+Enumerator -> RemoteSDK: Retrieve needed attributes
 RemoteSDK --> Enumerator: Attrs
 end
-Enumerator --> Scanner: []Resource with\nlimited attributes
+Enumerator --> Scanner: []Resource with limited attributes
 end
 alt if deep mode enabled
 hnote across: Details fetching phase
@@ -23,5 +23,5 @@ Deserializer -> DetailsFetcher: Resource
 DetailsFetcher -> Scanner: Resource with\nfull attributes
 end
 end
-Scanner --> Driftctl: []Resource
+Scanner --> driftctl: []Resource
 @enduml

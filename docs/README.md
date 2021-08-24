@@ -16,5 +16,5 @@ Resource listing is done using cloud providers SDK. Resource details retrieval i
 
 - `Remote` is a representation of a cloud provider
 - `Resource` is an abstract representation of a cloud provider resource (e.g. S3 bucket, EC2 instance, etc ...)
-- `Enumerator` is used to list resources from a given type on a given remote and return a resource list, it should exist only one Enumerator per resource
-- `DetailFetcher` is used to retrieve details for resources from a given type, this is an optional layer and is used only in deep mode.
+- `Enumerator` is used to list resources of a given type from a given remote and return a resource list, it should exist only one Enumerator per resource
+- `DetailsFetcher` is used to retrieve resource's details of a given type, this is an optional layer and is used only in deep mode.
