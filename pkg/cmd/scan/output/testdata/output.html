@@ -380,26 +380,26 @@ input[type="search"], select {
     <section>
         <div class="card">
             <span>Total Resources:</span>
-            <span class="strong">13</span>
+            <span class="strong">15</span>
         </div>
         <div class="card">
             <span>Coverage:</span>
-            <span class="strong">15%</span>
+            <span class="strong">26%</span>
         </div>
         <div class="card">
             <span>Managed:</span>
-            <span class="strong">15.38%</span>
-            <span class="fraction">2/13</span>
+            <span class="strong">26.66%</span>
+            <span class="fraction">4/15</span>
         </div>
         <div class="card">
             <span>Unmanaged:</span>
-            <span class="strong">38.46%</span>
-            <span class="fraction">5/13</span>
+            <span class="strong">33.33%</span>
+            <span class="fraction">5/15</span>
         </div>
         <div class="card">
             <span>Missing:</span>
-            <span class="strong">46.15%</span>
-            <span class="fraction">6/13</span>
+            <span class="strong">40%</span>
+            <span class="fraction">6/15</span>
         </div>
     </section>
     <main>
@@ -407,8 +407,8 @@ input[type="search"], select {
         <form role="search">
             <label for="search" class="visuallyhidden">Search resources by id:</label>
             <input type="search" id="search" name="search" placeholder="Search resources by id...">
-            <label for="select" class="visuallyhidden">Select a resource type:</label>
-            <select id="select" name="select">
+            <label for="resource-type-select" class="visuallyhidden">Select a resource type:</label>
+            <select id="resource-type-select" name="resource-type-select">
                 <option value="">Select a resource type</option>
                 
                 <option value="aws_unmanaged_resource">aws_unmanaged_resource</option>
@@ -416,6 +416,15 @@ input[type="search"], select {
                 <option value="aws_deleted_resource">aws_deleted_resource</option>
                 
                 <option value="aws_diff_resource">aws_diff_resource</option>
+                
+            </select>
+            <label for="iac-source-select" class="visuallyhidden">Select an IaC source:</label>
+            <select id="iac-source-select" name="iac-source-select">
+                <option value="">Select an IaC source</option>
+                
+                <option value="tfstate://state.tfstate">tfstate://state.tfstate</option>
+                
+                <option value="tfstate&#43;s3://state2.tfstate">tfstate&#43;s3://state2.tfstate</option>
                 
             </select>
             <input type="reset" value="Reset Filters">
@@ -431,7 +440,7 @@ input[type="search"], select {
                 
                 <button type="button" role="tab" aria-selected="false" aria-controls="changed-tab" id="changed"
                         tabindex="-1">
-                    Changed Resources (<span data-count="resource-changed">2</span>)
+                    Changed Resources (<span data-count="resource-changed">3</span>)
                 </button>
                 
                 
@@ -497,15 +506,19 @@ input[type="search"], select {
                         <div role="rowgroup">
                             <div role="row" class="table-header">
                                 <span role="columnheader">Resource ID</span>
-                                <span role="columnheader">Resource Type</span>
+                                <span role="columnheader">IaC source</span>
                             </div>
                         </div>
                         <div role="rowgroup" class="table-body">
                             
                             <div role="row" data-kind="resource-changed" class="resource-item">
                                 <div class="row">
-                                    <span role="cell" data-type="resource-id">diff-id-1</span>
-                                    <span role="cell" data-type="resource-type">aws_diff_resource</span>
+                                    <span role="cell">
+                                        <span data-type="resource-id">diff-id-1</span>
+                                        (<span>module.aws_diff_resource.name</span>)
+                                        <span style="display:none;" data-type="resource-type">aws_diff_resource</span>
+                                    </span>
+                                    <span role="cell" data-type="resource-source">tfstate://state.tfstate</span>
                                 </div>
                                 <pre class="code-box">
                                     <code class="code-box-line">&emsp;~ updated.field: <span class="code-box-line-delete">"foobar"</span> => <span class="code-box-line-create">"barfoo"</span><br>&emsp;+ new.field: <span class="code-box-line-create">"newValue"</span><br>&emsp;- a: <span class="code-box-line-delete">"oldValue"</span><br></code>
@@ -514,8 +527,12 @@ input[type="search"], select {
                             
                             <div role="row" data-kind="resource-changed" class="resource-item">
                                 <div class="row">
-                                    <span role="cell" data-type="resource-id">diff-id-2</span>
-                                    <span role="cell" data-type="resource-type">aws_diff_resource</span>
+                                    <span role="cell">
+                                        <span data-type="resource-id">diff-id-2</span>
+                                        (<span>module.aws_diff_resource.diff-id-2</span>)
+                                        <span style="display:none;" data-type="resource-type">aws_diff_resource</span>
+                                    </span>
+                                    <span role="cell" data-type="resource-source">tfstate://state.tfstate</span>
                                 </div>
                                 <pre class="code-box">
                                     <code class="code-box-line">&emsp;- path.to.fields.[0]: <span class="code-box-line-delete">"value"</span><br>&emsp;~ path.to.fields.[1]: <span class="code-box-line-delete">12</span> => <span class="code-box-line-create">"12"</span><br>&emsp;- group_ids: <span class="code-box-line-delete">["a071314398026"]</span><br>&emsp;~ policy:<br>&emsp; {
@@ -549,6 +566,20 @@ input[type="search"], select {
 <span class="code-box-line-create">+  ]</span>
  }
 <br>&emsp;+ Tags.[0].Name: <span class="code-box-line-create">"test"</span><br>&emsp;~ InstanceInitiatedShutdownBehavior: <span class="code-box-line-delete">""</span> => <span class="code-box-line-create">null</span><br></code>
+                                </pre>
+                            </div>
+                            
+                            <div role="row" data-kind="resource-changed" class="resource-item">
+                                <div class="row">
+                                    <span role="cell">
+                                        <span data-type="resource-id">diff-id-3</span>
+                                        (<span>aws_diff_resource.b</span>)
+                                        <span style="display:none;" data-type="resource-type">aws_diff_resource</span>
+                                    </span>
+                                    <span role="cell" data-type="resource-source">tfstate&#43;s3://state2.tfstate</span>
+                                </div>
+                                <pre class="code-box">
+                                    <code class="code-box-line">&emsp;~ InstanceInitiatedShutdownBehavior: <span class="code-box-line-delete">""</span> => <span class="code-box-line-create">null</span><br></code>
                                 </pre>
                             </div>
                             
@@ -646,11 +677,13 @@ input[type="search"], select {
 
     const resources = document.querySelectorAll("[data-kind^='resource-']");
     const searchInput = document.querySelector('[type="search"]');
-    const selectBox = document.querySelector("select");
+    const resourceTypeSelectBox = document.querySelector("#resource-type-select");
+    const iacSourceSelectBox = document.querySelector("#iac-source-select");
     const resetButton = document.querySelector('[type="reset"]');
 
     searchInput.addEventListener("input", filterResources);
-    selectBox.addEventListener("input", filterResources);
+    resourceTypeSelectBox.addEventListener("input", filterResources);
+    iacSourceSelectBox.addEventListener("input", filterResources);
     resetButton.addEventListener("click", resetResources);
 
     function refreshPanel(count, el) {
@@ -710,13 +743,26 @@ input[type="search"], select {
         return el.innerText === type;
     }
 
+    function resourceSourceEquals(res, source) {
+        if (source === "") {
+            return true;
+        }
+        const el = res.querySelector("[data-type='resource-source']");
+        if (!el) {
+            return false;
+        }
+        return el.innerText === source;
+    }
+
     function filterResources() {
         const id = searchInput.value;
-        const type = selectBox.value;
+        const type = resourceTypeSelectBox.value;
+        const source = iacSourceSelectBox.value;
         for (const res of resources) {
             const matchId = resourceIdContains(res, id);
             const matchType = resourceTypeEquals(res, type);
-            if (matchId && matchType) {
+            const matchSource = resourceSourceEquals(res, source);
+            if (matchId && matchType && matchSource) {
                 res.classList.remove("is-hidden");
             } else {
                 res.classList.add("is-hidden");

@@ -96,6 +96,13 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 
 			return distinctResourceTypes(resources)
 		},
+		"getIaCSources": func() []string {
+			resources := make([]*resource.Resource, 0)
+			resources = append(resources, analysis.Deleted()...)
+			resources = append(resources, analysis.Managed()...)
+
+			return distinctIaCSources(resources)
+		},
 		"rate": func(count int) float64 {
 			if analysis.Summary().TotalResources == 0 {
 				return 0
@@ -184,6 +191,29 @@ func distinctResourceTypes(resources []*resource.Resource) []string {
 		}
 		if !found {
 			types = append(types, res.ResourceType())
+		}
+	}
+
+	return types
+}
+
+func distinctIaCSources(resources []*resource.Resource) []string {
+	types := make([]string, 0)
+
+	for _, res := range resources {
+		if res.Src() == nil {
+			continue
+		}
+
+		found := false
+		for _, v := range types {
+			if v == res.Src().Source() {
+				found = true
+				break
+			}
+		}
+		if !found {
+			types = append(types, res.Src().Source())
 		}
 	}
 

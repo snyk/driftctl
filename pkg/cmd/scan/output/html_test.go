@@ -60,6 +60,25 @@ func TestHTML_Write(t *testing.T) {
 				a := fakeAnalysisWithAlerts()
 				a.Date = time.Date(2021, 06, 10, 0, 0, 0, 0, &time.Location{})
 				a.Duration = 91 * time.Second
+				a.AddManaged(
+					&resource.Resource{
+						Id:   "diff-id-2",
+						Type: "aws_diff_resource",
+						Source: &resource.TerraformStateSource{
+							State:  "tfstate://state.tfstate",
+							Name:   "diff-id-2",
+							Module: "module",
+						},
+					},
+					&resource.Resource{
+						Id:   "diff-id-3",
+						Type: "aws_diff_resource",
+						Source: &resource.TerraformStateSource{
+							State: "tfstate+s3://state2.tfstate",
+							Name:  "b",
+						},
+					},
+				)
 				a.AddDeleted(
 					&resource.Resource{
 						Id:   "deleted-id-3",
@@ -98,8 +117,8 @@ func TestHTML_Write(t *testing.T) {
 						Type: "aws_diff_resource",
 						Source: &resource.TerraformStateSource{
 							State:  "tfstate://state.tfstate",
+							Name:   "diff-id-2",
 							Module: "module",
-							Name:   "name",
 						},
 					}, Changelog: []analyser.Change{
 						{
@@ -152,6 +171,24 @@ func TestHTML_Write(t *testing.T) {
 							},
 						},
 					}})
+				a.AddDifference(analyser.Difference{
+					Res: &resource.Resource{
+						Id:   "diff-id-3",
+						Type: "aws_diff_resource",
+						Source: &resource.TerraformStateSource{
+							State: "tfstate+s3://state2.tfstate",
+							Name:  "b",
+						},
+					}, Changelog: []analyser.Change{
+						{
+							Change: diff.Change{
+								Type: diff.UPDATE,
+								Path: []string{"InstanceInitiatedShutdownBehavior"},
+								From: "",
+								To:   nil,
+							},
+						},
+					}})
 				a.ProviderName = "AWS"
 				a.ProviderVersion = "3.19.0"
 				return a
@@ -169,6 +206,11 @@ func TestHTML_Write(t *testing.T) {
 					&resource.Resource{
 						Id:   "resource-id-1",
 						Type: "aws_resource",
+						Source: &resource.TerraformStateSource{
+							State:  "tfstate://state.tfstate",
+							Module: "module",
+							Name:   "name",
+						},
 					},
 				)
 				a.AddDifference(analyser.Difference{
@@ -277,6 +319,72 @@ func TestHTML_DistinctResourceTypes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := distinctResourceTypes(tt.resources)
+			assert.Equal(t, tt.value, got)
+		})
+	}
+}
+
+func TestHTML_DistinctIaCSources(t *testing.T) {
+	tests := []struct {
+		name      string
+		resources []*resource.Resource
+		value     []string
+	}{
+		{
+			name:      "test empty array",
+			resources: []*resource.Resource{},
+			value:     []string{},
+		},
+		{
+			name: "test empty array",
+			resources: []*resource.Resource{
+				{
+					Id:   "deleted-id-1",
+					Type: "aws_deleted_resource",
+					Source: &resource.TerraformStateSource{
+						Module: "module",
+						Name:   "test",
+						State:  "tfstate://terraform.tfstate",
+					},
+				},
+				{
+					Id:   "unmanaged-id-1",
+					Type: "aws_unmanaged_resource",
+					Source: &resource.TerraformStateSource{
+						Module: "module",
+						Name:   "test",
+						State:  "tfstate://terraform2.tfstate",
+					},
+				},
+				{
+					Id:   "unmanaged-id-2",
+					Type: "aws_unmanaged_resource",
+					Source: &resource.TerraformStateSource{
+						Module: "module",
+						Name:   "test",
+						State:  "tfstate+s3://test/terraform.tfstate",
+					},
+				},
+				{
+					Id:   "diff-id-1",
+					Type: "aws_diff_resource",
+					Source: &resource.TerraformStateSource{
+						Module: "module",
+						Name:   "test",
+						State:  "tfstate://terraform.tfstate",
+					},
+				},
+				{
+					Id:   "deleted-id-2",
+					Type: "aws_deleted_resource",
+				},
+			},
+			value: []string{"tfstate://terraform.tfstate", "tfstate://terraform2.tfstate", "tfstate+s3://test/terraform.tfstate"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := distinctIaCSources(tt.resources)
 			assert.Equal(t, tt.value, got)
 		})
 	}
