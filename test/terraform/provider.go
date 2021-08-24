@@ -5,6 +5,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
+	"github.com/cloudskiff/driftctl/pkg/remote/azurerm"
 	"github.com/cloudskiff/driftctl/pkg/remote/github"
 	"github.com/cloudskiff/driftctl/pkg/remote/google"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -41,6 +42,18 @@ func InitTestGoogleProvider(providerLibrary *terraform.ProviderLibrary, version 
 		return nil, err
 	}
 	providerLibrary.AddProvider(terraform.GOOGLE, provider)
+
+	return provider, nil
+}
+
+func InitTestAzureProvider(providerLibrary *terraform.ProviderLibrary, version string) (*azurerm.AzureTerraformProvider, error) {
+	progress := &output.MockProgress{}
+	progress.On("Inc").Maybe().Return()
+	provider, err := azurerm.NewAzureTerraformProvider(version, progress, "")
+	if err != nil {
+		return nil, err
+	}
+	providerLibrary.AddProvider(terraform.AZURE, provider)
 
 	return provider, nil
 }
