@@ -23,7 +23,7 @@ func (m VPCSecurityGroupRuleSanitizer) Execute(remoteResources, resourcesFromSta
 
 	for _, stateResource := range *resourcesFromState {
 		// Ignore all resources other than security group rule
-		if stateResource.TerraformType() != resourceaws.AwsSecurityGroupRuleResourceType {
+		if stateResource.ResourceType() != resourceaws.AwsSecurityGroupRuleResourceType {
 			newStateResources = append(newStateResources, stateResource)
 			continue
 		}
@@ -46,8 +46,8 @@ func (m VPCSecurityGroupRuleSanitizer) Execute(remoteResources, resourcesFromSta
 				_ = attrs.SafeSet([]string{"prefix_list_ids"}, []interface{}{})
 				res := m.createRule(attrs)
 				logrus.WithFields(logrus.Fields{
-					"formerRuleId": stateResource.TerraformId(),
-					"newRuleId":    res.TerraformId(),
+					"formerRuleId": stateResource.ResourceId(),
+					"newRuleId":    res.ResourceId(),
 				}).Debug("Splitting aws_security_group_rule")
 				res.Attrs.SafeDelete([]string{"self"})
 				newStateResources = append(newStateResources, res)
@@ -62,8 +62,8 @@ func (m VPCSecurityGroupRuleSanitizer) Execute(remoteResources, resourcesFromSta
 				_ = attrs.SafeSet([]string{"prefix_list_ids"}, []interface{}{})
 				res := m.createRule(attrs)
 				logrus.WithFields(logrus.Fields{
-					"formerRuleId": stateResource.TerraformId(),
-					"newRuleId":    res.TerraformId(),
+					"formerRuleId": stateResource.ResourceId(),
+					"newRuleId":    res.ResourceId(),
 				}).Debug("Splitting aws_security_group_rule")
 				res.Attrs.SafeDelete([]string{"self"})
 				newStateResources = append(newStateResources, res)
@@ -78,8 +78,8 @@ func (m VPCSecurityGroupRuleSanitizer) Execute(remoteResources, resourcesFromSta
 				_ = attrs.SafeSet([]string{"prefix_list_ids"}, []interface{}{listId})
 				res := m.createRule(attrs)
 				logrus.WithFields(logrus.Fields{
-					"formerRuleId": stateResource.TerraformId(),
-					"newRuleId":    res.TerraformId(),
+					"formerRuleId": stateResource.ResourceId(),
+					"newRuleId":    res.ResourceId(),
 				}).Debug("Splitting aws_security_group_rule")
 				res.Attrs.SafeDelete([]string{"self"})
 				newStateResources = append(newStateResources, res)
@@ -94,8 +94,8 @@ func (m VPCSecurityGroupRuleSanitizer) Execute(remoteResources, resourcesFromSta
 			_ = attrs.SafeSet([]string{"prefix_list_ids"}, []interface{}{})
 			res := m.createRule(attrs)
 			logrus.WithFields(logrus.Fields{
-				"formerRuleId": stateResource.TerraformId(),
-				"newRuleId":    res.TerraformId(),
+				"formerRuleId": stateResource.ResourceId(),
+				"newRuleId":    res.ResourceId(),
 			}).Debug("Splitting aws_security_group_rule")
 			res.Attrs.SafeDelete([]string{"self"})
 			newStateResources = append(newStateResources, res)
@@ -105,7 +105,7 @@ func (m VPCSecurityGroupRuleSanitizer) Execute(remoteResources, resourcesFromSta
 	*resourcesFromState = newStateResources
 
 	for _, res := range *remoteResources {
-		if res.TerraformType() != resourceaws.AwsSecurityGroupRuleResourceType {
+		if res.ResourceType() != resourceaws.AwsSecurityGroupRuleResourceType {
 			continue
 		}
 		res.Attrs.SafeDelete([]string{"self"})

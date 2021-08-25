@@ -22,14 +22,14 @@ func (m AwsBucketPolicyExpander) Execute(_, resourcesFromState *[]*resource.Reso
 	newList := make([]*resource.Resource, 0)
 	for _, res := range *resourcesFromState {
 		// Ignore all resources other than s3_bucket
-		if res.TerraformType() != aws.AwsS3BucketResourceType {
+		if res.ResourceType() != aws.AwsS3BucketResourceType {
 			newList = append(newList, res)
 			continue
 		}
 
 		newList = append(newList, res)
 
-		if hasPolicyAttached(res.TerraformId(), resourcesFromState) {
+		if hasPolicyAttached(res.ResourceId(), resourcesFromState) {
 			res.Attrs.SafeDelete([]string{"policy"})
 			continue
 		}
@@ -50,16 +50,16 @@ func (m *AwsBucketPolicyExpander) handlePolicy(bucket *resource.Resource, result
 	}
 
 	data := map[string]interface{}{
-		"id":     bucket.TerraformId(),
+		"id":     bucket.ResourceId(),
 		"bucket": (*bucket.Attrs)["bucket"],
 		"policy": (*bucket.Attrs)["policy"],
 	}
 
-	newPolicy := m.resourceFactory.CreateAbstractResource(aws.AwsS3BucketPolicyResourceType, bucket.TerraformId(), data)
+	newPolicy := m.resourceFactory.CreateAbstractResource(aws.AwsS3BucketPolicyResourceType, bucket.ResourceId(), data)
 
 	*results = append(*results, newPolicy)
 	logrus.WithFields(logrus.Fields{
-		"id": newPolicy.TerraformId(),
+		"id": newPolicy.ResourceId(),
 	}).Debug("Created new policy from bucket")
 
 	bucket.Attrs.SafeDelete([]string{"policy"})
@@ -72,8 +72,8 @@ func (m *AwsBucketPolicyExpander) handlePolicy(bucket *resource.Resource, result
 // the aws_bucket_policy will be used.
 func hasPolicyAttached(bucket string, resourcesFromState *[]*resource.Resource) bool {
 	for _, res := range *resourcesFromState {
-		if res.TerraformType() == aws.AwsS3BucketPolicyResourceType &&
-			res.TerraformId() == bucket {
+		if res.ResourceType() == aws.AwsS3BucketPolicyResourceType &&
+			res.ResourceId() == bucket {
 			return true
 		}
 	}

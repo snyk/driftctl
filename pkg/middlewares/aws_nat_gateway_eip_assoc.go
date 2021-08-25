@@ -21,7 +21,7 @@ func (a AwsNatGatewayEipAssoc) Execute(remoteResources, resourcesFromState *[]*r
 
 	for _, remoteResource := range *remoteResources {
 		// Ignore all resources other than aws_eip_association
-		if remoteResource.TerraformType() != aws.AwsEipAssociationResourceType {
+		if remoteResource.ResourceType() != aws.AwsEipAssociationResourceType {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
@@ -30,7 +30,7 @@ func (a AwsNatGatewayEipAssoc) Execute(remoteResources, resourcesFromState *[]*r
 
 		// Search for a nat gateway associated with our EIP
 		for _, res := range *remoteResources {
-			if res.TerraformType() == aws.AwsNatGatewayResourceType {
+			if res.ResourceType() == aws.AwsNatGatewayResourceType {
 				allocationId, allocationIdExist := res.Attrs.Get("allocation_id")
 				eipAssocAllocId, eipAssocAllocIdExist := remoteResource.Attrs.Get("allocation_id")
 				if allocationIdExist && eipAssocAllocIdExist &&
@@ -43,8 +43,8 @@ func (a AwsNatGatewayEipAssoc) Execute(remoteResources, resourcesFromState *[]*r
 
 		if isAssociatedToNatGateway {
 			logrus.WithFields(logrus.Fields{
-				"id":   remoteResource.TerraformId(),
-				"type": remoteResource.TerraformType(),
+				"id":   remoteResource.ResourceId(),
+				"type": remoteResource.ResourceType(),
 			}).Debug("Ignoring aws_eip_association as it is associated to a nat gateway")
 			continue
 		}

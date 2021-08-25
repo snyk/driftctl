@@ -24,7 +24,7 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 	for _, stateRes := range *resourcesFromState {
 
 		// Ignore all resources other than aws_instance
-		if stateRes.TerraformType() != aws.AwsInstanceResourceType {
+		if stateRes.ResourceType() != aws.AwsInstanceResourceType {
 			newStateResources = append(newStateResources, stateRes)
 			continue
 		}
@@ -34,7 +34,7 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 				rootBlock := rootBlock.(map[string]interface{})
 				logrus.WithFields(logrus.Fields{
 					"volume":   rootBlock["volume_id"],
-					"instance": stateRes.TerraformId(),
+					"instance": stateRes.ResourceId(),
 				}).Debug("Creating aws_ebs_volume from aws_instance.root_block_device")
 				data := map[string]interface{}{
 					"availability_zone":    (*stateRes.Attrs)["availability_zone"],
@@ -65,7 +65,7 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 				}
 				logrus.WithFields(logrus.Fields{
 					"volume":   blockDevice["volume_id"],
-					"instance": stateRes.TerraformId(),
+					"instance": stateRes.ResourceId(),
 				}).Debug("Creating aws_ebs_volume from aws_instance.ebs_block_device")
 				data := map[string]interface{}{
 					"availability_zone":    (*stateRes.Attrs)["availability_zone"],
@@ -92,7 +92,7 @@ func (a AwsInstanceBlockDeviceResourceMapper) Execute(remoteResources, resources
 
 	newRemoteResources := make([]*resource.Resource, 0)
 	for _, remoteRes := range *remoteResources {
-		if remoteRes.TerraformType() != aws.AwsInstanceResourceType {
+		if remoteRes.ResourceType() != aws.AwsInstanceResourceType {
 			newRemoteResources = append(newRemoteResources, remoteRes)
 			continue
 		}
@@ -117,8 +117,8 @@ func (a AwsInstanceBlockDeviceResourceMapper) volumeTags(instance *resource.Reso
 
 func (a AwsInstanceBlockDeviceResourceMapper) hasBlockDevice(blockDevice map[string]interface{}, resourcesFromState *[]*resource.Resource) bool {
 	for _, stateRes := range *resourcesFromState {
-		if stateRes.TerraformType() == aws.AwsEbsVolumeResourceType &&
-			stateRes.TerraformId() == blockDevice["volume_id"] {
+		if stateRes.ResourceType() == aws.AwsEbsVolumeResourceType &&
+			stateRes.ResourceId() == blockDevice["volume_id"] {
 			return true
 		}
 	}

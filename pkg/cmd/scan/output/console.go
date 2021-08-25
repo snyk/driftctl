@@ -40,7 +40,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 		for _, ty := range keys {
 			fmt.Printf("  %s:\n", ty)
 			for _, res := range deletedByType[ty] {
-				humanString := fmt.Sprintf("    - %s", res.TerraformId())
+				humanString := fmt.Sprintf("    - %s", res.ResourceId())
 				if humanAttrs := formatResourceAttributes(res); humanAttrs != "" {
 					humanString += fmt.Sprintf("\n        %s", humanAttrs)
 				}
@@ -55,7 +55,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 		for _, ty := range keys {
 			fmt.Printf("  %s:\n", ty)
 			for _, res := range unmanagedByType[ty] {
-				humanString := fmt.Sprintf("    - %s", res.TerraformId())
+				humanString := fmt.Sprintf("    - %s", res.ResourceId())
 				if humanAttrs := formatResourceAttributes(res); humanAttrs != "" {
 					humanString += fmt.Sprintf("\n        %s", humanAttrs)
 				}
@@ -80,7 +80,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 		for source, differences := range groupedBySource {
 			fmt.Print(color.BlueString("  From %s\n", source))
 			for _, difference := range differences {
-				humanString := fmt.Sprintf("    - %s (%s):", difference.Res.TerraformId(), difference.Res.SourceString())
+				humanString := fmt.Sprintf("    - %s (%s):", difference.Res.ResourceId(), difference.Res.SourceString())
 				whiteSpace := "        "
 				if humanAttrs := formatResourceAttributes(difference.Res); humanAttrs != "" {
 					humanString += fmt.Sprintf("\n        %s", humanAttrs)
@@ -191,11 +191,11 @@ func prettify(resource interface{}) string {
 func groupByType(resources []*resource.Resource) (map[string][]*resource.Resource, []string) {
 	result := map[string][]*resource.Resource{}
 	for _, res := range resources {
-		if result[res.TerraformType()] == nil {
-			result[res.TerraformType()] = []*resource.Resource{res}
+		if result[res.ResourceType()] == nil {
+			result[res.ResourceType()] = []*resource.Resource{res}
 			continue
 		}
-		result[res.TerraformType()] = append(result[res.TerraformType()], res)
+		result[res.ResourceType()] = append(result[res.ResourceType()], res)
 	}
 
 	keys := make([]string, 0, len(result))

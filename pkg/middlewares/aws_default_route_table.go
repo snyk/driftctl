@@ -22,7 +22,7 @@ func (m AwsDefaultRouteTable) Execute(remoteResources, resourcesFromState *[]*re
 		existInState := false
 
 		// Ignore all resources other than default RouteTable
-		if remoteResource.TerraformType() != aws.AwsDefaultRouteTableResourceType {
+		if remoteResource.ResourceType() != aws.AwsDefaultRouteTableResourceType {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
@@ -40,8 +40,8 @@ func (m AwsDefaultRouteTable) Execute(remoteResources, resourcesFromState *[]*re
 
 		if !existInState {
 			logrus.WithFields(logrus.Fields{
-				"id":   remoteResource.TerraformId(),
-				"type": remoteResource.TerraformType(),
+				"id":   remoteResource.ResourceId(),
+				"type": remoteResource.ResourceType(),
 			}).Debug("Ignoring default route table as it is not managed by IaC")
 		}
 

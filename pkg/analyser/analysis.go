@@ -226,7 +226,7 @@ func (a *Analysis) DriftIgnoreList(opts GenDriftIgnoreOptions) (int, string) {
 
 	addResources := func(res ...*resource.Resource) {
 		for _, r := range res {
-			list = append(list, fmt.Sprintf("%s.%s", r.TerraformType(), escapeKey(r.TerraformId())))
+			list = append(list, fmt.Sprintf("%s.%s", r.ResourceType(), escapeKey(r.ResourceId())))
 		}
 		resourceCount += len(res)
 	}
@@ -255,10 +255,10 @@ func (a *Analysis) DriftIgnoreList(opts GenDriftIgnoreOptions) (int, string) {
 
 func SortDifferences(diffs []Difference) []Difference {
 	sort.SliceStable(diffs, func(i, j int) bool {
-		if diffs[i].Res.TerraformType() != diffs[j].Res.TerraformType() {
-			return diffs[i].Res.TerraformType() < diffs[j].Res.TerraformType()
+		if diffs[i].Res.ResourceType() != diffs[j].Res.ResourceType() {
+			return diffs[i].Res.ResourceType() < diffs[j].Res.ResourceType()
 		}
-		return diffs[i].Res.TerraformId() < diffs[j].Res.TerraformId()
+		return diffs[i].Res.ResourceId() < diffs[j].Res.ResourceId()
 	})
 
 	for _, d := range diffs {

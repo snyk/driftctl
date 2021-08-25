@@ -69,7 +69,7 @@ func TestAwsDefaults_Execute(t *testing.T) {
 			func(t *testing.T, remoteResources, resourcesFromState []*resource.Resource) {
 				assert.Len(t, remoteResources, 3)
 				for _, remoteResource := range remoteResources {
-					if remoteResource.TerraformId() == "AWSServiceRoleForSSO" {
+					if remoteResource.ResourceId() == "AWSServiceRoleForSSO" {
 						t.Fatal("AWSServiceRoleForSSO should have been ignored")
 					}
 				}
@@ -186,12 +186,12 @@ func TestAwsDefaults_Execute(t *testing.T) {
 			func(t *testing.T, remoteResources, resourcesFromState []*resource.Resource) {
 				assert.Len(t, remoteResources, 3)
 				for _, remoteResource := range remoteResources {
-					if remoteResource.TerraformId() == "AWSServiceRoleForSSO" &&
-						remoteResource.TerraformType() == aws.AwsIamRoleResourceType {
+					if remoteResource.ResourceId() == "AWSServiceRoleForSSO" &&
+						remoteResource.ResourceType() == aws.AwsIamRoleResourceType {
 						t.Fatal("AWSServiceRoleForSSO role should have been ignored")
 					}
-					if remoteResource.TerraformId() == "AWSServiceRoleForSSO" &&
-						remoteResource.TerraformType() == aws.AwsIamRolePolicyResourceType {
+					if remoteResource.ResourceId() == "AWSServiceRoleForSSO" &&
+						remoteResource.ResourceType() == aws.AwsIamRolePolicyResourceType {
 						t.Fatal("AWSServiceRoleForSSO policy should have been ignored")
 					}
 				}
@@ -243,12 +243,12 @@ func TestAwsDefaults_Execute(t *testing.T) {
 			func(t *testing.T, remoteResources, resourcesFromState []*resource.Resource) {
 				assert.Len(t, remoteResources, 2)
 				for _, remoteResource := range remoteResources {
-					if remoteResource.TerraformId() == "OrganizationAccountAccessRole" &&
-						remoteResource.TerraformType() == aws.AwsIamRoleResourceType {
+					if remoteResource.ResourceId() == "OrganizationAccountAccessRole" &&
+						remoteResource.ResourceType() == aws.AwsIamRoleResourceType {
 						t.Fatal("OrganizationAccountAccessRole role should have been ignored")
 					}
-					if remoteResource.TerraformId() == "OrganizationAccountAccessRole:AdministratorAccess" &&
-						remoteResource.TerraformType() == aws.AwsIamRolePolicyResourceType {
+					if remoteResource.ResourceId() == "OrganizationAccountAccessRole:AdministratorAccess" &&
+						remoteResource.ResourceType() == aws.AwsIamRolePolicyResourceType {
 						t.Fatal("OrganizationAccountAccessRole:AdministratorAccess policy should have been ignored")
 					}
 				}

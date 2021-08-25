@@ -32,16 +32,16 @@ func (f *GenericDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.R
 	}
 	ctyVal, err := f.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty:         f.resType,
-		ID:         res.TerraformId(),
+		ID:         res.ResourceId(),
 		Attributes: attributes,
 	})
 	if err != nil {
-		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
+		return nil, remoteerror.NewResourceScanningError(err, res.ResourceType(), res.ResourceId())
 	}
 	if ctyVal.IsNull() {
 		logrus.WithFields(logrus.Fields{
 			"type": f.resType,
-			"id":   res.TerraformId(),
+			"id":   res.ResourceId(),
 		}).Debug("Got null while reading resource details")
 		return nil, nil
 	}
