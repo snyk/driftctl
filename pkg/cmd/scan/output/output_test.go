@@ -17,43 +17,42 @@ import (
 func fakeAnalysis() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddUnmanaged(
-		&resource.Resource{
-			Id:   "unmanaged-id-1",
-			Type: "aws_unmanaged_resource",
-		},
-		&resource.Resource{
-			Id:   "unmanaged-id-2",
-			Type: "aws_unmanaged_resource",
-		},
+		resource.NewResource(
+			"unmanaged-id-1",
+			"aws_unmanaged_resource",
+		),
+		resource.NewResource(
+			"unmanaged-id-2",
+			"aws_unmanaged_resource",
+		),
 	)
 	a.AddDeleted(
-		&resource.Resource{
-			Id:   "deleted-id-1",
-			Type: "aws_deleted_resource",
-		}, &resource.Resource{
-			Id:   "deleted-id-2",
-			Type: "aws_deleted_resource",
-		},
+		resource.NewResource(
+			"deleted-id-1",
+			"aws_deleted_resource",
+		),
+		resource.NewResource(
+			"deleted-id-2",
+			"aws_deleted_resource",
+		),
 	)
 	a.AddManaged(
-		&resource.Resource{
-			Id:   "diff-id-1",
-			Type: "aws_diff_resource",
-		},
-		&resource.Resource{
-			Id:   "no-diff-id-1",
-			Type: "aws_no_diff_resource",
-		},
+		resource.NewResource(
+			"diff-id-1",
+			"aws_diff_resource",
+		),
+		resource.NewResource(
+			"no-diff-id-1",
+			"aws_no_diff_resource",
+		),
 	)
-	a.AddDifference(analyser.Difference{Res: &resource.Resource{
-		Id:   "diff-id-1",
-		Type: "aws_diff_resource",
-		Source: &resource.TerraformStateSource{
-			State:  "tfstate://state.tfstate",
-			Module: "module",
-			Name:   "name",
-		},
-	},
+	a.AddDifference(analyser.Difference{Res: resource.NewResource(
+		"diff-id-1",
+		"aws_diff_resource").SetSource(&resource.TerraformStateSource{
+		State:  "tfstate://state.tfstate",
+		Module: "module",
+		Name:   "name",
+	}),
 		Changelog: []analyser.Change{
 			{
 				Change: diff.Change{
@@ -101,10 +100,10 @@ func fakeAnalysisWithAlerts() *analyser.Analysis {
 func fakeAnalysisNoDrift() *analyser.Analysis {
 	a := analyser.Analysis{}
 	for i := 0; i < 5; i++ {
-		a.AddManaged(&resource.Resource{
-			Id:   "managed-id-" + fmt.Sprintf("%d", i),
-			Type: "aws_managed_resource",
-		})
+		a.AddManaged(resource.NewResource(
+			"managed-id-"+fmt.Sprintf("%d", i),
+			"aws_managed_resource",
+		))
 	}
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
@@ -114,27 +113,25 @@ func fakeAnalysisNoDrift() *analyser.Analysis {
 func fakeAnalysisWithJsonFields() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddManaged(
-		&resource.Resource{
-			Id:   "diff-id-1",
-			Type: "aws_diff_resource",
-		},
+		resource.NewResource(
+			"diff-id-1",
+			"aws_diff_resource",
+		),
 	)
 	a.AddManaged(
-		&resource.Resource{
-			Id:   "diff-id-2",
-			Type: "aws_diff_resource",
-		},
+		resource.NewResource(
+			"diff-id-2",
+			"aws_diff_resource",
+		),
 	)
 	a.AddDifference(analyser.Difference{
-		Res: &resource.Resource{
-			Id:   "diff-id-1",
-			Type: "aws_diff_resource",
-			Source: &resource.TerraformStateSource{
-				State:  "tfstate://state.tfstate",
-				Module: "module",
-				Name:   "name",
-			},
-		},
+		Res: resource.NewResource(
+			"diff-id-1",
+			"aws_diff_resource").SetSource(&resource.TerraformStateSource{
+			State:  "tfstate://state.tfstate",
+			Module: "module",
+			Name:   "name",
+		}),
 		Changelog: []analyser.Change{
 			{
 				JsonString: true,
@@ -147,15 +144,13 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 			},
 		}})
 	a.AddDifference(analyser.Difference{
-		Res: &resource.Resource{
-			Id:   "diff-id-2",
-			Type: "aws_diff_resource",
-			Source: &resource.TerraformStateSource{
-				State:  "tfstate://state.tfstate",
-				Module: "module",
-				Name:   "name",
-			},
-		},
+		Res: resource.NewResource(
+			"diff-id-2",
+			"aws_diff_resource").SetSource(&resource.TerraformStateSource{
+			State:  "tfstate://state.tfstate",
+			Module: "module",
+			Name:   "name",
+		}),
 		Changelog: []analyser.Change{
 			{
 				JsonString: true,
@@ -175,25 +170,22 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddDeleted(
-		&resource.Resource{
-			Id:    "dfjkgnbsgj",
-			Type:  "FakeResourceStringer",
-			Attrs: &resource.Attributes{},
-		},
+		resource.NewResource(
+			"dfjkgnbsgj",
+			"FakeResourceStringer",
+		).SetAttributes(&resource.Attributes{}),
 	)
 	a.AddManaged(
-		&resource.Resource{
-			Id:    "usqyfsdbgjsdgjkdfg",
-			Type:  "FakeResourceStringer",
-			Attrs: &resource.Attributes{},
-		},
+		resource.NewResource(
+			"usqyfsdbgjsdgjkdfg",
+			"FakeResourceStringer",
+		).SetAttributes(&resource.Attributes{}),
 	)
 	a.AddUnmanaged(
-		&resource.Resource{
-			Id:    "duysgkfdjfdgfhd",
-			Type:  "FakeResourceStringer",
-			Attrs: &resource.Attributes{},
-		},
+		resource.NewResource(
+			"duysgkfdjfdgfhd",
+			"FakeResourceStringer",
+		).SetAttributes(&resource.Attributes{}),
 	)
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
@@ -208,57 +200,52 @@ func fakeAnalysisWithStringerResources() *analyser.Analysis {
 		}
 	}}
 	a.AddDeleted(
-		&resource.Resource{
-			Id:   "dfjkgnbsgj",
-			Type: "FakeResourceStringer",
-			Sch:  schema,
-			Attrs: &resource.Attributes{
-				"name": "deleted resource",
-			},
-		},
+		resource.NewResource(
+			"dfjkgnbsgj",
+			"FakeResourceStringer").SetAttributes(&resource.Attributes{
+			"name": "deleted resource",
+		}).SetSchema(schema),
 	)
 	a.AddManaged(
-		&resource.Resource{
-			Id:   "usqyfsdbgjsdgjkdfg",
-			Type: "FakeResourceStringer",
-			Sch:  schema,
-			Attrs: &resource.Attributes{
-				"name": "managed resource",
-			},
-		},
+		resource.NewResource(
+			"usqyfsdbgjsdgjkdfg",
+			"FakeResourceStringer",
+		).SetAttributes(&resource.Attributes{
+			"name": "managed resource",
+		}).SetSchema(schema),
 	)
 	a.AddUnmanaged(
-		&resource.Resource{
-			Id:   "duysgkfdjfdgfhd",
-			Type: "FakeResourceStringer",
-			Sch:  schema,
-			Attrs: &resource.Attributes{
-				"name": "unmanaged resource",
-			},
-		},
+		resource.NewResource(
+			"duysgkfdjfdgfhd",
+			"FakeResourceStringer",
+		).SetAttributes(&resource.Attributes{
+			"name": "unmanaged resource",
+		}).SetSchema(schema),
 	)
-	a.AddDifference(analyser.Difference{Res: &resource.Resource{
-		Id:   "gdsfhgkbn",
-		Type: "FakeResourceStringer",
-		Sch:  schema,
-		Attrs: &resource.Attributes{
-			"name": "resource with diff",
-		},
-		Source: &resource.TerraformStateSource{
-			State:  "tfstate://state.tfstate",
-			Module: "module",
-			Name:   "name",
-		},
-	}, Changelog: []analyser.Change{
-		{
-			Change: diff.Change{
-				Type: diff.UPDATE,
-				Path: []string{"Name"},
-				From: "",
-				To:   "resource with diff",
+	a.AddDifference(analyser.Difference{
+		Res: resource.NewResource(
+			"gdsfhgkbn",
+			"FakeResourceStringer",
+		).
+			SetAttributes(&resource.Attributes{
+				"name": "resource with diff",
+			}).
+			SetSchema(schema).
+			SetSource(&resource.TerraformStateSource{
+				State:  "tfstate://state.tfstate",
+				Module: "module",
+				Name:   "name",
+			}),
+		Changelog: []analyser.Change{
+			{
+				Change: diff.Change{
+					Type: diff.UPDATE,
+					Path: []string{"Name"},
+					From: "",
+					To:   "resource with diff",
+				},
 			},
-		},
-	}})
+		}})
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
 	return &a
@@ -267,21 +254,22 @@ func fakeAnalysisWithStringerResources() *analyser.Analysis {
 func fakeAnalysisWithComputedFields() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddManaged(
-		&resource.Resource{
-			Id:   "diff-id-1",
-			Type: "aws_diff_resource",
-		},
+		resource.NewResource(
+			"diff-id-1",
+			"aws_diff_resource",
+		),
 	)
 	a.AddDifference(analyser.Difference{
-		Res: &resource.Resource{
-			Id:   "diff-id-1",
-			Type: "aws_diff_resource",
-			Source: &resource.TerraformStateSource{
+		Res: resource.NewResource(
+			"diff-id-1",
+			"aws_diff_resource",
+		).
+			SetSource(&resource.TerraformStateSource{
 				State:  "tfstate://state.tfstate",
 				Module: "module",
 				Name:   "name",
-			},
-		}, Changelog: []analyser.Change{
+			}),
+		Changelog: []analyser.Change{
 			{
 				Change: diff.Change{
 					Type: diff.UPDATE,
@@ -335,7 +323,8 @@ func fakeAnalysisWithComputedFields() *analyser.Analysis {
 				},
 				Computed: true,
 			},
-		}})
+		},
+	})
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
 			analyser.NewComputedDiffAlert(),
@@ -376,36 +365,28 @@ func fakeAnalysisWithGithubEnumerationError() *analyser.Analysis {
 func fakeAnalysisForJSONPlan() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.AddUnmanaged(
-		&resource.Resource{
-			Id:   "unmanaged-id-1",
-			Type: "aws_unmanaged_resource",
-			Attrs: &resource.Attributes{
-				"name": "First unmanaged resource",
-			},
-		},
-		&resource.Resource{
-			Id:   "unmanaged-id-2",
-			Type: "aws_unmanaged_resource",
-			Attrs: &resource.Attributes{
-				"name": "Second unmanaged resource",
-			},
-		},
+		resource.NewResource(
+			"unmanaged-id-1",
+			"aws_unmanaged_resource").SetAttributes(&resource.Attributes{
+			"name": "First unmanaged resource",
+		}),
+		resource.NewResource(
+			"unmanaged-id-2",
+			"aws_unmanaged_resource").SetAttributes(&resource.Attributes{
+			"name": "Second unmanaged resource",
+		}),
 	)
 	a.AddManaged(
-		&resource.Resource{
-			Id:   "managed-id-1",
-			Type: "aws_managed_resource",
-			Attrs: &resource.Attributes{
-				"name": "First managed resource",
-			},
-		},
-		&resource.Resource{
-			Id:   "managed-id-2",
-			Type: "aws_managed_resource",
-			Attrs: &resource.Attributes{
-				"name": "Second managed resource",
-			},
-		},
+		resource.NewResource(
+			"managed-id-1",
+			"aws_managed_resource").SetAttributes(&resource.Attributes{
+			"name": "First managed resource",
+		}),
+		resource.NewResource(
+			"managed-id-2",
+			"aws_managed_resource").SetAttributes(&resource.Attributes{
+			"name": "Second managed resource",
+		}),
 	)
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"

@@ -48,12 +48,24 @@ type Resource struct {
 	Id     string
 	Type   string
 	Attrs  *Attributes
-	Sch    *Schema `json:"-" diff:"-"`
-	Source Source  `json:"-"`
+	Sch    *Schema `diff:"-"`
+	Source Source
+}
+
+func NewResource(id, ty string) *Resource {
+	return &Resource{
+		Id:   id,
+		Type: ty,
+	}
 }
 
 func (r *Resource) Schema() *Schema {
 	return r.Sch
+}
+
+func (r *Resource) SetSchema(v *Schema) *Resource {
+	r.Sch = v
+	return r
 }
 
 func (r *Resource) ResourceId() string {
@@ -68,8 +80,18 @@ func (r *Resource) Attributes() *Attributes {
 	return r.Attrs
 }
 
+func (r *Resource) SetAttributes(v *Attributes) *Resource {
+	r.Attrs = v
+	return r
+}
+
 func (r *Resource) Src() Source {
 	return r.Source
+}
+
+func (r *Resource) SetSource(v Source) *Resource {
+	r.Source = v
+	return r
 }
 
 func (r *Resource) SourceString() string {

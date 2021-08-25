@@ -41,10 +41,10 @@ func TestHTML_Write(t *testing.T) {
 				a.Date = time.Date(2021, 06, 10, 0, 0, 0, 0, &time.Location{})
 				a.Duration = 72 * time.Second
 				a.AddManaged(
-					&resource.Resource{
-						Id:   "deleted-id-3",
-						Type: "aws_deleted_resource",
-					},
+					resource.NewResource(
+						"deleted-id-3",
+						"aws_deleted_resource",
+					),
 				)
 				a.ProviderName = "AWS"
 				a.ProviderVersion = "3.19.0"
@@ -61,47 +61,46 @@ func TestHTML_Write(t *testing.T) {
 				a.Date = time.Date(2021, 06, 10, 0, 0, 0, 0, &time.Location{})
 				a.Duration = 91 * time.Second
 				a.AddDeleted(
-					&resource.Resource{
-						Id:   "deleted-id-3",
-						Type: "aws_deleted_resource",
-					},
-					&resource.Resource{
-						Id:   "deleted-id-4",
-						Type: "aws_deleted_resource",
-					},
-					&resource.Resource{
-						Id:   "deleted-id-5",
-						Type: "aws_deleted_resource",
-					},
-					&resource.Resource{
-						Id:   "deleted-id-6",
-						Type: "aws_deleted_resource",
-					},
+					resource.NewResource(
+						"deleted-id-3",
+						"aws_deleted_resource",
+					),
+					resource.NewResource(
+						"deleted-id-4",
+						"aws_deleted_resource",
+					),
+					resource.NewResource(
+						"deleted-id-5",
+						"aws_deleted_resource",
+					),
+					resource.NewResource(
+						"deleted-id-6",
+						"aws_deleted_resource",
+					),
 				)
 				a.AddUnmanaged(
-					&resource.Resource{
-						Id:   "unmanaged-id-3",
-						Type: "aws_unmanaged_resource",
-					},
-					&resource.Resource{
-						Id:   "unmanaged-id-4",
-						Type: "aws_unmanaged_resource",
-					},
-					&resource.Resource{
-						Id:   "unmanaged-id-5",
-						Type: "aws_unmanaged_resource",
-					},
+					resource.NewResource(
+						"unmanaged-id-3",
+						"aws_unmanaged_resource",
+					),
+					resource.NewResource(
+						"unmanaged-id-4",
+						"aws_unmanaged_resource",
+					),
+					resource.NewResource(
+						"unmanaged-id-5",
+						"aws_unmanaged_resource",
+					),
 				)
 				a.AddDifference(analyser.Difference{
-					Res: &resource.Resource{
-						Id:   "diff-id-2",
-						Type: "aws_diff_resource",
-						Source: &resource.TerraformStateSource{
-							State:  "tfstate://state.tfstate",
-							Module: "module",
-							Name:   "name",
-						},
-					}, Changelog: []analyser.Change{
+					Res: resource.NewResource(
+						"diff-id-2",
+						"aws_diff_resource",
+					).SetSource(&resource.TerraformStateSource{
+						State:  "tfstate://state.tfstate",
+						Module: "module",
+						Name:   "name",
+					}), Changelog: []analyser.Change{
 						{
 							Change: diff.Change{
 								Type: diff.DELETE,
@@ -166,21 +165,20 @@ func TestHTML_Write(t *testing.T) {
 				a.Date = time.Date(2021, 06, 10, 0, 0, 0, 0, &time.Location{})
 				a.Duration = 91 * time.Second
 				a.AddManaged(
-					&resource.Resource{
-						Id:   "resource-id-1",
-						Type: "aws_resource",
-					},
+					resource.NewResource(
+						"resource-id-1",
+						"aws_resource",
+					),
 				)
 				a.AddDifference(analyser.Difference{
-					Res: &resource.Resource{
-						Id:   "resource-id-1",
-						Type: "aws_resource",
-						Source: &resource.TerraformStateSource{
-							State:  "tfstate://state.tfstate",
-							Module: "module",
-							Name:   "name",
-						},
-					}, Changelog: []analyser.Change{
+					Res: resource.NewResource(
+						"resource-id-1",
+						"aws_resource",
+					).SetSource(&resource.TerraformStateSource{
+						State:  "tfstate://state.tfstate",
+						Module: "module",
+						Name:   "name",
+					}), Changelog: []analyser.Change{
 						{
 							Change: diff.Change{
 								Type: diff.DELETE,
@@ -250,26 +248,26 @@ func TestHTML_DistinctResourceTypes(t *testing.T) {
 		{
 			name: "test empty array",
 			resources: []*resource.Resource{
-				{
-					Id:   "deleted-id-1",
-					Type: "aws_deleted_resource",
-				},
-				{
-					Id:   "unmanaged-id-1",
-					Type: "aws_unmanaged_resource",
-				},
-				{
-					Id:   "unmanaged-id-2",
-					Type: "aws_unmanaged_resource",
-				},
-				{
-					Id:   "diff-id-1",
-					Type: "aws_diff_resource",
-				},
-				{
-					Id:   "deleted-id-2",
-					Type: "aws_deleted_resource",
-				},
+				resource.NewResource(
+					"deleted-id-1",
+					"aws_deleted_resource",
+				),
+				resource.NewResource(
+					"unmanaged-id-1",
+					"aws_unmanaged_resource",
+				),
+				resource.NewResource(
+					"unmanaged-id-2",
+					"aws_unmanaged_resource",
+				),
+				resource.NewResource(
+					"diff-id-1",
+					"aws_diff_resource",
+				),
+				resource.NewResource(
+					"deleted-id-2",
+					"aws_deleted_resource",
+				),
 			},
 			value: []string{"aws_deleted_resource", "aws_unmanaged_resource", "aws_diff_resource"},
 		},

@@ -10,17 +10,11 @@ import (
 
 func TestChainSupplier_Resources(t *testing.T) {
 
-	assert := assert.New(t)
-
 	fakeTestSupplier := resource.MockSupplier{}
 	fakeTestSupplier.On("Resources").Return(
 		[]*resource.Resource{
-			&resource.Resource{
-				Id: "fake-supplier-1_fake-resource-1",
-			},
-			&resource.Resource{
-				Id: "fake-supplier-1_fake-resource-2",
-			},
+			resource.NewResource("fake-supplier-1_fake-resource-1", "fake_resource_type"),
+			resource.NewResource("fake-supplier-1_fake-resource-2", "fake_resource_type"),
 		},
 		nil,
 	).Once()
@@ -28,12 +22,8 @@ func TestChainSupplier_Resources(t *testing.T) {
 	anotherFakeTestSupplier := resource.MockSupplier{}
 	anotherFakeTestSupplier.On("Resources").Return(
 		[]*resource.Resource{
-			&resource.Resource{
-				Id: "fake-supplier-2_fake-resource-1",
-			},
-			&resource.Resource{
-				Id: "fake-supplier-2_fake-resource-2",
-			},
+			resource.NewResource("fake-supplier-2_fake-resource-1", "fake_resource_type"),
+			resource.NewResource("fake-supplier-2_fake-resource-2", "fake_resource_type"),
 		},
 		nil,
 	).Once()
@@ -50,23 +40,17 @@ func TestChainSupplier_Resources(t *testing.T) {
 
 	anotherFakeTestSupplier.AssertExpectations(t)
 	fakeTestSupplier.AssertExpectations(t)
-	assert.Len(res, 4)
+	assert.Len(t, res, 4)
 }
 
 func TestChainSupplier_Resources_WithError(t *testing.T) {
-
-	assert := assert.New(t)
 
 	fakeTestSupplier := resource.MockSupplier{}
 	fakeTestSupplier.
 		On("Resources").
 		Return([]*resource.Resource{
-			&resource.Resource{
-				Id: "fake-supplier-1_fake-resource-1",
-			},
-			&resource.Resource{
-				Id: "fake-supplier-1_fake-resource-2",
-			},
+			resource.NewResource("fake-supplier-1_fake-resource-1", "fake_resource_type"),
+			resource.NewResource("fake-supplier-1_fake-resource-2", "fake_resource_type"),
 		},
 			nil,
 		)
@@ -84,6 +68,6 @@ func TestChainSupplier_Resources_WithError(t *testing.T) {
 	res, err := chain.Resources()
 
 	anotherFakeTestSupplier.AssertExpectations(t)
-	assert.Nil(res)
-	assert.Equal("error from another supplier", err.Error())
+	assert.Nil(t, res)
+	assert.Equal(t, "error from another supplier", err.Error())
 }

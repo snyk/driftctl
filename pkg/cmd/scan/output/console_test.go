@@ -33,24 +33,22 @@ func TestConsole_Write(t *testing.T) {
 			args: args{analysis: func() *analyser.Analysis {
 				a := fakeAnalysis()
 				a.AddDeleted(
-					&resource.Resource{
-						Id:   "test-id-1",
-						Type: "aws_test_resource",
-					},
-					&resource.Resource{
-						Id:   "test-id-2",
-						Type: "aws_test_resource",
-					},
+					resource.NewResource("test-id-1",
+						"aws_test_resource",
+					),
+					resource.NewResource(
+						"test-id-2",
+						"aws_test_resource",
+					),
 				)
 				a.AddUnmanaged(
-					&resource.Resource{
-						Id:   "test-id-1",
-						Type: "aws_testing_resource",
-					},
-					&resource.Resource{
-						Id:   "test-id-2",
-						Type: "aws_resource",
-					},
+					resource.NewResource("test-id-1",
+						"aws_testing_resource",
+					),
+					resource.NewResource(
+						"test-id-2",
+						"aws_resource",
+					),
 				)
 				return a
 			}()},
