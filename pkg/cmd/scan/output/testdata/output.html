@@ -422,6 +422,8 @@ input[type="search"], select {
             <select id="iac-source-select" name="iac-source-select">
                 <option value="">Select an IaC source</option>
                 
+                <option value="tfstate://deleted/terraform.tfstate">tfstate://deleted/terraform.tfstate</option>
+                
                 <option value="tfstate://state.tfstate">tfstate://state.tfstate</option>
                 
                 <option value="tfstate&#43;s3://state2.tfstate">tfstate&#43;s3://state2.tfstate</option>
@@ -596,39 +598,63 @@ input[type="search"], select {
                         <thead>
                         <tr class="table-header">
                             <th>Resource ID</th>
-                            <th>Resource Type</th>
+                            <th>IaC source</th>
                         </tr>
                         </thead>
                         <tbody>
                         
                         <tr data-kind="resource-deleted" class="resource-item row">
-                            <td data-type="resource-id">deleted-id-1</td>
-                            <td data-type="resource-type">aws_deleted_resource</td>
+                            <td>
+                                <span data-type="resource-id">deleted-id-1</span>
+                                <span>(aws_deleted_resource)</span>
+                                <span data-type="resource-type" style="display:none;">aws_deleted_resource</span>
+                            </td>
+                            
                         </tr>
                         
                         <tr data-kind="resource-deleted" class="resource-item row">
-                            <td data-type="resource-id">deleted-id-2</td>
-                            <td data-type="resource-type">aws_deleted_resource</td>
+                            <td>
+                                <span data-type="resource-id">deleted-id-2</span>
+                                <span>(aws_deleted_resource)</span>
+                                <span data-type="resource-type" style="display:none;">aws_deleted_resource</span>
+                            </td>
+                            
                         </tr>
                         
                         <tr data-kind="resource-deleted" class="resource-item row">
-                            <td data-type="resource-id">deleted-id-3</td>
-                            <td data-type="resource-type">aws_deleted_resource</td>
+                            <td>
+                                <span data-type="resource-id">deleted-id-3</span>
+                                <span>(aws_deleted_resource.deleted-id-3)</span>
+                                <span data-type="resource-type" style="display:none;">aws_deleted_resource</span>
+                            </td>
+                            <td data-type="resource-source">tfstate://deleted/terraform.tfstate</td>
                         </tr>
                         
                         <tr data-kind="resource-deleted" class="resource-item row">
-                            <td data-type="resource-id">deleted-id-4</td>
-                            <td data-type="resource-type">aws_deleted_resource</td>
+                            <td>
+                                <span data-type="resource-id">deleted-id-4</span>
+                                <span>(aws_deleted_resource.deleted-id-3)</span>
+                                <span data-type="resource-type" style="display:none;">aws_deleted_resource</span>
+                            </td>
+                            <td data-type="resource-source">tfstate://deleted/terraform.tfstate</td>
                         </tr>
                         
                         <tr data-kind="resource-deleted" class="resource-item row">
-                            <td data-type="resource-id">deleted-id-5</td>
-                            <td data-type="resource-type">aws_deleted_resource</td>
+                            <td>
+                                <span data-type="resource-id">deleted-id-5</span>
+                                <span>(module-1.aws_deleted_resource.deleted-id-3)</span>
+                                <span data-type="resource-type" style="display:none;">aws_deleted_resource</span>
+                            </td>
+                            <td data-type="resource-source">tfstate://deleted/terraform.tfstate</td>
                         </tr>
                         
                         <tr data-kind="resource-deleted" class="resource-item row">
-                            <td data-type="resource-id">deleted-id-6</td>
-                            <td data-type="resource-type">aws_deleted_resource</td>
+                            <td>
+                                <span data-type="resource-id">deleted-id-6</span>
+                                <span>(aws_deleted_resource)</span>
+                                <span data-type="resource-type" style="display:none;">aws_deleted_resource</span>
+                            </td>
+                            
                         </tr>
                         
                         </tbody>

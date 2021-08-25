@@ -135,12 +135,10 @@
                                 <div class="row">
                                     <span role="cell">
                                         <span data-type="resource-id">{{$diff.Res.ResourceId}}</span>
-                                        (<span>{{$diff.Res.SourceString}}</span>)
+                                        {{ if $diff.Res.Src }}(<span>{{$diff.Res.SourceString}}</span>){{ end }}
                                         <span style="display:none;" data-type="resource-type">{{$diff.Res.ResourceType}}</span>
                                     </span>
-                                    <span role="cell" data-type="resource-source">{{$diff.Res.Src.Source}}</span>
-                                    <span role="cell" data-type="resource-id">{{$diff.Res.ResourceId}}</span>
-                                    <span role="cell" data-type="resource-type">{{$diff.Res.ResourceType}}</span>
+                                    {{ if $diff.Res.Src }}<span role="cell" data-type="resource-source">{{$diff.Res.Src.Source}}</span>{{ end }}
                                 </div>
                                 <pre class="code-box">
                                     <code class="code-box-line">{{ jsonDiff $diff.Changelog }}</code>
@@ -160,14 +158,18 @@
                         <thead>
                         <tr class="table-header">
                             <th>Resource ID</th>
-                            <th>Resource Type</th>
+                            <th>IaC source</th>
                         </tr>
                         </thead>
                         <tbody>
                         {{range $res := .Deleted}}
                         <tr data-kind="resource-deleted" class="resource-item row">
-                            <td data-type="resource-id">{{$res.ResourceId}}</td>
-                            <td data-type="resource-type">{{$res.ResourceType}}</td>
+                            <td>
+                                <span data-type="resource-id">{{$res.ResourceId}}</span>
+                                {{ if $res.Src }}<span>({{$res.SourceString}})</span>{{ else }}<span>({{$res.ResourceType}})</span>{{ end }}
+                                <span data-type="resource-type" style="display:none;">{{$res.ResourceType}}</span>
+                            </td>
+                            {{ if $res.Src }}<td data-type="resource-source">{{$res.Src.Source}}</td>{{ end }}
                         </tr>
                         {{end}}
                         </tbody>

@@ -55,7 +55,6 @@ func TestHTML_Write(t *testing.T) {
 		{
 			name:       "test html output",
 			goldenfile: "output.html",
-
 			analysis: func() *analyser.Analysis {
 				a := fakeAnalysisWithAlerts()
 				a.Date = time.Date(2021, 06, 10, 0, 0, 0, 0, &time.Location{})
@@ -83,14 +82,27 @@ func TestHTML_Write(t *testing.T) {
 					&resource.Resource{
 						Id:   "deleted-id-3",
 						Type: "aws_deleted_resource",
+						Source: &resource.TerraformStateSource{
+							State: "tfstate://deleted/terraform.tfstate",
+							Name:  "deleted-id-3",
+						},
 					},
 					&resource.Resource{
 						Id:   "deleted-id-4",
 						Type: "aws_deleted_resource",
+						Source: &resource.TerraformStateSource{
+							State: "tfstate://deleted/terraform.tfstate",
+							Name:  "deleted-id-3",
+						},
 					},
 					&resource.Resource{
 						Id:   "deleted-id-5",
 						Type: "aws_deleted_resource",
+						Source: &resource.TerraformStateSource{
+							State:  "tfstate://deleted/terraform.tfstate",
+							Name:   "deleted-id-3",
+							Module: "module-1",
+						},
 					},
 					&resource.Resource{
 						Id:   "deleted-id-6",
