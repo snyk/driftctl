@@ -422,6 +422,8 @@ input[type="search"], select {
             <select id="iac-source-select" name="iac-source-select">
                 <option value="">Select an IaC source</option>
                 
+                <option value="tfstate://delete_state.tfstate">tfstate://delete_state.tfstate</option>
+                
                 <option value="tfstate://deleted/terraform.tfstate">tfstate://deleted/terraform.tfstate</option>
                 
                 <option value="tfstate://state.tfstate">tfstate://state.tfstate</option>
@@ -575,10 +577,10 @@ input[type="search"], select {
                                 <div class="row">
                                     <span role="cell">
                                         <span data-type="resource-id">diff-id-3</span>
-                                        (<span>aws_diff_resource.b</span>)
+                                        <span>(aws_diff_resource)</span>
                                         <span style="display:none;" data-type="resource-type">aws_diff_resource</span>
                                     </span>
-                                    <span role="cell" data-type="resource-source">tfstate&#43;s3://state2.tfstate</span>
+                                    
                                 </div>
                                 <pre class="code-box">
                                     <code class="code-box-line">&emsp;~ InstanceInitiatedShutdownBehavior: <span class="code-box-line-delete">""</span> => <span class="code-box-line-create">null</span><br></code>
@@ -606,19 +608,19 @@ input[type="search"], select {
                         <tr data-kind="resource-deleted" class="resource-item row">
                             <td>
                                 <span data-type="resource-id">deleted-id-1</span>
-                                <span>(aws_deleted_resource)</span>
+                                <span>(module.aws_deleted_resource.name)</span>
                                 <span data-type="resource-type" style="display:none;">aws_deleted_resource</span>
                             </td>
-                            
+                            <td data-type="resource-source">tfstate://delete_state.tfstate</td>
                         </tr>
                         
                         <tr data-kind="resource-deleted" class="resource-item row">
                             <td>
                                 <span data-type="resource-id">deleted-id-2</span>
-                                <span>(aws_deleted_resource)</span>
+                                <span>(module.aws_deleted_resource.name)</span>
                                 <span data-type="resource-type" style="display:none;">aws_deleted_resource</span>
                             </td>
-                            
+                            <td data-type="resource-source">tfstate://delete_state.tfstate</td>
                         </tr>
                         
                         <tr data-kind="resource-deleted" class="resource-item row">

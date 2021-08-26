@@ -135,7 +135,7 @@
                                 <div class="row">
                                     <span role="cell">
                                         <span data-type="resource-id">{{$diff.Res.ResourceId}}</span>
-                                        {{ if $diff.Res.Src }}(<span>{{$diff.Res.SourceString}}</span>){{ end }}
+                                        {{ if $diff.Res.Src }}(<span>{{$diff.Res.SourceString}}</span>){{ else }}<span>({{$diff.Res.ResourceType}})</span>{{ end }}
                                         <span style="display:none;" data-type="resource-type">{{$diff.Res.ResourceType}}</span>
                                     </span>
                                     {{ if $diff.Res.Src }}<span role="cell" data-type="resource-source">{{$diff.Res.Src.Source}}</span>{{ end }}

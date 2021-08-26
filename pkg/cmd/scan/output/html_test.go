@@ -187,10 +187,6 @@ func TestHTML_Write(t *testing.T) {
 					Res: &resource.Resource{
 						Id:   "diff-id-3",
 						Type: "aws_diff_resource",
-						Source: &resource.TerraformStateSource{
-							State: "tfstate+s3://state2.tfstate",
-							Name:  "b",
-						},
 					}, Changelog: []analyser.Change{
 						{
 							Change: diff.Change{
@@ -297,12 +293,12 @@ func TestHTML_DistinctResourceTypes(t *testing.T) {
 		value     []string
 	}{
 		{
-			name:      "test empty array",
+			name:      "should return empty array",
 			resources: []*resource.Resource{},
 			value:     []string{},
 		},
 		{
-			name: "test empty array",
+			name: "should return distinct list of resource types",
 			resources: []*resource.Resource{
 				{
 					Id:   "deleted-id-1",
@@ -343,12 +339,12 @@ func TestHTML_DistinctIaCSources(t *testing.T) {
 		value     []string
 	}{
 		{
-			name:      "test empty array",
+			name:      "should return empty array",
 			resources: []*resource.Resource{},
 			value:     []string{},
 		},
 		{
-			name: "test empty array",
+			name: "should return distinct list of iac sources",
 			resources: []*resource.Resource{
 				{
 					Id:   "deleted-id-1",
