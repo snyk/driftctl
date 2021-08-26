@@ -78,7 +78,6 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 		}
 	}
 
-
 	if analysis.Summary().TotalDrifted > 0 {
 
 		groupedBySource := make(map[string][]analyser.Difference)
