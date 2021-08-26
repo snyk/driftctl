@@ -9,7 +9,7 @@ import (
 
 func TestAcc_AwsS3Bucket_BucketInUsEast1(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion: "0.14.9",
+		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_s3_bucket"},
 		Args:             []string{"scan", "--filter", "Type=='aws_s3_bucket' || Type=='aws_s3_bucket_policy'", "--deep"},
 		Checks: []acceptance.AccCheck{
@@ -22,9 +22,7 @@ func TestAcc_AwsS3Bucket_BucketInUsEast1(t *testing.T) {
 						t.Fatal(err)
 					}
 					result.AssertManagedCount(5)
-					// Actually we have a false positive drift on policies due to AWS behavior
-					// AWS rework policy and mutate single element array into a string
-					// result.AssertDriftCountTotal(0)
+					result.AssertDriftCountTotal(0)
 				},
 			},
 		},

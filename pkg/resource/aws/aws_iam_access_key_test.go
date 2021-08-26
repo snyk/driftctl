@@ -9,7 +9,7 @@ import (
 
 func TestAcc_Aws_IamAccessKey(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion: "0.14.9",
+		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_iam_access_key"},
 		Args:             []string{"scan", "--filter", "Type=='aws_iam_access_key' && Attr.user!='circleci_acc_tests_admin' && Attr.user!='driftctl_qa'", "--deep"},
 		Checks: []acceptance.AccCheck{

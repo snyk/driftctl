@@ -24,7 +24,7 @@ import (
 func TestAcc_AwsSNSTopic(t *testing.T) {
 	var mutatedTopicArn string
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion: "0.14.9",
+		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_sns_topic"},
 		Args:             []string{"scan", "--filter", "Type=='aws_sns_topic'", "--deep"},
 		Checks: []acceptance.AccCheck{

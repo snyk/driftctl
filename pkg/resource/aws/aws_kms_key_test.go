@@ -9,7 +9,7 @@ import (
 
 func TestAcc_Aws_KMSKey(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion: "0.14.9",
+		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_kms_key"},
 		Args:             []string{"scan", "--filter", "Type=='aws_kms_key'", "--deep"},
 		Checks: []acceptance.AccCheck{

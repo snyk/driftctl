@@ -9,7 +9,7 @@ import (
 
 func TestAcc_AwsRouteTable(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion: "0.14.9",
+		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_route_table"},
 		Args:             []string{"scan", "--filter", "Type=='aws_route_table' || Type=='aws_default_route_table'", "--deep"},
 		Checks: []acceptance.AccCheck{
