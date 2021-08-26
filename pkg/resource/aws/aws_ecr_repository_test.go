@@ -33,7 +33,7 @@ func TestAcc_AwsECRRepository(t *testing.T) {
 					result.AssertInfrastructureIsInSync()
 					result.AssertManagedCount(1)
 
-					mutatedRepositoryID = result.Managed()[0].TerraformId()
+					mutatedRepositoryID = result.Managed()[0].ResourceId()
 				},
 			},
 			{

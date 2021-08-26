@@ -20,7 +20,7 @@ func (m AwsDefaultSecurityGroupRule) Execute(remoteResources, resourcesFromState
 		existInState := false
 
 		// Ignore all resources other than security group rules
-		if remoteResource.TerraformType() != aws.AwsSecurityGroupRuleResourceType {
+		if remoteResource.ResourceType() != aws.AwsSecurityGroupRuleResourceType {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
@@ -44,8 +44,8 @@ func (m AwsDefaultSecurityGroupRule) Execute(remoteResources, resourcesFromState
 
 		if !existInState {
 			logrus.WithFields(logrus.Fields{
-				"id":   remoteResource.TerraformId(),
-				"type": remoteResource.TerraformType(),
+				"id":   remoteResource.ResourceId(),
+				"type": remoteResource.ResourceType(),
 			}).Debug("Ignoring default unmanaged security group rule")
 		}
 	}
@@ -121,10 +121,10 @@ func isDefaultEgress(rule *resource.Resource, remoteResources *[]*resource.Resou
 
 func isFromDefaultSecurityGroup(sgId *string, remoteResources *[]*resource.Resource) bool {
 	for _, remoteResource := range *remoteResources {
-		if remoteResource.TerraformType() != aws.AwsDefaultSecurityGroupResourceType {
+		if remoteResource.ResourceType() != aws.AwsDefaultSecurityGroupResourceType {
 			continue
 		}
-		if *sgId == remoteResource.TerraformId() {
+		if *sgId == remoteResource.ResourceId() {
 			return true
 		}
 	}

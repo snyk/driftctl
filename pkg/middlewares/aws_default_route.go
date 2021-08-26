@@ -20,7 +20,7 @@ func (m AwsDefaultRoute) Execute(remoteResources, resourcesFromState *[]*resourc
 
 	for _, remoteResource := range *remoteResources {
 		// Ignore all resources other than routes
-		if remoteResource.TerraformType() != aws.AwsRouteResourceType {
+		if remoteResource.ResourceType() != aws.AwsRouteResourceType {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
@@ -49,8 +49,8 @@ func (m AwsDefaultRoute) Execute(remoteResources, resourcesFromState *[]*resourc
 		// Else, resource is not added to newRemoteResources slice so it will be ignored
 		logrus.WithFields(logrus.Fields{
 			// "route": route.String(), TODO
-			"id":   remoteResource.TerraformId(),
-			"type": remoteResource.TerraformType(),
+			"id":   remoteResource.ResourceId(),
+			"type": remoteResource.ResourceType(),
 		}).Debug("Ignoring default route as it is not managed by IaC")
 	}
 

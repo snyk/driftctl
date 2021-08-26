@@ -33,6 +33,7 @@ type HTML struct {
 }
 
 type HTMLTemplateParams struct {
+	IsSync          bool
 	ScanDate        string
 	Coverage        int
 	Summary         analyser.Summary
@@ -146,6 +147,7 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 	}
 
 	data := &HTMLTemplateParams{
+		IsSync:          analysis.IsSync(),
 		ScanDate:        analysis.Date.Format("Jan 02, 2006"),
 		Coverage:        analysis.Coverage(),
 		Summary:         analysis.Summary(),
@@ -175,13 +177,13 @@ func distinctResourceTypes(resources []*resource.Resource) []string {
 	for _, res := range resources {
 		found := false
 		for _, v := range types {
-			if v == res.TerraformType() {
+			if v == res.ResourceType() {
 				found = true
 				break
 			}
 		}
 		if !found {
-			types = append(types, res.TerraformType())
+			types = append(types, res.ResourceType())
 		}
 	}
 

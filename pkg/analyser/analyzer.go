@@ -156,7 +156,7 @@ func removeResourceByIndex(i int, resources []*resource.Resource) []*resource.Re
 // security group rule
 func (a Analyzer) hasUnmanagedSecurityGroupRules(unmanagedResources []*resource.Resource) bool {
 	for _, res := range unmanagedResources {
-		if res.TerraformType() == resourceaws.AwsSecurityGroupRuleResourceType {
+		if res.ResourceType() == resourceaws.AwsSecurityGroupRuleResourceType {
 			return true
 		}
 	}

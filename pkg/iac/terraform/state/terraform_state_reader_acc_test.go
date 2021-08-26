@@ -30,8 +30,8 @@ func TestAcc_StateReader_WithMultipleStatesInDirectory(t *testing.T) {
 					}
 					result.AssertInfrastructureIsInSync()
 					result.AssertManagedCount(2)
-					result.Equal("aws_route53_zone", result.Managed()[0].TerraformType())
-					result.Equal("aws_s3_bucket", result.Managed()[1].TerraformType())
+					result.Equal("aws_route53_zone", result.Managed()[0].ResourceType())
+					result.Equal("aws_s3_bucket", result.Managed()[1].ResourceType())
 				},
 			},
 		},
@@ -64,8 +64,8 @@ func TestAcc_StateReader_WithMultiplesStatesInS3(t *testing.T) {
 					result.AssertDeletedCount(0)
 					result.AssertResourceUnmanaged("driftctl-acc-test-only", "aws_s3_bucket")
 					result.AssertManagedCount(2)
-					result.Equal("aws_route53_zone", result.Managed()[0].TerraformType())
-					result.Equal("aws_s3_bucket", result.Managed()[1].TerraformType())
+					result.Equal("aws_route53_zone", result.Managed()[0].ResourceType())
+					result.Equal("aws_s3_bucket", result.Managed()[1].ResourceType())
 				},
 			},
 		},

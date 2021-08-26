@@ -35,7 +35,7 @@ func TestAcc_Aws_CloudfrontDistribution(t *testing.T) {
 					}
 					result.AssertInfrastructureIsInSync()
 					result.AssertManagedCount(1)
-					mutatedDistribution = result.Managed()[0].TerraformId()
+					mutatedDistribution = result.Managed()[0].ResourceId()
 				},
 			},
 			{

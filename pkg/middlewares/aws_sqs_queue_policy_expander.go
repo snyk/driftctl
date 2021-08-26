@@ -22,7 +22,7 @@ func NewAwsSQSQueuePolicyExpander(resourceFactory resource.ResourceFactory, reso
 
 func (m AwsSQSQueuePolicyExpander) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
 	for _, res := range *remoteResources {
-		if res.TerraformType() != aws.AwsSqsQueueResourceType {
+		if res.ResourceType() != aws.AwsSqsQueueResourceType {
 			continue
 		}
 		res.Attrs.SafeDelete([]string{"policy"})
@@ -31,7 +31,7 @@ func (m AwsSQSQueuePolicyExpander) Execute(remoteResources, resourcesFromState *
 	newList := make([]*resource.Resource, 0)
 	for _, res := range *resourcesFromState {
 		// Ignore all resources other than sqs_queue
-		if res.TerraformType() != aws.AwsSqsQueueResourceType {
+		if res.ResourceType() != aws.AwsSqsQueueResourceType {
 			newList = append(newList, res)
 			continue
 		}
@@ -73,7 +73,7 @@ func (m *AwsSQSQueuePolicyExpander) handlePolicy(queue *resource.Resource, resul
 	newPolicy := m.resourceFactory.CreateAbstractResource("aws_sqs_queue_policy", queue.Id, data)
 	*results = append(*results, newPolicy)
 	logrus.WithFields(logrus.Fields{
-		"id": newPolicy.TerraformId(),
+		"id": newPolicy.ResourceId(),
 	}).Debug("Created new policy from sqs queue")
 
 	queue.Attrs.SafeDelete([]string{"policy"})
@@ -86,8 +86,8 @@ func (m *AwsSQSQueuePolicyExpander) handlePolicy(queue *resource.Resource, resul
 // the aws_sqs_queue_policy will be used.
 func (m *AwsSQSQueuePolicyExpander) hasPolicyAttached(queue *resource.Resource, resourcesFromState *[]*resource.Resource) bool {
 	for _, res := range *resourcesFromState {
-		if res.TerraformType() == aws.AwsSqsQueuePolicyResourceType &&
-			res.TerraformId() == queue.Id {
+		if res.ResourceType() == aws.AwsSqsQueuePolicyResourceType &&
+			res.ResourceId() == queue.Id {
 			return true
 		}
 	}

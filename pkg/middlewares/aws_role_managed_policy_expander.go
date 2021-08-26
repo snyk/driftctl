@@ -25,7 +25,7 @@ func (a AwsRoleManagedPolicyExpander) Execute(remoteResources, resourcesFromStat
 	newList := make([]*resource.Resource, 0)
 	for _, res := range *remoteResources {
 		// Ignore all resources other than iam_role
-		if res.TerraformType() != aws.AwsIamRoleResourceType {
+		if res.ResourceType() != aws.AwsIamRoleResourceType {
 			newList = append(newList, res)
 			continue
 		}
@@ -38,7 +38,7 @@ func (a AwsRoleManagedPolicyExpander) Execute(remoteResources, resourcesFromStat
 	newList = make([]*resource.Resource, 0)
 	for _, res := range *resourcesFromState {
 		// Ignore all resources other than iam_role
-		if res.TerraformType() != aws.AwsIamRoleResourceType {
+		if res.ResourceType() != aws.AwsIamRoleResourceType {
 			newList = append(newList, res)
 			continue
 		}

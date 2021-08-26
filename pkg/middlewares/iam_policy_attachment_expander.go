@@ -23,7 +23,7 @@ func (m IamPolicyAttachmentExpander) Execute(remoteResources, resourcesFromState
 
 	for _, stateResource := range *resourcesFromState {
 		// Ignore all resources other than policy attachment
-		if stateResource.TerraformType() != resourceaws.AwsIamPolicyAttachmentResourceType {
+		if stateResource.ResourceType() != resourceaws.AwsIamPolicyAttachmentResourceType {
 			newStateResources = append(newStateResources, stateResource)
 			continue
 		}
@@ -35,7 +35,7 @@ func (m IamPolicyAttachmentExpander) Execute(remoteResources, resourcesFromState
 
 	for _, remoteResource := range *remoteResources {
 		// Ignore all resources other than policy attachment
-		if remoteResource.TerraformType() != resourceaws.AwsIamPolicyAttachmentResourceType {
+		if remoteResource.ResourceType() != resourceaws.AwsIamPolicyAttachmentResourceType {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}

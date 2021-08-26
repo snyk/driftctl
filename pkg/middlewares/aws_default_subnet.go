@@ -22,7 +22,7 @@ func (m AwsDefaultSubnet) Execute(remoteResources, resourcesFromState *[]*resour
 		existInState := false
 
 		// Ignore all resources other than default Subnet
-		if remoteResource.TerraformType() != aws.AwsDefaultSubnetResourceType {
+		if remoteResource.ResourceType() != aws.AwsDefaultSubnetResourceType {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
@@ -40,8 +40,8 @@ func (m AwsDefaultSubnet) Execute(remoteResources, resourcesFromState *[]*resour
 
 		if !existInState {
 			logrus.WithFields(logrus.Fields{
-				"id":   remoteResource.TerraformId(),
-				"type": remoteResource.TerraformType(),
+				"id":   remoteResource.ResourceId(),
+				"type": remoteResource.ResourceType(),
 			}).Debug("Ignoring default Subnet as it is not managed by IaC")
 		}
 

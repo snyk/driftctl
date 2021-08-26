@@ -72,14 +72,14 @@ func TestTerraformStateReader_Source(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Len(t, got, 2)
 	for _, res := range got {
-		if res.TerraformType() == resourceaws.AwsS3BucketResourceType {
+		if res.ResourceType() == resourceaws.AwsS3BucketResourceType {
 			assert.Equal(t, &resource.TerraformStateSource{
 				State:  "tfstate://test/source/terraform.tfstate",
 				Module: "",
 				Name:   "bucket",
 			}, res.Source)
 		}
-		if res.TerraformType() == resourceaws.AwsIamUserResourceType {
+		if res.ResourceType() == resourceaws.AwsIamUserResourceType {
 			assert.Equal(t, &resource.TerraformStateSource{
 				State:  "tfstate://test/source/terraform.tfstate",
 				Module: "module.iam_iam-user",

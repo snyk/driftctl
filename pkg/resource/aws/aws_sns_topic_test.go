@@ -57,8 +57,8 @@ func TestAcc_AwsSNSTopic(t *testing.T) {
 					result.AssertManagedCount(3)
 
 					for _, resource := range result.Analysis.Managed() {
-						if strings.Contains(resource.TerraformId(), "user-updates-topic3") {
-							mutatedTopicArn = resource.TerraformId()
+						if strings.Contains(resource.ResourceId(), "user-updates-topic3") {
+							mutatedTopicArn = resource.ResourceId()
 						}
 					}
 				},

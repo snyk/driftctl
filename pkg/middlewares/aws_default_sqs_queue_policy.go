@@ -22,7 +22,7 @@ func (m AwsDefaultSQSQueuePolicy) Execute(remoteResources, resourcesFromState *[
 	newRemoteResources := make([]*resource.Resource, 0)
 	for _, res := range *remoteResources {
 		// Ignore all resources other than sqs_queue_policy
-		if res.TerraformType() != aws.AwsSqsQueuePolicyResourceType {
+		if res.ResourceType() != aws.AwsSqsQueuePolicyResourceType {
 			newRemoteResources = append(newRemoteResources, res)
 			continue
 		}
@@ -52,8 +52,8 @@ func (m AwsDefaultSQSQueuePolicy) Execute(remoteResources, resourcesFromState *[
 
 		// Else, resource is not added to newRemoteResources slice so it will be ignored
 		logrus.WithFields(logrus.Fields{
-			"id":   res.TerraformId(),
-			"type": res.TerraformType(),
+			"id":   res.ResourceId(),
+			"type": res.ResourceType(),
 		}).Debug("Ignoring default queue policy as it is not managed by IaC")
 	}
 	*remoteResources = newRemoteResources
