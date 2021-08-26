@@ -35,13 +35,27 @@ func NewConsole() *Console {
 
 func (c *Console) Write(analysis *analyser.Analysis) error {
 	if analysis.Summary().TotalDeleted > 0 {
+		groupedBySource := make(map[string][]*resource.Resource)
+
+		for _, deletedResource := range analysis.Deleted() {
+			key := deletedResource.Source.Source()
+
+			if _, exist := groupedBySource[key]; !exist {
+				groupedBySource[key] = []*resource.Resource{deletedResource}
+				continue
+			}
+
+			groupedBySource[key] = append(groupedBySource[key], deletedResource)
+		}
+
 		fmt.Println("Found missing resources:")
-		deletedByType, keys := groupByType(analysis.Deleted())
-		for _, ty := range keys {
-			fmt.Printf("  %s:\n", ty)
-			for _, res := range deletedByType[ty] {
-				humanString := fmt.Sprintf("    - %s", res.ResourceId())
-				if humanAttrs := formatResourceAttributes(res); humanAttrs != "" {
+
+		for source, deletedResources := range groupedBySource {
+			fmt.Print(color.BlueString("  From %s\n", source))
+			for _, deletedResource := range deletedResources {
+				humanString := fmt.Sprintf("    - %s (%s)", deletedResource.ResourceId(), deletedResource.SourceString())
+
+				if humanAttrs := formatResourceAttributes(deletedResource); humanAttrs != "" {
 					humanString += fmt.Sprintf("\n        %s", humanAttrs)
 				}
 				fmt.Println(humanString)
@@ -63,6 +77,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 			}
 		}
 	}
+
 
 	if analysis.Summary().TotalDrifted > 0 {
 

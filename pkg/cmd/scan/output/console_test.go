@@ -36,10 +36,20 @@ func TestConsole_Write(t *testing.T) {
 					&resource.Resource{
 						Id:   "test-id-1",
 						Type: "aws_test_resource",
+						Source: &resource.TerraformStateSource{
+							State:  "tfstate://test_state.tfstate",
+							Module: "module",
+							Name:   "name",
+						},
 					},
 					&resource.Resource{
 						Id:   "test-id-2",
 						Type: "aws_test_resource",
+						Source: &resource.TerraformStateSource{
+							State:  "tfstate://test_state.tfstate",
+							Module: "module",
+							Name:   "name",
+						},
 					},
 				)
 				a.AddUnmanaged(
