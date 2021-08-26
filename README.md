@@ -27,7 +27,7 @@
 </p>
 
 <details>
-  <summary>Packaging statuss</summary>
+  <summary>Packaging status</summary>
   <a href="https://repology.org/project/driftctl/versions">
     <img src="https://repology.org/badge/vertical-allrepos/driftctl.svg" alt="Packaging status">
   </a>
