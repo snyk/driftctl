@@ -9,7 +9,7 @@ import (
 
 func TestAcc_Github_BranchProtection(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion: "0.14.4",
+		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/github_branch_protection"},
 		Args: []string{
 			"scan",

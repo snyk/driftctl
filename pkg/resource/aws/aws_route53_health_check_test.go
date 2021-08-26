@@ -17,7 +17,7 @@ import (
 func TestAcc_AwsRoute53HealthCheck(t *testing.T) {
 	var mutatedHealthCheckID string
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion: "0.14.9",
+		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_route53_health_check"},
 		Args:             []string{"scan", "--filter", "Type=='aws_route53_health_check'", "--deep"},
 		Checks: []acceptance.AccCheck{

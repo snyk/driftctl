@@ -16,7 +16,7 @@ import (
 
 func TestAcc_AwsInstance(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion: "0.14.9",
+		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_instance_default"},
 		Args: []string{
 			"scan",
@@ -46,7 +46,7 @@ func TestAcc_AwsInstance(t *testing.T) {
 func TestAcc_AwsInstance_WithBlockDevices(t *testing.T) {
 	var mutatedInstanceId string
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion: "0.14.9",
+		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_instance"},
 		Args: []string{
 			"scan",
