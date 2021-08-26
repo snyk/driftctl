@@ -1,6 +1,6 @@
 Found missing resources:
-  FakeResourceStringer:
-    - dfjkgnbsgj
+  From tfstate://state.tfstate
+    - dfjkgnbsgj (module.FakeResourceStringer.name)
         Name: deleted resource
 Found resources not covered by IaC:
   FakeResourceStringer:
