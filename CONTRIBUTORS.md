@@ -26,6 +26,9 @@ Thank you to all the people who have already contributed to driftctl.
     <td align="center"><a href="https://remidoreau.com"><img src="https://avatars.githubusercontent.com/u/32459935?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Rémi Doreau</b></sub></a><br /><a href="https://github.com/cloudskiff/driftctl/commits?author=ayshiff" title="Code">💻</a></td>
     <td align="center"><a href="https://vorobiev.cloud"><img src="https://avatars.githubusercontent.com/u/197565?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Anton Vorobiev</b></sub></a><br /><a href="https://github.com/cloudskiff/driftctl/issues?q=author%3Aa-vorobiev" title="Bug reports">🐛</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://orenleung.com"><img src="https://avatars.githubusercontent.com/u/47992694?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Oren Leung</b></sub></a><br /><a href="https://github.com/cloudskiff/driftctl/commits?author=OrenLeung" title="Code">💻</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->
