@@ -429,7 +429,7 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 			for _, arg := range tt.args {
 				got := r.IsFieldIgnored(arg.Res, arg.Path)
 				if arg.Want != got {
-					t.Errorf("%s.%s.%s expected %v got %v", arg.Res.TerraformType(), arg.Res.TerraformId(), strings.Join(arg.Path, "."), arg.Want, got)
+					t.Errorf("%s.%s.%s expected %v got %v", arg.Res.ResourceType(), arg.Res.ResourceId(), strings.Join(arg.Path, "."), arg.Want, got)
 				}
 			}
 		})

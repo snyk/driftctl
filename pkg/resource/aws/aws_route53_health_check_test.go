@@ -32,7 +32,7 @@ func TestAcc_AwsRoute53HealthCheck(t *testing.T) {
 					result.AssertInfrastructureIsInSync()
 					result.AssertManagedCount(2)
 
-					mutatedHealthCheckID = result.Managed()[0].TerraformId()
+					mutatedHealthCheckID = result.Managed()[0].ResourceId()
 				},
 			},
 			{

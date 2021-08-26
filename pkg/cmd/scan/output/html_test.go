@@ -158,6 +158,44 @@ func TestHTML_Write(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			name:       "test html output when coverage is 100",
+			goldenfile: "output_coverage_100.html",
+			analysis: func() *analyser.Analysis {
+				a := &analyser.Analysis{}
+				a.Date = time.Date(2021, 06, 10, 0, 0, 0, 0, &time.Location{})
+				a.Duration = 91 * time.Second
+				a.AddManaged(
+					&resource.Resource{
+						Id:   "resource-id-1",
+						Type: "aws_resource",
+					},
+				)
+				a.AddDifference(analyser.Difference{
+					Res: &resource.Resource{
+						Id:   "resource-id-1",
+						Type: "aws_resource",
+						Source: &resource.TerraformStateSource{
+							State:  "tfstate://state.tfstate",
+							Module: "module",
+							Name:   "name",
+						},
+					}, Changelog: []analyser.Change{
+						{
+							Change: diff.Change{
+								Type: diff.DELETE,
+								Path: []string{"path", "to", "fields", "0"},
+								From: "value",
+								To:   nil,
+							},
+						},
+					}})
+				a.ProviderName = "AWS"
+				a.ProviderVersion = "3.19.0"
+				return a
+			},
+			err: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

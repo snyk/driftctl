@@ -10,7 +10,7 @@ func initAwsLambdaFunctionMetaData(resourceSchemaRepository resource.SchemaRepos
 
 	resourceSchemaRepository.SetResolveReadAttributesFunc(AwsLambdaFunctionResourceType, func(res *resource.Resource) map[string]string {
 		return map[string]string{
-			"function_name": res.TerraformId(),
+			"function_name": res.ResourceId(),
 		}
 	})
 

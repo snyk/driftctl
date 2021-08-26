@@ -24,7 +24,7 @@ func NewScanResult(t *testing.T, analysis *analyser.Analysis) *ScanResult {
 
 func (r *ScanResult) AssertResourceUnmanaged(id, ty string) {
 	for _, u := range r.Unmanaged() {
-		if u.TerraformType() == ty && u.TerraformId() == id {
+		if u.ResourceType() == ty && u.ResourceId() == id {
 			return
 		}
 	}
@@ -33,7 +33,7 @@ func (r *ScanResult) AssertResourceUnmanaged(id, ty string) {
 
 func (r *ScanResult) AssertResourceDeleted(id, ty string) {
 	for _, u := range r.Deleted() {
-		if u.TerraformType() == ty && u.TerraformId() == id {
+		if u.ResourceType() == ty && u.ResourceId() == id {
 			return
 		}
 	}
@@ -42,7 +42,7 @@ func (r *ScanResult) AssertResourceDeleted(id, ty string) {
 
 func (r *ScanResult) AssertResourceDriftCount(id, ty string, count int) {
 	for _, u := range r.Differences() {
-		if u.Res.TerraformType() == ty && u.Res.TerraformId() == id {
+		if u.Res.ResourceType() == ty && u.Res.ResourceId() == id {
 			r.Equal(count, len(u.Changelog))
 		}
 	}
@@ -52,7 +52,7 @@ func (r *ScanResult) AssertResourceDriftCount(id, ty string, count int) {
 func (r *ScanResult) AssertResourceHasDrift(id, ty string, change analyser.Change) {
 	found := false
 	for _, u := range r.Differences() {
-		if u.Res.TerraformType() == ty && u.Res.TerraformId() == id {
+		if u.Res.ResourceType() == ty && u.Res.ResourceId() == id {
 			changelogStr, _ := json.MarshalIndent(u.Changelog, "", " ")
 			changeStr, _ := json.MarshalIndent(change, "", " ")
 			r.Contains(u.Changelog, change, fmt.Sprintf("Change not found\nCHANGE: %s\nCHANGELOG:\n%s", changeStr, changelogStr))
@@ -66,7 +66,7 @@ func (r *ScanResult) AssertResourceHasDrift(id, ty string, change analyser.Chang
 
 func (r *ScanResult) AssertResourceHasNoDrift(id, ty string) {
 	for _, u := range r.Differences() {
-		if u.Res.TerraformType() == ty && u.Res.TerraformId() == id {
+		if u.Res.ResourceType() == ty && u.Res.ResourceId() == id {
 			changelogStr, _ := json.MarshalIndent(u.Changelog, "", " ")
 			r.Failf("resource has drifted", "%s(%s) :\n %v", id, ty, changelogStr)
 		}

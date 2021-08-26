@@ -23,7 +23,7 @@ func (m EipAssociationExpander) Execute(_, resourcesFromState *[]*resource.Resou
 	for _, res := range *resourcesFromState {
 		newResources = append(newResources, res)
 
-		if res.TerraformType() != aws.AwsEipResourceType {
+		if res.ResourceType() != aws.AwsEipResourceType {
 			continue
 		}
 		if m.haveMatchingEipAssociation(res, resourcesFromState) {
@@ -40,7 +40,7 @@ func (m EipAssociationExpander) Execute(_, resourcesFromState *[]*resource.Resou
 			aws.AwsEipAssociationResourceType,
 			*assocID,
 			map[string]interface{}{
-				"allocation_id":        res.TerraformId(),
+				"allocation_id":        res.ResourceId(),
 				"id":                   *assocID,
 				"instance_id":          attributes["instance"],
 				"network_interface_id": attributes["network_interface"],
@@ -58,11 +58,11 @@ func (m EipAssociationExpander) Execute(_, resourcesFromState *[]*resource.Resou
 
 func (m EipAssociationExpander) haveMatchingEipAssociation(cur *resource.Resource, stateRes *[]*resource.Resource) bool {
 	for _, res := range *stateRes {
-		if res.TerraformType() != aws.AwsEipAssociationResourceType {
+		if res.ResourceType() != aws.AwsEipAssociationResourceType {
 			continue
 		}
 		assocId := cur.Attributes().GetString("association_id")
-		if assocId != nil && res.TerraformId() == *assocId {
+		if assocId != nil && res.ResourceId() == *assocId {
 			return true
 		}
 	}

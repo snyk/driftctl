@@ -24,19 +24,19 @@ func NewSQSQueueDetailsFetcher(provider terraform.ResourceReader, deserializer *
 
 func (r *SQSQueueDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	ctyVal, err := r.reader.ReadResource(terraform.ReadResourceArgs{
-		ID: res.TerraformId(),
+		ID: res.ResourceId(),
 		Ty: aws.AwsSqsQueueResourceType,
 	})
 	if err != nil {
 		if strings.Contains(err.Error(), "NonExistentQueue") {
 			logrus.WithFields(logrus.Fields{
-				"id":   res.TerraformId(),
+				"id":   res.ResourceId(),
 				"type": aws.AwsSqsQueueResourceType,
 			}).Debugf("Ignoring queue that seems to be already deleted: %+v", err)
 			return nil, nil
 		}
 		logrus.Error(err)
-		return nil, remoteerror.NewResourceScanningError(err, res.TerraformType(), res.TerraformId())
+		return nil, remoteerror.NewResourceScanningError(err, res.ResourceType(), res.ResourceId())
 	}
 	deserializedRes, err := r.deserializer.DeserializeOne(aws.AwsSqsQueueResourceType, *ctyVal)
 	if err != nil {

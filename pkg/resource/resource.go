@@ -52,36 +52,36 @@ type Resource struct {
 	Source Source  `json:"-"`
 }
 
-func (a *Resource) Schema() *Schema {
-	return a.Sch
+func (r *Resource) Schema() *Schema {
+	return r.Sch
 }
 
-func (a *Resource) TerraformId() string {
-	return a.Id
+func (r *Resource) ResourceId() string {
+	return r.Id
 }
 
-func (a *Resource) TerraformType() string {
-	return a.Type
+func (r *Resource) ResourceType() string {
+	return r.Type
 }
 
-func (a *Resource) Attributes() *Attributes {
-	return a.Attrs
+func (r *Resource) Attributes() *Attributes {
+	return r.Attrs
 }
 
-func (a *Resource) Src() Source {
-	return a.Source
+func (r *Resource) Src() Source {
+	return r.Source
 }
 
-func (a *Resource) SourceString() string {
-	if a.Source.Namespace() == "" {
-		return fmt.Sprintf("%s.%s", a.TerraformType(), a.Source.InternalName())
+func (r *Resource) SourceString() string {
+	if r.Source.Namespace() == "" {
+		return fmt.Sprintf("%s.%s", r.ResourceType(), r.Source.InternalName())
 	}
-	return fmt.Sprintf("%s.%s.%s", a.Source.Namespace(), a.TerraformType(), a.Source.InternalName())
+	return fmt.Sprintf("%s.%s.%s", r.Source.Namespace(), r.ResourceType(), r.Source.InternalName())
 }
 
 func (r *Resource) Equal(res *Resource) bool {
-	return r.TerraformId() == res.TerraformId() &&
-		r.TerraformType() == res.TerraformType()
+	return r.ResourceId() == res.ResourceId() &&
+		r.ResourceType() == res.ResourceType()
 }
 
 type ResourceFactory interface {
@@ -104,8 +104,8 @@ func NewSerializableResource(res *Resource) *SerializableResource {
 		}
 	}
 	return &SerializableResource{
-		Id:     res.TerraformId(),
-		Type:   res.TerraformType(),
+		Id:     res.ResourceId(),
+		Type:   res.ResourceType(),
 		Source: src,
 	}
 }
@@ -117,10 +117,10 @@ type NormalizedResource interface {
 
 func Sort(res []*Resource) []*Resource {
 	sort.SliceStable(res, func(i, j int) bool {
-		if res[i].TerraformType() != res[j].TerraformType() {
-			return res[i].TerraformType() < res[j].TerraformType()
+		if res[i].ResourceType() != res[j].ResourceType() {
+			return res[i].ResourceType() < res[j].ResourceType()
 		}
-		return res[i].TerraformId() < res[j].TerraformId()
+		return res[i].ResourceId() < res[j].ResourceId()
 	})
 	return res
 }
@@ -252,9 +252,9 @@ func concatenatePath(path, next string) string {
 
 func (a *Attributes) SanitizeDefaults() {
 	original := reflect.ValueOf(*a)
-	copy := reflect.New(original.Type()).Elem()
-	a.sanitize("", original, copy)
-	*a = copy.Interface().(Attributes)
+	attributesCopy := reflect.New(original.Type()).Elem()
+	a.sanitize("", original, attributesCopy)
+	*a = attributesCopy.Interface().(Attributes)
 }
 
 func (a *Attributes) sanitize(path string, original, copy reflect.Value) bool {

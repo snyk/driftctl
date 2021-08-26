@@ -49,7 +49,7 @@
         </div>
     </section>
     <main>
-        {{ if (lt .Coverage 100) }}
+        {{ if not .IsSync }}
         <form role="search">
             <label for="search" class="visuallyhidden">Search resources by id:</label>
             <input type="search" id="search" name="search" placeholder="Search resources by id...">
@@ -102,8 +102,8 @@
                         <tbody>
                         {{range $res := .Unmanaged}}
                         <tr data-kind="resource-unmanaged" class="resource-item row">
-                            <td data-type="resource-id">{{$res.TerraformId}}</td>
-                            <td data-type="resource-type">{{$res.TerraformType}}</td>
+                            <td data-type="resource-id">{{$res.ResourceId}}</td>
+                            <td data-type="resource-type">{{$res.ResourceType}}</td>
                         </tr>
                         {{end}}
                         </tbody>
@@ -126,8 +126,8 @@
                             {{range $diff := .Differences}}
                             <div role="row" data-kind="resource-changed" class="resource-item">
                                 <div class="row">
-                                    <span role="cell" data-type="resource-id">{{$diff.Res.TerraformId}}</span>
-                                    <span role="cell" data-type="resource-type">{{$diff.Res.TerraformType}}</span>
+                                    <span role="cell" data-type="resource-id">{{$diff.Res.ResourceId}}</span>
+                                    <span role="cell" data-type="resource-type">{{$diff.Res.ResourceType}}</span>
                                 </div>
                                 <pre class="code-box">
                                     <code class="code-box-line">{{ jsonDiff $diff.Changelog }}</code>
@@ -153,8 +153,8 @@
                         <tbody>
                         {{range $res := .Deleted}}
                         <tr data-kind="resource-deleted" class="resource-item row">
-                            <td data-type="resource-id">{{$res.TerraformId}}</td>
-                            <td data-type="resource-type">{{$res.TerraformType}}</td>
+                            <td data-type="resource-id">{{$res.ResourceId}}</td>
+                            <td data-type="resource-type">{{$res.ResourceType}}</td>
                         </tr>
                         {{end}}
                         </tbody>

@@ -58,7 +58,7 @@ func runTest(t *testing.T, cases TestCases) {
 			}
 
 			for _, res := range c.stateResources {
-				schema, _ := repo.GetSchema(res.TerraformType())
+				schema, _ := repo.GetSchema(res.ResourceType())
 				res.Sch = schema
 			}
 
@@ -70,7 +70,7 @@ func runTest(t *testing.T, cases TestCases) {
 			}
 
 			for _, res := range c.remoteResources {
-				schema, _ := repo.GetSchema(res.TerraformType())
+				schema, _ := repo.GetSchema(res.ResourceType())
 				res.Sch = schema
 			}
 			remoteSupplier := &resource.MockSupplier{}

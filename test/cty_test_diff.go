@@ -23,14 +23,14 @@ func doTestDiff(got []*resource.Resource, dirName string, provider terraform.Ter
 	resources := make(map[string][]resource.Attributes)
 
 	for _, r := range got {
-		res, exist := resources[r.TerraformType()]
+		res, exist := resources[r.ResourceType()]
 
 		if !exist {
-			resources[r.TerraformType()] = []resource.Attributes{*r.Attributes()}
+			resources[r.ResourceType()] = []resource.Attributes{*r.Attributes()}
 			continue
 		}
 
-		resources[r.TerraformType()] = append(res, *r.Attributes())
+		resources[r.ResourceType()] = append(res, *r.Attributes())
 	}
 
 	expectedResources := []*resource.Resource{}

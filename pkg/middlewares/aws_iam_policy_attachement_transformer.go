@@ -30,39 +30,39 @@ func (m IamPolicyAttachmentTransformer) Execute(remoteResources, resourcesFromSt
 func (m IamPolicyAttachmentTransformer) transform(resources *[]*resource.Resource) []*resource.Resource {
 	var newResources []*resource.Resource
 	for _, res := range *resources {
-		if res.TerraformType() != aws.AwsIamUserPolicyAttachmentResourceType &&
-			res.TerraformType() != aws.AwsIamRolePolicyAttachmentResourceType {
+		if res.ResourceType() != aws.AwsIamUserPolicyAttachmentResourceType &&
+			res.ResourceType() != aws.AwsIamRolePolicyAttachmentResourceType {
 			newResources = append(newResources, res)
 			continue
 		}
 
-		if res.TerraformType() == aws.AwsIamUserPolicyAttachmentResourceType {
+		if res.ResourceType() == aws.AwsIamUserPolicyAttachmentResourceType {
 			attrs := *res.Attributes()
 			policyAttachmentData := resource.Attributes{
-				"id":         res.TerraformId(),
+				"id":         res.ResourceId(),
 				"policy_arn": attrs["policy_arn"],
 				"users":      []interface{}{attrs["user"]},
 				"groups":     []interface{}{},
 				"roles":      []interface{}{},
 			}
 
-			policyAttachment := m.resourceFactory.CreateAbstractResource(aws.AwsIamPolicyAttachmentResourceType, res.TerraformId(), policyAttachmentData)
+			policyAttachment := m.resourceFactory.CreateAbstractResource(aws.AwsIamPolicyAttachmentResourceType, res.ResourceId(), policyAttachmentData)
 
 			newResources = append(newResources, policyAttachment)
 			continue
 		}
 
-		if res.TerraformType() == aws.AwsIamRolePolicyAttachmentResourceType {
+		if res.ResourceType() == aws.AwsIamRolePolicyAttachmentResourceType {
 			attrs := *res.Attributes()
 			policyAttachmentData := resource.Attributes{
-				"id":         res.TerraformId(),
+				"id":         res.ResourceId(),
 				"policy_arn": attrs["policy_arn"],
 				"users":      []interface{}{},
 				"groups":     []interface{}{},
 				"roles":      []interface{}{attrs["role"]},
 			}
 
-			policyAttachment := m.resourceFactory.CreateAbstractResource(aws.AwsIamPolicyAttachmentResourceType, res.TerraformId(), policyAttachmentData)
+			policyAttachment := m.resourceFactory.CreateAbstractResource(aws.AwsIamPolicyAttachmentResourceType, res.ResourceId(), policyAttachmentData)
 
 			newResources = append(newResources, policyAttachment)
 			continue
