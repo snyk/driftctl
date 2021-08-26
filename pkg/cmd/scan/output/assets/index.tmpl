@@ -53,11 +53,18 @@
         <form role="search">
             <label for="search" class="visuallyhidden">Search resources by id:</label>
             <input type="search" id="search" name="search" placeholder="Search resources by id...">
-            <label for="select" class="visuallyhidden">Select a resource type:</label>
-            <select id="select" name="select">
+            <label for="resource-type-select" class="visuallyhidden">Select a resource type:</label>
+            <select id="resource-type-select" name="resource-type-select">
                 <option value="">Select a resource type</option>
                 {{ range $type := getResourceTypes }}
                 <option value="{{$type}}">{{ $type }}</option>
+                {{end}}
+            </select>
+            <label for="iac-source-select" class="visuallyhidden">Select an IaC source:</label>
+            <select id="iac-source-select" name="iac-source-select">
+                <option value="">Select an IaC source</option>
+                {{ range $source := getIaCSources }}
+                <option value="{{$source}}">{{ $source }}</option>
                 {{end}}
             </select>
             <input type="reset" value="Reset Filters">
@@ -119,15 +126,19 @@
                         <div role="rowgroup">
                             <div role="row" class="table-header">
                                 <span role="columnheader">Resource ID</span>
-                                <span role="columnheader">Resource Type</span>
+                                <span role="columnheader">IaC source</span>
                             </div>
                         </div>
                         <div role="rowgroup" class="table-body">
                             {{range $diff := .Differences}}
                             <div role="row" data-kind="resource-changed" class="resource-item">
                                 <div class="row">
-                                    <span role="cell" data-type="resource-id">{{$diff.Res.ResourceId}}</span>
-                                    <span role="cell" data-type="resource-type">{{$diff.Res.ResourceType}}</span>
+                                    <span role="cell">
+                                        <span data-type="resource-id">{{$diff.Res.ResourceId}}</span>
+                                        {{ if $diff.Res.Src }}(<span>{{$diff.Res.SourceString}}</span>){{ else }}<span>({{$diff.Res.ResourceType}})</span>{{ end }}
+                                        <span style="display:none;" data-type="resource-type">{{$diff.Res.ResourceType}}</span>
+                                    </span>
+                                    {{ if $diff.Res.Src }}<span role="cell" data-type="resource-source">{{$diff.Res.Src.Source}}</span>{{ end }}
                                 </div>
                                 <pre class="code-box">
                                     <code class="code-box-line">{{ jsonDiff $diff.Changelog }}</code>
@@ -147,14 +158,18 @@
                         <thead>
                         <tr class="table-header">
                             <th>Resource ID</th>
-                            <th>Resource Type</th>
+                            <th>IaC source</th>
                         </tr>
                         </thead>
                         <tbody>
                         {{range $res := .Deleted}}
                         <tr data-kind="resource-deleted" class="resource-item row">
-                            <td data-type="resource-id">{{$res.ResourceId}}</td>
-                            <td data-type="resource-type">{{$res.ResourceType}}</td>
+                            <td>
+                                <span data-type="resource-id">{{$res.ResourceId}}</span>
+                                {{ if $res.Src }}<span>({{$res.SourceString}})</span>{{ else }}<span>({{$res.ResourceType}})</span>{{ end }}
+                                <span data-type="resource-type" style="display:none;">{{$res.ResourceType}}</span>
+                            </td>
+                            {{ if $res.Src }}<td data-type="resource-source">{{$res.Src.Source}}</td>{{ end }}
                         </tr>
                         {{end}}
                         </tbody>
@@ -197,11 +212,13 @@
 
     const resources = document.querySelectorAll("[data-kind^='resource-']");
     const searchInput = document.querySelector('[type="search"]');
-    const selectBox = document.querySelector("select");
+    const resourceTypeSelectBox = document.querySelector("#resource-type-select");
+    const iacSourceSelectBox = document.querySelector("#iac-source-select");
     const resetButton = document.querySelector('[type="reset"]');
 
     searchInput.addEventListener("input", filterResources);
-    selectBox.addEventListener("input", filterResources);
+    resourceTypeSelectBox.addEventListener("input", filterResources);
+    iacSourceSelectBox.addEventListener("input", filterResources);
     resetButton.addEventListener("click", resetResources);
 
     function refreshPanel(count, el) {
@@ -261,13 +278,26 @@
         return el.innerText === type;
     }
 
+    function resourceSourceEquals(res, source) {
+        if (source === "") {
+            return true;
+        }
+        const el = res.querySelector("[data-type='resource-source']");
+        if (!el) {
+            return false;
+        }
+        return el.innerText === source;
+    }
+
     function filterResources() {
         const id = searchInput.value;
-        const type = selectBox.value;
+        const type = resourceTypeSelectBox.value;
+        const source = iacSourceSelectBox.value;
         for (const res of resources) {
             const matchId = resourceIdContains(res, id);
             const matchType = resourceTypeEquals(res, type);
-            if (matchId && matchType) {
+            const matchSource = resourceSourceEquals(res, source);
+            if (matchId && matchType && matchSource) {
                 res.classList.remove("is-hidden");
             } else {
                 res.classList.add("is-hidden");
