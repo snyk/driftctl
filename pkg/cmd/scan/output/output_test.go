@@ -30,19 +30,9 @@ func fakeAnalysis() *analyser.Analysis {
 		&resource.Resource{
 			Id:   "deleted-id-1",
 			Type: "aws_deleted_resource",
-			Source: &resource.TerraformStateSource{
-				State:  "tfstate://delete_state.tfstate",
-				Module: "module",
-				Name:   "name",
-			},
 		}, &resource.Resource{
 			Id:   "deleted-id-2",
 			Type: "aws_deleted_resource",
-			Source: &resource.TerraformStateSource{
-				State:  "tfstate://delete_state.tfstate",
-				Module: "module",
-				Name:   "name",
-			},
 		},
 	)
 	a.AddManaged(
@@ -189,11 +179,6 @@ func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 			Id:    "dfjkgnbsgj",
 			Type:  "FakeResourceStringer",
 			Attrs: &resource.Attributes{},
-			Source: &resource.TerraformStateSource{
-				State:  "tfstate://state.tfstate",
-				Module: "module",
-				Name:   "name",
-			},
 		},
 	)
 	a.AddManaged(
@@ -229,11 +214,6 @@ func fakeAnalysisWithStringerResources() *analyser.Analysis {
 			Sch:  schema,
 			Attrs: &resource.Attributes{
 				"name": "deleted resource",
-			},
-			Source: &resource.TerraformStateSource{
-				State:  "tfstate://state.tfstate",
-				Module: "module",
-				Name:   "name",
 			},
 		},
 	)

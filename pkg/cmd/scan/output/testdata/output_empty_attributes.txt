@@ -1,6 +1,6 @@
 Found missing resources:
-  From tfstate://state.tfstate
-    - dfjkgnbsgj (module.FakeResourceStringer.name)
+  FakeResourceStringer:
+    - dfjkgnbsgj
 Found resources not covered by IaC:
   FakeResourceStringer:
     - duysgkfdjfdgfhd

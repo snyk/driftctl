@@ -1,10 +1,10 @@
 Found missing resources:
-  From tfstate://delete_state.tfstate
-    - deleted-id-1 (module.aws_deleted_resource.name)
-    - deleted-id-2 (module.aws_deleted_resource.name)
-  From tfstate://test_state.tfstate
-    - test-id-1 (module.aws_test_resource.name)
-    - test-id-2 (module.aws_test_resource.name)
+  aws_deleted_resource:
+    - deleted-id-1
+    - deleted-id-2
+  aws_test_resource:
+    - test-id-1
+    - test-id-2
 Found resources not covered by IaC:
   aws_resource:
     - test-id-2
