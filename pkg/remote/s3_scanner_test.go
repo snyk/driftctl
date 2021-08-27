@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
@@ -33,12 +34,12 @@ func TestS3Bucket(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *repository.MockS3Repository)
+		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test: "multiple bucket", dirName: "aws_s3_bucket_multiple",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -74,8 +75,10 @@ func TestS3Bucket(t *testing.T) {
 		},
 		{
 			test: "cannot list bucket", dirName: "s3_bucket_list",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsS3BucketResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketResourceType, resourceaws.AwsS3BucketResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -100,9 +103,8 @@ func TestS3Bucket(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockS3Repository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
 			var repo repository.S3Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -138,6 +140,8 @@ func TestS3Bucket(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsS3BucketResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }
@@ -147,12 +151,12 @@ func TestS3BucketInventory(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *repository.MockS3Repository)
+		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test: "multiple bucket with multiple inventories", dirName: "s3_bucket_inventories_multiple",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -200,14 +204,16 @@ func TestS3BucketInventory(t *testing.T) {
 		},
 		{
 			test: "cannot list bucket", dirName: "s3_bucket_inventories_list_bucket",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsS3BucketInventoryResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketInventoryResourceType, resourceaws.AwsS3BucketResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
 		{
 			test: "cannot list bucket inventories", dirName: "s3_bucket_inventories_list_inventories",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return(
 					[]*s3.Bucket{
 						{Name: awssdk.String("bucket-martin-test-drift")},
@@ -229,6 +235,8 @@ func TestS3BucketInventory(t *testing.T) {
 					nil,
 					awserr.NewRequestFailure(nil, 403, ""),
 				)
+
+				alerter.On("SendAlert", resourceaws.AwsS3BucketInventoryResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketInventoryResourceType, resourceaws.AwsS3BucketInventoryResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -253,9 +261,8 @@ func TestS3BucketInventory(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockS3Repository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
 			var repo repository.S3Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -291,6 +298,8 @@ func TestS3BucketInventory(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsS3BucketInventoryResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }
@@ -300,13 +309,13 @@ func TestS3BucketNotification(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *repository.MockS3Repository)
+		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "single bucket without notifications",
 			dirName: "s3_bucket_notifications_no_notif",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -333,7 +342,7 @@ func TestS3BucketNotification(t *testing.T) {
 		},
 		{
 			test: "multiple bucket with notifications", dirName: "s3_bucket_notifications_multiple",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -387,7 +396,7 @@ func TestS3BucketNotification(t *testing.T) {
 		},
 		{
 			test: "Cannot get bucket notification", dirName: "s3_bucket_notifications_list_bucket",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -401,13 +410,17 @@ func TestS3BucketNotification(t *testing.T) {
 					nil,
 				)
 				repository.On("GetBucketNotification", "dritftctl-test-notifications-error", "eu-west-3").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", "aws_s3_bucket_notification.dritftctl-test-notifications-error", alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_s3_bucket_notification.dritftctl-test-notifications-error", resourceaws.AwsS3BucketNotificationResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
 		{
 			test: "Cannot list bucket", dirName: "s3_bucket_notifications_list_bucket",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsS3BucketNotificationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketNotificationResourceType, resourceaws.AwsS3BucketResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -432,9 +445,8 @@ func TestS3BucketNotification(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockS3Repository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
 			var repo repository.S3Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -470,6 +482,8 @@ func TestS3BucketNotification(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsS3BucketNotificationResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }
@@ -479,12 +493,12 @@ func TestS3BucketMetrics(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *repository.MockS3Repository)
+		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test: "multiple bucket with multiple metrics", dirName: "s3_bucket_metrics_multiple",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -532,14 +546,16 @@ func TestS3BucketMetrics(t *testing.T) {
 		},
 		{
 			test: "cannot list bucket", dirName: "s3_bucket_metrics_list_bucket",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsS3BucketMetricResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketMetricResourceType, resourceaws.AwsS3BucketResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
 		{
 			test: "cannot list metrics", dirName: "s3_bucket_metrics_list_metrics",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return(
 					[]*s3.Bucket{
 						{Name: awssdk.String("bucket-martin-test-drift")},
@@ -563,6 +579,7 @@ func TestS3BucketMetrics(t *testing.T) {
 					awserr.NewRequestFailure(nil, 403, ""),
 				)
 
+				alerter.On("SendAlert", resourceaws.AwsS3BucketMetricResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketMetricResourceType, resourceaws.AwsS3BucketMetricResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -587,9 +604,8 @@ func TestS3BucketMetrics(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockS3Repository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
 			var repo repository.S3Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -625,6 +641,8 @@ func TestS3BucketMetrics(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsS3BucketMetricResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }
@@ -634,13 +652,13 @@ func TestS3BucketPolicy(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *repository.MockS3Repository)
+		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "single bucket without policy",
 			dirName: "s3_bucket_policy_no_policy",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -667,7 +685,7 @@ func TestS3BucketPolicy(t *testing.T) {
 		},
 		{
 			test: "multiple bucket with policies", dirName: "s3_bucket_policies_multiple",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -715,8 +733,10 @@ func TestS3BucketPolicy(t *testing.T) {
 		},
 		{
 			test: "cannot list bucket", dirName: "s3_bucket_policies_list_bucket",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsS3BucketPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketPolicyResourceType, resourceaws.AwsS3BucketResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -741,9 +761,8 @@ func TestS3BucketPolicy(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockS3Repository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
 			var repo repository.S3Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -779,6 +798,8 @@ func TestS3BucketPolicy(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsS3BucketPolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }
@@ -788,13 +809,13 @@ func TestS3BucketAnalytic(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *repository.MockS3Repository)
+		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "multiple bucket with multiple analytics",
 			dirName: "aws_s3_bucket_analytics_multiple",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -840,17 +861,18 @@ func TestS3BucketAnalytic(t *testing.T) {
 				)
 			},
 		},
-
 		{
 			test: "cannot list bucket", dirName: "aws_s3_bucket_analytics_list_bucket",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, resourceaws.AwsS3BucketResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
 		{
 			test: "cannot list Analytics", dirName: "aws_s3_bucket_analytics_list_analytics",
-			mocks: func(repository *repository.MockS3Repository) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return(
 					[]*s3.Bucket{
 						{Name: awssdk.String("bucket-martin-test-drift")},
@@ -874,6 +896,7 @@ func TestS3BucketAnalytic(t *testing.T) {
 					awserr.NewRequestFailure(nil, 403, ""),
 				)
 
+				alerter.On("SendAlert", resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -898,9 +921,8 @@ func TestS3BucketAnalytic(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockS3Repository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
 			var repo repository.S3Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -936,6 +958,8 @@ func TestS3BucketAnalytic(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }

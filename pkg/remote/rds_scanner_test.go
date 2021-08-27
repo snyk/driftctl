@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
@@ -28,20 +29,20 @@ func TestRDSDBInstance(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *repository.MockRDSRepository)
+		mocks   func(*repository.MockRDSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no db instances",
 			dirName: "aws_rds_db_instance_empty",
-			mocks: func(repository *repository.MockRDSRepository) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBInstances").Return([]*rds.DBInstance{}, nil)
 			},
 		},
 		{
 			test:    "single db instance",
 			dirName: "aws_rds_db_instance_single",
-			mocks: func(repository *repository.MockRDSRepository) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBInstances").Return([]*rds.DBInstance{
 					{DBInstanceIdentifier: awssdk.String("terraform-20201015115018309600000001")},
 				}, nil)
@@ -50,7 +51,7 @@ func TestRDSDBInstance(t *testing.T) {
 		{
 			test:    "multiple mixed db instances",
 			dirName: "aws_rds_db_instance_multiple",
-			mocks: func(repository *repository.MockRDSRepository) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBInstances").Return([]*rds.DBInstance{
 					{DBInstanceIdentifier: awssdk.String("terraform-20201015115018309600000001")},
 					{DBInstanceIdentifier: awssdk.String("database-1")},
@@ -60,8 +61,10 @@ func TestRDSDBInstance(t *testing.T) {
 		{
 			test:    "cannot list db instances",
 			dirName: "aws_rds_db_instance_list",
-			mocks: func(repository *repository.MockRDSRepository) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBInstances").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsDbInstanceResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsDbInstanceResourceType, resourceaws.AwsDbInstanceResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -86,9 +89,9 @@ func TestRDSDBInstance(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockRDSRepository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
+
 			var repo repository.RDSRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -121,6 +124,8 @@ func TestRDSDBInstance(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsDbInstanceResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }
@@ -129,20 +134,20 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *repository.MockRDSRepository)
+		mocks   func(*repository.MockRDSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no db subnet groups",
 			dirName: "aws_rds_db_subnet_group_empty",
-			mocks: func(repository *repository.MockRDSRepository) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBSubnetGroups").Return([]*rds.DBSubnetGroup{}, nil)
 			},
 		},
 		{
 			test:    "multiple db subnet groups",
 			dirName: "aws_rds_db_subnet_group_multiple",
-			mocks: func(repository *repository.MockRDSRepository) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBSubnetGroups").Return([]*rds.DBSubnetGroup{
 					{DBSubnetGroupName: awssdk.String("foo")},
 					{DBSubnetGroupName: awssdk.String("bar")},
@@ -152,8 +157,10 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 		{
 			test:    "cannot list db subnet groups",
 			dirName: "aws_rds_db_subnet_group_list",
-			mocks: func(repository *repository.MockRDSRepository) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBSubnetGroups").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+
+				alerter.On("SendAlert", resourceaws.AwsDbSubnetGroupResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsDbSubnetGroupResourceType, resourceaws.AwsDbSubnetGroupResourceType, alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -178,9 +185,9 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			alerter.On("SendAlert", mock.Anything, mock.Anything).Maybe().Return()
 			fakeRepo := &repository.MockRDSRepository{}
-			c.mocks(fakeRepo)
+			c.mocks(fakeRepo, alerter)
+
 			var repo repository.RDSRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
@@ -213,6 +220,8 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, resourceaws.AwsDbSubnetGroupResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
 		})
 	}
 }

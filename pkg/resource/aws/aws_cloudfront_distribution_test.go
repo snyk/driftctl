@@ -20,7 +20,7 @@ import (
 func TestAcc_Aws_CloudfrontDistribution(t *testing.T) {
 	var mutatedDistribution string
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion:           "0.14.9",
+		TerraformVersion:           "0.15.5",
 		Paths:                      []string{"./testdata/acc/aws_cloudfront_distribution"},
 		Args:                       []string{"scan", "--filter", "Type=='aws_cloudfront_distribution'", "--deep"},
 		ShouldRefreshBeforeDestroy: true,
@@ -35,7 +35,7 @@ func TestAcc_Aws_CloudfrontDistribution(t *testing.T) {
 					}
 					result.AssertInfrastructureIsInSync()
 					result.AssertManagedCount(1)
-					mutatedDistribution = result.Managed()[0].TerraformId()
+					mutatedDistribution = result.Managed()[0].ResourceId()
 				},
 			},
 			{

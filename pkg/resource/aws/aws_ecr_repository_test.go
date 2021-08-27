@@ -18,7 +18,7 @@ import (
 func TestAcc_AwsECRRepository(t *testing.T) {
 	var mutatedRepositoryID string
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion: "0.14.9",
+		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_ecr_repository"},
 		Args:             []string{"scan", "--filter", "Type=='aws_ecr_repository'", "--deep"},
 		Checks: []acceptance.AccCheck{
@@ -33,7 +33,7 @@ func TestAcc_AwsECRRepository(t *testing.T) {
 					result.AssertInfrastructureIsInSync()
 					result.AssertManagedCount(1)
 
-					mutatedRepositoryID = result.Managed()[0].TerraformId()
+					mutatedRepositoryID = result.Managed()[0].ResourceId()
 				},
 			},
 			{

@@ -22,7 +22,7 @@ import (
 func TestAcc_AwsSQSQueue(t *testing.T) {
 	var mutatedQueue string
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion: "0.14.9",
+		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_sqs_queue"},
 		Args:             []string{"scan", "--filter", "Type=='aws_sqs_queue'", "--deep"},
 		Checks: []acceptance.AccCheck{
@@ -52,7 +52,7 @@ func TestAcc_AwsSQSQueue(t *testing.T) {
 					}
 					result.AssertInfrastructureIsInSync()
 					result.Equal(2, result.Summary().TotalManaged)
-					mutatedQueue = result.Managed()[0].TerraformId()
+					mutatedQueue = result.Managed()[0].ResourceId()
 				},
 			},
 			{

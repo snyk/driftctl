@@ -20,7 +20,7 @@ func (m VPCDefaultSecurityGroupSanitizer) Execute(remoteResources, resourcesFrom
 		existInState := false
 
 		// Ignore all resources other than default security group
-		if remoteResource.TerraformType() != aws.AwsDefaultSecurityGroupResourceType {
+		if remoteResource.ResourceType() != aws.AwsDefaultSecurityGroupResourceType {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
@@ -38,8 +38,8 @@ func (m VPCDefaultSecurityGroupSanitizer) Execute(remoteResources, resourcesFrom
 
 		if !existInState {
 			logrus.WithFields(logrus.Fields{
-				"id":   remoteResource.TerraformId(),
-				"type": remoteResource.TerraformType(),
+				"id":   remoteResource.ResourceId(),
+				"type": remoteResource.ResourceType(),
 			}).Debug("Ignoring default unmanaged security group")
 		}
 	}

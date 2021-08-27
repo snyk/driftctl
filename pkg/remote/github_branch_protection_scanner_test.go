@@ -5,6 +5,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	"github.com/cloudskiff/driftctl/pkg/remote/github"
@@ -12,6 +13,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	tftest "github.com/cloudskiff/driftctl/test/terraform"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -25,13 +27,13 @@ func TestScanGithubBranchProtection(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(client *github.MockGithubRepository)
+		mocks   func(*github.MockGithubRepository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no branch protection",
 			dirName: "github_branch_protection_empty",
-			mocks: func(client *github.MockGithubRepository) {
+			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListBranchProtection").Return([]string{}, nil)
 			},
 			err: nil,
@@ -39,7 +41,7 @@ func TestScanGithubBranchProtection(t *testing.T) {
 		{
 			test:    "Multiple branch protections",
 			dirName: "github_branch_protection_multiples",
-			mocks: func(client *github.MockGithubRepository) {
+			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListBranchProtection").Return([]string{
 					"MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0NzI=", //"repo0:main"
 					"MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0Nzg=", //"repo0:toto"
@@ -51,13 +53,22 @@ func TestScanGithubBranchProtection(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			test:    "cannot list branch protections",
+			dirName: "github_branch_protection_empty",
+			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
+				client.On("ListBranchProtection").Return(nil, errors.New("Your token has not been granted the required scopes to execute this query."))
+
+				alerter.On("SendAlert", githubres.GithubBranchProtectionResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, githubres.GithubBranchProtectionResourceType, githubres.GithubBranchProtectionResourceType, alerts.EnumerationPhase)).Return()
+			},
+			err: nil,
+		},
 	}
 
 	schemaRepository := testresource.InitFakeSchemaRepository("github", "4.4.0")
 	githubres.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -68,8 +79,11 @@ func TestScanGithubBranchProtection(t *testing.T) {
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
 			mockedRepo := github.MockGithubRepository{}
-			c.mocks(&mockedRepo)
+			c.mocks(&mockedRepo, alerter)
+
 			var repo github.GithubRepository = &mockedRepo
 
 			realProvider, err := tftest.InitTestGithubProvider(providerLibrary, "4.4.0")
@@ -101,6 +115,8 @@ func TestScanGithubBranchProtection(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, githubres.GithubBranchProtectionResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			mockedRepo.AssertExpectations(tt)
+			alerter.AssertExpectations(tt)
 		})
 	}
 }

@@ -38,8 +38,8 @@ func (e *FilterEngine) Run(resources []*resource.Resource) ([]*resource.Resource
 		f := filtrableResource{
 			Attr: attrs,
 			Res:  res,
-			Id:   res.TerraformId(),
-			Type: res.TerraformType(),
+			Id:   res.ResourceId(),
+			Type: res.ResourceType(),
 		}
 		filtrableResources = append(
 			filtrableResources,

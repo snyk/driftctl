@@ -29,11 +29,21 @@
 	"missing": [
 		{
 			"id": "deleted-id-1",
-			"type": "aws_deleted_resource"
+			"type": "aws_deleted_resource",
+			"source": {
+				"source": "tfstate://delete_state.tfstate",
+				"namespace": "module",
+				"internal_name": "name"
+			}
 		},
 		{
 			"id": "deleted-id-2",
-			"type": "aws_deleted_resource"
+			"type": "aws_deleted_resource",
+			"source": {
+				"source": "tfstate://delete_state.tfstate",
+				"namespace": "module",
+				"internal_name": "name"
+			}
 		}
 	],
 	"differences": [

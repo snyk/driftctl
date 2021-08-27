@@ -35,13 +35,27 @@ func NewConsole() *Console {
 
 func (c *Console) Write(analysis *analyser.Analysis) error {
 	if analysis.Summary().TotalDeleted > 0 {
+		groupedBySource := make(map[string][]*resource.Resource)
+
+		for _, deletedResource := range analysis.Deleted() {
+			key := deletedResource.Source.Source()
+
+			if _, exist := groupedBySource[key]; !exist {
+				groupedBySource[key] = []*resource.Resource{deletedResource}
+				continue
+			}
+
+			groupedBySource[key] = append(groupedBySource[key], deletedResource)
+		}
+
 		fmt.Println("Found missing resources:")
-		deletedByType, keys := groupByType(analysis.Deleted())
-		for _, ty := range keys {
-			fmt.Printf("  %s:\n", ty)
-			for _, res := range deletedByType[ty] {
-				humanString := fmt.Sprintf("    - %s", res.TerraformId())
-				if humanAttrs := formatResourceAttributes(res); humanAttrs != "" {
+
+		for source, deletedResources := range groupedBySource {
+			fmt.Print(color.BlueString("  From %s\n", source))
+			for _, deletedResource := range deletedResources {
+				humanString := fmt.Sprintf("    - %s (%s)", deletedResource.ResourceId(), deletedResource.SourceString())
+
+				if humanAttrs := formatResourceAttributes(deletedResource); humanAttrs != "" {
 					humanString += fmt.Sprintf("\n        %s", humanAttrs)
 				}
 				fmt.Println(humanString)
@@ -55,7 +69,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 		for _, ty := range keys {
 			fmt.Printf("  %s:\n", ty)
 			for _, res := range unmanagedByType[ty] {
-				humanString := fmt.Sprintf("    - %s", res.TerraformId())
+				humanString := fmt.Sprintf("    - %s", res.ResourceId())
 				if humanAttrs := formatResourceAttributes(res); humanAttrs != "" {
 					humanString += fmt.Sprintf("\n        %s", humanAttrs)
 				}
@@ -80,7 +94,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 		for source, differences := range groupedBySource {
 			fmt.Print(color.BlueString("  From %s\n", source))
 			for _, difference := range differences {
-				humanString := fmt.Sprintf("    - %s (%s):", difference.Res.TerraformId(), difference.Res.SourceString())
+				humanString := fmt.Sprintf("    - %s (%s):", difference.Res.ResourceId(), difference.Res.SourceString())
 				whiteSpace := "        "
 				if humanAttrs := formatResourceAttributes(difference.Res); humanAttrs != "" {
 					humanString += fmt.Sprintf("\n        %s", humanAttrs)
@@ -98,7 +112,7 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 					if change.Type == diff.UPDATE {
 						if change.JsonString {
 							prefix := "           "
-							fmt.Printf("%s%s\n%s%s\n", whiteSpace, pref, prefix, jsonDiff(change.From, change.To, prefix))
+							fmt.Printf("%s%s\n%s%s\n", whiteSpace, pref, prefix, jsonDiff(change.From, change.To, isatty.IsTerminal(os.Stdout.Fd())))
 							continue
 						}
 					}
@@ -191,11 +205,11 @@ func prettify(resource interface{}) string {
 func groupByType(resources []*resource.Resource) (map[string][]*resource.Resource, []string) {
 	result := map[string][]*resource.Resource{}
 	for _, res := range resources {
-		if result[res.TerraformType()] == nil {
-			result[res.TerraformType()] = []*resource.Resource{res}
+		if result[res.ResourceType()] == nil {
+			result[res.ResourceType()] = []*resource.Resource{res}
 			continue
 		}
-		result[res.TerraformType()] = append(result[res.TerraformType()], res)
+		result[res.ResourceType()] = append(result[res.ResourceType()], res)
 	}
 
 	keys := make([]string, 0, len(result))
@@ -207,22 +221,22 @@ func groupByType(resources []*resource.Resource) (map[string][]*resource.Resourc
 	return result, keys
 }
 
-func jsonDiff(a, b interface{}, prefix string) string {
+func jsonDiff(a, b interface{}, coloring bool) string {
 	aStr := fmt.Sprintf("%s", a)
 	bStr := fmt.Sprintf("%s", b)
 	d := gojsondiff.New()
 	var aJson map[string]interface{}
 	_ = json.Unmarshal([]byte(aStr), &aJson)
-	diff, _ := d.Compare([]byte(aStr), []byte(bStr))
+	result, _ := d.Compare([]byte(aStr), []byte(bStr))
 	f := formatter.NewAsciiFormatter(aJson, formatter.AsciiFormatterConfig{
-		Coloring: isatty.IsTerminal(os.Stdout.Fd()),
+		Coloring: coloring,
 	})
 	// Set foreground green color for added lines and red color for deleted lines
 	formatter.AsciiStyles = map[string]string{
 		"+": "32",
 		"-": "31",
 	}
-	diffStr, _ := f.Format(diff)
+	diffStr, _ := f.Format(result)
 
 	return diffStr
 }

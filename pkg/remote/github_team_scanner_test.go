@@ -1,10 +1,12 @@
 package remote
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	"github.com/cloudskiff/driftctl/pkg/remote/github"
@@ -25,13 +27,13 @@ func TestScanGithubTeam(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(repository *github.MockGithubRepository)
+		mocks   func(*github.MockGithubRepository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no github teams",
 			dirName: "github_teams_empty",
-			mocks: func(client *github.MockGithubRepository) {
+			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListTeams").Return([]github.Team{}, nil)
 			},
 			err: nil,
@@ -39,12 +41,22 @@ func TestScanGithubTeam(t *testing.T) {
 		{
 			test:    "Multiple github teams with parent",
 			dirName: "github_teams_multiple",
-			mocks: func(client *github.MockGithubRepository) {
+			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListTeams").Return([]github.Team{
 					{DatabaseId: 4556811}, // github_team.team1
 					{DatabaseId: 4556812}, // github_team.team2
 					{DatabaseId: 4556814}, // github_team.with_parent
 				}, nil)
+			},
+			err: nil,
+		},
+		{
+			test:    "cannot list teams",
+			dirName: "github_teams_empty",
+			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
+				client.On("ListTeams").Return(nil, errors.New("Your token has not been granted the required scopes to execute this query."))
+
+				alerter.On("SendAlert", githubres.GithubTeamResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, githubres.GithubTeamResourceType, githubres.GithubTeamResourceType, alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -54,7 +66,6 @@ func TestScanGithubTeam(t *testing.T) {
 	githubres.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
-	alerter := &mocks.AlerterInterface{}
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -65,8 +76,11 @@ func TestScanGithubTeam(t *testing.T) {
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
 			mockedRepo := github.MockGithubRepository{}
-			c.mocks(&mockedRepo)
+			c.mocks(&mockedRepo, alerter)
+
 			var repo github.GithubRepository = &mockedRepo
 
 			realProvider, err := tftest.InitTestGithubProvider(providerLibrary, "4.4.0")
@@ -98,6 +112,8 @@ func TestScanGithubTeam(t *testing.T) {
 				return
 			}
 			test.TestAgainstGoldenFile(got, githubres.GithubTeamResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			mockedRepo.AssertExpectations(tt)
+			alerter.AssertExpectations(tt)
 		})
 	}
 }

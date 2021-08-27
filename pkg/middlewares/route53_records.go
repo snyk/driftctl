@@ -23,7 +23,7 @@ func (m Route53DefaultZoneRecordSanitizer) Execute(remoteResources, resourcesFro
 		existInState := false
 
 		// Ignore all resources other than route53 records
-		if remoteResource.TerraformType() != aws.AwsRoute53RecordResourceType {
+		if remoteResource.ResourceType() != aws.AwsRoute53RecordResourceType {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
@@ -46,8 +46,8 @@ func (m Route53DefaultZoneRecordSanitizer) Execute(remoteResources, resourcesFro
 
 		if !existInState {
 			logrus.WithFields(logrus.Fields{
-				"id":   remoteResource.TerraformId(),
-				"type": remoteResource.TerraformType(),
+				"id":   remoteResource.ResourceId(),
+				"type": remoteResource.ResourceType(),
 			}).Debug("Ignoring default unmanaged record")
 		}
 

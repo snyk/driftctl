@@ -4,8 +4,7 @@
     <title>driftctl Scan Report</title>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link rel="shortcut icon"
-          href="https://raw.githubusercontent.com/cloudskiff/driftctl-docs/main/static/img/favicon.ico"/>
+    <link rel="shortcut icon" type="image/x-icon" href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAflBMVEVHcEyG1N1wgIVytMRxtMNufIByf4JxtMQpPUJxs8NytMRxtMR2u8VytcV0tcUvRUt1t8dxs8RytMR1t8UvSE5xtMRxs8Nxs8Nxs8NUZGdbam4pPUL///&#43;nr7G0u73a3t9ygIOYoqTFy82GkZRxs8NKW19jcXXy9PRSY2c9T1PL6xgVAAAAG3RSTlMABedb3drdoM31bYIfPzzdGrN2LN6217251dZBPg6dAAABA0lEQVR4Xq2T2XKCMBSGQ9maKBS0oDbrAtq&#43;/wsWDnKGxZnc&#43;DETLs6fs4e8lSNrEkqThh1fm/MOyV9IYtotoPHWfug2HNb2U7fjtLQXc&#43;y4LOM5l4IgUQLm65kA5ysIkggFbLpOkMkJWzuoo4XLeuWihMIqsqCCokssEQMgOZZ6y7KPkQz5&#43;Rz5Ghn&#43;RApAjYcT0mnhOOc9tz0HngJptHRKaaONVHffK3P/XQoe0jonhB0&#43;&#43;XCec8/XAmG91mMcJbRUxnNj/uxTcEtTSDJFpiS/ByDJQJnhRgH7VjfQ6uCwtuO&#43;zOO&#43;4Lj3C1MU64UJr1x4acNrH344SMXqltK2ZhV5J/88zzYOY4aflwAAAABJRU5ErkJggg==" />
     <style>html, body, div, span, h1, h2, p, pre, a, code, img, ul, li, form, label, table, tbody, thead, tr, th, td, header, section, button {
     border: 0;
     font: inherit;
@@ -49,7 +48,7 @@ header {
     padding: 12px 0;
 }
 
-img {
+svg {
     margin-right: 20px;
 }
 
@@ -219,6 +218,7 @@ input[type="search"], select {
 
 .div-right {
     margin: 12px 0;
+    text-align: center;
 }
 
 .empty-panel {
@@ -350,6 +350,10 @@ input[type="search"], select {
         margin: 0;
     }
 
+    .div-right {
+        text-align: right;
+    }
+
     .panels {
         padding: 20px;
     }
@@ -360,7 +364,8 @@ input[type="search"], select {
 <div class="container">
     <header>
         <div class="div-left">
-            <img src="https://raw.githubusercontent.com/cloudskiff/driftctl-docs/main/static/img/driftctl_light.svg" width="100px" height="81px" alt="driftctl logo" />
+            <svg width="100" height="81" viewBox="0 0 1490.92 1207.41" xmlns="http://www.w3.org/2000/svg"><path d="m450.87 700.16c48.21-154.42 192.33-266.49 362.63-266.49s314.42 112.07 362.63 266.49h230.41c-53-279.23-298.37-490.36-593-490.36s-540 211.13-593 490.36z" fill="#71b3c3" transform="translate(-68.04 -209.8)"/><path d="m1176.13 926.84c-48.21 154.42-192.33 266.49-362.63 266.49s-314.42-112.07-362.63-266.49h-230.4c53 279.23 298.36 490.36 593 490.36s540-211.13 593-490.36z" fill="#71b3c3" transform="translate(-68.04 -209.8)"/><path d="m0 482.77h1490.92v241.88h-1490.92z" fill="#293d42"/><path d="m19 501.77h852.03v203.88h-852.03z" fill="#fff"/><g transform="translate(-68.04 -209.8)"><path d="m1015.32 875.71c-22.39 0-37.84-15-37.84-37.61 0-22.81 15.67-38 38.44-38 10.28 0 19 4.06 27.52 11.06l10.37-13.62c-8.74-8.49-21.75-15.18-38.83-15.18-32.17 0-59.59 20.26-59.59 55.7 0 35.08 25 55.34 58.19 55.34a64.53 64.53 0 0 0 42.41-16.3l-9.27-13.88c-8.42 6.88-18.85 12.49-31.4 12.49z" fill="#fff"/><path d="m1152.93 876c-19.15 0-25.59-8.81-25.59-27v-46.78h49.94v-17.22h-49.94v-33.55h-17.9l-2.82 33.55-30 1.12v16.1h29.16v46.78c0 26.56 10.53 44.47 42.18 44.47 13.5 0 24-2.85 33.5-6.16l-4.39-15.76a67.72 67.72 0 0 1 -24.14 4.45z" fill="#fff"/><path d="m1281 871.26c-7 3-13.16 4.45-18.94 4.45-11.63 0-20-5.94-20-20.62v-117.84h-58v17.23h36.38v99.31c0 25.52 12.79 39.65 36.49 39.65 12 0 19.06-2.16 29.17-6.16z" fill="#fff"/><path d="m418 776.75 1 18.59h-.52c-8.79-8.16-18.09-12.94-30.45-12.94-24.51 0-47.21 21.23-47.21 55.7 0 35.09 18.11 55.34 45.45 55.34 12.56 0 24.76-7.13 33.23-15.73h.69l1.72 13.13h17.64v-153.59h-21.55zm0 84.56c-8.35 9.59-17.12 14.14-26.71 14.14-17.66 0-28.35-13.53-28.35-37.61 0-23.11 13.52-37.45 30-37.45 8.37 0 16.48 2.89 25 10.84z" fill="#293d42"/><path d="m496.88 809.55h-.52l-1.93-24.55h-17.86v105.84h21.58v-60.06c11.71-21.37 26.34-29.1 41.5-29.1 8.15 0 12.17 1.08 19.38 3.38l4.72-18.33c-6.42-3.13-12.55-4.33-20.75-4.33-18.89 0-35.2 9.91-46.12 27.15z" fill="#293d42"/><path d="m644.66 733.56c-9.29 0-16.08 6.28-16.08 15.4 0 9.29 6.79 15.32 16.08 15.32s16.07-6 16.07-15.32c0-9.12-6.79-15.4-16.07-15.4z" fill="#293d42"/></g><path d="m520.24 592.43h47.33v88.62h21.58v-105.85h-68.91z" fill="#293d42"/><path d="m725.05 777.69v7.31l-29.67 1.1v16.1h29.67v88.62h21.4v-88.6h42.16v-17.22h-42.16v-7.83c0-15.89 7.3-25.29 24.81-25.29a58.07 58.07 0 0 1 24 4.78l4.64-16a83.66 83.66 0 0 0 -30.9-6c-30.28-.01-43.95 17.71-43.95 43.03z" fill="#293d42" transform="translate(-68.04 -209.8)"/><path d="m912.4 871.52a67.72 67.72 0 0 1 -24.12 4.48c-19.15 0-25.59-8.81-25.59-27v-46.78h49.94v-17.22h-49.94v-33.55h-17.9l-2.79 33.55-30 1.12v16.1h29.17v46.78c0 26.56 10.53 44.47 42.18 44.47 13.5 0 24-2.85 33.5-6.16z" fill="#293d42" transform="translate(-68.04 -209.8)"/></svg>
+
             <div>
                 <h1>Scan Report</h1>
                 <h2>Jun 10, 2021</h2>
@@ -369,33 +374,32 @@ input[type="search"], select {
         </div>
         <div class="div-right">
             <p class="provider">IaC Source: Terraform</p>
-            <p class="provider">Cloud Provider: AWS</p>
-            <p class="provider">Version: 3.19.0</p>
+            <p class="provider">Cloud Provider: AWS (3.19.0)</p>
         </div>
     </header>
     <section>
         <div class="card">
             <span>Total Resources:</span>
-            <span class="strong">13</span>
+            <span class="strong">15</span>
         </div>
         <div class="card">
             <span>Coverage:</span>
-            <span class="strong">15%</span>
+            <span class="strong">26%</span>
         </div>
         <div class="card">
             <span>Managed:</span>
-            <span class="strong">15.38%</span>
-            <span class="fraction">2/13</span>
+            <span class="strong">26.66%</span>
+            <span class="fraction">4/15</span>
         </div>
         <div class="card">
             <span>Unmanaged:</span>
-            <span class="strong">38.46%</span>
-            <span class="fraction">5/13</span>
+            <span class="strong">33.33%</span>
+            <span class="fraction">5/15</span>
         </div>
         <div class="card">
             <span>Missing:</span>
-            <span class="strong">46.15%</span>
-            <span class="fraction">6/13</span>
+            <span class="strong">40%</span>
+            <span class="fraction">6/15</span>
         </div>
     </section>
     <main>
@@ -403,8 +407,8 @@ input[type="search"], select {
         <form role="search">
             <label for="search" class="visuallyhidden">Search resources by id:</label>
             <input type="search" id="search" name="search" placeholder="Search resources by id...">
-            <label for="select" class="visuallyhidden">Select a resource type:</label>
-            <select id="select" name="select">
+            <label for="resource-type-select" class="visuallyhidden">Select a resource type:</label>
+            <select id="resource-type-select" name="resource-type-select">
                 <option value="">Select a resource type</option>
                 
                 <option value="aws_unmanaged_resource">aws_unmanaged_resource</option>
@@ -412,6 +416,19 @@ input[type="search"], select {
                 <option value="aws_deleted_resource">aws_deleted_resource</option>
                 
                 <option value="aws_diff_resource">aws_diff_resource</option>
+                
+            </select>
+            <label for="iac-source-select" class="visuallyhidden">Select an IaC source:</label>
+            <select id="iac-source-select" name="iac-source-select">
+                <option value="">Select an IaC source</option>
+                
+                <option value="tfstate://delete_state.tfstate">tfstate://delete_state.tfstate</option>
+                
+                <option value="tfstate://deleted/terraform.tfstate">tfstate://deleted/terraform.tfstate</option>
+                
+                <option value="tfstate://state.tfstate">tfstate://state.tfstate</option>
+                
+                <option value="tfstate&#43;s3://state2.tfstate">tfstate&#43;s3://state2.tfstate</option>
                 
             </select>
             <input type="reset" value="Reset Filters">
@@ -427,7 +444,7 @@ input[type="search"], select {
                 
                 <button type="button" role="tab" aria-selected="false" aria-controls="changed-tab" id="changed"
                         tabindex="-1">
-                    Changed Resources (<span data-count="resource-changed">2</span>)
+                    Changed Resources (<span data-count="resource-changed">3</span>)
                 </button>
                 
                 
@@ -493,15 +510,19 @@ input[type="search"], select {
                         <div role="rowgroup">
                             <div role="row" class="table-header">
                                 <span role="columnheader">Resource ID</span>
-                                <span role="columnheader">Resource Type</span>
+                                <span role="columnheader">IaC source</span>
                             </div>
                         </div>
                         <div role="rowgroup" class="table-body">
                             
                             <div role="row" data-kind="resource-changed" class="resource-item">
                                 <div class="row">
-                                    <span role="cell" data-type="resource-id">diff-id-1</span>
-                                    <span role="cell" data-type="resource-type">aws_diff_resource</span>
+                                    <span role="cell">
+                                        <span data-type="resource-id">diff-id-1</span>
+                                        (<span>module.aws_diff_resource.name</span>)
+                                        <span style="display:none;" data-type="resource-type">aws_diff_resource</span>
+                                    </span>
+                                    <span role="cell" data-type="resource-source">tfstate://state.tfstate</span>
                                 </div>
                                 <pre class="code-box">
                                     <code class="code-box-line">&emsp;~ updated.field: <span class="code-box-line-delete">"foobar"</span> => <span class="code-box-line-create">"barfoo"</span><br>&emsp;+ new.field: <span class="code-box-line-create">"newValue"</span><br>&emsp;- a: <span class="code-box-line-delete">"oldValue"</span><br></code>
@@ -510,19 +531,59 @@ input[type="search"], select {
                             
                             <div role="row" data-kind="resource-changed" class="resource-item">
                                 <div class="row">
-                                    <span role="cell" data-type="resource-id">diff-id-2</span>
-                                    <span role="cell" data-type="resource-type">aws_diff_resource</span>
+                                    <span role="cell">
+                                        <span data-type="resource-id">diff-id-2</span>
+                                        (<span>module.aws_diff_resource.diff-id-2</span>)
+                                        <span style="display:none;" data-type="resource-type">aws_diff_resource</span>
+                                    </span>
+                                    <span role="cell" data-type="resource-source">tfstate://state.tfstate</span>
                                 </div>
                                 <pre class="code-box">
-                                    <code class="code-box-line">&emsp;- path.to.fields.[0]: <span class="code-box-line-delete">"value"</span><br>&emsp;~ path.to.fields.[1]: <span class="code-box-line-delete">12</span> => <span class="code-box-line-create">"12"</span><br>&emsp;- group_ids: <span class="code-box-line-delete">["a071314398026"]</span><br>&emsp;~ Policies.[0]: <span class="code-box-line-delete">{
-  Id: "",
-  Type: "",
-  Source: <nil>
-}</span> => <span class="code-box-line-create">{
-  Id: "093cd6ba-cf6d-4800-b252-6a50ca8903cd",
-  Type: "aws_iam_policy",
-  Source: <nil>
-}</span><br>&emsp;+ Tags.[0].Name: <span class="code-box-line-create">"test"</span><br>&emsp;~ InstanceInitiatedShutdownBehavior: <span class="code-box-line-delete">""</span> => <span class="code-box-line-create">null</span><br></code>
+                                    <code class="code-box-line">&emsp;- path.to.fields.[0]: <span class="code-box-line-delete">"value"</span><br>&emsp;~ path.to.fields.[1]: <span class="code-box-line-delete">12</span> => <span class="code-box-line-create">"12"</span><br>&emsp;- group_ids: <span class="code-box-line-delete">["a071314398026"]</span><br>&emsp;~ policy:<br>&emsp; {
+   "Statement": [
+     {
+       "Action": [
+<span class="code-box-line-delete">-        "s3:GetObjectVersion"</span>
+<span class="code-box-line-create">+        "*"</span>
+       ],
+<span class="code-box-line-delete">-      "Effect": "Allow",</span>
+<span class="code-box-line-create">+      "Effect": "Deny",</span>
+       "Principal": "*",
+<span class="code-box-line-delete">-      "Resource": "arn:aws:s3:::tmxxrn.foobar.driftctl-test.com/*",</span>
+<span class="code-box-line-create">+      "Resource": "arn:aws:s3:::tmxxrn.foobar.driftctl-test.com/b/*",</span>
+<span class="code-box-line-delete">-      "Sid": "PublicRead"</span>
+<span class="code-box-line-create">+      "Sid": "PublicReadWrite"</span>
+     }
+<span class="code-box-line-create">+    {</span>
+<span class="code-box-line-create">+      "Action": [</span>
+<span class="code-box-line-create">+        "*"</span>
+<span class="code-box-line-create">+      ],</span>
+<span class="code-box-line-create">+      "Effect": "Deny",</span>
+<span class="code-box-line-create">+      "Principal": "*",</span>
+<span class="code-box-line-create">+      "Resource": "arn:aws:s3:::tmxxrn.foobar.driftctl-test.com/b/*",</span>
+<span class="code-box-line-create">+      "Sid": "PublicReadWrite"</span>
+<span class="code-box-line-create">+    }</span>
+   ],
+<span class="code-box-line-delete">-  "Version": "2012-10-17"</span>
+<span class="code-box-line-create">+  "Version": "2021-10-17"</span>
+<span class="code-box-line-create">+  "Test": [</span>
+<span class="code-box-line-create">+  ]</span>
+ }
+<br>&emsp;+ Tags.[0].Name: <span class="code-box-line-create">"test"</span><br>&emsp;~ InstanceInitiatedShutdownBehavior: <span class="code-box-line-delete">""</span> => <span class="code-box-line-create">null</span><br></code>
+                                </pre>
+                            </div>
+                            
+                            <div role="row" data-kind="resource-changed" class="resource-item">
+                                <div class="row">
+                                    <span role="cell">
+                                        <span data-type="resource-id">diff-id-3</span>
+                                        <span>(aws_diff_resource)</span>
+                                        <span style="display:none;" data-type="resource-type">aws_diff_resource</span>
+                                    </span>
+                                    
+                                </div>
+                                <pre class="code-box">
+                                    <code class="code-box-line">&emsp;~ InstanceInitiatedShutdownBehavior: <span class="code-box-line-delete">""</span> => <span class="code-box-line-create">null</span><br></code>
                                 </pre>
                             </div>
                             
@@ -539,39 +600,63 @@ input[type="search"], select {
                         <thead>
                         <tr class="table-header">
                             <th>Resource ID</th>
-                            <th>Resource Type</th>
+                            <th>IaC source</th>
                         </tr>
                         </thead>
                         <tbody>
                         
                         <tr data-kind="resource-deleted" class="resource-item row">
-                            <td data-type="resource-id">deleted-id-1</td>
-                            <td data-type="resource-type">aws_deleted_resource</td>
+                            <td>
+                                <span data-type="resource-id">deleted-id-1</span>
+                                <span>(module.aws_deleted_resource.name)</span>
+                                <span data-type="resource-type" style="display:none;">aws_deleted_resource</span>
+                            </td>
+                            <td data-type="resource-source">tfstate://delete_state.tfstate</td>
                         </tr>
                         
                         <tr data-kind="resource-deleted" class="resource-item row">
-                            <td data-type="resource-id">deleted-id-2</td>
-                            <td data-type="resource-type">aws_deleted_resource</td>
+                            <td>
+                                <span data-type="resource-id">deleted-id-2</span>
+                                <span>(module.aws_deleted_resource.name)</span>
+                                <span data-type="resource-type" style="display:none;">aws_deleted_resource</span>
+                            </td>
+                            <td data-type="resource-source">tfstate://delete_state.tfstate</td>
                         </tr>
                         
                         <tr data-kind="resource-deleted" class="resource-item row">
-                            <td data-type="resource-id">deleted-id-3</td>
-                            <td data-type="resource-type">aws_deleted_resource</td>
+                            <td>
+                                <span data-type="resource-id">deleted-id-3</span>
+                                <span>(aws_deleted_resource.deleted-id-3)</span>
+                                <span data-type="resource-type" style="display:none;">aws_deleted_resource</span>
+                            </td>
+                            <td data-type="resource-source">tfstate://deleted/terraform.tfstate</td>
                         </tr>
                         
                         <tr data-kind="resource-deleted" class="resource-item row">
-                            <td data-type="resource-id">deleted-id-4</td>
-                            <td data-type="resource-type">aws_deleted_resource</td>
+                            <td>
+                                <span data-type="resource-id">deleted-id-4</span>
+                                <span>(aws_deleted_resource.deleted-id-3)</span>
+                                <span data-type="resource-type" style="display:none;">aws_deleted_resource</span>
+                            </td>
+                            <td data-type="resource-source">tfstate://deleted/terraform.tfstate</td>
                         </tr>
                         
                         <tr data-kind="resource-deleted" class="resource-item row">
-                            <td data-type="resource-id">deleted-id-5</td>
-                            <td data-type="resource-type">aws_deleted_resource</td>
+                            <td>
+                                <span data-type="resource-id">deleted-id-5</span>
+                                <span>(module-1.aws_deleted_resource.deleted-id-3)</span>
+                                <span data-type="resource-type" style="display:none;">aws_deleted_resource</span>
+                            </td>
+                            <td data-type="resource-source">tfstate://deleted/terraform.tfstate</td>
                         </tr>
                         
                         <tr data-kind="resource-deleted" class="resource-item row">
-                            <td data-type="resource-id">deleted-id-6</td>
-                            <td data-type="resource-type">aws_deleted_resource</td>
+                            <td>
+                                <span data-type="resource-id">deleted-id-6</span>
+                                <span>(aws_deleted_resource)</span>
+                                <span data-type="resource-type" style="display:none;">aws_deleted_resource</span>
+                            </td>
+                            
                         </tr>
                         
                         </tbody>
@@ -620,11 +705,13 @@ input[type="search"], select {
 
     const resources = document.querySelectorAll("[data-kind^='resource-']");
     const searchInput = document.querySelector('[type="search"]');
-    const selectBox = document.querySelector("select");
+    const resourceTypeSelectBox = document.querySelector("#resource-type-select");
+    const iacSourceSelectBox = document.querySelector("#iac-source-select");
     const resetButton = document.querySelector('[type="reset"]');
 
     searchInput.addEventListener("input", filterResources);
-    selectBox.addEventListener("input", filterResources);
+    resourceTypeSelectBox.addEventListener("input", filterResources);
+    iacSourceSelectBox.addEventListener("input", filterResources);
     resetButton.addEventListener("click", resetResources);
 
     function refreshPanel(count, el) {
@@ -684,13 +771,26 @@ input[type="search"], select {
         return el.innerText === type;
     }
 
+    function resourceSourceEquals(res, source) {
+        if (source === "") {
+            return true;
+        }
+        const el = res.querySelector("[data-type='resource-source']");
+        if (!el) {
+            return false;
+        }
+        return el.innerText === source;
+    }
+
     function filterResources() {
         const id = searchInput.value;
-        const type = selectBox.value;
+        const type = resourceTypeSelectBox.value;
+        const source = iacSourceSelectBox.value;
         for (const res of resources) {
             const matchId = resourceIdContains(res, id);
             const matchType = resourceTypeEquals(res, type);
-            if (matchId && matchType) {
+            const matchSource = resourceSourceEquals(res, source);
+            if (matchId && matchType && matchSource) {
                 res.classList.remove("is-hidden");
             } else {
                 res.classList.add("is-hidden");

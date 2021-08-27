@@ -17,7 +17,7 @@ import (
 func TestAcc_AwsRoute53HealthCheck(t *testing.T) {
 	var mutatedHealthCheckID string
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion: "0.14.9",
+		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_route53_health_check"},
 		Args:             []string{"scan", "--filter", "Type=='aws_route53_health_check'", "--deep"},
 		Checks: []acceptance.AccCheck{
@@ -32,7 +32,7 @@ func TestAcc_AwsRoute53HealthCheck(t *testing.T) {
 					result.AssertInfrastructureIsInSync()
 					result.AssertManagedCount(2)
 
-					mutatedHealthCheckID = result.Managed()[0].TerraformId()
+					mutatedHealthCheckID = result.Managed()[0].ResourceId()
 				},
 			},
 			{

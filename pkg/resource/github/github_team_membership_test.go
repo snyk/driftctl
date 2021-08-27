@@ -9,7 +9,7 @@ import (
 
 func TestAcc_Github_TeamMembership(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion: "0.14.4",
+		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/github_team_membership"},
 		Args: []string{
 			"scan",

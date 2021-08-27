@@ -24,7 +24,7 @@ resource "aws_s3_bucket" "foobar-policy" {
       "Effect":"Allow",
       "Principal": "*",
       "Action":["s3:GetObject","s3:GetObjectVersion"],
-      "Resource":["arn:aws:s3:::${random_string.prefix.result}.policy.driftctl-test.com/*"]
+      "Resource":"arn:aws:s3:::${random_string.prefix.result}.policy.driftctl-test.com/*"
     }
   ]
 }
@@ -42,7 +42,7 @@ resource "aws_s3_bucket_policy" "foobar" {
       "Effect":"Allow",
       "Principal": "*",
       "Action":["s3:GetObject","s3:GetObjectVersion"],
-      "Resource":["arn:aws:s3:::${random_string.prefix.result}.driftctl-test.com/*"]
+      "Resource":"arn:aws:s3:::${random_string.prefix.result}.driftctl-test.com/*"
     }
   ]
 }
