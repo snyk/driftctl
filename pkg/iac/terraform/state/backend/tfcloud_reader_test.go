@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewTFCloudReader(t *testing.T) {
+func TestTFCloudBackend_Read(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 	type args struct {
@@ -17,12 +17,12 @@ func TestNewTFCloudReader(t *testing.T) {
 		options     *Options
 	}
 	tests := []struct {
-		name    string
-		args    args
-		url     string
-		wantURL string
-		wantErr error
-		mock    func()
+		name     string
+		args     args
+		url      string
+		wantErr  error
+		expected string
+		mock     func()
 	}{
 		{
 			name: "Should fetch URL with auth header",
@@ -32,9 +32,9 @@ func TestNewTFCloudReader(t *testing.T) {
 					TFCloudToken: "TOKEN",
 				},
 			},
-			url:     "https://app.terraform.io/api/v2/workspaces/workspaceId/current-state-version",
-			wantURL: "https://archivist.terraform.io/v1/object/test",
-			wantErr: nil,
+			url:      "https://app.terraform.io/api/v2/workspaces/workspaceId/current-state-version",
+			wantErr:  nil,
+			expected: "{}",
 			mock: func() {
 				httpmock.Reset()
 				httpmock.RegisterResponder(
@@ -57,8 +57,7 @@ func TestNewTFCloudReader(t *testing.T) {
 					TFCloudToken: "TOKEN",
 				},
 			},
-			url:     "https://app.terraform.io/api/v2/workspaces/wrong_workspaceId/current-state-version",
-			wantURL: "",
+			url: "https://app.terraform.io/api/v2/workspaces/wrong_workspaceId/current-state-version",
 			mock: func() {
 				httpmock.Reset()
 				httpmock.RegisterResponder(
@@ -77,8 +76,7 @@ func TestNewTFCloudReader(t *testing.T) {
 					TFCloudToken: "TOKEN",
 				},
 			},
-			url:     "https://app.terraform.io/api/v2/workspaces/workspaceId/current-state-version",
-			wantURL: "",
+			url: "https://app.terraform.io/api/v2/workspaces/workspaceId/current-state-version",
 			mock: func() {
 				httpmock.Reset()
 				httpmock.RegisterResponder(
@@ -93,7 +91,12 @@ func TestNewTFCloudReader(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mock()
-			got, err := NewTFCloudReader(&http.Client{}, tt.args.workspaceId, tt.args.options)
+
+			reader, err := NewTFCloudReader(&http.Client{}, tt.args.workspaceId, tt.args.options)
+			assert.NoError(t, err)
+
+			got := make([]byte, len(tt.expected))
+			_, err = reader.Read(got)
 			if tt.wantErr != nil {
 				assert.EqualError(t, err, tt.wantErr.Error())
 				return
@@ -101,7 +104,7 @@ func TestNewTFCloudReader(t *testing.T) {
 				assert.NoError(t, err)
 			}
 			assert.NotNil(t, got)
-			assert.Equal(t, tt.wantURL, got.request.URL.String())
+			assert.Equal(t, tt.expected, string(got))
 		})
 	}
 }
