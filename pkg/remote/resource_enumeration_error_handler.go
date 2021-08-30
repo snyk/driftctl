@@ -8,6 +8,8 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func HandleResourceEnumerationError(err error, alerter alerter.AlerterInterface) error {
@@ -17,6 +19,14 @@ func HandleResourceEnumerationError(err error, alerter alerter.AlerterInterface)
 	}
 
 	rootCause := listError.RootCause()
+
+	// We cannot use the status.FromError() method because AWS errors are not well-formed.
+	// Indeed, they compose the error interface without implementing the Error() method and thus triggering a nil panic
+	// when returning an unknown error from status.FromError()
+	// As a workaround we duplicated the logic from status.FromError here
+	if _, ok := rootCause.(interface{ GRPCStatus() *status.Status }); ok {
+		return handleGoogleEnumerationError(alerter, listError, status.Convert(rootCause))
+	}
 
 	reqerr, ok := rootCause.(awserr.RequestFailure)
 	if ok {
@@ -49,6 +59,11 @@ func HandleResourceDetailsFetchingError(err error, alerter alerter.AlerterInterf
 
 	rootCause := listError.RootCause()
 
+	if shouldHandleGoogleDetailsFetchingError(listError) {
+		alerts.SendDetailsFetchingAlert(common.RemoteGoogleTerraform, alerter, listError)
+		return nil
+	}
+
 	// This handles access denied errors like the following:
 	// iam_role_policy: error reading IAM Role Policy (<policy>): AccessDenied: User: <role_arn> ...
 	if strings.HasPrefix(rootCause.Error(), "AccessDeniedException") ||
@@ -68,4 +83,27 @@ func handleAWSError(alerter alerter.AlerterInterface, listError *remoteerror.Res
 	}
 
 	return reqerr
+}
+
+func handleGoogleEnumerationError(alerter alerter.AlerterInterface, err *remoteerror.ResourceScanningError, st *status.Status) error {
+	if st.Code() == codes.PermissionDenied {
+		alerts.SendEnumerationAlert(common.RemoteGoogleTerraform, alerter, err)
+		return nil
+	}
+	return err
+}
+
+func shouldHandleGoogleDetailsFetchingError(err *remoteerror.ResourceScanningError) bool {
+	errMsg := err.RootCause().Error()
+
+	// Check if this is a Google related error
+	if !strings.Contains(errMsg, "googleapi") {
+		return false
+	}
+
+	if strings.Contains(errMsg, "Error 403") {
+		return true
+	}
+
+	return false
 }

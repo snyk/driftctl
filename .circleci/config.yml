@@ -12,6 +12,9 @@ jobs:
       ACC_PATTERN: << parameters.pattern >>
       AWS_DEFAULT_REGION: us-east-1
       CHECKPOINT_DISABLE: 'true' # Disable terraform version check
+      CLOUDSDK_CORE_PROJECT: driftctl-qa-1
+      GOOGLE_APPLICATION_CREDENTIALS: /tmp/google.json
+      ACC_GOOGLE_CREDENTIALS: /tmp/google-admin.json
     steps:
       - checkout
       - go/install:
@@ -19,6 +22,11 @@ jobs:
           # Disable cache at it seem to broke go 1.16 installation
           cache: false
       - run: make install-tools
+      - run:
+          name: Setup Google credentials
+          command: |
+              echo ${GCLOUD_KEYFILE} | base64 -d > /tmp/google.json
+              echo ${ACC_GCLOUD_KEYFILE} | base64 -d > /tmp/google-admin.json
       - run:
           name: Run acceptance tests
           command: make acc
@@ -154,6 +162,7 @@ workflows:
               pattern:
                 - TestAcc_Aws
                 - TestAcc_Github_
+                - TestAcc_Google
           context:
             - driftctl-acc
     triggers:
@@ -188,6 +197,7 @@ workflows:
               pattern:
                 - TestAcc_Aws
                 - TestAcc_Github_
+                - TestAcc_Google
           context:
             - driftctl-acc
   push:

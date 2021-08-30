@@ -61,6 +61,8 @@ var supportedTypes = map[string]struct{}{
 	"github_repository":        {},
 	"github_team":              {},
 	"github_team_membership":   {},
+
+	"google_storage_bucket": {},
 }
 
 func IsResourceTypeSupported(ty string) bool {
