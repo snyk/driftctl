@@ -12,19 +12,25 @@ type CloudfrontRepository interface {
 }
 
 type cloudfrontRepository struct {
+	*methodLocker
 	client cloudfrontiface.CloudFrontAPI
 	cache  cache.Cache
 }
 
 func NewCloudfrontRepository(session *session.Session, c cache.Cache) *cloudfrontRepository {
 	return &cloudfrontRepository{
+		newMethodLocker(),
 		cloudfront.New(session),
 		c,
 	}
 }
 
 func (r *cloudfrontRepository) ListAllDistributions() ([]*cloudfront.DistributionSummary, error) {
-	if v := r.cache.Get("cloudfrontListAllDistributions"); v != nil {
+	cacheKey := "cloudfrontListAllDistributions"
+	r.Lock(cacheKey)
+	defer r.Unlock(cacheKey)
+
+	if v := r.cache.Get(cacheKey); v != nil {
 		return v.([]*cloudfront.DistributionSummary), nil
 	}
 
@@ -42,6 +48,6 @@ func (r *cloudfrontRepository) ListAllDistributions() ([]*cloudfront.Distributio
 		return nil, err
 	}
 
-	r.cache.Put("cloudfrontListAllDistributions", distributions)
+	r.cache.Put(cacheKey, distributions)
 	return distributions, nil
 }

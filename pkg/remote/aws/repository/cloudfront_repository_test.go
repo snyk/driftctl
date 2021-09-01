@@ -65,9 +65,14 @@ func Test_cloudfrontRepository_ListAllDistributions(t *testing.T) {
 			client := awstest.MockFakeCloudFront{}
 			tt.mocks(&client)
 			r := &cloudfrontRepository{
-				client: &client,
-				cache:  store,
+				methodLocker: newMethodLocker(),
+				client:       &client,
+				cache:        store,
 			}
+
+			// Ensure mocks are called only once even with concurrency
+			go r.ListAllDistributions()
+
 			got, err := r.ListAllDistributions()
 			assert.Equal(t, tt.wantErr, err)
 
@@ -87,6 +92,8 @@ func Test_cloudfrontRepository_ListAllDistributions(t *testing.T) {
 				}
 				t.Fail()
 			}
+
+			client.AssertExpectations(t)
 		})
 	}
 }
