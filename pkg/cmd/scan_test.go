@@ -218,8 +218,7 @@ func Test_parseOutputFlag(t *testing.T) {
 				out: "console://",
 			},
 			want: &output.OutputConfig{
-				Key:     "console",
-				Options: map[string]string{},
+				Key: "console",
 			},
 			err: nil,
 		},
@@ -229,10 +228,8 @@ func Test_parseOutputFlag(t *testing.T) {
 				out: "json:///tmp/foobar.json",
 			},
 			want: &output.OutputConfig{
-				Key: "json",
-				Options: map[string]string{
-					"path": "/tmp/foobar.json",
-				},
+				Key:  "json",
+				Path: "/tmp/foobar.json",
 			},
 			err: nil,
 		},
@@ -250,10 +247,8 @@ func Test_parseOutputFlag(t *testing.T) {
 				out: "plan:///tmp/foobar.json",
 			},
 			want: &output.OutputConfig{
-				Key: "plan",
-				Options: map[string]string{
-					"path": "/tmp/foobar.json",
-				},
+				Key:  "plan",
+				Path: "/tmp/foobar.json",
 			},
 			err: nil,
 		},

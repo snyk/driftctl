@@ -367,8 +367,10 @@ func parseOutputFlag(out string) (*output.OutputConfig, error) {
 		)
 	}
 
-	o := schemeOpts[0]
-	if !output.IsSupported(o) {
+	o := &output.OutputConfig{
+		Key: schemeOpts[0],
+	}
+	if !output.IsSupported(o.Key) {
 		return nil, errors.Wrapf(
 			cmderrors.NewUsageError(
 				fmt.Sprintf(
@@ -377,14 +379,13 @@ func parseOutputFlag(out string) (*output.OutputConfig, error) {
 				),
 			),
 			"Unsupported output '%s'",
-			o,
+			o.Key,
 		)
 	}
 
 	opts := schemeOpts[1:]
-	options := map[string]string{}
 
-	switch o {
+	switch o.Key {
 	case output.JSONOutputType:
 		if len(opts) != 1 || opts[0] == "" {
 			return nil, errors.Wrapf(
@@ -398,7 +399,7 @@ func parseOutputFlag(out string) (*output.OutputConfig, error) {
 				out,
 			)
 		}
-		options["path"] = opts[0]
+		o.Path = opts[0]
 	case output.HTMLOutputType:
 		if len(opts) != 1 || opts[0] == "" {
 			return nil, errors.Wrapf(
@@ -412,7 +413,7 @@ func parseOutputFlag(out string) (*output.OutputConfig, error) {
 				out,
 			)
 		}
-		options["path"] = opts[0]
+		o.Path = opts[0]
 	case output.PlanOutputType:
 		if len(opts) != 1 || opts[0] == "" {
 			return nil, errors.Wrapf(
@@ -426,13 +427,10 @@ func parseOutputFlag(out string) (*output.OutputConfig, error) {
 				out,
 			)
 		}
-		options["path"] = opts[0]
+		o.Path = opts[0]
 	}
 
-	return &output.OutputConfig{
-		Key:     o,
-		Options: options,
-	}, nil
+	return o, nil
 }
 
 func validateTfProviderVersionString(version string) error {
