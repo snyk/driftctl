@@ -56,11 +56,11 @@ func GetOutput(config OutputConfig, quiet bool) Output {
 
 	switch config.Key {
 	case JSONOutputType:
-		return NewJSON(config.Options["path"])
+		return NewJSON(config.Path)
 	case HTMLOutputType:
-		return NewHTML(config.Options["path"])
+		return NewHTML(config.Path)
 	case PlanOutputType:
-		return NewPlan(config.Options["path"])
+		return NewPlan(config.Path)
 	case ConsoleOutputType:
 		fallthrough
 	default:
@@ -75,12 +75,12 @@ func GetPrinter(config OutputConfig, quiet bool) output.Printer {
 
 	switch config.Key {
 	case JSONOutputType:
-		if isStdOut(config.Options["path"]) {
+		if isStdOut(config.Path) {
 			return &output.VoidPrinter{}
 		}
 		fallthrough
 	case PlanOutputType:
-		if isStdOut(config.Options["path"]) {
+		if isStdOut(config.Path) {
 			return &output.VoidPrinter{}
 		}
 		fallthrough

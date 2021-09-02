@@ -500,10 +500,8 @@ func TestGetPrinter(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := GetPrinter(OutputConfig{
-				Key: tt.key,
-				Options: map[string]string{
-					"path": tt.path,
-				},
+				Key:  tt.key,
+				Path: tt.path,
 			}, tt.quiet); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetPrinter() = %v, want %v", got, tt.want)
 			}
