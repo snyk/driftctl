@@ -16,6 +16,7 @@ func initAwsRDSClusterMetaData(resourceSchemaRepository resource.SchemaRepositor
 		val := res.Attributes()
 		val.SafeDelete([]string{"timeouts"})
 		val.SafeDelete([]string{"master_password"})
+		val.SafeDelete([]string{"cluster_members"})
 		if v := val.GetBool("skip_final_snapshot"); v == nil {
 			_ = val.SafeSet([]string{"skip_final_snapshot"}, false)
 		}
