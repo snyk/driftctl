@@ -10,6 +10,7 @@ import (
 type RDSRepository interface {
 	ListAllDBInstances() ([]*rds.DBInstance, error)
 	ListAllDBSubnetGroups() ([]*rds.DBSubnetGroup, error)
+	ListAllDBClusters() ([]*rds.DBCluster, error)
 }
 
 type rdsRepository struct {
@@ -59,4 +60,23 @@ func (r *rdsRepository) ListAllDBSubnetGroups() ([]*rds.DBSubnetGroup, error) {
 
 	r.cache.Put("rdsListAllDBSubnetGroups", subnetGroups)
 	return subnetGroups, err
+}
+
+func (r *rdsRepository) ListAllDBClusters() ([]*rds.DBCluster, error) {
+	cacheKey := "rdsListAllDBClusters"
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*rds.DBCluster), nil
+	}
+
+	var clusters []*rds.DBCluster
+	input := rds.DescribeDBClustersInput{}
+	err := r.client.DescribeDBClustersPages(&input,
+		func(resp *rds.DescribeDBClustersOutput, lastPage bool) bool {
+			clusters = append(clusters, resp.DBClusters...)
+			return !lastPage
+		},
+	)
+
+	r.cache.Put(cacheKey, clusters)
+	return clusters, err
 }
