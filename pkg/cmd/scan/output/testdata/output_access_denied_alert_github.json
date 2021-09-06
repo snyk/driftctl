@@ -14,10 +14,10 @@
 	"alerts": {
 		"": [
 			{
-				"message": "Ignoring github_team from drift calculation: Listing github_team is forbidden."
+				"message": "Ignoring github_team from drift calculation: Listing github_team is forbidden: dummy error"
 			},
 			{
-				"message": "Ignoring github_team_membership from drift calculation: Listing github_team is forbidden."
+				"message": "Ignoring github_team_membership from drift calculation: Listing github_team is forbidden: dummy error"
 			}
 		]
 	},

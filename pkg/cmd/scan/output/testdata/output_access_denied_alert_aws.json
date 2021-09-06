@@ -14,13 +14,13 @@
 	"alerts": {
 		"": [
 			{
-				"message": "Ignoring aws_vpc from drift calculation: Listing aws_vpc is forbidden."
+				"message": "Ignoring aws_vpc from drift calculation: Listing aws_vpc is forbidden: dummy error"
 			},
 			{
-				"message": "Ignoring aws_sqs from drift calculation: Listing aws_sqs is forbidden."
+				"message": "Ignoring aws_sqs from drift calculation: Listing aws_sqs is forbidden: dummy error"
 			},
 			{
-				"message": "Ignoring aws_sns from drift calculation: Listing aws_sns is forbidden."
+				"message": "Ignoring aws_sns from drift calculation: Listing aws_sns is forbidden: dummy error"
 			}
 		]
 	},

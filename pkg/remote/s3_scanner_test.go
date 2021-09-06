@@ -13,9 +13,11 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
+	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
 	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
@@ -76,9 +78,10 @@ func TestS3Bucket(t *testing.T) {
 		{
 			test: "cannot list bucket", dirName: "s3_bucket_list",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllBuckets").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsS3BucketResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketResourceType, resourceaws.AwsS3BucketResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsS3BucketResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketResourceType, resourceaws.AwsS3BucketResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -205,9 +208,10 @@ func TestS3BucketInventory(t *testing.T) {
 		{
 			test: "cannot list bucket", dirName: "s3_bucket_inventories_list_bucket",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllBuckets").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsS3BucketInventoryResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketInventoryResourceType, resourceaws.AwsS3BucketResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsS3BucketInventoryResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketInventoryResourceType, resourceaws.AwsS3BucketResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -227,16 +231,17 @@ func TestS3BucketInventory(t *testing.T) {
 					"eu-west-3",
 					nil,
 				)
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On(
 					"ListBucketInventoryConfigurations",
 					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift")},
 					"eu-west-3",
 				).Return(
 					nil,
-					awserr.NewRequestFailure(nil, 403, ""),
+					awsError,
 				)
 
-				alerter.On("SendAlert", resourceaws.AwsS3BucketInventoryResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketInventoryResourceType, resourceaws.AwsS3BucketInventoryResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsS3BucketInventoryResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketInventoryResourceType, resourceaws.AwsS3BucketInventoryResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -409,18 +414,20 @@ func TestS3BucketNotification(t *testing.T) {
 					"eu-west-3",
 					nil,
 				)
-				repository.On("GetBucketNotification", "dritftctl-test-notifications-error", "eu-west-3").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("GetBucketNotification", "dritftctl-test-notifications-error", "eu-west-3").Return(nil, awsError)
 
-				alerter.On("SendAlert", "aws_s3_bucket_notification.dritftctl-test-notifications-error", alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_s3_bucket_notification.dritftctl-test-notifications-error", resourceaws.AwsS3BucketNotificationResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", "aws_s3_bucket_notification.dritftctl-test-notifications-error", alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, "aws_s3_bucket_notification.dritftctl-test-notifications-error", resourceaws.AwsS3BucketNotificationResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
 		{
 			test: "Cannot list bucket", dirName: "s3_bucket_notifications_list_bucket",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllBuckets").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsS3BucketNotificationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketNotificationResourceType, resourceaws.AwsS3BucketResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsS3BucketNotificationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketNotificationResourceType, resourceaws.AwsS3BucketResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -547,9 +554,10 @@ func TestS3BucketMetrics(t *testing.T) {
 		{
 			test: "cannot list bucket", dirName: "s3_bucket_metrics_list_bucket",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllBuckets").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsS3BucketMetricResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketMetricResourceType, resourceaws.AwsS3BucketResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsS3BucketMetricResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketMetricResourceType, resourceaws.AwsS3BucketResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -570,16 +578,17 @@ func TestS3BucketMetrics(t *testing.T) {
 					nil,
 				)
 
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On(
 					"ListBucketMetricsConfigurations",
 					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift")},
 					"eu-west-3",
 				).Return(
 					nil,
-					awserr.NewRequestFailure(nil, 403, ""),
+					awsError,
 				)
 
-				alerter.On("SendAlert", resourceaws.AwsS3BucketMetricResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketMetricResourceType, resourceaws.AwsS3BucketMetricResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsS3BucketMetricResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketMetricResourceType, resourceaws.AwsS3BucketMetricResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -734,9 +743,10 @@ func TestS3BucketPolicy(t *testing.T) {
 		{
 			test: "cannot list bucket", dirName: "s3_bucket_policies_list_bucket",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllBuckets").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsS3BucketPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketPolicyResourceType, resourceaws.AwsS3BucketResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsS3BucketPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketPolicyResourceType, resourceaws.AwsS3BucketResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -864,9 +874,10 @@ func TestS3BucketAnalytic(t *testing.T) {
 		{
 			test: "cannot list bucket", dirName: "aws_s3_bucket_analytics_list_bucket",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllBuckets").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllBuckets").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, resourceaws.AwsS3BucketResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, resourceaws.AwsS3BucketResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -887,16 +898,17 @@ func TestS3BucketAnalytic(t *testing.T) {
 					nil,
 				)
 
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On(
 					"ListBucketAnalyticsConfigurations",
 					&s3.Bucket{Name: awssdk.String("bucket-martin-test-drift")},
 					"eu-west-3",
 				).Return(
 					nil,
-					awserr.NewRequestFailure(nil, 403, ""),
+					awsError,
 				)
 
-				alerter.On("SendAlert", resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},

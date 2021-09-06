@@ -14,6 +14,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
+	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -21,6 +22,7 @@ import (
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -55,9 +57,10 @@ func TestECRRepository(t *testing.T) {
 			test:    "cannot list repository",
 			dirName: "aws_ecr_repository_empty",
 			mocks: func(client *repository.MockECRRepository, alerter *mocks.AlerterInterface) {
-				client.On("ListAllRepositories").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				client.On("ListAllRepositories").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsEcrRepositoryResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsEcrRepositoryResourceType, resourceaws.AwsEcrRepositoryResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsEcrRepositoryResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEcrRepositoryResourceType, resourceaws.AwsEcrRepositoryResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},

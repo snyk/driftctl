@@ -13,8 +13,10 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
+	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
@@ -74,9 +76,10 @@ func TestScanLambdaFunction(t *testing.T) {
 			test:    "cannot list lambda functions",
 			dirName: "lambda_function_empty",
 			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
-				repo.On("ListAllLambdaFunctions").Return([]*lambda.FunctionConfiguration{}, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repo.On("ListAllLambdaFunctions").Return([]*lambda.FunctionConfiguration{}, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsLambdaFunctionResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsLambdaFunctionResourceType, resourceaws.AwsLambdaFunctionResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsLambdaFunctionResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLambdaFunctionResourceType, resourceaws.AwsLambdaFunctionResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -189,9 +192,10 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 			test:    "cannot list lambda functions",
 			dirName: "lambda_function_empty",
 			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
-				repo.On("ListAllLambdaEventSourceMappings").Return([]*lambda.EventSourceMappingConfiguration{}, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repo.On("ListAllLambdaEventSourceMappings").Return([]*lambda.EventSourceMappingConfiguration{}, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsLambdaEventSourceMappingResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsLambdaEventSourceMappingResourceType, resourceaws.AwsLambdaEventSourceMappingResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsLambdaEventSourceMappingResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLambdaEventSourceMappingResourceType, resourceaws.AwsLambdaEventSourceMappingResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
