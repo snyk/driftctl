@@ -28,7 +28,7 @@ func NewGenDriftIgnoreCmd() *cobra.Command {
 				return err
 			}
 
-			fmt.Print(list)
+			fmt.Println(list)
 
 			return nil
 		},
