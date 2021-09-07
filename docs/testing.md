@@ -1,5 +1,18 @@
 # Testing
 
+## Table of Content
+
+- [Golden files](#golden-files)
+- [Unit testing](#unit-testing)
+  - [Mocks](#mocks)
+    - [Mocking repositories](#mocking-repositories)
+- [Acceptance testing](#acceptance-testing)
+  - [Credentials](#credentials)
+    - [AWS](#aws)
+  - [Workflow](#workflow)
+  - [Example](#example)
+
+
 driftctl uses **unit tests**, **functional tests** and **acceptance tests**.
 
 - A **unit test** tests only a very specific part of code
@@ -44,6 +57,8 @@ For example, we don't care about covering `NewStruct()` constructors if there is
 Remember, a covered code does not mean that all conditions are tested and asserted, so be careful to test the right things.
 A bug can still happen in a covered part of your code.
 
+## Golden files
+
 We use the golden file pattern to assert on results. Golden files could be updated with `-update flag`.
 For example, I've made modifications to s3 bucket policy, I could update golden files with the following command:
 
@@ -82,7 +97,10 @@ type FakeEC2 interface {
 }
 ```
 
-2. Use mockery to generate a full mocked struct `mockery --name FakeEC2 --dir ./test/aws`
+2. Use mockery to generate a full mocked struct
+```
+$ mockery --name FakeEC2 --dir ./test/aws
+```
 3. Mock a response in your test (list IAM users for example)
 
 ```go
@@ -129,6 +147,33 @@ client.On("ListUsersPages",
     })
 ).Once().Return(nil)
 ```
+
+#### Mocking repositories
+
+Repositories are an abstraction layer for data retrival. They're used by enumerators to retrieve data from a cloud provider through its SDK. For example, each AWS service has a repository attached. We only implement repositories and methods we need. Mocking repositories is almost the same process than mocking the cloud provider's SDK.
+
+Since there's an interface for each repository, generating a mock for it is quick and easy. Note the difference between the interface and struct here. Remember a struct cannot be mocked in Go.
+
+```go
+type ECRRepository interface {
+	ListAllRepositories() ([]*ecr.Repository, error)
+}
+
+type ecrRepository struct {
+	client ecriface.ECRAPI
+	cache  cache.Cache
+}
+```
+
+Here's an example that will create a mock for the ECR repository : 
+
+```
+$ mockery --name=ECRRepository --dir pkg/remote/aws/repository/
+```
+
+`ECRRepository` is the name of the interface present in the `pkg/remote/aws/repository/` directory.
+
+----
 
 🙏 We are still looking for a better way to handle this, contributions are welcome.
 
