@@ -35,10 +35,14 @@ func NewConsole() *Console {
 
 func (c *Console) Write(analysis *analyser.Analysis) error {
 	if analysis.Summary().TotalDeleted > 0 {
+		var sources []string
 		groupedBySource := make(map[string][]*resource.Resource)
 
 		for _, deletedResource := range analysis.Deleted() {
-			key := deletedResource.Source.Source()
+			key := ""
+			if deletedResource.Source != nil {
+				key = deletedResource.Source.Source()
+			}
 
 			if _, exist := groupedBySource[key]; !exist {
 				groupedBySource[key] = []*resource.Resource{deletedResource}
@@ -48,15 +52,28 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 			groupedBySource[key] = append(groupedBySource[key], deletedResource)
 		}
 
+		for s := range groupedBySource {
+			sources = append(sources, s)
+		}
+		sort.Strings(sources)
+
 		fmt.Println("Found missing resources:")
 
-		for source, deletedResources := range groupedBySource {
-			fmt.Print(color.BlueString("  From %s\n", source))
-			for _, deletedResource := range deletedResources {
-				humanString := fmt.Sprintf("    - %s (%s)", deletedResource.ResourceId(), deletedResource.SourceString())
+		for _, source := range sources {
+			indentBase := "  "
+			if source != "" {
+				fmt.Print(color.BlueString("%sFrom %s\n", indentBase, source))
+				indentBase += indentBase
+			}
+			for _, deletedResource := range groupedBySource[source] {
+				humanStringSource := deletedResource.ResourceType()
+				if deletedResource.SourceString() != "" {
+					humanStringSource = deletedResource.SourceString()
+				}
+				humanString := fmt.Sprintf("%s- %s (%s)", indentBase, deletedResource.ResourceId(), humanStringSource)
 
 				if humanAttrs := formatResourceAttributes(deletedResource); humanAttrs != "" {
-					humanString += fmt.Sprintf("\n        %s", humanAttrs)
+					humanString += fmt.Sprintf("\n%s    %s", indentBase, humanAttrs)
 				}
 				fmt.Println(humanString)
 			}
@@ -79,26 +96,42 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 	}
 
 	if analysis.Summary().TotalDrifted > 0 {
-
+		var sources []string
 		groupedBySource := make(map[string][]analyser.Difference)
-		for _, diff := range analysis.Differences() {
-			key := diff.Res.Source.Source()
+		for _, difference := range analysis.Differences() {
+			key := ""
+			if difference.Res.Source != nil {
+				key = difference.Res.Source.Source()
+			}
 			if _, exist := groupedBySource[key]; !exist {
-				groupedBySource[key] = []analyser.Difference{diff}
+				groupedBySource[key] = []analyser.Difference{difference}
 				continue
 			}
-			groupedBySource[key] = append(groupedBySource[key], diff)
+			groupedBySource[key] = append(groupedBySource[key], difference)
 		}
 
+		for s := range groupedBySource {
+			sources = append(sources, s)
+		}
+		sort.Strings(sources)
+
 		fmt.Println("Found changed resources:")
-		for source, differences := range groupedBySource {
-			fmt.Print(color.BlueString("  From %s\n", source))
-			for _, difference := range differences {
-				humanString := fmt.Sprintf("    - %s (%s):", difference.Res.ResourceId(), difference.Res.SourceString())
-				whiteSpace := "        "
+		for _, source := range sources {
+			indentBase := "  "
+			if source != "" {
+				fmt.Print(color.BlueString("%sFrom %s\n", indentBase, source))
+				indentBase += indentBase
+			}
+			for _, difference := range groupedBySource[source] {
+				humanStringSource := difference.Res.ResourceType()
+				if difference.Res.SourceString() != "" {
+					humanStringSource = difference.Res.SourceString()
+				}
+				humanString := fmt.Sprintf("%s- %s (%s):", indentBase, difference.Res.ResourceId(), humanStringSource)
+				whiteSpace := indentBase + "    "
 				if humanAttrs := formatResourceAttributes(difference.Res); humanAttrs != "" {
-					humanString += fmt.Sprintf("\n        %s", humanAttrs)
-					whiteSpace = "            "
+					humanString += fmt.Sprintf("\n%s%s", whiteSpace, humanAttrs)
+					whiteSpace += "    "
 				}
 				fmt.Println(humanString)
 				for _, change := range difference.Changelog {

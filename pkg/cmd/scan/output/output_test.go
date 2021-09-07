@@ -40,11 +40,6 @@ func fakeAnalysis() *analyser.Analysis {
 		}, &resource.Resource{
 			Id:   "deleted-id-2",
 			Type: "aws_deleted_resource",
-			Source: &resource.TerraformStateSource{
-				State:  "tfstate://delete_state.tfstate",
-				Module: "module",
-				Name:   "name",
-			},
 		},
 	)
 	a.AddManaged(
@@ -57,6 +52,23 @@ func fakeAnalysis() *analyser.Analysis {
 			Type: "aws_no_diff_resource",
 		},
 	)
+	// Cover the case when a diff occur on a resource without a source
+	a.AddDifference(analyser.Difference{
+		Res: &resource.Resource{
+			Id:   "diff-id-2",
+			Type: "aws_diff_resource",
+		},
+		Changelog: []analyser.Change{
+			{
+				Change: diff.Change{
+					Type: diff.UPDATE,
+					Path: []string{"updated", "field"},
+					From: "foobar",
+					To:   "barfoo",
+				},
+			},
+		},
+	})
 	a.AddDifference(analyser.Difference{Res: &resource.Resource{
 		Id:   "diff-id-1",
 		Type: "aws_diff_resource",

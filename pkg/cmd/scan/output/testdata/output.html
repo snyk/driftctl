@@ -518,6 +518,20 @@ input[type="search"], select {
                             <div role="row" data-kind="resource-changed" class="resource-item">
                                 <div class="row">
                                     <span role="cell">
+                                        <span data-type="resource-id">diff-id-2</span>
+                                        <span>(aws_diff_resource)</span>
+                                        <span style="display:none;" data-type="resource-type">aws_diff_resource</span>
+                                    </span>
+                                    
+                                </div>
+                                <pre class="code-box">
+                                    <code class="code-box-line">&emsp;~ updated.field: <span class="code-box-line-delete">"foobar"</span> => <span class="code-box-line-create">"barfoo"</span><br></code>
+                                </pre>
+                            </div>
+                            
+                            <div role="row" data-kind="resource-changed" class="resource-item">
+                                <div class="row">
+                                    <span role="cell">
                                         <span data-type="resource-id">diff-id-1</span>
                                         (<span>module.aws_diff_resource.name</span>)
                                         <span style="display:none;" data-type="resource-type">aws_diff_resource</span>
@@ -573,20 +587,6 @@ input[type="search"], select {
                                 </pre>
                             </div>
                             
-                            <div role="row" data-kind="resource-changed" class="resource-item">
-                                <div class="row">
-                                    <span role="cell">
-                                        <span data-type="resource-id">diff-id-3</span>
-                                        <span>(aws_diff_resource)</span>
-                                        <span style="display:none;" data-type="resource-type">aws_diff_resource</span>
-                                    </span>
-                                    
-                                </div>
-                                <pre class="code-box">
-                                    <code class="code-box-line">&emsp;~ InstanceInitiatedShutdownBehavior: <span class="code-box-line-delete">""</span> => <span class="code-box-line-create">null</span><br></code>
-                                </pre>
-                            </div>
-                            
                         </div>
                     </div>
                     <div class="empty-panel is-hidden">
@@ -617,10 +617,10 @@ input[type="search"], select {
                         <tr data-kind="resource-deleted" class="resource-item row">
                             <td>
                                 <span data-type="resource-id">deleted-id-2</span>
-                                <span>(module.aws_deleted_resource.name)</span>
+                                <span>(aws_deleted_resource)</span>
                                 <span data-type="resource-type" style="display:none;">aws_deleted_resource</span>
                             </td>
-                            <td data-type="resource-source">tfstate://delete_state.tfstate</td>
+                            
                         </tr>
                         
                         <tr data-kind="resource-deleted" class="resource-item row">
