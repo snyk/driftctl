@@ -61,12 +61,13 @@ func NewScanCmd() *cobra.Command {
 				)
 			}
 
-			outputFlag, _ := cmd.Flags().GetString("output")
-			out, err := parseOutputFlag(outputFlag)
+			outputFlag, _ := cmd.Flags().GetStringSlice("output")
+
+			out, err := parseOutputFlags(outputFlag)
 			if err != nil {
 				return err
 			}
-			opts.Output = *out
+			opts.Output = out
 
 			filterFlag, _ := cmd.Flags().GetStringArray("filter")
 
@@ -117,10 +118,10 @@ func NewScanCmd() *cobra.Command {
 			"  - Type =='aws_s3_bucket && Id != 'my_bucket' (excludes s3 bucket 'my_bucket')\n"+
 			"  - Attr.Tags.Terraform == 'true' (include only resources that have Tag Terraform equal to 'true')\n",
 	)
-	fl.StringP(
+	fl.StringSliceP(
 		"output",
 		"o",
-		output.Example(output.ConsoleOutputType),
+		[]string{output.Example(output.ConsoleOutputType)},
 		"Output format, by default it will write to the console\n"+
 			"Accepted formats are: "+strings.Join(output.SupportedOutputsExample(), ",")+"\n",
 	)
@@ -190,7 +191,6 @@ func NewScanCmd() *cobra.Command {
 
 func scanRun(opts *pkg.ScanOptions) error {
 	store := memstore.New()
-	selectedOutput := output.GetOutput(opts.Output, opts.Quiet)
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -256,9 +256,21 @@ func scanRun(opts *pkg.ScanOptions) error {
 	analysis.ProviderVersion = resourceSchemaRepository.ProviderVersion.String()
 	analysis.ProviderName = resourceSchemaRepository.ProviderName
 
-	err = selectedOutput.Write(analysis)
-	if err != nil {
-		return err
+	validOutput := false
+	for _, o := range opts.Output {
+		if err = output.GetOutput(o, opts.Quiet).Write(analysis); err != nil {
+			logrus.Errorf("Error writing to output %s: %v", o.String(), err.Error())
+			continue
+		}
+		validOutput = true
+	}
+
+	// Fallback to console output if all output failed
+	if !validOutput {
+		logrus.Debug("All outputs failed, fallback to console output")
+		if err = output.NewConsole().Write(analysis); err != nil {
+			return err
+		}
 	}
 
 	globaloutput.Printf(color.WhiteString("Scan duration: %s\n", analysis.Duration.Round(time.Second)))
@@ -350,6 +362,18 @@ func parseFromFlag(from []string) ([]config.SupplierConfig, error) {
 	}
 
 	return configs, nil
+}
+
+func parseOutputFlags(out []string) ([]output.OutputConfig, error) {
+	result := make([]output.OutputConfig, 0, len(out))
+	for _, v := range out {
+		o, err := parseOutputFlag(v)
+		if err != nil {
+			return result, err
+		}
+		result = append(result, *o)
+	}
+	return result, nil
 }
 
 func parseOutputFlag(out string) (*output.OutputConfig, error) {

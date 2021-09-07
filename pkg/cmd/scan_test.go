@@ -48,6 +48,7 @@ func TestScanCmd_Valid(t *testing.T) {
 		{args: []string{"scan", "--tf-provider-version", "3.30.2"}},
 		{args: []string{"scan", "--driftignore", "./path/to/driftignore.s3"}},
 		{args: []string{"scan", "--driftignore", ".driftignore"}},
+		{args: []string{"scan", "-o", "html://result.html", "-o", "json://result.json"}},
 	}
 
 	for _, tt := range cases {
@@ -164,98 +165,161 @@ func Test_parseFromFlag(t *testing.T) {
 
 func Test_parseOutputFlag(t *testing.T) {
 	type args struct {
-		out string
+		out []string
 	}
 	tests := []struct {
 		name string
 		args args
-		want *output.OutputConfig
+		want []output.OutputConfig
 		err  error
 	}{
 		{
-			name: "test empty",
+			name: "test empty output",
 			args: args{
-				out: "",
+				out: []string{""},
 			},
-			want: nil,
+			want: []output.OutputConfig{},
 			err:  fmt.Errorf("Unable to parse output flag '': \nAccepted formats are: console://,html://PATH/TO/FILE.html,json://PATH/TO/FILE.json,plan://PATH/TO/FILE.json"),
+		},
+		{
+			name: "test empty array",
+			args: args{
+				out: []string{},
+			},
+			want: []output.OutputConfig{},
+			err:  nil,
 		},
 		{
 			name: "test invalid",
 			args: args{
-				out: "sdgjsdgjsdg",
+				out: []string{"sdgjsdgjsdg"},
 			},
-			want: nil,
+			want: []output.OutputConfig{},
 			err:  fmt.Errorf("Unable to parse output flag 'sdgjsdgjsdg': \nAccepted formats are: console://,html://PATH/TO/FILE.html,json://PATH/TO/FILE.json,plan://PATH/TO/FILE.json"),
 		},
 		{
 			name: "test invalid",
 			args: args{
-				out: "://",
+				out: []string{"://"},
 			},
-			want: nil,
+			want: []output.OutputConfig{},
 			err:  fmt.Errorf("Unable to parse output flag '://': \nAccepted formats are: console://,html://PATH/TO/FILE.html,json://PATH/TO/FILE.json,plan://PATH/TO/FILE.json"),
 		},
 		{
 			name: "test unsupported",
 			args: args{
-				out: "foobar://",
+				out: []string{"foobar://"},
 			},
-			want: nil,
+			want: []output.OutputConfig{},
 			err:  fmt.Errorf("Unsupported output 'foobar': \nValid formats are: console://,html://PATH/TO/FILE.html,json://PATH/TO/FILE.json,plan://PATH/TO/FILE.json"),
 		},
 		{
 			name: "test empty json",
 			args: args{
-				out: "json://",
+				out: []string{"json://"},
 			},
-			want: nil,
+			want: []output.OutputConfig{},
 			err:  fmt.Errorf("Invalid json output 'json://': \nMust be of kind: json://PATH/TO/FILE.json"),
 		},
 		{
 			name: "test valid console",
 			args: args{
-				out: "console://",
+				out: []string{"console://"},
 			},
-			want: &output.OutputConfig{
-				Key: "console",
+			want: []output.OutputConfig{
+				{
+					Key: "console",
+				},
 			},
 			err: nil,
 		},
 		{
 			name: "test valid json",
 			args: args{
-				out: "json:///tmp/foobar.json",
+				out: []string{"json:///tmp/foobar.json"},
 			},
-			want: &output.OutputConfig{
-				Key:  "json",
-				Path: "/tmp/foobar.json",
+			want: []output.OutputConfig{
+				{
+					Key:  "json",
+					Path: "/tmp/foobar.json",
+				},
 			},
 			err: nil,
 		},
 		{
 			name: "test empty jsonplan",
 			args: args{
-				out: "plan://",
+				out: []string{"plan://"},
 			},
-			want: nil,
+			want: []output.OutputConfig{},
 			err:  fmt.Errorf("Invalid plan output 'plan://': \nMust be of kind: plan://PATH/TO/FILE.json"),
 		},
 		{
 			name: "test valid jsonplan",
 			args: args{
-				out: "plan:///tmp/foobar.json",
+				out: []string{"plan:///tmp/foobar.json"},
 			},
-			want: &output.OutputConfig{
-				Key:  "plan",
-				Path: "/tmp/foobar.json",
+			want: []output.OutputConfig{
+				{
+					Key:  "plan",
+					Path: "/tmp/foobar.json",
+				},
+			},
+			err: nil,
+		},
+		{
+			name: "test multiple output values",
+			args: args{
+				out: []string{"console:///dev/stdout", "json://result.json"},
+			},
+			want: []output.OutputConfig{
+				{
+					Key: "console",
+				},
+				{
+					Key:  "json",
+					Path: "result.json",
+				},
+			},
+			err: nil,
+		},
+		{
+			name: "test multiple output values with invalid value",
+			args: args{
+				out: []string{"console:///dev/stdout", "invalid://result.json"},
+			},
+			want: []output.OutputConfig{
+				{
+					Key: "console",
+				},
+			},
+			err: fmt.Errorf("Unsupported output 'invalid': \nValid formats are: console://,html://PATH/TO/FILE.html,json://PATH/TO/FILE.json,plan://PATH/TO/FILE.json"),
+		},
+		{
+			name: "test multiple valid output values",
+			args: args{
+				out: []string{"json://result1.json", "json://result2.json", "json://result3.json"},
+			},
+			want: []output.OutputConfig{
+				{
+					Key:  "json",
+					Path: "result1.json",
+				},
+				{
+					Key:  "json",
+					Path: "result2.json",
+				},
+				{
+					Key:  "json",
+					Path: "result3.json",
+				},
 			},
 			err: nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := parseOutputFlag(tt.args.out)
+			got, err := parseOutputFlags(tt.args.out)
 			if err != nil && err.Error() != tt.err.Error() {
 				t.Fatalf("got error = '%v', expected '%v'", err, tt.err)
 			}

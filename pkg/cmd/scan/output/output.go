@@ -25,10 +25,6 @@ var supportedOutputExample = map[string]string{
 	PlanOutputType:    PlanOutputExample,
 }
 
-func SupportedOutputs() []string {
-	return supportedOutputTypes
-}
-
 func SupportedOutputsExample() []string {
 	examples := make([]string, 0, len(supportedOutputExample))
 	for _, ex := range supportedOutputExample {
