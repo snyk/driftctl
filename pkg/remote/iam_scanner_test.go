@@ -14,6 +14,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
+	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -21,6 +22,7 @@ import (
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -63,9 +65,10 @@ func TestIamUser(t *testing.T) {
 			test:    "cannot list iam user",
 			dirName: "iam_user_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
-				repo.On("ListAllUsers").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repo.On("ListAllUsers").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsIamUserResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsIamUserResourceType, resourceaws.AwsIamUserResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsIamUserResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamUserResourceType, resourceaws.AwsIamUserResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -189,9 +192,10 @@ func TestIamUserPolicy(t *testing.T) {
 			test:    "cannot list user",
 			dirName: "iam_user_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
-				repo.On("ListAllUsers").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repo.On("ListAllUsers").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsIamUserPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsIamUserPolicyResourceType, resourceaws.AwsIamUserResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsIamUserPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamUserPolicyResourceType, resourceaws.AwsIamUserResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -200,9 +204,10 @@ func TestIamUserPolicy(t *testing.T) {
 			dirName: "iam_user_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllUsers").Once().Return([]*iam.User{}, nil)
-				repo.On("ListAllUserPolicies", mock.Anything).Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repo.On("ListAllUserPolicies", mock.Anything).Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsIamUserPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsIamUserPolicyResourceType, resourceaws.AwsIamUserPolicyResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsIamUserPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamUserPolicyResourceType, resourceaws.AwsIamUserPolicyResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -305,9 +310,10 @@ func TestIamPolicy(t *testing.T) {
 			test:    "cannot list iam custom policies",
 			dirName: "iam_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
-				repo.On("ListAllPolicies").Once().Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repo.On("ListAllPolicies").Once().Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsIamPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsIamPolicyResourceType, resourceaws.AwsIamPolicyResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsIamPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamPolicyResourceType, resourceaws.AwsIamPolicyResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -597,9 +603,10 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 			test:    "Cannot list roles",
 			dirName: "aws_iam_role_policy_attachment_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
-				repo.On("ListAllRoles").Once().Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repo.On("ListAllRoles").Once().Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsIamRolePolicyAttachmentResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsIamRolePolicyAttachmentResourceType, resourceaws.AwsIamRoleResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsIamRolePolicyAttachmentResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamRolePolicyAttachmentResourceType, resourceaws.AwsIamRoleResourceType), alerts.EnumerationPhase)).Return()
 			},
 		},
 		{
@@ -607,9 +614,10 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 			dirName: "aws_iam_role_policy_attachment_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRoles").Once().Return([]*iam.Role{{RoleName: aws.String("test")}}, nil)
-				repo.On("ListAllRolePolicyAttachments", mock.Anything).Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repo.On("ListAllRolePolicyAttachments", mock.Anything).Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsIamRolePolicyAttachmentResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsIamRolePolicyAttachmentResourceType, resourceaws.AwsIamRolePolicyAttachmentResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsIamRolePolicyAttachmentResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamRolePolicyAttachmentResourceType, resourceaws.AwsIamRolePolicyAttachmentResourceType), alerts.EnumerationPhase)).Return()
 			},
 		},
 	}
@@ -731,9 +739,10 @@ func TestIamAccessKey(t *testing.T) {
 			test:    "Cannot list iam user",
 			dirName: "iam_access_key_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
-				repo.On("ListAllUsers").Once().Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repo.On("ListAllUsers").Once().Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsIamAccessKeyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsIamAccessKeyResourceType, resourceaws.AwsIamUserResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsIamAccessKeyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamAccessKeyResourceType, resourceaws.AwsIamUserResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -742,9 +751,10 @@ func TestIamAccessKey(t *testing.T) {
 			dirName: "iam_access_key_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllUsers").Once().Return([]*iam.User{}, nil)
-				repo.On("ListAllAccessKeys", mock.Anything).Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repo.On("ListAllAccessKeys", mock.Anything).Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsIamAccessKeyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsIamAccessKeyResourceType, resourceaws.AwsIamAccessKeyResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsIamAccessKeyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamAccessKeyResourceType, resourceaws.AwsIamAccessKeyResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -942,9 +952,10 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 			test:    "cannot list user",
 			dirName: "iam_user_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
-				repo.On("ListAllUsers").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repo.On("ListAllUsers").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsIamUserPolicyAttachmentResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsIamUserPolicyAttachmentResourceType, resourceaws.AwsIamUserResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsIamUserPolicyAttachmentResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamUserPolicyAttachmentResourceType, resourceaws.AwsIamUserResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -953,9 +964,10 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 			dirName: "iam_user_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllUsers").Once().Return([]*iam.User{}, nil)
-				repo.On("ListAllUserPolicyAttachments", mock.Anything).Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repo.On("ListAllUserPolicyAttachments", mock.Anything).Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsIamUserPolicyAttachmentResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsIamUserPolicyAttachmentResourceType, resourceaws.AwsIamUserPolicyAttachmentResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsIamUserPolicyAttachmentResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamUserPolicyAttachmentResourceType, resourceaws.AwsIamUserPolicyAttachmentResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1071,9 +1083,10 @@ func TestIamRolePolicy(t *testing.T) {
 			test:    "Cannot list roles",
 			dirName: "iam_role_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
-				repo.On("ListAllRoles").Once().Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repo.On("ListAllRoles").Once().Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsIamRolePolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsIamRolePolicyResourceType, resourceaws.AwsIamRoleResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsIamRolePolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamRolePolicyResourceType, resourceaws.AwsIamRoleResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1082,9 +1095,10 @@ func TestIamRolePolicy(t *testing.T) {
 			dirName: "iam_role_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRoles").Once().Return([]*iam.Role{}, nil)
-				repo.On("ListAllRolePolicies", mock.Anything).Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repo.On("ListAllRolePolicies", mock.Anything).Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsIamRolePolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsIamRolePolicyResourceType, resourceaws.AwsIamRolePolicyResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsIamRolePolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamRolePolicyResourceType, resourceaws.AwsIamRolePolicyResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},

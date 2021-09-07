@@ -14,6 +14,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
+	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -21,6 +22,7 @@ import (
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -53,9 +55,10 @@ func TestEC2EbsVolume(t *testing.T) {
 			test:    "cannot list volumes",
 			dirName: "aws_ec2_ebs_volume_list",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllVolumes").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllVolumes").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsEbsVolumeResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsEbsVolumeResourceType, resourceaws.AwsEbsVolumeResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsEbsVolumeResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEbsVolumeResourceType, resourceaws.AwsEbsVolumeResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -149,9 +152,10 @@ func TestEC2EbsSnapshot(t *testing.T) {
 			test:    "cannot list snapshots",
 			dirName: "aws_ec2_ebs_snapshot_list",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllSnapshots").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllSnapshots").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsEbsSnapshotResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsEbsSnapshotResourceType, resourceaws.AwsEbsSnapshotResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsEbsSnapshotResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEbsSnapshotResourceType, resourceaws.AwsEbsSnapshotResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -245,9 +249,10 @@ func TestEC2Eip(t *testing.T) {
 			test:    "cannot list eips",
 			dirName: "aws_ec2_eip_list",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllAddresses").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllAddresses").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsEipResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsEipResourceType, resourceaws.AwsEipResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsEipResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEipResourceType, resourceaws.AwsEipResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -341,9 +346,10 @@ func TestEC2Ami(t *testing.T) {
 			test:    "cannot list ami",
 			dirName: "aws_ec2_ami_list",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllImages").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllImages").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsAmiResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsAmiResourceType, resourceaws.AwsAmiResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsAmiResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsAmiResourceType, resourceaws.AwsAmiResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -437,9 +443,10 @@ func TestEC2KeyPair(t *testing.T) {
 			test:    "cannot list key pairs",
 			dirName: "aws_ec2_key_pair_list",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllKeyPairs").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllKeyPairs").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsKeyPairResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsKeyPairResourceType, resourceaws.AwsKeyPairResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsKeyPairResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsKeyPairResourceType, resourceaws.AwsKeyPairResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -535,9 +542,10 @@ func TestEC2EipAssociation(t *testing.T) {
 			test:    "cannot list eip associations",
 			dirName: "aws_ec2_eip_association_list",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllAddressesAssociation").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllAddressesAssociation").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsEipAssociationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsEipAssociationResourceType, resourceaws.AwsEipAssociationResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsEipAssociationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEipAssociationResourceType, resourceaws.AwsEipAssociationResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -641,9 +649,10 @@ func TestEC2Instance(t *testing.T) {
 			test:    "cannot list instances",
 			dirName: "aws_ec2_instance_list",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllInstances").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllInstances").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsInstanceResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsInstanceResourceType, resourceaws.AwsInstanceResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsInstanceResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsInstanceResourceType, resourceaws.AwsInstanceResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -737,9 +746,10 @@ func TestEC2InternetGateway(t *testing.T) {
 			test:    "cannot list internet gateways",
 			dirName: "aws_ec2_internet_gateway_list",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllInternetGateways").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllInternetGateways").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsInternetGatewayResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsInternetGatewayResourceType, resourceaws.AwsInternetGatewayResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsInternetGatewayResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsInternetGatewayResourceType, resourceaws.AwsInternetGatewayResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -850,9 +860,10 @@ func TestVPC(t *testing.T) {
 			test:    "cannot list VPC",
 			dirName: "vpc_empty",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				client.On("ListAllVPCs").Once().Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				client.On("ListAllVPCs").Once().Return(nil, nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsVpcResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsVpcResourceType, resourceaws.AwsVpcResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsVpcResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsVpcResourceType, resourceaws.AwsVpcResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -960,9 +971,10 @@ func TestDefaultVPC(t *testing.T) {
 			test:    "cannot list VPC",
 			dirName: "vpc_empty",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				client.On("ListAllVPCs").Once().Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				client.On("ListAllVPCs").Once().Return(nil, nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsDefaultVpcResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsDefaultVpcResourceType, resourceaws.AwsDefaultVpcResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsDefaultVpcResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsDefaultVpcResourceType, resourceaws.AwsDefaultVpcResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1125,9 +1137,10 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 			test:    "cannot list route table associations",
 			dirName: "aws_ec2_route_table_association_list",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllRouteTables").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllRouteTables").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsRouteTableAssociationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsRouteTableAssociationResourceType, resourceaws.AwsRouteTableResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsRouteTableAssociationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRouteTableAssociationResourceType, resourceaws.AwsRouteTableResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1244,9 +1257,10 @@ func TestEC2Subnet(t *testing.T) {
 			test:    "cannot list subnets",
 			dirName: "aws_ec2_subnet_list",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllSubnets").Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllSubnets").Return(nil, nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsSubnetResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsSubnetResourceType, resourceaws.AwsSubnetResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsSubnetResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSubnetResourceType, resourceaws.AwsSubnetResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1363,9 +1377,10 @@ func TestEC2DefaultSubnet(t *testing.T) {
 			test:    "cannot list default subnets",
 			dirName: "aws_ec2_default_subnet_list",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllSubnets").Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllSubnets").Return(nil, nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsDefaultSubnetResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsDefaultSubnetResourceType, resourceaws.AwsDefaultSubnetResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsDefaultSubnetResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsDefaultSubnetResourceType, resourceaws.AwsDefaultSubnetResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1469,9 +1484,10 @@ func TestEC2RouteTable(t *testing.T) {
 			test:    "cannot list route tables",
 			dirName: "aws_ec2_route_table_list",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllRouteTables").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllRouteTables").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsRouteTableResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsRouteTableResourceType, resourceaws.AwsRouteTableResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsRouteTableResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRouteTableResourceType, resourceaws.AwsRouteTableResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1575,9 +1591,10 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 			test:    "cannot list default route tables",
 			dirName: "aws_ec2_default_route_table_list",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllRouteTables").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllRouteTables").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsDefaultRouteTableResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsDefaultRouteTableResourceType, resourceaws.AwsDefaultRouteTableResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsDefaultRouteTableResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsDefaultRouteTableResourceType, resourceaws.AwsDefaultRouteTableResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1681,9 +1698,10 @@ func TestVpcSecurityGroup(t *testing.T) {
 			test:    "cannot list security groups",
 			dirName: "vpc_security_group_empty",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				client.On("ListAllSecurityGroups").Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				client.On("ListAllSecurityGroups").Return(nil, nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsSecurityGroupResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsSecurityGroupResourceType, resourceaws.AwsSecurityGroupResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsSecurityGroupResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSecurityGroupResourceType, resourceaws.AwsSecurityGroupResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1787,9 +1805,10 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 			test:    "cannot list security groups",
 			dirName: "vpc_default_security_group_empty",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				client.On("ListAllSecurityGroups").Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				client.On("ListAllSecurityGroups").Return(nil, nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsDefaultSecurityGroupResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsDefaultSecurityGroupResourceType, resourceaws.AwsDefaultSecurityGroupResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsDefaultSecurityGroupResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsDefaultSecurityGroupResourceType, resourceaws.AwsDefaultSecurityGroupResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1882,9 +1901,10 @@ func TestEC2NatGateway(t *testing.T) {
 			test:    "cannot list nat gateways",
 			dirName: "aws_ec2_nat_gateway_list",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllNatGateways").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllNatGateways").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsNatGatewayResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsNatGatewayResourceType, resourceaws.AwsNatGatewayResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsNatGatewayResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsNatGatewayResourceType, resourceaws.AwsNatGatewayResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -2050,9 +2070,10 @@ func TestEC2Route(t *testing.T) {
 			test:    "cannot list routes",
 			dirName: "aws_ec2_route_list",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllRouteTables").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllRouteTables").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsRouteResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsRouteResourceType, resourceaws.AwsRouteTableResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsRouteResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRouteResourceType, resourceaws.AwsRouteTableResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -2240,9 +2261,10 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 			test:    "cannot list security group rules",
 			dirName: "vpc_security_group_rule_empty",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				client.On("ListAllSecurityGroups").Once().Return(nil, nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				client.On("ListAllSecurityGroups").Once().Return(nil, nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsSecurityGroupRuleResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsSecurityGroupRuleResourceType, resourceaws.AwsSecurityGroupResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsSecurityGroupRuleResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSecurityGroupRuleResourceType, resourceaws.AwsSecurityGroupResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},

@@ -13,8 +13,10 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
+	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
@@ -58,9 +60,10 @@ func TestRoute53_HealthCheck(t *testing.T) {
 			test:    "cannot list health check",
 			dirName: "route53_health_check_empty",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
-				client.On("ListAllHealthChecks").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				client.On("ListAllHealthChecks").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsRoute53HealthCheckResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsRoute53HealthCheckResourceType, resourceaws.AwsRoute53HealthCheckResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsRoute53HealthCheckResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRoute53HealthCheckResourceType, resourceaws.AwsRoute53HealthCheckResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -189,12 +192,13 @@ func TestRoute53_Zone(t *testing.T) {
 			test:    "cannot list zones",
 			dirName: "route53_zone_empty",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{},
-					awserr.NewRequestFailure(nil, 403, ""),
+					awsError,
 				)
 
-				alerter.On("SendAlert", resourceaws.AwsRoute53ZoneResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsRoute53ZoneResourceType, resourceaws.AwsRoute53ZoneResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsRoute53ZoneResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRoute53ZoneResourceType, resourceaws.AwsRoute53ZoneResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -379,11 +383,12 @@ func TestRoute53_Record(t *testing.T) {
 			test:    "cannot list zones",
 			dirName: "route53_zone_with_no_record",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{},
-					awserr.NewRequestFailure(nil, 403, ""))
+					awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsRoute53RecordResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsRoute53RecordResourceType, resourceaws.AwsRoute53ZoneResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsRoute53RecordResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRoute53RecordResourceType, resourceaws.AwsRoute53ZoneResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -399,11 +404,11 @@ func TestRoute53_Record(t *testing.T) {
 						},
 					},
 					nil)
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListRecordsForZone", "Z06486383UC8WYSBZTWFM").Return(
-					[]*route53.ResourceRecordSet{},
-					awserr.NewRequestFailure(nil, 403, ""))
+					[]*route53.ResourceRecordSet{}, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsRoute53RecordResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsRoute53RecordResourceType, resourceaws.AwsRoute53RecordResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsRoute53RecordResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRoute53RecordResourceType, resourceaws.AwsRoute53RecordResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},

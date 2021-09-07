@@ -13,8 +13,10 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
+	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
@@ -59,9 +61,10 @@ func TestScanSNSTopic(t *testing.T) {
 			test:    "cannot list SNSTopic",
 			dirName: "sns_topic_empty",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
-				client.On("ListAllTopics").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				client.On("ListAllTopics").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsSnsTopicResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsSnsTopicResourceType, resourceaws.AwsSnsTopicResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsSnsTopicResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSnsTopicResourceType, resourceaws.AwsSnsTopicResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -158,9 +161,10 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 			test:    "cannot list SNSTopic",
 			dirName: "sns_topic_policy_topic_list",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
-				client.On("ListAllTopics").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				client.On("ListAllTopics").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsSnsTopicPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsSnsTopicPolicyResourceType, resourceaws.AwsSnsTopicResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsSnsTopicPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSnsTopicPolicyResourceType, resourceaws.AwsSnsTopicResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -274,9 +278,10 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 			test:    "cannot list SNSTopic subscription",
 			dirName: "sns_topic_subscription_list",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
-				client.On("ListAllSubscriptions").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				client.On("ListAllSubscriptions").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsSnsTopicSubscriptionResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsSnsTopicSubscriptionResourceType, resourceaws.AwsSnsTopicSubscriptionResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsSnsTopicSubscriptionResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSnsTopicSubscriptionResourceType, resourceaws.AwsSnsTopicSubscriptionResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},

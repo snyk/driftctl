@@ -9,6 +9,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
+	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/remote/github"
 	githubres "github.com/cloudskiff/driftctl/pkg/resource/github"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -55,7 +56,7 @@ func TestScanGithubMembership(t *testing.T) {
 			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListMembership").Return(nil, errors.New("Your token has not been granted the required scopes to execute this query."))
 
-				alerter.On("SendAlert", githubres.GithubMembershipResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, githubres.GithubMembershipResourceType, githubres.GithubMembershipResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", githubres.GithubMembershipResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Your token has not been granted the required scopes to execute this query."), githubres.GithubMembershipResourceType, githubres.GithubMembershipResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},

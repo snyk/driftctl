@@ -1,8 +1,8 @@
 Found 0 resource(s)
  - 0% coverage
 Congrats! Your infrastructure is fully in sync.
-Ignoring github_team from drift calculation: Listing github_team is forbidden.
-Ignoring github_team_membership from drift calculation: Listing github_team is forbidden.
+Ignoring github_team from drift calculation: Listing github_team is forbidden: dummy error
+Ignoring github_team_membership from drift calculation: Listing github_team is forbidden: dummy error
 
 It seems that we got access denied exceptions while listing resources.
 Please be sure that your Github token has the right permissions, check the last up-to-date documentation there: https://docs.driftctl.com/github/policy

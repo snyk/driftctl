@@ -10,7 +10,9 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
+	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/pkg/errors"
 	"github.com/r3labs/diff/v2"
 )
 
@@ -111,9 +113,9 @@ func fakeAnalysisWithAlerts() *analyser.Analysis {
 	a := fakeAnalysis()
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
-			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_vpc", "aws_vpc", alerts.EnumerationPhase),
-			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_sqs", "aws_sqs", alerts.EnumerationPhase),
-			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_sns", "aws_sns", alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("dummy error"), "aws_vpc", "aws_vpc"), alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("dummy error"), "aws_sqs", "aws_sqs"), alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("dummy error"), "aws_sns", "aws_sns"), alerts.EnumerationPhase),
 		},
 	})
 	a.ProviderVersion = "3.19.0"
@@ -382,9 +384,9 @@ func fakeAnalysisWithAWSEnumerationError() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
-			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_vpc", "aws_vpc", alerts.EnumerationPhase),
-			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_sqs", "aws_sqs", alerts.EnumerationPhase),
-			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, "aws_sns", "aws_sns", alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("dummy error"), "aws_vpc", "aws_vpc"), alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("dummy error"), "aws_sqs", "aws_sqs"), alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("dummy error"), "aws_sns", "aws_sns"), alerts.EnumerationPhase),
 		},
 	})
 	a.ProviderName = "AWS"
@@ -396,8 +398,8 @@ func fakeAnalysisWithGithubEnumerationError() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
-			alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, "github_team", "github_team", alerts.EnumerationPhase),
-			alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, "github_team_membership", "github_team", alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("dummy error"), "github_team", "github_team"), alerts.EnumerationPhase),
+			alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("dummy error"), "github_team_membership", "github_team"), alerts.EnumerationPhase),
 		},
 	})
 	a.ProviderName = "AWS"

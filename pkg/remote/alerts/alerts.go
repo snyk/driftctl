@@ -22,15 +22,29 @@ type RemoteAccessDeniedAlert struct {
 	scanningPhase ScanningPhase
 }
 
-func NewRemoteAccessDeniedAlert(provider, resource, listedTypeError string, scanningPhase ScanningPhase) *RemoteAccessDeniedAlert {
+func NewRemoteAccessDeniedAlert(provider string, scanErr *remoteerror.ResourceScanningError, scanningPhase ScanningPhase) *RemoteAccessDeniedAlert {
 	var message string
 	switch scanningPhase {
 	case EnumerationPhase:
-		message = fmt.Sprintf("Ignoring %s from drift calculation: Listing %s is forbidden.", resource, listedTypeError)
+		message = fmt.Sprintf(
+			"Ignoring %s from drift calculation: Listing %s is forbidden: %s",
+			scanErr.Resource(),
+			scanErr.ListedTypeError(),
+			scanErr.RootCause().Error(),
+		)
 	case DetailsFetchingPhase:
-		message = fmt.Sprintf("Ignoring %s from drift calculation: Reading details of %s is forbidden.", resource, listedTypeError)
+		message = fmt.Sprintf(
+			"Ignoring %s from drift calculation: Reading details of %s is forbidden: %s",
+			scanErr.Resource(),
+			scanErr.ListedTypeError(),
+			scanErr.RootCause().Error(),
+		)
 	default:
-		message = fmt.Sprintf("Ignoring %s from drift calculation: %s", resource, listedTypeError)
+		message = fmt.Sprintf(
+			"Ignoring %s from drift calculation: %s",
+			scanErr.Resource(),
+			scanErr.RootCause().Error(),
+		)
 	}
 	return &RemoteAccessDeniedAlert{message, provider, scanningPhase}
 }
@@ -69,8 +83,8 @@ func sendRemoteAccessDeniedAlert(provider string, alerter alerter.AlerterInterfa
 	logrus.WithFields(logrus.Fields{
 		"resource":    listError.Resource(),
 		"listed_type": listError.ListedTypeError(),
-	}).Debugf("Got an access denied error: %+v", listError.String())
-	alerter.SendAlert(listError.Resource(), NewRemoteAccessDeniedAlert(provider, listError.Resource(), listError.ListedTypeError(), p))
+	}).Debugf("Got an access denied error: %+v", listError.Error())
+	alerter.SendAlert(listError.Resource(), NewRemoteAccessDeniedAlert(provider, listError, p))
 }
 
 func SendEnumerationAlert(provider string, alerter alerter.AlerterInterface, listError *remoteerror.ResourceScanningError) {

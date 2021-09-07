@@ -14,6 +14,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
+	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -21,6 +22,7 @@ import (
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -55,9 +57,10 @@ func TestSQSQueue(t *testing.T) {
 			test:    "cannot list sqs queues",
 			dirName: "sqs_queue_empty",
 			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
-				client.On("ListAllQueues").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				client.On("ListAllQueues").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsSqsQueueResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsSqsQueueResourceType, resourceaws.AwsSqsQueueResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsSqsQueueResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSqsQueueResourceType, resourceaws.AwsSqsQueueResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -181,9 +184,10 @@ func TestSQSQueuePolicy(t *testing.T) {
 			test:    "cannot list sqs queues, thus sqs queue policies",
 			dirName: "sqs_queue_policy_empty",
 			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
-				client.On("ListAllQueues").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				client.On("ListAllQueues").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsSqsQueuePolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsSqsQueuePolicyResourceType, resourceaws.AwsSqsQueueResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsSqsQueuePolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSqsQueuePolicyResourceType, resourceaws.AwsSqsQueueResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},

@@ -14,6 +14,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
+	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -55,9 +56,10 @@ func TestDynamoDBTable(t *testing.T) {
 			test:    "cannot list DynamoDB Table",
 			dirName: "dynamodb_table_list",
 			mocks: func(client *repository.MockDynamoDBRepository, alerter *mocks.AlerterInterface) {
-				client.On("ListAllTables").Return(nil, awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 400, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 400, "")
+				client.On("ListAllTables").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsDynamodbTableResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsDynamodbTableResourceType, resourceaws.AwsDynamodbTableResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsDynamodbTableResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsDynamodbTableResourceType, resourceaws.AwsDynamodbTableResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},

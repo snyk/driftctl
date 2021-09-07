@@ -10,6 +10,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
+	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/remote/google"
 	"github.com/cloudskiff/driftctl/pkg/remote/google/repository"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -72,7 +73,10 @@ func TestGoogleStorageBucket(t *testing.T) {
 					"google_storage_bucket",
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
-						"google_storage_bucket", "google_storage_bucket",
+						remoteerr.NewResourceListingError(
+							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							"google_storage_bucket",
+						),
 						alerts.EnumerationPhase,
 					),
 				).Once()

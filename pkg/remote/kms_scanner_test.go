@@ -14,6 +14,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
+	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -21,6 +22,7 @@ import (
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -54,9 +56,10 @@ func TestKMSKey(t *testing.T) {
 			test:    "cannot list keys",
 			dirName: "aws_kms_key_list",
 			mocks: func(repository *repository.MockKMSRepository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllKeys").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllKeys").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsKmsKeyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsKmsKeyResourceType, resourceaws.AwsKmsKeyResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsKmsKeyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsKmsKeyResourceType, resourceaws.AwsKmsKeyResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -151,9 +154,10 @@ func TestKMSAlias(t *testing.T) {
 			test:    "cannot list aliases",
 			dirName: "aws_kms_alias_list",
 			mocks: func(repository *repository.MockKMSRepository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllAliases").Return(nil, awserr.NewRequestFailure(nil, 403, ""))
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllAliases").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsKmsAliasResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsKmsAliasResourceType, resourceaws.AwsKmsAliasResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsKmsAliasResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsKmsAliasResourceType, resourceaws.AwsKmsAliasResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},

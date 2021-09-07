@@ -9,6 +9,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
+	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/remote/github"
 	githubres "github.com/cloudskiff/driftctl/pkg/resource/github"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -56,7 +57,7 @@ func TestScanGithubTeam(t *testing.T) {
 			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListTeams").Return(nil, errors.New("Your token has not been granted the required scopes to execute this query."))
 
-				alerter.On("SendAlert", githubres.GithubTeamResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, githubres.GithubTeamResourceType, githubres.GithubTeamResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", githubres.GithubTeamResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Your token has not been granted the required scopes to execute this query."), githubres.GithubTeamResourceType, githubres.GithubTeamResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
