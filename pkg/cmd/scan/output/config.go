@@ -8,5 +8,5 @@ type OutputConfig struct {
 }
 
 func (o *OutputConfig) String() string {
-	return fmt.Sprintf("%s://%s", o.Key, o.Options["path"])
+	return fmt.Sprintf("%s://%s", o.Key, o.Path)
 }

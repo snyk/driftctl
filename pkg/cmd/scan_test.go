@@ -302,22 +302,16 @@ func Test_parseOutputFlag(t *testing.T) {
 			},
 			want: []output.OutputConfig{
 				{
-					Key: "json",
-					Options: map[string]string{
-						"path": "result1.json",
-					},
+					Key:  "json",
+					Path: "result1.json",
 				},
 				{
-					Key: "json",
-					Options: map[string]string{
-						"path": "result2.json",
-					},
+					Key:  "json",
+					Path: "result2.json",
 				},
 				{
-					Key: "json",
-					Options: map[string]string{
-						"path": "result3.json",
-					},
+					Key:  "json",
+					Path: "result3.json",
 				},
 			},
 			err: nil,
