@@ -35,6 +35,7 @@ func NewConsole() *Console {
 
 func (c *Console) Write(analysis *analyser.Analysis) error {
 	if analysis.Summary().TotalDeleted > 0 {
+		var sources []string
 		groupedBySource := make(map[string][]*resource.Resource)
 
 		for _, deletedResource := range analysis.Deleted() {
@@ -48,11 +49,16 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 			groupedBySource[key] = append(groupedBySource[key], deletedResource)
 		}
 
+		for s := range groupedBySource {
+			sources = append(sources, s)
+		}
+		sort.Strings(sources)
+
 		fmt.Println("Found missing resources:")
 
-		for source, deletedResources := range groupedBySource {
+		for _, source := range sources {
 			fmt.Print(color.BlueString("  From %s\n", source))
-			for _, deletedResource := range deletedResources {
+			for _, deletedResource := range groupedBySource[source] {
 				humanString := fmt.Sprintf("    - %s (%s)", deletedResource.ResourceId(), deletedResource.SourceString())
 
 				if humanAttrs := formatResourceAttributes(deletedResource); humanAttrs != "" {
@@ -79,21 +85,26 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 	}
 
 	if analysis.Summary().TotalDrifted > 0 {
-
+		var sources []string
 		groupedBySource := make(map[string][]analyser.Difference)
-		for _, diff := range analysis.Differences() {
-			key := diff.Res.Source.Source()
+		for _, difference := range analysis.Differences() {
+			key := difference.Res.Source.Source()
 			if _, exist := groupedBySource[key]; !exist {
-				groupedBySource[key] = []analyser.Difference{diff}
+				groupedBySource[key] = []analyser.Difference{difference}
 				continue
 			}
-			groupedBySource[key] = append(groupedBySource[key], diff)
+			groupedBySource[key] = append(groupedBySource[key], difference)
 		}
 
+		for s := range groupedBySource {
+			sources = append(sources, s)
+		}
+		sort.Strings(sources)
+
 		fmt.Println("Found changed resources:")
-		for source, differences := range groupedBySource {
+		for _, source := range sources {
 			fmt.Print(color.BlueString("  From %s\n", source))
-			for _, difference := range differences {
+			for _, difference := range groupedBySource[source] {
 				humanString := fmt.Sprintf("    - %s (%s):", difference.Res.ResourceId(), difference.Res.SourceString())
 				whiteSpace := "        "
 				if humanAttrs := formatResourceAttributes(difference.Res); humanAttrs != "" {
