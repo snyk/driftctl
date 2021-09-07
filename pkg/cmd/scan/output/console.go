@@ -39,7 +39,10 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 		groupedBySource := make(map[string][]*resource.Resource)
 
 		for _, deletedResource := range analysis.Deleted() {
-			key := deletedResource.Source.Source()
+			key := ""
+			if deletedResource.Source != nil {
+				key = deletedResource.Source.Source()
+			}
 
 			if _, exist := groupedBySource[key]; !exist {
 				groupedBySource[key] = []*resource.Resource{deletedResource}
@@ -57,12 +60,20 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 		fmt.Println("Found missing resources:")
 
 		for _, source := range sources {
-			fmt.Print(color.BlueString("  From %s\n", source))
+			indentBase := "  "
+			if source != "" {
+				fmt.Print(color.BlueString("%sFrom %s\n", indentBase, source))
+				indentBase += indentBase
+			}
 			for _, deletedResource := range groupedBySource[source] {
-				humanString := fmt.Sprintf("    - %s (%s)", deletedResource.ResourceId(), deletedResource.SourceString())
+				humanStringSource := deletedResource.ResourceType()
+				if deletedResource.SourceString() != "" {
+					humanStringSource = deletedResource.SourceString()
+				}
+				humanString := fmt.Sprintf("%s- %s (%s)", indentBase, deletedResource.ResourceId(), humanStringSource)
 
 				if humanAttrs := formatResourceAttributes(deletedResource); humanAttrs != "" {
-					humanString += fmt.Sprintf("\n        %s", humanAttrs)
+					humanString += fmt.Sprintf("\n%s    %s", indentBase, humanAttrs)
 				}
 				fmt.Println(humanString)
 			}
@@ -88,7 +99,10 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 		var sources []string
 		groupedBySource := make(map[string][]analyser.Difference)
 		for _, difference := range analysis.Differences() {
-			key := difference.Res.Source.Source()
+			key := ""
+			if difference.Res.Source != nil {
+				key = difference.Res.Source.Source()
+			}
 			if _, exist := groupedBySource[key]; !exist {
 				groupedBySource[key] = []analyser.Difference{difference}
 				continue
@@ -103,13 +117,21 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 
 		fmt.Println("Found changed resources:")
 		for _, source := range sources {
-			fmt.Print(color.BlueString("  From %s\n", source))
+			indentBase := "  "
+			if source != "" {
+				fmt.Print(color.BlueString("%sFrom %s\n", indentBase, source))
+				indentBase += indentBase
+			}
 			for _, difference := range groupedBySource[source] {
-				humanString := fmt.Sprintf("    - %s (%s):", difference.Res.ResourceId(), difference.Res.SourceString())
-				whiteSpace := "        "
+				humanStringSource := difference.Res.ResourceType()
+				if difference.Res.SourceString() != "" {
+					humanStringSource = difference.Res.SourceString()
+				}
+				humanString := fmt.Sprintf("%s- %s (%s):", indentBase, difference.Res.ResourceId(), humanStringSource)
+				whiteSpace := indentBase + "    "
 				if humanAttrs := formatResourceAttributes(difference.Res); humanAttrs != "" {
-					humanString += fmt.Sprintf("\n        %s", humanAttrs)
-					whiteSpace = "            "
+					humanString += fmt.Sprintf("\n%s%s", whiteSpace, humanAttrs)
+					whiteSpace += "    "
 				}
 				fmt.Println(humanString)
 				for _, change := range difference.Changelog {

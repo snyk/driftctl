@@ -73,6 +73,9 @@ func (r *Resource) Src() Source {
 }
 
 func (r *Resource) SourceString() string {
+	if r.Source == nil {
+		return ""
+	}
 	if r.Source.Namespace() == "" {
 		return fmt.Sprintf("%s.%s", r.ResourceType(), r.Source.InternalName())
 	}
