@@ -183,20 +183,6 @@ func TestHTML_Write(t *testing.T) {
 							},
 						},
 					}})
-				a.AddDifference(analyser.Difference{
-					Res: &resource.Resource{
-						Id:   "diff-id-3",
-						Type: "aws_diff_resource",
-					}, Changelog: []analyser.Change{
-						{
-							Change: diff.Change{
-								Type: diff.UPDATE,
-								Path: []string{"InstanceInitiatedShutdownBehavior"},
-								From: "",
-								To:   nil,
-							},
-						},
-					}})
 				a.ProviderName = "AWS"
 				a.ProviderVersion = "3.19.0"
 				return a

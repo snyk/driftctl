@@ -1,7 +1,7 @@
 Found missing resources:
+  - deleted-id-2 (aws_deleted_resource)
   From tfstate://delete_state.tfstate
     - deleted-id-1 (module.aws_deleted_resource.name)
-    - deleted-id-2 (module.aws_deleted_resource.name)
   From tfstate://test_state.tfstate
     - test-id-1 (module.aws_test_resource.name)
     - test-id-2 (module.aws_test_resource.name)
@@ -14,6 +14,8 @@ Found resources not covered by IaC:
     - unmanaged-id-1
     - unmanaged-id-2
 Found changed resources:
+  - diff-id-2 (aws_diff_resource):
+      ~ updated.field: "foobar" => "barfoo"
   From tfstate://state.tfstate
     - diff-id-1 (module.aws_diff_resource.name):
         ~ updated.field: "foobar" => "barfoo"
@@ -22,6 +24,6 @@ Found changed resources:
 Found 10 resource(s)
  - 20% coverage
  - 2 resource(s) managed by terraform
-     - 1/2 resource(s) out of sync with Terraform state
+     - 2/2 resource(s) out of sync with Terraform state
  - 4 resource(s) not managed by Terraform
  - 4 resource(s) found in a Terraform state but missing on the cloud provider
