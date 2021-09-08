@@ -49,4 +49,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsSecurityGroupRuleMetaData(resourceSchemaRepository)
 	initAwsSecurityGroupMetaData(resourceSchemaRepository)
 	initAwsRDSClusterMetaData(resourceSchemaRepository)
+	initAwsCloudformationStackMetaData(resourceSchemaRepository)
 }

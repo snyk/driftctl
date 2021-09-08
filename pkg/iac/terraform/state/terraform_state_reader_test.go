@@ -145,6 +145,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "VPC", dirName: "vpc", wantErr: false},
 		{name: "Subnet", dirName: "subnet", wantErr: false},
 		{name: "RDS cluster", dirName: "rds_cluster", wantErr: false},
+		{name: "Cloudformation stack", dirName: "cloudformation_stack", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
