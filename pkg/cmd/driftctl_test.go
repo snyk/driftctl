@@ -87,7 +87,7 @@ func TestDriftctlCmd_Scan(t *testing.T) {
 			env: map[string]string{
 				"DCTL_TO": "test",
 			},
-			err: fmt.Errorf("unsupported cloud provider 'test'\nValid values are: aws+tf,github+tf,gcp+tf"),
+			err: fmt.Errorf("unsupported cloud provider 'test'\nValid values are: aws+tf,github+tf,gcp+tf,azure+tf"),
 		},
 		{
 			env: map[string]string{

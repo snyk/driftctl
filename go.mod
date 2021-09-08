@@ -4,6 +4,11 @@ go 1.16
 
 require (
 	cloud.google.com/go/asset v0.1.0
+	github.com/Azure/azure-sdk-for-go/sdk/armcore v0.8.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.9.2
+	github.com/Azure/azure-sdk-for-go/sdk/storage/armstorage v0.1.1
+	github.com/Azure/azure-sdk-for-go/sdk/to v0.1.4
+	github.com/Azure/go-autorest/autorest v0.11.3
 	github.com/aws/aws-sdk-go v1.38.68
 	github.com/bmatcuk/doublestar/v4 v4.0.1
 	github.com/eapache/go-resiliency v1.2.0

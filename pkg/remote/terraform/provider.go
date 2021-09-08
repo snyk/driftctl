@@ -112,17 +112,19 @@ func (p *TerraformProvider) configure(alias string) error {
 	if p.schemas == nil {
 		p.schemas = schema.ResourceTypes
 	}
-	configType := schema.Provider.Block.ImpliedType()
-	val, err := gocty.ToCtyValue(p.Config.GetProviderConfig(alias), configType)
-	if err != nil {
-		return err
-	}
-	resp := p.grpcProviders[alias].Configure(providers.ConfigureRequest{
-		Config: val,
-	})
 
-	if resp.Diagnostics.HasErrors() {
-		return resp.Diagnostics.Err()
+	if p.Config.GetProviderConfig != nil {
+		configType := schema.Provider.Block.ImpliedType()
+		val, err := gocty.ToCtyValue(p.Config.GetProviderConfig(alias), configType)
+		if err != nil {
+			return err
+		}
+		resp := p.grpcProviders[alias].Configure(providers.ConfigureRequest{
+			Config: val,
+		})
+		if resp.Diagnostics.HasErrors() {
+			return resp.Diagnostics.Err()
+		}
 	}
 
 	logrus.WithFields(logrus.Fields{
