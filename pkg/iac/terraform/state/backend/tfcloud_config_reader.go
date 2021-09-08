@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"runtime"
 
@@ -48,9 +49,9 @@ func getTerraformConfigFile() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	tfConfigDir := ".terraform.d"
+	basePath := filepath.Join(homeDir, ".terraform.d")
 	if runtime.GOOS == "windows" {
-		tfConfigDir = "terraform.d"
+		basePath = filepath.Join(os.Getenv("APPDATA"), "terraform.d")
 	}
-	return filepath.Join(homeDir, tfConfigDir, "credentials.tfrc.json"), nil
+	return filepath.Join(basePath, "credentials.tfrc.json"), nil
 }
