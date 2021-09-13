@@ -9,28 +9,37 @@ terraform {
   }
 }
 
-resource "random_string" "postfix" {
-  length  = 6
+resource "random_string" "driftctl-unittest-1" {
+  length  = 12
+  upper   = false
+  special = false
+}
+
+resource "random_string" "driftctl-unittest-2" {
+  length  = 12
+  upper   = false
+  special = false
+}
+
+resource "random_string" "driftctl-unittest-3" {
+  length  = 12
   upper   = false
   special = false
 }
 
 resource "google_compute_network" "driftctl-unittest-1" {
-  project = "driftctl-qa-1"
-  name    = "driftctl-unittest-${random_string.postfix.result}"
+  name    = "driftctl-unittest-${random_string.driftctl-unittest-1.result}"
 }
 
 resource "google_compute_network" "driftctl-unittest-2" {
-  project                 = "driftctl-qa-1"
-  name                    = "driftctl-unittest-${random_string.postfix.result}"
+  name                    = "driftctl-unittest-${random_string.driftctl-unittest-2.result}"
   auto_create_subnetworks = true
   mtu                     = 1460
   routing_mode            = "GLOBAL"
 }
 
 resource "google_compute_network" "driftctl-unittest-3" {
-  project                         = "driftctl-qa-1"
-  name                            = "driftctl-unittest-${random_string.postfix.result}"
+  name                            = "driftctl-unittest-${random_string.driftctl-unittest-3.result}"
   description                     = "driftctl test"
   auto_create_subnetworks         = false
   mtu                             = 1500

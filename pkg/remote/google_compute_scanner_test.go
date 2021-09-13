@@ -402,17 +402,17 @@ func TestGoogleComputeNetwork(t *testing.T) {
 				{
 					AssetType:   "compute.googleapis.com/Network",
 					DisplayName: "driftctl-unittest-1",
-					Name:        "//compute.googleapis.com/projects/cloudskiff-dev-raphael/global/networks/driftctl-unittest-1",
+					Name:        "//compute.googleapis.com/projects/driftctl-qa-1/global/networks/driftctl-unittest-1",
 				},
 				{
 					AssetType:   "compute.googleapis.com/Network",
 					DisplayName: "driftctl-unittest-2",
-					Name:        "//compute.googleapis.com/projects/cloudskiff-dev-raphael/global/networks/driftctl-unittest-2",
+					Name:        "//compute.googleapis.com/projects/driftctl-qa-1/global/networks/driftctl-unittest-2",
 				},
 				{
 					AssetType:   "compute.googleapis.com/Network",
 					DisplayName: "driftctl-unittest-3",
-					Name:        "//compute.googleapis.com/projects/cloudskiff-dev-raphael/global/networks/driftctl-unittest-3",
+					Name:        "//compute.googleapis.com/projects/driftctl-qa-1/global/networks/driftctl-unittest-3",
 				},
 			},
 			wantErr: nil,

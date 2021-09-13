@@ -10,7 +10,7 @@ import (
 func TestAcc_Google_ComputeNetwork(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
-		Paths:            []string{"./testdata/acc/google_storage_bucket"},
+		Paths:            []string{"./testdata/acc/google_compute_network"},
 		Args: []string{
 			"scan",
 			"--to", "gcp+tf",
