@@ -1,0 +1,41 @@
+[
+ {
+  "auto_create_subnetworks": false,
+  "delete_default_routes_on_create": false,
+  "description": "",
+  "gateway_ipv4": null,
+  "id": "projects/cloudskiff-dev-raphael/global/networks/driftctl-unittest-3",
+  "mtu": 1460,
+  "name": "driftctl-unittest-3",
+  "project": "cloudskiff-dev-raphael",
+  "routing_mode": "REGIONAL",
+  "self_link": null,
+  "timeouts": null
+ },
+ {
+  "auto_create_subnetworks": true,
+  "delete_default_routes_on_create": false,
+  "description": "",
+  "gateway_ipv4": null,
+  "id": "projects/cloudskiff-dev-raphael/global/networks/driftctl-unittest-2",
+  "mtu": 1460,
+  "name": "driftctl-unittest-2",
+  "project": "cloudskiff-dev-raphael",
+  "routing_mode": "REGIONAL",
+  "self_link": null,
+  "timeouts": null
+ },
+ {
+  "auto_create_subnetworks": false,
+  "delete_default_routes_on_create": false,
+  "description": "",
+  "gateway_ipv4": null,
+  "id": "projects/cloudskiff-dev-raphael/global/networks/driftctl-unittest-1",
+  "mtu": 1460,
+  "name": "driftctl-unittest-1",
+  "project": "cloudskiff-dev-raphael",
+  "routing_mode": "REGIONAL",
+  "self_link": null,
+  "timeouts": null
+ }
+]
