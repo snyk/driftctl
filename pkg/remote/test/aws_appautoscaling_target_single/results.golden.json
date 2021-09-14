@@ -1,0 +1,11 @@
+[
+ {
+  "id": "table/GameScores",
+  "max_capacity": 100,
+  "min_capacity": 5,
+  "resource_id": "table/GameScores",
+  "role_arn": "arn:aws:iam::533948124879:role/aws-service-role/dynamodb.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_DynamoDBTable",
+  "scalable_dimension": "dynamodb:table:ReadCapacityUnits",
+  "service_namespace": "dynamodb"
+ }
+]

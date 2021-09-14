@@ -53,6 +53,7 @@ func Init(version string, alerter *alerter.Alerter,
 	iamRepository := repository.NewIAMRepository(provider.session, repositoryCache)
 	cloudformationRepository := repository.NewCloudformationRepository(provider.session, repositoryCache)
 	apigatewayRepository := repository.NewApiGatewayRepository(provider.session, repositoryCache)
+	appAutoScalingRepository := repository.NewAppAutoScalingRepository(provider.session, repositoryCache)
 
 	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.AWS, provider)
@@ -179,6 +180,9 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsCloudformationStackResourceType, common.NewGenericDetailsFetcher(aws.AwsCloudformationStackResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewApiGatewayRestApiEnumerator(apigatewayRepository, factory))
+
+	remoteLibrary.AddEnumerator(NewAppAutoscalingTargetEnumerator(appAutoScalingRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsAppAutoscalingTargetResourceType, common.NewGenericDetailsFetcher(aws.AwsAppAutoscalingTargetResourceType, provider, deserializer))
 
 	err = resourceSchemaRepository.Init(terraform.AWS, version, provider.Schema())
 	if err != nil {
