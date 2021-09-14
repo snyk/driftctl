@@ -1,0 +1,34 @@
+[
+ {
+  "Id": "projects/cloudskiff-dev-elie/global/firewalls/test-firewall",
+  "Type": "google_compute_firewall",
+  "Attrs": {
+   "allow": [
+    {
+     "ports": [
+      "80",
+      "8080",
+      "1000-2000"
+     ],
+     "protocol": "tcp"
+    },
+    {
+     "protocol": "icmp"
+    }
+   ],
+   "creation_timestamp": "2021-09-14T02:45:33.796-07:00",
+   "description": "",
+   "direction": "INGRESS",
+   "disabled": false,
+   "id": "projects/cloudskiff-dev-elie/global/firewalls/test-firewall",
+   "name": "test-firewall",
+   "network": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-elie/global/networks/test-network",
+   "priority": 1000,
+   "project": "cloudskiff-dev-elie",
+   "self_link": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-elie/global/firewalls/test-firewall",
+   "source_tags": [
+    "web"
+   ]
+  }
+ }
+]

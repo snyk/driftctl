@@ -13,11 +13,13 @@ import (
 )
 
 const (
-	storageBucketAssetType = "storage.googleapis.com/Bucket"
+	storageBucketAssetType   = "storage.googleapis.com/Bucket"
+	computeFirewallAssetType = "compute.googleapis.com/Firewall"
 )
 
 type AssetRepository interface {
 	SearchAllBuckets() ([]*assetpb.ResourceSearchResult, error)
+	SearchAllFirewalls() ([]*assetpb.ResourceSearchResult, error)
 }
 
 type assetRepository struct {
@@ -41,6 +43,7 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 		Scope: fmt.Sprintf("projects/%s", s.config.Project),
 		AssetTypes: []string{
 			storageBucketAssetType,
+			computeFirewallAssetType,
 		},
 	}
 	var results []*assetpb.ResourceSearchResult
@@ -78,4 +81,8 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 
 func (s assetRepository) SearchAllBuckets() ([]*assetpb.ResourceSearchResult, error) {
 	return s.searchAllResources(storageBucketAssetType)
+}
+
+func (s assetRepository) SearchAllFirewalls() ([]*assetpb.ResourceSearchResult, error) {
+	return s.searchAllResources(computeFirewallAssetType)
 }
