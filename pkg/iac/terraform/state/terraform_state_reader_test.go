@@ -144,6 +144,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "lambda event source mapping", dirName: "aws_lambda_event_source_mapping", wantErr: false},
 		{name: "VPC", dirName: "vpc", wantErr: false},
 		{name: "Subnet", dirName: "subnet", wantErr: false},
+		{name: "RDS cluster", dirName: "rds_cluster", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

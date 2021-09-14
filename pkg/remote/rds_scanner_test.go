@@ -257,9 +257,10 @@ func TestRDSCluster(t *testing.T) {
 			test:    "cannot list clusters",
 			dirName: "aws_rds_cluster_denied",
 			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllDBClusters").Return(nil, awserr.NewRequestFailure(nil, 403, "")).Once()
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 400, "")
+				repository.On("ListAllDBClusters").Return(nil, awsError).Once()
 
-				alerter.On("SendAlert", resourceaws.AwsRDSClusterResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, resourceaws.AwsRDSClusterResourceType, resourceaws.AwsRDSClusterResourceType, alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsRDSClusterResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRDSClusterResourceType, resourceaws.AwsRDSClusterResourceType), alerts.EnumerationPhase)).Return().Once()
 			},
 			wantErr: nil,
 		},
