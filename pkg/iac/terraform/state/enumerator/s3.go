@@ -33,8 +33,8 @@ func NewS3Enumerator(config config.SupplierConfig) *S3Enumerator {
 	}
 }
 
-func (s *S3Enumerator) Path() string {
-	return s.config.Path
+func (s *S3Enumerator) Origin() string {
+	return s.config.String()
 }
 
 func (s *S3Enumerator) Enumerate() ([]string, error) {

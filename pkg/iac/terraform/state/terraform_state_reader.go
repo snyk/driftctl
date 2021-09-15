@@ -6,6 +6,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/cloudskiff/driftctl/pkg/iac"
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/hashicorp/terraform/addrs"
 	"github.com/hashicorp/terraform/states"
@@ -222,16 +223,17 @@ func (r *TerraformStateReader) retrieveForState(path string) ([]*resource.Resour
 	r.progress.Inc()
 	values, err := r.retrieve()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, r.config.String())
 	}
-	return r.decode(values)
+	decode, err := r.decode(values)
+	return decode, errors.Wrap(err, r.config.String())
 }
 
 func (r *TerraformStateReader) retrieveMultiplesStates() ([]*resource.Resource, error) {
 	keys, err := r.enumerator.Enumerate()
 	if err != nil {
-		r.alerter.SendAlert("", NewStateReadingAlert(r.enumerator.Path(), err))
-		return nil, err
+		r.alerter.SendAlert("", NewStateReadingAlert(r.enumerator.Origin(), err))
+		return nil, errors.Wrap(err, r.config.String())
 	}
 
 	logrus.WithFields(logrus.Fields{
@@ -239,21 +241,23 @@ func (r *TerraformStateReader) retrieveMultiplesStates() ([]*resource.Resource, 
 	}).Debug("Enumerated keys")
 
 	results := make([]*resource.Resource, 0)
-	nbAlert := 0
+	isSuccess := false
+	readingError := iac.NewStateReadingError()
 
 	for _, key := range keys {
 		resources, err := r.retrieveForState(key)
 		if err != nil {
+			readingError.Add(err)
 			r.alerter.SendAlert("", NewStateReadingAlert(key, err))
-			nbAlert++
 			continue
 		}
+		isSuccess = true
 		results = append(results, resources...)
 	}
 
-	if nbAlert == len(keys) {
+	if !isSuccess {
 		// all key failed, throw an error
-		return results, errors.Errorf("Files were found but none of them could be read as a Terraform state.")
+		return results, readingError
 	}
 
 	return results, nil

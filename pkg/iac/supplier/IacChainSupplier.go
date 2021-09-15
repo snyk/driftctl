@@ -4,9 +4,9 @@ import (
 	"context"
 	"runtime"
 
+	"github.com/cloudskiff/driftctl/pkg/iac"
 	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/pkg/errors"
 )
 
 type IacChainSupplier struct {
@@ -16,8 +16,7 @@ type IacChainSupplier struct {
 
 func NewIacChainSupplier() *IacChainSupplier {
 	return &IacChainSupplier{
-		suppliers: []resource.Supplier{},
-		runner:    parallel.NewParallelRunner(context.TODO(), int64(runtime.NumCPU())),
+		runner: parallel.NewParallelRunner(context.TODO(), int64(runtime.NumCPU())),
 	}
 }
 
@@ -25,15 +24,7 @@ func (r *IacChainSupplier) AddSupplier(supplier resource.Supplier) {
 	r.suppliers = append(r.suppliers, supplier)
 }
 
-func (r *IacChainSupplier) CountSuppliers() int {
-	return len(r.suppliers)
-}
-
 func (r *IacChainSupplier) Resources() ([]*resource.Resource, error) {
-
-	if len(r.suppliers) <= 0 {
-		return nil, errors.New("There was an error retrieving your states check alerts for details.")
-	}
 
 	for _, supplier := range r.suppliers {
 		sup := supplier
@@ -44,7 +35,8 @@ func (r *IacChainSupplier) Resources() ([]*resource.Resource, error) {
 	}
 
 	results := make([]*resource.Resource, 0)
-	nbErrors := 0
+	isSuccess := false
+	retrieveError := iac.NewStateReadingError()
 ReadLoop:
 	for {
 		select {
@@ -57,10 +49,10 @@ ReadLoop:
 			result, _ := supplierResult.(*result)
 
 			if result.err != nil {
-				nbErrors++
+				retrieveError.Add(result.err)
 				continue
 			}
-
+			isSuccess = true
 			results = append(results, result.res...)
 		case <-r.runner.DoneChan():
 			break ReadLoop
@@ -71,9 +63,9 @@ ReadLoop:
 		return nil, r.runner.Err()
 	}
 
-	if nbErrors == len(r.suppliers) {
+	if !isSuccess {
 		// only fail if all suppliers failed
-		return nil, errors.New("There was an error retrieving your states check alerts for details.")
+		return nil, retrieveError
 	}
 
 	return results, nil
