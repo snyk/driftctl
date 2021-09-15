@@ -28,6 +28,12 @@ func HandleResourceEnumerationError(err error, alerter alerter.AlerterInterface)
 		return handleGoogleEnumerationError(alerter, listError, status.Convert(rootCause))
 	}
 
+	// at least for storage api google sdk does not return grpc error so we parse the error message.
+	if shouldHandleGoogleForbiddenError(listError) {
+		alerts.SendEnumerationAlert(common.RemoteGoogleTerraform, alerter, listError)
+		return nil
+	}
+
 	reqerr, ok := rootCause.(awserr.RequestFailure)
 	if ok {
 		return handleAWSError(alerter, listError, reqerr)
@@ -59,7 +65,7 @@ func HandleResourceDetailsFetchingError(err error, alerter alerter.AlerterInterf
 
 	rootCause := listError.RootCause()
 
-	if shouldHandleGoogleDetailsFetchingError(listError) {
+	if shouldHandleGoogleForbiddenError(listError) {
 		alerts.SendDetailsFetchingAlert(common.RemoteGoogleTerraform, alerter, listError)
 		return nil
 	}
@@ -93,7 +99,7 @@ func handleGoogleEnumerationError(alerter alerter.AlerterInterface, err *remotee
 	return err
 }
 
-func shouldHandleGoogleDetailsFetchingError(err *remoteerror.ResourceScanningError) bool {
+func shouldHandleGoogleForbiddenError(err *remoteerror.ResourceScanningError) bool {
 	errMsg := err.RootCause().Error()
 
 	// Check if this is a Google related error

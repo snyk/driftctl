@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"cloud.google.com/go/storage"
@@ -9,7 +10,7 @@ import (
 )
 
 type StorageRepository interface {
-	ListAllBindings(bucketName string) map[string][]string
+	ListAllBindings(bucketName string) (map[string][]string, error)
 }
 
 type storageRepository struct {
@@ -18,12 +19,7 @@ type storageRepository struct {
 	lock   sync.Locker
 }
 
-func NewStorageRepository(cache cache.Cache) *storageRepository {
-	client, err := storage.NewClient(context.Background())
-	if err != nil {
-		panic(err)
-	}
-
+func NewStorageRepository(client *storage.Client, cache cache.Cache) *storageRepository {
 	return &storageRepository{
 		client: client,
 		cache:  cache,
@@ -31,18 +27,18 @@ func NewStorageRepository(cache cache.Cache) *storageRepository {
 	}
 }
 
-func (s storageRepository) ListAllBindings(bucketName string) map[string][]string {
+func (s storageRepository) ListAllBindings(bucketName string) (map[string][]string, error) {
 
 	s.lock.Lock()
 	defer s.lock.Unlock()
-	if cachedResults := s.cache.Get("ListAllBindings"); cachedResults != nil {
-		return cachedResults.(map[string][]string)
+	if cachedResults := s.cache.Get(fmt.Sprintf("%s-%s", "ListAllBindings", bucketName)); cachedResults != nil {
+		return cachedResults.(map[string][]string), nil
 	}
 
 	bucket := s.client.Bucket(bucketName)
 	policy, err := bucket.IAM().Policy(context.Background())
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	bindings := make(map[string][]string)
 	for _, name := range policy.Roles() {
@@ -52,5 +48,5 @@ func (s storageRepository) ListAllBindings(bucketName string) map[string][]strin
 
 	s.cache.Put("ListAllBindings", bindings)
 
-	return bindings
+	return bindings, nil
 }

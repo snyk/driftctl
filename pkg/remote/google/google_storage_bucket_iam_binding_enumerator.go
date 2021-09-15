@@ -29,15 +29,18 @@ func (e *GoogleStorageBucketIamBindingEnumerator) SupportedType() resource.Resou
 
 func (e *GoogleStorageBucketIamBindingEnumerator) Enumerate() ([]*resource.Resource, error) {
 	resources, err := e.repository.SearchAllBuckets()
-
 	if err != nil {
-		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
+		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), google.GoogleStorageBucketResourceType)
 	}
 
 	results := make([]*resource.Resource, len(resources))
 
 	for _, bucket := range resources {
-		for roleName, members := range e.storageRepository.ListAllBindings(bucket.DisplayName) {
+		bindings, err := e.storageRepository.ListAllBindings(bucket.DisplayName)
+		if err != nil {
+			return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
+		}
+		for roleName, members := range bindings {
 			id := fmt.Sprintf("b/%s/%s", bucket.DisplayName, roleName)
 			results = append(
 				results,
