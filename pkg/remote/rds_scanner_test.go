@@ -229,3 +229,99 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 		})
 	}
 }
+
+func TestRDSCluster(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(*repository.MockRDSRepository, *mocks.AlerterInterface)
+		wantErr error
+	}{
+		{
+			test:    "no cluster",
+			dirName: "aws_rds_cluster_empty",
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllDBClusters").Return([]*rds.DBCluster{}, nil)
+			},
+		},
+		{
+			test:    "should return one result",
+			dirName: "aws_rds_clusters_results",
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllDBClusters").Return([]*rds.DBCluster{
+					{DBClusterIdentifier: awssdk.String("aurora-cluster-demo")},
+				}, nil)
+			},
+		},
+		{
+			test:    "cannot list clusters",
+			dirName: "aws_rds_cluster_denied",
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 400, "")
+				repository.On("ListAllDBClusters").Return(nil, awsError).Once()
+
+				alerter.On("SendAlert", resourceaws.AwsRDSClusterResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRDSClusterResourceType, resourceaws.AwsRDSClusterResourceType), alerts.EnumerationPhase)).Return().Once()
+			},
+			wantErr: nil,
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockRDSRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.RDSRepository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewRDSRepository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewRDSClusterEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRDSClusterResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRDSClusterResourceType, provider, deserializer))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsRDSClusterResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+		})
+	}
+}

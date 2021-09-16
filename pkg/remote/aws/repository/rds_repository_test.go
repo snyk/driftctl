@@ -156,3 +156,90 @@ func Test_rdsRepository_ListAllDBSubnetGroups(t *testing.T) {
 		})
 	}
 }
+
+func Test_rdsRepository_ListAllDBClusters(t *testing.T) {
+	tests := []struct {
+		name    string
+		mocks   func(*awstest.MockFakeRDS, *cache.MockCache)
+		want    []*rds.DBCluster
+		wantErr error
+	}{
+		{
+			name: "should list with 2 pages",
+			mocks: func(client *awstest.MockFakeRDS, store *cache.MockCache) {
+				clusters := []*rds.DBCluster{
+					{DBClusterIdentifier: aws.String("1")},
+					{DBClusterIdentifier: aws.String("2")},
+					{DBClusterIdentifier: aws.String("3")},
+					{DBClusterIdentifier: aws.String("4")},
+					{DBClusterIdentifier: aws.String("5")},
+					{DBClusterIdentifier: aws.String("6")},
+				}
+
+				client.On("DescribeDBClustersPages",
+					&rds.DescribeDBClustersInput{},
+					mock.MatchedBy(func(callback func(res *rds.DescribeDBClustersOutput, lastPage bool) bool) bool {
+						callback(&rds.DescribeDBClustersOutput{DBClusters: clusters[:3]}, false)
+						callback(&rds.DescribeDBClustersOutput{DBClusters: clusters[3:]}, true)
+						return true
+					})).Return(nil).Once()
+
+				store.On("Get", "rdsListAllDBClusters").Return(nil).Once()
+				store.On("Put", "rdsListAllDBClusters", clusters).Return(false).Once()
+			},
+			want: []*rds.DBCluster{
+				{DBClusterIdentifier: aws.String("1")},
+				{DBClusterIdentifier: aws.String("2")},
+				{DBClusterIdentifier: aws.String("3")},
+				{DBClusterIdentifier: aws.String("4")},
+				{DBClusterIdentifier: aws.String("5")},
+				{DBClusterIdentifier: aws.String("6")},
+			},
+		},
+		{
+			name: "should hit cache",
+			mocks: func(client *awstest.MockFakeRDS, store *cache.MockCache) {
+				clusters := []*rds.DBCluster{
+					{DBClusterIdentifier: aws.String("1")},
+					{DBClusterIdentifier: aws.String("2")},
+					{DBClusterIdentifier: aws.String("3")},
+					{DBClusterIdentifier: aws.String("4")},
+					{DBClusterIdentifier: aws.String("5")},
+					{DBClusterIdentifier: aws.String("6")},
+				}
+
+				store.On("Get", "rdsListAllDBClusters").Return(clusters).Once()
+			},
+			want: []*rds.DBCluster{
+				{DBClusterIdentifier: aws.String("1")},
+				{DBClusterIdentifier: aws.String("2")},
+				{DBClusterIdentifier: aws.String("3")},
+				{DBClusterIdentifier: aws.String("4")},
+				{DBClusterIdentifier: aws.String("5")},
+				{DBClusterIdentifier: aws.String("6")},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := &cache.MockCache{}
+			client := &awstest.MockFakeRDS{}
+			tt.mocks(client, store)
+			r := &rdsRepository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.ListAllDBClusters()
+			assert.Equal(t, tt.wantErr, err)
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}

@@ -12,6 +12,29 @@ type MockRDSRepository struct {
 	mock.Mock
 }
 
+// ListAllDBClusters provides a mock function with given fields:
+func (_m *MockRDSRepository) ListAllDBClusters() ([]*rds.DBCluster, error) {
+	ret := _m.Called()
+
+	var r0 []*rds.DBCluster
+	if rf, ok := ret.Get(0).(func() []*rds.DBCluster); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*rds.DBCluster)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListAllDBInstances provides a mock function with given fields:
 func (_m *MockRDSRepository) ListAllDBInstances() ([]*rds.DBInstance, error) {
 	ret := _m.Called()
