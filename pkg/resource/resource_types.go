@@ -56,6 +56,7 @@ var supportedTypes = map[string]struct{}{
 	"aws_subnet":                            {},
 	"aws_vpc":                               {},
 	"aws_rds_cluster":                       {},
+	"aws_cloudformation_stack":              {},
 
 	"github_branch_protection": {},
 	"github_membership":        {},

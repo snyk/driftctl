@@ -1,0 +1,5 @@
+Resources:
+  myUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: "bar_cfn"

@@ -51,6 +51,7 @@ func Init(version string, alerter *alerter.Alerter,
 	ecrRepository := repository.NewECRRepository(provider.session, repositoryCache)
 	kmsRepository := repository.NewKMSRepository(provider.session, repositoryCache)
 	iamRepository := repository.NewIAMRepository(provider.session, repositoryCache)
+	cloudformationRepository := repository.NewCloudformationRepository(provider.session, repositoryCache)
 
 	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.AWS, provider)
@@ -172,6 +173,9 @@ func Init(version string, alerter *alerter.Alerter,
 
 	remoteLibrary.AddEnumerator(NewRDSClusterEnumerator(rdsRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsRDSClusterResourceType, common.NewGenericDetailsFetcher(aws.AwsRDSClusterResourceType, provider, deserializer))
+
+	remoteLibrary.AddEnumerator(NewCloudformationStackEnumerator(cloudformationRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsCloudformationStackResourceType, common.NewGenericDetailsFetcher(aws.AwsCloudformationStackResourceType, provider, deserializer))
 
 	err = resourceSchemaRepository.Init(terraform.AWS, version, provider.Schema())
 	if err != nil {
