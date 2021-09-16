@@ -42,13 +42,16 @@ func Init(version string, alerter *alerter.Alerter,
 	if err != nil {
 		return err
 	}
-	storageRepo := repository.NewAssetRepository(assetClient, provider.GetConfig(), repositoryCache)
+	assetRepository := repository.NewAssetRepository(assetClient, provider.GetConfig(), repositoryCache)
 
 	providerLibrary.AddProvider(terraform.GOOGLE, provider)
 	deserializer := resource.NewDeserializer(factory)
 
-	remoteLibrary.AddEnumerator(NewGoogleStorageBucketEnumerator(storageRepo, factory))
+	remoteLibrary.AddEnumerator(NewGoogleStorageBucketEnumerator(assetRepository, factory))
 	remoteLibrary.AddDetailsFetcher(google.GoogleStorageBucketResourceType, common.NewGenericDetailsFetcher(google.GoogleStorageBucketResourceType, provider, deserializer))
+
+	remoteLibrary.AddEnumerator(NewGoogleComputeFirewallEnumerator(assetRepository, factory))
+	remoteLibrary.AddDetailsFetcher(google.GoogleComputeFirewallResourceType, common.NewGenericDetailsFetcher(google.GoogleComputeFirewallResourceType, provider, deserializer))
 
 	err = resourceSchemaRepository.Init(terraform.GOOGLE, version, provider.Schema())
 	if err != nil {
