@@ -7,6 +7,7 @@ import (
 )
 
 type StateEnumerator interface {
+	Origin() string
 	Enumerate() ([]string, error)
 }
 

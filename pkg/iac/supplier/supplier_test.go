@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
@@ -90,10 +91,12 @@ func TestGetIACSupplier(t *testing.T) {
 
 			repo := resource.InitFakeSchemaRepository("aws", "3.19.0")
 			factory := terraform.NewTerraformResourceFactory(repo)
+			alerter := alerter.NewAlerter()
 
 			testFilter := &filter.MockFilter{}
 
-			_, err := GetIACSupplier(tt.args.config, terraform.NewProviderLibrary(), tt.args.options, progress, factory, testFilter)
+			_, err := GetIACSupplier(tt.args.config, terraform.NewProviderLibrary(), tt.args.options, progress, alerter, factory, testFilter)
+
 			if tt.wantErr != nil && err.Error() != tt.wantErr.Error() {
 				t.Errorf("GetIACSupplier() error = %v, wantErr %v", err, tt.wantErr)
 				return
