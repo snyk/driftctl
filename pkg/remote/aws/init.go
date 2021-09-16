@@ -170,6 +170,9 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewECRRepositoryEnumerator(ecrRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsEcrRepositoryResourceType, common.NewGenericDetailsFetcher(aws.AwsEcrRepositoryResourceType, provider, deserializer))
 
+	remoteLibrary.AddEnumerator(NewRDSClusterEnumerator(rdsRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsRDSClusterResourceType, common.NewGenericDetailsFetcher(aws.AwsRDSClusterResourceType, provider, deserializer))
+
 	err = resourceSchemaRepository.Init(terraform.AWS, version, provider.Schema())
 	if err != nil {
 		return err

@@ -23,6 +23,10 @@ func NewFileEnumerator(config config.SupplierConfig) *FileEnumerator {
 	}
 }
 
+func (s *FileEnumerator) Origin() string {
+	return s.config.String()
+}
+
 func (s *FileEnumerator) Enumerate() ([]string, error) {
 	path := s.config.Path
 
