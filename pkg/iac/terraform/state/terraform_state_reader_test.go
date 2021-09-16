@@ -9,9 +9,12 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/output"
+	"github.com/cloudskiff/driftctl/pkg/remote/google"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	resourcegithub "github.com/cloudskiff/driftctl/pkg/resource/github"
+	resourcegoogle "github.com/cloudskiff/driftctl/pkg/resource/google"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
+	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
@@ -259,6 +262,88 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 
 			repo := testresource.InitFakeSchemaRepository(terraform.GITHUB, "4.4.0")
 			resourcegithub.InitResourcesMetadata(repo)
+			factory := terraform.NewTerraformResourceFactory(repo)
+
+			r := &TerraformStateReader{
+				config: config.SupplierConfig{
+					Path: path.Join(goldenfile.GoldenFilePath, tt.dirName, "terraform.tfstate"),
+				},
+				library:      library,
+				progress:     progress,
+				deserializer: resource.NewDeserializer(factory),
+			}
+
+			got, err := r.Resources()
+			resGoldenName := goldenfile.ResultsFilename
+			if shouldUpdate {
+				unm, err := json.Marshal(got)
+				if err != nil {
+					panic(err)
+				}
+				goldenfile.WriteFile(tt.dirName, unm, resGoldenName)
+			}
+
+			file := goldenfile.ReadFile(tt.dirName, resGoldenName)
+			var want []interface{}
+			if err := json.Unmarshal(file, &want); err != nil {
+				panic(err)
+			}
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Resources() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			changelog, err := diff.Diff(convert(got), want)
+			if err != nil {
+				panic(err)
+			}
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s got = %v, want %v", strings.Join(change.Path, "."), change.From, change.To)
+				}
+			}
+		})
+	}
+}
+
+func TestTerraformStateReader_Google_Resources(t *testing.T) {
+	tests := []struct {
+		name    string
+		dirName string
+		wantErr bool
+	}{
+		{name: "compute firewall", dirName: "google_compute_firewall", wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			progress := &output.MockProgress{}
+			progress.On("Inc").Return().Times(1)
+			progress.On("Stop").Return().Times(1)
+
+			shouldUpdate := tt.dirName == *goldenfile.Update
+
+			var realProvider *google.GCPTerraformProvider
+			providerVersion := "3.78.0"
+			var err error
+			realProvider, err = google.NewGCPTerraformProvider(providerVersion, progress, "")
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+
+			if shouldUpdate {
+				err = realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+			}
+
+			library := terraform.NewProviderLibrary()
+			library.AddProvider(terraform.GOOGLE, provider)
+
+			repo := testresource.InitFakeSchemaRepository(terraform.GOOGLE, providerVersion)
+			resourcegoogle.InitResourcesMetadata(repo)
 			factory := terraform.NewTerraformResourceFactory(repo)
 
 			r := &TerraformStateReader{
