@@ -50,7 +50,7 @@ func Test_ListAllStorageAccount_MultiplesResults(t *testing.T) {
 	fakeClient := &mockStorageAccountClient{}
 
 	mockPager := &azure.MockStorageAccountPager{}
-	mockPager.On("Err").Return(nil).Times(2)
+	mockPager.On("Err").Return(nil).Times(3)
 	mockPager.On("NextPage", mock.Anything).Return(true).Times(2)
 	mockPager.On("NextPage", mock.Anything).Return(false).Times(1)
 	mockPager.On("PageResponse").Return(armstorage.StorageAccountListResultResponse{
@@ -207,7 +207,7 @@ func Test_ListAllStorageContainer_MultiplesResults(t *testing.T) {
 	fakeClient := &mockBlobContainerClient{}
 
 	mockPager := &azure.MockListContainerItemPager{}
-	mockPager.On("Err").Return(nil).Times(2)
+	mockPager.On("Err").Return(nil).Times(3)
 	mockPager.On("NextPage", mock.Anything).Return(true).Times(2)
 	mockPager.On("NextPage", mock.Anything).Return(false).Times(1)
 	mockPager.On("PageResponse").Return(armstorage.ListContainerItemsResponse{
