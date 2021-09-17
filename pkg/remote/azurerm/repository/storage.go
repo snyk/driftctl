@@ -63,6 +63,10 @@ func (s *storageRepository) ListAllStorageAccount() ([]*armstorage.StorageAccoun
 		results = append(results, resp.StorageAccountListResult.Value...)
 	}
 
+	if err := pager.Err(); err != nil {
+		return nil, err
+	}
+
 	s.cache.Put("ListAllStorageAccount", results)
 
 	return results, nil
@@ -90,6 +94,10 @@ func (s *storageRepository) ListAllStorageContainer(account *armstorage.StorageA
 		for _, item := range resp.ListContainerItems.Value {
 			results = append(results, fmt.Sprintf("%s%s", *account.Properties.PrimaryEndpoints.Blob, *item.Name))
 		}
+	}
+
+	if err := pager.Err(); err != nil {
+		return nil, err
 	}
 
 	s.cache.Put(cacheKey, results)
