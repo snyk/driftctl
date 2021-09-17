@@ -29,4 +29,5 @@ func initSnsTopicPolicyMetaData(resourceSchemaRepository resource.SchemaReposito
 		}
 		_ = val.SafeSet([]string{"policy"}, jsonString)
 	})
+	resourceSchemaRepository.SetFlags(AwsSnsTopicPolicyResourceType, resource.FlagDeepMode)
 }

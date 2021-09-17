@@ -40,4 +40,5 @@ func initSnsTopicMetaData(resourceSchemaRepository resource.SchemaRepositoryInte
 		}
 		return attrs
 	})
+	resourceSchemaRepository.SetFlags(AwsSnsTopicResourceType, resource.FlagDeepMode)
 }

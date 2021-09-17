@@ -26,4 +26,5 @@ func initAwsS3BucketPolicyMetaData(resourceSchemaRepository resource.SchemaRepos
 		}
 		_ = val.SafeSet([]string{"policy"}, jsonString)
 	})
+	resourceSchemaRepository.SetFlags(AwsS3BucketPolicyResourceType, resource.FlagDeepMode)
 }

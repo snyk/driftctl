@@ -22,4 +22,5 @@ func initGithubTeamMetaData(resourceSchemaRepository resource.SchemaRepositoryIn
 		}
 		return attrs
 	})
+	resourceSchemaRepository.SetFlags(GithubTeamResourceType, resource.FlagDeepMode)
 }

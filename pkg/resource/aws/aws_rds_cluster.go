@@ -19,4 +19,5 @@ func initAwsRDSClusterMetaData(resourceSchemaRepository resource.SchemaRepositor
 		val.SafeDelete([]string{"cluster_members"})
 		val.SafeDelete([]string{"skip_final_snapshot"})
 	})
+	resourceSchemaRepository.SetFlags(AwsRDSClusterResourceType, resource.FlagDeepMode)
 }

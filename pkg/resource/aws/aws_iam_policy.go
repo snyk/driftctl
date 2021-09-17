@@ -22,4 +22,5 @@ func initAwsIAMPolicyMetaData(resourceSchemaRepository resource.SchemaRepository
 
 		val.SafeDelete([]string{"name_prefix"})
 	})
+	resourceSchemaRepository.SetFlags(AwsIamPolicyResourceType, resource.FlagDeepMode)
 }

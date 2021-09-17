@@ -12,4 +12,5 @@ func initAwsIAMUserPolicyMetaData(resourceSchemaRepository resource.SchemaReposi
 			attributeSchema.JsonString = true
 		},
 	})
+	resourceSchemaRepository.SetFlags(AwsIamUserPolicyResourceType, resource.FlagDeepMode)
 }

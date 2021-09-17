@@ -12,4 +12,5 @@ func initAwsKmsAliasMetaData(resourceSchemaRepository resource.SchemaRepositoryI
 		val.SafeDelete([]string{"name"})
 		val.SafeDelete([]string{"name_prefix"})
 	})
+	resourceSchemaRepository.SetFlags(AwsKmsAliasResourceType, resource.FlagDeepMode)
 }

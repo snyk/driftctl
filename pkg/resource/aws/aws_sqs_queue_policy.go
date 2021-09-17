@@ -21,4 +21,5 @@ func initAwsSQSQueuePolicyMetaData(resourceSchemaRepository resource.SchemaRepos
 		}
 		_ = val.SafeSet([]string{"policy"}, jsonString)
 	})
+	resourceSchemaRepository.SetFlags(AwsSqsQueuePolicyResourceType, resource.FlagDeepMode)
 }

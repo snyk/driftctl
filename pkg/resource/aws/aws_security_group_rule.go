@@ -161,4 +161,5 @@ func initAwsSecurityGroupRuleMetaData(resourceSchemaRepository resource.SchemaRe
 		}
 		return attrs
 	})
+	resourceSchemaRepository.SetFlags(AwsSecurityGroupRuleResourceType, resource.FlagDeepMode)
 }

@@ -11,4 +11,5 @@ func initAwsEbsSnapshotMetaData(resourceSchemaRepository resource.SchemaReposito
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 	})
+	resourceSchemaRepository.SetFlags(AwsEbsSnapshotResourceType, resource.FlagDeepMode)
 }

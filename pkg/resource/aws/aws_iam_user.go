@@ -15,4 +15,5 @@ func initAwsIAMUserMetaData(resourceSchemaRepository resource.SchemaRepositoryIn
 		}
 		val.SafeDelete([]string{"force_destroy"})
 	})
+	resourceSchemaRepository.SetFlags(AwsIamUserResourceType, resource.FlagDeepMode)
 }

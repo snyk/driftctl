@@ -10,4 +10,5 @@ func initAwsDefaultRouteTableMetadata(resourceSchemaRepository resource.SchemaRe
 			"vpc_id": *res.Attributes().GetString("vpc_id"),
 		}
 	})
+	resourceSchemaRepository.SetFlags(AwsDefaultRouteTableResourceType, resource.FlagDeepMode)
 }
