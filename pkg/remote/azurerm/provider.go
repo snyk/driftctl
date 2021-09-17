@@ -43,10 +43,7 @@ func NewAzureTerraformProvider(version string, progress output.Progress, configD
 
 func (p *AzureTerraformProvider) GetConfig() common.AzureProviderConfig {
 	return common.AzureProviderConfig{
-		SubscriptionID: os.Getenv("ARM_SUBSCRIPTION_ID"),
-		TenantID:       os.Getenv("ARM_TENANT_ID"),
-		ClientID:       os.Getenv("ARM_CLIENT_ID"),
-		ClientSecret:   os.Getenv("ARM_CLIENT_SECRET"),
+		SubscriptionID: os.Getenv("AZURE_SUBSCRIPTION_ID"),
 	}
 }
 
