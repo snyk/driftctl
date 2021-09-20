@@ -11,4 +11,5 @@ func initAwsIamUserPolicyAttachmentMetaData(resourceSchemaRepository resource.Sc
 			"policy_arn": *res.Attributes().GetString("policy_arn"),
 		}
 	})
+	resourceSchemaRepository.SetFlags(AwsIamUserPolicyAttachmentResourceType, resource.FlagDeepMode)
 }

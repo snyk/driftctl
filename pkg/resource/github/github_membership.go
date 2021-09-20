@@ -10,4 +10,5 @@ func initGithubMembershipMetaData(resourceSchemaRepository resource.SchemaReposi
 		val := res.Attrs
 		val.SafeDelete([]string{"etag"})
 	})
+	resourceSchemaRepository.SetFlags(GithubMembershipResourceType, resource.FlagDeepMode)
 }

@@ -9,4 +9,5 @@ func initAwsEcrRepositoryMetaData(resourceSchemaRepository resource.SchemaReposi
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 	})
+	resourceSchemaRepository.SetFlags(AwsEcrRepositoryResourceType, resource.FlagDeepMode)
 }

@@ -11,4 +11,5 @@ func initAwsIAMPolicyAttachmentMetaData(resourceSchemaRepository resource.Schema
 		val := res.Attrs
 		val.SafeDelete([]string{"name"})
 	})
+	resourceSchemaRepository.SetFlags(AwsIamPolicyAttachmentResourceType, resource.FlagDeepMode)
 }

@@ -13,4 +13,5 @@ func initGoogleStorageBucketMetadata(resourceSchemaRepository resource.SchemaRep
 			"name": res.ResourceId(),
 		}
 	})
+	resourceSchemaRepository.SetFlags(GoogleStorageBucketResourceType, resource.FlagDeepMode)
 }

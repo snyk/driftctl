@@ -85,6 +85,11 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []*resource.Resour
 			continue
 		}
 
+		// Stop if the resource is not compatible with deep mode
+		if stateRes.Schema() != nil && !stateRes.Schema().Flags.HasFlag(resource.FlagDeepMode) {
+			continue
+		}
+
 		var delta diff.Changelog
 		delta, _ = diff.Diff(stateRes.Attributes(), remoteRes.Attributes())
 

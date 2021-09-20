@@ -42,4 +42,5 @@ func initSnsTopicSubscriptionMetaData(resourceSchemaRepository resource.SchemaRe
 			val.SafeDelete([]string{"confirmation_timeout_in_minutes"})
 		}
 	})
+	resourceSchemaRepository.SetFlags(AwsSnsTopicSubscriptionResourceType, resource.FlagDeepMode)
 }

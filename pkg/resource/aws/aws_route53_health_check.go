@@ -39,4 +39,5 @@ func initAwsRoute53HealthCheckMetaData(resourceSchemaRepository resource.SchemaR
 		}
 		return attrs
 	})
+	resourceSchemaRepository.SetFlags(AwsRoute53HealthCheckResourceType, resource.FlagDeepMode)
 }

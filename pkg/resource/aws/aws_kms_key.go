@@ -22,4 +22,5 @@ func initAwsKmsKeyMetaData(resourceSchemaRepository resource.SchemaRepositoryInt
 		}
 		_ = val.SafeSet([]string{"policy"}, jsonString)
 	})
+	resourceSchemaRepository.SetFlags(AwsKmsKeyResourceType, resource.FlagDeepMode)
 }

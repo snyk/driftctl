@@ -10,4 +10,5 @@ func initAwsS3BucketNotificationMetadata(resourceSchemaRepository resource.Schem
 			"alias": *res.Attributes().GetString("region"),
 		}
 	})
+	resourceSchemaRepository.SetFlags(AwsS3BucketNotificationResourceType, resource.FlagDeepMode)
 }

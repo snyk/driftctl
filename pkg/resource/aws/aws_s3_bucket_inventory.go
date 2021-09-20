@@ -10,4 +10,5 @@ func initAwsS3BucketInventoryMetadata(resourceSchemaRepository resource.SchemaRe
 			"alias": *res.Attributes().GetString("region"),
 		}
 	})
+	resourceSchemaRepository.SetFlags(AwsS3BucketInventoryResourceType, resource.FlagDeepMode)
 }

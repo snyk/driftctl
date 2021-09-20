@@ -26,4 +26,5 @@ func initAwsInstanceMetaData(resourceSchemaRepository resource.SchemaRepositoryI
 		}
 		return attrs
 	})
+	resourceSchemaRepository.SetFlags(AwsInstanceResourceType, resource.FlagDeepMode)
 }

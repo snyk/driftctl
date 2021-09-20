@@ -16,4 +16,5 @@ func initAwsIAMRoleMetaData(resourceSchemaRepository resource.SchemaRepositoryIn
 		val := res.Attrs
 		val.SafeDelete([]string{"force_detach_policies"})
 	})
+	resourceSchemaRepository.SetFlags(AwsIamRoleResourceType, resource.FlagDeepMode)
 }

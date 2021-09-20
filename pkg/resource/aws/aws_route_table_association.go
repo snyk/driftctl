@@ -26,4 +26,5 @@ func initAwsRouteTableAssociationMetaData(resourceSchemaRepository resource.Sche
 		}
 		return attrs
 	})
+	resourceSchemaRepository.SetFlags(AwsRouteTableAssociationResourceType, resource.FlagDeepMode)
 }

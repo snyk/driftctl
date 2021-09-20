@@ -22,4 +22,5 @@ func initAwsS3BucketMetaData(resourceSchemaRepository resource.SchemaRepositoryI
 		val.SafeDelete([]string{"force_destroy"})
 		val.SafeDelete([]string{"bucket_prefix"})
 	})
+	resourceSchemaRepository.SetFlags(AwsS3BucketResourceType, resource.FlagDeepMode)
 }

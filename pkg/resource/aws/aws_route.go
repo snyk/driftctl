@@ -57,6 +57,7 @@ func initAwsRouteMetaData(resourceSchemaRepository resource.SchemaRepositoryInte
 		}
 		return attrs
 	})
+	resourceSchemaRepository.SetFlags(AwsRouteResourceType, resource.FlagDeepMode)
 }
 
 func CalculateRouteID(tableId, CidrBlock, Ipv6CidrBlock, PrefixListId *string) string {

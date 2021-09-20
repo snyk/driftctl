@@ -10,4 +10,5 @@ func initAwsS3BucketMetricMetadata(resourceSchemaRepository resource.SchemaRepos
 			"alias": *res.Attributes().GetString("region"),
 		}
 	})
+	resourceSchemaRepository.SetFlags(AwsS3BucketMetricResourceType, resource.FlagDeepMode)
 }

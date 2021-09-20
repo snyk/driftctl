@@ -13,4 +13,5 @@ func initAwsDefaultSecurityGroupMetaData(resourceSchemaRepository resource.Schem
 		val.SafeDelete([]string{"ingress"})
 		val.SafeDelete([]string{"egress"})
 	})
+	resourceSchemaRepository.SetFlags(AwsDefaultSecurityGroupResourceType, resource.FlagDeepMode)
 }

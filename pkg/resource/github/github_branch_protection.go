@@ -39,4 +39,5 @@ func initGithubBranchProtectionMetaData(resourceSchemaRepository resource.Schema
 		attrs["Id"] = res.ResourceId()
 		return attrs
 	})
+	resourceSchemaRepository.SetFlags(GithubBranchProtectionResourceType, resource.FlagDeepMode)
 }

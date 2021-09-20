@@ -14,8 +14,23 @@ type AttributeSchema struct {
 	JsonString   bool
 }
 
+type Flags uint32
+
+const (
+	FlagDeepMode Flags = 1 << iota
+)
+
+func (f Flags) HasFlag(flag Flags) bool {
+	return f&flag != 0
+}
+
+func (f *Flags) AddFlag(flag Flags) {
+	*f |= flag
+}
+
 type Schema struct {
 	ProviderVersion             *version.Version
+	Flags                       Flags
 	SchemaVersion               int64
 	Attributes                  map[string]AttributeSchema
 	NormalizeFunc               func(res *Resource)
@@ -41,6 +56,7 @@ func (s *Schema) IsJsonStringField(path []string) bool {
 
 type SchemaRepositoryInterface interface {
 	GetSchema(resourceType string) (*Schema, bool)
+	SetFlags(typ string, flags ...Flags)
 	UpdateSchema(typ string, schemasMutators map[string]func(attributeSchema *AttributeSchema))
 	SetNormalizeFunc(typ string, normalizeFunc func(res *Resource))
 	SetHumanReadableAttributesFunc(typ string, humanReadableAttributesFunc func(res *Resource) map[string]string)
@@ -104,6 +120,17 @@ func (r *SchemaRepository) Init(providerName, providerVersion string, schema map
 		}
 	}
 	return nil
+}
+
+func (r SchemaRepository) SetFlags(typ string, flags ...Flags) {
+	metadata, exist := r.GetSchema(typ)
+	if !exist {
+		logrus.WithFields(logrus.Fields{"type": typ}).Warning("Unable to set flags, no schema found")
+		return
+	}
+	for _, flag := range flags {
+		metadata.Flags.AddFlag(flag)
+	}
 }
 
 func (r *SchemaRepository) UpdateSchema(typ string, schemasMutators map[string]func(attributeSchema *AttributeSchema)) {
