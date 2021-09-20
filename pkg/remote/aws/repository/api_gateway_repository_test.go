@@ -348,3 +348,74 @@ func Test_apigatewayRepository_ListAllRestApiStages(t *testing.T) {
 		})
 	}
 }
+
+func Test_apigatewayRepository_ListAllRestApiResources(t *testing.T) {
+	api := &apigateway.RestApi{
+		Id: aws.String("restapi1"),
+	}
+
+	apiResources := []*apigateway.Resource{
+		{Id: aws.String("resource1")},
+		{Id: aws.String("resource2")},
+		{Id: aws.String("resource3")},
+		{Id: aws.String("resource4")},
+	}
+
+	tests := []struct {
+		name    string
+		mocks   func(client *awstest.MockFakeApiGateway, store *cache.MockCache)
+		want    []*apigateway.Resource
+		wantErr error
+	}{
+		{
+			name: "list multiple rest api resources",
+			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
+				client.On("GetResourcesPages",
+					&apigateway.GetResourcesInput{
+						RestApiId: aws.String("restapi1"),
+					},
+					mock.MatchedBy(func(callback func(res *apigateway.GetResourcesOutput, lastPage bool) bool) bool {
+						callback(&apigateway.GetResourcesOutput{
+							Items: apiResources,
+						}, true)
+						return true
+					})).Return(nil).Once()
+
+				store.On("Get", "apigatewayListAllRestApiResources_api_restapi1").Return(nil).Times(1)
+				store.On("Put", "apigatewayListAllRestApiResources_api_restapi1", apiResources).Return(false).Times(1)
+			},
+			want: apiResources,
+		},
+		{
+			name: "should hit cache",
+			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
+				store.On("Get", "apigatewayListAllRestApiResources_api_restapi1").Return(apiResources).Times(1)
+			},
+			want: apiResources,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := &cache.MockCache{}
+			client := &awstest.MockFakeApiGateway{}
+			tt.mocks(client, store)
+			r := &apigatewayRepository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.ListAllRestApiResources(*api.Id)
+			assert.Equal(t, tt.wantErr, err)
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+			store.AssertExpectations(t)
+			client.AssertExpectations(t)
+		})
+	}
+}

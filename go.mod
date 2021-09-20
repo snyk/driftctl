@@ -15,6 +15,7 @@ require (
 	github.com/bmatcuk/doublestar/v4 v4.0.1
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/fatih/color v1.9.0
+	github.com/getkin/kin-openapi v0.75.0
 	github.com/getsentry/sentry-go v0.10.0
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/hashicorp/go-getter v1.5.3

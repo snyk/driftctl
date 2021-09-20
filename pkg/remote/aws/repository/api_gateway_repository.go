@@ -15,6 +15,7 @@ type ApiGatewayRepository interface {
 	ListAllApiKeys() ([]*apigateway.ApiKey, error)
 	ListAllRestApiAuthorizers([]*apigateway.RestApi) ([]*apigateway.Authorizer, error)
 	ListAllRestApiStages(string) ([]*apigateway.Stage, error)
+	ListAllRestApiResources(string) ([]*apigateway.Resource, error)
 }
 
 type apigatewayRepository struct {
@@ -125,4 +126,26 @@ func (r *apigatewayRepository) ListAllRestApiStages(apiId string) ([]*apigateway
 
 	r.cache.Put(cacheKey, resources.Item)
 	return resources.Item, nil
+}
+
+func (r *apigatewayRepository) ListAllRestApiResources(apiId string) ([]*apigateway.Resource, error) {
+	cacheKey := fmt.Sprintf("apigatewayListAllRestApiResources_api_%s", apiId)
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*apigateway.Resource), nil
+	}
+
+	var resources []*apigateway.Resource
+	input := &apigateway.GetResourcesInput{
+		RestApiId: &apiId,
+	}
+	err := r.client.GetResourcesPages(input, func(res *apigateway.GetResourcesOutput, lastPage bool) bool {
+		resources = append(resources, res.Items...)
+		return !lastPage
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put(cacheKey, resources)
+	return resources, nil
 }
