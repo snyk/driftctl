@@ -126,26 +126,48 @@ It means your callback will always be called, this is an unwanted behaviour most
 A workaround is to manage flags but this is an ugly solution, here is an example using a boolean flag:
 
 ```go
-mockCalled := false
-client := mocks.FakeIAM{}
-client.On("ListUsersPages",
-    &iam.ListUsersInput{},
-    mock.MatchedBy(func(callback func(res *iam.ListUsersOutput, lastPage bool) bool) bool {
-        if mockCalled {
+client := awstest.MockFakeIAM{}
+shouldSkipfirst := false
+shouldSkipSecond := false
+
+client.On("ListAttachedRolePoliciesPages",
+    &iam.ListAttachedRolePoliciesInput{
+        RoleName: aws.String("test-role"),
+    },
+    mock.MatchedBy(func(callback func(res *iam.ListAttachedRolePoliciesOutput, lastPage bool) bool) bool {
+		// This will be evaluated every time, that's why we set this bool to true after the call
+        if shouldSkipfirst {
             return false
         }
-        callback(&iam.ListUsersOutput{Users: []*iam.User{
+        callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
             {
-                UserName: aws.String("test-driftctl"),
-            },
-            {
-                UserName: aws.String("test-driftctl2"),
+                PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy"),
+                PolicyName: aws.String("policy"),
             },
         }}, true)
-        mockCalled = true
+        shouldSkipfirst = true
         return true
-    })
-).Once().Return(nil)
+    }),
+).Return(nil).Once()
+
+client.On("ListAttachedRolePoliciesPages",
+    &iam.ListAttachedRolePoliciesInput{
+        RoleName: aws.String("test-role2"),
+    },
+    mock.MatchedBy(func(callback func(res *iam.ListAttachedRolePoliciesOutput, lastPage bool) bool) bool {
+        if shouldSkipSecond {
+            return false
+        }
+        callback(&iam.ListAttachedRolePoliciesOutput{AttachedPolicies: []*iam.AttachedPolicy{
+            {
+                PolicyArn:  aws.String("arn:aws:iam::526954929923:policy/test-policy"),
+                PolicyName: aws.String("policy"),
+            },
+        }}, true)
+        shouldSkipSecond = true
+        return true
+    }),
+).Return(nil).Once()
 ```
 
 #### Mocking repositories
