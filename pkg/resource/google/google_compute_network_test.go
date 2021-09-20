@@ -15,6 +15,7 @@ func TestAcc_Google_ComputeNetwork(t *testing.T) {
 			"scan",
 			"--to", "gcp+tf",
 			"--filter", "Type=='google_compute_network'",
+			"--deep",
 		},
 		Checks: []acceptance.AccCheck{
 			{
@@ -24,6 +25,7 @@ func TestAcc_Google_ComputeNetwork(t *testing.T) {
 					}
 					result.AssertInfrastructureIsInSync()
 					result.AssertManagedCount(3)
+					result.AssertDriftCountTotal(0)
 				},
 			},
 		},

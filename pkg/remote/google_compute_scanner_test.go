@@ -1,10 +1,8 @@
 package remote
 
 import (
-	"context"
 	"testing"
 
-	asset "cloud.google.com/go/asset/apiv1"
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
@@ -460,13 +458,9 @@ func TestGoogleComputeNetwork(t *testing.T) {
 				c.setupAlerterMock(alerter)
 			}
 
-			var assetClient *asset.Client
-			if !shouldUpdate {
-				var err error
-				assetClient, err = testgoogle.NewFakeAssetServer(c.response, c.responseErr)
-				if err != nil {
-					tt.Fatal(err)
-				}
+			assetClient, err := testgoogle.NewFakeAssetServer(c.response, c.responseErr)
+			if err != nil {
+				tt.Fatal(err)
 			}
 
 			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
@@ -478,11 +472,6 @@ func TestGoogleComputeNetwork(t *testing.T) {
 
 			// Replace mock by real resources if we are in update mode
 			if shouldUpdate {
-				ctx := context.Background()
-				assetClient, err = asset.NewClient(ctx)
-				if err != nil {
-					tt.Fatal(err)
-				}
 				err = realProvider.Init()
 				if err != nil {
 					tt.Fatal(err)

@@ -9,6 +9,7 @@ func initGoogleComputeNetworkMetadata(resourceSchemaRepository resource.SchemaRe
 		res.Attributes().SafeDelete([]string{"timeouts"})
 		res.Attributes().SafeDelete([]string{"self_link"})
 		res.Attributes().SafeDelete([]string{"gateway_ipv4"})
+		res.Attributes().SafeDelete([]string{"delete_default_routes_on_create"})
 	})
 	resourceSchemaRepository.SetResolveReadAttributesFunc(GoogleComputeNetworkResourceType, func(res *resource.Resource) map[string]string {
 		return map[string]string{
