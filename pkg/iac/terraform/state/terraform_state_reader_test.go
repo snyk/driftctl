@@ -315,6 +315,7 @@ func TestTerraformStateReader_Google_Resources(t *testing.T) {
 		wantErr bool
 	}{
 		{name: "compute firewall", dirName: "google_compute_firewall", wantErr: false},
+		{name: "compute router", dirName: "google_compute_router", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
