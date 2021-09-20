@@ -1,9 +1,10 @@
 package google
 
 import (
-	"strings"
+	"regexp"
 )
 
 func trimResourceName(name string) string {
-	return strings.TrimPrefix(name, "//compute.googleapis.com/")
+	re, _ := regexp.Compile(`^\/\/[\w]+.googleapis.com\/`)
+	return re.ReplaceAllString(name, "")
 }
