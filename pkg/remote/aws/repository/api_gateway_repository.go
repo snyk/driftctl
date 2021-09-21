@@ -9,6 +9,7 @@ import (
 
 type ApiGatewayRepository interface {
 	ListAllRestApis() ([]*apigateway.RestApi, error)
+	GetAccount() (*apigateway.Account, error)
 }
 
 type apigatewayRepository struct {
@@ -42,4 +43,18 @@ func (r *apigatewayRepository) ListAllRestApis() ([]*apigateway.RestApi, error) 
 
 	r.cache.Put("apigatewayListAllRestApis", restApis)
 	return restApis, nil
+}
+
+func (r *apigatewayRepository) GetAccount() (*apigateway.Account, error) {
+	if v := r.cache.Get("apigatewayGetAccount"); v != nil {
+		return v.(*apigateway.Account), nil
+	}
+
+	account, err := r.client.GetAccount(&apigateway.GetAccountInput{})
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put("apigatewayGetAccount", account)
+	return account, nil
 }
