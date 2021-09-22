@@ -13,6 +13,7 @@ type AppAutoScalingRepository interface {
 	ServiceNamespaceValues() []string
 	DescribeScalableTargets(string) ([]*applicationautoscaling.ScalableTarget, error)
 	DescribeScalingPolicies(string) ([]*applicationautoscaling.ScalingPolicy, error)
+	DescribeScheduledActions(string) ([]*applicationautoscaling.ScheduledAction, error)
 }
 
 type appAutoScalingRepository struct {
@@ -65,4 +66,22 @@ func (r *appAutoScalingRepository) DescribeScalingPolicies(namespace string) ([]
 
 	r.cache.Put(cacheKey, result.ScalingPolicies)
 	return result.ScalingPolicies, nil
+}
+
+func (r *appAutoScalingRepository) DescribeScheduledActions(namespace string) ([]*applicationautoscaling.ScheduledAction, error) {
+	cacheKey := fmt.Sprintf("appAutoScalingDescribeScheduledActions_%s", namespace)
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*applicationautoscaling.ScheduledAction), nil
+	}
+
+	input := &applicationautoscaling.DescribeScheduledActionsInput{
+		ServiceNamespace: &namespace,
+	}
+	result, err := r.client.DescribeScheduledActions(input)
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put(cacheKey, result.ScheduledActions)
+	return result.ScheduledActions, nil
 }

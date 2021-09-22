@@ -58,6 +58,29 @@ func (_m *MockAppAutoScalingRepository) DescribeScalingPolicies(_a0 string) ([]*
 	return r0, r1
 }
 
+// DescribeScheduledActions provides a mock function with given fields: _a0
+func (_m *MockAppAutoScalingRepository) DescribeScheduledActions(_a0 string) ([]*applicationautoscaling.ScheduledAction, error) {
+	ret := _m.Called(_a0)
+
+	var r0 []*applicationautoscaling.ScheduledAction
+	if rf, ok := ret.Get(0).(func(string) []*applicationautoscaling.ScheduledAction); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*applicationautoscaling.ScheduledAction)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ServiceNamespaceValues provides a mock function with given fields:
 func (_m *MockAppAutoScalingRepository) ServiceNamespaceValues() []string {
 	ret := _m.Called()

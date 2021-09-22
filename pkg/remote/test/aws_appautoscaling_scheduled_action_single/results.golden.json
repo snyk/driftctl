@@ -1,0 +1,14 @@
+[
+ {
+  "arn": "arn:aws:autoscaling:us-east-1:533948124879:scheduledAction:012b61a9-c500-41a0-84a4-019976bd10fc:resource/dynamodb/table/GameScores:scheduledActionName/action",
+  "end_time": null,
+  "id": "action-dynamodb-table/GameScores",
+  "name": "action",
+  "resource_id": "table/GameScores",
+  "scalable_dimension": "dynamodb:table:ReadCapacityUnits",
+  "scalable_target_action": null,
+  "schedule": null,
+  "service_namespace": "dynamodb",
+  "start_time": null
+ }
+]

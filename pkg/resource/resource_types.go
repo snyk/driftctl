@@ -69,6 +69,7 @@ var supportedTypes = map[string]struct{}{
 	"aws_appautoscaling_target":             {},
 	"aws_rds_cluster_instance":              {},
 	"aws_appautoscaling_policy":             {},
+	"aws_appautoscaling_scheduled_action":   {},
 
 	"github_branch_protection": {},
 	"github_membership":        {},
