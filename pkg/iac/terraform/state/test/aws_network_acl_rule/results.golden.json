@@ -1,0 +1,32 @@
+[
+ {
+  "Id": "nacl-2880546575",
+  "Type": "aws_network_acl_rule",
+  "Attrs": {
+   "cidr_block": "172.31.0.0/16",
+   "egress": true,
+   "from_port": 80,
+   "id": "nacl-2880546575",
+   "network_acl_id": "acl-01b7bc85a61d92e70",
+   "protocol": "17",
+   "rule_action": "allow",
+   "rule_number": 100,
+   "to_port": 80
+  }
+ },
+ {
+  "Id": "nacl-1525104124",
+  "Type": "aws_network_acl_rule",
+  "Attrs": {
+   "cidr_block": "172.31.0.0/16",
+   "egress": false,
+   "from_port": 80,
+   "id": "nacl-1525104124",
+   "network_acl_id": "acl-01b7bc85a61d92e70",
+   "protocol": "6",
+   "rule_action": "allow",
+   "rule_number": 100,
+   "to_port": 80
+  }
+ }
+]

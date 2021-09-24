@@ -151,6 +151,9 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "Cloudformation stack", dirName: "cloudformation_stack", wantErr: false},
 		{name: "Api Gateway Rest Api", dirName: "api_gateway_rest_api", wantErr: false},
 		{name: "AppAutoScaling Targets", dirName: "aws_appautoscaling_target", wantErr: false},
+		{name: "network acl", dirName: "aws_network_acl", wantErr: false},
+		{name: "network acl rule", dirName: "aws_network_acl_rule", wantErr: false},
+		{name: "default network acl", dirName: "aws_default_network_acl", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
