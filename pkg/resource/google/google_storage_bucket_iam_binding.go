@@ -14,4 +14,6 @@ func initGoogleStorageBucketIamBindingMetadata(resourceSchemaRepository resource
 			"bucket": *res.Attrs.GetString("bucket"),
 		}
 	})
+	resourceSchemaRepository.SetFlags(GoogleStorageBucketIamBindingResourceType, resource.FlagDeepMode)
+
 }

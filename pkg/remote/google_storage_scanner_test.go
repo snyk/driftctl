@@ -289,8 +289,8 @@ func TestGoogleStorageBucketIAMBinding(t *testing.T) {
 				c.storageRepositoryMock(storageRepo)
 			}
 			var storageRepository repository.StorageRepository = storageRepo
-			storageClient, err := storage.NewClient(context.Background())
 			if shouldUpdate {
+				storageClient, err := storage.NewClient(context.Background())
 				if err != nil {
 					panic(err)
 				}
