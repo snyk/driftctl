@@ -1,0 +1,30 @@
+[
+ {
+  "Id": "9ge737dd45",
+  "Type": "aws_api_gateway_api_key",
+  "Attrs": {
+   "arn": "arn:aws:apigateway:us-east-1::/apikeys/9ge737dd45",
+   "created_date": "2021-09-27T09:10:54Z",
+   "description": "Foo Api Key",
+   "enabled": false,
+   "id": "9ge737dd45",
+   "last_updated_date": "2021-09-27T09:10:54Z",
+   "name": "foo",
+   "value": "nHt1Wqv9538R7HUN5LtH11DyaluIiGwM39svyqqi"
+  }
+ },
+ {
+  "Id": "fuwnl8lrva",
+  "Type": "aws_api_gateway_api_key",
+  "Attrs": {
+   "arn": "arn:aws:apigateway:us-east-1::/apikeys/fuwnl8lrva",
+   "created_date": "2021-09-27T09:10:54Z",
+   "description": "Bar Api Key",
+   "enabled": false,
+   "id": "fuwnl8lrva",
+   "last_updated_date": "2021-09-27T09:10:54Z",
+   "name": "bar",
+   "value": "pmqQupx2Eu2KG4bh8UPTP5gpPTYC5dlF6VcrygNy"
+  }
+ }
+]

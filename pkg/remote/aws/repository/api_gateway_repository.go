@@ -10,6 +10,7 @@ import (
 type ApiGatewayRepository interface {
 	ListAllRestApis() ([]*apigateway.RestApi, error)
 	GetAccount() (*apigateway.Account, error)
+	ListAllApiKeys() ([]*apigateway.ApiKey, error)
 }
 
 type apigatewayRepository struct {
@@ -57,4 +58,25 @@ func (r *apigatewayRepository) GetAccount() (*apigateway.Account, error) {
 
 	r.cache.Put("apigatewayGetAccount", account)
 	return account, nil
+}
+
+func (r *apigatewayRepository) ListAllApiKeys() ([]*apigateway.ApiKey, error) {
+	if v := r.cache.Get("apigatewayListAllApiKeys"); v != nil {
+		return v.([]*apigateway.ApiKey), nil
+	}
+
+	var apiKeys []*apigateway.ApiKey
+	input := apigateway.GetApiKeysInput{}
+	err := r.client.GetApiKeysPages(&input,
+		func(resp *apigateway.GetApiKeysOutput, lastPage bool) bool {
+			apiKeys = append(apiKeys, resp.Items...)
+			return !lastPage
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put("apigatewayListAllApiKeys", apiKeys)
+	return apiKeys, nil
 }
