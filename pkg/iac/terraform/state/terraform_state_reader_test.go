@@ -150,6 +150,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "RDS cluster", dirName: "rds_cluster", wantErr: false},
 		{name: "Cloudformation stack", dirName: "cloudformation_stack", wantErr: false},
 		{name: "Api Gateway Rest Api", dirName: "api_gateway_rest_api", wantErr: false},
+		{name: "AppAutoScaling Targets", dirName: "aws_appautoscaling_target", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
