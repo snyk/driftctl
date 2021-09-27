@@ -1,8 +1,6 @@
 package google
 
 import (
-	"strings"
-
 	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/remote/google/repository"
 	"github.com/cloudskiff/driftctl/pkg/resource"
@@ -38,7 +36,7 @@ func (e *GoogleComputeNetworkEnumerator) Enumerate() ([]*resource.Resource, erro
 			results,
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
-				strings.Replace(res.Name, "//compute.googleapis.com/", "", 1),
+				trimResourceName(res.GetName()),
 				map[string]interface{}{
 					"display_name": res.DisplayName,
 				},
