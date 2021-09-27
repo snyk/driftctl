@@ -46,7 +46,7 @@ func (e *GoogleComputeFirewallEnumerator) Enumerate() ([]*resource.Resource, err
 			results,
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
-				strings.TrimPrefix(res.GetName(), "//compute.googleapis.com/"),
+				trimResourceName(res.GetName()),
 				map[string]interface{}{
 					"name":    res.DisplayName,
 					"project": project,

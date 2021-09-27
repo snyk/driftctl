@@ -1,0 +1,63 @@
+[
+ {
+  "Id": "projects/cloudskiff-dev-elie/zones/us-central1-a/instances/test",
+  "Type": "google_compute_instance",
+  "Attrs": {
+   "boot_disk": [
+    {
+     "auto_delete": true,
+     "device_name": "persistent-disk-0",
+     "disk_encryption_key_raw": "",
+     "disk_encryption_key_sha256": "",
+     "initialize_params": [
+      {
+       "image": "https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-9-stretch-v20210916",
+       "size": 10,
+       "type": "pd-standard"
+      }
+     ],
+     "kms_key_self_link": "",
+     "mode": "READ_WRITE",
+     "source": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-elie/zones/us-central1-a/disks/test"
+    }
+   ],
+   "can_ip_forward": false,
+   "cpu_platform": "Intel Haswell",
+   "current_status": "RUNNING",
+   "deletion_protection": false,
+   "description": "",
+   "enable_display": false,
+   "hostname": "",
+   "id": "projects/cloudskiff-dev-elie/zones/us-central1-a/instances/test",
+   "instance_id": "4993131743765937902",
+   "label_fingerprint": "42WmSpB8rSM=",
+   "machine_type": "e2-medium",
+   "metadata_fingerprint": "Av7l3BNGSpc=",
+   "metadata_startup_script": "",
+   "min_cpu_platform": "",
+   "name": "test",
+   "network_interface": [
+    {
+     "name": "nic0",
+     "network": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-elie/global/networks/default",
+     "network_ip": "10.128.0.2",
+     "nic_type": "",
+     "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-elie/regions/us-central1/subnetworks/default",
+     "subnetwork_project": "cloudskiff-dev-elie"
+    }
+   ],
+   "project": "cloudskiff-dev-elie",
+   "scheduling": [
+    {
+     "automatic_restart": true,
+     "min_node_cpus": 0,
+     "on_host_maintenance": "MIGRATE",
+     "preemptible": false
+    }
+   ],
+   "self_link": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-elie/zones/us-central1-a/instances/test",
+   "tags_fingerprint": "42WmSpB8rSM=",
+   "zone": "us-central1-a"
+  }
+ }
+]

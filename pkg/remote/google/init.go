@@ -53,6 +53,10 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewGoogleComputeFirewallEnumerator(assetRepository, factory))
 	remoteLibrary.AddDetailsFetcher(google.GoogleComputeFirewallResourceType, common.NewGenericDetailsFetcher(google.GoogleComputeFirewallResourceType, provider, deserializer))
 
+	remoteLibrary.AddEnumerator(NewGoogleComputeRouterEnumerator(assetRepository, factory))
+
+	remoteLibrary.AddEnumerator(NewGoogleComputeInstanceEnumerator(assetRepository, factory))
+
 	err = resourceSchemaRepository.Init(terraform.GOOGLE, version, provider.Schema())
 	if err != nil {
 		return err

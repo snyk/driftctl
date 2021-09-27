@@ -1,0 +1,26 @@
+provider "google" {}
+
+terraform {
+    required_version = "~> 0.15.0"
+    required_providers {
+        google = {
+            version = "3.78.0"
+        }
+    }
+}
+
+resource "google_compute_instance" "default" {
+    name         = "test"
+    machine_type = "e2-medium"
+    zone         = "us-central1-a"
+
+    boot_disk {
+        initialize_params {
+            image = "debian-cloud/debian-9"
+        }
+    }
+
+    network_interface {
+        network = "default"
+    }
+}
