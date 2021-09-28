@@ -46,6 +46,7 @@ func (m AwsRDSClusterInstanceExpander) Execute(remoteResources, resourcesFromSta
 				logrus.WithFields(logrus.Fields{
 					"id": newDbInstance.ResourceId(),
 				}).Debug("Created new db instance from RDS cluster instance")
+				break
 			}
 		}
 
