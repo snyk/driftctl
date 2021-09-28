@@ -25,7 +25,7 @@ resource "github_branch" "repo_toto" {
 resource "github_branch_protection" "main_repo" {
   count = 3
   pattern = "main"
-  repository_id = github_repository.repo[count.index].node_id
+  repository_id = github_repository.repo[count.index].name
   enforce_admins = true
   required_status_checks {
     strict = false
@@ -50,7 +50,7 @@ resource "github_branch_protection" "main_repo" {
 
 resource "github_branch_protection" "toto_repo" {
   count = 3
-  repository_id     = github_repository.repo[count.index].node_id
+  repository_id     = github_repository.repo[count.index].name
   pattern         = github_branch.repo_toto[count.index].branch
   enforce_admins = true
 }
