@@ -11,11 +11,11 @@ import (
 // Creating buckets add legacy role bindings, this middleware will filter them unless they are managed.
 type GoogleLegacyBucketIAMBindings struct{}
 
-func NewGoogleLegacyBucketIAMBindings() GoogleLegacyBucketIAMBindings {
-	return GoogleLegacyBucketIAMBindings{}
+func NewGoogleLegacyBucketIAMBindings() *GoogleLegacyBucketIAMBindings {
+	return &GoogleLegacyBucketIAMBindings{}
 }
 
-func (m GoogleLegacyBucketIAMBindings) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
+func (m *GoogleLegacyBucketIAMBindings) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
 
 	newRemoteResources := make([]*resource.Resource, 0)
 

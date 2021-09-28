@@ -110,6 +110,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		middlewares.NewTagsAllManager(),
 		middlewares.NewEipAssociationExpander(d.resourceFactory),
 		middlewares.NewRDSClusterInstanceExpander(d.resourceFactory),
+		middlewares.NewGoogleStorageBucketIAMMemberTransformer(d.resourceFactory),
 		middlewares.NewGoogleLegacyBucketIAMBindings(),
 		middlewares.NewAzurermSubnetExpander(d.resourceFactory),
 		middlewares.NewAwsApiGatewayDeploymentExpander(d.resourceFactory),
