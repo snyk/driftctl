@@ -15,7 +15,6 @@ jobs:
       CLOUDSDK_CORE_PROJECT: driftctl-qa-1
       GOOGLE_APPLICATION_CREDENTIALS: /tmp/google.json
       ACC_GOOGLE_CREDENTIALS: /tmp/google-admin.json
-      ARM_SKIP_PROVIDER_REGISTRATION: 'true'
     steps:
       - checkout
       - go/install:
