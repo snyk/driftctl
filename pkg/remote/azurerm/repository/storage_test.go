@@ -5,10 +5,9 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/armstorage"
-	"github.com/Azure/azure-sdk-for-go/sdk/to"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
-	"github.com/cloudskiff/driftctl/test/azure"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -49,44 +48,48 @@ func Test_ListAllStorageAccount_MultiplesResults(t *testing.T) {
 
 	fakeClient := &mockStorageAccountClient{}
 
-	mockPager := &azure.MockStorageAccountPager{}
+	mockPager := &mockStorageAccountListPager{}
 	mockPager.On("Err").Return(nil).Times(3)
 	mockPager.On("NextPage", mock.Anything).Return(true).Times(2)
 	mockPager.On("NextPage", mock.Anything).Return(false).Times(1)
-	mockPager.On("PageResponse").Return(armstorage.StorageAccountListResultResponse{
-		StorageAccountListResult: &armstorage.StorageAccountListResult{
-			Value: []*armstorage.StorageAccount{
-				{
-					TrackedResource: armstorage.TrackedResource{
-						Resource: armstorage.Resource{
-							ID: func(s string) *string { return &s }("account1"),
+	mockPager.On("PageResponse").Return(armstorage.StorageAccountsListResponse{
+		StorageAccountsListResult: armstorage.StorageAccountsListResult{
+			StorageAccountListResult: armstorage.StorageAccountListResult{
+				Value: []*armstorage.StorageAccount{
+					{
+						TrackedResource: armstorage.TrackedResource{
+							Resource: armstorage.Resource{
+								ID: func(s string) *string { return &s }("account1"),
+							},
 						},
 					},
-				},
-				{
-					TrackedResource: armstorage.TrackedResource{
-						Resource: armstorage.Resource{
-							ID: func(s string) *string { return &s }("account2"),
+					{
+						TrackedResource: armstorage.TrackedResource{
+							Resource: armstorage.Resource{
+								ID: func(s string) *string { return &s }("account2"),
+							},
 						},
 					},
 				},
 			},
 		},
 	}).Times(1)
-	mockPager.On("PageResponse").Return(armstorage.StorageAccountListResultResponse{
-		StorageAccountListResult: &armstorage.StorageAccountListResult{
-			Value: []*armstorage.StorageAccount{
-				{
-					TrackedResource: armstorage.TrackedResource{
-						Resource: armstorage.Resource{
-							ID: func(s string) *string { return &s }("account3"),
+	mockPager.On("PageResponse").Return(armstorage.StorageAccountsListResponse{
+		StorageAccountsListResult: armstorage.StorageAccountsListResult{
+			StorageAccountListResult: armstorage.StorageAccountListResult{
+				Value: []*armstorage.StorageAccount{
+					{
+						TrackedResource: armstorage.TrackedResource{
+							Resource: armstorage.Resource{
+								ID: func(s string) *string { return &s }("account3"),
+							},
 						},
 					},
-				},
-				{
-					TrackedResource: armstorage.TrackedResource{
-						Resource: armstorage.Resource{
-							ID: func(s string) *string { return &s }("account4"),
+					{
+						TrackedResource: armstorage.TrackedResource{
+							Resource: armstorage.Resource{
+								ID: func(s string) *string { return &s }("account4"),
+							},
 						},
 					},
 				},
@@ -160,10 +163,10 @@ func Test_ListAllStorageAccount_Error(t *testing.T) {
 
 	expectedErr := errors.New("unexpected error")
 
-	mockPager := &azure.MockStorageAccountPager{}
+	mockPager := &mockStorageAccountListPager{}
 	mockPager.On("Err").Return(expectedErr).Times(1)
 	mockPager.On("NextPage", mock.Anything).Return(true).Times(1)
-	mockPager.On("PageResponse").Return(armstorage.StorageAccountListResultResponse{}).Times(1)
+	mockPager.On("PageResponse").Return(armstorage.StorageAccountsListResponse{}).Times(1)
 
 	fakeClient.On("List", mock.Anything).Return(mockPager)
 
@@ -206,44 +209,48 @@ func Test_ListAllStorageContainer_MultiplesResults(t *testing.T) {
 
 	fakeClient := &mockBlobContainerClient{}
 
-	mockPager := &azure.MockListContainerItemPager{}
+	mockPager := &mockBlobContainerListPager{}
 	mockPager.On("Err").Return(nil).Times(3)
 	mockPager.On("NextPage", mock.Anything).Return(true).Times(2)
 	mockPager.On("NextPage", mock.Anything).Return(false).Times(1)
-	mockPager.On("PageResponse").Return(armstorage.ListContainerItemsResponse{
-		ListContainerItems: &armstorage.ListContainerItems{
-			Value: []*armstorage.ListContainerItem{
-				{
-					AzureEntityResource: armstorage.AzureEntityResource{
-						Resource: armstorage.Resource{
-							Name: to.StringPtr("container1"),
+	mockPager.On("PageResponse").Return(armstorage.BlobContainersListResponse{
+		BlobContainersListResult: armstorage.BlobContainersListResult{
+			ListContainerItems: armstorage.ListContainerItems{
+				Value: []*armstorage.ListContainerItem{
+					{
+						AzureEntityResource: armstorage.AzureEntityResource{
+							Resource: armstorage.Resource{
+								Name: to.StringPtr("container1"),
+							},
 						},
 					},
-				},
-				{
-					AzureEntityResource: armstorage.AzureEntityResource{
-						Resource: armstorage.Resource{
-							Name: to.StringPtr("container2"),
+					{
+						AzureEntityResource: armstorage.AzureEntityResource{
+							Resource: armstorage.Resource{
+								Name: to.StringPtr("container2"),
+							},
 						},
 					},
 				},
 			},
 		},
 	}).Times(1)
-	mockPager.On("PageResponse").Return(armstorage.ListContainerItemsResponse{
-		ListContainerItems: &armstorage.ListContainerItems{
-			Value: []*armstorage.ListContainerItem{
-				{
-					AzureEntityResource: armstorage.AzureEntityResource{
-						Resource: armstorage.Resource{
-							Name: to.StringPtr("container3"),
+	mockPager.On("PageResponse").Return(armstorage.BlobContainersListResponse{
+		BlobContainersListResult: armstorage.BlobContainersListResult{
+			ListContainerItems: armstorage.ListContainerItems{
+				Value: []*armstorage.ListContainerItem{
+					{
+						AzureEntityResource: armstorage.AzureEntityResource{
+							Resource: armstorage.Resource{
+								Name: to.StringPtr("container3"),
+							},
 						},
 					},
-				},
-				{
-					AzureEntityResource: armstorage.AzureEntityResource{
-						Resource: armstorage.Resource{
-							Name: to.StringPtr("container4"),
+					{
+						AzureEntityResource: armstorage.AzureEntityResource{
+							Resource: armstorage.Resource{
+								Name: to.StringPtr("container4"),
+							},
 						},
 					},
 				},
@@ -350,10 +357,10 @@ func Test_ListAllStorageContainer_Error(t *testing.T) {
 	expectedErr := errors.New("sample error")
 
 	fakeClient := &mockBlobContainerClient{}
-	mockPager := &azure.MockListContainerItemPager{}
+	mockPager := &mockBlobContainerListPager{}
 	mockPager.On("NextPage", mock.Anything).Return(true).Times(1)
 	mockPager.On("Err").Return(expectedErr).Times(1)
-	mockPager.On("PageResponse").Return(armstorage.ListContainerItemsResponse{}).Times(1)
+	mockPager.On("PageResponse").Return(armstorage.BlobContainersListResponse{}).Times(1)
 
 	fakeClient.On("List", "foobar", "testeliedriftctl", (*armstorage.BlobContainersListOptions)(nil)).Return(mockPager)
 

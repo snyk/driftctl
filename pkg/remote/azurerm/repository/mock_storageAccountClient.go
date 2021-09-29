@@ -13,15 +13,15 @@ type mockStorageAccountClient struct {
 }
 
 // List provides a mock function with given fields: options
-func (_m *mockStorageAccountClient) List(options *armstorage.StorageAccountsListOptions) armstorage.StorageAccountListResultPager {
+func (_m *mockStorageAccountClient) List(options *armstorage.StorageAccountsListOptions) storageAccountListPager {
 	ret := _m.Called(options)
 
-	var r0 armstorage.StorageAccountListResultPager
-	if rf, ok := ret.Get(0).(func(*armstorage.StorageAccountsListOptions) armstorage.StorageAccountListResultPager); ok {
+	var r0 storageAccountListPager
+	if rf, ok := ret.Get(0).(func(*armstorage.StorageAccountsListOptions) storageAccountListPager); ok {
 		r0 = rf(options)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(armstorage.StorageAccountListResultPager)
+			r0 = ret.Get(0).(storageAccountListPager)
 		}
 	}
 

@@ -13,15 +13,15 @@ type mockBlobContainerClient struct {
 }
 
 // List provides a mock function with given fields: resourceGroupName, accountName, options
-func (_m *mockBlobContainerClient) List(resourceGroupName string, accountName string, options *armstorage.BlobContainersListOptions) armstorage.ListContainerItemsPager {
+func (_m *mockBlobContainerClient) List(resourceGroupName string, accountName string, options *armstorage.BlobContainersListOptions) blobContainerListPager {
 	ret := _m.Called(resourceGroupName, accountName, options)
 
-	var r0 armstorage.ListContainerItemsPager
-	if rf, ok := ret.Get(0).(func(string, string, *armstorage.BlobContainersListOptions) armstorage.ListContainerItemsPager); ok {
+	var r0 blobContainerListPager
+	if rf, ok := ret.Get(0).(func(string, string, *armstorage.BlobContainersListOptions) blobContainerListPager); ok {
 		r0 = rf(resourceGroupName, accountName, options)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(armstorage.ListContainerItemsPager)
+			r0 = ret.Get(0).(blobContainerListPager)
 		}
 	}
 
