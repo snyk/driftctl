@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/armcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/armstorage"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/cloudskiff/driftctl/pkg/remote/azurerm/common"
@@ -17,13 +17,41 @@ type StorageRespository interface {
 	ListAllStorageContainer(account *armstorage.StorageAccount) ([]string, error)
 }
 
+type blobContainerListPager interface {
+	Err() error
+	NextPage(ctx context.Context) bool
+	PageResponse() armstorage.BlobContainersListResponse
+}
+
 // Interfaces are only used to create mock on Azure SDK
 type blobContainerClient interface {
-	List(resourceGroupName string, accountName string, options *armstorage.BlobContainersListOptions) armstorage.ListContainerItemsPager
+	List(resourceGroupName string, accountName string, options *armstorage.BlobContainersListOptions) blobContainerListPager
+}
+
+type blobContainerClientImpl struct {
+	client *armstorage.BlobContainersClient
+}
+
+func (c blobContainerClientImpl) List(resourceGroupName string, accountName string, options *armstorage.BlobContainersListOptions) blobContainerListPager {
+	return c.client.List(resourceGroupName, accountName, options)
+}
+
+type storageAccountListPager interface {
+	Err() error
+	NextPage(ctx context.Context) bool
+	PageResponse() armstorage.StorageAccountsListResponse
 }
 
 type storageAccountClient interface {
-	List(options *armstorage.StorageAccountsListOptions) armstorage.StorageAccountListResultPager
+	List(options *armstorage.StorageAccountsListOptions) storageAccountListPager
+}
+
+type storageAccountClientImpl struct {
+	client *armstorage.StorageAccountsClient
+}
+
+func (c storageAccountClientImpl) List(options *armstorage.StorageAccountsListOptions) storageAccountListPager {
+	return c.client.List(options)
 }
 
 type storageRepository struct {
@@ -33,11 +61,11 @@ type storageRepository struct {
 	cache                     cache.Cache
 }
 
-func NewStorageRepository(con *armcore.Connection, config common.AzureProviderConfig, cache cache.Cache) *storageRepository {
+func NewStorageRepository(con *arm.Connection, config common.AzureProviderConfig, cache cache.Cache) *storageRepository {
 	return &storageRepository{
 		&sync.Mutex{},
-		armstorage.NewStorageAccountsClient(con, config.SubscriptionID),
-		armstorage.NewBlobContainersClient(con, config.SubscriptionID),
+		storageAccountClientImpl{client: armstorage.NewStorageAccountsClient(con, config.SubscriptionID)},
+		blobContainerClientImpl{client: armstorage.NewBlobContainersClient(con, config.SubscriptionID)},
 		cache,
 	}
 }
@@ -60,7 +88,7 @@ func (s *storageRepository) ListAllStorageAccount() ([]*armstorage.StorageAccoun
 		if err := pager.Err(); err != nil {
 			return nil, err
 		}
-		results = append(results, resp.StorageAccountListResult.Value...)
+		results = append(results, resp.StorageAccountsListResult.StorageAccountListResult.Value...)
 	}
 
 	if err := pager.Err(); err != nil {
@@ -91,7 +119,7 @@ func (s *storageRepository) ListAllStorageContainer(account *armstorage.StorageA
 		if err := pager.Err(); err != nil {
 			return nil, err
 		}
-		for _, item := range resp.ListContainerItems.Value {
+		for _, item := range resp.BlobContainersListResult.ListContainerItems.Value {
 			results = append(results, fmt.Sprintf("%s%s", *account.Properties.PrimaryEndpoints.Blob, *item.Name))
 		}
 	}

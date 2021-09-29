@@ -1,7 +1,7 @@
 package azurerm
 
 import (
-	"github.com/Azure/azure-sdk-for-go/sdk/armcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/cloudskiff/driftctl/pkg/alerter"
 	"github.com/cloudskiff/driftctl/pkg/output"
@@ -41,7 +41,7 @@ func Init(
 	if err != nil {
 		return err
 	}
-	con := armcore.NewDefaultConnection(cred, nil)
+	con := arm.NewDefaultConnection(cred, nil)
 
 	c := cache.New(100)
 
