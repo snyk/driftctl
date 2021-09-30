@@ -109,6 +109,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		middlewares.NewAwsRoleManagedPolicyExpander(d.resourceFactory),
 		middlewares.NewTagsAllManager(),
 		middlewares.NewEipAssociationExpander(d.resourceFactory),
+		middlewares.NewRDSClusterInstanceExpander(d.resourceFactory),
 	)
 
 	if !d.opts.StrictMode {
