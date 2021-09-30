@@ -22,6 +22,7 @@ type EC2Repository interface {
 	ListAllRouteTables() ([]*ec2.RouteTable, error)
 	ListAllVPCs() ([]*ec2.Vpc, []*ec2.Vpc, error)
 	ListAllSecurityGroups() ([]*ec2.SecurityGroup, []*ec2.SecurityGroup, error)
+	ListAllNetworkACLs() ([]*ec2.NetworkAcl, error)
 }
 
 type ec2Repository struct {
@@ -327,4 +328,29 @@ func (r *ec2Repository) ListAllSecurityGroups() ([]*ec2.SecurityGroup, []*ec2.Se
 	r.cache.Put("ec2ListAllSecurityGroups", securityGroups)
 	r.cache.Put("ec2ListAllDefaultSecurityGroups", defaultSecurityGroups)
 	return securityGroups, defaultSecurityGroups, nil
+}
+
+func (r *ec2Repository) ListAllNetworkACLs() ([]*ec2.NetworkAcl, error) {
+
+	cacheKey := "ec2ListAllNetworkACLs"
+
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*ec2.NetworkAcl), nil
+	}
+
+	var ACLs []*ec2.NetworkAcl
+	input := ec2.DescribeNetworkAclsInput{}
+	err := r.client.DescribeNetworkAclsPages(&input,
+		func(resp *ec2.DescribeNetworkAclsOutput, lastPage bool) bool {
+			ACLs = append(ACLs, resp.NetworkAcls...)
+			return !lastPage
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put(cacheKey, ACLs)
+	return ACLs, nil
 }

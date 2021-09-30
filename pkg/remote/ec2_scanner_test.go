@@ -1970,6 +1970,391 @@ func TestEC2NatGateway(t *testing.T) {
 	}
 }
 
+func TestEC2NetworkACL(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
+		wantErr error
+	}{
+		{
+			test:    "no network ACL",
+			dirName: "aws_ec2_network_acl_empty",
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllNetworkACLs").Return([]*ec2.NetworkAcl{}, nil)
+			},
+		},
+		{
+			test:    "network acl",
+			dirName: "aws_ec2_network_acl",
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllNetworkACLs").Return([]*ec2.NetworkAcl{
+					{
+						NetworkAclId: awssdk.String("acl-043880b4682d2366b"),
+						IsDefault:    awssdk.Bool(false),
+					},
+					{
+						NetworkAclId: awssdk.String("acl-07a565dbe518c0713"),
+						IsDefault:    awssdk.Bool(false),
+					},
+					{
+						NetworkAclId: awssdk.String("acl-e88ee595"),
+						IsDefault:    awssdk.Bool(true),
+					},
+				}, nil)
+			},
+		},
+		{
+			test:    "cannot list network acl",
+			dirName: "aws_ec2_network_acl_empty",
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllNetworkACLs").Return(nil, awsError)
+
+				alerter.On("SendAlert",
+					resourceaws.AwsNetworkACLResourceType,
+					alerts.NewRemoteAccessDeniedAlert(
+						common.RemoteAWSTerraform,
+						remoteerr.NewResourceListingErrorWithType(
+							awsError,
+							resourceaws.AwsNetworkACLResourceType,
+							resourceaws.AwsNetworkACLResourceType,
+						),
+						alerts.EnumerationPhase,
+					),
+				).Return()
+			},
+			wantErr: nil,
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewEC2NetworkACLEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsNetworkACLResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsNetworkACLResourceType, provider, deserializer))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsNetworkACLResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+		})
+	}
+}
+
+func TestEC2NetworkACLRule(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
+		wantErr error
+	}{
+		{
+			test:    "no network ACL",
+			dirName: "aws_ec2_network_acl_rule_empty",
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllNetworkACLs").Return([]*ec2.NetworkAcl{}, nil)
+			},
+		},
+		{
+			test:    "network acl rules",
+			dirName: "aws_ec2_network_acl_rule",
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllNetworkACLs").Return([]*ec2.NetworkAcl{
+					{
+						NetworkAclId: awssdk.String("acl-0ad6d657494d17ee2"), // test
+						IsDefault:    awssdk.Bool(false),
+						Entries: []*ec2.NetworkAclEntry{
+							{
+								Egress:     awssdk.Bool(false),
+								RuleNumber: awssdk.Int64(100),
+								Protocol:   awssdk.String("6"), // tcp
+								RuleAction: awssdk.String("deny"),
+								CidrBlock:  awssdk.String("0.0.0.0/0"),
+							},
+							{
+								Egress:        awssdk.Bool(false),
+								RuleNumber:    awssdk.Int64(200),
+								Protocol:      awssdk.String("6"), // tcp
+								RuleAction:    awssdk.String("allow"),
+								Ipv6CidrBlock: awssdk.String("::/0"),
+							},
+							{
+								Egress:     awssdk.Bool(true),
+								RuleNumber: awssdk.Int64(100),
+								Protocol:   awssdk.String("17"), // udp
+								RuleAction: awssdk.String("allow"),
+								CidrBlock:  awssdk.String("172.16.1.0/0"),
+							},
+						},
+					},
+					{
+						NetworkAclId: awssdk.String("acl-0de54ef59074b622e"), // test2
+						IsDefault:    awssdk.Bool(false),
+						Entries: []*ec2.NetworkAclEntry{
+							{
+								Egress:     awssdk.Bool(false),
+								RuleNumber: awssdk.Int64(100),
+								Protocol:   awssdk.String("17"), // udp
+								RuleAction: awssdk.String("deny"),
+								CidrBlock:  awssdk.String("0.0.0.0/0"),
+							},
+							{
+								Egress:     awssdk.Bool(true),
+								RuleNumber: awssdk.Int64(100),
+								Protocol:   awssdk.String("17"), // udp
+								RuleAction: awssdk.String("allow"),
+								CidrBlock:  awssdk.String("172.16.1.0/0"),
+							},
+						},
+					},
+				}, nil)
+			},
+		},
+		{
+			test:    "cannot list network acl",
+			dirName: "aws_ec2_network_acl_rule_empty",
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllNetworkACLs").Return(nil, awsError)
+
+				alerter.On("SendAlert",
+					resourceaws.AwsNetworkACLRuleResourceType,
+					alerts.NewRemoteAccessDeniedAlert(
+						common.RemoteAWSTerraform,
+						remoteerr.NewResourceListingErrorWithType(
+							awsError,
+							resourceaws.AwsNetworkACLRuleResourceType,
+							resourceaws.AwsNetworkACLResourceType,
+						),
+						alerts.EnumerationPhase,
+					),
+				).Return()
+			},
+			wantErr: nil,
+		},
+	}
+
+	version := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", version)
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := version
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewEC2NetworkACLRuleEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsNetworkACLRuleResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsNetworkACLRuleResourceType, provider, deserializer))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsNetworkACLRuleResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+		})
+	}
+}
+
+func TestEC2DefaultNetworkACL(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
+		wantErr error
+	}{
+		{
+			test:    "no network ACL",
+			dirName: "aws_ec2_default_network_acl_empty",
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllNetworkACLs").Return([]*ec2.NetworkAcl{}, nil)
+			},
+		},
+		{
+			test:    "default network acl",
+			dirName: "aws_ec2_default_network_acl",
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllNetworkACLs").Return([]*ec2.NetworkAcl{
+					{
+						NetworkAclId: awssdk.String("acl-043880b4682d2366b"),
+						IsDefault:    awssdk.Bool(false),
+					},
+					{
+						NetworkAclId: awssdk.String("acl-07a565dbe518c0713"),
+						IsDefault:    awssdk.Bool(false),
+					},
+					{
+						NetworkAclId: awssdk.String("acl-e88ee595"),
+						IsDefault:    awssdk.Bool(true),
+					},
+				}, nil)
+			},
+		},
+		{
+			test:    "cannot list default network acl",
+			dirName: "aws_ec2_default_network_acl_empty",
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllNetworkACLs").Return(nil, awsError)
+
+				alerter.On("SendAlert",
+					resourceaws.AwsDefaultNetworkACLResourceType,
+					alerts.NewRemoteAccessDeniedAlert(
+						common.RemoteAWSTerraform,
+						remoteerr.NewResourceListingErrorWithType(
+							awsError,
+							resourceaws.AwsDefaultNetworkACLResourceType,
+							resourceaws.AwsDefaultNetworkACLResourceType,
+						),
+						alerts.EnumerationPhase,
+					),
+				).Return()
+			},
+			wantErr: nil,
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewEC2DefaultNetworkACLEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultNetworkACLResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultNetworkACLResourceType, provider, deserializer))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsDefaultNetworkACLResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+		})
+	}
+}
+
 func TestEC2Route(t *testing.T) {
 	tests := []struct {
 		test    string
