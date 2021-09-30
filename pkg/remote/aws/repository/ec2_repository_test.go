@@ -6,6 +6,7 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	awstest "github.com/cloudskiff/driftctl/test/aws"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -1191,6 +1192,88 @@ func Test_ec2Repository_ListAllSecurityGroups(t *testing.T) {
 				}
 				t.Fail()
 			}
+		})
+	}
+}
+
+func Test_ec2Repository_ListAllNetworkACLs(t *testing.T) {
+
+	testErr := errors.New("test")
+
+	tests := []struct {
+		name    string
+		mocks   func(client *awstest.MockFakeEC2)
+		want    []*ec2.NetworkAcl
+		wantErr error
+	}{
+		{
+			name: "List with 1 pages",
+			mocks: func(client *awstest.MockFakeEC2) {
+				client.On("DescribeNetworkAclsPages",
+					&ec2.DescribeNetworkAclsInput{},
+					mock.MatchedBy(func(callback func(res *ec2.DescribeNetworkAclsOutput, lastPage bool) bool) bool {
+						callback(&ec2.DescribeNetworkAclsOutput{
+							NetworkAcls: []*ec2.NetworkAcl{
+								{
+									NetworkAclId: aws.String("id1"),
+								},
+								{
+									NetworkAclId: aws.String("id2"),
+								},
+							},
+						}, true)
+						return true
+					})).Return(nil).Once()
+			},
+			want: []*ec2.NetworkAcl{
+				{
+					NetworkAclId: aws.String("id1"),
+				},
+				{
+					NetworkAclId: aws.String("id2"),
+				},
+			},
+		},
+		{
+			name: "List return error",
+			mocks: func(client *awstest.MockFakeEC2) {
+				client.On("DescribeNetworkAclsPages",
+					&ec2.DescribeNetworkAclsInput{},
+					mock.Anything,
+				).Return(testErr)
+			},
+			wantErr: testErr,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(2)
+			client := &awstest.MockFakeEC2{}
+			tt.mocks(client)
+			r := &ec2Repository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.ListAllNetworkACLs()
+			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllNetworkACLs()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*ec2.NetworkAcl{}, store.Get("ec2ListAllNetworkACLs"))
+			}
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+			client.AssertExpectations(t)
 		})
 	}
 }

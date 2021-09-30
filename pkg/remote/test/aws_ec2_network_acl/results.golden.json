@@ -1,0 +1,74 @@
+[
+ {
+  "arn": "arn:aws:ec2:us-east-1:929327065333:network-acl/acl-07a565dbe518c0713",
+  "egress": [
+   {
+    "action": "allow",
+    "cidr_block": "172.31.0.0/16",
+    "from_port": 80,
+    "icmp_code": 0,
+    "icmp_type": 0,
+    "ipv6_cidr_block": "",
+    "protocol": "17",
+    "rule_no": 100,
+    "to_port": 80
+   }
+  ],
+  "id": "acl-07a565dbe518c0713",
+  "ingress": [
+   {
+    "action": "allow",
+    "cidr_block": "172.31.0.0/16",
+    "from_port": 80,
+    "icmp_code": 0,
+    "icmp_type": 0,
+    "ipv6_cidr_block": "",
+    "protocol": "17",
+    "rule_no": 100,
+    "to_port": 80
+   }
+  ],
+  "owner_id": "929327065333",
+  "subnet_ids": null,
+  "tags": {
+   "Name": "test"
+  },
+  "vpc_id": "vpc-41d1d13b"
+ },
+ {
+  "arn": "arn:aws:ec2:us-east-1:929327065333:network-acl/acl-043880b4682d2366b",
+  "egress": [
+   {
+    "action": "allow",
+    "cidr_block": "172.31.0.0/16",
+    "from_port": 80,
+    "icmp_code": 0,
+    "icmp_type": 0,
+    "ipv6_cidr_block": "",
+    "protocol": "17",
+    "rule_no": 100,
+    "to_port": 80
+   }
+  ],
+  "id": "acl-043880b4682d2366b",
+  "ingress": [
+   {
+    "action": "allow",
+    "cidr_block": "172.31.0.0/16",
+    "from_port": 80,
+    "icmp_code": 0,
+    "icmp_type": 0,
+    "ipv6_cidr_block": "",
+    "protocol": "6",
+    "rule_no": 100,
+    "to_port": 80
+   }
+  ],
+  "owner_id": "929327065333",
+  "subnet_ids": null,
+  "tags": {
+   "Name": "test2"
+  },
+  "vpc_id": "vpc-41d1d13b"
+ }
+]
