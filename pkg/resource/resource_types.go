@@ -73,6 +73,7 @@ var supportedTypes = map[string]struct{}{
 	"google_compute_firewall": {},
 	"google_compute_router":   {},
 	"google_compute_instance": {},
+	"google_compute_network":  {},
 
 	"azurerm_storage_account":   {},
 	"azurerm_storage_container": {},
