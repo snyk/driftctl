@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/apigateway/apigatewayiface"
@@ -11,6 +13,7 @@ type ApiGatewayRepository interface {
 	ListAllRestApis() ([]*apigateway.RestApi, error)
 	GetAccount() (*apigateway.Account, error)
 	ListAllApiKeys() ([]*apigateway.ApiKey, error)
+	ListAllRestApiAuthorizers([]*apigateway.RestApi) ([]*apigateway.Authorizer, error)
 }
 
 type apigatewayRepository struct {
@@ -79,4 +82,28 @@ func (r *apigatewayRepository) ListAllApiKeys() ([]*apigateway.ApiKey, error) {
 
 	r.cache.Put("apigatewayListAllApiKeys", apiKeys)
 	return apiKeys, nil
+}
+
+func (r *apigatewayRepository) ListAllRestApiAuthorizers(apis []*apigateway.RestApi) ([]*apigateway.Authorizer, error) {
+	var authorizers []*apigateway.Authorizer
+	for _, api := range apis {
+		a := *api
+		cacheKey := fmt.Sprintf("apigatewayListAllRestApiAuthorizers_api_%s", *a.Id)
+		if v := r.cache.Get(cacheKey); v != nil {
+			authorizers = append(authorizers, v.([]*apigateway.Authorizer)...)
+			continue
+		}
+
+		input := &apigateway.GetAuthorizersInput{
+			RestApiId: a.Id,
+		}
+		resources, err := r.client.GetAuthorizers(input)
+		if err != nil {
+			return nil, err
+		}
+
+		r.cache.Put(cacheKey, resources.Items)
+		authorizers = append(authorizers, resources.Items...)
+	}
+	return authorizers, nil
 }
