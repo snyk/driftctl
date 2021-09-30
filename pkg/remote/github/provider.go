@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/cloudskiff/driftctl/pkg/output"
-
 	"github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	tf "github.com/cloudskiff/driftctl/pkg/terraform"
 )
@@ -22,6 +21,9 @@ type githubConfig struct {
 }
 
 func NewGithubTerraformProvider(version string, progress output.Progress, configDir string) (*GithubTerraformProvider, error) {
+	if version == "" {
+		version = "4.4.0"
+	}
 	p := &GithubTerraformProvider{
 		version: version,
 		name:    "github",

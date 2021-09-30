@@ -5,7 +5,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg"
 	"github.com/cloudskiff/driftctl/pkg/cmd/scan/output"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/cloudskiff/driftctl/test"
@@ -16,14 +18,14 @@ import (
 // TODO: Test successful scan
 func TestScanCmd(t *testing.T) {
 	rootCmd := &cobra.Command{Use: "root"}
-	rootCmd.AddCommand(NewScanCmd())
+	rootCmd.AddCommand(NewScanCmd(&pkg.ScanOptions{}))
 	// test.Execute(rootCmd, "scan")
 
 }
 
 func TestScanCmd_Valid(t *testing.T) {
 	rootCmd := &cobra.Command{Use: "root"}
-	scanCmd := NewScanCmd()
+	scanCmd := NewScanCmd(&pkg.ScanOptions{})
 	scanCmd.RunE = func(_ *cobra.Command, args []string) error { return nil }
 	rootCmd.AddCommand(scanCmd)
 
@@ -49,6 +51,7 @@ func TestScanCmd_Valid(t *testing.T) {
 		{args: []string{"scan", "--driftignore", "./path/to/driftignore.s3"}},
 		{args: []string{"scan", "--driftignore", ".driftignore"}},
 		{args: []string{"scan", "-o", "html://result.html", "-o", "json://result.json"}},
+		{args: []string{"scan", "--tf-lockfile", "../.terraform.lock.hcl"}},
 	}
 
 	for _, tt := range cases {
@@ -90,11 +93,12 @@ func TestScanCmd_Invalid(t *testing.T) {
 		{args: []string{"scan", "--tf-provider-version", ".30.2"}, expected: "Invalid version argument .30.2, expected a valid semver string (e.g. 2.13.4)"},
 		{args: []string{"scan", "--tf-provider-version", "foo"}, expected: "Invalid version argument foo, expected a valid semver string (e.g. 2.13.4)"},
 		{args: []string{"scan", "--driftignore"}, expected: "flag needs an argument: --driftignore"},
+		{args: []string{"scan", "--tf-lockfile"}, expected: "flag needs an argument: --tf-lockfile"},
 	}
 
 	for _, tt := range cases {
 		rootCmd := &cobra.Command{Use: "root"}
-		rootCmd.AddCommand(NewScanCmd())
+		rootCmd.AddCommand(NewScanCmd(&pkg.ScanOptions{}))
 		_, err := test.Execute(rootCmd, tt.args...)
 		if err == nil {
 			t.Errorf("Invalid arg should generate error")
@@ -326,6 +330,58 @@ func Test_parseOutputFlag(t *testing.T) {
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Fatalf("parseOutputFlag() got = '%v', want '%v'", got, tt.want)
 			}
+		})
+	}
+}
+
+func Test_Options(t *testing.T) {
+	cases := []struct {
+		name          string
+		args          []string
+		assertOptions func(*testing.T, *pkg.ScanOptions)
+	}{
+		{
+			name: "lockfile should be ignored by tf-provider-version flag",
+			args: []string{"scan", "--to", "aws+tf", "--tf-lockfile", "testdata/terraform_valid.lock.hcl", "--tf-provider-version", "3.41.0"},
+			assertOptions: func(t *testing.T, opts *pkg.ScanOptions) {
+				assert.Equal(t, "3.41.0", opts.ProviderVersion)
+			},
+		},
+		{
+			name: "should get provider version from lockfile",
+			args: []string{"scan", "--to", "aws+tf", "--tf-lockfile", "testdata/terraform_valid.lock.hcl"},
+			assertOptions: func(t *testing.T, opts *pkg.ScanOptions) {
+				assert.Equal(t, "3.47.0", opts.ProviderVersion)
+			},
+		},
+		{
+			name: "should not find provider version in lockfile",
+			args: []string{"scan", "--to", "gcp+tf", "--tf-lockfile", "testdata/terraform_valid.lock.hcl"},
+			assertOptions: func(t *testing.T, opts *pkg.ScanOptions) {
+				assert.Equal(t, "", opts.ProviderVersion)
+			},
+		},
+		{
+			name: "should fail to read lockfile with silent error",
+			args: []string{"scan", "--to", "gcp+tf", "--tf-lockfile", "testdata/terraform_invalid.lock.hcl"},
+			assertOptions: func(t *testing.T, opts *pkg.ScanOptions) {
+				assert.Equal(t, "", opts.ProviderVersion)
+			},
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			opts := &pkg.ScanOptions{}
+
+			rootCmd := &cobra.Command{Use: "root"}
+			scanCmd := NewScanCmd(opts)
+			scanCmd.RunE = func(_ *cobra.Command, args []string) error { return nil }
+			rootCmd.AddCommand(scanCmd)
+
+			_, err := test.Execute(rootCmd, tt.args...)
+			assert.NoError(t, err)
+			tt.assertOptions(t, opts)
 		})
 	}
 }

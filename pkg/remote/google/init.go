@@ -22,10 +22,6 @@ func Init(version string, alerter *alerter.Alerter,
 	factory resource.ResourceFactory,
 	configDir string) error {
 
-	if version == "" {
-		version = "3.78.0"
-	}
-
 	provider, err := NewGCPTerraformProvider(version, progress, configDir)
 	if err != nil {
 		return err
@@ -60,7 +56,7 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewGoogleComputeNetworkEnumerator(assetRepository, factory))
 	remoteLibrary.AddDetailsFetcher(google.GoogleComputeNetworkResourceType, common.NewGenericDetailsFetcher(google.GoogleComputeNetworkResourceType, provider, deserializer))
 
-	err = resourceSchemaRepository.Init(terraform.GOOGLE, version, provider.Schema())
+	err = resourceSchemaRepository.Init(terraform.GOOGLE, provider.Version(), provider.Schema())
 	if err != nil {
 		return err
 	}

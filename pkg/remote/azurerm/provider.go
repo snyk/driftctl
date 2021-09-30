@@ -16,6 +16,9 @@ type AzureTerraformProvider struct {
 }
 
 func NewAzureTerraformProvider(version string, progress output.Progress, configDir string) (*AzureTerraformProvider, error) {
+	if version == "" {
+		version = "2.71.0"
+	}
 	// Just pass your version and name
 	p := &AzureTerraformProvider{
 		version: version,

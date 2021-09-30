@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/cloudskiff/driftctl/pkg/output"
-
 	"github.com/eapache/go-resiliency/retrier"
 	"github.com/hashicorp/terraform/plugin"
 	"github.com/hashicorp/terraform/plugin/discovery"
@@ -88,7 +87,6 @@ func (p *TerraformProvider) Runner() *parallel.ParallelRunner {
 }
 
 func (p *TerraformProvider) configure(alias string) error {
-
 	providerPath, err := p.providerInstaller.Install()
 	if err != nil {
 		return err

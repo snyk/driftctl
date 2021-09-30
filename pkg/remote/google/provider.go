@@ -5,7 +5,6 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote/google/config"
-
 	"github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	tf "github.com/cloudskiff/driftctl/pkg/terraform"
 )
@@ -17,6 +16,9 @@ type GCPTerraformProvider struct {
 }
 
 func NewGCPTerraformProvider(version string, progress output.Progress, configDir string) (*GCPTerraformProvider, error) {
+	if version == "" {
+		version = "3.78.0"
+	}
 	p := &GCPTerraformProvider{
 		version: version,
 		name:    tf.GOOGLE,
