@@ -2,7 +2,6 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
-
 	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/cloudskiff/driftctl/pkg/remote/terraform"
 	tf "github.com/cloudskiff/driftctl/pkg/terraform"
@@ -45,6 +44,9 @@ type AWSTerraformProvider struct {
 }
 
 func NewAWSTerraformProvider(version string, progress output.Progress, configDir string) (*AWSTerraformProvider, error) {
+	if version == "" {
+		version = "3.19.0"
+	}
 	p := &AWSTerraformProvider{
 		version: version,
 		name:    "aws",

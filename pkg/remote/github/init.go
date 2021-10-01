@@ -22,9 +22,6 @@ func Init(version string, alerter *alerter.Alerter,
 	resourceSchemaRepository *resource.SchemaRepository,
 	factory resource.ResourceFactory,
 	configDir string) error {
-	if version == "" {
-		version = "4.4.0"
-	}
 
 	provider, err := NewGithubTerraformProvider(version, progress, configDir)
 	if err != nil {
@@ -56,7 +53,7 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewGithubBranchProtectionEnumerator(repository, factory))
 	remoteLibrary.AddDetailsFetcher(github.GithubBranchProtectionResourceType, common.NewGenericDetailsFetcher(github.GithubBranchProtectionResourceType, provider, deserializer))
 
-	err = resourceSchemaRepository.Init(terraform.GITHUB, version, provider.Schema())
+	err = resourceSchemaRepository.Init(terraform.GITHUB, provider.Version(), provider.Schema())
 	if err != nil {
 		return err
 	}

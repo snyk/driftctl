@@ -13,6 +13,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/memstore"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	"github.com/cloudskiff/driftctl/pkg/telemetry"
+	"github.com/cloudskiff/driftctl/pkg/terraform/lock"
 	"github.com/fatih/color"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
@@ -33,8 +34,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/terraform"
 )
 
-func NewScanCmd() *cobra.Command {
-	opts := &pkg.ScanOptions{}
+func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 	opts.BackendOptions = &backend.Options{}
 
 	cmd := &cobra.Command{
@@ -88,6 +88,20 @@ func NewScanCmd() *cobra.Command {
 				return err
 			}
 			opts.ProviderVersion = providerVersion
+
+			if opts.ProviderVersion == "" {
+				lockfilePath, _ := cmd.Flags().GetString("tf-lockfile")
+
+				// Attempt to read the provider version from a terraform lock file
+				lockFile, err := lock.ReadLocksFromFile(lockfilePath)
+				if err != nil {
+					logrus.WithField("error", err.Error()).Debug("Error while parsing terraform lock file")
+				}
+				if provider := lockFile.GetProviderByAddress(common.RemoteParameter(to).GetProviderAddress()); provider != nil {
+					opts.ProviderVersion = provider.Version
+					logrus.WithFields(logrus.Fields{"version": opts.ProviderVersion, "provider": to}).Debug("Found provider version in terraform lock file")
+				}
+			}
 
 			opts.Quiet, _ = cmd.Flags().GetBool("quiet")
 			opts.DisableTelemetry, _ = cmd.Flags().GetBool("disable-telemetry")
@@ -174,6 +188,11 @@ func NewScanCmd() *cobra.Command {
 		"driftignore",
 		".driftignore",
 		"Path to the driftignore file",
+	)
+	fl.String(
+		"tf-lockfile",
+		".terraform.lock.hcl",
+		"Terraform lock file to get the provider's version from. Will be ignored if the file doesn't exist.\n",
 	)
 
 	configDir, err := homedir.Dir()
