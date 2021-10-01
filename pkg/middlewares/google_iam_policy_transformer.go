@@ -3,6 +3,7 @@ package middlewares
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/google"
@@ -11,10 +12,16 @@ import (
 // GoogleStorageBucketIAMPolicyTransformer Transforms Bucket IAM policy in bucket iam binding to ease comparison.
 type GoogleStorageBucketIAMPolicyTransformer struct {
 	resourceFactory resource.ResourceFactory
+	resFieldByType  map[string]string // map of the field to add to resource attribute for all supported type
 }
 
-func NewGoogleStorageBucketIAMPolicyTransformer(resourceFactory resource.ResourceFactory) *GoogleStorageBucketIAMPolicyTransformer {
-	return &GoogleStorageBucketIAMPolicyTransformer{resourceFactory}
+func NewGoogleIAMPolicyTransformer(resourceFactory resource.ResourceFactory) *GoogleStorageBucketIAMPolicyTransformer {
+	return &GoogleStorageBucketIAMPolicyTransformer{
+		resourceFactory,
+		map[string]string{
+			google.GoogleStorageBucketIamPolicyResourceType: "bucket",
+			google.GoogleProjectIamPolicyResourceType:       "project",
+		}}
 }
 
 func (m *GoogleStorageBucketIAMPolicyTransformer) Execute(_, resourcesFromState *[]*resource.Resource) error {
@@ -23,12 +30,14 @@ func (m *GoogleStorageBucketIAMPolicyTransformer) Execute(_, resourcesFromState 
 
 	for _, stateRes := range *resourcesFromState {
 		// Ignore all resources other than BucketIamBinding
-		if stateRes.ResourceType() != google.GoogleStorageBucketIamPolicyResourceType {
+		resType := stateRes.ResourceType()
+		resField, supported := m.resFieldByType[resType]
+		if !supported {
 			resources = append(resources, stateRes)
 			continue
 		}
 
-		bucket := *stateRes.Attrs.GetString("bucket")
+		resName := *stateRes.Attrs.GetString(resField)
 		policyJSON := *stateRes.Attrs.GetString("policy_data")
 
 		policies := policyDataType{}
@@ -38,20 +47,20 @@ func (m *GoogleStorageBucketIAMPolicyTransformer) Execute(_, resourcesFromState 
 		}
 
 		for _, policy := range policies.Bindings {
-			roleName := policy.Role
-			members := policy.Members
+			roleName := policy["role"].(string)
+			members := policy["members"].([]interface{})
 			for _, member := range members {
-				id := fmt.Sprintf("%s/%s/%s", bucket, roleName, member)
+				id := fmt.Sprintf("%s/%s/%s", resName, roleName, member)
 				resources = append(
 					resources,
 					m.resourceFactory.CreateAbstractResource(
-						google.GoogleStorageBucketIamMemberResourceType,
+						fmt.Sprintf("%s_member", strings.TrimSuffix(resType, "_policy")),
 						id,
 						map[string]interface{}{
 							"id":     id,
-							"bucket": bucket,
+							resField: resName,
 							"role":   roleName,
-							"member": member,
+							"member": member.(string),
 						},
 					),
 				)
@@ -65,8 +74,5 @@ func (m *GoogleStorageBucketIAMPolicyTransformer) Execute(_, resourcesFromState 
 }
 
 type policyDataType struct {
-	Bindings []struct {
-		Members []string
-		Role    string
-	}
+	Bindings []map[string]interface{}
 }

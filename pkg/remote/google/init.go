@@ -13,6 +13,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/google"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"google.golang.org/api/cloudresourcemanager/v1"
 )
 
 func Init(version string, alerter *alerter.Alerter,
@@ -45,8 +46,14 @@ func Init(version string, alerter *alerter.Alerter,
 		return err
 	}
 
+	crmService, err := cloudresourcemanager.NewService(ctx)
+	if err != nil {
+		return err
+	}
+
 	assetRepository := repository.NewAssetRepository(assetClient, provider.GetConfig(), repositoryCache)
 	storageRepository := repository.NewStorageRepository(storageClient, repositoryCache)
+	iamRepository := repository.NewCloudResourceManagerRepository(crmService, provider.GetConfig(), repositoryCache)
 
 	providerLibrary.AddProvider(terraform.GOOGLE, provider)
 	deserializer := resource.NewDeserializer(factory)
@@ -60,6 +67,9 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewGoogleComputeRouterEnumerator(assetRepository, factory))
 
 	remoteLibrary.AddEnumerator(NewGoogleComputeInstanceEnumerator(assetRepository, factory))
+
+	remoteLibrary.AddEnumerator(NewGoogleProjectIamMemberEnumerator(iamRepository, factory))
+	remoteLibrary.AddDetailsFetcher(google.GoogleProjectIamMemberResourceType, common.NewGenericDetailsFetcher(google.GoogleProjectIamMemberResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewGoogleStorageBucketIamMemberEnumerator(assetRepository, storageRepository, factory))
 	remoteLibrary.AddDetailsFetcher(google.GoogleStorageBucketIamMemberResourceType, common.NewGenericDetailsFetcher(google.GoogleStorageBucketIamMemberResourceType, provider, deserializer))
