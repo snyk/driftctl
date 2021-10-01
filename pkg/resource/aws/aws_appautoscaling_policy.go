@@ -13,4 +13,5 @@ func initAwsAppAutoscalingPolicyMetaData(resourceSchemaRepository resource.Schem
 			"scalable_dimension": *res.Attributes().GetString("scalable_dimension"),
 		}
 	})
+	resourceSchemaRepository.SetFlags(AwsAppAutoscalingPolicyResourceType, resource.FlagDeepMode)
 }
