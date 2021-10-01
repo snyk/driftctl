@@ -22,9 +22,9 @@ func Test_ReadLockFile(t *testing.T) {
 					Hostname:  "registry.terraform.io",
 				})
 
-				assert.Len(t, locks.Providers, 0)
-				assert.Nil(t, provider)
-				assert.EqualError(t, err, "<nil>: Failed to read file; The configuration file \"testdata/file_does_not_exist.hcl\" could not be read.")
+				assert.Len(tt, locks.Providers, 0)
+				assert.Nil(tt, provider)
+				assert.EqualError(tt, err, "<nil>: Failed to read file; The configuration file \"testdata/file_does_not_exist.hcl\" could not be read.")
 			},
 		},
 		{
@@ -37,11 +37,11 @@ func Test_ReadLockFile(t *testing.T) {
 					Hostname:  "registry.terraform.io",
 				})
 
-				assert.Len(t, locks.Providers, 10)
-				assert.Equal(t, "3.47.0", provider.Version)
-				assert.Equal(t, "registry.terraform.io/hashicorp/aws", provider.Address)
-				assert.Equal(t, "~> 3.47.0", provider.Constraints)
-				assert.Nil(t, err)
+				assert.Len(tt, locks.Providers, 10)
+				assert.Equal(tt, "3.47.0", provider.Version)
+				assert.Equal(tt, "registry.terraform.io/hashicorp/aws", provider.Address)
+				assert.Equal(tt, "~> 3.47.0", provider.Constraints)
+				assert.Nil(tt, err)
 			},
 		},
 		{
@@ -50,9 +50,9 @@ func Test_ReadLockFile(t *testing.T) {
 			assert: func(tt *testing.T, locks *Lockfile, err error) {
 				provider := locks.GetProviderByAddress(&ProviderAddress{})
 
-				assert.Len(t, locks.Providers, 10)
-				assert.Nil(t, provider)
-				assert.Nil(t, err)
+				assert.Len(tt, locks.Providers, 10)
+				assert.Nil(tt, provider)
+				assert.Nil(tt, err)
 			},
 		},
 		{
@@ -61,9 +61,9 @@ func Test_ReadLockFile(t *testing.T) {
 			assert: func(tt *testing.T, locks *Lockfile, err error) {
 				provider := locks.GetProviderByAddress(&ProviderAddress{})
 
-				assert.Len(t, locks.Providers, 0)
-				assert.Nil(t, provider)
-				assert.Nil(t, err)
+				assert.Len(tt, locks.Providers, 0)
+				assert.Nil(tt, provider)
+				assert.Nil(tt, err)
 			},
 		},
 		{
@@ -72,9 +72,9 @@ func Test_ReadLockFile(t *testing.T) {
 			assert: func(tt *testing.T, locks *Lockfile, err error) {
 				provider := locks.GetProviderByAddress(&ProviderAddress{})
 
-				assert.Len(t, locks.Providers, 1)
-				assert.Nil(t, provider)
-				assert.EqualError(t, err, "testdata/lockfile_invalid.hcl:4,48-48: Missing required argument; The argument \"version\" is required, but no definition was found.")
+				assert.Len(tt, locks.Providers, 1)
+				assert.Nil(tt, provider)
+				assert.EqualError(tt, err, "testdata/lockfile_invalid.hcl:4,48-48: Missing required argument; The argument \"version\" is required, but no definition was found.")
 			},
 		},
 		{
@@ -87,11 +87,11 @@ func Test_ReadLockFile(t *testing.T) {
 					Hostname:  "registry.terraform.io",
 				})
 
-				assert.Len(t, locks.Providers, 2)
-				assert.Equal(t, "2.71.0", provider.Version)
-				assert.Equal(t, "registry.terraform.io/hashicorp/google-beta", provider.Address)
-				assert.Equal(t, "~> 2.71.0", provider.Constraints)
-				assert.Nil(t, err)
+				assert.Len(tt, locks.Providers, 2)
+				assert.Equal(tt, "2.71.0", provider.Version)
+				assert.Equal(tt, "registry.terraform.io/hashicorp/google-beta", provider.Address)
+				assert.Equal(tt, "~> 2.71.0", provider.Constraints)
+				assert.Nil(tt, err)
 			},
 		},
 		{
@@ -104,11 +104,11 @@ func Test_ReadLockFile(t *testing.T) {
 					Hostname:  "registry.terraform.io",
 				})
 
-				assert.Len(t, locks.Providers, 2)
-				assert.Equal(t, "2.71.0", provider.Version)
-				assert.Equal(t, "registry.terraform.io/hashicorp/google-beta", provider.Address)
-				assert.Equal(t, "~> 2.71.0", provider.Constraints)
-				assert.Nil(t, err)
+				assert.Len(tt, locks.Providers, 2)
+				assert.Equal(tt, "2.71.0", provider.Version)
+				assert.Equal(tt, "registry.terraform.io/hashicorp/google-beta", provider.Address)
+				assert.Equal(tt, "~> 2.71.0", provider.Constraints)
+				assert.Nil(tt, err)
 			},
 		},
 		{
@@ -121,9 +121,9 @@ func Test_ReadLockFile(t *testing.T) {
 					Hostname:  "registry.terraform.io",
 				})
 
-				assert.Len(t, locks.Providers, 10)
-				assert.Nil(t, provider)
-				assert.Nil(t, err)
+				assert.Len(tt, locks.Providers, 10)
+				assert.Nil(tt, provider)
+				assert.Nil(tt, err)
 			},
 		},
 	}
