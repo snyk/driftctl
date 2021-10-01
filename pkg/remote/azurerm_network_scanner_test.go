@@ -52,12 +52,14 @@ func TestAzurermVirtualNetwork(t *testing.T) {
 				repository.On("ListAllVirtualNetworks").Return([]*armnetwork.VirtualNetwork{
 					{
 						Resource: armnetwork.Resource{
-							ID: to.StringPtr("network1"),
+							ID:   to.StringPtr("network1"),
+							Name: to.StringPtr("network1"),
 						},
 					},
 					{
 						Resource: armnetwork.Resource{
-							ID: to.StringPtr("network2"),
+							ID:   to.StringPtr("network2"),
+							Name: to.StringPtr("network2"),
 						},
 					},
 				}, nil)

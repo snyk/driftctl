@@ -37,7 +37,9 @@ func (e *AzurermVirtualNetworkEnumerator) Enumerate() ([]*resource.Resource, err
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
 				*res.ID,
-				map[string]interface{}{},
+				map[string]interface{}{
+					"name": *res.Name,
+				},
 			),
 		)
 	}
