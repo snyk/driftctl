@@ -19,6 +19,7 @@ require (
 	github.com/hashicorp/go-hclog v0.9.2
 	github.com/hashicorp/go-plugin v1.3.0
 	github.com/hashicorp/go-version v1.3.0
+	github.com/hashicorp/hcl/v2 v2.7.2
 	github.com/hashicorp/terraform v0.14.0
 	github.com/hashicorp/terraform-exec v0.14.0
 	github.com/jarcoal/httpmock v1.0.6
@@ -40,6 +41,7 @@ require (
 	github.com/yudai/gojsondiff v1.0.0
 	github.com/zclconf/go-cty v1.8.4
 	go.uber.org/atomic v1.4.0
+	golang.org/x/net v0.0.0-20210913180222-943fd674d43e // indirect
 	golang.org/x/oauth2 v0.0.0-20210805134026-6f1e6394065a
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	google.golang.org/api v0.54.0

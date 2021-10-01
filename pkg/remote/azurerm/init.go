@@ -23,10 +23,6 @@ func Init(
 	factory resource.ResourceFactory,
 	configDir string) error {
 
-	if version == "" {
-		version = "2.71.0"
-	}
-
 	provider, err := NewAzureTerraformProvider(version, progress, configDir)
 	if err != nil {
 		return err
