@@ -23,7 +23,6 @@ func TestAcc_Aws_AppAutoscalingScheduledAction(t *testing.T) {
 					}
 					result.AssertInfrastructureIsInSync()
 					result.AssertManagedCount(1)
-					result.AssertDriftCountTotal(0)
 				},
 			},
 		},
