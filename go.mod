@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	cloud.google.com/go/asset v0.1.0
+	cloud.google.com/go/storage v1.10.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.19.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.11.0
 	github.com/Azure/azure-sdk-for-go/sdk/network/armnetwork v0.3.0
