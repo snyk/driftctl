@@ -209,3 +209,77 @@ func Test_apigatewayRepository_ListAllApiKeys(t *testing.T) {
 		})
 	}
 }
+
+func Test_apigatewayRepository_ListAllRestApiAuthorizers(t *testing.T) {
+	apis := []*apigateway.RestApi{
+		{Id: aws.String("restapi1")},
+		{Id: aws.String("restapi2")},
+	}
+
+	apiAuthorizers := []*apigateway.Authorizer{
+		{Id: aws.String("resource1")},
+		{Id: aws.String("resource2")},
+		{Id: aws.String("resource3")},
+		{Id: aws.String("resource4")},
+	}
+
+	tests := []struct {
+		name    string
+		mocks   func(client *awstest.MockFakeApiGateway, store *cache.MockCache)
+		want    []*apigateway.Authorizer
+		wantErr error
+	}{
+		{
+			name: "list multiple rest api authorizers",
+			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
+				client.On("GetAuthorizers",
+					&apigateway.GetAuthorizersInput{
+						RestApiId: aws.String("restapi1"),
+					}).Return(&apigateway.GetAuthorizersOutput{Items: apiAuthorizers[:2]}, nil).Once()
+
+				client.On("GetAuthorizers",
+					&apigateway.GetAuthorizersInput{
+						RestApiId: aws.String("restapi2"),
+					}).Return(&apigateway.GetAuthorizersOutput{Items: apiAuthorizers[2:]}, nil).Once()
+
+				store.On("Get", "apigatewayListAllRestApiAuthorizers_api_restapi1").Return(nil).Times(1)
+				store.On("Put", "apigatewayListAllRestApiAuthorizers_api_restapi1", apiAuthorizers[:2]).Return(false).Times(1)
+				store.On("Get", "apigatewayListAllRestApiAuthorizers_api_restapi2").Return(nil).Times(1)
+				store.On("Put", "apigatewayListAllRestApiAuthorizers_api_restapi2", apiAuthorizers[2:]).Return(false).Times(1)
+			},
+			want: apiAuthorizers,
+		},
+		{
+			name: "should hit cache",
+			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
+				store.On("Get", "apigatewayListAllRestApiAuthorizers_api_restapi1").Return(apiAuthorizers[:2]).Times(1)
+				store.On("Get", "apigatewayListAllRestApiAuthorizers_api_restapi2").Return(apiAuthorizers[2:]).Times(1)
+			},
+			want: apiAuthorizers,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := &cache.MockCache{}
+			client := &awstest.MockFakeApiGateway{}
+			tt.mocks(client, store)
+			r := &apigatewayRepository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.ListAllRestApiAuthorizers(apis)
+			assert.Equal(t, tt.wantErr, err)
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+			store.AssertExpectations(t)
+			client.AssertExpectations(t)
+		})
+	}
+}
