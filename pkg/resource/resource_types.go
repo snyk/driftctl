@@ -62,6 +62,7 @@ var supportedTypes = map[string]struct{}{
 	"aws_cloudformation_stack":              {},
 	"aws_api_gateway_rest_api":              {},
 	"aws_api_gateway_account":               {},
+	"aws_api_gateway_api_key":               {},
 	"aws_appautoscaling_target":             {},
 	"aws_rds_cluster_instance":              {},
 

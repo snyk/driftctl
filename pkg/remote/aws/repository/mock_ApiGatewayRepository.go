@@ -35,6 +35,29 @@ func (_m *MockApiGatewayRepository) GetAccount() (*apigateway.Account, error) {
 	return r0, r1
 }
 
+// ListAllApiKeys provides a mock function with given fields:
+func (_m *MockApiGatewayRepository) ListAllApiKeys() ([]*apigateway.ApiKey, error) {
+	ret := _m.Called()
+
+	var r0 []*apigateway.ApiKey
+	if rf, ok := ret.Get(0).(func() []*apigateway.ApiKey); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*apigateway.ApiKey)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListAllRestApis provides a mock function with given fields:
 func (_m *MockApiGatewayRepository) ListAllRestApis() ([]*apigateway.RestApi, error) {
 	ret := _m.Called()
