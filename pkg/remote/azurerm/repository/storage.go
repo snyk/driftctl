@@ -18,8 +18,7 @@ type StorageRespository interface {
 }
 
 type blobContainerListPager interface {
-	Err() error
-	NextPage(ctx context.Context) bool
+	pager
 	PageResponse() armstorage.BlobContainersListResponse
 }
 
@@ -37,8 +36,7 @@ func (c blobContainerClientImpl) List(resourceGroupName string, accountName stri
 }
 
 type storageAccountListPager interface {
-	Err() error
-	NextPage(ctx context.Context) bool
+	pager
 	PageResponse() armstorage.StorageAccountsListResponse
 }
 
