@@ -129,12 +129,11 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"github_repository":        {},
 	"github_team":              {},
 	"github_team_membership":   {},
-
-	"google_storage_bucket":   {},
-	"google_compute_firewall": {},
-	"google_compute_router":   {},
-	"google_compute_instance": {},
-	"google_compute_network":  {},
+	"google_storage_bucket":    {},
+	"google_compute_firewall":  {},
+	"google_compute_router":    {},
+	"google_compute_instance":  {},
+	"google_compute_network":   {},
 	"google_storage_bucket_iam_binding": {children: []ResourceType{
 		"google_storage_bucket_iam_member",
 	}},
