@@ -33,8 +33,12 @@ func (s *Deserializer) DeserializeOne(ty string, value cty.Value) (*Resource, er
 		return nil, nil
 	}
 
+	// Marked values cannot be deserialized to JSON.
+	// For example, this ensures we can deserialize sensitive values too.
+	unmarkedVal, _ := value.UnmarkDeep()
+
 	var attrs Attributes
-	bytes, _ := ctyjson.Marshal(value, value.Type())
+	bytes, _ := ctyjson.Marshal(unmarkedVal, unmarkedVal.Type())
 	err := json.Unmarshal(bytes, &attrs)
 	if err != nil {
 		return nil, err
