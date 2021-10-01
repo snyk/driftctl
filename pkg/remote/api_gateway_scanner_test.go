@@ -103,3 +103,80 @@ func TestApiGatewayRestApi(t *testing.T) {
 		})
 	}
 }
+
+func TestApiGatewayAccount(t *testing.T) {
+	dummyError := errors.New("this is an error")
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "no api gateway account",
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repository.On("GetAccount").Return(nil, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "empty api gateway account",
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repository.On("GetAccount").Return(&apigateway.Account{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+
+				assert.Equal(t, got[0].ResourceId(), "api-gateway-account")
+				assert.Equal(t, got[0].ResourceType(), resourceaws.AwsApiGatewayAccountResourceType)
+			},
+		},
+		{
+			test: "cannot get api gateway account",
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repository.On("GetAccount").Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayAccountResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayAccountResourceType, resourceaws.AwsApiGatewayAccountResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayAccountResourceType),
+		},
+	}
+
+	providerVersion := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.ApiGatewayRepository = fakeRepo
+
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayAccountEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+		})
+	}
+}
