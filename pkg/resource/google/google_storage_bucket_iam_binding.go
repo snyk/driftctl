@@ -12,6 +12,7 @@ func initGoogleStorageBucketIamBindingMetadata(resourceSchemaRepository resource
 	resourceSchemaRepository.SetResolveReadAttributesFunc(GoogleStorageBucketIamBindingResourceType, func(res *resource.Resource) map[string]string {
 		return map[string]string{
 			"bucket": *res.Attrs.GetString("bucket"),
+			"role":   *res.Attrs.GetString("role"),
 		}
 	})
 	resourceSchemaRepository.SetFlags(GoogleStorageBucketIamBindingResourceType, resource.FlagDeepMode)
