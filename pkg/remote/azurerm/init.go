@@ -52,6 +52,7 @@ func Init(
 	remoteLibrary.AddEnumerator(NewAzurermVirtualNetworkEnumerator(networkRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermRouteTableEnumerator(networkRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermResourceGroupEnumerator(resourcesRepo, factory))
+	remoteLibrary.AddEnumerator(NewAzurermSubnetEnumerator(networkRepo, factory))
 
 	err = resourceSchemaRepository.Init(terraform.AZURE, provider.Version(), provider.Schema())
 	if err != nil {

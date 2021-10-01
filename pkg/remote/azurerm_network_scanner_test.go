@@ -205,3 +205,136 @@ func TestAzurermRouteTables(t *testing.T) {
 		})
 	}
 }
+
+func TestAzurermSubnets(t *testing.T) {
+
+	dummyError := errors.New("this is an error")
+
+	networks := []*armnetwork.VirtualNetwork{
+		{
+			Resource: armnetwork.Resource{
+				ID: to.StringPtr("network1"),
+			},
+		},
+		{
+			Resource: armnetwork.Resource{
+				ID: to.StringPtr("network2"),
+			},
+		},
+	}
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "no subnets",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllVirtualNetworks").Return(networks, nil)
+				repository.On("ListAllSubnets", networks[0]).Return([]*armnetwork.Subnet{}, nil).Times(1)
+				repository.On("ListAllSubnets", networks[1]).Return([]*armnetwork.Subnet{}, nil).Times(1)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "error listing virtual network",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllVirtualNetworks").Return(nil, dummyError)
+			},
+			wantErr: error2.NewResourceListingErrorWithType(dummyError, resourceazure.AzureSubnetResourceType, resourceazure.AzureVirtualNetworkResourceType),
+		},
+		{
+			test: "error listing subnets",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllVirtualNetworks").Return(networks, nil)
+				repository.On("ListAllSubnets", networks[0]).Return(nil, dummyError).Times(1)
+			},
+			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzureSubnetResourceType),
+		},
+		{
+			test: "multiple subnets",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllVirtualNetworks").Return(networks, nil)
+				repository.On("ListAllSubnets", networks[0]).Return([]*armnetwork.Subnet{
+					{
+						SubResource: armnetwork.SubResource{
+							ID: to.StringPtr("subnet1"),
+						},
+					},
+					{
+						SubResource: armnetwork.SubResource{
+							ID: to.StringPtr("subnet2"),
+						},
+					},
+				}, nil).Times(1)
+				repository.On("ListAllSubnets", networks[1]).Return([]*armnetwork.Subnet{
+					{
+						SubResource: armnetwork.SubResource{
+							ID: to.StringPtr("subnet3"),
+						},
+					},
+					{
+						SubResource: armnetwork.SubResource{
+							ID: to.StringPtr("subnet4"),
+						},
+					},
+				}, nil).Times(1)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 4)
+
+				assert.Equal(t, got[0].ResourceId(), "subnet1")
+				assert.Equal(t, got[0].ResourceType(), resourceazure.AzureSubnetResourceType)
+
+				assert.Equal(t, got[1].ResourceId(), "subnet2")
+				assert.Equal(t, got[1].ResourceType(), resourceazure.AzureSubnetResourceType)
+
+				assert.Equal(t, got[2].ResourceId(), "subnet3")
+				assert.Equal(t, got[2].ResourceType(), resourceazure.AzureSubnetResourceType)
+
+				assert.Equal(t, got[3].ResourceId(), "subnet4")
+				assert.Equal(t, got[3].ResourceType(), resourceazure.AzureSubnetResourceType)
+			},
+		},
+	}
+
+	providerVersion := "2.71.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
+	resourceazure.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockNetworkRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.NetworkRepository = fakeRepo
+
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermSubnetEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, c.wantErr, err)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+		})
+	}
+}
