@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func Test_ArmResources_ListAllResourceGroups(t *testing.T) {
+func Test_Resources_ListAllResourceGroups(t *testing.T) {
 	expectedResults := []*armresources.ResourceGroup{
 		{
 			ID:   to.StringPtr("/subscriptions/008b5f48-1b66-4d92-a6b6-d215b4c9b473/resourceGroups/elie-dev"),
