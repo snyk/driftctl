@@ -12,7 +12,30 @@ type MockNetworkRepository struct {
 	mock.Mock
 }
 
-// ListAllVirtualNetwork provides a mock function with given fields:
+// ListAllRouteTables provides a mock function with given fields:
+func (_m *MockNetworkRepository) ListAllRouteTables() ([]*armnetwork.RouteTable, error) {
+	ret := _m.Called()
+
+	var r0 []*armnetwork.RouteTable
+	if rf, ok := ret.Get(0).(func() []*armnetwork.RouteTable); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*armnetwork.RouteTable)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ListAllVirtualNetworks provides a mock function with given fields:
 func (_m *MockNetworkRepository) ListAllVirtualNetworks() ([]*armnetwork.VirtualNetwork, error) {
 	ret := _m.Called()
 
