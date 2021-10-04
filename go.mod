@@ -8,6 +8,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.19.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.11.0
 	github.com/Azure/azure-sdk-for-go/sdk/network/armnetwork v0.3.0
+	github.com/Azure/azure-sdk-for-go/sdk/resources/armresources v0.3.0
 	github.com/Azure/azure-sdk-for-go/sdk/storage/armstorage v0.2.0
 	github.com/Azure/go-autorest/autorest v0.11.3
 	github.com/aws/aws-sdk-go v1.38.68
