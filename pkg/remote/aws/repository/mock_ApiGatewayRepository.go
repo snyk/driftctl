@@ -81,6 +81,29 @@ func (_m *MockApiGatewayRepository) ListAllRestApiAuthorizers(_a0 []*apigateway.
 	return r0, r1
 }
 
+// ListAllRestApiStages provides a mock function with given fields: _a0
+func (_m *MockApiGatewayRepository) ListAllRestApiStages(_a0 string) ([]*apigateway.Stage, error) {
+	ret := _m.Called(_a0)
+
+	var r0 []*apigateway.Stage
+	if rf, ok := ret.Get(0).(func(string) []*apigateway.Stage); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*apigateway.Stage)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListAllRestApis provides a mock function with given fields:
 func (_m *MockApiGatewayRepository) ListAllRestApis() ([]*apigateway.RestApi, error) {
 	ret := _m.Called()

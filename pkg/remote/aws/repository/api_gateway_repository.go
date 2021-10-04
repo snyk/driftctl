@@ -14,6 +14,7 @@ type ApiGatewayRepository interface {
 	GetAccount() (*apigateway.Account, error)
 	ListAllApiKeys() ([]*apigateway.ApiKey, error)
 	ListAllRestApiAuthorizers([]*apigateway.RestApi) ([]*apigateway.Authorizer, error)
+	ListAllRestApiStages(string) ([]*apigateway.Stage, error)
 }
 
 type apigatewayRepository struct {
@@ -106,4 +107,22 @@ func (r *apigatewayRepository) ListAllRestApiAuthorizers(apis []*apigateway.Rest
 		authorizers = append(authorizers, resources.Items...)
 	}
 	return authorizers, nil
+}
+
+func (r *apigatewayRepository) ListAllRestApiStages(apiId string) ([]*apigateway.Stage, error) {
+	cacheKey := fmt.Sprintf("apigatewayListAllRestApiStages_api_%s", apiId)
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*apigateway.Stage), nil
+	}
+
+	input := &apigateway.GetStagesInput{
+		RestApiId: &apiId,
+	}
+	resources, err := r.client.GetStages(input)
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put(cacheKey, resources.Item)
+	return resources.Item, nil
 }

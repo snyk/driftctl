@@ -361,3 +361,100 @@ func TestApiGatewayAuthorizer(t *testing.T) {
 		})
 	}
 }
+
+func TestApiGatewayStage(t *testing.T) {
+	dummyError := errors.New("this is an error")
+	apis := []*apigateway.RestApi{
+		{Id: awssdk.String("3of73v5ob4")},
+	}
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "no api gateway stages",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllRestApis").Return(apis, nil)
+				repo.On("ListAllRestApiStages", *apis[0].Id).Return([]*apigateway.Stage{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "multiple api gateway stages",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllRestApis").Return(apis, nil)
+				repo.On("ListAllRestApiStages", *apis[0].Id).Return([]*apigateway.Stage{
+					{StageName: awssdk.String("foo")},
+					{StageName: awssdk.String("baz")},
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, got[0].ResourceId(), "ags-3of73v5ob4-foo")
+				assert.Equal(t, got[0].ResourceType(), resourceaws.AwsApiGatewayStageResourceType)
+
+				assert.Equal(t, got[1].ResourceId(), "ags-3of73v5ob4-baz")
+				assert.Equal(t, got[1].ResourceType(), resourceaws.AwsApiGatewayStageResourceType)
+			},
+		},
+		{
+			test: "cannot list rest apis",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllRestApis").Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayStageResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayStageResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayStageResourceType, resourceaws.AwsApiGatewayRestApiResourceType),
+		},
+		{
+			test: "cannot list api gateway stages",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllRestApis").Return(apis, nil)
+				repo.On("ListAllRestApiStages", *apis[0].Id).Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayStageResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayStageResourceType, resourceaws.AwsApiGatewayStageResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayStageResourceType),
+		},
+	}
+
+	providerVersion := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.ApiGatewayRepository = fakeRepo
+
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayStageEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+		})
+	}
+}
