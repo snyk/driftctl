@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   go: circleci/go@1.5.0
+  codecov: codecov/codecov@3.1.0
 jobs:
   test_acc:
     parameters:
@@ -31,6 +32,9 @@ jobs:
           name: Run acceptance tests
           command: make acc
           no_output_timeout: 30m
+      - codecov/upload:
+          flags: << parameters.pattern >>
+          file: cover-acc.out
       - run:
           name: Discord notification
           when: on_fail
@@ -72,17 +76,8 @@ jobs:
               -w /app\
               golang:1.16\
               bash -c 'make install-tools && make test'
-      - run:
-          name: Check Codecov
-          command: |
-            curl -s -o codecov https://codecov.io/bash \
-              && VERSION=$(grep 'VERSION=\".*\"' codecov | cut -d'"' -f2) \
-              && shasum -a 512 -c --ignore-missing <(curl -s https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA512SUM)
-      - run:
-          name: Codecov upload
-          command: |
-            chmod +x codecov
-            ./codecov
+      - codecov/upload:
+          flags: unit
       - store_test_results:
           path: ./
   release:
