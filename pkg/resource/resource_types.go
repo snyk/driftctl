@@ -92,6 +92,7 @@ var supportedTypes = map[string]struct{}{
 	"azurerm_storage_container":  {},
 	"azurerm_virtual_network":    {},
 	"azurerm_route_table":        {},
+	"azurerm_route":              {},
 	"azurerm_resource_group":     {},
 	"azurerm_subnet":             {},
 	"azurerm_container_registry": {},

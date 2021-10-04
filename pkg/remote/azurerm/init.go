@@ -52,6 +52,7 @@ func Init(
 	remoteLibrary.AddEnumerator(NewAzurermStorageContainerEnumerator(storageAccountRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermVirtualNetworkEnumerator(networkRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermRouteTableEnumerator(networkRepo, factory))
+	remoteLibrary.AddEnumerator(NewAzurermRouteEnumerator(networkRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermResourceGroupEnumerator(resourcesRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermSubnetEnumerator(networkRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermContainerRegistryEnumerator(containerRegistryRepo, factory))

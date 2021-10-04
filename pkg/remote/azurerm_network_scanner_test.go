@@ -206,6 +206,155 @@ func TestAzurermRouteTables(t *testing.T) {
 	}
 }
 
+func TestAzurermRoutes(t *testing.T) {
+
+	dummyError := errors.New("this is an error")
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "no route tables",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllRouteTables").Return([]*armnetwork.RouteTable{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "no routes",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllRouteTables").Return([]*armnetwork.RouteTable{
+					{
+						Properties: &armnetwork.RouteTablePropertiesFormat{
+							Routes: []*armnetwork.Route{},
+						},
+					},
+					{
+						Properties: &armnetwork.RouteTablePropertiesFormat{
+							Routes: []*armnetwork.Route{},
+						},
+					},
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "error listing route tables",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllRouteTables").Return(nil, dummyError)
+			},
+			wantErr: error2.NewResourceListingErrorWithType(dummyError, resourceazure.AzureRouteResourceType, resourceazure.AzureRouteTableResourceType),
+		},
+		{
+			test: "multiple routes",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllRouteTables").Return([]*armnetwork.RouteTable{
+					{
+						Resource: armnetwork.Resource{
+							Name: to.StringPtr("table1"),
+						},
+						Properties: &armnetwork.RouteTablePropertiesFormat{
+							Routes: []*armnetwork.Route{
+								{
+									SubResource: armnetwork.SubResource{
+										ID: to.StringPtr("route1"),
+									},
+									Name: to.StringPtr("route1"),
+								},
+								{
+									SubResource: armnetwork.SubResource{
+										ID: to.StringPtr("route2"),
+									},
+									Name: to.StringPtr("route2"),
+								},
+							},
+						},
+					},
+					{
+						Resource: armnetwork.Resource{
+							Name: to.StringPtr("table2"),
+						},
+						Properties: &armnetwork.RouteTablePropertiesFormat{
+							Routes: []*armnetwork.Route{
+								{
+									SubResource: armnetwork.SubResource{
+										ID: to.StringPtr("route3"),
+									},
+									Name: to.StringPtr("route3"),
+								},
+								{
+									SubResource: armnetwork.SubResource{
+										ID: to.StringPtr("route4"),
+									},
+									Name: to.StringPtr("route4"),
+								},
+							},
+						},
+					},
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 4)
+
+				assert.Equal(t, "route1", got[0].ResourceId())
+				assert.Equal(t, resourceazure.AzureRouteResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "route2", got[1].ResourceId())
+				assert.Equal(t, resourceazure.AzureRouteResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "route3", got[2].ResourceId())
+				assert.Equal(t, resourceazure.AzureRouteResourceType, got[2].ResourceType())
+
+				assert.Equal(t, "route4", got[3].ResourceId())
+				assert.Equal(t, resourceazure.AzureRouteResourceType, got[3].ResourceType())
+			},
+		},
+	}
+
+	providerVersion := "2.71.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
+	resourceazure.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockNetworkRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.NetworkRepository = fakeRepo
+
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermRouteEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, c.wantErr, err)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+		})
+	}
+}
+
 func TestAzurermSubnets(t *testing.T) {
 
 	dummyError := errors.New("this is an error")
