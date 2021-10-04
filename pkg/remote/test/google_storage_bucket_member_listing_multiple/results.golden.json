@@ -1,0 +1,34 @@
+[
+ {
+  "bucket": "b/dctlgstoragebucketiambinding-1",
+  "condition": null,
+  "etag": null,
+  "id": "b/dctlgstoragebucketiambinding-1/roles/storage.admin/user:elie.charra@cloudskiff.com",
+  "member": "user:elie.charra@cloudskiff.com",
+  "role": "roles/storage.admin"
+ },
+ {
+  "bucket": "b/dctlgstoragebucketiambinding-1",
+  "condition": null,
+  "etag": null,
+  "id": "b/dctlgstoragebucketiambinding-1/roles/storage.objectViewer/user:william.beuil@cloudskiff.com",
+  "member": "user:william.beuil@cloudskiff.com",
+  "role": "roles/storage.objectViewer"
+ },
+ {
+  "bucket": "b/dctlgstoragebucketiambinding-2",
+  "condition": null,
+  "etag": null,
+  "id": "b/dctlgstoragebucketiambinding-2/roles/storage.admin/user:william.beuil@cloudskiff.com",
+  "member": "user:william.beuil@cloudskiff.com",
+  "role": "roles/storage.admin"
+ },
+ {
+  "bucket": "b/dctlgstoragebucketiambinding-2",
+  "condition": null,
+  "etag": null,
+  "id": "b/dctlgstoragebucketiambinding-2/roles/storage.objectViewer/user:elie.charra@cloudskiff.com",
+  "member": "user:elie.charra@cloudskiff.com",
+  "role": "roles/storage.objectViewer"
+ }
+]

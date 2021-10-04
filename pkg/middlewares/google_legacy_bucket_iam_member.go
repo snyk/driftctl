@@ -9,30 +9,30 @@ import (
 )
 
 // Creating buckets add legacy role bindings, this middleware will filter them unless they are managed.
-type GoogleLegacyBucketIAMBindings struct{}
+type GoogleLegacyBucketIAMMmeber struct{}
 
-func NewGoogleLegacyBucketIAMBindings() *GoogleLegacyBucketIAMBindings {
-	return &GoogleLegacyBucketIAMBindings{}
+func NewGoogleLegacyBucketIAMBindings() *GoogleLegacyBucketIAMMmeber {
+	return &GoogleLegacyBucketIAMMmeber{}
 }
 
-func (m *GoogleLegacyBucketIAMBindings) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
+func (m *GoogleLegacyBucketIAMMmeber) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
 
 	newRemoteResources := make([]*resource.Resource, 0)
 
 	for _, remoteResource := range *remoteResources {
 		// Ignore all resources other than BucketIamBinding
-		if remoteResource.ResourceType() != google.GoogleStorageBucketIamBindingResourceType {
+		if remoteResource.ResourceType() != google.GoogleStorageBucketIamMemberResourceType {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
 
-		// Ignore all non-legacy bindings
+		// Ignore all non-legacy member
 		if roleName := remoteResource.Attrs.GetString("role"); roleName != nil && !strings.Contains(*roleName, "legacy") {
 			newRemoteResources = append(newRemoteResources, remoteResource)
 			continue
 		}
 
-		// Check if bindings is managed by IaC
+		// Check if member is managed by IaC
 		existInState := false
 		for _, stateResource := range *resourcesFromState {
 			if remoteResource.Equal(stateResource) {
@@ -51,7 +51,7 @@ func (m *GoogleLegacyBucketIAMBindings) Execute(remoteResources, resourcesFromSt
 		logrus.WithFields(logrus.Fields{
 			"id":   remoteResource.ResourceId(),
 			"type": remoteResource.ResourceType(),
-		}).Debug("Ignoring legacy bucket bindings as it is not managed by IaC")
+		}).Debug("Ignoring legacy bucket member as it is not managed by IaC")
 	}
 
 	*remoteResources = newRemoteResources

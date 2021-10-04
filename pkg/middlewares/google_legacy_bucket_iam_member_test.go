@@ -27,14 +27,14 @@ func TestGoogleLegacyBucketIAMBindings_Execute(t *testing.T) {
 				},
 				{
 					Id:   "admin bucket",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
 						"role": "storage.admin",
 					},
 				},
 				{
 					Id:   "legacy",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
 						"role": "storage.legacyBucketOwner",
 					},
@@ -49,7 +49,7 @@ func TestGoogleLegacyBucketIAMBindings_Execute(t *testing.T) {
 				},
 				{
 					Id:   "admin bucket",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
 						"role": "storage.admin",
 					},
@@ -66,21 +66,21 @@ func TestGoogleLegacyBucketIAMBindings_Execute(t *testing.T) {
 				},
 				{
 					Id:   "admin bucket",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
 						"role": "storage.admin",
 					},
 				},
 				{
 					Id:   "legacy",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
 						"role": "storage.legacyBucketOwner",
 					},
 				},
 				{
 					Id:   "legacy-managed",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
 						"role": "storage.legacyBucketOwner",
 					},
@@ -89,7 +89,7 @@ func TestGoogleLegacyBucketIAMBindings_Execute(t *testing.T) {
 			[]*resource.Resource{
 				{
 					Id:   "legacy-managed",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
 						"role": "storage.legacyBucketOwner",
 					},
@@ -103,14 +103,14 @@ func TestGoogleLegacyBucketIAMBindings_Execute(t *testing.T) {
 				},
 				{
 					Id:   "admin bucket",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
 						"role": "storage.admin",
 					},
 				},
 				{
 					Id:   "legacy-managed",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
 						"role": "storage.legacyBucketOwner",
 					},

@@ -11,7 +11,7 @@ import (
 	"github.com/r3labs/diff/v2"
 )
 
-func TestGoogleBucketIAMMemberTransformer_Execute(t *testing.T) {
+func TestGoogleBucketIAMBindingTransformer_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
 		resourcesFromState []*resource.Resource
@@ -19,7 +19,7 @@ func TestGoogleBucketIAMMemberTransformer_Execute(t *testing.T) {
 		mock               func(factory *terraform.MockResourceFactory)
 	}{
 		{
-			"Test that bucket member are transformed into bindings",
+			"Test that bucket bindings are transformed into member",
 			[]*resource.Resource{
 				{
 					Id:    "fake",
@@ -28,13 +28,66 @@ func TestGoogleBucketIAMMemberTransformer_Execute(t *testing.T) {
 				},
 				{
 					Id:   "admin bucket",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
-						"role": "storage.admin",
+						"bucket": "coucou",
+						"role":   "storage.admin",
+						"member": "user:elie@cloudskiff.com",
 					},
 				},
 				{
-					Id:   "b/bucket/admin/elie",
+					Id:   "b/bucket/admin",
+					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Attrs: &resource.Attributes{
+						"role":   "storage.admin",
+						"bucket": "b/bucket",
+						"members": []string{
+							"user:elie@cloudskiff.com",
+							"user:william@cloudskiff.com",
+						},
+					},
+				},
+
+				{
+					Id:   "b/bucket/viewer",
+					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Attrs: &resource.Attributes{
+						"role":   "storage.viewer",
+						"bucket": "b/bucket",
+						"members": []string{
+							"user:william@cloudskiff.com",
+						},
+					},
+				},
+				{
+					Id:   "b/bucket2/viewer",
+					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Attrs: &resource.Attributes{
+						"role":   "storage.viewer",
+						"bucket": "b/bucket2",
+						"members": []string{
+							"user:william@cloudskiff.com",
+						},
+					},
+				},
+			},
+			[]*resource.Resource{
+				{
+					Id:    "fake",
+					Type:  google.GoogleStorageBucketResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:   "admin bucket",
+					Type: google.GoogleStorageBucketIamMemberResourceType,
+					Attrs: &resource.Attributes{
+						"bucket": "coucou",
+						"role":   "storage.admin",
+						"member": "user:elie@cloudskiff.com",
+					},
+				},
+				{
+					Id:   "b/bucket/storage.admin/user:elie@cloudskiff.com",
 					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
 						"role":   "storage.admin",
@@ -43,7 +96,7 @@ func TestGoogleBucketIAMMemberTransformer_Execute(t *testing.T) {
 					},
 				},
 				{
-					Id:   "b/bucket/admin/William",
+					Id:   "b/bucket/storage.admin/user:william@cloudskiff.com",
 					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
 						"role":   "storage.admin",
@@ -52,7 +105,7 @@ func TestGoogleBucketIAMMemberTransformer_Execute(t *testing.T) {
 					},
 				},
 				{
-					Id:   "b/bucket/viewer/William",
+					Id:   "b/bucket/storage.viewer/user:william@cloudskiff.com",
 					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
 						"role":   "storage.viewer",
@@ -61,135 +114,91 @@ func TestGoogleBucketIAMMemberTransformer_Execute(t *testing.T) {
 					},
 				},
 				{
-					Id:   "b/bucket2/viewer/William",
+					Id:   "b/bucket2/storage.viewer/user:william@cloudskiff.com",
 					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
 						"role":   "storage.viewer",
 						"bucket": "b/bucket2",
 						"member": "user:william@cloudskiff.com",
-					},
-				},
-			},
-			[]*resource.Resource{
-				{
-					Id:    "fake",
-					Type:  google.GoogleStorageBucketResourceType,
-					Attrs: &resource.Attributes{},
-				},
-				{
-					Id:   "admin bucket",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
-					Attrs: &resource.Attributes{
-						"role": "storage.admin",
-					},
-				},
-				{
-					Id:   "b/bucket/storage.admin",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
-					Attrs: &resource.Attributes{
-						"role":   "storage.admin",
-						"bucket": "b/bucket",
-						"members": []string{
-							"user:elie@cloudskiff.com",
-							"user:william@cloudskiff.com",
-						},
-					},
-				},
-				{
-					Id:   "b/bucket/storage.viewer",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
-					Attrs: &resource.Attributes{
-						"role":   "storage.viewer",
-						"bucket": "b/bucket",
-						"members": []string{
-							"user:william@cloudskiff.com",
-						},
-					},
-				},
-				{
-					Id:   "b/bucket2/storage.viewer",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
-					Attrs: &resource.Attributes{
-						"role":   "storage.viewer",
-						"bucket": "b/bucket2",
-						"members": []string{
-							"user:william@cloudskiff.com",
-						},
 					},
 				},
 			},
 			func(factory *terraform.MockResourceFactory) {
 				factory.On(
-					"CreateAbstractResource", google.GoogleStorageBucketIamBindingResourceType,
-					"b/bucket/storage.admin",
+					"CreateAbstractResource", google.GoogleStorageBucketIamMemberResourceType,
+					"b/bucket/storage.admin/user:elie@cloudskiff.com",
 					map[string]interface{}{
-						"id":     "b/bucket/storage.admin",
+						"id":     "b/bucket/storage.admin/user:elie@cloudskiff.com",
 						"bucket": "b/bucket",
 						"role":   "storage.admin",
-						"members": []string{
-							"user:elie@cloudskiff.com",
-							"user:william@cloudskiff.com",
-						},
+						"member": "user:elie@cloudskiff.com",
 					}).Return(&resource.Resource{
-					Id:   "b/bucket/storage.admin",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Id:   "b/bucket/storage.admin/user:elie@cloudskiff.com",
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
 						"role":   "storage.admin",
 						"bucket": "b/bucket",
-						"members": []string{
-							"user:elie@cloudskiff.com",
-							"user:william@cloudskiff.com",
-						},
+						"member": "user:elie@cloudskiff.com",
 					},
 				}).Once()
 
 				factory.On(
-					"CreateAbstractResource", google.GoogleStorageBucketIamBindingResourceType,
-					"b/bucket/storage.viewer",
+					"CreateAbstractResource", google.GoogleStorageBucketIamMemberResourceType,
+					"b/bucket/storage.admin/user:william@cloudskiff.com",
 					map[string]interface{}{
-						"id":     "b/bucket/storage.viewer",
+						"id":     "b/bucket/storage.admin/user:william@cloudskiff.com",
 						"bucket": "b/bucket",
-						"role":   "storage.viewer",
-						"members": []string{
-							"user:william@cloudskiff.com",
-						},
+						"role":   "storage.admin",
+						"member": "user:william@cloudskiff.com",
 					}).Return(&resource.Resource{
-					Id:   "b/bucket/storage.viewer",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Id:   "b/bucket/storage.admin/user:william@cloudskiff.com",
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
-						"role":   "storage.viewer",
+						"role":   "storage.admin",
 						"bucket": "b/bucket",
-						"members": []string{
-							"user:william@cloudskiff.com",
-						},
+						"member": "user:william@cloudskiff.com",
 					},
 				}).Once()
 
 				factory.On(
-					"CreateAbstractResource", google.GoogleStorageBucketIamBindingResourceType,
-					"b/bucket2/storage.viewer",
+					"CreateAbstractResource", google.GoogleStorageBucketIamMemberResourceType,
+					"b/bucket/storage.viewer/user:william@cloudskiff.com",
 					map[string]interface{}{
-						"id":     "b/bucket2/storage.viewer",
+						"id":     "b/bucket/storage.viewer/user:william@cloudskiff.com",
+						"bucket": "b/bucket",
+						"role":   "storage.viewer",
+						"member": "user:william@cloudskiff.com",
+					}).Return(&resource.Resource{
+					Id:   "b/bucket/storage.viewer/user:william@cloudskiff.com",
+					Type: google.GoogleStorageBucketIamMemberResourceType,
+					Attrs: &resource.Attributes{
+						"role":   "storage.viewer",
+						"bucket": "b/bucket",
+						"member": "user:william@cloudskiff.com",
+					},
+				}).Once()
+
+				factory.On(
+					"CreateAbstractResource", google.GoogleStorageBucketIamMemberResourceType,
+					"b/bucket2/storage.viewer/user:william@cloudskiff.com",
+					map[string]interface{}{
+						"id":     "b/bucket2/storage.viewer/user:william@cloudskiff.com",
 						"bucket": "b/bucket2",
 						"role":   "storage.viewer",
-						"members": []string{
-							"user:william@cloudskiff.com",
-						},
+						"member": "user:william@cloudskiff.com",
 					}).Return(&resource.Resource{
-					Id:   "b/bucket2/storage.viewer",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Id:   "b/bucket2/storage.viewer/user:william@cloudskiff.com",
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
 						"role":   "storage.viewer",
 						"bucket": "b/bucket2",
-						"members": []string{
-							"user:william@cloudskiff.com",
-						},
+						"member": "user:william@cloudskiff.com",
 					},
 				}).Once()
 			},
 		},
 		{
-			"test that everything is fine when there is no members",
+			"test that everything is fine when there is no bindings",
 			[]*resource.Resource{
 				{
 					Id:    "fake",
@@ -198,9 +207,11 @@ func TestGoogleBucketIAMMemberTransformer_Execute(t *testing.T) {
 				},
 				{
 					Id:   "admin bucket",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
-						"role": "storage.admin",
+						"bucket": "coucou",
+						"role":   "storage.admin",
+						"member": "user:elie@cloudskiff.com",
 					},
 				},
 			},
@@ -212,9 +223,11 @@ func TestGoogleBucketIAMMemberTransformer_Execute(t *testing.T) {
 				},
 				{
 					Id:   "admin bucket",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
-						"role": "storage.admin",
+						"bucket": "coucou",
+						"role":   "storage.admin",
+						"member": "user:elie@cloudskiff.com",
 					},
 				},
 			},
@@ -230,7 +243,7 @@ func TestGoogleBucketIAMMemberTransformer_Execute(t *testing.T) {
 				tt.mock(factory)
 			}
 
-			m := NewGoogleStorageBucketIAMMemberTransformer(factory)
+			m := NewGoogleStorageBucketIAMBindingTransformer(factory)
 			err := m.Execute(&[]*resource.Resource{}, &tt.resourcesFromState)
 			if err != nil {
 				t.Fatal(err)

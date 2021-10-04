@@ -37,7 +37,7 @@ func TestGoogleBucketIAMPolicyTransformer_Execute(t *testing.T) {
 					Attrs: &resource.Attributes{
 						"bucket":      "b/dctlgstoragebucketiambinding-1",
 						"id":          "b/dctlgstoragebucketiambinding-1",
-						"policy_data": "{\"bindings\":[{\"members\":[\"serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com\",\"user:elie.charra@cloudskiff.com\",\"user:martin.guibert@cloudskiff.com\"],\"role\":\"roles/storage.admin\"},{\"members\":[\"user:william.beuil@cloudskiff.com\"],\"role\":\"roles/storage.objectViewer\"}]}",
+						"policy_data": "{\"bindings\":[{\"members\":[\"serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com\"],\"role\":\"roles/storage.admin\"},{\"members\":[\"user:william.beuil@cloudskiff.com\"],\"role\":\"roles/storage.objectViewer\"}]}",
 					},
 				},
 				{
@@ -47,7 +47,7 @@ func TestGoogleBucketIAMPolicyTransformer_Execute(t *testing.T) {
 						"bucket":      "b/dctlgstoragebucketiambinding-2",
 						"etag":        "CAU=",
 						"id":          "b/dctlgstoragebucketiambinding-2",
-						"policy_data": "{\"bindings\":[{\"members\":[\"serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com\",\"user:elie.charra@cloudskiff.com\",\"user:martin.guibert@cloudskiff.com\"],\"role\":\"roles/storage.admin\"},{\"members\":[\"user:william.beuil@cloudskiff.com\"],\"role\":\"roles/storage.objectViewer\"}]}",
+						"policy_data": "{\"bindings\":[{\"members\":[\"serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com\"],\"role\":\"roles/storage.admin\"},{\"members\":[\"user:william.beuil@cloudskiff.com\"],\"role\":\"roles/storage.objectViewer\"}]}",
 					},
 				},
 			},
@@ -63,156 +63,120 @@ func TestGoogleBucketIAMPolicyTransformer_Execute(t *testing.T) {
 					Attrs: &resource.Attributes{},
 				},
 				{
-					Id:   "b/dctlgstoragebucketiambinding-1/roles/storage.admin",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Id:   "b/dctlgstoragebucketiambinding-1/roles/storage.admin/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
-						"id":     "b/dctlgstoragebucketiambinding-1/roles/storage.admin",
+						"id":     "b/dctlgstoragebucketiambinding-1/roles/storage.admin/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
 						"role":   "roles/storage.admin",
 						"bucket": "b/dctlgstoragebucketiambinding-1",
-						"members": []string{
-							"user:elie.charra@cloudskiff.com",
-							"user:martin.guibert@cloudskiff.com",
-							"serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
-						},
+						"member": "serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
 					},
 				},
 				{
-					Id:   "b/dctlgstoragebucketiambinding-1/roles/storage.objectViewer",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Id:   "b/dctlgstoragebucketiambinding-1/roles/storage.objectViewer/user:william.beuil@cloudskiff.com",
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
-						"id":     "b/dctlgstoragebucketiambinding-1/roles/storage.objectViewer",
+						"id":     "b/dctlgstoragebucketiambinding-1/roles/storage.objectViewer/user:william.beuil@cloudskiff.com",
 						"role":   "roles/storage.objectViewer",
 						"bucket": "b/dctlgstoragebucketiambinding-1",
-						"members": []string{
-							"user:william.beuil@cloudskiff.com",
-						},
+						"member": "user:william.beuil@cloudskiff.com",
 					},
 				},
 				{
-					Id:   "b/dctlgstoragebucketiambinding-2/roles/storage.admin",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Id:   "b/dctlgstoragebucketiambinding-2/roles/storage.admin/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
-						"id":     "b/dctlgstoragebucketiambinding-2/roles/storage.admin",
+						"id":     "b/dctlgstoragebucketiambinding-2/roles/storage.admin/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
 						"role":   "roles/storage.admin",
 						"bucket": "b/dctlgstoragebucketiambinding-2",
-						"members": []string{
-							"user:elie.charra@cloudskiff.com",
-							"user:martin.guibert@cloudskiff.com",
-							"serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
-						},
+						"member": "serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
 					},
 				},
 				{
-					Id:   "b/dctlgstoragebucketiambinding-2/roles/storage.objectViewer",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Id:   "b/dctlgstoragebucketiambinding-2/roles/storage.objectViewer/user:william.beuil@cloudskiff.com",
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
-						"id":     "b/dctlgstoragebucketiambinding-2/roles/storage.objectViewer",
+						"id":     "b/dctlgstoragebucketiambinding-2/roles/storage.objectViewer/user:william.beuil@cloudskiff.com",
 						"role":   "roles/storage.objectViewer",
 						"bucket": "b/dctlgstoragebucketiambinding-2",
-						"members": []string{
-							"user:william.beuil@cloudskiff.com",
-						},
+						"member": "user:william.beuil@cloudskiff.com",
 					},
 				},
 			},
 			func(factory *terraform.MockResourceFactory) {
 				factory.On(
-					"CreateAbstractResource", google.GoogleStorageBucketIamBindingResourceType,
-					"b/dctlgstoragebucketiambinding-1/roles/storage.admin",
+					"CreateAbstractResource", google.GoogleStorageBucketIamMemberResourceType,
+					"b/dctlgstoragebucketiambinding-1/roles/storage.admin/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
 					map[string]interface{}{
-						"id":     "b/dctlgstoragebucketiambinding-1/roles/storage.admin",
+						"id":     "b/dctlgstoragebucketiambinding-1/roles/storage.admin/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
 						"bucket": "b/dctlgstoragebucketiambinding-1",
 						"role":   "roles/storage.admin",
-						"members": []string{
-							"serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
-							"user:elie.charra@cloudskiff.com",
-							"user:martin.guibert@cloudskiff.com",
-						},
+						"member": "serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
 					}).Return(&resource.Resource{
-					Id:   "b/dctlgstoragebucketiambinding-1/roles/storage.admin",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Id:   "b/dctlgstoragebucketiambinding-1/roles/storage.admin/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
-						"id":     "b/dctlgstoragebucketiambinding-1/roles/storage.admin",
+						"id":     "b/dctlgstoragebucketiambinding-1/roles/storage.admin/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
 						"role":   "roles/storage.admin",
 						"bucket": "b/dctlgstoragebucketiambinding-1",
-						"members": []string{
-							"serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
-							"user:elie.charra@cloudskiff.com",
-							"user:martin.guibert@cloudskiff.com",
-						},
+						"member": "serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
 					},
 				}).Once()
 
 				factory.On(
-					"CreateAbstractResource", google.GoogleStorageBucketIamBindingResourceType,
-					"b/dctlgstoragebucketiambinding-1/roles/storage.objectViewer",
+					"CreateAbstractResource", google.GoogleStorageBucketIamMemberResourceType,
+					"b/dctlgstoragebucketiambinding-1/roles/storage.objectViewer/user:william.beuil@cloudskiff.com",
 					map[string]interface{}{
-						"id":     "b/dctlgstoragebucketiambinding-1/roles/storage.objectViewer",
+						"id":     "b/dctlgstoragebucketiambinding-1/roles/storage.objectViewer/user:william.beuil@cloudskiff.com",
 						"bucket": "b/dctlgstoragebucketiambinding-1",
 						"role":   "roles/storage.objectViewer",
-						"members": []string{
-							"user:william.beuil@cloudskiff.com",
-						},
+						"member": "user:william.beuil@cloudskiff.com",
 					}).Return(&resource.Resource{
-					Id:   "b/dctlgstoragebucketiambinding-1/roles/storage.objectViewer",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Id:   "b/dctlgstoragebucketiambinding-1/roles/storage.objectViewer/user:william.beuil@cloudskiff.com",
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
-						"id":     "b/dctlgstoragebucketiambinding-1/roles/storage.objectViewer",
+						"id":     "b/dctlgstoragebucketiambinding-1/roles/storage.objectViewer/user:william.beuil@cloudskiff.com",
 						"role":   "roles/storage.objectViewer",
 						"bucket": "b/dctlgstoragebucketiambinding-1",
-						"members": []string{
-							"user:william.beuil@cloudskiff.com",
-						},
+						"member": "user:william.beuil@cloudskiff.com",
 					},
 				}).Once()
 
 				factory.On(
-					"CreateAbstractResource", google.GoogleStorageBucketIamBindingResourceType,
-					"b/dctlgstoragebucketiambinding-2/roles/storage.admin",
+					"CreateAbstractResource", google.GoogleStorageBucketIamMemberResourceType,
+					"b/dctlgstoragebucketiambinding-2/roles/storage.admin/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
 					map[string]interface{}{
-						"id":     "b/dctlgstoragebucketiambinding-2/roles/storage.admin",
+						"id":     "b/dctlgstoragebucketiambinding-2/roles/storage.admin/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
 						"bucket": "b/dctlgstoragebucketiambinding-2",
 						"role":   "roles/storage.admin",
-						"members": []string{
-							"serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
-							"user:elie.charra@cloudskiff.com",
-							"user:martin.guibert@cloudskiff.com",
-						},
+						"member": "serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
 					}).Return(&resource.Resource{
-					Id:   "b/dctlgstoragebucketiambinding-2/roles/storage.admin",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Id:   "b/dctlgstoragebucketiambinding-2/roles/storage.admin/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
-						"id":     "b/dctlgstoragebucketiambinding-2/roles/storage.admin",
+						"id":     "b/dctlgstoragebucketiambinding-2/roles/storage.admin/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
 						"role":   "roles/storage.admin",
 						"bucket": "b/dctlgstoragebucketiambinding-2",
-						"members": []string{
-							"serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
-							"user:elie.charra@cloudskiff.com",
-							"user:martin.guibert@cloudskiff.com",
-						},
+						"member": "serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
 					},
 				}).Once()
 
 				factory.On(
-					"CreateAbstractResource", google.GoogleStorageBucketIamBindingResourceType,
-					"b/dctlgstoragebucketiambinding-2/roles/storage.objectViewer",
+					"CreateAbstractResource", google.GoogleStorageBucketIamMemberResourceType,
+					"b/dctlgstoragebucketiambinding-2/roles/storage.objectViewer/user:william.beuil@cloudskiff.com",
 					map[string]interface{}{
-						"id":     "b/dctlgstoragebucketiambinding-2/roles/storage.objectViewer",
+						"id":     "b/dctlgstoragebucketiambinding-2/roles/storage.objectViewer/user:william.beuil@cloudskiff.com",
 						"bucket": "b/dctlgstoragebucketiambinding-2",
 						"role":   "roles/storage.objectViewer",
-						"members": []string{
-							"user:william.beuil@cloudskiff.com",
-						},
+						"member": "user:william.beuil@cloudskiff.com",
 					}).Return(&resource.Resource{
-					Id:   "b/dctlgstoragebucketiambinding-2/roles/storage.objectViewer",
-					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Id:   "b/dctlgstoragebucketiambinding-2/roles/storage.objectViewer/user:william.beuil@cloudskiff.com",
+					Type: google.GoogleStorageBucketIamMemberResourceType,
 					Attrs: &resource.Attributes{
-						"id":     "b/dctlgstoragebucketiambinding-2/roles/storage.objectViewer",
+						"id":     "b/dctlgstoragebucketiambinding-2/roles/storage.objectViewer/user:william.beuil@cloudskiff.com",
 						"role":   "roles/storage.objectViewer",
 						"bucket": "b/dctlgstoragebucketiambinding-2",
-						"members": []string{
-							"user:william.beuil@cloudskiff.com",
-						},
+						"member": "user:william.beuil@cloudskiff.com",
 					},
 				}).Once()
 			},

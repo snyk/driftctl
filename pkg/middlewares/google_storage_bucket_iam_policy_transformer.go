@@ -40,20 +40,22 @@ func (m *GoogleStorageBucketIAMPolicyTransformer) Execute(_, resourcesFromState 
 		for _, policy := range policies.Bindings {
 			roleName := policy.Role
 			members := policy.Members
-			id := fmt.Sprintf("%s/%s", bucket, roleName)
-			resources = append(
-				resources,
-				m.resourceFactory.CreateAbstractResource(
-					google.GoogleStorageBucketIamBindingResourceType,
-					id,
-					map[string]interface{}{
-						"id":      id,
-						"bucket":  bucket,
-						"role":    roleName,
-						"members": members,
-					},
-				),
-			)
+			for _, member := range members {
+				id := fmt.Sprintf("%s/%s/%s", bucket, roleName, member)
+				resources = append(
+					resources,
+					m.resourceFactory.CreateAbstractResource(
+						google.GoogleStorageBucketIamMemberResourceType,
+						id,
+						map[string]interface{}{
+							"id":     id,
+							"bucket": bucket,
+							"role":   roleName,
+							"member": member,
+						},
+					),
+				)
+			}
 		}
 	}
 
