@@ -48,6 +48,7 @@ cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/AndreasBriese/bbloom v0.0.0-20190306092124-e2d15f34fcf9/go.mod h1:bOvUY6CB00SOBii9/FifXqc0awNKxLFCL/+pkDPuyl8=
 github.com/Azure/azure-sdk-for-go v45.0.0+incompatible/go.mod h1:9XXNKU+eRnpl9moKnB4QOLf1HestfXbmab5FXxiDBjc=
+github.com/Azure/azure-sdk-for-go v57.0.0+incompatible/go.mod h1:9XXNKU+eRnpl9moKnB4QOLf1HestfXbmab5FXxiDBjc=
 github.com/Azure/azure-sdk-for-go v57.1.0+incompatible h1:TKQ3ieyB0vVKkF6t9dsWbMjq56O1xU3eh3Ec09v6ajM=
 github.com/Azure/azure-sdk-for-go v57.1.0+incompatible/go.mod h1:9XXNKU+eRnpl9moKnB4QOLf1HestfXbmab5FXxiDBjc=
 github.com/Azure/azure-sdk-for-go/sdk/azcore v0.19.0 h1:lhSJz9RMbJcTgxifR1hUNJnn6CNYtbgEDtQV22/9RBA=
@@ -59,6 +60,8 @@ github.com/Azure/azure-sdk-for-go/sdk/internal v0.7.0 h1:v9p9TfTbf7AwNb5NYQt7hI4
 github.com/Azure/azure-sdk-for-go/sdk/internal v0.7.0/go.mod h1:yqy467j36fJxcRV2TzfVZ1pCb5vxm4BtZPUdYWe/Xo8=
 github.com/Azure/azure-sdk-for-go/sdk/network/armnetwork v0.3.0 h1:3ICM5L/XRaknp4DUNqdcNtiOzs6Mc3VKeyQp81+JS2Y=
 github.com/Azure/azure-sdk-for-go/sdk/network/armnetwork v0.3.0/go.mod h1:YSO+0IW+22kuLybFl2GAYaTDh1VWxNid83hqY/DkpGQ=
+github.com/Azure/azure-sdk-for-go/sdk/resources/armresources v0.3.0 h1:I1cONUC2nKiGU3JXm2jRB4+QIs06lGqkplVpwy4ie9o=
+github.com/Azure/azure-sdk-for-go/sdk/resources/armresources v0.3.0/go.mod h1:LdmyxRi5+2XPnbuv0X9c6ymGle+UkoNvqsBvG+oG53M=
 github.com/Azure/azure-sdk-for-go/sdk/storage/armstorage v0.2.0 h1:LOq4ZG6rMgTAZTyGbYHyxL1EVfZdngpUDRY/KvBToMs=
 github.com/Azure/azure-sdk-for-go/sdk/storage/armstorage v0.2.0/go.mod h1:mIFJgQ93RCQPBsN2jBDzDOfwJpLacGwXIxmirNQMiq4=
 github.com/Azure/go-autorest v14.2.0+incompatible h1:V5VMDjClD3GiElqLWO7mz2MxNAK/vTfRHdAubSIPRgs=
