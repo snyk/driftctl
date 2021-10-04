@@ -40,12 +40,7 @@ func (e *AppAutoscalingScheduledActionEnumerator) Enumerate() ([]*resource.Resou
 				e.factory.CreateAbstractResource(
 					string(e.SupportedType()),
 					strings.Join([]string{*action.ScheduledActionName, *action.ServiceNamespace, *action.ResourceId}, "-"),
-					map[string]interface{}{
-						"name":               *action.ScheduledActionName,
-						"service_namespace":  *action.ServiceNamespace,
-						"scalable_dimension": *action.ScalableDimension,
-						"resource_id":        *action.ResourceId,
-					},
+					map[string]interface{}{},
 				),
 			)
 		}

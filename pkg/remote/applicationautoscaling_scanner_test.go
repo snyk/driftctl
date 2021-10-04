@@ -234,15 +234,16 @@ func TestAppAutoScalingPolicy(t *testing.T) {
 }
 
 func TestAppAutoScalingScheduledAction(t *testing.T) {
+	dummyError := errors.New("this is an error")
+
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockAppAutoScalingRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		mocks          func(*repository.MockAppAutoScalingRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
 	}{
 		{
-			test:    "should return one scheduled action",
-			dirName: "aws_appautoscaling_scheduled_action_single",
+			test: "should return one scheduled action",
 			mocks: func(client *repository.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
 				matchServiceNamespaceFunc := func(ns string) bool {
 					for _, n := range applicationautoscaling.ServiceNamespace_Values() {
@@ -266,35 +267,35 @@ func TestAppAutoScalingScheduledAction(t *testing.T) {
 
 				client.On("DescribeScheduledActions", mock.MatchedBy(matchServiceNamespaceFunc)).Return([]*applicationautoscaling.ScheduledAction{}, nil).Times(len(applicationautoscaling.ServiceNamespace_Values()) - 1)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+				assert.Equal(t, "action-dynamodb-table/GameScores", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsAppAutoscalingScheduledActionResourceType, got[0].ResourceType())
+			},
 			wantErr: nil,
 		},
 		{
-			test:    "should return remote error",
-			dirName: "aws_appautoscaling_scheduled_action_empty",
+			test: "should return remote error",
 			mocks: func(client *repository.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
 				client.On("ServiceNamespaceValues").Return(applicationautoscaling.ServiceNamespace_Values()).Once()
 
-				client.On("DescribeScheduledActions", mock.AnythingOfType("string")).Return(nil, errors.New("remote error")).Once()
+				client.On("DescribeScheduledActions", mock.AnythingOfType("string")).Return(nil, dummyError).Once()
 			},
-			wantErr: remoteerror.NewResourceListingError(errors.New("remote error"), resourceaws.AwsAppAutoscalingScheduledActionResourceType),
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+			wantErr: remoteerror.NewResourceListingError(dummyError, resourceaws.AwsAppAutoscalingScheduledActionResourceType),
 		},
 	}
 
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	providerVersion := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
 	resourceaws.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-			shouldUpdate := c.dirName == *goldenfile.Update
-
-			sess := session.Must(session.NewSessionWithOptions(session.Options{
-				SharedConfigState: session.SharedConfigEnable,
-			}))
-
-			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform.NewProviderLibrary()
+			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -303,44 +304,23 @@ func TestAppAutoScalingScheduledAction(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.AppAutoScalingRepository = fakeRepo
-			providerVersion := "3.19.0"
-			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
-			if err != nil {
-				t.Fatal(err)
-			}
-			provider := terraform2.NewFakeTerraformProvider(realProvider)
-			provider.WithResponse(c.dirName)
-
-			// Replace mock by real resources if we are in update mode
-			if shouldUpdate {
-				err := realProvider.Init()
-				if err != nil {
-					t.Fatal(err)
-				}
-				provider.ShouldUpdate()
-				repo = repository.NewAppAutoScalingRepository(sess, cache.New(0))
-			}
 
 			remoteLibrary.AddEnumerator(aws.NewAppAutoscalingScheduledActionEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsAppAutoscalingScheduledActionResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsAppAutoscalingScheduledActionResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
 			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
-			if err != nil {
-				assert.EqualError(tt, c.wantErr, err.Error())
-			} else {
-				assert.Equal(tt, err, c.wantErr)
-			}
-
+			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsAppAutoscalingScheduledActionResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
 		})
 	}
 }
