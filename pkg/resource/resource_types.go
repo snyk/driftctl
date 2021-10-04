@@ -83,6 +83,7 @@ var supportedTypes = map[string]struct{}{
 	"azurerm_storage_account":   {},
 	"azurerm_storage_container": {},
 	"azurerm_virtual_network":   {},
+	"azurerm_route_table":       {},
 }
 
 func IsResourceTypeSupported(ty string) bool {
