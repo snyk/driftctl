@@ -111,6 +111,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		middlewares.NewEipAssociationExpander(d.resourceFactory),
 		middlewares.NewRDSClusterInstanceExpander(d.resourceFactory),
 		middlewares.NewGoogleLegacyBucketIAMBindings(),
+		middlewares.NewAzurermSubnetExpander(d.resourceFactory),
 	)
 
 	if !d.opts.StrictMode {
