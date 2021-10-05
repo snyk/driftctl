@@ -61,4 +61,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsCloudformationStackMetaData(resourceSchemaRepository)
 	initAwsVpcMetaData(resourceSchemaRepository)
 	initAwsAppAutoscalingTargetMetaData(resourceSchemaRepository)
+	initAwsAppAutoscalingPolicyMetaData(resourceSchemaRepository)
 }

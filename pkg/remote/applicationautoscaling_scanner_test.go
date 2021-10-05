@@ -129,3 +129,106 @@ func TestAppAutoScalingTarget(t *testing.T) {
 		})
 	}
 }
+
+func TestAppAutoScalingPolicy(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(*repository.MockAppAutoScalingRepository, *mocks.AlerterInterface)
+		wantErr error
+	}{
+		{
+			test:    "should return one policy",
+			dirName: "aws_appautoscaling_policy_single",
+			mocks: func(client *repository.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
+				client.On("ServiceNamespaceValues").Return(applicationautoscaling.ServiceNamespace_Values()).Once()
+
+				client.On("DescribeScalingPolicies", "dynamodb").Return([]*applicationautoscaling.ScalingPolicy{
+					{
+						PolicyName:        awssdk.String("DynamoDBReadCapacityUtilization:table/GameScores"),
+						ResourceId:        awssdk.String("table/GameScores"),
+						ScalableDimension: awssdk.String("dynamodb:table:ReadCapacityUnits"),
+						ServiceNamespace:  awssdk.String("dynamodb"),
+					},
+				}, nil).Once()
+
+				client.On("DescribeScalingPolicies", mock.AnythingOfType("string")).Return([]*applicationautoscaling.ScalingPolicy{}, nil).Times(len(applicationautoscaling.ServiceNamespace_Values()) - 1)
+			},
+			wantErr: nil,
+		},
+		{
+			test:    "should return remote error",
+			dirName: "aws_appautoscaling_policy_single",
+			mocks: func(client *repository.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
+				client.On("ServiceNamespaceValues").Return(applicationautoscaling.ServiceNamespace_Values()).Once()
+
+				client.On("DescribeScalingPolicies", mock.AnythingOfType("string")).Return(nil, errors.New("remote error")).Once()
+			},
+			wantErr: remoteerror.NewResourceListingError(errors.New("remote error"), resourceaws.AwsAppAutoscalingPolicyResourceType),
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockAppAutoScalingRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.AppAutoScalingRepository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewAppAutoScalingRepository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewAppAutoscalingPolicyEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsAppAutoscalingPolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsAppAutoscalingPolicyResourceType, provider, deserializer))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			if err != nil {
+				assert.EqualError(tt, c.wantErr, err.Error())
+			} else {
+				assert.Equal(tt, err, c.wantErr)
+			}
+
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsAppAutoscalingPolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+		})
+	}
+}

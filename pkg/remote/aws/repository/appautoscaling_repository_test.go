@@ -122,3 +122,112 @@ func Test_appautoscalingRepository_DescribeScalableTargets(t *testing.T) {
 		})
 	}
 }
+
+func Test_appautoscalingRepository_DescribeScalingPolicies(t *testing.T) {
+	type args struct {
+		namespace string
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		mocks   func(*awstest.MockFakeApplicationAutoScaling, *cache.MockCache)
+		want    []*applicationautoscaling.ScalingPolicy
+		wantErr error
+	}{
+		{
+			name: "should return remote error",
+			args: args{
+				namespace: "test",
+			},
+			mocks: func(client *awstest.MockFakeApplicationAutoScaling, c *cache.MockCache) {
+				client.On("DescribeScalingPolicies",
+					&applicationautoscaling.DescribeScalingPoliciesInput{
+						ServiceNamespace: aws.String("test"),
+					}).Return(nil, errors.New("remote error")).Once()
+
+				c.On("Get", "appAutoScalingDescribeScalingPolicies_test").Return(nil).Once()
+			},
+			want:    nil,
+			wantErr: errors.New("remote error"),
+		},
+		{
+			name: "should return scaling policies",
+			args: args{
+				namespace: "test",
+			},
+			mocks: func(client *awstest.MockFakeApplicationAutoScaling, c *cache.MockCache) {
+				results := []*applicationautoscaling.ScalingPolicy{
+					{
+						PolicyARN: aws.String("test_policy"),
+					},
+				}
+
+				client.On("DescribeScalingPolicies",
+					&applicationautoscaling.DescribeScalingPoliciesInput{
+						ServiceNamespace: aws.String("test"),
+					}).Return(&applicationautoscaling.DescribeScalingPoliciesOutput{
+					ScalingPolicies: results,
+				}, nil).Once()
+
+				c.On("Get", "appAutoScalingDescribeScalingPolicies_test").Return(nil).Once()
+				c.On("Put", "appAutoScalingDescribeScalingPolicies_test", results).Return(true).Once()
+			},
+			want: []*applicationautoscaling.ScalingPolicy{
+				{
+					PolicyARN: aws.String("test_policy"),
+				},
+			},
+		},
+		{
+			name: "should hit cache return scaling policies",
+			args: args{
+				namespace: "test",
+			},
+			mocks: func(client *awstest.MockFakeApplicationAutoScaling, c *cache.MockCache) {
+				results := []*applicationautoscaling.ScalingPolicy{
+					{
+						PolicyARN: aws.String("test_policy"),
+					},
+				}
+
+				c.On("Get", "appAutoScalingDescribeScalingPolicies_test").Return(results).Once()
+			},
+			want: []*applicationautoscaling.ScalingPolicy{
+				{
+					PolicyARN: aws.String("test_policy"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := &cache.MockCache{}
+			client := &awstest.MockFakeApplicationAutoScaling{}
+			tt.mocks(client, store)
+
+			r := &appAutoScalingRepository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.DescribeScalingPolicies(tt.args.namespace)
+			if err != nil {
+				assert.EqualError(t, tt.wantErr, err.Error())
+			} else {
+				assert.Equal(t, tt.wantErr, err)
+			}
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+
+			client.AssertExpectations(t)
+			store.AssertExpectations(t)
+		})
+	}
+}

@@ -1,0 +1,29 @@
+[
+ {
+  "Id": "DynamoDBReadCapacityUtilization:table/GameScores",
+  "Type": "aws_appautoscaling_policy",
+  "Attrs": {
+   "arn": "arn:aws:autoscaling:us-east-1:533948124879:scalingPolicy:081dd219-093d-4a1d-8207-423db1d49bd9:resource/dynamodb/table/GameScores:policyName/DynamoDBReadCapacityUtilization:table/GameScores",
+   "id": "DynamoDBReadCapacityUtilization:table/GameScores",
+   "name": "DynamoDBReadCapacityUtilization:table/GameScores",
+   "policy_type": "TargetTrackingScaling",
+   "resource_id": "table/GameScores",
+   "scalable_dimension": "dynamodb:table:ReadCapacityUnits",
+   "service_namespace": "dynamodb",
+   "target_tracking_scaling_policy_configuration": [
+    {
+     "disable_scale_in": false,
+     "predefined_metric_specification": [
+      {
+       "predefined_metric_type": "DynamoDBReadCapacityUtilization",
+       "resource_label": ""
+      }
+     ],
+     "scale_in_cooldown": 0,
+     "scale_out_cooldown": 0,
+     "target_value": 70
+    }
+   ]
+  }
+ }
+]
