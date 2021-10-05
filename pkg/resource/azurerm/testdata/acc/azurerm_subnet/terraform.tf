@@ -12,7 +12,7 @@ provider "azurerm" {
 }
 
 data "azurerm_resource_group" "qa1" {
-    name = "elie-dev"
+    name = "driftctl-qa-1"
 }
 
 resource "azurerm_virtual_network" "test" {
