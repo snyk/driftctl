@@ -43,14 +43,18 @@ func Init(
 
 	storageAccountRepo := repository.NewStorageRepository(con, providerConfig, c)
 	networkRepo := repository.NewNetworkRepository(con, providerConfig, c)
+	resourcesRepo := repository.NewResourcesRepository(con, providerConfig, c)
 
 	providerLibrary.AddProvider(terraform.AZURE, provider)
 
 	remoteLibrary.AddEnumerator(NewAzurermStorageAccountEnumerator(storageAccountRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermStorageContainerEnumerator(storageAccountRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermVirtualNetworkEnumerator(networkRepo, factory))
+	remoteLibrary.AddEnumerator(NewAzurermRouteTableEnumerator(networkRepo, factory))
+	remoteLibrary.AddEnumerator(NewAzurermResourceGroupEnumerator(resourcesRepo, factory))
+	remoteLibrary.AddEnumerator(NewAzurermSubnetEnumerator(networkRepo, factory))
 
-	err = resourceSchemaRepository.Init(terraform.AZURE, version, provider.Schema())
+	err = resourceSchemaRepository.Init(terraform.AZURE, provider.Version(), provider.Schema())
 	if err != nil {
 		return err
 	}

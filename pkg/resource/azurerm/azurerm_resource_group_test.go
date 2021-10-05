@@ -1,4 +1,4 @@
-package google_test
+package azurerm_test
 
 import (
 	"testing"
@@ -7,15 +7,14 @@ import (
 	"github.com/cloudskiff/driftctl/test/acceptance"
 )
 
-func TestAcc_Google_ComputeFirewall(t *testing.T) {
+func TestAcc_Azure_ResourceGroup(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
-		Paths:            []string{"./testdata/acc/google_compute_firewall"},
+		Paths:            []string{"./testdata/acc/azurerm_resource_group"},
 		Args: []string{
 			"scan",
-			"--to", "gcp+tf",
-			"--filter", "Type=='google_compute_firewall'",
-			"--deep",
+			"--to", "azure+tf",
+			"--filter", "Type=='azurerm_resource_group' && contains(Id, 'acc-test-res-group-')",
 		},
 		Checks: []acceptance.AccCheck{
 			{
@@ -24,7 +23,7 @@ func TestAcc_Google_ComputeFirewall(t *testing.T) {
 						t.Fatal(err)
 					}
 					result.AssertInfrastructureIsInSync()
-					result.AssertManagedCount(3)
+					result.AssertManagedCount(2)
 				},
 			},
 		},
