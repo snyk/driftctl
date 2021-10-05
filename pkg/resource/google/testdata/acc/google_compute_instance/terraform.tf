@@ -9,6 +9,10 @@ terraform {
     }
 }
 
+resource "google_compute_network" "driftctl-unittest-instance" {
+    name    = "driftctl-unittest-instance"
+}
+
 resource "google_compute_instance" "default" {
     name         = "test"
     machine_type = "e2-medium"
@@ -21,6 +25,6 @@ resource "google_compute_instance" "default" {
     }
 
     network_interface {
-        network = "default"
+        network = google_compute_network.driftctl-unittest-instance.name
     }
 }

@@ -23,9 +23,8 @@ func TestAcc_Google_ComputeFirewall(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
+					result.AssertInfrastructureIsInSync()
 					result.AssertManagedCount(3)
-					result.AssertDriftCountTotal(0)
-					result.AssertUnmanagedCount(4) // Default VPCs
 				},
 			},
 		},
