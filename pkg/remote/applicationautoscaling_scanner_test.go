@@ -232,3 +232,95 @@ func TestAppAutoScalingPolicy(t *testing.T) {
 		})
 	}
 }
+
+func TestAppAutoScalingScheduledAction(t *testing.T) {
+	dummyError := errors.New("this is an error")
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockAppAutoScalingRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "should return one scheduled action",
+			mocks: func(client *repository.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
+				matchServiceNamespaceFunc := func(ns string) bool {
+					for _, n := range applicationautoscaling.ServiceNamespace_Values() {
+						if n == ns {
+							return true
+						}
+					}
+					return false
+				}
+
+				client.On("ServiceNamespaceValues").Return(applicationautoscaling.ServiceNamespace_Values()).Once()
+
+				client.On("DescribeScheduledActions", mock.MatchedBy(matchServiceNamespaceFunc)).Return([]*applicationautoscaling.ScheduledAction{
+					{
+						ScheduledActionName: awssdk.String("action"),
+						ResourceId:          awssdk.String("table/GameScores"),
+						ScalableDimension:   awssdk.String("dynamodb:table:ReadCapacityUnits"),
+						ServiceNamespace:    awssdk.String("dynamodb"),
+					},
+				}, nil).Once()
+
+				client.On("DescribeScheduledActions", mock.MatchedBy(matchServiceNamespaceFunc)).Return([]*applicationautoscaling.ScheduledAction{}, nil).Times(len(applicationautoscaling.ServiceNamespace_Values()) - 1)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+				assert.Equal(t, "action-dynamodb-table/GameScores", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsAppAutoscalingScheduledActionResourceType, got[0].ResourceType())
+			},
+			wantErr: nil,
+		},
+		{
+			test: "should return remote error",
+			mocks: func(client *repository.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
+				client.On("ServiceNamespaceValues").Return(applicationautoscaling.ServiceNamespace_Values()).Once()
+
+				client.On("DescribeScheduledActions", mock.AnythingOfType("string")).Return(nil, dummyError).Once()
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+			wantErr: remoteerror.NewResourceListingError(dummyError, resourceaws.AwsAppAutoscalingScheduledActionResourceType),
+		},
+	}
+
+	providerVersion := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockAppAutoScalingRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.AppAutoScalingRepository = fakeRepo
+
+			remoteLibrary.AddEnumerator(aws.NewAppAutoscalingScheduledActionEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+		})
+	}
+}

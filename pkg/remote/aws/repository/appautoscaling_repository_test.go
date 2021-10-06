@@ -231,3 +231,112 @@ func Test_appautoscalingRepository_DescribeScalingPolicies(t *testing.T) {
 		})
 	}
 }
+
+func Test_appautoscalingRepository_DescribeScheduledActions(t *testing.T) {
+	type args struct {
+		namespace string
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		mocks   func(*awstest.MockFakeApplicationAutoScaling, *cache.MockCache)
+		want    []*applicationautoscaling.ScheduledAction
+		wantErr error
+	}{
+		{
+			name: "should return remote error",
+			args: args{
+				namespace: "test",
+			},
+			mocks: func(client *awstest.MockFakeApplicationAutoScaling, c *cache.MockCache) {
+				client.On("DescribeScheduledActions",
+					&applicationautoscaling.DescribeScheduledActionsInput{
+						ServiceNamespace: aws.String("test"),
+					}).Return(nil, errors.New("remote error")).Once()
+
+				c.On("Get", "appAutoScalingDescribeScheduledActions_test").Return(nil).Once()
+			},
+			want:    nil,
+			wantErr: errors.New("remote error"),
+		},
+		{
+			name: "should return scheduled actions",
+			args: args{
+				namespace: "test",
+			},
+			mocks: func(client *awstest.MockFakeApplicationAutoScaling, c *cache.MockCache) {
+				results := []*applicationautoscaling.ScheduledAction{
+					{
+						ResourceId: aws.String("test"),
+					},
+				}
+
+				client.On("DescribeScheduledActions",
+					&applicationautoscaling.DescribeScheduledActionsInput{
+						ServiceNamespace: aws.String("test"),
+					}).Return(&applicationautoscaling.DescribeScheduledActionsOutput{
+					ScheduledActions: results,
+				}, nil).Once()
+
+				c.On("Get", "appAutoScalingDescribeScheduledActions_test").Return(nil).Once()
+				c.On("Put", "appAutoScalingDescribeScheduledActions_test", results).Return(true).Once()
+			},
+			want: []*applicationautoscaling.ScheduledAction{
+				{
+					ResourceId: aws.String("test"),
+				},
+			},
+		},
+		{
+			name: "should hit cache return scheduled actions",
+			args: args{
+				namespace: "test",
+			},
+			mocks: func(client *awstest.MockFakeApplicationAutoScaling, c *cache.MockCache) {
+				results := []*applicationautoscaling.ScheduledAction{
+					{
+						ResourceId: aws.String("test"),
+					},
+				}
+
+				c.On("Get", "appAutoScalingDescribeScheduledActions_test").Return(results).Once()
+			},
+			want: []*applicationautoscaling.ScheduledAction{
+				{
+					ResourceId: aws.String("test"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := &cache.MockCache{}
+			client := &awstest.MockFakeApplicationAutoScaling{}
+			tt.mocks(client, store)
+
+			r := &appAutoScalingRepository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.DescribeScheduledActions(tt.args.namespace)
+			if err != nil {
+				assert.EqualError(t, tt.wantErr, err.Error())
+			} else {
+				assert.Equal(t, tt.wantErr, err)
+			}
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+
+			client.AssertExpectations(t)
+			store.AssertExpectations(t)
+		})
+	}
+}

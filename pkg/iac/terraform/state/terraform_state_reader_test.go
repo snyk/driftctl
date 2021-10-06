@@ -160,6 +160,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "network acl rule", dirName: "aws_network_acl_rule", wantErr: false},
 		{name: "default network acl", dirName: "aws_default_network_acl", wantErr: false},
 		{name: "App autoscaling policy", dirName: "aws_appautoscaling_policy", wantErr: false},
+		{name: "App autoscaling scheduled action", dirName: "aws_appautoscaling_scheduled_action", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
