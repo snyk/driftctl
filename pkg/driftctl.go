@@ -113,7 +113,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 
 		middlewares.NewGoogleStorageBucketIAMBindingTransformer(d.resourceFactory),
 		middlewares.NewGoogleStorageBucketIAMPolicyTransformer(d.resourceFactory),
-		middlewares.NewGoogleLegacyBucketIAMBindings(),
+		middlewares.NewGoogleLegacyBucketIAMMember(),
 
 		middlewares.NewAzurermSubnetExpander(d.resourceFactory),
 		middlewares.NewAwsApiGatewayDeploymentExpander(d.resourceFactory),

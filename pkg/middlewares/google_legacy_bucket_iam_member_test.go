@@ -10,7 +10,7 @@ import (
 	"github.com/r3labs/diff/v2"
 )
 
-func TestGoogleLegacyBucketIAMBindings_Execute(t *testing.T) {
+func TestGoogleLegacyBucketIAMMember_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
 		remoteResources    []*resource.Resource
@@ -120,7 +120,7 @@ func TestGoogleLegacyBucketIAMBindings_Execute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := NewGoogleLegacyBucketIAMBindings()
+			m := NewGoogleLegacyBucketIAMMember()
 			err := m.Execute(&tt.remoteResources, &tt.resourcesFromState)
 			if err != nil {
 				t.Fatal(err)
