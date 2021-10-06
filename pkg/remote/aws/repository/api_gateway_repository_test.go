@@ -419,3 +419,73 @@ func Test_apigatewayRepository_ListAllRestApiResources(t *testing.T) {
 		})
 	}
 }
+
+func Test_apigatewayRepository_ListAllDomainNames(t *testing.T) {
+	domainNames := []*apigateway.DomainName{
+		{DomainName: aws.String("domainName1")},
+		{DomainName: aws.String("domainName2")},
+		{DomainName: aws.String("domainName3")},
+		{DomainName: aws.String("domainName4")},
+		{DomainName: aws.String("domainName5")},
+		{DomainName: aws.String("domainName6")},
+	}
+
+	tests := []struct {
+		name    string
+		mocks   func(client *awstest.MockFakeApiGateway, store *cache.MockCache)
+		want    []*apigateway.DomainName
+		wantErr error
+	}{
+		{
+			name: "list multiple domain names",
+			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
+				client.On("GetDomainNamesPages",
+					&apigateway.GetDomainNamesInput{},
+					mock.MatchedBy(func(callback func(res *apigateway.GetDomainNamesOutput, lastPage bool) bool) bool {
+						callback(&apigateway.GetDomainNamesOutput{
+							Items: domainNames[:3],
+						}, false)
+						callback(&apigateway.GetDomainNamesOutput{
+							Items: domainNames[3:],
+						}, true)
+						return true
+					})).Return(nil).Once()
+
+				store.On("Get", "apigatewayListAllDomainNames").Return(nil).Times(1)
+				store.On("Put", "apigatewayListAllDomainNames", domainNames).Return(false).Times(1)
+			},
+			want: domainNames,
+		},
+		{
+			name: "should hit cache",
+			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
+				store.On("Get", "apigatewayListAllDomainNames").Return(domainNames).Times(1)
+			},
+			want: domainNames,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := &cache.MockCache{}
+			client := &awstest.MockFakeApiGateway{}
+			tt.mocks(client, store)
+			r := &apigatewayRepository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.ListAllDomainNames()
+			assert.Equal(t, tt.wantErr, err)
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+			store.AssertExpectations(t)
+			client.AssertExpectations(t)
+		})
+	}
+}

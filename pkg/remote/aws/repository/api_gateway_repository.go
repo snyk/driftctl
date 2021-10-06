@@ -16,6 +16,7 @@ type ApiGatewayRepository interface {
 	ListAllRestApiAuthorizers([]*apigateway.RestApi) ([]*apigateway.Authorizer, error)
 	ListAllRestApiStages(string) ([]*apigateway.Stage, error)
 	ListAllRestApiResources(string) ([]*apigateway.Resource, error)
+	ListAllDomainNames() ([]*apigateway.DomainName, error)
 }
 
 type apigatewayRepository struct {
@@ -148,4 +149,25 @@ func (r *apigatewayRepository) ListAllRestApiResources(apiId string) ([]*apigate
 
 	r.cache.Put(cacheKey, resources)
 	return resources, nil
+}
+
+func (r *apigatewayRepository) ListAllDomainNames() ([]*apigateway.DomainName, error) {
+	if v := r.cache.Get("apigatewayListAllDomainNames"); v != nil {
+		return v.([]*apigateway.DomainName), nil
+	}
+
+	var domainNames []*apigateway.DomainName
+	input := apigateway.GetDomainNamesInput{}
+	err := r.client.GetDomainNamesPages(&input,
+		func(resp *apigateway.GetDomainNamesOutput, lastPage bool) bool {
+			domainNames = append(domainNames, resp.Items...)
+			return !lastPage
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put("apigatewayListAllDomainNames", domainNames)
+	return domainNames, nil
 }
