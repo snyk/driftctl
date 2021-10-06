@@ -12,7 +12,7 @@ provider "azurerm" {
 }
 
 data "azurerm_resource_group" "qa1" {
-    name = "raphael-dev"
+    name = "driftctl-qa-1"
 }
 
 resource "azurerm_container_registry" "acr" {

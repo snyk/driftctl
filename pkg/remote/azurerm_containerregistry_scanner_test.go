@@ -52,14 +52,12 @@ func TestAzurermContainerRegistry(t *testing.T) {
 				repository.On("ListAllContainerRegistries").Return([]*armcontainerregistry.Registry{
 					{
 						Resource: armcontainerregistry.Resource{
-							ID:   to.StringPtr("registry1"),
-							Name: to.StringPtr("registry1"),
+							ID: to.StringPtr("registry1"),
 						},
 					},
 					{
 						Resource: armcontainerregistry.Resource{
-							ID:   to.StringPtr("registry2"),
-							Name: to.StringPtr("registry2"),
+							ID: to.StringPtr("registry2"),
 						},
 					},
 				}, nil)
