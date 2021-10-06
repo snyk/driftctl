@@ -1,0 +1,40 @@
+[
+ {
+  "Id": "ags-3of73v5ob4-baz",
+  "Type": "aws_api_gateway_stage",
+  "Attrs": {
+   "arn": "arn:aws:apigateway:us-east-1::/restapis/3of73v5ob4/stages/baz",
+   "cache_cluster_enabled": false,
+   "cache_cluster_size": "",
+   "client_certificate_id": "",
+   "deployment_id": "i5bl4e",
+   "description": "",
+   "documentation_version": "",
+   "execution_arn": "arn:aws:execute-api:us-east-1:047081014315:3of73v5ob4/baz",
+   "id": "ags-3of73v5ob4-baz",
+   "invoke_url": "https://3of73v5ob4.execute-api.us-east-1.amazonaws.com/baz",
+   "rest_api_id": "3of73v5ob4",
+   "stage_name": "baz",
+   "xray_tracing_enabled": false
+  }
+ },
+ {
+  "Id": "ags-3of73v5ob4-foo",
+  "Type": "aws_api_gateway_stage",
+  "Attrs": {
+   "arn": "arn:aws:apigateway:us-east-1::/restapis/3of73v5ob4/stages/foo",
+   "cache_cluster_enabled": false,
+   "cache_cluster_size": "",
+   "client_certificate_id": "",
+   "deployment_id": "i5bl4e",
+   "description": "",
+   "documentation_version": "",
+   "execution_arn": "arn:aws:execute-api:us-east-1:047081014315:3of73v5ob4/foo",
+   "id": "ags-3of73v5ob4-foo",
+   "invoke_url": "https://3of73v5ob4.execute-api.us-east-1.amazonaws.com/foo",
+   "rest_api_id": "3of73v5ob4",
+   "stage_name": "foo",
+   "xray_tracing_enabled": false
+  }
+ }
+]
