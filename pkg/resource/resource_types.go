@@ -84,12 +84,13 @@ var supportedTypes = map[string]struct{}{
 	"google_compute_network":            {},
 	"google_storage_bucket_iam_binding": {},
 
-	"azurerm_storage_account":   {},
-	"azurerm_storage_container": {},
-	"azurerm_virtual_network":   {},
-	"azurerm_route_table":       {},
-	"azurerm_resource_group":    {},
-	"azurerm_subnet":            {},
+	"azurerm_storage_account":    {},
+	"azurerm_storage_container":  {},
+	"azurerm_virtual_network":    {},
+	"azurerm_route_table":        {},
+	"azurerm_resource_group":     {},
+	"azurerm_subnet":             {},
+	"azurerm_container_registry": {},
 }
 
 func IsResourceTypeSupported(ty string) bool {

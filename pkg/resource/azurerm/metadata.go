@@ -6,4 +6,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAzureVirtualNetworkMetaData(resourceSchemaRepository)
 	initAzureRouteTableMetaData(resourceSchemaRepository)
 	initAzureResourceGroupMetadata(resourceSchemaRepository)
+	initAzureContainerRegistryMetadata(resourceSchemaRepository)
 }
