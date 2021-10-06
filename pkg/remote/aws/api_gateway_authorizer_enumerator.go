@@ -29,22 +29,27 @@ func (e *ApiGatewayAuthorizerEnumerator) Enumerate() ([]*resource.Resource, erro
 		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), aws.AwsApiGatewayRestApiResourceType)
 	}
 
-	authorizers, err := e.repository.ListAllRestApiAuthorizers(apis)
-	if err != nil {
-		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
-	}
+	results := make([]*resource.Resource, 0)
 
-	results := make([]*resource.Resource, len(authorizers))
+	for _, api := range apis {
+		a := api
+		authorizers, err := e.repository.ListAllRestApiAuthorizers(*a.Id)
+		if err != nil {
+			return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
+		}
 
-	for _, authorizer := range authorizers {
-		results = append(
-			results,
-			e.factory.CreateAbstractResource(
-				string(e.SupportedType()),
-				*authorizer.Id,
-				map[string]interface{}{},
-			),
-		)
+		for _, authorizer := range authorizers {
+			au := authorizer
+			results = append(
+				results,
+				e.factory.CreateAbstractResource(
+					string(e.SupportedType()),
+					*au.Id,
+					map[string]interface{}{},
+				),
+			)
+		}
+
 	}
 
 	return results, err

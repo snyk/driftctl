@@ -281,7 +281,8 @@ func TestApiGatewayAuthorizer(t *testing.T) {
 			test: "no api gateway authorizers",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
-				repo.On("ListAllRestApiAuthorizers", apis).Return([]*apigateway.Authorizer{}, nil)
+				repo.On("ListAllRestApiAuthorizers", *apis[0].Id).Return([]*apigateway.Authorizer{}, nil).Once()
+				repo.On("ListAllRestApiAuthorizers", *apis[1].Id).Return([]*apigateway.Authorizer{}, nil).Once()
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
 				assert.Len(t, got, 0)
@@ -291,10 +292,12 @@ func TestApiGatewayAuthorizer(t *testing.T) {
 			test: "multiple api gateway authorizers",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
-				repo.On("ListAllRestApiAuthorizers", apis).Return([]*apigateway.Authorizer{
+				repo.On("ListAllRestApiAuthorizers", *apis[0].Id).Return([]*apigateway.Authorizer{
 					{Id: awssdk.String("ypcpde")},
+				}, nil).Once()
+				repo.On("ListAllRestApiAuthorizers", *apis[1].Id).Return([]*apigateway.Authorizer{
 					{Id: awssdk.String("bwhebj")},
-				}, nil)
+				}, nil).Once()
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
 				assert.Len(t, got, 2)
@@ -318,7 +321,7 @@ func TestApiGatewayAuthorizer(t *testing.T) {
 			test: "cannot list api gateway resources",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
-				repo.On("ListAllRestApiAuthorizers", apis).Return(nil, dummyError)
+				repo.On("ListAllRestApiAuthorizers", *apis[0].Id).Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayAuthorizerResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayAuthorizerResourceType, resourceaws.AwsApiGatewayAuthorizerResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayAuthorizerResourceType),

@@ -59,11 +59,11 @@ func (_m *MockApiGatewayRepository) ListAllApiKeys() ([]*apigateway.ApiKey, erro
 }
 
 // ListAllRestApiAuthorizers provides a mock function with given fields: _a0
-func (_m *MockApiGatewayRepository) ListAllRestApiAuthorizers(_a0 []*apigateway.RestApi) ([]*apigateway.Authorizer, error) {
+func (_m *MockApiGatewayRepository) ListAllRestApiAuthorizers(_a0 string) ([]*apigateway.Authorizer, error) {
 	ret := _m.Called(_a0)
 
 	var r0 []*apigateway.Authorizer
-	if rf, ok := ret.Get(0).(func([]*apigateway.RestApi) []*apigateway.Authorizer); ok {
+	if rf, ok := ret.Get(0).(func(string) []*apigateway.Authorizer); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
@@ -72,7 +72,7 @@ func (_m *MockApiGatewayRepository) ListAllRestApiAuthorizers(_a0 []*apigateway.
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func([]*apigateway.RestApi) error); ok {
+	if rf, ok := ret.Get(1).(func(string) error); ok {
 		r1 = rf(_a0)
 	} else {
 		r1 = ret.Error(1)
