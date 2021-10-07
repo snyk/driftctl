@@ -211,9 +211,8 @@ func Test_apigatewayRepository_ListAllApiKeys(t *testing.T) {
 }
 
 func Test_apigatewayRepository_ListAllRestApiAuthorizers(t *testing.T) {
-	apis := []*apigateway.RestApi{
-		{Id: aws.String("restapi1")},
-		{Id: aws.String("restapi2")},
+	api := &apigateway.RestApi{
+		Id: aws.String("restapi1"),
 	}
 
 	apiAuthorizers := []*apigateway.Authorizer{
@@ -235,25 +234,17 @@ func Test_apigatewayRepository_ListAllRestApiAuthorizers(t *testing.T) {
 				client.On("GetAuthorizers",
 					&apigateway.GetAuthorizersInput{
 						RestApiId: aws.String("restapi1"),
-					}).Return(&apigateway.GetAuthorizersOutput{Items: apiAuthorizers[:2]}, nil).Once()
-
-				client.On("GetAuthorizers",
-					&apigateway.GetAuthorizersInput{
-						RestApiId: aws.String("restapi2"),
-					}).Return(&apigateway.GetAuthorizersOutput{Items: apiAuthorizers[2:]}, nil).Once()
+					}).Return(&apigateway.GetAuthorizersOutput{Items: apiAuthorizers}, nil).Once()
 
 				store.On("Get", "apigatewayListAllRestApiAuthorizers_api_restapi1").Return(nil).Times(1)
-				store.On("Put", "apigatewayListAllRestApiAuthorizers_api_restapi1", apiAuthorizers[:2]).Return(false).Times(1)
-				store.On("Get", "apigatewayListAllRestApiAuthorizers_api_restapi2").Return(nil).Times(1)
-				store.On("Put", "apigatewayListAllRestApiAuthorizers_api_restapi2", apiAuthorizers[2:]).Return(false).Times(1)
+				store.On("Put", "apigatewayListAllRestApiAuthorizers_api_restapi1", apiAuthorizers).Return(false).Times(1)
 			},
 			want: apiAuthorizers,
 		},
 		{
 			name: "should hit cache",
 			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
-				store.On("Get", "apigatewayListAllRestApiAuthorizers_api_restapi1").Return(apiAuthorizers[:2]).Times(1)
-				store.On("Get", "apigatewayListAllRestApiAuthorizers_api_restapi2").Return(apiAuthorizers[2:]).Times(1)
+				store.On("Get", "apigatewayListAllRestApiAuthorizers_api_restapi1").Return(apiAuthorizers).Times(1)
 			},
 			want: apiAuthorizers,
 		},
@@ -267,7 +258,7 @@ func Test_apigatewayRepository_ListAllRestApiAuthorizers(t *testing.T) {
 				client: client,
 				cache:  store,
 			}
-			got, err := r.ListAllRestApiAuthorizers(apis)
+			got, err := r.ListAllRestApiAuthorizers(*api.Id)
 			assert.Equal(t, tt.wantErr, err)
 
 			changelog, err := diff.Diff(got, tt.want)
