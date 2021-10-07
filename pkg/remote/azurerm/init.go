@@ -55,6 +55,7 @@ func Init(
 	remoteLibrary.AddEnumerator(NewAzurermResourceGroupEnumerator(resourcesRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermSubnetEnumerator(networkRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermContainerRegistryEnumerator(containerRegistryRepo, factory))
+	remoteLibrary.AddEnumerator(NewAzurermFirewallsEnumerator(networkRepo, factory))
 
 	err = resourceSchemaRepository.Init(terraform.AZURE, provider.Version(), provider.Schema())
 	if err != nil {
