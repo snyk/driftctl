@@ -1,9 +1,23 @@
 [
  {
+  "Id": "b/dctlgstoragebucketiambinding-1/roles/storage.admin",
+  "Type": "google_storage_bucket_iam_binding",
+  "Attrs": {
+   "bucket": "b/dctlgstoragebucketiambinding-1",
+   "etag": "CAM=",
+   "id": "b/dctlgstoragebucketiambinding-1/roles/storage.admin",
+   "members": [
+    "user:elie.charra@cloudskiff.com"
+   ],
+   "role": "roles/storage.admin"
+  }
+ },
+ {
   "Id": "b/dctlgstoragebucketiambinding-2/roles/storage.admin",
   "Type": "google_storage_bucket_iam_binding",
   "Attrs": {
    "bucket": "b/dctlgstoragebucketiambinding-2",
+   "etag": "CAM=",
    "id": "b/dctlgstoragebucketiambinding-2/roles/storage.admin",
    "members": [
     "user:william.beuil@cloudskiff.com"
@@ -16,6 +30,7 @@
   "Type": "google_storage_bucket_iam_binding",
   "Attrs": {
    "bucket": "b/dctlgstoragebucketiambinding-1",
+   "etag": "CAM=",
    "id": "b/dctlgstoragebucketiambinding-1/roles/storage.objectViewer",
    "members": [
     "user:william.beuil@cloudskiff.com"
@@ -28,23 +43,12 @@
   "Type": "google_storage_bucket_iam_binding",
   "Attrs": {
    "bucket": "b/dctlgstoragebucketiambinding-2",
+   "etag": "CAM=",
    "id": "b/dctlgstoragebucketiambinding-2/roles/storage.objectViewer",
    "members": [
     "user:elie.charra@cloudskiff.com"
    ],
    "role": "roles/storage.objectViewer"
-  }
- },
- {
-  "Id": "b/dctlgstoragebucketiambinding-1/roles/storage.admin",
-  "Type": "google_storage_bucket_iam_binding",
-  "Attrs": {
-   "bucket": "b/dctlgstoragebucketiambinding-1",
-   "id": "b/dctlgstoragebucketiambinding-1/roles/storage.admin",
-   "members": [
-    "user:elie.charra@cloudskiff.com"
-   ],
-   "role": "roles/storage.admin"
   }
  }
 ]

@@ -61,8 +61,8 @@ func Init(version string, alerter *alerter.Alerter,
 
 	remoteLibrary.AddEnumerator(NewGoogleComputeInstanceEnumerator(assetRepository, factory))
 
-	remoteLibrary.AddEnumerator(NewGoogleStorageBucketIamBindingEnumerator(assetRepository, storageRepository, factory))
-	remoteLibrary.AddDetailsFetcher(google.GoogleStorageBucketIamBindingResourceType, common.NewGenericDetailsFetcher(google.GoogleStorageBucketIamBindingResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewGoogleStorageBucketIamMemberEnumerator(assetRepository, storageRepository, factory))
+	remoteLibrary.AddDetailsFetcher(google.GoogleStorageBucketIamMemberResourceType, common.NewGenericDetailsFetcher(google.GoogleStorageBucketIamMemberResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewGoogleComputeNetworkEnumerator(assetRepository, factory))
 	remoteLibrary.AddDetailsFetcher(google.GoogleComputeNetworkResourceType, common.NewGenericDetailsFetcher(google.GoogleComputeNetworkResourceType, provider, deserializer))

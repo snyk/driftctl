@@ -159,7 +159,7 @@ func TestGoogleStorageBucket(t *testing.T) {
 	}
 }
 
-func TestGoogleStorageBucketIAMBinding(t *testing.T) {
+func TestGoogleStorageBucketIAMMember(t *testing.T) {
 
 	cases := []struct {
 		test                  string
@@ -172,7 +172,7 @@ func TestGoogleStorageBucketIAMBinding(t *testing.T) {
 	}{
 		{
 			test:    "no storage buckets",
-			dirName: "google_storage_bucket_empty",
+			dirName: "google_storage_bucket_member_empty",
 			assetRepositoryMock: func(assetRepository *repository.MockAssetRepository) {
 				assetRepository.On("SearchAllBuckets").Return([]*assetpb.ResourceSearchResult{}, nil)
 			},
@@ -180,7 +180,7 @@ func TestGoogleStorageBucketIAMBinding(t *testing.T) {
 		},
 		{
 			test:    "multiples storage buckets, no bindings",
-			dirName: "google_storage_bucket_binding_empty",
+			dirName: "google_storage_bucket_member_empty",
 			assetRepositoryMock: func(assetRepository *repository.MockAssetRepository) {
 				assetRepository.On("SearchAllBuckets").Return([]*assetpb.ResourceSearchResult{
 					{
@@ -201,7 +201,7 @@ func TestGoogleStorageBucketIAMBinding(t *testing.T) {
 		},
 		{
 			test:    "Cannot list bindings",
-			dirName: "google_storage_bucket_binding_listing_error",
+			dirName: "google_storage_bucket_member_listing_error",
 			assetRepositoryMock: func(assetRepository *repository.MockAssetRepository) {
 				assetRepository.On("SearchAllBuckets").Return([]*assetpb.ResourceSearchResult{
 					{
@@ -218,12 +218,12 @@ func TestGoogleStorageBucketIAMBinding(t *testing.T) {
 			setupAlerterMock: func(alerter *mocks.AlerterInterface) {
 				alerter.On(
 					"SendAlert",
-					"google_storage_bucket_iam_binding",
+					"google_storage_bucket_iam_member",
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							errors.New("googleapi: Error 403: driftctl-acc-circle@driftctl-qa-1.iam.gserviceaccount.com does not have storage.buckets.getIamPolicy access to the Google Cloud Storage bucket., forbidden"),
-							"google_storage_bucket_iam_binding",
+							"google_storage_bucket_iam_member",
 						),
 						alerts.EnumerationPhase,
 					),
@@ -233,7 +233,7 @@ func TestGoogleStorageBucketIAMBinding(t *testing.T) {
 		},
 		{
 			test:    "multiples storage buckets, multiple bindings",
-			dirName: "google_storage_bucket_binding_multiple",
+			dirName: "google_storage_bucket_member_listing_multiple",
 			assetRepositoryMock: func(assetRepository *repository.MockAssetRepository) {
 				assetRepository.On("SearchAllBuckets").Return([]*assetpb.ResourceSearchResult{
 					{
@@ -262,7 +262,7 @@ func TestGoogleStorageBucketIAMBinding(t *testing.T) {
 	}
 
 	providerVersion := "3.78.0"
-	resType := resource.ResourceType(googleresource.GoogleStorageBucketIamBindingResourceType)
+	resType := resource.ResourceType(googleresource.GoogleStorageBucketIamMemberResourceType)
 	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
@@ -310,7 +310,7 @@ func TestGoogleStorageBucketIAMBinding(t *testing.T) {
 			provider := terraform2.NewFakeTerraformProvider(realProvider)
 			provider.WithResponse(c.dirName)
 
-			remoteLibrary.AddEnumerator(google.NewGoogleStorageBucketIamBindingEnumerator(assetRepository, storageRepository, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleStorageBucketIamMemberEnumerator(assetRepository, storageRepository, factory))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

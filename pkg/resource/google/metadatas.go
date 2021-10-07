@@ -7,5 +7,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initGoogleComputeFirewallMetadata(resourceSchemaRepository)
 	initGoogleComputeRouterMetadata(resourceSchemaRepository)
 	initGoogleComputeNetworkMetadata(resourceSchemaRepository)
-	initGoogleStorageBucketIamBindingMetadata(resourceSchemaRepository)
+	initGoogleStorageBucketIamBMemberMetadata(resourceSchemaRepository)
 }

@@ -9,25 +9,25 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource/google"
 )
 
-type GoogleStorageBucketIamBindingEnumerator struct {
+type GoogleStorageBucketIamMemberEnumerator struct {
 	repository        repository.AssetRepository
 	storageRepository repository.StorageRepository
 	factory           resource.ResourceFactory
 }
 
-func NewGoogleStorageBucketIamBindingEnumerator(repo repository.AssetRepository, storageRepo repository.StorageRepository, factory resource.ResourceFactory) *GoogleStorageBucketIamBindingEnumerator {
-	return &GoogleStorageBucketIamBindingEnumerator{
+func NewGoogleStorageBucketIamMemberEnumerator(repo repository.AssetRepository, storageRepo repository.StorageRepository, factory resource.ResourceFactory) *GoogleStorageBucketIamMemberEnumerator {
+	return &GoogleStorageBucketIamMemberEnumerator{
 		repository:        repo,
 		storageRepository: storageRepo,
 		factory:           factory,
 	}
 }
 
-func (e *GoogleStorageBucketIamBindingEnumerator) SupportedType() resource.ResourceType {
-	return google.GoogleStorageBucketIamBindingResourceType
+func (e *GoogleStorageBucketIamMemberEnumerator) SupportedType() resource.ResourceType {
+	return google.GoogleStorageBucketIamMemberResourceType
 }
 
-func (e *GoogleStorageBucketIamBindingEnumerator) Enumerate() ([]*resource.Resource, error) {
+func (e *GoogleStorageBucketIamMemberEnumerator) Enumerate() ([]*resource.Resource, error) {
 	resources, err := e.repository.SearchAllBuckets()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), google.GoogleStorageBucketResourceType)
@@ -41,20 +41,22 @@ func (e *GoogleStorageBucketIamBindingEnumerator) Enumerate() ([]*resource.Resou
 			return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 		}
 		for roleName, members := range bindings {
-			id := fmt.Sprintf("b/%s/%s", bucket.DisplayName, roleName)
-			results = append(
-				results,
-				e.factory.CreateAbstractResource(
-					string(e.SupportedType()),
-					id,
-					map[string]interface{}{
-						"id":      id,
-						"bucket":  fmt.Sprintf("b/%s", bucket.DisplayName),
-						"role":    roleName,
-						"members": members,
-					},
-				),
-			)
+			for _, member := range members {
+				id := fmt.Sprintf("b/%s/%s/%s", bucket.DisplayName, roleName, member)
+				results = append(
+					results,
+					e.factory.CreateAbstractResource(
+						string(e.SupportedType()),
+						id,
+						map[string]interface{}{
+							"id":     id,
+							"bucket": fmt.Sprintf("b/%s", bucket.DisplayName),
+							"role":   roleName,
+							"member": member,
+						},
+					),
+				)
+			}
 		}
 	}
 
