@@ -565,3 +565,156 @@ func Test_ListAllSubnets_ErrorOnInvalidNetworkID(t *testing.T) {
 	assert.Equal(t, expectedErr.Error(), err.Error())
 	assert.Nil(t, got)
 }
+
+func Test_ListAllFirewalls_MultiplesResults(t *testing.T) {
+
+	expected := []*armnetwork.AzureFirewall{
+		{
+			Resource: armnetwork.Resource{
+				ID: to.StringPtr("firewall1"),
+			},
+		},
+		{
+			Resource: armnetwork.Resource{
+				ID: to.StringPtr("firewall2"),
+			},
+		},
+		{
+			Resource: armnetwork.Resource{
+				ID: to.StringPtr("firewall3"),
+			},
+		},
+		{
+			Resource: armnetwork.Resource{
+				ID: to.StringPtr("firewall4"),
+			},
+		},
+	}
+
+	fakeClient := &mockFirewallsClient{}
+
+	mockPager := &mockFirewallsListAllPager{}
+	mockPager.On("Err").Return(nil).Times(3)
+	mockPager.On("NextPage", mock.Anything).Return(true).Times(2)
+	mockPager.On("NextPage", mock.Anything).Return(false).Times(1)
+	mockPager.On("PageResponse").Return(armnetwork.AzureFirewallsListAllResponse{
+		AzureFirewallsListAllResult: armnetwork.AzureFirewallsListAllResult{
+			AzureFirewallListResult: armnetwork.AzureFirewallListResult{
+				Value: expected[:2],
+			},
+		},
+	}).Times(1)
+	mockPager.On("PageResponse").Return(armnetwork.AzureFirewallsListAllResponse{
+		AzureFirewallsListAllResult: armnetwork.AzureFirewallsListAllResult{
+			AzureFirewallListResult: armnetwork.AzureFirewallListResult{
+				Value: expected[2:],
+			},
+		},
+	}).Times(1)
+
+	fakeClient.On("ListAll", mock.Anything).Return(mockPager)
+
+	c := &cache.MockCache{}
+	c.On("Get", "ListAllFirewalls").Return(nil).Times(1)
+	c.On("Put", "ListAllFirewalls", expected).Return(true).Times(1)
+	s := &networkRepository{
+		firewallsClient: fakeClient,
+		cache:           c,
+	}
+	got, err := s.ListAllFirewalls()
+	if err != nil {
+		t.Errorf("ListAllFirewalls() error = %v", err)
+		return
+	}
+
+	mockPager.AssertExpectations(t)
+	fakeClient.AssertExpectations(t)
+	c.AssertExpectations(t)
+
+	if !reflect.DeepEqual(got, expected) {
+		t.Errorf("ListAllFirewalls() got = %v, want %v", got, expected)
+	}
+}
+
+func Test_ListAllFirewalls_MultiplesResults_WithCache(t *testing.T) {
+
+	expected := []*armnetwork.AzureFirewall{
+		{
+			Resource: armnetwork.Resource{
+				ID: to.StringPtr("firewall1"),
+			},
+		},
+	}
+
+	fakeClient := &mockFirewallsClient{}
+
+	c := &cache.MockCache{}
+	c.On("Get", "ListAllFirewalls").Return(expected).Times(1)
+	s := &networkRepository{
+		firewallsClient: fakeClient,
+		cache:           c,
+	}
+	got, err := s.ListAllFirewalls()
+	if err != nil {
+		t.Errorf("ListAllFirewalls() error = %v", err)
+		return
+	}
+
+	fakeClient.AssertExpectations(t)
+	c.AssertExpectations(t)
+
+	if !reflect.DeepEqual(got, expected) {
+		t.Errorf("ListAllFirewalls() got = %v, want %v", got, expected)
+	}
+}
+
+func Test_ListAllFirewalls_Error_OnPageResponse(t *testing.T) {
+
+	fakeClient := &mockFirewallsClient{}
+
+	expectedErr := errors.New("unexpected error")
+
+	mockPager := &mockFirewallsListAllPager{}
+	mockPager.On("Err").Return(expectedErr).Times(1)
+	mockPager.On("NextPage", mock.Anything).Return(true).Times(1)
+	mockPager.On("PageResponse").Return(armnetwork.AzureFirewallsListAllResponse{}).Times(1)
+
+	fakeClient.On("ListAll", mock.Anything).Return(mockPager)
+
+	s := &networkRepository{
+		firewallsClient: fakeClient,
+		cache:           cache.New(0),
+	}
+	got, err := s.ListAllFirewalls()
+
+	mockPager.AssertExpectations(t)
+	fakeClient.AssertExpectations(t)
+
+	assert.Equal(t, expectedErr, err)
+	assert.Nil(t, got)
+}
+
+func Test_ListAllFirewalls_Error(t *testing.T) {
+
+	fakeClient := &mockFirewallsClient{}
+
+	expectedErr := errors.New("unexpected error")
+
+	mockPager := &mockFirewallsListAllPager{}
+	mockPager.On("Err").Return(expectedErr).Times(1)
+	mockPager.On("NextPage", mock.Anything).Return(false).Times(1)
+
+	fakeClient.On("ListAll", mock.Anything).Return(mockPager)
+
+	s := &networkRepository{
+		firewallsClient: fakeClient,
+		cache:           cache.New(0),
+	}
+	got, err := s.ListAllFirewalls()
+
+	mockPager.AssertExpectations(t)
+	fakeClient.AssertExpectations(t)
+
+	assert.Equal(t, expectedErr, err)
+	assert.Nil(t, got)
+}
