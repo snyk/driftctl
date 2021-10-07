@@ -96,6 +96,7 @@ var supportedTypes = map[string]struct{}{
 	"azurerm_subnet":             {},
 	"azurerm_container_registry": {},
 	"azurerm_firewall":           {},
+	"azurerm_postgresql_server":  {},
 }
 
 func IsResourceTypeSupported(ty string) bool {

@@ -62,6 +62,8 @@ github.com/Azure/azure-sdk-for-go/sdk/internal v0.7.0 h1:v9p9TfTbf7AwNb5NYQt7hI4
 github.com/Azure/azure-sdk-for-go/sdk/internal v0.7.0/go.mod h1:yqy467j36fJxcRV2TzfVZ1pCb5vxm4BtZPUdYWe/Xo8=
 github.com/Azure/azure-sdk-for-go/sdk/network/armnetwork v0.3.0 h1:3ICM5L/XRaknp4DUNqdcNtiOzs6Mc3VKeyQp81+JS2Y=
 github.com/Azure/azure-sdk-for-go/sdk/network/armnetwork v0.3.0/go.mod h1:YSO+0IW+22kuLybFl2GAYaTDh1VWxNid83hqY/DkpGQ=
+github.com/Azure/azure-sdk-for-go/sdk/postgresql/armpostgresql v0.2.0 h1:EZ1NQo84rR8CmjynKcKXdTsRa1Th+Lc1HGn91eiSvOg=
+github.com/Azure/azure-sdk-for-go/sdk/postgresql/armpostgresql v0.2.0/go.mod h1:sbAG2tkFoaiR112qwra1mWRtY82eu+5R1fq2/tylwmE=
 github.com/Azure/azure-sdk-for-go/sdk/resources/armresources v0.3.0 h1:I1cONUC2nKiGU3JXm2jRB4+QIs06lGqkplVpwy4ie9o=
 github.com/Azure/azure-sdk-for-go/sdk/resources/armresources v0.3.0/go.mod h1:LdmyxRi5+2XPnbuv0X9c6ymGle+UkoNvqsBvG+oG53M=
 github.com/Azure/azure-sdk-for-go/sdk/storage/armstorage v0.2.0 h1:LOq4ZG6rMgTAZTyGbYHyxL1EVfZdngpUDRY/KvBToMs=

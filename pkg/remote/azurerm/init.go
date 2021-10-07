@@ -45,6 +45,7 @@ func Init(
 	networkRepo := repository.NewNetworkRepository(con, providerConfig, c)
 	resourcesRepo := repository.NewResourcesRepository(con, providerConfig, c)
 	containerRegistryRepo := repository.NewContainerRegistryRepository(con, providerConfig, c)
+	postgresqlRepo := repository.NewPostgresqlRepository(con, providerConfig, c)
 
 	providerLibrary.AddProvider(terraform.AZURE, provider)
 
@@ -56,6 +57,7 @@ func Init(
 	remoteLibrary.AddEnumerator(NewAzurermSubnetEnumerator(networkRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermContainerRegistryEnumerator(containerRegistryRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermFirewallsEnumerator(networkRepo, factory))
+	remoteLibrary.AddEnumerator(NewAzurermPostgresqlServerEnumerator(postgresqlRepo, factory))
 
 	err = resourceSchemaRepository.Init(terraform.AZURE, provider.Version(), provider.Schema())
 	if err != nil {
