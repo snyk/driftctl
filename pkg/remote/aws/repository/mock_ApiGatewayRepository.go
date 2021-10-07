@@ -58,6 +58,29 @@ func (_m *MockApiGatewayRepository) ListAllApiKeys() ([]*apigateway.ApiKey, erro
 	return r0, r1
 }
 
+// ListAllDomainNames provides a mock function with given fields:
+func (_m *MockApiGatewayRepository) ListAllDomainNames() ([]*apigateway.DomainName, error) {
+	ret := _m.Called()
+
+	var r0 []*apigateway.DomainName
+	if rf, ok := ret.Get(0).(func() []*apigateway.DomainName); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*apigateway.DomainName)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListAllRestApiAuthorizers provides a mock function with given fields: _a0
 func (_m *MockApiGatewayRepository) ListAllRestApiAuthorizers(_a0 string) ([]*apigateway.Authorizer, error) {
 	ret := _m.Called(_a0)

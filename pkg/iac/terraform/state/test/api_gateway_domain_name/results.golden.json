@@ -1,0 +1,28 @@
+[
+ {
+  "Id": "example-driftctl.com",
+  "Type": "aws_api_gateway_domain_name",
+  "Attrs": {
+   "arn": "arn:aws:apigateway:us-east-1::/domainnames/example-driftctl.com",
+   "certificate_arn": "",
+   "certificate_name": "",
+   "certificate_upload_date": "2021-10-05T10:12:49Z",
+   "cloudfront_domain_name": "",
+   "cloudfront_zone_id": "Z2FDTNDATAQYW2",
+   "domain_name": "example-driftctl.com",
+   "endpoint_configuration": [
+    {
+     "types": [
+      "REGIONAL"
+     ]
+    }
+   ],
+   "id": "example-driftctl.com",
+   "regional_certificate_arn": "arn:aws:acm:us-east-1:047081014315:certificate/9759296d-8303-4f62-b6f0-f84ed1530047",
+   "regional_certificate_name": "",
+   "regional_domain_name": "d-r6fst05lt4.execute-api.us-east-1.amazonaws.com",
+   "regional_zone_id": "Z1UJRXOUMOOFQ8",
+   "security_policy": "TLS_1_0"
+  }
+ }
+]

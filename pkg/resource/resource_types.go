@@ -67,6 +67,7 @@ var supportedTypes = map[string]struct{}{
 	"aws_api_gateway_deployment":            {},
 	"aws_api_gateway_stage":                 {},
 	"aws_api_gateway_resource":              {},
+	"aws_api_gateway_domain_name":           {},
 	"aws_appautoscaling_target":             {},
 	"aws_rds_cluster_instance":              {},
 	"aws_appautoscaling_policy":             {},
