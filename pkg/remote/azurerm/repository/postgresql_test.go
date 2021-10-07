@@ -98,3 +98,89 @@ func Test_Postgresql_ListAllServers(t *testing.T) {
 		})
 	}
 }
+
+func Test_Postgresql_ListAllDatabases(t *testing.T) {
+	expectedResults := []*armpostgresql.Database{
+		{
+			ProxyResource: armpostgresql.ProxyResource{
+				Resource: armpostgresql.Resource{
+					ID: to.StringPtr("postgresql-db-1"),
+				},
+			},
+		},
+		{
+			ProxyResource: armpostgresql.ProxyResource{
+				Resource: armpostgresql.Resource{
+					ID: to.StringPtr("postgresql-db-2"),
+				},
+			},
+		},
+	}
+
+	testcases := []struct {
+		name     string
+		mocks    func(*mockPostgresqlDatabaseClient, *cache.MockCache)
+		expected []*armpostgresql.Database
+		wantErr  string
+	}{
+		{
+			name: "should return postgres servers",
+			mocks: func(client *mockPostgresqlDatabaseClient, mockCache *cache.MockCache) {
+				client.On("ListByServer", context.Background(), "res-group", "server", &armpostgresql.DatabasesListByServerOptions{}).Return(armpostgresql.DatabasesListByServerResponse{
+					DatabasesListByServerResult: armpostgresql.DatabasesListByServerResult{
+						DatabaseListResult: armpostgresql.DatabaseListResult{
+							Value: expectedResults,
+						},
+					},
+				}, nil).Times(1)
+
+				mockCache.On("Get", "postgresqlListAllDatabases_res-group_server").Return(nil).Times(1)
+				mockCache.On("Put", "postgresqlListAllDatabases_res-group_server", expectedResults).Return(false).Times(1)
+			},
+			expected: expectedResults,
+		},
+		{
+			name: "should hit cache and return postgres servers",
+			mocks: func(client *mockPostgresqlDatabaseClient, mockCache *cache.MockCache) {
+				mockCache.On("Get", "postgresqlListAllDatabases_res-group_server").Return(expectedResults).Times(1)
+			},
+			expected: expectedResults,
+		},
+		{
+			name: "should return remote error",
+			mocks: func(client *mockPostgresqlDatabaseClient, mockCache *cache.MockCache) {
+				mockCache.On("Get", "postgresqlListAllDatabases_res-group_server").Return(nil).Times(1)
+
+				client.On("ListByServer", context.Background(), "res-group", "server", &armpostgresql.DatabasesListByServerOptions{}).Return(armpostgresql.DatabasesListByServerResponse{}, errors.New("remote error")).Times(1)
+			},
+			wantErr: "remote error",
+		},
+	}
+
+	for _, tt := range testcases {
+		t.Run(tt.name, func(t *testing.T) {
+			fakeClient := &mockPostgresqlDatabaseClient{}
+			mockCache := &cache.MockCache{}
+
+			tt.mocks(fakeClient, mockCache)
+
+			s := &postgresqlRepository{
+				databaseClient: fakeClient,
+				cache:          mockCache,
+			}
+			got, err := s.ListAllDatabasesByServer("res-group", "server")
+			if tt.wantErr != "" {
+				assert.EqualError(t, err, tt.wantErr)
+			} else {
+				assert.Nil(t, err)
+			}
+
+			fakeClient.AssertExpectations(t)
+			mockCache.AssertExpectations(t)
+
+			if !reflect.DeepEqual(got, tt.expected) {
+				t.Errorf("ListAllResourceGroups() got = %v, want %v", got, tt.expected)
+			}
+		})
+	}
+}
