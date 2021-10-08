@@ -2,7 +2,6 @@ package repository
 
 import (
 	"reflect"
-	"sync"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
@@ -100,12 +99,12 @@ func Test_ListAllStorageAccount_MultiplesResults(t *testing.T) {
 	fakeClient.On("List", mock.Anything).Return(mockPager)
 
 	c := &cache.MockCache{}
-	c.On("Get", "ListAllStorageAccount").Return(nil).Times(1)
+	c.On("GetAndLock", "ListAllStorageAccount").Return(nil).Times(1)
+	c.On("Unlock", "ListAllStorageAccount").Times(1)
 	c.On("Put", "ListAllStorageAccount", expected).Return(true).Times(1)
 	s := &storageRepository{
-		listAllStorageAccountLock: &sync.Mutex{},
-		storageAccountsClient:     fakeClient,
-		cache:                     c,
+		storageAccountsClient: fakeClient,
+		cache:                 c,
 	}
 	got, err := s.ListAllStorageAccount()
 	if err != nil {
@@ -137,11 +136,11 @@ func Test_ListAllStorageAccount_MultiplesResults_WithCache(t *testing.T) {
 	fakeClient := &mockStorageAccountClient{}
 
 	c := &cache.MockCache{}
-	c.On("Get", "ListAllStorageAccount").Return(expected).Times(1)
+	c.On("GetAndLock", "ListAllStorageAccount").Return(expected).Times(1)
+	c.On("Unlock", "ListAllStorageAccount").Times(1)
 	s := &storageRepository{
-		listAllStorageAccountLock: &sync.Mutex{},
-		storageAccountsClient:     fakeClient,
-		cache:                     c,
+		storageAccountsClient: fakeClient,
+		cache:                 c,
 	}
 	got, err := s.ListAllStorageAccount()
 	if err != nil {
@@ -171,9 +170,8 @@ func Test_ListAllStorageAccount_Error(t *testing.T) {
 	fakeClient.On("List", mock.Anything).Return(mockPager)
 
 	s := &storageRepository{
-		listAllStorageAccountLock: &sync.Mutex{},
-		storageAccountsClient:     fakeClient,
-		cache:                     cache.New(0),
+		storageAccountsClient: fakeClient,
+		cache:                 cache.New(0),
 	}
 	got, err := s.ListAllStorageAccount()
 
@@ -264,9 +262,8 @@ func Test_ListAllStorageContainer_MultiplesResults(t *testing.T) {
 	c.On("Get", "ListAllStorageContainer_testeliedriftctl").Return(nil).Times(1)
 	c.On("Put", "ListAllStorageContainer_testeliedriftctl", expected).Return(true).Times(1)
 	s := &storageRepository{
-		listAllStorageAccountLock: &sync.Mutex{},
-		blobContainerClient:       fakeClient,
-		cache:                     c,
+		blobContainerClient: fakeClient,
+		cache:               c,
 	}
 	got, err := s.ListAllStorageContainer(&account)
 	if err != nil {
@@ -301,9 +298,8 @@ func Test_ListAllStorageContainer_MultiplesResults_WithCache(t *testing.T) {
 	c := &cache.MockCache{}
 	c.On("Get", "ListAllStorageContainer_testeliedriftctl").Return(expected).Times(1)
 	s := &storageRepository{
-		listAllStorageAccountLock: &sync.Mutex{},
-		blobContainerClient:       fakeClient,
-		cache:                     c,
+		blobContainerClient: fakeClient,
+		cache:               c,
 	}
 	got, err := s.ListAllStorageContainer(&account)
 	if err != nil {
@@ -331,9 +327,8 @@ func Test_ListAllStorageContainer_InvalidStorageAccountResourceID(t *testing.T) 
 	fakeClient := &mockBlobContainerClient{}
 
 	s := &storageRepository{
-		listAllStorageAccountLock: &sync.Mutex{},
-		blobContainerClient:       fakeClient,
-		cache:                     cache.New(0),
+		blobContainerClient: fakeClient,
+		cache:               cache.New(0),
 	}
 	got, err := s.ListAllStorageContainer(&account)
 
@@ -365,9 +360,8 @@ func Test_ListAllStorageContainer_Error(t *testing.T) {
 	fakeClient.On("List", "foobar", "testeliedriftctl", (*armstorage.BlobContainersListOptions)(nil)).Return(mockPager)
 
 	s := &storageRepository{
-		listAllStorageAccountLock: &sync.Mutex{},
-		blobContainerClient:       fakeClient,
-		cache:                     cache.New(0),
+		blobContainerClient: fakeClient,
+		cache:               cache.New(0),
 	}
 	got, err := s.ListAllStorageContainer(&account)
 

@@ -8,14 +8,17 @@ import (
 type Cache interface {
 	Put(string, interface{}) bool
 	Get(string) interface{}
+	GetAndLock(string) interface{}
+	Unlock(string)
 	Len() int
 }
 
 type LRUCache struct {
-	cap int
-	mu  *sync.Mutex
-	l   *list.List
-	m   map[string]*list.Element
+	cap     int
+	mu      *sync.Mutex
+	l       *list.List
+	m       map[string]*list.Element
+	lockMap *sync.Map
 }
 
 type pair struct {
@@ -25,10 +28,11 @@ type pair struct {
 
 func New(capacity int) Cache {
 	return &LRUCache{
-		cap: capacity,
-		mu:  &sync.Mutex{},
-		l:   &list.List{},
-		m:   make(map[string]*list.Element, capacity),
+		cap:     capacity,
+		mu:      &sync.Mutex{},
+		l:       &list.List{},
+		m:       make(map[string]*list.Element, capacity),
+		lockMap: &sync.Map{},
 	}
 }
 
@@ -82,4 +86,17 @@ func (c *LRUCache) Put(key string, value interface{}) bool {
 
 func (c *LRUCache) Len() int {
 	return c.l.Len()
+}
+
+func (c *LRUCache) GetAndLock(s string) interface{} {
+	lock, _ := c.lockMap.LoadOrStore(s, &sync.Mutex{})
+	lock.(*sync.Mutex).Lock()
+	return c.Get(s)
+}
+
+func (c *LRUCache) Unlock(s string) {
+	lock, exist := c.lockMap.Load(s)
+	if exist {
+		lock.(*sync.Mutex).Unlock()
+	}
 }

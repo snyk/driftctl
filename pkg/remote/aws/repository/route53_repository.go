@@ -48,7 +48,10 @@ func (r *route53Repository) ListAllHealthChecks() ([]*route53.HealthCheck, error
 }
 
 func (r *route53Repository) ListAllZones() ([]*route53.HostedZone, error) {
-	if v := r.cache.Get("route53ListAllZones"); v != nil {
+	cacheKey := "route53ListAllZones"
+	v := r.cache.GetAndLock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*route53.HostedZone), nil
 	}
 
@@ -62,7 +65,7 @@ func (r *route53Repository) ListAllZones() ([]*route53.HostedZone, error) {
 		return nil, err
 	}
 
-	r.cache.Put("route53ListAllZones", result)
+	r.cache.Put(cacheKey, result)
 	return result, nil
 }
 

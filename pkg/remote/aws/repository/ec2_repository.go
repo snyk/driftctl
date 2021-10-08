@@ -96,7 +96,10 @@ func (r *ec2Repository) ListAllVolumes() ([]*ec2.Volume, error) {
 }
 
 func (r *ec2Repository) ListAllAddresses() ([]*ec2.Address, error) {
-	if v := r.cache.Get("ec2ListAllAddresses"); v != nil {
+	cacheKey := "ec2ListAllAddresses"
+	v := r.cache.GetAndLock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*ec2.Address), nil
 	}
 
@@ -105,7 +108,7 @@ func (r *ec2Repository) ListAllAddresses() ([]*ec2.Address, error) {
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Put("ec2ListAllAddresses", response.Addresses)
+	r.cache.Put(cacheKey, response.Addresses)
 	return response.Addresses, nil
 }
 
@@ -198,8 +201,13 @@ func (r *ec2Repository) ListAllInternetGateways() ([]*ec2.InternetGateway, error
 }
 
 func (r *ec2Repository) ListAllSubnets() ([]*ec2.Subnet, []*ec2.Subnet, error) {
-	cacheSubnets := r.cache.Get("ec2ListAllSubnets")
-	cacheDefaultSubnets := r.cache.Get("ec2ListAllDefaultSubnets")
+	cacheKey := "ec2ListAllSubnets"
+	cacheSubnets := r.cache.GetAndLock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
+
+	defaultCacheKey := "ec2ListAllDefaultSubnets"
+	cacheDefaultSubnets := r.cache.GetAndLock(defaultCacheKey)
+	defer r.cache.Unlock(defaultCacheKey)
 	if cacheSubnets != nil && cacheDefaultSubnets != nil {
 		return cacheSubnets.([]*ec2.Subnet), cacheDefaultSubnets.([]*ec2.Subnet), nil
 	}
@@ -221,8 +229,8 @@ func (r *ec2Repository) ListAllSubnets() ([]*ec2.Subnet, []*ec2.Subnet, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	r.cache.Put("ec2ListAllSubnets", subnets)
-	r.cache.Put("ec2ListAllDefaultSubnets", defaultSubnets)
+	r.cache.Put(cacheKey, subnets)
+	r.cache.Put(defaultCacheKey, defaultSubnets)
 	return subnets, defaultSubnets, nil
 }
 
@@ -249,7 +257,10 @@ func (r *ec2Repository) ListAllNatGateways() ([]*ec2.NatGateway, error) {
 }
 
 func (r *ec2Repository) ListAllRouteTables() ([]*ec2.RouteTable, error) {
-	if v := r.cache.Get("ec2ListAllRouteTables"); v != nil {
+	cacheKey := "ec2ListAllRouteTables"
+	v := r.cache.GetAndLock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*ec2.RouteTable), nil
 	}
 
@@ -266,13 +277,17 @@ func (r *ec2Repository) ListAllRouteTables() ([]*ec2.RouteTable, error) {
 		return nil, err
 	}
 
-	r.cache.Put("ec2ListAllRouteTables", routeTables)
+	r.cache.Put(cacheKey, routeTables)
 	return routeTables, nil
 }
 
 func (r *ec2Repository) ListAllVPCs() ([]*ec2.Vpc, []*ec2.Vpc, error) {
-	cacheVPCs := r.cache.Get("ec2ListAllVPCs")
-	cacheDefaultVPCs := r.cache.Get("ec2ListAllDefaultVPCs")
+	cacheKey := "ec2ListAllVPCs"
+	cacheVPCs := r.cache.GetAndLock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
+	defaultCacheKey := "ec2ListAllDefaultVPCs"
+	cacheDefaultVPCs := r.cache.GetAndLock(defaultCacheKey)
+	defer r.cache.Unlock(defaultCacheKey)
 	if cacheVPCs != nil && cacheDefaultVPCs != nil {
 		return cacheVPCs.([]*ec2.Vpc), cacheDefaultVPCs.([]*ec2.Vpc), nil
 	}
@@ -296,14 +311,18 @@ func (r *ec2Repository) ListAllVPCs() ([]*ec2.Vpc, []*ec2.Vpc, error) {
 		return nil, nil, err
 	}
 
-	r.cache.Put("ec2ListAllVPCs", VPCs)
-	r.cache.Put("ec2ListAllDefaultVPCs", defaultVPCs)
+	r.cache.Put(cacheKey, VPCs)
+	r.cache.Put(defaultCacheKey, defaultVPCs)
 	return VPCs, defaultVPCs, nil
 }
 
 func (r *ec2Repository) ListAllSecurityGroups() ([]*ec2.SecurityGroup, []*ec2.SecurityGroup, error) {
-	cacheSecurityGroups := r.cache.Get("ec2ListAllSecurityGroups")
-	cacheDefaultSecurityGroups := r.cache.Get("ec2ListAllDefaultSecurityGroups")
+	cacheKey := "ec2ListAllSecurityGroups"
+	cacheSecurityGroups := r.cache.GetAndLock(cacheKey)
+	r.cache.Unlock(cacheKey)
+	defaultCacheKey := "ec2ListAllDefaultSecurityGroups"
+	cacheDefaultSecurityGroups := r.cache.GetAndLock(defaultCacheKey)
+	r.cache.Unlock(defaultCacheKey)
 	if cacheSecurityGroups != nil && cacheDefaultSecurityGroups != nil {
 		return cacheSecurityGroups.([]*ec2.SecurityGroup), cacheDefaultSecurityGroups.([]*ec2.SecurityGroup), nil
 	}
@@ -325,16 +344,17 @@ func (r *ec2Repository) ListAllSecurityGroups() ([]*ec2.SecurityGroup, []*ec2.Se
 		return nil, nil, err
 	}
 
-	r.cache.Put("ec2ListAllSecurityGroups", securityGroups)
-	r.cache.Put("ec2ListAllDefaultSecurityGroups", defaultSecurityGroups)
+	r.cache.Put(cacheKey, securityGroups)
+	r.cache.Put(defaultCacheKey, defaultSecurityGroups)
 	return securityGroups, defaultSecurityGroups, nil
 }
 
 func (r *ec2Repository) ListAllNetworkACLs() ([]*ec2.NetworkAcl, error) {
 
 	cacheKey := "ec2ListAllNetworkACLs"
-
-	if v := r.cache.Get(cacheKey); v != nil {
+	v := r.cache.GetAndLock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*ec2.NetworkAcl), nil
 	}
 

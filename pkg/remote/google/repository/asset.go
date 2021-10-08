@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"sync"
 
 	asset "cloud.google.com/go/asset/apiv1"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
@@ -32,7 +31,6 @@ type assetRepository struct {
 	client *asset.Client
 	config config.GCPTerraformConfig
 	cache  cache.Cache
-	lock   sync.Locker
 }
 
 func NewAssetRepository(client *asset.Client, config config.GCPTerraformConfig, c cache.Cache) *assetRepository {
@@ -40,7 +38,6 @@ func NewAssetRepository(client *asset.Client, config config.GCPTerraformConfig, 
 		client,
 		config,
 		c,
-		&sync.Mutex{},
 	}
 }
 
@@ -57,9 +54,10 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 	}
 	var results []*assetpb.ResourceSearchResult
 
-	s.lock.Lock()
-	defer s.lock.Unlock()
-	if cachedResults := s.cache.Get("SearchAllResources"); cachedResults != nil {
+	cacheKey := "SearchAllResources"
+	cachedResults := s.cache.GetAndLock(cacheKey)
+	defer s.cache.Unlock(cacheKey)
+	if cachedResults != nil {
 		results = cachedResults.([]*assetpb.ResourceSearchResult)
 	}
 
@@ -75,7 +73,7 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 			}
 			results = append(results, resource)
 		}
-		s.cache.Put("SearchAllResources", results)
+		s.cache.Put(cacheKey, results)
 	}
 
 	filteredResults := []*assetpb.ResourceSearchResult{}

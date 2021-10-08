@@ -35,7 +35,10 @@ func NewS3Repository(factory client.AwsClientFactoryInterface, c cache.Cache) *s
 }
 
 func (s *s3Repository) ListAllBuckets() ([]*s3.Bucket, error) {
-	if v := s.cache.Get("s3ListAllBuckets"); v != nil {
+	cacheKey := "s3ListAllBuckets"
+	v := s.cache.GetAndLock(cacheKey)
+	defer s.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*s3.Bucket), nil
 	}
 
@@ -43,7 +46,7 @@ func (s *s3Repository) ListAllBuckets() ([]*s3.Bucket, error) {
 	if err != nil {
 		return nil, err
 	}
-	s.cache.Put("s3ListAllBuckets", out.Buckets)
+	s.cache.Put(cacheKey, out.Buckets)
 	return out.Buckets, nil
 }
 
@@ -217,7 +220,9 @@ func (s *s3Repository) ListBucketAnalyticsConfigurations(bucket *s3.Bucket, regi
 
 func (s *s3Repository) GetBucketLocation(bucketName string) (string, error) {
 	cacheKey := fmt.Sprintf("s3GetBucketLocation_%s", bucketName)
-	if v := s.cache.Get(cacheKey); v != nil {
+	v := s.cache.GetAndLock(cacheKey)
+	defer s.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.(string), nil
 	}
 

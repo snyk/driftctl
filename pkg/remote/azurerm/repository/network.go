@@ -106,7 +106,10 @@ func NewNetworkRepository(con *arm.Connection, config common.AzureProviderConfig
 
 func (s *networkRepository) ListAllVirtualNetworks() ([]*armnetwork.VirtualNetwork, error) {
 
-	if v := s.cache.Get("ListAllVirtualNetworks"); v != nil {
+	cacheKey := "ListAllVirtualNetworks"
+	v := s.cache.GetAndLock(cacheKey)
+	defer s.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*armnetwork.VirtualNetwork), nil
 	}
 
@@ -124,13 +127,16 @@ func (s *networkRepository) ListAllVirtualNetworks() ([]*armnetwork.VirtualNetwo
 		return nil, err
 	}
 
-	s.cache.Put("ListAllVirtualNetworks", results)
+	s.cache.Put(cacheKey, results)
 
 	return results, nil
 }
 
 func (s *networkRepository) ListAllRouteTables() ([]*armnetwork.RouteTable, error) {
-	if v := s.cache.Get("ListAllRouteTables"); v != nil {
+	cacheKey := "ListAllRouteTables"
+	v := s.cache.GetAndLock(cacheKey)
+	defer s.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*armnetwork.RouteTable), nil
 	}
 
@@ -148,7 +154,7 @@ func (s *networkRepository) ListAllRouteTables() ([]*armnetwork.RouteTable, erro
 		return nil, err
 	}
 
-	s.cache.Put("ListAllRouteTables", results)
+	s.cache.Put(cacheKey, results)
 
 	return results, nil
 }

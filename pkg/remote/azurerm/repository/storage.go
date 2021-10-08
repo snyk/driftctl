@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"sync"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/armstorage"
@@ -53,15 +52,13 @@ func (c storageAccountClientImpl) List(options *armstorage.StorageAccountsListOp
 }
 
 type storageRepository struct {
-	listAllStorageAccountLock sync.Locker
-	storageAccountsClient     storageAccountClient
-	blobContainerClient       blobContainerClient
-	cache                     cache.Cache
+	storageAccountsClient storageAccountClient
+	blobContainerClient   blobContainerClient
+	cache                 cache.Cache
 }
 
 func NewStorageRepository(con *arm.Connection, config common.AzureProviderConfig, cache cache.Cache) *storageRepository {
 	return &storageRepository{
-		&sync.Mutex{},
 		storageAccountClientImpl{client: armstorage.NewStorageAccountsClient(con, config.SubscriptionID)},
 		blobContainerClientImpl{client: armstorage.NewBlobContainersClient(con, config.SubscriptionID)},
 		cache,
@@ -70,12 +67,10 @@ func NewStorageRepository(con *arm.Connection, config common.AzureProviderConfig
 
 func (s *storageRepository) ListAllStorageAccount() ([]*armstorage.StorageAccount, error) {
 
-	// Since ListAllStorageAccount can be called from multiple suppliers we should lock here to ensure
-	// the cache is hit when multiple calls are running in parallel
-	s.listAllStorageAccountLock.Lock()
-	defer s.listAllStorageAccountLock.Unlock()
-
-	if v := s.cache.Get("ListAllStorageAccount"); v != nil {
+	cacheKey := "ListAllStorageAccount"
+	v := s.cache.GetAndLock(cacheKey)
+	defer s.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*armstorage.StorageAccount), nil
 	}
 
@@ -93,7 +88,7 @@ func (s *storageRepository) ListAllStorageAccount() ([]*armstorage.StorageAccoun
 		return nil, err
 	}
 
-	s.cache.Put("ListAllStorageAccount", results)
+	s.cache.Put(cacheKey, results)
 
 	return results, nil
 }
