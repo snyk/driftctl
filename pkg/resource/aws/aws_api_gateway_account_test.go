@@ -11,7 +11,7 @@ func TestAcc_Aws_ApiGatewayAccount(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_api_gateway_account"},
-		Args:             []string{"scan", "--filter", "Type=='aws_api_gateway_account'"},
+		Args:             []string{"scan"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

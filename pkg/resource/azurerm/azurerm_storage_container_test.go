@@ -14,7 +14,6 @@ func TestAcc_Azure_StorageContainer(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "azure+tf",
-			"--filter", "Type=='azurerm_storage_container' || Type=='azurerm_storage_account'",
 		},
 		Checks: []acceptance.AccCheck{
 			{

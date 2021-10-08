@@ -14,7 +14,6 @@ func TestAcc_Google_StorageBucket(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "gcp+tf",
-			"--filter", "Type=='google_storage_bucket'",
 		},
 		Checks: []acceptance.AccCheck{
 			{

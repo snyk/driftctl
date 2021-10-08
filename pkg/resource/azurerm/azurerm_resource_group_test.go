@@ -14,7 +14,7 @@ func TestAcc_Azure_ResourceGroup(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "azure+tf",
-			"--filter", "Type=='azurerm_resource_group' && contains(Id, 'acc-test-res-group-')",
+			"--filter", "contains(Id, 'acc-test-res-group-')",
 		},
 		Checks: []acceptance.AccCheck{
 			{

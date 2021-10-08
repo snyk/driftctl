@@ -14,7 +14,6 @@ func TestAcc_Azure_RouteTable(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "azure+tf",
-			"--filter", "Type=='azurerm_route_table'",
 		},
 		Checks: []acceptance.AccCheck{
 			{

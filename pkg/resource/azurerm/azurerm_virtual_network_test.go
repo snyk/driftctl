@@ -14,7 +14,6 @@ func TestAcc_Azure_VirtualNetwork(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "azure+tf",
-			"--filter", "Type=='azurerm_virtual_network'",
 		},
 		Checks: []acceptance.AccCheck{
 			{

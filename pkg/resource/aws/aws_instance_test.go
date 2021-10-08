@@ -20,10 +20,6 @@ func TestAcc_AwsInstance(t *testing.T) {
 		Paths:            []string{"./testdata/acc/aws_instance_default"},
 		Args: []string{
 			"scan",
-			"--filter",
-			"Type=='aws_instance' || Type=='aws_ebs_volume'",
-			"--tf-provider-version",
-			"3.45.0",
 			"--deep",
 		},
 		Checks: []acceptance.AccCheck{
@@ -50,10 +46,6 @@ func TestAcc_AwsInstance_WithBlockDevices(t *testing.T) {
 		Paths:            []string{"./testdata/acc/aws_instance"},
 		Args: []string{
 			"scan",
-			"--filter",
-			"Type=='aws_instance'",
-			"--tf-provider-version",
-			"3.19.0",
 			"--deep",
 		},
 		Checks: []acceptance.AccCheck{

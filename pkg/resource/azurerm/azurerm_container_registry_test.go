@@ -14,7 +14,7 @@ func TestAcc_Azure_ContainerRegistry(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "azure+tf",
-			"--filter", "Type=='azurerm_container_registry' && contains(Id, 'containerRegistryAcc')",
+			"--filter", "contains(Id, 'containerRegistryAcc')",
 		},
 		Checks: []acceptance.AccCheck{
 			{
