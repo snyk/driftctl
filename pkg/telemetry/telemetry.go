@@ -18,6 +18,7 @@ type telemetry struct {
 	TotalResources int    `json:"total_resources"`
 	TotalManaged   int    `json:"total_managed"`
 	Duration       uint   `json:"duration"`
+	ProviderName   string `json:"provider_name"`
 }
 
 func SendTelemetry(store memstore.Bucket) {
@@ -37,6 +38,10 @@ func SendTelemetry(store memstore.Bucket) {
 
 	if val, ok := store.Get("duration").(uint); ok {
 		t.Duration = val
+	}
+
+	if val, ok := store.Get("provider_name").(string); ok {
+		t.ProviderName = val
 	}
 
 	body, err := json.Marshal(t)
