@@ -52,7 +52,7 @@ func (m *AwsApiGatewayRestApiExpander) handleBody(api *resource.Resource, result
 	}
 	// It's an OpenAPI v3 document
 	if docV3.OpenAPI != "" {
-		return m.handleBodyV3(docV3, results, remoteResources)
+		return m.handleBodyV3(api.ResourceId(), docV3, results, remoteResources)
 	}
 
 	docV2 := &openapi2.T{}
@@ -61,29 +61,29 @@ func (m *AwsApiGatewayRestApiExpander) handleBody(api *resource.Resource, result
 	}
 	// It's an OpenAPI v2 document
 	if docV2.Swagger != "" {
-		return m.handleBodyV2(docV2, results, remoteResources)
+		return m.handleBodyV2(api.ResourceId(), docV2, results, remoteResources)
 	}
 
 	return nil
 }
 
-func (m *AwsApiGatewayRestApiExpander) handleBodyV3(doc *openapi3.T, results, remoteResources *[]*resource.Resource) error {
+func (m *AwsApiGatewayRestApiExpander) handleBodyV3(apiId string, doc *openapi3.T, results, remoteResources *[]*resource.Resource) error {
 	for path := range doc.Paths {
-		m.createApiGatewayResource(path, results, remoteResources)
+		m.createApiGatewayResource(apiId, path, results, remoteResources)
 	}
 	return nil
 }
 
-func (m *AwsApiGatewayRestApiExpander) handleBodyV2(doc *openapi2.T, results, remoteResources *[]*resource.Resource) error {
+func (m *AwsApiGatewayRestApiExpander) handleBodyV2(apiId string, doc *openapi2.T, results, remoteResources *[]*resource.Resource) error {
 	for path := range doc.Paths {
-		m.createApiGatewayResource(path, results, remoteResources)
+		m.createApiGatewayResource(apiId, path, results, remoteResources)
 	}
 	return nil
 }
 
 // Create aws_api_gateway_resource resource
-func (m *AwsApiGatewayRestApiExpander) createApiGatewayResource(path string, results, remoteResources *[]*resource.Resource) {
-	if res := foundMatchingResource(path, remoteResources); res != nil {
+func (m *AwsApiGatewayRestApiExpander) createApiGatewayResource(apiId, path string, results, remoteResources *[]*resource.Resource) {
+	if res := foundMatchingResource(apiId, path, remoteResources); res != nil {
 		newResource := m.resourceFactory.CreateAbstractResource(aws.AwsApiGatewayResourceResourceType, res.ResourceId(), map[string]interface{}{
 			"rest_api_id": *res.Attributes().GetString("rest_api_id"),
 			"path":        path,
@@ -93,10 +93,12 @@ func (m *AwsApiGatewayRestApiExpander) createApiGatewayResource(path string, res
 }
 
 // Returns the aws_api_gateway_resource resource that matches the path attribute
-func foundMatchingResource(path string, remoteResources *[]*resource.Resource) *resource.Resource {
+func foundMatchingResource(apiId, path string, remoteResources *[]*resource.Resource) *resource.Resource {
 	for _, res := range *remoteResources {
 		if res.ResourceType() == aws.AwsApiGatewayResourceResourceType {
-			if p := res.Attributes().GetString("path"); p != nil && *p == path {
+			p := res.Attributes().GetString("path")
+			i := res.Attributes().GetString("rest_api_id")
+			if p != nil && i != nil && *p == path && *i == apiId {
 				return res
 			}
 		}
