@@ -13,5 +13,12 @@ func initAwsAppAutoscalingPolicyMetaData(resourceSchemaRepository resource.Schem
 			"scalable_dimension": *res.Attributes().GetString("scalable_dimension"),
 		}
 	})
+	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsAppAutoscalingPolicyResourceType, func(res *resource.Resource) map[string]string {
+		attrs := make(map[string]string)
+		if v := res.Attributes().GetString("scalable_dimension"); v != nil && *v != "" {
+			attrs["Scalable dimension"] = *v
+		}
+		return attrs
+	})
 	resourceSchemaRepository.SetFlags(AwsAppAutoscalingPolicyResourceType, resource.FlagDeepMode)
 }
