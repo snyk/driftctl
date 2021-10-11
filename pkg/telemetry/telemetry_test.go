@@ -42,11 +42,13 @@ func TestSendTelemetry(t *testing.T) {
 				TotalResources: 2,
 				TotalManaged:   1,
 				Duration:       123,
+				ProviderName:   "aws",
 			},
 			setStoreValues: func(s memstore.Bucket, a *analyser.Analysis) {
 				s.Set("total_resources", a.Summary().TotalResources)
 				s.Set("total_managed", a.Summary().TotalManaged)
 				s.Set("duration", uint(a.Duration.Seconds()+0.5))
+				s.Set("provider_name", "aws")
 			},
 		},
 		{
@@ -57,15 +59,17 @@ func TestSendTelemetry(t *testing.T) {
 				return a
 			}(),
 			expectedBody: &telemetry{
-				Version:  version.Current(),
-				Os:       runtime.GOOS,
-				Arch:     runtime.GOARCH,
-				Duration: 124,
+				Version:      version.Current(),
+				Os:           runtime.GOOS,
+				Arch:         runtime.GOARCH,
+				Duration:     124,
+				ProviderName: "aws",
 			},
 			setStoreValues: func(s memstore.Bucket, a *analyser.Analysis) {
 				s.Set("total_resources", a.Summary().TotalResources)
 				s.Set("total_managed", a.Summary().TotalManaged)
 				s.Set("duration", uint(a.Duration.Seconds()+0.5))
+				s.Set("provider_name", "aws")
 			},
 		},
 		{

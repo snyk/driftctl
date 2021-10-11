@@ -274,6 +274,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	analysis.ProviderVersion = resourceSchemaRepository.ProviderVersion.String()
 	analysis.ProviderName = resourceSchemaRepository.ProviderName
+	store.Bucket(memstore.TelemetryBucket).Set("provider_name", analysis.ProviderName)
 
 	validOutput := false
 	for _, o := range opts.Output {
