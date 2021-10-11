@@ -637,3 +637,82 @@ func TestApiGatewayDomainName(t *testing.T) {
 		})
 	}
 }
+
+func TestApiGatewayVpcLink(t *testing.T) {
+	dummyError := errors.New("this is an error")
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "no api gateway vpc links",
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllVpcLinks").Return([]*apigateway.UpdateVpcLinkOutput{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "single api gateway vpc link",
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllVpcLinks").Return([]*apigateway.UpdateVpcLinkOutput{
+					{Id: awssdk.String("ipu24n")},
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+
+				assert.Equal(t, got[0].ResourceId(), "ipu24n")
+				assert.Equal(t, got[0].ResourceType(), resourceaws.AwsApiGatewayVpcLinkResourceType)
+			},
+		},
+		{
+			test: "cannot list api gateway vpc links",
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllVpcLinks").Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayVpcLinkResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayVpcLinkResourceType, resourceaws.AwsApiGatewayVpcLinkResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayVpcLinkResourceType),
+		},
+	}
+
+	providerVersion := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.ApiGatewayRepository = fakeRepo
+
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayVpcLinkEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+		})
+	}
+}

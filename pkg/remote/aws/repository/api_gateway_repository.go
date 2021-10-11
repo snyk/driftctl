@@ -17,6 +17,7 @@ type ApiGatewayRepository interface {
 	ListAllRestApiStages(string) ([]*apigateway.Stage, error)
 	ListAllRestApiResources(string) ([]*apigateway.Resource, error)
 	ListAllDomainNames() ([]*apigateway.DomainName, error)
+	ListAllVpcLinks() ([]*apigateway.UpdateVpcLinkOutput, error)
 }
 
 type apigatewayRepository struct {
@@ -167,4 +168,25 @@ func (r *apigatewayRepository) ListAllDomainNames() ([]*apigateway.DomainName, e
 
 	r.cache.Put("apigatewayListAllDomainNames", domainNames)
 	return domainNames, nil
+}
+
+func (r *apigatewayRepository) ListAllVpcLinks() ([]*apigateway.UpdateVpcLinkOutput, error) {
+	if v := r.cache.Get("apigatewayListAllVpcLinks"); v != nil {
+		return v.([]*apigateway.UpdateVpcLinkOutput), nil
+	}
+
+	var vpcLinks []*apigateway.UpdateVpcLinkOutput
+	input := apigateway.GetVpcLinksInput{}
+	err := r.client.GetVpcLinksPages(&input,
+		func(resp *apigateway.GetVpcLinksOutput, lastPage bool) bool {
+			vpcLinks = append(vpcLinks, resp.Items...)
+			return !lastPage
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put("apigatewayListAllVpcLinks", vpcLinks)
+	return vpcLinks, nil
 }
