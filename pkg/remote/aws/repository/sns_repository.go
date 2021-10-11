@@ -25,7 +25,11 @@ func NewSNSRepository(session *session.Session, c cache.Cache) *snsRepository {
 }
 
 func (r *snsRepository) ListAllTopics() ([]*sns.Topic, error) {
-	if v := r.cache.Get("snsListAllTopics"); v != nil {
+
+	cacheKey := "snsListAllTopics"
+	v := r.cache.GetAndLock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*sns.Topic), nil
 	}
 
@@ -39,7 +43,7 @@ func (r *snsRepository) ListAllTopics() ([]*sns.Topic, error) {
 		return nil, err
 	}
 
-	r.cache.Put("snsListAllTopics", topics)
+	r.cache.Put(cacheKey, topics)
 	return topics, nil
 }
 

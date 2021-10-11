@@ -84,7 +84,8 @@ func Test_ListAllVirtualNetwork_MultiplesResults(t *testing.T) {
 	fakeClient.On("ListAll", mock.Anything).Return(mockPager)
 
 	c := &cache.MockCache{}
-	c.On("Get", "ListAllVirtualNetworks").Return(nil).Times(1)
+	c.On("GetAndLock", "ListAllVirtualNetworks").Return(nil).Times(1)
+	c.On("Unlock", "ListAllVirtualNetworks").Times(1)
 	c.On("Put", "ListAllVirtualNetworks", expected).Return(true).Times(1)
 	s := &networkRepository{
 		virtualNetworksClient: fakeClient,
@@ -118,7 +119,8 @@ func Test_ListAllVirtualNetwork_MultiplesResults_WithCache(t *testing.T) {
 	fakeClient := &mockVirtualNetworkClient{}
 
 	c := &cache.MockCache{}
-	c.On("Get", "ListAllVirtualNetworks").Return(expected).Times(1)
+	c.On("GetAndLock", "ListAllVirtualNetworks").Return(expected).Times(1)
+	c.On("Unlock", "ListAllVirtualNetworks").Times(1)
 	s := &networkRepository{
 		virtualNetworksClient: fakeClient,
 		cache:                 c,
@@ -237,7 +239,8 @@ func Test_ListAllRouteTables_MultiplesResults(t *testing.T) {
 	fakeClient.On("ListAll", mock.Anything).Return(mockPager)
 
 	c := &cache.MockCache{}
-	c.On("Get", "ListAllRouteTables").Return(nil).Times(1)
+	c.On("GetAndLock", "ListAllRouteTables").Return(nil).Times(1)
+	c.On("Unlock", "ListAllRouteTables").Times(1)
 	c.On("Put", "ListAllRouteTables", expected).Return(true).Times(1)
 	s := &networkRepository{
 		routeTableClient: fakeClient,
@@ -271,7 +274,8 @@ func Test_ListAllRouteTables_MultiplesResults_WithCache(t *testing.T) {
 	fakeClient := &mockRouteTablesClient{}
 
 	c := &cache.MockCache{}
-	c.On("Get", "ListAllRouteTables").Return(expected).Times(1)
+	c.On("GetAndLock", "ListAllRouteTables").Return(expected).Times(1)
+	c.On("Unlock", "ListAllRouteTables").Times(1)
 	s := &networkRepository{
 		routeTableClient: fakeClient,
 		cache:            c,

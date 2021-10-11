@@ -46,7 +46,8 @@ func Test_apigatewayRepository_ListAllRestApis(t *testing.T) {
 						return true
 					})).Return(nil).Once()
 
-				store.On("Get", "apigatewayListAllRestApis").Return(nil).Times(1)
+				store.On("GetAndLock", "apigatewayListAllRestApis").Return(nil).Times(1)
+				store.On("Unlock", "apigatewayListAllRestApis").Times(1)
 				store.On("Put", "apigatewayListAllRestApis", apis).Return(false).Times(1)
 			},
 			want: apis,
@@ -54,7 +55,8 @@ func Test_apigatewayRepository_ListAllRestApis(t *testing.T) {
 		{
 			name: "should hit cache",
 			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
-				store.On("Get", "apigatewayListAllRestApis").Return(apis).Times(1)
+				store.On("GetAndLock", "apigatewayListAllRestApis").Return(apis).Times(1)
+				store.On("Unlock", "apigatewayListAllRestApis").Times(1)
 			},
 			want: apis,
 		},

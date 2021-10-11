@@ -25,6 +25,22 @@ func (_m *MockCache) Get(_a0 string) interface{} {
 	return r0
 }
 
+// GetAndLock provides a mock function with given fields: _a0
+func (_m *MockCache) GetAndLock(_a0 string) interface{} {
+	ret := _m.Called(_a0)
+
+	var r0 interface{}
+	if rf, ok := ret.Get(0).(func(string) interface{}); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(interface{})
+		}
+	}
+
+	return r0
+}
+
 // Len provides a mock function with given fields:
 func (_m *MockCache) Len() int {
 	ret := _m.Called()
@@ -51,4 +67,9 @@ func (_m *MockCache) Put(_a0 string, _a1 interface{}) bool {
 	}
 
 	return r0
+}
+
+// Unlock provides a mock function with given fields: _a0
+func (_m *MockCache) Unlock(_a0 string) {
+	_m.Called(_a0)
 }

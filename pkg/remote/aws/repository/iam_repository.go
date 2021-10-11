@@ -62,7 +62,11 @@ func (r *iamRepository) ListAllAccessKeys(users []*iam.User) ([]*iam.AccessKeyMe
 }
 
 func (r *iamRepository) ListAllUsers() ([]*iam.User, error) {
-	if v := r.cache.Get("iamListAllUsers"); v != nil {
+
+	cacheKey := "iamListAllUsers"
+	v := r.cache.GetAndLock(cacheKey)
+	r.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*iam.User), nil
 	}
 
@@ -76,7 +80,7 @@ func (r *iamRepository) ListAllUsers() ([]*iam.User, error) {
 		return nil, err
 	}
 
-	r.cache.Put("iamListAllUsers", resources)
+	r.cache.Put(cacheKey, resources)
 	return resources, nil
 }
 
@@ -102,7 +106,10 @@ func (r *iamRepository) ListAllPolicies() ([]*iam.Policy, error) {
 }
 
 func (r *iamRepository) ListAllRoles() ([]*iam.Role, error) {
-	if v := r.cache.Get("iamListAllRoles"); v != nil {
+	cacheKey := "iamListAllRoles"
+	v := r.cache.GetAndLock(cacheKey)
+	r.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*iam.Role), nil
 	}
 
@@ -116,7 +123,7 @@ func (r *iamRepository) ListAllRoles() ([]*iam.Role, error) {
 		return nil, err
 	}
 
-	r.cache.Put("iamListAllRoles", resources)
+	r.cache.Put(cacheKey, resources)
 	return resources, nil
 }
 

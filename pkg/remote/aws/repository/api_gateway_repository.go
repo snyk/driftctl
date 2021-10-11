@@ -33,7 +33,10 @@ func NewApiGatewayRepository(session *session.Session, c cache.Cache) *apigatewa
 }
 
 func (r *apigatewayRepository) ListAllRestApis() ([]*apigateway.RestApi, error) {
-	if v := r.cache.Get("apigatewayListAllRestApis"); v != nil {
+	cacheKey := "apigatewayListAllRestApis"
+	v := r.cache.GetAndLock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*apigateway.RestApi), nil
 	}
 
@@ -49,7 +52,7 @@ func (r *apigatewayRepository) ListAllRestApis() ([]*apigateway.RestApi, error) 
 		return nil, err
 	}
 
-	r.cache.Put("apigatewayListAllRestApis", restApis)
+	r.cache.Put(cacheKey, restApis)
 	return restApis, nil
 }
 

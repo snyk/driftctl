@@ -47,7 +47,11 @@ func (r *sqsRepository) GetQueueAttributes(url string) (*sqs.GetQueueAttributesO
 }
 
 func (r *sqsRepository) ListAllQueues() ([]*string, error) {
-	if v := r.cache.Get("sqsListAllQueues"); v != nil {
+
+	cacheKey := "sqsListAllQueues"
+	v := r.cache.GetAndLock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*string), nil
 	}
 
@@ -63,6 +67,6 @@ func (r *sqsRepository) ListAllQueues() ([]*string, error) {
 		return nil, err
 	}
 
-	r.cache.Put("sqsListAllQueues", queues)
+	r.cache.Put(cacheKey, queues)
 	return queues, nil
 }
