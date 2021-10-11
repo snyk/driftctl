@@ -41,7 +41,7 @@ func TestGoogleBucketIAMBindingTransformer_Execute(t *testing.T) {
 					Attrs: &resource.Attributes{
 						"role":   "storage.admin",
 						"bucket": "b/bucket",
-						"members": []string{
+						"members": []interface{}{
 							"user:elie@cloudskiff.com",
 							"user:william@cloudskiff.com",
 						},
@@ -54,7 +54,7 @@ func TestGoogleBucketIAMBindingTransformer_Execute(t *testing.T) {
 					Attrs: &resource.Attributes{
 						"role":   "storage.viewer",
 						"bucket": "b/bucket",
-						"members": []string{
+						"members": []interface{}{
 							"user:william@cloudskiff.com",
 						},
 					},
@@ -65,7 +65,7 @@ func TestGoogleBucketIAMBindingTransformer_Execute(t *testing.T) {
 					Attrs: &resource.Attributes{
 						"role":   "storage.viewer",
 						"bucket": "b/bucket2",
-						"members": []string{
+						"members": []interface{}{
 							"user:william@cloudskiff.com",
 						},
 					},

@@ -31,7 +31,7 @@ func (m *GoogleStorageBucketIAMBindingTransformer) Execute(_, resourcesFromState
 		roleName := *stateRes.Attrs.GetString("role")
 		members, _ := stateRes.Attrs.Get("members")
 
-		for _, member := range members.([]string) {
+		for _, member := range members.([]interface{}) {
 			id := fmt.Sprintf("%s/%s/%s", bucket, roleName, member)
 			resources = append(
 				resources,
@@ -42,7 +42,7 @@ func (m *GoogleStorageBucketIAMBindingTransformer) Execute(_, resourcesFromState
 						"id":     id,
 						"bucket": bucket,
 						"role":   roleName,
-						"member": member,
+						"member": member.(string),
 					},
 				),
 			)
