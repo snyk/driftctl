@@ -211,6 +211,173 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "create resources with same path but not the same rest api id",
+			mocks: func(factory *terraform.MockResourceFactory) {
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayResourceResourceType,
+					"foo-path1",
+					map[string]interface{}{
+						"rest_api_id": "foo",
+						"path":        "/path1",
+					},
+				).Once().Return(&resource.Resource{
+					Id:   "foo-path1",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "foo",
+						"path":        "/path1",
+					},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayResourceResourceType,
+					"foo-path1-path2",
+					map[string]interface{}{
+						"rest_api_id": "foo",
+						"path":        "/path1/path2",
+					},
+				).Once().Return(&resource.Resource{
+					Id:   "foo-path1-path2",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "foo",
+						"path":        "/path1/path2",
+					},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayResourceResourceType,
+					"bar-path1",
+					map[string]interface{}{
+						"rest_api_id": "bar",
+						"path":        "/path1",
+					},
+				).Once().Return(&resource.Resource{
+					Id:   "bar-path1",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "bar",
+						"path":        "/path1",
+					},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayResourceResourceType,
+					"bar-path1-path2",
+					map[string]interface{}{
+						"rest_api_id": "bar",
+						"path":        "/path1/path2",
+					},
+				).Once().Return(&resource.Resource{
+					Id:   "bar-path1-path2",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "bar",
+						"path":        "/path1/path2",
+					},
+				})
+			},
+			resourcesFromState: []*resource.Resource{
+				{
+					Id:   "foo",
+					Type: aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": "{\"info\":{\"title\":\"example\",\"version\":\"1.0\"},\"openapi\":\"3.0.1\",\"paths\":{\"/path1\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}},\"/path1/path2\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}}}}",
+					},
+				},
+				{
+					Id:   "bar",
+					Type: aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": "{\"info\":{\"title\":\"example\",\"version\":\"1.0\"},\"openapi\":\"3.0.1\",\"paths\":{\"/path1\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}},\"/path1/path2\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}}}}",
+					},
+				},
+			},
+			remoteResources: []*resource.Resource{
+				{
+					Id:   "foo-path1",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "foo",
+						"path":        "/path1",
+					},
+				},
+				{
+					Id:   "foo-path1-path2",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "foo",
+						"path":        "/path1/path2",
+					},
+				},
+				{
+					Id:   "bar-path1",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "bar",
+						"path":        "/path1",
+					},
+				},
+				{
+					Id:   "bar-path1-path2",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "bar",
+						"path":        "/path1/path2",
+					},
+				},
+			},
+			expected: []*resource.Resource{
+				{
+					Id:   "foo",
+					Type: aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": "{\"info\":{\"title\":\"example\",\"version\":\"1.0\"},\"openapi\":\"3.0.1\",\"paths\":{\"/path1\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}},\"/path1/path2\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}}}}",
+					},
+				},
+				{
+					Id:   "foo-path1",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "foo",
+						"path":        "/path1",
+					},
+				},
+				{
+					Id:   "foo-path1-path2",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "foo",
+						"path":        "/path1/path2",
+					},
+				},
+				{
+					Id:   "bar",
+					Type: aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": "{\"info\":{\"title\":\"example\",\"version\":\"1.0\"},\"openapi\":\"3.0.1\",\"paths\":{\"/path1\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}},\"/path1/path2\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}}}}",
+					},
+				},
+				{
+					Id:   "bar-path1",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "bar",
+						"path":        "/path1",
+					},
+				},
+				{
+					Id:   "bar-path1-path2",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "bar",
+						"path":        "/path1/path2",
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
