@@ -12,13 +12,19 @@ provider "azurerm" {
 }
 
 data "azurerm_resource_group" "qa1" {
-  name = "raphael-dev"
+  name = "raphael-dev" // driftctl-qa-1
 }
 
 resource "random_string" "suffix" {
   length  = 12
   upper   = false
   special = false
+}
+
+resource "random_password" "password" {
+  length           = 16
+  special          = true
+  override_special = "_%@"
 }
 
 resource "azurerm_postgresql_server" "example" {
@@ -34,7 +40,7 @@ resource "azurerm_postgresql_server" "example" {
   auto_grow_enabled            = true
 
   administrator_login          = "psqladminun"
-  administrator_login_password = "H@Sh1CoR3!"
+  administrator_login_password = random_password.password.result
   version                      = "10"
   ssl_enforcement_enabled      = true
 }

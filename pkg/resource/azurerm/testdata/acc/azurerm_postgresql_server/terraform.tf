@@ -21,6 +21,12 @@ resource "random_string" "suffix" {
   special = false
 }
 
+resource "random_password" "password" {
+  length           = 16
+  special          = true
+  override_special = "_%@"
+}
+
 resource "azurerm_postgresql_server" "example" {
   name                = "acc-postgresql-server-${random_string.suffix.result}"
   location            = data.azurerm_resource_group.qa1.location
@@ -34,7 +40,7 @@ resource "azurerm_postgresql_server" "example" {
   auto_grow_enabled            = true
 
   administrator_login          = "psqladminun"
-  administrator_login_password = "H@Sh1CoR3!"
+  administrator_login_password = random_password.password.result
   version                      = "9.5"
   ssl_enforcement_enabled      = true
 }
