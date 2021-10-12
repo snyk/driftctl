@@ -673,3 +673,96 @@ func TestAzurermPublicIP(t *testing.T) {
 		})
 	}
 }
+
+func TestAzurermSecurityGroups(t *testing.T) {
+
+	dummyError := errors.New("this is an error")
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "no security group",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllSecurityGroups").Return([]*armnetwork.NetworkSecurityGroup{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "error listing security groups",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllSecurityGroups").Return(nil, dummyError)
+			},
+			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzureNetworkSecurityGroupResourceType),
+		},
+		{
+			test: "multiple security groups",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllSecurityGroups").Return([]*armnetwork.NetworkSecurityGroup{
+					{
+						Resource: armnetwork.Resource{
+							ID:   to.StringPtr("sec-group1"), // Here we don't care to have a valid ID, it is for testing purpose only
+							Name: to.StringPtr("sec-group1"),
+						},
+					},
+					{
+						Resource: armnetwork.Resource{
+							ID:   to.StringPtr("sec-group2"),
+							Name: to.StringPtr("sec-group2"),
+						},
+					},
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, got[0].ResourceId(), "sec-group1")
+				assert.Equal(t, got[0].ResourceType(), resourceazure.AzureNetworkSecurityGroupResourceType)
+
+				assert.Equal(t, got[1].ResourceId(), "sec-group2")
+				assert.Equal(t, got[1].ResourceType(), resourceazure.AzureNetworkSecurityGroupResourceType)
+			},
+		},
+	}
+
+	providerVersion := "2.71.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
+	resourceazure.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockNetworkRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.NetworkRepository = fakeRepo
+
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermNetworkSecurityGroupEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, c.wantErr, err)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+		})
+	}
+}

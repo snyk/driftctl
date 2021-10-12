@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"testing"
@@ -874,4 +875,84 @@ func Test_ListAllPublicIPAddresses_Error(t *testing.T) {
 
 	assert.Equal(t, expectedErr, err)
 	assert.Nil(t, got)
+}
+
+func Test_Network_ListAllSecurityGroups(t *testing.T) {
+	expectedResults := []*armnetwork.NetworkSecurityGroup{}
+
+	testcases := []struct {
+		name     string
+		mocks    func(*mockNetworkSecurityGroupsListAllPager, *cache.MockCache)
+		expected []*armnetwork.NetworkSecurityGroup
+		wantErr  string
+	}{
+		{
+			name: "should return security groups",
+			mocks: func(pager *mockNetworkSecurityGroupsListAllPager, mockCache *cache.MockCache) {
+				pager.On("NextPage", context.Background()).Return(true).Times(1)
+				pager.On("NextPage", context.Background()).Return(false).Times(1)
+				pager.On("PageResponse").Return(armnetwork.NetworkSecurityGroupsListAllResponse{
+					NetworkSecurityGroupsListAllResult: armnetwork.NetworkSecurityGroupsListAllResult{
+						NetworkSecurityGroupListResult: armnetwork.NetworkSecurityGroupListResult{
+							Value: expectedResults,
+						},
+					},
+				}).Times(1)
+				pager.On("Err").Return(nil).Times(2)
+
+				mockCache.On("Get", "networkListAllSecurityGroups").Return(nil).Times(1)
+				mockCache.On("Put", "networkListAllSecurityGroups", expectedResults).Return(false).Times(1)
+			},
+			expected: expectedResults,
+		},
+		{
+			name: "should hit cache and return security groups",
+			mocks: func(pager *mockNetworkSecurityGroupsListAllPager, mockCache *cache.MockCache) {
+				mockCache.On("Get", "networkListAllSecurityGroups").Return(expectedResults).Times(1)
+			},
+			expected: expectedResults,
+		},
+		{
+			name: "should return remote error",
+			mocks: func(pager *mockNetworkSecurityGroupsListAllPager, mockCache *cache.MockCache) {
+				pager.On("NextPage", context.Background()).Return(true).Times(1)
+				pager.On("NextPage", context.Background()).Return(false).Times(1)
+				pager.On("PageResponse").Return(armnetwork.NetworkSecurityGroupsListAllResponse{}).Times(1)
+				pager.On("Err").Return(errors.New("remote error")).Times(1)
+
+				mockCache.On("Get", "networkListAllSecurityGroups").Return(nil).Times(1)
+			},
+			wantErr: "remote error",
+		},
+	}
+
+	for _, tt := range testcases {
+		t.Run(tt.name, func(t *testing.T) {
+			fakePager := &mockNetworkSecurityGroupsListAllPager{}
+			fakeClient := &mockNetworkSecurityGroupsClient{}
+			mockCache := &cache.MockCache{}
+
+			fakeClient.On("ListAll", (*armnetwork.NetworkSecurityGroupsListAllOptions)(nil)).Return(fakePager).Maybe()
+
+			tt.mocks(fakePager, mockCache)
+
+			s := &networkRepository{
+				networkSecurityGroupsClient: fakeClient,
+				cache:                       mockCache,
+			}
+			got, err := s.ListAllSecurityGroups()
+			if tt.wantErr != "" {
+				assert.EqualError(t, err, tt.wantErr)
+			} else {
+				assert.Nil(t, err)
+			}
+
+			fakeClient.AssertExpectations(t)
+			mockCache.AssertExpectations(t)
+
+			if !reflect.DeepEqual(got, tt.expected) {
+				t.Errorf("ListAllSecurityGroups() got = %v, want %v", got, tt.expected)
+			}
+		})
+	}
 }
