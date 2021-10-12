@@ -35,6 +35,29 @@ func (_m *MockNetworkRepository) ListAllFirewalls() ([]*armnetwork.AzureFirewall
 	return r0, r1
 }
 
+// ListAllPublicIPAddresses provides a mock function with given fields:
+func (_m *MockNetworkRepository) ListAllPublicIPAddresses() ([]*armnetwork.PublicIPAddress, error) {
+	ret := _m.Called()
+
+	var r0 []*armnetwork.PublicIPAddress
+	if rf, ok := ret.Get(0).(func() []*armnetwork.PublicIPAddress); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*armnetwork.PublicIPAddress)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListAllRouteTables provides a mock function with given fields:
 func (_m *MockNetworkRepository) ListAllRouteTables() ([]*armnetwork.RouteTable, error) {
 	ret := _m.Called()
