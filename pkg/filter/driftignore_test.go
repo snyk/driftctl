@@ -435,3 +435,102 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 		})
 	}
 }
+
+func TestDriftIgnore_IsTypeIgnored(t *testing.T) {
+	tests := []struct {
+		name      string
+		resources []*resource.Resource
+		want      []bool
+		path      string
+	}{
+		{
+			name: "drift_ignore_type_exclude_with_child_1_nesting",
+			resources: []*resource.Resource{
+				{
+					Type: "aws_route",
+				},
+				{
+					Type: "aws_route_table",
+				},
+				{
+					Type: "non_ignored_type",
+				},
+				{
+					Type: "ignored_type",
+				},
+			},
+			want: []bool{
+				false,
+				false,
+				false,
+				true,
+			},
+			path: "testdata/drift_ignore_type/.driftignore_child_1",
+		},
+		{
+			name: "drift_ignore_type_exclude_with_child_2_nesting",
+			resources: []*resource.Resource{
+				{
+					Type: "non_ignored_type",
+				},
+				{
+					Type: "aws_iam_user",
+				},
+				{
+					Type: "aws_iam_user_policy",
+				},
+				{
+					Type: "aws_iam_user_policy_attachment",
+				},
+				{
+					Type: "ignored_type",
+				},
+			},
+			want: []bool{
+				false,
+				false,
+				false,
+				false,
+				true,
+			},
+			path: "testdata/drift_ignore_type/.driftignore_child_2",
+		},
+		{
+			name: "drift_ignore_type_exclude",
+			resources: []*resource.Resource{
+				{
+					Type: "type",
+				},
+				{
+					Type: "type_1",
+				},
+				{
+					Type: "type_2",
+				},
+				{
+					Type: "type_3",
+				},
+			},
+			want: []bool{
+				true,
+				false,
+				true,
+				true,
+			},
+			path: "testdata/drift_ignore_type/.driftignore",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cwd, _ := os.Getwd()
+			defer func() { _ = os.Chdir(cwd) }()
+
+			r := NewDriftIgnore(tt.path)
+			got := make([]bool, 0, len(tt.want))
+			for _, res := range tt.resources {
+				got = append(got, r.IsTypeIgnored(resource.ResourceType(res.ResourceType())))
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}

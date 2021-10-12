@@ -1,0 +1,3 @@
+*
+!aws_iam_user_policy_attachment
+!non_ignored_type.*

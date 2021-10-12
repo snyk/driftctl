@@ -67,7 +67,26 @@ func (r *DriftIgnore) readIgnoreFile() error {
 	return nil
 }
 
+func (r *DriftIgnore) isAnyOfChildrenTypesNotIgnored(ty resource.ResourceType) bool {
+	childrenTypes := resource.GetMeta(ty).GetChildrenTypes()
+	for _, childrenType := range childrenTypes {
+		if !r.match(fmt.Sprintf("%s.*", childrenType)) {
+			return true
+		}
+		if r.isAnyOfChildrenTypesNotIgnored(childrenType) {
+			return true
+		}
+	}
+	return false
+}
+
 func (r *DriftIgnore) IsTypeIgnored(ty resource.ResourceType) bool {
+	// Iterate over children types, and do not ignore parent resource
+	// if at least one of children type is not ignored.
+	if r.isAnyOfChildrenTypesNotIgnored(ty) {
+		return false
+	}
+
 	return r.match(fmt.Sprintf("%s.*", ty))
 }
 
