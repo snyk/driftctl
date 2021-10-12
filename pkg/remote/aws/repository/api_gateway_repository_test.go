@@ -445,7 +445,8 @@ func Test_apigatewayRepository_ListAllDomainNames(t *testing.T) {
 						return true
 					})).Return(nil).Once()
 
-				store.On("Get", "apigatewayListAllDomainNames").Return(nil).Times(1)
+				store.On("GetAndLock", "apigatewayListAllDomainNames").Return(nil).Times(1)
+				store.On("Unlock", "apigatewayListAllDomainNames").Times(1)
 				store.On("Put", "apigatewayListAllDomainNames", domainNames).Return(false).Times(1)
 			},
 			want: domainNames,
@@ -453,7 +454,8 @@ func Test_apigatewayRepository_ListAllDomainNames(t *testing.T) {
 		{
 			name: "should hit cache",
 			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
-				store.On("Get", "apigatewayListAllDomainNames").Return(domainNames).Times(1)
+				store.On("GetAndLock", "apigatewayListAllDomainNames").Return(domainNames).Times(1)
+				store.On("Unlock", "apigatewayListAllDomainNames").Times(1)
 			},
 			want: domainNames,
 		},
@@ -617,6 +619,91 @@ func Test_apigatewayRepository_ListAllRestApiRequestValidators(t *testing.T) {
 				cache:  store,
 			}
 			got, err := r.ListAllRestApiRequestValidators(*api.Id)
+			assert.Equal(t, tt.wantErr, err)
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+			store.AssertExpectations(t)
+			client.AssertExpectations(t)
+		})
+	}
+}
+
+func Test_apigatewayRepository_ListAllDomainNameBasePathMappings(t *testing.T) {
+	domainName := &apigateway.DomainName{
+		DomainName: aws.String("domainName1"),
+	}
+
+	mappings := []*apigateway.BasePathMapping{
+		{BasePath: aws.String("path1")},
+		{BasePath: aws.String("path2")},
+		{BasePath: aws.String("path3")},
+		{BasePath: aws.String("path4")},
+	}
+
+	remoteError := errors.New("remote error")
+
+	tests := []struct {
+		name    string
+		mocks   func(client *awstest.MockFakeApiGateway, store *cache.MockCache)
+		want    []*apigateway.BasePathMapping
+		wantErr error
+	}{
+		{
+			name: "list multiple domain name base path mappings",
+			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
+				client.On("GetBasePathMappingsPages",
+					&apigateway.GetBasePathMappingsInput{
+						DomainName: aws.String("domainName1"),
+					},
+					mock.MatchedBy(func(callback func(res *apigateway.GetBasePathMappingsOutput, lastPage bool) bool) bool {
+						callback(&apigateway.GetBasePathMappingsOutput{
+							Items: mappings,
+						}, true)
+						return true
+					})).Return(nil).Once()
+
+				store.On("Get", "apigatewayListAllDomainNameBasePathMappings_domainName_domainName1").Return(nil).Times(1)
+				store.On("Put", "apigatewayListAllDomainNameBasePathMappings_domainName_domainName1", mappings).Return(false).Times(1)
+			},
+			want: mappings,
+		},
+		{
+			name: "should hit cache",
+			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
+				store.On("Get", "apigatewayListAllDomainNameBasePathMappings_domainName_domainName1").Return(mappings).Times(1)
+			},
+			want: mappings,
+		},
+		{
+			name: "should return remote error",
+			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
+				client.On("GetBasePathMappingsPages",
+					&apigateway.GetBasePathMappingsInput{
+						DomainName: aws.String("domainName1"),
+					}, mock.AnythingOfType("func(*apigateway.GetBasePathMappingsOutput, bool) bool")).Return(remoteError).Once()
+
+				store.On("Get", "apigatewayListAllDomainNameBasePathMappings_domainName_domainName1").Return(nil).Times(1)
+			},
+			wantErr: remoteError,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := &cache.MockCache{}
+			client := &awstest.MockFakeApiGateway{}
+			tt.mocks(client, store)
+			r := &apigatewayRepository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.ListAllDomainNameBasePathMappings(*domainName.DomainName)
 			assert.Equal(t, tt.wantErr, err)
 
 			changelog, err := diff.Diff(got, tt.want)

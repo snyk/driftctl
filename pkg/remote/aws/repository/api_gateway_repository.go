@@ -19,6 +19,7 @@ type ApiGatewayRepository interface {
 	ListAllDomainNames() ([]*apigateway.DomainName, error)
 	ListAllVpcLinks() ([]*apigateway.UpdateVpcLinkOutput, error)
 	ListAllRestApiRequestValidators(string) ([]*apigateway.UpdateRequestValidatorOutput, error)
+	ListAllDomainNameBasePathMappings(string) ([]*apigateway.BasePathMapping, error)
 }
 
 type apigatewayRepository struct {
@@ -151,7 +152,10 @@ func (r *apigatewayRepository) ListAllRestApiResources(apiId string) ([]*apigate
 }
 
 func (r *apigatewayRepository) ListAllDomainNames() ([]*apigateway.DomainName, error) {
-	if v := r.cache.Get("apigatewayListAllDomainNames"); v != nil {
+	cacheKey := "apigatewayListAllDomainNames"
+	v := r.cache.GetAndLock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*apigateway.DomainName), nil
 	}
 
@@ -167,7 +171,7 @@ func (r *apigatewayRepository) ListAllDomainNames() ([]*apigateway.DomainName, e
 		return nil, err
 	}
 
-	r.cache.Put("apigatewayListAllDomainNames", domainNames)
+	r.cache.Put(cacheKey, domainNames)
 	return domainNames, nil
 }
 
@@ -208,4 +212,26 @@ func (r *apigatewayRepository) ListAllRestApiRequestValidators(apiId string) ([]
 
 	r.cache.Put(cacheKey, resources.Items)
 	return resources.Items, nil
+}
+
+func (r *apigatewayRepository) ListAllDomainNameBasePathMappings(domainName string) ([]*apigateway.BasePathMapping, error) {
+	cacheKey := fmt.Sprintf("apigatewayListAllDomainNameBasePathMappings_domainName_%s", domainName)
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*apigateway.BasePathMapping), nil
+	}
+
+	var mappings []*apigateway.BasePathMapping
+	input := &apigateway.GetBasePathMappingsInput{
+		DomainName: &domainName,
+	}
+	err := r.client.GetBasePathMappingsPages(input, func(res *apigateway.GetBasePathMappingsOutput, lastPage bool) bool {
+		mappings = append(mappings, res.Items...)
+		return !lastPage
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put(cacheKey, mappings)
+	return mappings, nil
 }

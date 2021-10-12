@@ -117,6 +117,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_api_gateway_vpc_link":          {},
 	"aws_api_gateway_request_validator": {},
 	"aws_api_gateway_rest_api_policy":   {},
+	"aws_api_gateway_base_path_mapping": {},
 	"aws_appautoscaling_target":         {},
 	"aws_rds_cluster_instance": {children: []ResourceType{
 		"aws_db_instance",

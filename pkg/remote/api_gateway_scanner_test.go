@@ -899,3 +899,100 @@ func TestApiGatewayRestApiPolicy(t *testing.T) {
 		})
 	}
 }
+
+func TestApiGatewayBasePathMapping(t *testing.T) {
+	dummyError := errors.New("this is an error")
+	domainNames := []*apigateway.DomainName{
+		{DomainName: awssdk.String("example-driftctl.com")},
+	}
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "no domain name base path mappings",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllDomainNames").Return(domainNames, nil)
+				repo.On("ListAllDomainNameBasePathMappings", *domainNames[0].DomainName).Return([]*apigateway.BasePathMapping{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "multiple domain name base path mappings",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllDomainNames").Return(domainNames, nil)
+				repo.On("ListAllDomainNameBasePathMappings", *domainNames[0].DomainName).Return([]*apigateway.BasePathMapping{
+					{BasePath: awssdk.String("foo")},
+					{BasePath: awssdk.String("(none)")},
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, got[0].ResourceId(), "example-driftctl.com/foo")
+				assert.Equal(t, got[0].ResourceType(), resourceaws.AwsApiGatewayBasePathMappingResourceType)
+
+				assert.Equal(t, got[1].ResourceId(), "example-driftctl.com/")
+				assert.Equal(t, got[1].ResourceType(), resourceaws.AwsApiGatewayBasePathMappingResourceType)
+			},
+		},
+		{
+			test: "cannot list domain names",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllDomainNames").Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayBasePathMappingResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayBasePathMappingResourceType, resourceaws.AwsApiGatewayDomainNameResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayBasePathMappingResourceType, resourceaws.AwsApiGatewayDomainNameResourceType),
+		},
+		{
+			test: "cannot list domain name base path mappings",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllDomainNames").Return(domainNames, nil)
+				repo.On("ListAllDomainNameBasePathMappings", *domainNames[0].DomainName).Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayBasePathMappingResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayBasePathMappingResourceType, resourceaws.AwsApiGatewayBasePathMappingResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayBasePathMappingResourceType),
+		},
+	}
+
+	providerVersion := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.ApiGatewayRepository = fakeRepo
+
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayBasePathMappingEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+		})
+	}
+}
