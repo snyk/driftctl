@@ -8,4 +8,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initGoogleComputeRouterMetadata(resourceSchemaRepository)
 	initGoogleComputeNetworkMetadata(resourceSchemaRepository)
 	initGoogleStorageBucketIamBMemberMetadata(resourceSchemaRepository)
+	initGoogleComputeInstanceGroupMetadata(resourceSchemaRepository)
 }
