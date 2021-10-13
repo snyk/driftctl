@@ -18,6 +18,7 @@ type ApiGatewayRepository interface {
 	ListAllRestApiResources(string) ([]*apigateway.Resource, error)
 	ListAllDomainNames() ([]*apigateway.DomainName, error)
 	ListAllVpcLinks() ([]*apigateway.UpdateVpcLinkOutput, error)
+	ListAllRestApiRequestValidators(string) ([]*apigateway.UpdateRequestValidatorOutput, error)
 }
 
 type apigatewayRepository struct {
@@ -189,4 +190,22 @@ func (r *apigatewayRepository) ListAllVpcLinks() ([]*apigateway.UpdateVpcLinkOut
 
 	r.cache.Put("apigatewayListAllVpcLinks", vpcLinks)
 	return vpcLinks, nil
+}
+
+func (r *apigatewayRepository) ListAllRestApiRequestValidators(apiId string) ([]*apigateway.UpdateRequestValidatorOutput, error) {
+	cacheKey := fmt.Sprintf("apigatewayListAllRestApiRequestValidators_api_%s", apiId)
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*apigateway.UpdateRequestValidatorOutput), nil
+	}
+
+	input := &apigateway.GetRequestValidatorsInput{
+		RestApiId: &apiId,
+	}
+	resources, err := r.client.GetRequestValidators(input)
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put(cacheKey, resources.Items)
+	return resources.Items, nil
 }
