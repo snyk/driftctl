@@ -10,4 +10,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAzureContainerRegistryMetadata(resourceSchemaRepository)
 	initAzureFirewallMetadata(resourceSchemaRepository)
 	initAzurePostgresqlServerMetadata(resourceSchemaRepository)
+	initAzurePublicIPMetadata(resourceSchemaRepository)
 }

@@ -722,3 +722,156 @@ func Test_ListAllFirewalls_Error(t *testing.T) {
 	assert.Equal(t, expectedErr, err)
 	assert.Nil(t, got)
 }
+
+func Test_ListAllPublicIPAddresses_MultiplesResults(t *testing.T) {
+
+	expected := []*armnetwork.PublicIPAddress{
+		{
+			Resource: armnetwork.Resource{
+				ID: to.StringPtr("ip1"),
+			},
+		},
+		{
+			Resource: armnetwork.Resource{
+				ID: to.StringPtr("ip2"),
+			},
+		},
+		{
+			Resource: armnetwork.Resource{
+				ID: to.StringPtr("ip3"),
+			},
+		},
+		{
+			Resource: armnetwork.Resource{
+				ID: to.StringPtr("ip4"),
+			},
+		},
+	}
+
+	fakeClient := &mockPublicIPAddressesClient{}
+
+	mockPager := &mockPublicIPAddressesListAllPager{}
+	mockPager.On("Err").Return(nil).Times(3)
+	mockPager.On("NextPage", mock.Anything).Return(true).Times(2)
+	mockPager.On("NextPage", mock.Anything).Return(false).Times(1)
+	mockPager.On("PageResponse").Return(armnetwork.PublicIPAddressesListAllResponse{
+		PublicIPAddressesListAllResult: armnetwork.PublicIPAddressesListAllResult{
+			PublicIPAddressListResult: armnetwork.PublicIPAddressListResult{
+				Value: expected[:2],
+			},
+		},
+	}).Times(1)
+	mockPager.On("PageResponse").Return(armnetwork.PublicIPAddressesListAllResponse{
+		PublicIPAddressesListAllResult: armnetwork.PublicIPAddressesListAllResult{
+			PublicIPAddressListResult: armnetwork.PublicIPAddressListResult{
+				Value: expected[2:],
+			},
+		},
+	}).Times(1)
+
+	fakeClient.On("ListAll", mock.Anything).Return(mockPager)
+
+	c := &cache.MockCache{}
+	c.On("Get", "ListAllPublicIPAddresses").Return(nil).Times(1)
+	c.On("Put", "ListAllPublicIPAddresses", expected).Return(true).Times(1)
+	s := &networkRepository{
+		publicIPAddressesClient: fakeClient,
+		cache:                   c,
+	}
+	got, err := s.ListAllPublicIPAddresses()
+	if err != nil {
+		t.Errorf("ListAllPublicIPAddresses() error = %v", err)
+		return
+	}
+
+	mockPager.AssertExpectations(t)
+	fakeClient.AssertExpectations(t)
+	c.AssertExpectations(t)
+
+	if !reflect.DeepEqual(got, expected) {
+		t.Errorf("ListAllPublicIPAddresses() got = %v, want %v", got, expected)
+	}
+}
+
+func Test_ListAllPublicIPAddresses_MultiplesResults_WithCache(t *testing.T) {
+
+	expected := []*armnetwork.PublicIPAddress{
+		{
+			Resource: armnetwork.Resource{
+				ID: to.StringPtr("ip1"),
+			},
+		},
+	}
+
+	fakeClient := &mockPublicIPAddressesClient{}
+
+	c := &cache.MockCache{}
+	c.On("Get", "ListAllPublicIPAddresses").Return(expected).Times(1)
+	s := &networkRepository{
+		publicIPAddressesClient: fakeClient,
+		cache:                   c,
+	}
+	got, err := s.ListAllPublicIPAddresses()
+	if err != nil {
+		t.Errorf("ListAllPublicIPAddresses() error = %v", err)
+		return
+	}
+
+	fakeClient.AssertExpectations(t)
+	c.AssertExpectations(t)
+
+	if !reflect.DeepEqual(got, expected) {
+		t.Errorf("ListAllPublicIPAddresses() got = %v, want %v", got, expected)
+	}
+}
+
+func Test_ListAllPublicIPAddresses_Error_OnPageResponse(t *testing.T) {
+
+	fakeClient := &mockPublicIPAddressesClient{}
+
+	expectedErr := errors.New("unexpected error")
+
+	mockPager := &mockPublicIPAddressesListAllPager{}
+	mockPager.On("Err").Return(expectedErr).Times(1)
+	mockPager.On("NextPage", mock.Anything).Return(true).Times(1)
+	mockPager.On("PageResponse").Return(armnetwork.PublicIPAddressesListAllResponse{}).Times(1)
+
+	fakeClient.On("ListAll", mock.Anything).Return(mockPager)
+
+	s := &networkRepository{
+		publicIPAddressesClient: fakeClient,
+		cache:                   cache.New(0),
+	}
+	got, err := s.ListAllPublicIPAddresses()
+
+	mockPager.AssertExpectations(t)
+	fakeClient.AssertExpectations(t)
+
+	assert.Equal(t, expectedErr, err)
+	assert.Nil(t, got)
+}
+
+func Test_ListAllPublicIPAddresses_Error(t *testing.T) {
+
+	fakeClient := &mockPublicIPAddressesClient{}
+
+	expectedErr := errors.New("unexpected error")
+
+	mockPager := &mockPublicIPAddressesListAllPager{}
+	mockPager.On("Err").Return(expectedErr).Times(1)
+	mockPager.On("NextPage", mock.Anything).Return(false).Times(1)
+
+	fakeClient.On("ListAll", mock.Anything).Return(mockPager)
+
+	s := &networkRepository{
+		publicIPAddressesClient: fakeClient,
+		cache:                   cache.New(0),
+	}
+	got, err := s.ListAllPublicIPAddresses()
+
+	mockPager.AssertExpectations(t)
+	fakeClient.AssertExpectations(t)
+
+	assert.Equal(t, expectedErr, err)
+	assert.Nil(t, got)
+}

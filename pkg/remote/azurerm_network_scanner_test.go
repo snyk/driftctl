@@ -580,3 +580,96 @@ func TestAzurermFirewalls(t *testing.T) {
 		})
 	}
 }
+
+func TestAzurermPublicIP(t *testing.T) {
+
+	dummyError := errors.New("this is an error")
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "no public IP",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllPublicIPAddresses").Return([]*armnetwork.PublicIPAddress{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "error listing public IPs",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllPublicIPAddresses").Return(nil, dummyError)
+			},
+			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzurePublicIPResourceType),
+		},
+		{
+			test: "multiple public IP",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllPublicIPAddresses").Return([]*armnetwork.PublicIPAddress{
+					{
+						Resource: armnetwork.Resource{
+							ID:   to.StringPtr("ip1"), // Here we don't care to have a valid ID, it is for testing purpose only
+							Name: to.StringPtr("ip1"),
+						},
+					},
+					{
+						Resource: armnetwork.Resource{
+							ID:   to.StringPtr("ip2"),
+							Name: to.StringPtr("ip2"),
+						},
+					},
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, got[0].ResourceId(), "ip1")
+				assert.Equal(t, got[0].ResourceType(), resourceazure.AzurePublicIPResourceType)
+
+				assert.Equal(t, got[1].ResourceId(), "ip2")
+				assert.Equal(t, got[1].ResourceType(), resourceazure.AzurePublicIPResourceType)
+			},
+		},
+	}
+
+	providerVersion := "2.71.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
+	resourceazure.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockNetworkRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.NetworkRepository = fakeRepo
+
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermPublicIPEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, c.wantErr, err)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+		})
+	}
+}
