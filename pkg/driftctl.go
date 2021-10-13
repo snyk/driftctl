@@ -117,7 +117,6 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 
 		middlewares.NewGoogleIAMBindingTransformer(d.resourceFactory),
 		middlewares.NewGoogleIAMPolicyTransformer(d.resourceFactory),
-		middlewares.NewGoogleLegacyBucketIAMMember(),
 
 		middlewares.NewAzurermRouteExpander(d.resourceFactory),
 		middlewares.NewAzurermSubnetExpander(d.resourceFactory),
@@ -126,6 +125,8 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	if !d.opts.StrictMode {
 		middleware = append(middleware,
 			middlewares.NewAwsDefaults(),
+			middlewares.NewGoogleLegacyBucketIAMMember(),
+			middlewares.NewGoogleDefaultIAMMember(),
 		)
 	}
 
