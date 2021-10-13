@@ -14,7 +14,7 @@ func TestAcc_Google_StorageBucketIAMMember(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "gcp+tf",
-			"--filter", "Type=='google_storage_bucket_iam_binding'",
+			"--filter", "Type=='google_storage_bucket_iam_member'",
 		},
 		Checks: []acceptance.AccCheck{
 			{
