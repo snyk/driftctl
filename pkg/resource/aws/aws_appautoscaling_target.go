@@ -18,4 +18,5 @@ func initAwsAppAutoscalingTargetMetaData(resourceSchemaRepository resource.Schem
 		}
 		return attrs
 	})
+	resourceSchemaRepository.SetFlags(AwsAppAutoscalingTargetResourceType, resource.FlagDeepMode)
 }
