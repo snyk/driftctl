@@ -1,4 +1,4 @@
-package google_test
+package azurerm_test
 
 import (
 	"testing"
@@ -7,14 +7,14 @@ import (
 	"github.com/cloudskiff/driftctl/test/acceptance"
 )
 
-func TestAcc_Google_StorageBucketIAMMember(t *testing.T) {
+func TestAcc_Azure_PublicIP(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
-		Paths:            []string{"./testdata/acc/google_storage_bucket_iam_member"},
+		Paths:            []string{"./testdata/acc/azurerm_public_ip"},
 		Args: []string{
 			"scan",
-			"--to", "gcp+tf",
-			"--filter", "Type=='google_storage_bucket_iam_member'",
+			"--to", "azure+tf",
+			"--filter", "Type=='azurerm_public_ip'",
 		},
 		Checks: []acceptance.AccCheck{
 			{
@@ -23,7 +23,7 @@ func TestAcc_Google_StorageBucketIAMMember(t *testing.T) {
 						t.Fatal(err)
 					}
 					result.AssertInfrastructureIsInSync()
-					result.AssertManagedCount(4)
+					result.AssertManagedCount(1)
 				},
 			},
 		},

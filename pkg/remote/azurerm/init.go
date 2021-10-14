@@ -59,6 +59,7 @@ func Init(
 	remoteLibrary.AddEnumerator(NewAzurermContainerRegistryEnumerator(containerRegistryRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermFirewallsEnumerator(networkRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermPostgresqlServerEnumerator(postgresqlRepo, factory))
+	remoteLibrary.AddEnumerator(NewAzurermPublicIPEnumerator(networkRepo, factory))
 
 	err = resourceSchemaRepository.Init(terraform.AZURE, provider.Version(), provider.Schema())
 	if err != nil {

@@ -16,6 +16,24 @@ type NetworkRepository interface {
 	ListAllRouteTables() ([]*armnetwork.RouteTable, error)
 	ListAllSubnets(virtualNetwork *armnetwork.VirtualNetwork) ([]*armnetwork.Subnet, error)
 	ListAllFirewalls() ([]*armnetwork.AzureFirewall, error)
+	ListAllPublicIPAddresses() ([]*armnetwork.PublicIPAddress, error)
+}
+
+type publicIPAddressesClient interface {
+	ListAll(options *armnetwork.PublicIPAddressesListAllOptions) publicIPAddressesListAllPager
+}
+
+type publicIPAddressesListAllPager interface {
+	pager
+	PageResponse() armnetwork.PublicIPAddressesListAllResponse
+}
+
+type publicIPAddressesClientImpl struct {
+	client *armnetwork.PublicIPAddressesClient
+}
+
+func (p publicIPAddressesClientImpl) ListAll(options *armnetwork.PublicIPAddressesListAllOptions) publicIPAddressesListAllPager {
+	return p.client.ListAll(options)
 }
 
 type firewallsListAllPager interface {
@@ -87,11 +105,12 @@ func (c routeTablesClientImpl) ListAll(options *armnetwork.RouteTablesListAllOpt
 }
 
 type networkRepository struct {
-	virtualNetworksClient virtualNetworksClient
-	routeTableClient      routeTablesClient
-	subnetsClient         subnetsClient
-	firewallsClient       firewallsClient
-	cache                 cache.Cache
+	virtualNetworksClient   virtualNetworksClient
+	routeTableClient        routeTablesClient
+	subnetsClient           subnetsClient
+	firewallsClient         firewallsClient
+	publicIPAddressesClient publicIPAddressesClient
+	cache                   cache.Cache
 }
 
 func NewNetworkRepository(con *arm.Connection, config common.AzureProviderConfig, cache cache.Cache) *networkRepository {
@@ -100,6 +119,7 @@ func NewNetworkRepository(con *arm.Connection, config common.AzureProviderConfig
 		&routeTablesClientImpl{client: armnetwork.NewRouteTablesClient(con, config.SubscriptionID)},
 		&subnetsClientImpl{client: armnetwork.NewSubnetsClient(con, config.SubscriptionID)},
 		&firewallsClientImpl{client: armnetwork.NewAzureFirewallsClient(con, config.SubscriptionID)},
+		&publicIPAddressesClientImpl{client: armnetwork.NewPublicIPAddressesClient(con, config.SubscriptionID)},
 		cache,
 	}
 }
@@ -207,6 +227,32 @@ func (s *networkRepository) ListAllFirewalls() ([]*armnetwork.AzureFirewall, err
 			return nil, err
 		}
 		results = append(results, resp.AzureFirewallsListAllResult.AzureFirewallListResult.Value...)
+	}
+
+	if err := pager.Err(); err != nil {
+		return nil, err
+	}
+
+	s.cache.Put(cacheKey, results)
+
+	return results, nil
+}
+
+func (s *networkRepository) ListAllPublicIPAddresses() ([]*armnetwork.PublicIPAddress, error) {
+	cacheKey := "ListAllPublicIPAddresses"
+
+	if v := s.cache.Get(cacheKey); v != nil {
+		return v.([]*armnetwork.PublicIPAddress), nil
+	}
+
+	pager := s.publicIPAddressesClient.ListAll(nil)
+	results := make([]*armnetwork.PublicIPAddress, 0)
+	for pager.NextPage(context.Background()) {
+		resp := pager.PageResponse()
+		if err := pager.Err(); err != nil {
+			return nil, err
+		}
+		results = append(results, resp.PublicIPAddressesListAllResult.PublicIPAddressListResult.Value...)
 	}
 
 	if err := pager.Err(); err != nil {
