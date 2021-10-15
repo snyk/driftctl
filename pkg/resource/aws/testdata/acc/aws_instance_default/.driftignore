@@ -1,0 +1,3 @@
+*
+!aws_instance
+!aws_ebs_volume

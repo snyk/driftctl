@@ -11,7 +11,7 @@ func TestAcc_Aws_AppAutoscalingScheduledAction(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_appautoscaling_scheduled_action"},
-		Args:             []string{"scan", "--filter", "Type=='aws_appautoscaling_scheduled_action'"},
+		Args:             []string{"scan"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

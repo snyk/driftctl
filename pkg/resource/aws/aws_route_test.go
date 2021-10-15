@@ -12,7 +12,7 @@ func TestAcc_AwsRoute(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_route"},
-		Args:             []string{"scan", "--filter", "Type=='aws_route'", "--tf-provider-version", "3.44.0", "--deep"},
+		Args:             []string{"scan", "--deep"},
 		RetryDestroy: acceptance.RetryConfig{
 			Attempts: 3,
 			Delay:    5 * time.Second,

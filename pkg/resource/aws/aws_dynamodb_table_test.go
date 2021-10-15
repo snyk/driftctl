@@ -11,7 +11,7 @@ func TestAcc_AwsDynamoDBTable(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_dynamodb_table"},
-		Args:             []string{"scan", "--filter", "Type=='aws_dynamodb_table'", "--deep"},
+		Args:             []string{"scan", "--deep"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

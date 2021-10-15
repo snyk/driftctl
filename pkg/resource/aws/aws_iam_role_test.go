@@ -11,7 +11,7 @@ func TestAcc_Aws_IamRole(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_iam_role"},
-		Args:             []string{"scan", "--filter", "Type=='aws_iam_role'", "--tf-provider-version", "3.45.0", "--deep"},
+		Args:             []string{"scan", "--deep"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
@@ -34,13 +34,7 @@ func TestAcc_Aws_IamRole_WithManaged(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_iam_role_with_managed_policies"},
-		Args: []string{
-			"scan",
-			"--filter",
-			"Type=='aws_iam_role' || Type=='aws_iam_policy_attachment'",
-			"--tf-provider-version",
-			"3.45.0",
-		},
+		Args:             []string{"scan"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

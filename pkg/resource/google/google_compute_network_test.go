@@ -14,7 +14,6 @@ func TestAcc_Google_ComputeNetwork(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "gcp+tf",
-			"--filter", "Type=='google_compute_network'",
 			"--deep",
 		},
 		Checks: []acceptance.AccCheck{

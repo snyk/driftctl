@@ -14,7 +14,6 @@ func TestAcc_Google_ComputeFirewall(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "gcp+tf",
-			"--filter", "Type=='google_compute_firewall'",
 			"--deep",
 		},
 		Checks: []acceptance.AccCheck{

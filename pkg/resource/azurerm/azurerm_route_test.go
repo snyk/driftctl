@@ -14,7 +14,6 @@ func TestAcc_Azure_Route(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "azure+tf",
-			"--filter", "Type=='azurerm_route'",
 		},
 		Checks: []acceptance.AccCheck{
 			{
@@ -37,7 +36,6 @@ func TestAcc_Azure_Route_Nested(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "azure+tf",
-			"--filter", "Type=='azurerm_route'",
 		},
 		Checks: []acceptance.AccCheck{
 			{

@@ -14,7 +14,6 @@ func TestAcc_Azure_Firewall(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "azure+tf",
-			"--filter", "Type=='azurerm_firewall'",
 		},
 		Checks: []acceptance.AccCheck{
 			{

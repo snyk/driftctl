@@ -11,7 +11,7 @@ func TestAcc_AwsS3Bucket_BucketInUsEast1(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_s3_bucket"},
-		Args:             []string{"scan", "--filter", "Type=='aws_s3_bucket' || Type=='aws_s3_bucket_policy'", "--deep"},
+		Args:             []string{"scan", "--deep"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

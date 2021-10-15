@@ -11,7 +11,7 @@ func TestAcc_AwsSubnet(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_subnet"},
-		Args:             []string{"scan", "--filter", "Type=='aws_subnet' || Type=='aws_default_subnet'", "--deep"},
+		Args:             []string{"scan", "--deep"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

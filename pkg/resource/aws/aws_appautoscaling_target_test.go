@@ -13,7 +13,6 @@ func TestAcc_Aws_AppAutoScalingTarget(t *testing.T) {
 		Paths:            []string{"./testdata/acc/aws_appautoscaling_target"},
 		Args: []string{
 			"scan",
-			"--filter", "Type=='aws_appautoscaling_target'",
 			"--deep",
 		},
 		Checks: []acceptance.AccCheck{

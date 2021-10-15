@@ -22,7 +22,7 @@ func TestAcc_Aws_CloudfrontDistribution(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion:           "0.15.5",
 		Paths:                      []string{"./testdata/acc/aws_cloudfront_distribution"},
-		Args:                       []string{"scan", "--filter", "Type=='aws_cloudfront_distribution'", "--deep"},
+		Args:                       []string{"scan", "--deep"},
 		ShouldRefreshBeforeDestroy: true,
 		Checks: []acceptance.AccCheck{
 			{

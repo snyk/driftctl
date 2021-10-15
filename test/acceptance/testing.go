@@ -47,6 +47,7 @@ type RetryConfig struct {
 
 type AccTestCase struct {
 	TerraformVersion           string
+	WorkingDir                 string
 	Paths                      []string
 	Args                       []string
 	OnStart                    func()
@@ -314,6 +315,8 @@ func (c *AccTestCase) setEnv(env []string) {
 
 func Run(t *testing.T, c AccTestCase) {
 
+	logger.Init()
+
 	if os.Getenv("DRIFTCTL_ACC") == "" {
 		t.Skip()
 	}
@@ -360,12 +363,17 @@ func Run(t *testing.T, c AccTestCase) {
 		t.Fatal(err)
 	}
 
-	logger.Init()
-
 	err = c.createResultFile(t)
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	// If the path contains only one element, we switch to this directory for driftctl execution
+	// We can override this logic by passing a WorkingDir argument in test
+	if c.WorkingDir == "" && len(c.Paths) == 1 {
+		c.WorkingDir = c.Paths[0]
+	}
+
 	if c.Args != nil {
 		c.Args = append([]string{""}, c.Args...)
 		isFromSet := false
@@ -375,7 +383,9 @@ func Run(t *testing.T, c AccTestCase) {
 				break
 			}
 		}
-		if !isFromSet {
+		// If any --from flag was manually provided OR if a working dir is specified,
+		// do not setup any --from flags
+		if !isFromSet && c.WorkingDir == "" {
 			for _, p := range c.Paths {
 				c.Args = append(c.Args,
 					"--from", fmt.Sprintf("tfstate://%s", path.Join(p, "terraform.tfstate")),
@@ -407,7 +417,31 @@ func Run(t *testing.T, c AccTestCase) {
 		if check.Args != nil {
 			os.Args = append(os.Args, check.Args()...)
 		}
+
+		wd, _ := os.Getwd()
+		if c.WorkingDir != "" {
+			logrus.WithField("dir", c.WorkingDir).Debug("Switching working directory for driftctl execution")
+			err = os.Chdir(c.WorkingDir)
+			if err != nil {
+				logrus.WithFields(logrus.Fields{
+					"from": wd,
+					"to":   c.WorkingDir,
+				}).Errorf("Unable to switch to testing working dir: %s", err.Error())
+			}
+		}
+		logrus.WithField("args", fmt.Sprintf("%+v", os.Args)).Debug("Running driftctl")
 		_, out, cmdErr := runDriftCtlCmd(driftctlCmd)
+		// Restore original working directory
+		if c.WorkingDir != "" {
+			err = os.Chdir(wd)
+			if err != nil {
+				logrus.WithFields(logrus.Fields{
+					"to":   wd,
+					"from": c.WorkingDir,
+				}).Errorf("Unable to switch back to original working dir: %s", err.Error())
+			}
+		}
+
 		if len(check.Env) > 0 {
 			for key := range check.Env {
 				_ = os.Unsetenv(key)
