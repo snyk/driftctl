@@ -19,4 +19,7 @@ func initAwsAppAutoscalingTargetMetaData(resourceSchemaRepository resource.Schem
 		return attrs
 	})
 	resourceSchemaRepository.SetFlags(AwsAppAutoscalingTargetResourceType, resource.FlagDeepMode)
+	resourceSchemaRepository.SetDiscriminantFunc(AwsAppAutoscalingTargetResourceType, func(self, target *resource.Resource) bool {
+		return *self.Attributes().GetString("scalable_dimension") == *target.Attributes().GetString("scalable_dimension")
+	})
 }
