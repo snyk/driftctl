@@ -5,6 +5,9 @@ import "github.com/cloudskiff/driftctl/pkg/resource"
 const GoogleComputeInstanceGroupResourceType = "google_compute_instance_group"
 
 func initGoogleComputeInstanceGroupMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(GoogleComputeInstanceGroupResourceType, func(res *resource.Resource) {
+		res.Attributes().SafeDelete([]string{"timeouts"})
+	})
 	resourceSchemaRepository.SetResolveReadAttributesFunc(GoogleComputeInstanceGroupResourceType, func(res *resource.Resource) map[string]string {
 		return map[string]string{
 			"name":    *res.Attributes().GetString("display_name"),

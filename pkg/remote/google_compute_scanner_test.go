@@ -522,18 +522,17 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 			response: []*assetpb.ResourceSearchResult{
 				{
 					AssetType:   "compute.googleapis.com/InstanceGroup",
-					DisplayName: "driftctl-unittest-1",
-					Name:        "//compute.googleapis.com/projects/driftctl-qa-1/zones/us-central1-a/instanceGroups/driftctl-unittest-1",
+					DisplayName: "driftctl-test-1",
+					Name:        "//compute.googleapis.com/projects/cloudskiff-dev-raphael/zones/us-central1-a/instanceGroups/driftctl-test-1",
+					Project:     "cloudskiff-dev-raphael",
+					Location:    "us-central1-a",
 				},
 				{
 					AssetType:   "compute.googleapis.com/InstanceGroup",
-					DisplayName: "driftctl-unittest-2",
-					Name:        "//compute.googleapis.com/projects/driftctl-qa-1/zones/us-central1-a/instanceGroups/driftctl-unittest-2",
-				},
-				{
-					AssetType:   "compute.googleapis.com/InstanceGroup",
-					DisplayName: "driftctl-unittest-3",
-					Name:        "//compute.googleapis.com/projects/driftctl-qa-1/zones/us-central1-a/instanceGroups/driftctl-unittest-3",
+					DisplayName: "driftctl-test-2",
+					Name:        "//compute.googleapis.com/projects/cloudskiff-dev-raphael/zones/us-central1-a/instanceGroups/driftctl-test-2",
+					Project:     "cloudskiff-dev-raphael",
+					Location:    "us-central1-a",
 				},
 			},
 			wantErr: nil,
@@ -612,10 +611,11 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 
 			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
-			assert.Equal(tt, err, c.wantErr)
+			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
 				return
 			}
+
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 			test.TestAgainstGoldenFile(got, resType.String(), c.dirName, provider, deserializer, shouldUpdate, tt)
