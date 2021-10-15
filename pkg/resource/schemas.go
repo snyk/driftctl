@@ -36,6 +36,7 @@ type Schema struct {
 	NormalizeFunc               func(res *Resource)
 	HumanReadableAttributesFunc func(res *Resource) map[string]string
 	ResolveReadAttributesFunc   func(res *Resource) map[string]string
+	DiscriminantFunc            func(*Resource, *Resource) bool
 }
 
 func (s *Schema) IsComputedField(path []string) bool {
@@ -61,6 +62,7 @@ type SchemaRepositoryInterface interface {
 	SetNormalizeFunc(typ string, normalizeFunc func(res *Resource))
 	SetHumanReadableAttributesFunc(typ string, humanReadableAttributesFunc func(res *Resource) map[string]string)
 	SetResolveReadAttributesFunc(typ string, resolveReadAttributesFunc func(res *Resource) map[string]string)
+	SetDiscriminantFunc(string, func(*Resource, *Resource) bool)
 }
 
 type SchemaRepository struct {
@@ -171,4 +173,13 @@ func (r *SchemaRepository) SetResolveReadAttributesFunc(typ string, resolveReadA
 		return
 	}
 	(*metadata).ResolveReadAttributesFunc = resolveReadAttributesFunc
+}
+
+func (r *SchemaRepository) SetDiscriminantFunc(typ string, fn func(self, res *Resource) bool) {
+	metadata, exist := r.GetSchema(typ)
+	if !exist {
+		logrus.WithFields(logrus.Fields{"type": typ}).Warning("Unable to set discriminant function, no schema found")
+		return
+	}
+	(*metadata).DiscriminantFunc = fn
 }

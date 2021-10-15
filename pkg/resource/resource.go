@@ -83,8 +83,15 @@ func (r *Resource) SourceString() string {
 }
 
 func (r *Resource) Equal(res *Resource) bool {
-	return r.ResourceId() == res.ResourceId() &&
-		r.ResourceType() == res.ResourceType()
+	if r.ResourceId() != res.ResourceId() || r.ResourceType() != res.ResourceType() {
+		return false
+	}
+
+	if r.Schema() != nil && r.Schema().DiscriminantFunc != nil {
+		return r.Schema().DiscriminantFunc(r, res)
+	}
+
+	return true
 }
 
 type ResourceFactory interface {

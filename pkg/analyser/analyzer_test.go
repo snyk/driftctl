@@ -926,6 +926,60 @@ func TestAnalyze(t *testing.T) {
 			},
 			hasDrifted: true,
 		},
+		{
+			name: "Test Discriminant function",
+			iac: []*resource.Resource{
+				{
+					Id:   "foo",
+					Type: aws.AwsAppAutoscalingTargetResourceType,
+					Attrs: &resource.Attributes{
+						"scalable_dimension": "test2",
+					},
+				},
+			},
+			cloud: []*resource.Resource{
+				{
+					Id:   "foo",
+					Type: aws.AwsAppAutoscalingTargetResourceType,
+					Attrs: &resource.Attributes{
+						"scalable_dimension": "test1",
+					},
+				},
+				{
+					Id:   "foo",
+					Type: aws.AwsAppAutoscalingTargetResourceType,
+					Attrs: &resource.Attributes{
+						"scalable_dimension": "test2",
+					},
+				},
+			},
+			hasDrifted: true,
+			expected: Analysis{
+				managed: []*resource.Resource{
+					{
+						Id:   "foo",
+						Type: aws.AwsAppAutoscalingTargetResourceType,
+						Attrs: &resource.Attributes{
+							"scalable_dimension": "test2",
+						},
+					},
+				},
+				unmanaged: []*resource.Resource{
+					{
+						Id:   "foo",
+						Type: aws.AwsAppAutoscalingTargetResourceType,
+						Attrs: &resource.Attributes{
+							"scalable_dimension": "test1",
+						},
+					},
+				},
+				summary: Summary{
+					TotalResources: 2,
+					TotalManaged:   1,
+					TotalUnmanaged: 1,
+				},
+			},
+		},
 	}
 
 	differ, err := diff.NewDiffer(diff.SliceOrdering(true))
