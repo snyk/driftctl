@@ -333,6 +333,7 @@ func TestTerraformStateReader_Google_Resources(t *testing.T) {
 		{name: "Bucket IAM Bindings", dirName: "google_bucket_iam_binding", wantErr: false},
 		{name: "Bucket IAM members", dirName: "google_bucket_iam_member", wantErr: false},
 		{name: "Bucket IAM Policy", dirName: "google_bucket_iam_policy", wantErr: false},
+		{name: "DNS managed zone", dirName: "google_dns_managed_zone", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

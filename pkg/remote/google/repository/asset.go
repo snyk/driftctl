@@ -11,12 +11,14 @@ import (
 	assetpb "google.golang.org/genproto/googleapis/cloud/asset/v1"
 )
 
+// https://cloud.google.com/asset-inventory/docs/supported-asset-types#supported_resource_types
 const (
 	storageBucketAssetType   = "storage.googleapis.com/Bucket"
 	computeFirewallAssetType = "compute.googleapis.com/Firewall"
 	computeRouterAssetType   = "compute.googleapis.com/Router"
 	computeInstanceAssetType = "compute.googleapis.com/Instance"
 	computeNetworkAssetType  = "compute.googleapis.com/Network"
+	dnsManagedZoneAssetType  = "dns.googleapis.com/ManagedZone"
 )
 
 type AssetRepository interface {
@@ -25,6 +27,7 @@ type AssetRepository interface {
 	SearchAllRouters() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllInstances() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllNetworks() ([]*assetpb.ResourceSearchResult, error)
+	SearchAllDNSManagedZones() ([]*assetpb.ResourceSearchResult, error)
 }
 
 type assetRepository struct {
@@ -50,6 +53,7 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 			computeRouterAssetType,
 			computeInstanceAssetType,
 			computeNetworkAssetType,
+			dnsManagedZoneAssetType,
 		},
 	}
 	var results []*assetpb.ResourceSearchResult
@@ -104,4 +108,8 @@ func (s assetRepository) SearchAllInstances() ([]*assetpb.ResourceSearchResult, 
 
 func (s assetRepository) SearchAllNetworks() ([]*assetpb.ResourceSearchResult, error) {
 	return s.searchAllResources(computeNetworkAssetType)
+}
+
+func (s assetRepository) SearchAllDNSManagedZones() ([]*assetpb.ResourceSearchResult, error) {
+	return s.searchAllResources(dnsManagedZoneAssetType)
 }
