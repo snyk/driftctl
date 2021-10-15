@@ -55,7 +55,9 @@ func NewPostgresqlRepository(con *arm.Connection, config common.AzureProviderCon
 
 func (s *postgresqlRepository) ListAllServers() ([]*armpostgresql.Server, error) {
 	cacheKey := "postgresqlListAllServers"
-	if v := s.cache.Get(cacheKey); v != nil {
+
+	defer s.cache.Unlock(cacheKey)
+	if v := s.cache.GetAndLock(cacheKey); v != nil {
 		return v.([]*armpostgresql.Server), nil
 	}
 

@@ -48,7 +48,8 @@ func Test_Postgresql_ListAllServers(t *testing.T) {
 					},
 				}, nil).Times(1)
 
-				mockCache.On("Get", "postgresqlListAllServers").Return(nil).Times(1)
+				mockCache.On("GetAndLock", "postgresqlListAllServers").Return(nil).Times(1)
+				mockCache.On("Unlock", "postgresqlListAllServers").Return().Times(1)
 				mockCache.On("Put", "postgresqlListAllServers", expectedResults).Return(false).Times(1)
 			},
 			expected: expectedResults,
@@ -56,7 +57,8 @@ func Test_Postgresql_ListAllServers(t *testing.T) {
 		{
 			name: "should hit cache and return postgres servers",
 			mocks: func(client *mockPostgresqlServersClient, mockCache *cache.MockCache) {
-				mockCache.On("Get", "postgresqlListAllServers").Return(expectedResults).Times(1)
+				mockCache.On("GetAndLock", "postgresqlListAllServers").Return(expectedResults).Times(1)
+				mockCache.On("Unlock", "postgresqlListAllServers").Return().Times(1)
 			},
 			expected: expectedResults,
 		},
@@ -65,7 +67,8 @@ func Test_Postgresql_ListAllServers(t *testing.T) {
 			mocks: func(client *mockPostgresqlServersClient, mockCache *cache.MockCache) {
 				client.On("List", context.Background(), mock.Anything).Return(armpostgresql.ServersListResponse{}, errors.New("remote error")).Times(1)
 
-				mockCache.On("Get", "postgresqlListAllServers").Return(nil).Times(1)
+				mockCache.On("GetAndLock", "postgresqlListAllServers").Return(nil).Times(1)
+				mockCache.On("Unlock", "postgresqlListAllServers").Return().Times(1)
 			},
 			wantErr: "remote error",
 		},
