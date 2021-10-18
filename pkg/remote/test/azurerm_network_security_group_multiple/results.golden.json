@@ -1,0 +1,41 @@
+[
+ {
+  "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/example-resources/providers/Microsoft.Network/networkSecurityGroups/acceptanceTestSecurityGroup2",
+  "location": "westeurope",
+  "name": "acceptanceTestSecurityGroup2",
+  "resource_group_name": "example-resources",
+  "security_rule": null,
+  "tags": null,
+  "timeouts": null
+ },
+ {
+  "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/example-resources/providers/Microsoft.Network/networkSecurityGroups/acceptanceTestSecurityGroup1",
+  "location": "westeurope",
+  "name": "acceptanceTestSecurityGroup1",
+  "resource_group_name": "example-resources",
+  "security_rule": [
+   {
+    "access": "Allow",
+    "description": "",
+    "destination_address_prefix": "*",
+    "destination_address_prefixes": null,
+    "destination_application_security_group_ids": null,
+    "destination_port_range": "*",
+    "destination_port_ranges": null,
+    "direction": "Inbound",
+    "name": "test123",
+    "priority": 100,
+    "protocol": "Tcp",
+    "source_address_prefix": "*",
+    "source_address_prefixes": null,
+    "source_application_security_group_ids": null,
+    "source_port_range": "*",
+    "source_port_ranges": null
+   }
+  ],
+  "tags": {
+   "environment": "Production"
+  },
+  "timeouts": null
+ }
+]

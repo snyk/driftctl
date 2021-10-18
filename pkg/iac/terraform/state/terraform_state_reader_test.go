@@ -9,8 +9,10 @@ import (
 
 	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/output"
+	"github.com/cloudskiff/driftctl/pkg/remote/azurerm"
 	"github.com/cloudskiff/driftctl/pkg/remote/google"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+	resourceazure "github.com/cloudskiff/driftctl/pkg/resource/azurerm"
 	resourcegithub "github.com/cloudskiff/driftctl/pkg/resource/github"
 	resourcegoogle "github.com/cloudskiff/driftctl/pkg/resource/google"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
@@ -366,6 +368,88 @@ func TestTerraformStateReader_Google_Resources(t *testing.T) {
 
 			repo := testresource.InitFakeSchemaRepository(terraform.GOOGLE, providerVersion)
 			resourcegoogle.InitResourcesMetadata(repo)
+			factory := terraform.NewTerraformResourceFactory(repo)
+
+			r := &TerraformStateReader{
+				config: config.SupplierConfig{
+					Path: path.Join(goldenfile.GoldenFilePath, tt.dirName, "terraform.tfstate"),
+				},
+				library:      library,
+				progress:     progress,
+				deserializer: resource.NewDeserializer(factory),
+			}
+
+			got, err := r.Resources()
+			resGoldenName := goldenfile.ResultsFilename
+			if shouldUpdate {
+				unm, err := json.Marshal(got)
+				if err != nil {
+					panic(err)
+				}
+				goldenfile.WriteFile(tt.dirName, unm, resGoldenName)
+			}
+
+			file := goldenfile.ReadFile(tt.dirName, resGoldenName)
+			var want []interface{}
+			if err := json.Unmarshal(file, &want); err != nil {
+				panic(err)
+			}
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Resources() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			changelog, err := diff.Diff(convert(got), want)
+			if err != nil {
+				panic(err)
+			}
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s got = %v, want %v", strings.Join(change.Path, "."), change.From, change.To)
+				}
+			}
+		})
+	}
+}
+
+func TestTerraformStateReader_Azure_Resources(t *testing.T) {
+	tests := []struct {
+		name    string
+		dirName string
+		wantErr bool
+	}{
+		{name: "network security group", dirName: "azurerm_network_security_group", wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			progress := &output.MockProgress{}
+			progress.On("Inc").Return().Times(1)
+			progress.On("Stop").Return().Times(1)
+
+			shouldUpdate := tt.dirName == *goldenfile.Update
+
+			var realProvider *azurerm.AzureTerraformProvider
+			providerVersion := "2.71.0"
+			var err error
+			realProvider, err = azurerm.NewAzureTerraformProvider(providerVersion, progress, "")
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+
+			if shouldUpdate {
+				err = realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+			}
+
+			library := terraform.NewProviderLibrary()
+			library.AddProvider(terraform.AZURE, provider)
+
+			repo := testresource.InitFakeSchemaRepository(terraform.AZURE, providerVersion)
+			resourceazure.InitResourcesMetadata(repo)
 			factory := terraform.NewTerraformResourceFactory(repo)
 
 			r := &TerraformStateReader{

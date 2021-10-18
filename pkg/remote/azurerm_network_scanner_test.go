@@ -3,18 +3,24 @@ package remote
 import (
 	"testing"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/network/armnetwork"
 	"github.com/cloudskiff/driftctl/mocks"
 	"github.com/cloudskiff/driftctl/pkg/filter"
 	"github.com/cloudskiff/driftctl/pkg/remote/azurerm"
 	"github.com/cloudskiff/driftctl/pkg/remote/azurerm/repository"
+	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
 	error2 "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceazure "github.com/cloudskiff/driftctl/pkg/resource/azurerm"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/cloudskiff/driftctl/test"
+	"github.com/cloudskiff/driftctl/test/goldenfile"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
+	terraform2 "github.com/cloudskiff/driftctl/test/terraform"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -679,53 +685,44 @@ func TestAzurermSecurityGroups(t *testing.T) {
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
-		test           string
-		mocks          func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
-		assertExpected func(t *testing.T, got []*resource.Resource)
-		wantErr        error
+		test    string
+		dirName string
+		mocks   func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
+		wantErr error
 	}{
 		{
-			test: "no security group",
+			test:    "no security group",
+			dirName: "azurerm_network_security_group_empty",
 			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSecurityGroups").Return([]*armnetwork.NetworkSecurityGroup{}, nil)
 			},
-			assertExpected: func(t *testing.T, got []*resource.Resource) {
-				assert.Len(t, got, 0)
-			},
 		},
 		{
-			test: "error listing security groups",
+			test:    "error listing security groups",
+			dirName: "azurerm_network_security_group_empty",
 			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSecurityGroups").Return(nil, dummyError)
 			},
 			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzureNetworkSecurityGroupResourceType),
 		},
 		{
-			test: "multiple security groups",
+			test:    "multiple security groups",
+			dirName: "azurerm_network_security_group_multiple",
 			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSecurityGroups").Return([]*armnetwork.NetworkSecurityGroup{
 					{
 						Resource: armnetwork.Resource{
-							ID:   to.StringPtr("sec-group1"), // Here we don't care to have a valid ID, it is for testing purpose only
-							Name: to.StringPtr("sec-group1"),
+							ID:   to.StringPtr("/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/example-resources/providers/Microsoft.Network/networkSecurityGroups/acceptanceTestSecurityGroup1"),
+							Name: to.StringPtr("acceptanceTestSecurityGroup1"),
 						},
 					},
 					{
 						Resource: armnetwork.Resource{
-							ID:   to.StringPtr("sec-group2"),
-							Name: to.StringPtr("sec-group2"),
+							ID:   to.StringPtr("/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/example-resources/providers/Microsoft.Network/networkSecurityGroups/acceptanceTestSecurityGroup2"),
+							Name: to.StringPtr("acceptanceTestSecurityGroup2"),
 						},
 					},
 				}, nil)
-			},
-			assertExpected: func(t *testing.T, got []*resource.Resource) {
-				assert.Len(t, got, 2)
-
-				assert.Equal(t, got[0].ResourceId(), "sec-group1")
-				assert.Equal(t, got[0].ResourceType(), resourceazure.AzureNetworkSecurityGroupResourceType)
-
-				assert.Equal(t, got[1].ResourceId(), "sec-group2")
-				assert.Equal(t, got[1].ResourceType(), resourceazure.AzureNetworkSecurityGroupResourceType)
 			},
 		},
 	}
@@ -734,11 +731,14 @@ func TestAzurermSecurityGroups(t *testing.T) {
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
 	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{}
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -747,8 +747,31 @@ func TestAzurermSecurityGroups(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.NetworkRepository = fakeRepo
+			providerVersion := "2.71.0"
+			realProvider, err := terraform2.InitTestAzureProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				cred, err := azidentity.NewDefaultAzureCredential(&azidentity.DefaultAzureCredentialOptions{})
+				if err != nil {
+					t.Fatal(err)
+				}
+				con := arm.NewDefaultConnection(cred, nil)
+				repo = repository.NewNetworkRepository(con, realProvider.GetConfig(), cache.New(0))
+			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermNetworkSecurityGroupEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceazure.AzureNetworkSecurityGroupResourceType, common.NewGenericDetailsFetcher(resourceazure.AzureNetworkSecurityGroupResourceType, provider, deserializer))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -756,11 +779,11 @@ func TestAzurermSecurityGroups(t *testing.T) {
 			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
+
 			if err != nil {
 				return
 			}
-
-			c.assertExpected(tt, got)
+			test.TestAgainstGoldenFile(got, resourceazure.AzureNetworkSecurityGroupResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})

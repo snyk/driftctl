@@ -5,6 +5,9 @@ import "github.com/cloudskiff/driftctl/pkg/resource"
 const AzureNetworkSecurityGroupResourceType = "azurerm_network_security_group"
 
 func initAzureNetworkSecurityGroupMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(AzureNetworkSecurityGroupResourceType, func(res *resource.Resource) {
+		res.Attributes().SafeDelete([]string{"timeouts"})
+	})
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(AzureNetworkSecurityGroupResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)
@@ -13,4 +16,5 @@ func initAzureNetworkSecurityGroupMetadata(resourceSchemaRepository resource.Sch
 		}
 		return attrs
 	})
+	resourceSchemaRepository.SetFlags(AzureNetworkSecurityGroupResourceType, resource.FlagDeepMode)
 }
