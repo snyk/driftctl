@@ -111,18 +111,22 @@ func (p *TerraformProvider) configure(alias string) error {
 		p.schemas = schema.ResourceTypes
 	}
 
+	// This value is optional. It'll be overridden by the provider config.
+	config := cty.NullVal(cty.DynamicPseudoType)
+
 	if p.Config.GetProviderConfig != nil {
 		configType := schema.Provider.Block.ImpliedType()
-		val, err := gocty.ToCtyValue(p.Config.GetProviderConfig(alias), configType)
+		config, err = gocty.ToCtyValue(p.Config.GetProviderConfig(alias), configType)
 		if err != nil {
 			return err
 		}
-		resp := p.grpcProviders[alias].Configure(providers.ConfigureRequest{
-			Config: val,
-		})
-		if resp.Diagnostics.HasErrors() {
-			return resp.Diagnostics.Err()
-		}
+	}
+
+	resp := p.grpcProviders[alias].Configure(providers.ConfigureRequest{
+		Config: config,
+	})
+	if resp.Diagnostics.HasErrors() {
+		return resp.Diagnostics.Err()
 	}
 
 	logrus.WithFields(logrus.Fields{
