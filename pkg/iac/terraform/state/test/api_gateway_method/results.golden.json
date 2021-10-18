@@ -1,0 +1,16 @@
+[
+ {
+  "Id": "agm-vryjzimtj1-hl7ksq-GET",
+  "Type": "aws_api_gateway_method",
+  "Attrs": {
+   "api_key_required": false,
+   "authorization": "NONE",
+   "authorizer_id": "",
+   "http_method": "GET",
+   "id": "agm-vryjzimtj1-hl7ksq-GET",
+   "request_validator_id": "",
+   "resource_id": "hl7ksq",
+   "rest_api_id": "vryjzimtj1"
+  }
+ }
+]
