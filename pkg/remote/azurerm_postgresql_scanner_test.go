@@ -157,7 +157,7 @@ func TestAzurermPostgresqlDatabase(t *testing.T) {
 					},
 				}, nil).Once()
 
-				repository.On("ListAllDatabasesByServer", "api-rg-pro", mock.IsType(&armpostgresql.Server{})).Return(nil, dummyError).Once()
+				repository.On("ListAllDatabasesByServer", mock.IsType(&armpostgresql.Server{})).Return(nil, dummyError).Once()
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzurePostgresqlDatabaseResourceType),
 		},
@@ -175,7 +175,7 @@ func TestAzurermPostgresqlDatabase(t *testing.T) {
 					},
 				}, nil).Once()
 
-				repository.On("ListAllDatabasesByServer", "api-rg-pro", mock.IsType(&armpostgresql.Server{})).Return([]*armpostgresql.Database{
+				repository.On("ListAllDatabasesByServer", mock.IsType(&armpostgresql.Server{})).Return([]*armpostgresql.Database{
 					{
 						ProxyResource: armpostgresql.ProxyResource{
 							Resource: armpostgresql.Resource{
