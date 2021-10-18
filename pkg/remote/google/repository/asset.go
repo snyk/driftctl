@@ -13,12 +13,13 @@ import (
 
 // https://cloud.google.com/asset-inventory/docs/supported-asset-types#supported_resource_types
 const (
-	storageBucketAssetType   = "storage.googleapis.com/Bucket"
-	computeFirewallAssetType = "compute.googleapis.com/Firewall"
-	computeRouterAssetType   = "compute.googleapis.com/Router"
-	computeInstanceAssetType = "compute.googleapis.com/Instance"
-	computeNetworkAssetType  = "compute.googleapis.com/Network"
-	dnsManagedZoneAssetType  = "dns.googleapis.com/ManagedZone"
+	storageBucketAssetType        = "storage.googleapis.com/Bucket"
+	computeFirewallAssetType      = "compute.googleapis.com/Firewall"
+	computeRouterAssetType        = "compute.googleapis.com/Router"
+	computeInstanceAssetType      = "compute.googleapis.com/Instance"
+	computeNetworkAssetType       = "compute.googleapis.com/Network"
+	dnsManagedZoneAssetType       = "dns.googleapis.com/ManagedZone"
+	computeInstanceGroupAssetType = "compute.googleapis.com/InstanceGroup"
 )
 
 type AssetRepository interface {
@@ -28,6 +29,7 @@ type AssetRepository interface {
 	SearchAllInstances() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllNetworks() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllDNSManagedZones() ([]*assetpb.ResourceSearchResult, error)
+	SearchAllInstanceGroups() ([]*assetpb.ResourceSearchResult, error)
 }
 
 type assetRepository struct {
@@ -54,6 +56,7 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 			computeInstanceAssetType,
 			computeNetworkAssetType,
 			dnsManagedZoneAssetType,
+			computeInstanceGroupAssetType,
 		},
 	}
 	var results []*assetpb.ResourceSearchResult
@@ -112,4 +115,8 @@ func (s assetRepository) SearchAllNetworks() ([]*assetpb.ResourceSearchResult, e
 
 func (s assetRepository) SearchAllDNSManagedZones() ([]*assetpb.ResourceSearchResult, error) {
 	return s.searchAllResources(dnsManagedZoneAssetType)
+}
+
+func (s assetRepository) SearchAllInstanceGroups() ([]*assetpb.ResourceSearchResult, error) {
+	return s.searchAllResources(computeInstanceGroupAssetType)
 }

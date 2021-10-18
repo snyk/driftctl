@@ -140,7 +140,8 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"google_storage_bucket_iam_policy": {children: []ResourceType{
 		"google_storage_bucket_iam_member",
 	}},
-	"google_dns_managed_zone": {},
+	"google_dns_managed_zone":       {},
+	"google_compute_instance_group": {},
 
 	"azurerm_storage_account":   {},
 	"azurerm_storage_container": {},
