@@ -41,6 +41,14 @@ resource "azurerm_postgresql_server" "example" {
 
   administrator_login          = "psqladminun"
   administrator_login_password = random_password.password.result
-  version                      = "9.5"
+  version                      = "10"
   ssl_enforcement_enabled      = true
+}
+
+resource "azurerm_postgresql_database" "example" {
+  name                = "acc-test-db"
+  resource_group_name = data.azurerm_resource_group.qa1.name
+  server_name         = azurerm_postgresql_server.example.name
+  charset             = "UTF8"
+  collation           = "English_United States.1252"
 }

@@ -2,15 +2,18 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/postgresql/armpostgresql"
+	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/cloudskiff/driftctl/pkg/remote/azurerm/common"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 )
 
 type PostgresqlRespository interface {
 	ListAllServers() ([]*armpostgresql.Server, error)
+	ListAllDatabasesByServer(server *armpostgresql.Server) ([]*armpostgresql.Database, error)
 }
 
 type postgresqlServersClientImpl struct {
@@ -25,21 +28,37 @@ func (c postgresqlServersClientImpl) List(ctx context.Context, options *armpostg
 	return c.client.List(ctx, options)
 }
 
+type postgresqlDatabaseClientImpl struct {
+	client *armpostgresql.DatabasesClient
+}
+
+type postgresqlDatabaseClient interface {
+	ListByServer(context.Context, string, string, *armpostgresql.DatabasesListByServerOptions) (armpostgresql.DatabasesListByServerResponse, error)
+}
+
+func (c postgresqlDatabaseClientImpl) ListByServer(ctx context.Context, resGroup string, serverName string, options *armpostgresql.DatabasesListByServerOptions) (armpostgresql.DatabasesListByServerResponse, error) {
+	return c.client.ListByServer(ctx, resGroup, serverName, options)
+}
+
 type postgresqlRepository struct {
-	serversClient postgresqlServersClient
-	cache         cache.Cache
+	serversClient  postgresqlServersClient
+	databaseClient postgresqlDatabaseClient
+	cache          cache.Cache
 }
 
 func NewPostgresqlRepository(con *arm.Connection, config common.AzureProviderConfig, cache cache.Cache) *postgresqlRepository {
 	return &postgresqlRepository{
 		postgresqlServersClientImpl{client: armpostgresql.NewServersClient(con, config.SubscriptionID)},
+		postgresqlDatabaseClientImpl{client: armpostgresql.NewDatabasesClient(con, config.SubscriptionID)},
 		cache,
 	}
 }
 
 func (s *postgresqlRepository) ListAllServers() ([]*armpostgresql.Server, error) {
 	cacheKey := "postgresqlListAllServers"
-	if v := s.cache.Get(cacheKey); v != nil {
+
+	defer s.cache.Unlock(cacheKey)
+	if v := s.cache.GetAndLock(cacheKey); v != nil {
 		return v.([]*armpostgresql.Server), nil
 	}
 
@@ -50,4 +69,24 @@ func (s *postgresqlRepository) ListAllServers() ([]*armpostgresql.Server, error)
 
 	s.cache.Put(cacheKey, res.Value)
 	return res.Value, nil
+}
+
+func (s *postgresqlRepository) ListAllDatabasesByServer(server *armpostgresql.Server) ([]*armpostgresql.Database, error) {
+	res, err := azure.ParseResourceID(*server.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	cacheKey := fmt.Sprintf("postgresqlListAllDatabases_%s_%s", res.ResourceGroup, *server.Name)
+	if v := s.cache.Get(cacheKey); v != nil {
+		return v.([]*armpostgresql.Database), nil
+	}
+
+	result, err := s.databaseClient.ListByServer(context.Background(), res.ResourceGroup, *server.Name, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	s.cache.Put(cacheKey, result.Value)
+	return result.Value, nil
 }
