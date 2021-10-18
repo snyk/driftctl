@@ -129,7 +129,7 @@ func Test_Postgresql_ListAllDatabases(t *testing.T) {
 		{
 			name: "should return postgres servers",
 			mocks: func(client *mockPostgresqlDatabaseClient, mockCache *cache.MockCache) {
-				client.On("ListByServer", context.Background(), "res-group", "server", &armpostgresql.DatabasesListByServerOptions{}).Return(armpostgresql.DatabasesListByServerResponse{
+				client.On("ListByServer", context.Background(), "res-group", "server", (*armpostgresql.DatabasesListByServerOptions)(nil)).Return(armpostgresql.DatabasesListByServerResponse{
 					DatabasesListByServerResult: armpostgresql.DatabasesListByServerResult{
 						DatabaseListResult: armpostgresql.DatabaseListResult{
 							Value: expectedResults,
@@ -154,7 +154,7 @@ func Test_Postgresql_ListAllDatabases(t *testing.T) {
 			mocks: func(client *mockPostgresqlDatabaseClient, mockCache *cache.MockCache) {
 				mockCache.On("Get", "postgresqlListAllDatabases_res-group_server").Return(nil).Times(1)
 
-				client.On("ListByServer", context.Background(), "res-group", "server", &armpostgresql.DatabasesListByServerOptions{}).Return(armpostgresql.DatabasesListByServerResponse{}, errors.New("remote error")).Times(1)
+				client.On("ListByServer", context.Background(), "res-group", "server", (*armpostgresql.DatabasesListByServerOptions)(nil)).Return(armpostgresql.DatabasesListByServerResponse{}, errors.New("remote error")).Times(1)
 			},
 			wantErr: "remote error",
 		},
@@ -171,7 +171,14 @@ func Test_Postgresql_ListAllDatabases(t *testing.T) {
 				databaseClient: fakeClient,
 				cache:          mockCache,
 			}
-			got, err := s.ListAllDatabasesByServer("res-group", "server")
+			got, err := s.ListAllDatabasesByServer("res-group", &armpostgresql.Server{
+				TrackedResource: armpostgresql.TrackedResource{
+					Resource: armpostgresql.Resource{
+						ID:   to.StringPtr("server"),
+						Name: to.StringPtr("server"),
+					},
+				},
+			})
 			if tt.wantErr != "" {
 				assert.EqualError(t, err, tt.wantErr)
 			} else {

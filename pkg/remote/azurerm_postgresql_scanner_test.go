@@ -10,7 +10,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/azurerm"
 	"github.com/cloudskiff/driftctl/pkg/remote/azurerm/repository"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
-	error2 "github.com/cloudskiff/driftctl/pkg/remote/error"
+	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceazure "github.com/cloudskiff/driftctl/pkg/resource/azurerm"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -44,7 +44,7 @@ func TestAzurermPostgresqlServer(t *testing.T) {
 			mocks: func(repository *repository.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllServers").Return(nil, dummyError)
 			},
-			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzurePostgresqlServerResourceType),
+			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzurePostgresqlServerResourceType),
 		},
 		{
 			test: "multiple postgres servers",
@@ -141,7 +141,7 @@ func TestAzurermPostgresqlDatabase(t *testing.T) {
 			mocks: func(repository *repository.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllServers").Return(nil, dummyError)
 			},
-			wantErr: error2.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePostgresqlDatabaseResourceType, resourceazure.AzurePostgresqlServerResourceType),
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePostgresqlDatabaseResourceType, resourceazure.AzurePostgresqlServerResourceType),
 		},
 		{
 			test: "error listing postgres databases",
@@ -157,9 +157,9 @@ func TestAzurermPostgresqlDatabase(t *testing.T) {
 					},
 				}, nil).Once()
 
-				repository.On("ListAllDatabasesByServer", "api-rg-pro", "postgresql-server-8791542").Return(nil, dummyError).Once()
+				repository.On("ListAllDatabasesByServer", "api-rg-pro", mock.IsType(&armpostgresql.Server{})).Return(nil, dummyError).Once()
 			},
-			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzurePostgresqlDatabaseResourceType),
+			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzurePostgresqlDatabaseResourceType),
 		},
 		{
 			test: "multiple postgres databases",
@@ -175,7 +175,7 @@ func TestAzurermPostgresqlDatabase(t *testing.T) {
 					},
 				}, nil).Once()
 
-				repository.On("ListAllDatabasesByServer", "api-rg-pro", "postgresql-server-8791542").Return([]*armpostgresql.Database{
+				repository.On("ListAllDatabasesByServer", "api-rg-pro", mock.IsType(&armpostgresql.Server{})).Return([]*armpostgresql.Database{
 					{
 						ProxyResource: armpostgresql.ProxyResource{
 							Resource: armpostgresql.Resource{

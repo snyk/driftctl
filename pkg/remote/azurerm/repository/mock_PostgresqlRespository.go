@@ -12,13 +12,13 @@ type MockPostgresqlRespository struct {
 	mock.Mock
 }
 
-// ListAllDatabasesByServer provides a mock function with given fields: resGroup, serverName
-func (_m *MockPostgresqlRespository) ListAllDatabasesByServer(resGroup string, serverName string) ([]*armpostgresql.Database, error) {
-	ret := _m.Called(resGroup, serverName)
+// ListAllDatabasesByServer provides a mock function with given fields: resGroup, server
+func (_m *MockPostgresqlRespository) ListAllDatabasesByServer(resGroup string, server *armpostgresql.Server) ([]*armpostgresql.Database, error) {
+	ret := _m.Called(resGroup, server)
 
 	var r0 []*armpostgresql.Database
-	if rf, ok := ret.Get(0).(func(string, string) []*armpostgresql.Database); ok {
-		r0 = rf(resGroup, serverName)
+	if rf, ok := ret.Get(0).(func(string, *armpostgresql.Server) []*armpostgresql.Database); ok {
+		r0 = rf(resGroup, server)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*armpostgresql.Database)
@@ -26,8 +26,8 @@ func (_m *MockPostgresqlRespository) ListAllDatabasesByServer(resGroup string, s
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string, string) error); ok {
-		r1 = rf(resGroup, serverName)
+	if rf, ok := ret.Get(1).(func(string, *armpostgresql.Server) error); ok {
+		r1 = rf(resGroup, server)
 	} else {
 		r1 = ret.Error(1)
 	}

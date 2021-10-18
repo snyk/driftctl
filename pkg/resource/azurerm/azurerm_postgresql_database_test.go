@@ -14,7 +14,7 @@ func TestAcc_Azure_PostgresqlDatabase(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "azure+tf",
-			"--filter", "Type=='azurerm_postgresql_database' && contains(Id, 'acc-test-db')",
+			"--filter", "contains(Id, 'acc-test-db')",
 		},
 		Checks: []acceptance.AccCheck{
 			{

@@ -12,7 +12,7 @@ import (
 
 type PostgresqlRespository interface {
 	ListAllServers() ([]*armpostgresql.Server, error)
-	ListAllDatabasesByServer(resGroup string, serverName string) ([]*armpostgresql.Database, error)
+	ListAllDatabasesByServer(resGroup string, server *armpostgresql.Server) ([]*armpostgresql.Database, error)
 }
 
 type postgresqlServersClientImpl struct {
@@ -70,13 +70,13 @@ func (s *postgresqlRepository) ListAllServers() ([]*armpostgresql.Server, error)
 	return res.Value, nil
 }
 
-func (s *postgresqlRepository) ListAllDatabasesByServer(resGroup string, serverName string) ([]*armpostgresql.Database, error) {
-	cacheKey := fmt.Sprintf("postgresqlListAllDatabases_%s_%s", resGroup, serverName)
+func (s *postgresqlRepository) ListAllDatabasesByServer(resGroup string, server *armpostgresql.Server) ([]*armpostgresql.Database, error) {
+	cacheKey := fmt.Sprintf("postgresqlListAllDatabases_%s_%s", resGroup, *server.Name)
 	if v := s.cache.Get(cacheKey); v != nil {
 		return v.([]*armpostgresql.Database), nil
 	}
 
-	res, err := s.databaseClient.ListByServer(context.Background(), resGroup, serverName, &armpostgresql.DatabasesListByServerOptions{})
+	res, err := s.databaseClient.ListByServer(context.Background(), resGroup, *server.Name, nil)
 	if err != nil {
 		return nil, err
 	}
