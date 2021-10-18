@@ -878,7 +878,20 @@ func Test_ListAllPublicIPAddresses_Error(t *testing.T) {
 }
 
 func Test_Network_ListAllSecurityGroups(t *testing.T) {
-	expectedResults := []*armnetwork.NetworkSecurityGroup{}
+	expectedResults := []*armnetwork.NetworkSecurityGroup{
+		{
+			Resource: armnetwork.Resource{
+				ID:   to.StringPtr("sgroup-1"),
+				Name: to.StringPtr("sgroup-1"),
+			},
+		},
+		{
+			Resource: armnetwork.Resource{
+				ID:   to.StringPtr("sgroup-2"),
+				Name: to.StringPtr("sgroup-2"),
+			},
+		},
+	}
 
 	testcases := []struct {
 		name     string

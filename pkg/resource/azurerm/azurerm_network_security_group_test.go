@@ -14,7 +14,7 @@ func TestAcc_Azure_NetworkSecurityGroup(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "azure+tf",
-			"--filter", "Type=='azurerm_network_security_group' && contains(Id, 'acceptanceTestSecurityGroup-')",
+			"--filter", "contains(Id, 'acceptanceTestSecurityGroup-')",
 		},
 		Checks: []acceptance.AccCheck{
 			{
