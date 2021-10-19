@@ -110,6 +110,10 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		middlewares.NewTagsAllManager(),
 		middlewares.NewEipAssociationExpander(d.resourceFactory),
 		middlewares.NewRDSClusterInstanceExpander(d.resourceFactory),
+		middlewares.NewAwsApiGatewayDeploymentExpander(d.resourceFactory),
+		middlewares.NewAwsApiGatewayResourceExpander(d.resourceFactory),
+		middlewares.NewAwsApiGatewayRestApiExpander(d.resourceFactory),
+		middlewares.NewAwsApiGatewayRestApiPolicyExpander(d.resourceFactory),
 
 		middlewares.NewGoogleStorageBucketIAMBindingTransformer(d.resourceFactory),
 		middlewares.NewGoogleStorageBucketIAMPolicyTransformer(d.resourceFactory),
@@ -117,9 +121,6 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 
 		middlewares.NewAzurermRouteExpander(d.resourceFactory),
 		middlewares.NewAzurermSubnetExpander(d.resourceFactory),
-		middlewares.NewAwsApiGatewayDeploymentExpander(d.resourceFactory),
-		middlewares.NewAwsApiGatewayResourceExpander(d.resourceFactory),
-		middlewares.NewAwsApiGatewayRestApiExpander(d.resourceFactory),
 	)
 
 	if !d.opts.StrictMode {
