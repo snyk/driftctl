@@ -61,14 +61,18 @@ func TestAwsRDSClusterInstanceExpander_Execute(t *testing.T) {
 					Attrs: &resource.Attributes{},
 				},
 				{
-					Id:    "aurora-cluster-demo-0",
-					Type:  aws.AwsDbInstanceResourceType,
-					Attrs: &resource.Attributes{},
+					Id:   "aurora-cluster-demo-0",
+					Type: aws.AwsDbInstanceResourceType,
+					Attrs: &resource.Attributes{
+						"field": "test",
+					},
 				},
 				{
-					Id:    "aurora-cluster-demo-1",
-					Type:  aws.AwsDbInstanceResourceType,
-					Attrs: &resource.Attributes{},
+					Id:   "aurora-cluster-demo-1",
+					Type: aws.AwsDbInstanceResourceType,
+					Attrs: &resource.Attributes{
+						"field": "test",
+					},
 				},
 			},
 			stateResources: []*resource.Resource{
@@ -95,42 +99,50 @@ func TestAwsRDSClusterInstanceExpander_Execute(t *testing.T) {
 					Attrs: &resource.Attributes{},
 				},
 				{
-					Id:    "aurora-cluster-demo-0",
-					Type:  aws.AwsDbInstanceResourceType,
-					Attrs: &resource.Attributes{},
+					Id:   "aurora-cluster-demo-0",
+					Type: aws.AwsDbInstanceResourceType,
+					Attrs: &resource.Attributes{
+						"field": "test",
+					},
 				},
 				{
-					Id:    "aurora-cluster-demo-1",
-					Type:  aws.AwsDbInstanceResourceType,
-					Attrs: &resource.Attributes{},
+					Id:   "aurora-cluster-demo-1",
+					Type: aws.AwsDbInstanceResourceType,
+					Attrs: &resource.Attributes{
+						"field": "test",
+					},
 				},
 			},
 			expectedStateResources: []*resource.Resource{
 				{
-					Id:    "aurora-cluster-demo-0",
-					Type:  aws.AwsDbInstanceResourceType,
-					Attrs: &resource.Attributes{},
+					Id:   "aurora-cluster-demo-0",
+					Type: aws.AwsDbInstanceResourceType,
+					Attrs: &resource.Attributes{
+						"field": "test",
+					},
 				},
 				{
-					Id:    "aurora-cluster-demo-1",
-					Type:  aws.AwsDbInstanceResourceType,
-					Attrs: &resource.Attributes{},
+					Id:   "aurora-cluster-demo-1",
+					Type: aws.AwsDbInstanceResourceType,
+					Attrs: &resource.Attributes{
+						"field": "test",
+					},
 				},
 			},
 			mock: func(factory *terraform.MockResourceFactory) {
-				factory.On("CreateAbstractResource", aws.AwsDbInstanceResourceType, "aurora-cluster-demo-0", map[string]interface{}{}).
+				factory.On("CreateAbstractResource", aws.AwsDbInstanceResourceType, "aurora-cluster-demo-0", map[string]interface{}{"field": "test"}).
 					Return(&resource.Resource{
 						Id:    "aurora-cluster-demo-0",
 						Type:  aws.AwsDbInstanceResourceType,
-						Attrs: &resource.Attributes{},
+						Attrs: &resource.Attributes{"field": "test"},
 					}).
 					Once()
 
-				factory.On("CreateAbstractResource", aws.AwsDbInstanceResourceType, "aurora-cluster-demo-1", map[string]interface{}{}).
+				factory.On("CreateAbstractResource", aws.AwsDbInstanceResourceType, "aurora-cluster-demo-1", map[string]interface{}{"field": "test"}).
 					Return(&resource.Resource{
 						Id:    "aurora-cluster-demo-1",
 						Type:  aws.AwsDbInstanceResourceType,
-						Attrs: &resource.Attributes{},
+						Attrs: &resource.Attributes{"field": "test"},
 					}).
 					Once()
 			},
