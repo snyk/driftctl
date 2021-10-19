@@ -57,6 +57,7 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewGoogleComputeFirewallEnumerator(assetRepository, factory))
 	remoteLibrary.AddDetailsFetcher(google.GoogleComputeFirewallResourceType, common.NewGenericDetailsFetcher(google.GoogleComputeFirewallResourceType, provider, deserializer))
 
+	remoteLibrary.AddEnumerator(NewGoogleComputeRouteEnumerator(assetRepository, factory))
 	remoteLibrary.AddEnumerator(NewGoogleComputeRouterEnumerator(assetRepository, factory))
 
 	remoteLibrary.AddEnumerator(NewGoogleComputeInstanceEnumerator(assetRepository, factory))

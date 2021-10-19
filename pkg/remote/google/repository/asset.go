@@ -15,6 +15,7 @@ import (
 const (
 	storageBucketAssetType        = "storage.googleapis.com/Bucket"
 	computeFirewallAssetType      = "compute.googleapis.com/Firewall"
+	computeRouteAssetType         = "compute.googleapis.com/Route"
 	computeRouterAssetType        = "compute.googleapis.com/Router"
 	computeInstanceAssetType      = "compute.googleapis.com/Instance"
 	computeNetworkAssetType       = "compute.googleapis.com/Network"
@@ -25,6 +26,7 @@ const (
 type AssetRepository interface {
 	SearchAllBuckets() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllFirewalls() ([]*assetpb.ResourceSearchResult, error)
+	SearchAllRoutes() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllRouters() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllInstances() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllNetworks() ([]*assetpb.ResourceSearchResult, error)
@@ -52,6 +54,7 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 		AssetTypes: []string{
 			storageBucketAssetType,
 			computeFirewallAssetType,
+			computeRouteAssetType,
 			computeRouterAssetType,
 			computeInstanceAssetType,
 			computeNetworkAssetType,
@@ -99,6 +102,10 @@ func (s assetRepository) SearchAllBuckets() ([]*assetpb.ResourceSearchResult, er
 
 func (s assetRepository) SearchAllFirewalls() ([]*assetpb.ResourceSearchResult, error) {
 	return s.searchAllResources(computeFirewallAssetType)
+}
+
+func (s assetRepository) SearchAllRoutes() ([]*assetpb.ResourceSearchResult, error) {
+	return s.searchAllResources(computeRouteAssetType)
 }
 
 func (s assetRepository) SearchAllRouters() ([]*assetpb.ResourceSearchResult, error) {

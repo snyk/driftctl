@@ -130,6 +130,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 
 	"google_storage_bucket":   {},
 	"google_compute_firewall": {},
+	"google_compute_route":    {},
 	"google_compute_router":   {},
 	"google_compute_instance": {},
 	"google_compute_network":  {},
