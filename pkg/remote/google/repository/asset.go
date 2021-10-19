@@ -20,6 +20,7 @@ const (
 	computeNetworkAssetType       = "compute.googleapis.com/Network"
 	dnsManagedZoneAssetType       = "dns.googleapis.com/ManagedZone"
 	computeInstanceGroupAssetType = "compute.googleapis.com/InstanceGroup"
+	bigqueryDatasetAssetType      = "bigquery.googleapis.com/Dataset"
 )
 
 type AssetRepository interface {
@@ -30,6 +31,7 @@ type AssetRepository interface {
 	SearchAllNetworks() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllDNSManagedZones() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllInstanceGroups() ([]*assetpb.ResourceSearchResult, error)
+	SearchAllDatasets() ([]*assetpb.ResourceSearchResult, error)
 }
 
 type assetRepository struct {
@@ -57,6 +59,7 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 			computeNetworkAssetType,
 			dnsManagedZoneAssetType,
 			computeInstanceGroupAssetType,
+			bigqueryDatasetAssetType,
 		},
 	}
 	var results []*assetpb.ResourceSearchResult
@@ -119,4 +122,8 @@ func (s assetRepository) SearchAllDNSManagedZones() ([]*assetpb.ResourceSearchRe
 
 func (s assetRepository) SearchAllInstanceGroups() ([]*assetpb.ResourceSearchResult, error) {
 	return s.searchAllResources(computeInstanceGroupAssetType)
+}
+
+func (s assetRepository) SearchAllDatasets() ([]*assetpb.ResourceSearchResult, error) {
+	return s.searchAllResources(bigqueryDatasetAssetType)
 }
