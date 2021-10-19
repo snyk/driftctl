@@ -22,6 +22,7 @@ const (
 	computeInstanceGroupAssetType = "compute.googleapis.com/InstanceGroup"
 	bigqueryDatasetAssetType      = "bigquery.googleapis.com/Dataset"
 	bigqueryTableAssetType        = "bigquery.googleapis.com/Table"
+	computeAddressAssetType       = "compute.googleapis.com/Address"
 )
 
 type AssetRepository interface {
@@ -34,6 +35,7 @@ type AssetRepository interface {
 	SearchAllInstanceGroups() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllDatasets() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllTables() ([]*assetpb.ResourceSearchResult, error)
+	SearchAllAddresses() ([]*assetpb.ResourceSearchResult, error)
 }
 
 type assetRepository struct {
@@ -63,6 +65,7 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 			computeInstanceGroupAssetType,
 			bigqueryDatasetAssetType,
 			bigqueryTableAssetType,
+			computeAddressAssetType,
 		},
 	}
 	var results []*assetpb.ResourceSearchResult
@@ -133,4 +136,8 @@ func (s assetRepository) SearchAllDatasets() ([]*assetpb.ResourceSearchResult, e
 
 func (s assetRepository) SearchAllTables() ([]*assetpb.ResourceSearchResult, error) {
 	return s.searchAllResources(bigqueryTableAssetType)
+}
+
+func (s assetRepository) SearchAllAddresses() ([]*assetpb.ResourceSearchResult, error) {
+	return s.searchAllResources(computeAddressAssetType)
 }
