@@ -29,7 +29,7 @@ func (m *GoogleStorageBucketIAMPolicyTransformer) Execute(_, resourcesFromState 
 	resources := make([]*resource.Resource, 0)
 
 	for _, stateRes := range *resourcesFromState {
-		// Ignore all resources other than BucketIamBinding
+		// Ignore all resources with type not in resFieldByType map
 		resType := stateRes.ResourceType()
 		resField, supported := m.resFieldByType[resType]
 		if !supported {

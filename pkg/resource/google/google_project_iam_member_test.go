@@ -14,7 +14,6 @@ func TestAcc_Google_ProjectIAMMember(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "gcp+tf",
-			"--filter", "Type=='google_project_iam_member'",
 		},
 		Checks: []acceptance.AccCheck{
 			{
