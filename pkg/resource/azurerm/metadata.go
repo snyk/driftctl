@@ -14,4 +14,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAzurePostgresqlDatabaseMetadata(resourceSchemaRepository)
 	initAzureNetworkSecurityGroupMetadata(resourceSchemaRepository)
 	initAzureLoadBalancerMetadata(resourceSchemaRepository)
+	initAzurePrivateDNSZoneMetaData(resourceSchemaRepository)
 }
