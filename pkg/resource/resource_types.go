@@ -144,6 +144,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	}},
 	"google_dns_managed_zone":       {},
 	"google_compute_instance_group": {},
+	"google_bigquery_dataset":       {},
 
 	"azurerm_storage_account":   {},
 	"azurerm_storage_container": {},
