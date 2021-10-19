@@ -81,6 +81,29 @@ func (_m *MockNetworkRepository) ListAllRouteTables() ([]*armnetwork.RouteTable,
 	return r0, r1
 }
 
+// ListAllSecurityGroups provides a mock function with given fields:
+func (_m *MockNetworkRepository) ListAllSecurityGroups() ([]*armnetwork.NetworkSecurityGroup, error) {
+	ret := _m.Called()
+
+	var r0 []*armnetwork.NetworkSecurityGroup
+	if rf, ok := ret.Get(0).(func() []*armnetwork.NetworkSecurityGroup); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*armnetwork.NetworkSecurityGroup)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListAllSubnets provides a mock function with given fields: virtualNetwork
 func (_m *MockNetworkRepository) ListAllSubnets(virtualNetwork *armnetwork.VirtualNetwork) ([]*armnetwork.Subnet, error) {
 	ret := _m.Called(virtualNetwork)

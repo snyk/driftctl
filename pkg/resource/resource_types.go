@@ -151,14 +151,15 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"azurerm_route_table": {children: []ResourceType{
 		"azurerm_route",
 	}},
-	"azurerm_route":               {},
-	"azurerm_resource_group":      {},
-	"azurerm_subnet":              {},
-	"azurerm_container_registry":  {},
-	"azurerm_firewall":            {},
-	"azurerm_postgresql_server":   {},
-	"azurerm_postgresql_database": {},
-	"azurerm_public_ip":           {},
+	"azurerm_route":                  {},
+	"azurerm_resource_group":         {},
+	"azurerm_subnet":                 {},
+	"azurerm_container_registry":     {},
+	"azurerm_firewall":               {},
+	"azurerm_postgresql_server":      {},
+	"azurerm_postgresql_database":    {},
+	"azurerm_public_ip":              {},
+	"azurerm_network_security_group": {},
 }
 
 func IsResourceTypeSupported(ty string) bool {

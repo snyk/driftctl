@@ -1,0 +1,48 @@
+[
+ {
+  "Id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/example-resources/providers/Microsoft.Network/networkSecurityGroups/acceptanceTestSecurityGroup1",
+  "Type": "azurerm_network_security_group",
+  "Attrs": {
+   "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/example-resources/providers/Microsoft.Network/networkSecurityGroups/acceptanceTestSecurityGroup1",
+   "location": "westeurope",
+   "name": "acceptanceTestSecurityGroup1",
+   "resource_group_name": "example-resources",
+   "security_rule": [
+    {
+     "access": "Allow",
+     "description": "",
+     "destination_address_prefix": "*",
+     "destination_port_range": "*",
+     "direction": "Inbound",
+     "name": "test123",
+     "priority": 100,
+     "protocol": "Tcp",
+     "source_address_prefix": "*",
+     "source_port_range": "*"
+    }
+   ],
+   "tags": {
+    "environment": "Production"
+   }
+  }
+ },
+ {
+  "Id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/example-resources/providers/Microsoft.Network/networkSecurityGroups/acceptanceTestSecurityGroup2",
+  "Type": "azurerm_network_security_group",
+  "Attrs": {
+   "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/example-resources/providers/Microsoft.Network/networkSecurityGroups/acceptanceTestSecurityGroup2",
+   "location": "westeurope",
+   "name": "acceptanceTestSecurityGroup2",
+   "resource_group_name": "example-resources"
+  }
+ },
+ {
+  "Id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/example-resources",
+  "Type": "azurerm_resource_group",
+  "Attrs": {
+   "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/example-resources",
+   "location": "westeurope",
+   "name": "example-resources"
+  }
+ }
+]
