@@ -87,7 +87,7 @@
     "hosted_zone_id": "Z2R2ITUGPM61AM",
     "iam_database_authentication_enabled": false,
     "iam_roles": null,
-    "id": "aurora-cluster-demo",
+    "id": "aurora-cluster-demo-2",
     "kms_key_id": "",
     "master_password": null,
     "master_username": "foo",
