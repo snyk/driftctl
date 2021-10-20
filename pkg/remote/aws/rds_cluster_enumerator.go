@@ -32,6 +32,12 @@ func (e *RDSClusterEnumerator) Enumerate() ([]*resource.Resource, error) {
 	results := make([]*resource.Resource, len(clusters))
 
 	for _, cluster := range clusters {
+		var databaseName string
+
+		if v := cluster.DatabaseName; v != nil {
+			databaseName = *cluster.DatabaseName
+		}
+
 		results = append(
 			results,
 			e.factory.CreateAbstractResource(
@@ -39,6 +45,7 @@ func (e *RDSClusterEnumerator) Enumerate() ([]*resource.Resource, error) {
 				*cluster.DBClusterIdentifier,
 				map[string]interface{}{
 					"cluster_identifier": *cluster.DBClusterIdentifier,
+					"database_name":      databaseName,
 				},
 			),
 		)

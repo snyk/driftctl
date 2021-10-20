@@ -249,7 +249,13 @@ func TestRDSCluster(t *testing.T) {
 			dirName: "aws_rds_clusters_results",
 			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBClusters").Return([]*rds.DBCluster{
-					{DBClusterIdentifier: awssdk.String("aurora-cluster-demo")},
+					{
+						DBClusterIdentifier: awssdk.String("aurora-cluster-demo"),
+						DatabaseName:        awssdk.String("mydb"),
+					},
+					{
+						DBClusterIdentifier: awssdk.String("aurora-cluster-demo-2"),
+					},
 				}, nil)
 			},
 		},
