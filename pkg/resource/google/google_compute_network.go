@@ -16,4 +16,5 @@ func initGoogleComputeNetworkMetadata(resourceSchemaRepository resource.SchemaRe
 			"name": *res.Attributes().GetString("display_name"),
 		}
 	})
+	resourceSchemaRepository.SetFlags(GoogleComputeNetworkResourceType, resource.FlagDeepMode)
 }
