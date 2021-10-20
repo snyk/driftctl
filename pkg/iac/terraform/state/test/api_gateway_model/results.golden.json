@@ -1,0 +1,26 @@
+[
+ {
+  "Id": "85v536",
+  "Type": "aws_api_gateway_model",
+  "Attrs": {
+   "content_type": "application/json",
+   "description": "a JSON schema",
+   "id": "85v536",
+   "name": "bar",
+   "rest_api_id": "zetudukz30",
+   "schema": "{\n  \"type\": \"object\"\n}\n"
+  }
+ },
+ {
+  "Id": "g68a4s",
+  "Type": "aws_api_gateway_model",
+  "Attrs": {
+   "content_type": "application/json",
+   "description": "a JSON schema",
+   "id": "g68a4s",
+   "name": "foo",
+   "rest_api_id": "vryjzimtj1",
+   "schema": "{\n  \"type\": \"object\"\n}\n"
+  }
+ }
+]
