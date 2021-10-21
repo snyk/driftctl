@@ -150,6 +150,29 @@ func (_m *MockApiGatewayRepository) ListAllRestApiModels(_a0 string) ([]*apigate
 	return r0, r1
 }
 
+// ListAllRestApiGatewayResponses provides a mock function with given fields: _a0
+func (_m *MockApiGatewayRepository) ListAllRestApiGatewayResponses(_a0 string) ([]*apigateway.UpdateGatewayResponseOutput, error) {
+	ret := _m.Called(_a0)
+
+	var r0 []*apigateway.UpdateGatewayResponseOutput
+	if rf, ok := ret.Get(0).(func(string) []*apigateway.UpdateGatewayResponseOutput); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*apigateway.UpdateGatewayResponseOutput)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListAllRestApiRequestValidators provides a mock function with given fields: _a0
 func (_m *MockApiGatewayRepository) ListAllRestApiRequestValidators(_a0 string) ([]*apigateway.UpdateRequestValidatorOutput, error) {
 	ret := _m.Called(_a0)

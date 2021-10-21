@@ -8,11 +8,16 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/getkin/kin-openapi/openapi2"
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/sirupsen/logrus"
 )
 
 // Explodes api gateway rest api body attribute to dedicated resources as per Terraform documentation (https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_rest_api)
 type AwsApiGatewayRestApiExpander struct {
 	resourceFactory resource.ResourceFactory
+}
+
+type OpenAPIAwsExtensions struct {
+	GatewayResponses map[string]interface{} `json:"x-amazon-apigateway-gateway-responses"`
 }
 
 func NewAwsApiGatewayRestApiExpander(resourceFactory resource.ResourceFactory) AwsApiGatewayRestApiExpander {
@@ -80,6 +85,9 @@ func (m *AwsApiGatewayRestApiExpander) handleBodyV3(apiId string, doc *openapi3.
 			}
 		}
 	}
+	if err := m.createExtensionsResources(apiId, doc.Extensions, results); err != nil {
+		return nil
+	}
 	return nil
 }
 
@@ -95,6 +103,25 @@ func (m *AwsApiGatewayRestApiExpander) handleBodyV2(apiId string, doc *openapi2.
 			}
 		}
 	}
+	if err := m.createExtensionsResources(apiId, doc.Extensions, results); err != nil {
+		return nil
+	}
+	return nil
+}
+
+// Create resources based on our OpenAPIAwsExtensions struct
+func (m *AwsApiGatewayRestApiExpander) createExtensionsResources(apiId string, extensions map[string]interface{}, results *[]*resource.Resource) error {
+	ext, err := decodeExtensions(extensions)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"id":   apiId,
+			"type": aws.AwsApiGatewayRestApiResourceType,
+		}).Debug("Failing to decode extensions from the OpenAPI body attribute")
+		return err
+	}
+	for gtwResponse := range ext.GatewayResponses {
+		m.createApiGatewayGatewayResponse(apiId, gtwResponse, results)
+	}
 	return nil
 }
 
@@ -109,6 +136,16 @@ func (m *AwsApiGatewayRestApiExpander) createApiGatewayResource(apiId, path stri
 		return newResource
 	}
 	return nil
+}
+
+// Create aws_api_gateway_gateway_response resource
+func (m *AwsApiGatewayRestApiExpander) createApiGatewayGatewayResponse(apiId, gtwResponse string, results *[]*resource.Resource) {
+	newResource := m.resourceFactory.CreateAbstractResource(
+		aws.AwsApiGatewayGatewayResponseResourceType,
+		strings.Join([]string{"aggr", apiId, gtwResponse}, "-"),
+		map[string]interface{}{},
+	)
+	*results = append(*results, newResource)
 }
 
 // Returns the aws_api_gateway_resource resource that matches the path attribute
@@ -143,4 +180,19 @@ func (m *AwsApiGatewayRestApiExpander) createApiGatewayMethodResponse(apiId, res
 		map[string]interface{}{},
 	)
 	*results = append(*results, newResource)
+}
+
+// Decode openapi.Extensions into our custom OpenAPIAwsExtensions struct that follows AWS
+// OpenAPI addons.
+func decodeExtensions(extensions map[string]interface{}) (*OpenAPIAwsExtensions, error) {
+	rawExtensions, err := json.Marshal(extensions)
+	if err != nil {
+		return nil, err
+	}
+	decodedExtensions := &OpenAPIAwsExtensions{}
+	err = json.Unmarshal(rawExtensions, decodedExtensions)
+	if err != nil {
+		return nil, err
+	}
+	return decodedExtensions, nil
 }

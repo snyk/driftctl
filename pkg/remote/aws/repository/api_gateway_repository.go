@@ -22,6 +22,7 @@ type ApiGatewayRepository interface {
 	ListAllRestApiRequestValidators(string) ([]*apigateway.UpdateRequestValidatorOutput, error)
 	ListAllDomainNameBasePathMappings(string) ([]*apigateway.BasePathMapping, error)
 	ListAllRestApiModels(string) ([]*apigateway.Model, error)
+	ListAllRestApiGatewayResponses(string) ([]*apigateway.UpdateGatewayResponseOutput, error)
 }
 
 type apigatewayRepository struct {
@@ -261,4 +262,22 @@ func (r *apigatewayRepository) ListAllRestApiModels(apiId string) ([]*apigateway
 
 	r.cache.Put(cacheKey, resources)
 	return resources, nil
+}
+
+func (r *apigatewayRepository) ListAllRestApiGatewayResponses(apiId string) ([]*apigateway.UpdateGatewayResponseOutput, error) {
+	cacheKey := fmt.Sprintf("apigatewayListAllRestApiGatewayResponses_api_%s", apiId)
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*apigateway.UpdateGatewayResponseOutput), nil
+	}
+
+	input := &apigateway.GetGatewayResponsesInput{
+		RestApiId: &apiId,
+	}
+	resources, err := r.client.GetGatewayResponses(input)
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put(cacheKey, resources.Items)
+	return resources.Items, nil
 }
