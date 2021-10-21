@@ -12,6 +12,29 @@ type MockAssetRepository struct {
 	mock.Mock
 }
 
+// SearchAllAddresses provides a mock function with given fields:
+func (_m *MockAssetRepository) SearchAllAddresses() ([]*asset.ResourceSearchResult, error) {
+	ret := _m.Called()
+
+	var r0 []*asset.ResourceSearchResult
+	if rf, ok := ret.Get(0).(func() []*asset.ResourceSearchResult); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*asset.ResourceSearchResult)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // SearchAllBuckets provides a mock function with given fields:
 func (_m *MockAssetRepository) SearchAllBuckets() ([]*asset.ResourceSearchResult, error) {
 	ret := _m.Called()
@@ -175,6 +198,29 @@ func (_m *MockAssetRepository) SearchAllNetworks() ([]*asset.ResourceSearchResul
 
 // SearchAllRouters provides a mock function with given fields:
 func (_m *MockAssetRepository) SearchAllRouters() ([]*asset.ResourceSearchResult, error) {
+	ret := _m.Called()
+
+	var r0 []*asset.ResourceSearchResult
+	if rf, ok := ret.Get(0).(func() []*asset.ResourceSearchResult); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*asset.ResourceSearchResult)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SearchAllTables provides a mock function with given fields:
+func (_m *MockAssetRepository) SearchAllTables() ([]*asset.ResourceSearchResult, error) {
 	ret := _m.Called()
 
 	var r0 []*asset.ResourceSearchResult

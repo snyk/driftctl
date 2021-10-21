@@ -117,6 +117,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_api_gateway_vpc_link":          {},
 	"aws_api_gateway_request_validator": {},
 	"aws_api_gateway_rest_api_policy":   {},
+	"aws_api_gateway_base_path_mapping": {},
 	"aws_appautoscaling_target":         {},
 	"aws_rds_cluster_instance": {children: []ResourceType{
 		"aws_db_instance",
@@ -145,6 +146,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"google_dns_managed_zone":       {},
 	"google_compute_instance_group": {},
 	"google_bigquery_dataset":       {},
+	"google_bigquery_table":         {},
 	"google_project_iam_member":     {},
 	"google_project_iam_binding": {children: []ResourceType{
 		"google_project_iam_member",
@@ -152,6 +154,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"google_project_iam_policy": {children: []ResourceType{
 		"google_project_iam_member",
 	}},
+	"google_compute_address": {},
 
 	"azurerm_storage_account":   {},
 	"azurerm_storage_container": {},

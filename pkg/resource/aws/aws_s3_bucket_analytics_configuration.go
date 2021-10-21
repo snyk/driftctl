@@ -10,4 +10,5 @@ func initAwsS3BucketAnalyticsConfigurationMetaData(resourceSchemaRepository reso
 			"alias": *res.Attributes().GetString("region"),
 		}
 	})
+	resourceSchemaRepository.SetFlags(AwsS3BucketAnalyticsConfigurationResourceType, resource.FlagDeepMode)
 }
