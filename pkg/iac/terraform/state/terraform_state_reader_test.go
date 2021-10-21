@@ -342,6 +342,7 @@ func TestTerraformStateReader_Google_Resources(t *testing.T) {
 		{name: "bigquery dataset", dirName: "google_bigquery_dataset", wantErr: false},
 		{name: "bigquery table", dirName: "google_bigquery_table", wantErr: false},
 		{name: "compute address", dirName: "google_compute_address", wantErr: false},
+		{name: "cloudfunctions function", dirName: "google_cloudfunctions_function", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
