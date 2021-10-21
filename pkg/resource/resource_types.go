@@ -153,6 +153,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"google_project_iam_policy": {children: []ResourceType{
 		"google_project_iam_member",
 	}},
+	"google_compute_address": {},
 
 	"azurerm_storage_account":   {},
 	"azurerm_storage_container": {},

@@ -24,6 +24,7 @@ import (
 	assetpb "google.golang.org/genproto/googleapis/cloud/asset/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func TestGoogleComputeFirewall(t *testing.T) {
@@ -619,6 +620,123 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 			test.TestAgainstGoldenFile(got, resType.String(), c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}
+
+func TestGoogleComputeAddress(t *testing.T) {
+
+	cases := []struct {
+		test             string
+		assertExpected   func(t *testing.T, got []*resource.Resource)
+		response         []*assetpb.ResourceSearchResult
+		responseErr      error
+		setupAlerterMock func(alerter *mocks.AlerterInterface)
+		wantErr          error
+	}{
+		{
+			test:     "no compute address",
+			response: []*assetpb.ResourceSearchResult{},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "multiples compute address",
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+				assert.Equal(t, "projects/cloudskiff-dev-elie/regions/us-central1/addresses/my-address", got[0].ResourceId())
+				assert.Equal(t, "google_compute_address", got[0].ResourceType())
+
+				assert.Equal(t, "projects/cloudskiff-dev-elie/regions/us-central1/addresses/my-address-2", got[1].ResourceId())
+				assert.Equal(t, "google_compute_address", got[1].ResourceType())
+				assert.Equal(t, "1.2.3.4", *got[1].Attributes().GetString("address"))
+			},
+			response: []*assetpb.ResourceSearchResult{
+				{
+					AssetType: "compute.googleapis.com/Address",
+					Name:      "//compute.googleapis.com/projects/cloudskiff-dev-elie/regions/us-central1/addresses/my-address",
+				},
+				{
+					AssetType: "compute.googleapis.com/Address",
+					Name:      "//compute.googleapis.com/projects/cloudskiff-dev-elie/regions/us-central1/addresses/my-address-2",
+					AdditionalAttributes: func() *structpb.Struct {
+						str, _ := structpb.NewStruct(map[string]interface{}{
+							"address": "1.2.3.4",
+						})
+						return str
+					}(),
+				},
+			},
+		},
+		{
+			test: "cannot list compute address",
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+			responseErr: status.Error(codes.PermissionDenied, "The caller does not have permission"),
+			setupAlerterMock: func(alerter *mocks.AlerterInterface) {
+				alerter.On(
+					"SendAlert",
+					"google_compute_address",
+					alerts.NewRemoteAccessDeniedAlert(
+						common.RemoteGoogleTerraform,
+						remoteerr.NewResourceListingError(
+							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							"google_compute_address",
+						),
+						alerts.EnumerationPhase,
+					),
+				).Once()
+			},
+		},
+	}
+
+	providerVersion := "3.78.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
+	googleresource.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range cases {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			if c.setupAlerterMock != nil {
+				c.setupAlerterMock(alerter)
+			}
+
+			assetClient, err := testgoogle.NewFakeAssetServer(c.response, c.responseErr)
+			if err != nil {
+				tt.Fatal(err)
+			}
+
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			if err != nil {
+				tt.Fatal(err)
+			}
+
+			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeAddressEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			alerter.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+			if c.assertExpected != nil {
+				c.assertExpected(t, got)
+			}
 		})
 	}
 }
