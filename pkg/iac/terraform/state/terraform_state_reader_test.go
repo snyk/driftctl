@@ -161,6 +161,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "Api Gateway vpc link", dirName: "api_gateway_vpc_link", wantErr: false},
 		{name: "Api Gateway request validator", dirName: "api_gateway_request_validator", wantErr: false},
 		{name: "Api Gateway rest api policy", dirName: "api_gateway_rest_api_policy", wantErr: false},
+		{name: "Api Gateway base path mapping", dirName: "api_gateway_base_path_mapping", wantErr: false},
 		{name: "AppAutoScaling Targets", dirName: "aws_appautoscaling_target", wantErr: false},
 		{name: "network acl", dirName: "aws_network_acl", wantErr: false},
 		{name: "network acl rule", dirName: "aws_network_acl_rule", wantErr: false},
