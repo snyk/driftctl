@@ -145,6 +145,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"google_dns_managed_zone":       {},
 	"google_compute_instance_group": {},
 	"google_bigquery_dataset":       {},
+	"google_bigquery_table":         {},
 	"google_project_iam_member":     {},
 	"google_project_iam_binding": {children: []ResourceType{
 		"google_project_iam_member",
