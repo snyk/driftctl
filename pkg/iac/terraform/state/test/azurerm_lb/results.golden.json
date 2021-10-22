@@ -1,0 +1,27 @@
+[
+ {
+  "Id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/LoadBalancerRG/providers/Microsoft.Network/loadBalancers/TestLoadBalancer",
+  "Type": "azurerm_lb",
+  "Attrs": {
+   "frontend_ip_configuration": [
+    {
+     "availability_zone": "No-Zone",
+     "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/LoadBalancerRG/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/frontendIPConfigurations/PublicIPAddress",
+     "name": "PublicIPAddress",
+     "private_ip_address": "",
+     "private_ip_address_allocation": "Dynamic",
+     "private_ip_address_version": "",
+     "public_ip_address_id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/LoadBalancerRG/providers/Microsoft.Network/publicIPAddresses/PublicIPForLB",
+     "public_ip_prefix_id": "",
+     "subnet_id": ""
+    }
+   ],
+   "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/LoadBalancerRG/providers/Microsoft.Network/loadBalancers/TestLoadBalancer",
+   "location": "westus",
+   "name": "TestLoadBalancer",
+   "private_ip_address": "",
+   "resource_group_name": "LoadBalancerRG",
+   "sku": "Basic"
+  }
+ }
+]

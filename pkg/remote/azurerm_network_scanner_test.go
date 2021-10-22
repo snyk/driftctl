@@ -789,3 +789,96 @@ func TestAzurermSecurityGroups(t *testing.T) {
 		})
 	}
 }
+
+func TestAzurermLoadBalancers(t *testing.T) {
+
+	dummyError := errors.New("this is an error")
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "no load balancer",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllLoadBalancers").Return([]*armnetwork.LoadBalancer{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "error listing load balancers",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllLoadBalancers").Return(nil, dummyError)
+			},
+			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzureLoadBalancerResourceType),
+		},
+		{
+			test: "multiple load balancers",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllLoadBalancers").Return([]*armnetwork.LoadBalancer{
+					{
+						Resource: armnetwork.Resource{
+							ID:   to.StringPtr("lb-1"), // Here we don't care to have a valid ID, it is for testing purpose only
+							Name: to.StringPtr("lb-1"),
+						},
+					},
+					{
+						Resource: armnetwork.Resource{
+							ID:   to.StringPtr("lb-2"),
+							Name: to.StringPtr("lb-2"),
+						},
+					},
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, got[0].ResourceId(), "lb-1")
+				assert.Equal(t, got[0].ResourceType(), resourceazure.AzureLoadBalancerResourceType)
+
+				assert.Equal(t, got[1].ResourceId(), "lb-2")
+				assert.Equal(t, got[1].ResourceType(), resourceazure.AzureLoadBalancerResourceType)
+			},
+		},
+	}
+
+	providerVersion := "2.71.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
+	resourceazure.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockNetworkRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.NetworkRepository = fakeRepo
+
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermLoadBalancerEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, c.wantErr, err)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+		})
+	}
+}
