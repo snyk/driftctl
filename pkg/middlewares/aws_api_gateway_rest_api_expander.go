@@ -72,8 +72,11 @@ func (m *AwsApiGatewayRestApiExpander) handleBodyV3(apiId string, doc *openapi3.
 	for path, pathItem := range doc.Paths {
 		if res := m.createApiGatewayResource(apiId, path, results, remoteResources); res != nil {
 			ops := pathItem.Operations()
-			for method := range ops {
-				m.createApiGatewayMethod(apiId, res.ResourceId(), method, results)
+			for httpMethod, method := range ops {
+				m.createApiGatewayMethod(apiId, res.ResourceId(), httpMethod, results)
+				for statusCode := range method.Responses {
+					m.createApiGatewayMethodResponse(apiId, res.ResourceId(), httpMethod, statusCode, results)
+				}
 			}
 		}
 	}
@@ -84,8 +87,11 @@ func (m *AwsApiGatewayRestApiExpander) handleBodyV2(apiId string, doc *openapi2.
 	for path, pathItem := range doc.Paths {
 		if res := m.createApiGatewayResource(apiId, path, results, remoteResources); res != nil {
 			ops := pathItem.Operations()
-			for method := range ops {
-				m.createApiGatewayMethod(apiId, res.ResourceId(), method, results)
+			for httpMethod, method := range ops {
+				m.createApiGatewayMethod(apiId, res.ResourceId(), httpMethod, results)
+				for statusCode := range method.Responses {
+					m.createApiGatewayMethodResponse(apiId, res.ResourceId(), httpMethod, statusCode, results)
+				}
 			}
 		}
 	}
@@ -120,10 +126,20 @@ func foundMatchingResource(apiId, path string, remoteResources *[]*resource.Reso
 }
 
 // Create aws_api_gateway_method resource
-func (m *AwsApiGatewayRestApiExpander) createApiGatewayMethod(apiId, resourceId, method string, results *[]*resource.Resource) {
+func (m *AwsApiGatewayRestApiExpander) createApiGatewayMethod(apiId, resourceId, httpMethod string, results *[]*resource.Resource) {
 	newResource := m.resourceFactory.CreateAbstractResource(
 		aws.AwsApiGatewayMethodResourceType,
-		strings.Join([]string{"agm", apiId, resourceId, method}, "-"),
+		strings.Join([]string{"agm", apiId, resourceId, httpMethod}, "-"),
+		map[string]interface{}{},
+	)
+	*results = append(*results, newResource)
+}
+
+// Create aws_api_gateway_method_response resource
+func (m *AwsApiGatewayRestApiExpander) createApiGatewayMethodResponse(apiId, resourceId, httpMethod, statusCode string, results *[]*resource.Resource) {
+	newResource := m.resourceFactory.CreateAbstractResource(
+		aws.AwsApiGatewayMethodResponseResourceType,
+		strings.Join([]string{"agmr", apiId, resourceId, httpMethod, statusCode}, "-"),
 		map[string]interface{}{},
 	)
 	*results = append(*results, newResource)

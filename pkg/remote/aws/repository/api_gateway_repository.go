@@ -3,6 +3,7 @@ package repository
 import (
 	"fmt"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/apigateway/apigatewayiface"
@@ -141,6 +142,7 @@ func (r *apigatewayRepository) ListAllRestApiResources(apiId string) ([]*apigate
 	var resources []*apigateway.Resource
 	input := &apigateway.GetResourcesInput{
 		RestApiId: &apiId,
+		Embed:     []*string{aws.String("methods")},
 	}
 	err := r.client.GetResourcesPages(input, func(res *apigateway.GetResourcesOutput, lastPage bool) bool {
 		resources = append(resources, res.Items...)

@@ -75,13 +75,23 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 					Type:  aws.AwsApiGatewayMethodResourceType,
 					Attrs: &resource.Attributes{},
 				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayMethodResponseResourceType,
+					"agmr-foo-bar-GET-200",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agmr-foo-bar-GET-200",
+					Type:  aws.AwsApiGatewayMethodResponseResourceType,
+					Attrs: &resource.Attributes{},
+				})
 			},
 			resourcesFromState: []*resource.Resource{
 				{
 					Id:   "foo",
 					Type: aws.AwsApiGatewayRestApiResourceType,
 					Attrs: &resource.Attributes{
-						"body": "{\"info\":{\"title\":\"example\",\"version\":\"1.0\"},\"openapi\":\"3.0.1\",\"paths\":{\"/path1\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}},\"/path1/path2\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}}}}",
+						"body": "{\"info\":{\"title\":\"example\",\"version\":\"1.0\"},\"openapi\":\"3.0.1\",\"paths\":{\"/path1\":{\"get\":{\"parameters\":[{\"in\":\"query\",\"name\":\"type\",\"schema\":{\"type\":\"string\"}},{\"in\":\"query\",\"name\":\"page\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/Pets\"}}},\"description\":\"200 response\",\"headers\":{\"Access-Control-Allow-Origin\":{\"schema\":{\"type\":\"string\"}}}}},\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}},\"/path1/path2\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}}}}",
 					},
 				},
 			},
@@ -112,13 +122,18 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 					Type:  aws.AwsApiGatewayMethodResourceType,
 					Attrs: &resource.Attributes{},
 				},
+				{
+					Id:    "agmr-foo-bar-GET-200",
+					Type:  aws.AwsApiGatewayMethodResponseResourceType,
+					Attrs: &resource.Attributes{},
+				},
 			},
 			expected: []*resource.Resource{
 				{
 					Id:   "foo",
 					Type: aws.AwsApiGatewayRestApiResourceType,
 					Attrs: &resource.Attributes{
-						"body": "{\"info\":{\"title\":\"example\",\"version\":\"1.0\"},\"openapi\":\"3.0.1\",\"paths\":{\"/path1\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}},\"/path1/path2\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}}}}",
+						"body": "{\"info\":{\"title\":\"example\",\"version\":\"1.0\"},\"openapi\":\"3.0.1\",\"paths\":{\"/path1\":{\"get\":{\"parameters\":[{\"in\":\"query\",\"name\":\"type\",\"schema\":{\"type\":\"string\"}},{\"in\":\"query\",\"name\":\"page\",\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\":{\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/Pets\"}}},\"description\":\"200 response\",\"headers\":{\"Access-Control-Allow-Origin\":{\"schema\":{\"type\":\"string\"}}}}},\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}},\"/path1/path2\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}}}}",
 					},
 				},
 				{
@@ -145,6 +160,11 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 				{
 					Id:    "agm-foo-baz-GET",
 					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agmr-foo-bar-GET-200",
+					Type:  aws.AwsApiGatewayMethodResponseResourceType,
 					Attrs: &resource.Attributes{},
 				},
 			},
@@ -178,6 +198,16 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 					Type:  aws.AwsApiGatewayMethodResourceType,
 					Attrs: &resource.Attributes{},
 				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayMethodResponseResourceType,
+					"agmr-foo-bar-GET-200",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agmr-foo-bar-GET-200",
+					Type:  aws.AwsApiGatewayMethodResponseResourceType,
+					Attrs: &resource.Attributes{},
+				})
 			},
 			resourcesFromState: []*resource.Resource{
 				{
@@ -202,6 +232,11 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 					Type:  aws.AwsApiGatewayMethodResourceType,
 					Attrs: &resource.Attributes{},
 				},
+				{
+					Id:    "agmr-foo-bar-GET-200",
+					Type:  aws.AwsApiGatewayMethodResponseResourceType,
+					Attrs: &resource.Attributes{},
+				},
 			},
 			expected: []*resource.Resource{
 				{
@@ -222,6 +257,11 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 				{
 					Id:    "agm-foo-bar-GET",
 					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agmr-foo-bar-GET-200",
+					Type:  aws.AwsApiGatewayMethodResponseResourceType,
 					Attrs: &resource.Attributes{},
 				},
 			},

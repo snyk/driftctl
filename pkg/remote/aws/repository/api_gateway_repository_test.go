@@ -367,6 +367,7 @@ func Test_apigatewayRepository_ListAllRestApiResources(t *testing.T) {
 				client.On("GetResourcesPages",
 					&apigateway.GetResourcesInput{
 						RestApiId: aws.String("restapi1"),
+						Embed:     []*string{aws.String("methods")},
 					},
 					mock.MatchedBy(func(callback func(res *apigateway.GetResourcesOutput, lastPage bool) bool) bool {
 						callback(&apigateway.GetResourcesOutput{

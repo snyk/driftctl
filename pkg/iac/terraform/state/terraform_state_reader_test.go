@@ -164,6 +164,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "Api Gateway base path mapping", dirName: "api_gateway_base_path_mapping", wantErr: false},
 		{name: "Api Gateway method", dirName: "api_gateway_method", wantErr: false},
 		{name: "Api Gateway model", dirName: "api_gateway_model", wantErr: false},
+		{name: "Api Gateway method response", dirName: "api_gateway_method_response", wantErr: false},
 		{name: "AppAutoScaling Targets", dirName: "aws_appautoscaling_target", wantErr: false},
 		{name: "network acl", dirName: "aws_network_acl", wantErr: false},
 		{name: "network acl rule", dirName: "aws_network_acl_rule", wantErr: false},
