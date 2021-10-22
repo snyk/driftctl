@@ -12,6 +12,7 @@ import (
 
 type FakeAssetServer struct {
 	SearchAllResourcesResults []*assetpb.ResourceSearchResult
+	ListAssetsResults         []*assetpb.Asset
 	err                       error
 	assetpb.UnimplementedAssetServiceServer
 }
@@ -20,9 +21,20 @@ func (s *FakeAssetServer) SearchAllResources(context.Context, *assetpb.SearchAll
 	return &assetpb.SearchAllResourcesResponse{Results: s.SearchAllResourcesResults}, s.err
 }
 
-func NewFakeAssetServer(results []*assetpb.ResourceSearchResult, err error) (*asset.Client, error) {
+func (s *FakeAssetServer) ListAssets(context.Context, *assetpb.ListAssetsRequest) (*assetpb.ListAssetsResponse, error) {
+	return &assetpb.ListAssetsResponse{Assets: s.ListAssetsResults}, s.err
+}
+
+func NewFakeAssertServerWithList(listResults []*assetpb.Asset, err error) (*asset.Client, error) {
+	return newAssetClient(&FakeAssetServer{ListAssetsResults: listResults, err: err})
+}
+
+func NewFakeAssetServer(searchResults []*assetpb.ResourceSearchResult, err error) (*asset.Client, error) {
+	return newAssetClient(&FakeAssetServer{SearchAllResourcesResults: searchResults, err: err})
+}
+
+func newAssetClient(fakeServer *FakeAssetServer) (*asset.Client, error) {
 	ctx := context.Background()
-	fakeServer := &FakeAssetServer{SearchAllResourcesResults: results, err: err}
 	l, err := net.Listen("tcp", "localhost:0")
 	if err != nil {
 		return nil, err

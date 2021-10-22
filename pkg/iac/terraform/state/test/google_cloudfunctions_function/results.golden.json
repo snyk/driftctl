@@ -1,0 +1,26 @@
+[
+ {
+  "Id": "projects/cloudskiff-dev-elie/locations/us-central1/functions/function-test",
+  "Type": "google_cloudfunctions_function",
+  "Attrs": {
+   "available_memory_mb": 128,
+   "description": "My function",
+   "entry_point": "helloHttp",
+   "https_trigger_url": "https://us-central1-cloudskiff-dev-elie.cloudfunctions.net/function-test",
+   "id": "projects/cloudskiff-dev-elie/locations/us-central1/functions/function-test",
+   "ingress_settings": "ALLOW_ALL",
+   "max_instances": 0,
+   "name": "function-test",
+   "project": "cloudskiff-dev-elie",
+   "region": "us-central1",
+   "runtime": "nodejs14",
+   "service_account_email": "cloudskiff-dev-elie@appspot.gserviceaccount.com",
+   "source_archive_bucket": "test-bucket-driftctl",
+   "source_archive_object": "index.zip",
+   "timeout": 60,
+   "trigger_http": true,
+   "vpc_connector": "",
+   "vpc_connector_egress_settings": ""
+  }
+ }
+]

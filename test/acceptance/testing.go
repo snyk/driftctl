@@ -33,11 +33,12 @@ import (
 )
 
 type AccCheck struct {
-	PreExec  func()
-	PostExec func()
-	Env      map[string]string
-	Args     func() []string
-	Check    func(result *test.ScanResult, stdout string, err error)
+	PreExec     func()
+	PostExec    func()
+	Env         map[string]string
+	Args        func() []string
+	ShouldRetry func(result *test.ScanResult, retryDuration time.Duration, retryCount uint8) bool
+	Check       func(result *test.ScanResult, stdout string, err error)
 }
 
 type RetryConfig struct {
@@ -431,6 +432,18 @@ func Run(t *testing.T, c AccTestCase) {
 		}
 		logrus.WithField("args", fmt.Sprintf("%+v", os.Args)).Debug("Running driftctl")
 		_, out, cmdErr := runDriftCtlCmd(driftctlCmd)
+		result := c.getResult(t)
+		var retryCount uint8 = 0
+		timeBeforeRetry := time.Now()
+		for {
+			if check.ShouldRetry == nil || !check.ShouldRetry(result, time.Since(timeBeforeRetry), retryCount) {
+				break
+			}
+			logrus.WithField("count", fmt.Sprintf("%d", retryCount)).Debug("Retrying scan ...")
+			_, _, _ = runDriftCtlCmd(driftctlCmd)
+			result = c.getResult(t)
+			retryCount++
+		}
 		// Restore original working directory
 		if c.WorkingDir != "" {
 			err = os.Chdir(wd)
@@ -447,7 +460,7 @@ func Run(t *testing.T, c AccTestCase) {
 				_ = os.Unsetenv(key)
 			}
 		}
-		check.Check(c.getResult(t), out, cmdErr)
+		check.Check(result, out, cmdErr)
 		if check.PostExec != nil {
 			check.PostExec()
 		}
