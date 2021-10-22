@@ -1,5 +1,8 @@
 package common
 
 type AzureProviderConfig struct {
-	SubscriptionID string
+	SubscriptionID,
+	ClientID,
+	TenantID,
+	ClientSecret string
 }

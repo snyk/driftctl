@@ -36,6 +36,15 @@ func NewAzureTerraformProvider(version string, progress output.Progress, configD
 
 	tfProvider, err := terraform.NewTerraformProvider(installer, terraform.TerraformProviderConfig{
 		Name: p.name,
+		GetProviderConfig: func(_ string) interface{} {
+			c := p.GetConfig()
+			return map[string]string{
+				"subscription_id": c.SubscriptionID,
+				"tenant_id":       c.TenantID,
+				"client_id":       c.ClientID,
+				"client_secret":   c.ClientSecret,
+			}
+		},
 	}, progress)
 	if err != nil {
 		return nil, err
@@ -47,6 +56,9 @@ func NewAzureTerraformProvider(version string, progress output.Progress, configD
 func (p *AzureTerraformProvider) GetConfig() common.AzureProviderConfig {
 	return common.AzureProviderConfig{
 		SubscriptionID: os.Getenv("AZURE_SUBSCRIPTION_ID"),
+		TenantID:       os.Getenv("AZURE_TENANT_ID"),
+		ClientID:       os.Getenv("AZURE_CLIENT_ID"),
+		ClientSecret:   os.Getenv("AZURE_CLIENT_SECRET"),
 	}
 }
 
