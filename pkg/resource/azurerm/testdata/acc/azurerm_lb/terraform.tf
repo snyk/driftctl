@@ -12,7 +12,7 @@ provider "azurerm" {
 }
 
 data "azurerm_resource_group" "qa1" {
-    name = "raphael-dev" //driftctl-qa-1
+    name = "driftctl-qa-1"
 }
 
 resource "random_uuid" "rgId" {}

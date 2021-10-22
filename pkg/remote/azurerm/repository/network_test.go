@@ -1057,7 +1057,7 @@ func Test_Network_ListAllLoadBalancers(t *testing.T) {
 			mockCache.AssertExpectations(t)
 
 			if !reflect.DeepEqual(got, tt.expected) {
-				t.Errorf("ListAllSecurityGroups() got = %v, want %v", got, tt.expected)
+				t.Errorf("ListAllLoadBalancers() got = %v, want %v", got, tt.expected)
 			}
 		})
 	}
