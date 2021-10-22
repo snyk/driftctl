@@ -349,6 +349,7 @@ func TestTerraformStateReader_Google_Resources(t *testing.T) {
 		{name: "compute subnetwork", dirName: "google_compute_subnetwork", wantErr: false},
 		{name: "compute disk", dirName: "google_compute_disk", wantErr: false},
 		{name: "bigtable instance", dirName: "google_bigtable_instance", wantErr: false},
+		{name: "bigtable table", dirName: "google_bigtable_table", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
