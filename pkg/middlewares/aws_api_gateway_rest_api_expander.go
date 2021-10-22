@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
@@ -68,28 +69,40 @@ func (m *AwsApiGatewayRestApiExpander) handleBody(api *resource.Resource, result
 }
 
 func (m *AwsApiGatewayRestApiExpander) handleBodyV3(apiId string, doc *openapi3.T, results, remoteResources *[]*resource.Resource) error {
-	for path := range doc.Paths {
-		m.createApiGatewayResource(apiId, path, results, remoteResources)
+	for path, pathItem := range doc.Paths {
+		if res := m.createApiGatewayResource(apiId, path, results, remoteResources); res != nil {
+			ops := pathItem.Operations()
+			for method := range ops {
+				m.createApiGatewayMethod(apiId, res.ResourceId(), method, results)
+			}
+		}
 	}
 	return nil
 }
 
 func (m *AwsApiGatewayRestApiExpander) handleBodyV2(apiId string, doc *openapi2.T, results, remoteResources *[]*resource.Resource) error {
-	for path := range doc.Paths {
-		m.createApiGatewayResource(apiId, path, results, remoteResources)
+	for path, pathItem := range doc.Paths {
+		if res := m.createApiGatewayResource(apiId, path, results, remoteResources); res != nil {
+			ops := pathItem.Operations()
+			for method := range ops {
+				m.createApiGatewayMethod(apiId, res.ResourceId(), method, results)
+			}
+		}
 	}
 	return nil
 }
 
 // Create aws_api_gateway_resource resource
-func (m *AwsApiGatewayRestApiExpander) createApiGatewayResource(apiId, path string, results, remoteResources *[]*resource.Resource) {
+func (m *AwsApiGatewayRestApiExpander) createApiGatewayResource(apiId, path string, results, remoteResources *[]*resource.Resource) *resource.Resource {
 	if res := foundMatchingResource(apiId, path, remoteResources); res != nil {
 		newResource := m.resourceFactory.CreateAbstractResource(aws.AwsApiGatewayResourceResourceType, res.ResourceId(), map[string]interface{}{
 			"rest_api_id": *res.Attributes().GetString("rest_api_id"),
 			"path":        path,
 		})
 		*results = append(*results, newResource)
+		return newResource
 	}
+	return nil
 }
 
 // Returns the aws_api_gateway_resource resource that matches the path attribute
@@ -104,4 +117,14 @@ func foundMatchingResource(apiId, path string, remoteResources *[]*resource.Reso
 		}
 	}
 	return nil
+}
+
+// Create aws_api_gateway_method resource
+func (m *AwsApiGatewayRestApiExpander) createApiGatewayMethod(apiId, resourceId, method string, results *[]*resource.Resource) {
+	newResource := m.resourceFactory.CreateAbstractResource(
+		aws.AwsApiGatewayMethodResourceType,
+		strings.Join([]string{"agm", apiId, resourceId, method}, "-"),
+		map[string]interface{}{},
+	)
+	*results = append(*results, newResource)
 }

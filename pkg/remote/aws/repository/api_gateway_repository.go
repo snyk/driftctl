@@ -131,7 +131,9 @@ func (r *apigatewayRepository) ListAllRestApiStages(apiId string) ([]*apigateway
 
 func (r *apigatewayRepository) ListAllRestApiResources(apiId string) ([]*apigateway.Resource, error) {
 	cacheKey := fmt.Sprintf("apigatewayListAllRestApiResources_api_%s", apiId)
-	if v := r.cache.Get(cacheKey); v != nil {
+	v := r.cache.GetAndLock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*apigateway.Resource), nil
 	}
 

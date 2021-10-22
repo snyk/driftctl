@@ -55,6 +55,26 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 						"path":        "/path1/path2",
 					},
 				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayMethodResourceType,
+					"agm-foo-bar-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agm-foo-bar-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayMethodResourceType,
+					"agm-foo-baz-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agm-foo-baz-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				})
 			},
 			resourcesFromState: []*resource.Resource{
 				{
@@ -82,6 +102,16 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 						"path":        "/path1/path2",
 					},
 				},
+				{
+					Id:    "agm-foo-bar-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agm-foo-baz-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
 			},
 			expected: []*resource.Resource{
 				{
@@ -106,6 +136,16 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 						"rest_api_id": "foo",
 						"path":        "/path1/path2",
 					},
+				},
+				{
+					Id:    "agm-foo-bar-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agm-foo-baz-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
 				},
 			},
 		},
@@ -128,6 +168,16 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 						"path":        "/test",
 					},
 				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayMethodResourceType,
+					"agm-foo-bar-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agm-foo-bar-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				})
 			},
 			resourcesFromState: []*resource.Resource{
 				{
@@ -147,6 +197,11 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 						"path":        "/test",
 					},
 				},
+				{
+					Id:    "agm-foo-bar-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
 			},
 			expected: []*resource.Resource{
 				{
@@ -163,6 +218,11 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 						"rest_api_id": "foo",
 						"path":        "/test",
 					},
+				},
+				{
+					Id:    "agm-foo-bar-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
 				},
 			},
 		},
@@ -207,6 +267,50 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 					Type: aws.AwsApiGatewayRestApiResourceType,
 					Attrs: &resource.Attributes{
 						"body": "{}",
+					},
+				},
+			},
+		},
+		{
+			name: "unknown resource in body (e.g. missing resources)",
+			resourcesFromState: []*resource.Resource{
+				{
+					Id:   "foo",
+					Type: aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": "{\"info\":{\"title\":\"example\",\"version\":\"1.0\"},\"openapi\":\"3.0.1\",\"paths\":{\"/path1\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}},\"/path1/path2\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}}}}",
+					},
+				},
+			},
+			remoteResources: []*resource.Resource{
+				{
+					Id:    "bar",
+					Type:  aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:   "bar-path1",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "bar",
+						"path":        "/path1",
+					},
+				},
+				{
+					Id:   "bar-path1-path2",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "bar",
+						"path":        "/path1/path2",
+					},
+				},
+			},
+			expected: []*resource.Resource{
+				{
+					Id:   "foo",
+					Type: aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": "{\"info\":{\"title\":\"example\",\"version\":\"1.0\"},\"openapi\":\"3.0.1\",\"paths\":{\"/path1\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}},\"/path1/path2\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}}}}",
 					},
 				},
 			},
@@ -278,6 +382,46 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 						"path":        "/path1/path2",
 					},
 				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayMethodResourceType,
+					"agm-foo-foo-path1-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agm-foo-foo-path1-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayMethodResourceType,
+					"agm-foo-foo-path1-path2-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agm-foo-foo-path1-path2-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayMethodResourceType,
+					"agm-bar-bar-path1-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agm-bar-bar-path1-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayMethodResourceType,
+					"agm-bar-bar-path1-path2-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agm-bar-bar-path1-path2-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				})
 			},
 			resourcesFromState: []*resource.Resource{
 				{
@@ -328,6 +472,26 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 						"path":        "/path1/path2",
 					},
 				},
+				{
+					Id:    "agm-foo-foo-path1-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agm-foo-foo-path1-path2-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agm-bar-bar-path1-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agm-bar-bar-path1-path2-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
 			},
 			expected: []*resource.Resource{
 				{
@@ -375,6 +539,26 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 						"rest_api_id": "bar",
 						"path":        "/path1/path2",
 					},
+				},
+				{
+					Id:    "agm-foo-foo-path1-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agm-foo-foo-path1-path2-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agm-bar-bar-path1-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agm-bar-bar-path1-path2-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
 				},
 			},
 		},

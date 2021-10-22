@@ -193,6 +193,7 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewApiGatewayRequestValidatorEnumerator(apigatewayRepository, factory))
 	remoteLibrary.AddEnumerator(NewApiGatewayRestApiPolicyEnumerator(apigatewayRepository, factory))
 	remoteLibrary.AddEnumerator(NewApiGatewayBasePathMappingEnumerator(apigatewayRepository, factory))
+	remoteLibrary.AddEnumerator(NewApiGatewayMethodEnumerator(apigatewayRepository, factory))
 
 	remoteLibrary.AddEnumerator(NewAppAutoscalingTargetEnumerator(appAutoScalingRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsAppAutoscalingTargetResourceType, common.NewGenericDetailsFetcher(aws.AwsAppAutoscalingTargetResourceType, provider, deserializer))

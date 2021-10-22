@@ -375,7 +375,8 @@ func Test_apigatewayRepository_ListAllRestApiResources(t *testing.T) {
 						return true
 					})).Return(nil).Once()
 
-				store.On("Get", "apigatewayListAllRestApiResources_api_restapi1").Return(nil).Times(1)
+				store.On("GetAndLock", "apigatewayListAllRestApiResources_api_restapi1").Return(nil).Times(1)
+				store.On("Unlock", "apigatewayListAllRestApiResources_api_restapi1").Times(1)
 				store.On("Put", "apigatewayListAllRestApiResources_api_restapi1", apiResources).Return(false).Times(1)
 			},
 			want: apiResources,
@@ -383,7 +384,8 @@ func Test_apigatewayRepository_ListAllRestApiResources(t *testing.T) {
 		{
 			name: "should hit cache",
 			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
-				store.On("Get", "apigatewayListAllRestApiResources_api_restapi1").Return(apiResources).Times(1)
+				store.On("GetAndLock", "apigatewayListAllRestApiResources_api_restapi1").Return(apiResources).Times(1)
+				store.On("Unlock", "apigatewayListAllRestApiResources_api_restapi1").Times(1)
 			},
 			want: apiResources,
 		},
