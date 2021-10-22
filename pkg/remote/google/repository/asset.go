@@ -23,6 +23,7 @@ const (
 	bigqueryDatasetAssetType      = "bigquery.googleapis.com/Dataset"
 	bigqueryTableAssetType        = "bigquery.googleapis.com/Table"
 	computeAddressAssetType       = "compute.googleapis.com/Address"
+	cloudFunctionsFunction        = "cloudfunctions.googleapis.com/CloudFunction"
 )
 
 type AssetRepository interface {
@@ -36,6 +37,7 @@ type AssetRepository interface {
 	SearchAllDatasets() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllTables() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllAddresses() ([]*assetpb.ResourceSearchResult, error)
+	SearchAllFunctions() ([]*assetpb.Asset, error)
 }
 
 type assetRepository struct {
@@ -50,6 +52,48 @@ func NewAssetRepository(client *asset.Client, config config.GCPTerraformConfig, 
 		config,
 		c,
 	}
+}
+
+func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
+	req := &assetpb.ListAssetsRequest{
+		Parent:      fmt.Sprintf("projects/%s", s.config.Project),
+		ContentType: assetpb.ContentType_RESOURCE,
+		AssetTypes: []string{
+			cloudFunctionsFunction,
+		},
+	}
+	var results []*assetpb.Asset
+
+	cacheKey := "listAllResources"
+	cachedResults := s.cache.GetAndLock(cacheKey)
+	defer s.cache.Unlock(cacheKey)
+	if cachedResults != nil {
+		results = cachedResults.([]*assetpb.Asset)
+	}
+
+	if results == nil {
+		it := s.client.ListAssets(context.Background(), req)
+		for {
+			resource, err := it.Next()
+			if err == iterator.Done {
+				break
+			}
+			if err != nil {
+				return nil, err
+			}
+			results = append(results, resource)
+		}
+		s.cache.Put(cacheKey, results)
+	}
+
+	filteredResults := []*assetpb.Asset{}
+	for _, result := range results {
+		if result.AssetType == ty {
+			filteredResults = append(filteredResults, result)
+		}
+	}
+
+	return filteredResults, nil
 }
 
 func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearchResult, error) {
@@ -140,4 +184,8 @@ func (s assetRepository) SearchAllTables() ([]*assetpb.ResourceSearchResult, err
 
 func (s assetRepository) SearchAllAddresses() ([]*assetpb.ResourceSearchResult, error) {
 	return s.searchAllResources(computeAddressAssetType)
+}
+
+func (s assetRepository) SearchAllFunctions() ([]*assetpb.Asset, error) {
+	return s.listAllResources(cloudFunctionsFunction)
 }
