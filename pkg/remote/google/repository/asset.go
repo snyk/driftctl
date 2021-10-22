@@ -26,6 +26,7 @@ const (
 	bigqueryTableAssetType        = "bigquery.googleapis.com/Table"
 	computeAddressAssetType       = "compute.googleapis.com/Address"
 	cloudFunctionsFunction        = "cloudfunctions.googleapis.com/CloudFunction"
+	bigtableInstanceAssetType     = "bigtableadmin.googleapis.com/Instance"
 )
 
 type AssetRepository interface {
@@ -42,6 +43,7 @@ type AssetRepository interface {
 	SearchAllAddresses() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllFunctions() ([]*assetpb.Asset, error)
 	SearchAllSubnetworks() ([]*assetpb.ResourceSearchResult, error)
+	SearchAllBigtableInstances() ([]*assetpb.Asset, error)
 }
 
 type assetRepository struct {
@@ -64,6 +66,7 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 		ContentType: assetpb.ContentType_RESOURCE,
 		AssetTypes: []string{
 			cloudFunctionsFunction,
+			bigtableInstanceAssetType,
 		},
 	}
 	var results []*assetpb.Asset
@@ -202,4 +205,8 @@ func (s assetRepository) SearchAllSubnetworks() ([]*assetpb.ResourceSearchResult
 
 func (s assetRepository) SearchAllDisks() ([]*assetpb.ResourceSearchResult, error) {
 	return s.searchAllResources(computeDiskAssetType)
+}
+
+func (s assetRepository) SearchAllBigtableInstances() ([]*assetpb.Asset, error) {
+	return s.listAllResources(bigtableInstanceAssetType)
 }

@@ -1,0 +1,23 @@
+[
+ {
+  "Id": "projects/cloudskiff-dev-elie/instances/tf-instance",
+  "Type": "google_bigtable_instance",
+  "Attrs": {
+   "cluster": [
+    {
+     "cluster_id": "tf-instance-cluster",
+     "kms_key_name": "",
+     "num_nodes": 1,
+     "storage_type": "HDD",
+     "zone": "us-central1-a"
+    }
+   ],
+   "deletion_protection": false,
+   "display_name": "tf-instance",
+   "id": "projects/cloudskiff-dev-elie/instances/tf-instance",
+   "instance_type": "PRODUCTION",
+   "name": "tf-instance",
+   "project": "cloudskiff-dev-elie"
+  }
+ }
+]
