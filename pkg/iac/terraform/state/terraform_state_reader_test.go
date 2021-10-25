@@ -426,6 +426,7 @@ func TestTerraformStateReader_Azure_Resources(t *testing.T) {
 		wantErr bool
 	}{
 		{name: "network security group", dirName: "azurerm_network_security_group", wantErr: false},
+		{name: "load balancers", dirName: "azurerm_lb", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

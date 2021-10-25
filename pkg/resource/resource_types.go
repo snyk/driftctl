@@ -178,6 +178,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"azurerm_postgresql_database":    {},
 	"azurerm_public_ip":              {},
 	"azurerm_network_security_group": {},
+	"azurerm_lb":                     {},
 }
 
 func IsResourceTypeSupported(ty string) bool {

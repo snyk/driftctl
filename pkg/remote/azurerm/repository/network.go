@@ -18,6 +18,7 @@ type NetworkRepository interface {
 	ListAllFirewalls() ([]*armnetwork.AzureFirewall, error)
 	ListAllPublicIPAddresses() ([]*armnetwork.PublicIPAddress, error)
 	ListAllSecurityGroups() ([]*armnetwork.NetworkSecurityGroup, error)
+	ListAllLoadBalancers() ([]*armnetwork.LoadBalancer, error)
 }
 
 type publicIPAddressesClient interface {
@@ -122,6 +123,23 @@ func (s networkSecurityGroupsClientImpl) ListAll(options *armnetwork.NetworkSecu
 	return s.client.ListAll(options)
 }
 
+type loadBalancersListAllPager interface {
+	pager
+	PageResponse() armnetwork.LoadBalancersListAllResponse
+}
+
+type loadBalancersClient interface {
+	ListAll(options *armnetwork.LoadBalancersListAllOptions) loadBalancersListAllPager
+}
+
+type loadBalancersClientImpl struct {
+	client *armnetwork.LoadBalancersClient
+}
+
+func (s loadBalancersClientImpl) ListAll(options *armnetwork.LoadBalancersListAllOptions) loadBalancersListAllPager {
+	return s.client.ListAll(options)
+}
+
 type networkRepository struct {
 	virtualNetworksClient       virtualNetworksClient
 	routeTableClient            routeTablesClient
@@ -129,6 +147,7 @@ type networkRepository struct {
 	firewallsClient             firewallsClient
 	publicIPAddressesClient     publicIPAddressesClient
 	networkSecurityGroupsClient networkSecurityGroupsClient
+	loadbalancersClient         loadBalancersClient
 	cache                       cache.Cache
 }
 
@@ -140,6 +159,7 @@ func NewNetworkRepository(con *arm.Connection, config common.AzureProviderConfig
 		&firewallsClientImpl{client: armnetwork.NewAzureFirewallsClient(con, config.SubscriptionID)},
 		&publicIPAddressesClientImpl{client: armnetwork.NewPublicIPAddressesClient(con, config.SubscriptionID)},
 		&networkSecurityGroupsClientImpl{client: armnetwork.NewNetworkSecurityGroupsClient(con, config.SubscriptionID)},
+		&loadBalancersClientImpl{client: armnetwork.NewLoadBalancersClient(con, config.SubscriptionID)},
 		cache,
 	}
 }
@@ -306,5 +326,29 @@ func (s *networkRepository) ListAllSecurityGroups() ([]*armnetwork.NetworkSecuri
 
 	s.cache.Put(cacheKey, results)
 
+	return results, nil
+}
+
+func (s *networkRepository) ListAllLoadBalancers() ([]*armnetwork.LoadBalancer, error) {
+	cacheKey := "networkListAllLoadBalancers"
+	if v := s.cache.Get(cacheKey); v != nil {
+		return v.([]*armnetwork.LoadBalancer), nil
+	}
+
+	pager := s.loadbalancersClient.ListAll(nil)
+	results := make([]*armnetwork.LoadBalancer, 0)
+	for pager.NextPage(context.Background()) {
+		resp := pager.PageResponse()
+		if err := pager.Err(); err != nil {
+			return nil, err
+		}
+		results = append(results, resp.Value...)
+	}
+
+	if err := pager.Err(); err != nil {
+		return nil, err
+	}
+
+	s.cache.Put(cacheKey, results)
 	return results, nil
 }
