@@ -58,6 +58,29 @@ func (_m *MockAssetRepository) SearchAllBigtableInstances() ([]*asset.Asset, err
 	return r0, r1
 }
 
+// SearchAllBigtableTables provides a mock function with given fields:
+func (_m *MockAssetRepository) SearchAllBigtableTables() ([]*asset.Asset, error) {
+	ret := _m.Called()
+
+	var r0 []*asset.Asset
+	if rf, ok := ret.Get(0).(func() []*asset.Asset); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*asset.Asset)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // SearchAllBuckets provides a mock function with given fields:
 func (_m *MockAssetRepository) SearchAllBuckets() ([]*asset.ResourceSearchResult, error) {
 	ret := _m.Called()
