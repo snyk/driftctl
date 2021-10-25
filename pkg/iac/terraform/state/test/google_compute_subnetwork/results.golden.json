@@ -1,0 +1,25 @@
+[
+ {
+  "Id": "projects/cloudskiff-dev-raphael/regions/us-central1/subnetworks/driftctl-unittest-1",
+  "Type": "google_compute_subnetwork",
+  "Attrs": {
+   "creation_timestamp": "2021-10-20T07:39:34.673-07:00",
+   "description": "",
+   "gateway_address": "10.2.0.1",
+   "id": "projects/cloudskiff-dev-raphael/regions/us-central1/subnetworks/driftctl-unittest-1",
+   "ip_cidr_range": "10.2.0.0/16",
+   "name": "driftctl-unittest-1",
+   "network": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-raphael/global/networks/test-network-1871346572",
+   "private_ip_google_access": false,
+   "private_ipv6_google_access": "DISABLE_GOOGLE_ACCESS",
+   "project": "cloudskiff-dev-raphael",
+   "region": "us-central1",
+   "secondary_ip_range": [
+    {
+     "ip_cidr_range": "192.168.10.0/24",
+     "range_name": "tf-test-secondary-range-update1"
+    }
+   ]
+  }
+ }
+]
