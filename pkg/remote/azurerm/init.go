@@ -47,6 +47,7 @@ func Init(
 	containerRegistryRepo := repository.NewContainerRegistryRepository(con, providerConfig, c)
 	postgresqlRepo := repository.NewPostgresqlRepository(con, providerConfig, c)
 	privateDNSRepo := repository.NewPrivateDNSRepository(con, providerConfig, c)
+	computeRepo := repository.NewComputeRepository(con, providerConfig, c)
 
 	providerLibrary.AddProvider(terraform.AZURE, provider)
 	deserializer := resource.NewDeserializer(factory)
@@ -68,6 +69,7 @@ func Init(
 	remoteLibrary.AddEnumerator(NewAzurermLoadBalancerEnumerator(networkRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSZoneEnumerator(privateDNSRepo, factory))
 	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSZoneResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSZoneResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewAzurermImageEnumerator(computeRepo, factory))
 
 	err = resourceSchemaRepository.Init(terraform.AZURE, provider.Version(), provider.Schema())
 	if err != nil {

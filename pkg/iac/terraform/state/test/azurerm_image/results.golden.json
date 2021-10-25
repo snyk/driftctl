@@ -1,0 +1,24 @@
+[
+ {
+  "Id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/tfvmex-resources/providers/Microsoft.Compute/images/acctest2",
+  "Type": "azurerm_image",
+  "Attrs": {
+   "hyper_v_generation": "V1",
+   "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/tfvmex-resources/providers/Microsoft.Compute/images/acctest2",
+   "location": "westeurope",
+   "name": "acctest2",
+   "os_disk": [
+    {
+     "blob_uri": "",
+     "caching": "None",
+     "managed_disk_id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/tfvmex-resources/providers/Microsoft.Compute/disks/acctestmd",
+     "os_state": "Generalized",
+     "os_type": "Linux",
+     "size_gb": 30
+    }
+   ],
+   "resource_group_name": "tfvmex-resources",
+   "zone_resilient": false
+  }
+ }
+]
