@@ -10,6 +10,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/containerregistry/armcontainerregistry v0.2.0
 	github.com/Azure/azure-sdk-for-go/sdk/network/armnetwork v0.3.0
 	github.com/Azure/azure-sdk-for-go/sdk/postgresql/armpostgresql v0.2.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute v0.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/privatedns/armprivatedns v0.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resources/armresources v0.3.0
 	github.com/Azure/azure-sdk-for-go/sdk/storage/armstorage v0.2.0

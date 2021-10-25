@@ -183,6 +183,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"azurerm_network_security_group": {},
 	"azurerm_lb":                     {},
 	"azurerm_private_dns_zone":       {},
+	"azurerm_image":                  {},
 }
 
 func IsResourceTypeSupported(ty string) bool {

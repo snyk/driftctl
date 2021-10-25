@@ -15,4 +15,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAzureNetworkSecurityGroupMetadata(resourceSchemaRepository)
 	initAzureLoadBalancerMetadata(resourceSchemaRepository)
 	initAzurePrivateDNSZoneMetaData(resourceSchemaRepository)
+	initAzureImageMetaData(resourceSchemaRepository)
 }
