@@ -17,6 +17,7 @@ func TestAWS_Metadata_Flags(t *testing.T) {
 		AwsApiGatewayAuthorizerResourceType:           {},
 		AwsApiGatewayDeploymentResourceType:           {},
 		AwsApiGatewayDomainNameResourceType:           {},
+		AwsApiGatewayModelResourceType:                {},
 		AwsApiGatewayRequestValidatorResourceType:     {},
 		AwsApiGatewayResourceResourceType:             {},
 		AwsApiGatewayRestApiResourceType:              {},

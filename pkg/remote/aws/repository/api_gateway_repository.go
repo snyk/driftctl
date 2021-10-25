@@ -20,6 +20,7 @@ type ApiGatewayRepository interface {
 	ListAllVpcLinks() ([]*apigateway.UpdateVpcLinkOutput, error)
 	ListAllRestApiRequestValidators(string) ([]*apigateway.UpdateRequestValidatorOutput, error)
 	ListAllDomainNameBasePathMappings(string) ([]*apigateway.BasePathMapping, error)
+	ListAllRestApiModels(string) ([]*apigateway.Model, error)
 }
 
 type apigatewayRepository struct {
@@ -236,4 +237,26 @@ func (r *apigatewayRepository) ListAllDomainNameBasePathMappings(domainName stri
 
 	r.cache.Put(cacheKey, mappings)
 	return mappings, nil
+}
+
+func (r *apigatewayRepository) ListAllRestApiModels(apiId string) ([]*apigateway.Model, error) {
+	cacheKey := fmt.Sprintf("apigatewayListAllRestApiModels_api_%s", apiId)
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*apigateway.Model), nil
+	}
+
+	var resources []*apigateway.Model
+	input := &apigateway.GetModelsInput{
+		RestApiId: &apiId,
+	}
+	err := r.client.GetModelsPages(input, func(res *apigateway.GetModelsOutput, lastPage bool) bool {
+		resources = append(resources, res.Items...)
+		return !lastPage
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put(cacheKey, resources)
+	return resources, nil
 }

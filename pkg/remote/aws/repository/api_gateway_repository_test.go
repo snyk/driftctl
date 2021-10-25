@@ -721,3 +721,88 @@ func Test_apigatewayRepository_ListAllDomainNameBasePathMappings(t *testing.T) {
 		})
 	}
 }
+
+func Test_apigatewayRepository_ListAllRestApiModels(t *testing.T) {
+	api := &apigateway.RestApi{
+		Id: aws.String("restapi1"),
+	}
+
+	apiModels := []*apigateway.Model{
+		{Id: aws.String("model1")},
+		{Id: aws.String("model2")},
+		{Id: aws.String("model3")},
+		{Id: aws.String("model4")},
+	}
+
+	remoteError := errors.New("remote error")
+
+	tests := []struct {
+		name    string
+		mocks   func(client *awstest.MockFakeApiGateway, store *cache.MockCache)
+		want    []*apigateway.Model
+		wantErr error
+	}{
+		{
+			name: "list multiple rest api models",
+			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
+				client.On("GetModelsPages",
+					&apigateway.GetModelsInput{
+						RestApiId: aws.String("restapi1"),
+					},
+					mock.MatchedBy(func(callback func(res *apigateway.GetModelsOutput, lastPage bool) bool) bool {
+						callback(&apigateway.GetModelsOutput{
+							Items: apiModels,
+						}, true)
+						return true
+					})).Return(nil).Once()
+
+				store.On("Get", "apigatewayListAllRestApiModels_api_restapi1").Return(nil).Times(1)
+				store.On("Put", "apigatewayListAllRestApiModels_api_restapi1", apiModels).Return(false).Times(1)
+			},
+			want: apiModels,
+		},
+		{
+			name: "should hit cache",
+			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
+				store.On("Get", "apigatewayListAllRestApiModels_api_restapi1").Return(apiModels).Times(1)
+			},
+			want: apiModels,
+		},
+		{
+			name: "should return remote error",
+			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
+				client.On("GetModelsPages",
+					&apigateway.GetModelsInput{
+						RestApiId: aws.String("restapi1"),
+					}, mock.AnythingOfType("func(*apigateway.GetModelsOutput, bool) bool")).Return(remoteError).Once()
+
+				store.On("Get", "apigatewayListAllRestApiModels_api_restapi1").Return(nil).Times(1)
+			},
+			wantErr: remoteError,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := &cache.MockCache{}
+			client := &awstest.MockFakeApiGateway{}
+			tt.mocks(client, store)
+			r := &apigatewayRepository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.ListAllRestApiModels(*api.Id)
+			assert.Equal(t, tt.wantErr, err)
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+			store.AssertExpectations(t)
+			client.AssertExpectations(t)
+		})
+	}
+}
