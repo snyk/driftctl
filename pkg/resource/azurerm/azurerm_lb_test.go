@@ -14,7 +14,6 @@ func TestAcc_Azure_LoadBalancers(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "azure+tf",
-			"--filter", "Attr.name=='AccTestLoadBalancer-7128046527'",
 		},
 		Checks: []acceptance.AccCheck{
 			{
