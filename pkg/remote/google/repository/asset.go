@@ -19,6 +19,7 @@ const (
 	computeInstanceAssetType      = "compute.googleapis.com/Instance"
 	computeNetworkAssetType       = "compute.googleapis.com/Network"
 	computeSubnetworkAssetType    = "compute.googleapis.com/Subnetwork"
+	computeDiskAssetType          = "compute.googleapis.com/Disk"
 	dnsManagedZoneAssetType       = "dns.googleapis.com/ManagedZone"
 	computeInstanceGroupAssetType = "compute.googleapis.com/InstanceGroup"
 	bigqueryDatasetAssetType      = "bigquery.googleapis.com/Dataset"
@@ -33,6 +34,7 @@ type AssetRepository interface {
 	SearchAllRouters() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllInstances() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllNetworks() ([]*assetpb.ResourceSearchResult, error)
+	SearchAllDisks() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllDNSManagedZones() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllInstanceGroups() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllDatasets() ([]*assetpb.ResourceSearchResult, error)
@@ -113,6 +115,7 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 			bigqueryDatasetAssetType,
 			bigqueryTableAssetType,
 			computeAddressAssetType,
+			computeDiskAssetType,
 		},
 	}
 	var results []*assetpb.ResourceSearchResult
@@ -195,4 +198,8 @@ func (s assetRepository) SearchAllFunctions() ([]*assetpb.Asset, error) {
 
 func (s assetRepository) SearchAllSubnetworks() ([]*assetpb.ResourceSearchResult, error) {
 	return s.searchAllResources(computeSubnetworkAssetType)
+}
+
+func (s assetRepository) SearchAllDisks() ([]*assetpb.ResourceSearchResult, error) {
+	return s.searchAllResources(computeDiskAssetType)
 }
