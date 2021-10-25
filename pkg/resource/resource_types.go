@@ -165,6 +165,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"google_compute_subnetwork":      {},
 	"google_cloudfunctions_function": {},
 	"google_compute_disk":            {},
+	"google_bigtable_instance":       {},
 
 	"azurerm_storage_account":   {},
 	"azurerm_storage_container": {},
