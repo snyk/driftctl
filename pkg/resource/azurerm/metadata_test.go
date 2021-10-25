@@ -25,6 +25,7 @@ func TestAzureMetadata_Flags(t *testing.T) {
 		AzureVirtualNetworkResourceType:       {},
 		AzureNetworkSecurityGroupResourceType: {resource.FlagDeepMode},
 		AzureLoadBalancerResourceType:         {},
+		AzurePrivateDNSZoneResourceType:       {resource.FlagDeepMode},
 	}
 
 	schemaRepository := testresource.InitFakeSchemaRepository(tf.AZURE, "2.71.0")
