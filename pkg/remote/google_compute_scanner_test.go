@@ -740,3 +740,126 @@ func TestGoogleComputeAddress(t *testing.T) {
 		})
 	}
 }
+
+func TestGoogleComputeSubnetwork(t *testing.T) {
+
+	cases := []struct {
+		test             string
+		dirName          string
+		response         []*assetpb.ResourceSearchResult
+		responseErr      error
+		setupAlerterMock func(alerter *mocks.AlerterInterface)
+		wantErr          error
+	}{
+		{
+			test:     "no subnetwork",
+			dirName:  "google_compute_subnetwork_empty",
+			response: []*assetpb.ResourceSearchResult{},
+			wantErr:  nil,
+		},
+		{
+			test:    "multiple subnetworks",
+			dirName: "google_compute_subnetwork_multiple",
+			response: []*assetpb.ResourceSearchResult{
+				{
+					AssetType:   "compute.googleapis.com/Subnetwork",
+					DisplayName: "driftctl-unittest-1",
+					Name:        "//compute.googleapis.com/projects/cloudskiff-dev-raphael/regions/us-central1/subnetworks/driftctl-unittest-1",
+				},
+				{
+					AssetType:   "compute.googleapis.com/Subnetwork",
+					DisplayName: "driftctl-unittest-2",
+					Name:        "//compute.googleapis.com/projects/cloudskiff-dev-raphael/regions/us-central1/subnetworks/driftctl-unittest-2",
+				},
+				{
+					AssetType:   "compute.googleapis.com/Subnetwork",
+					DisplayName: "driftctl-unittest-3",
+					Name:        "//compute.googleapis.com/projects/cloudskiff-dev-raphael/regions/us-central1/subnetworks/driftctl-unittest-3",
+				},
+			},
+			wantErr: nil,
+		},
+		{
+			test:        "cannot list compute subnetworks",
+			dirName:     "google_compute_subnetwork_empty",
+			responseErr: status.Error(codes.PermissionDenied, "The caller does not have permission"),
+			setupAlerterMock: func(alerter *mocks.AlerterInterface) {
+				alerter.On(
+					"SendAlert",
+					"google_compute_subnetwork",
+					alerts.NewRemoteAccessDeniedAlert(
+						common.RemoteGoogleTerraform,
+						remoteerr.NewResourceListingError(
+							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							"google_compute_subnetwork",
+						),
+						alerts.EnumerationPhase,
+					),
+				).Once()
+			},
+			wantErr: nil,
+		},
+	}
+
+	providerVersion := "3.78.0"
+	resType := resource.ResourceType(googleresource.GoogleComputeSubnetworkResourceType)
+	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
+	googleresource.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range cases {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			if c.setupAlerterMock != nil {
+				c.setupAlerterMock(alerter)
+			}
+
+			assetClient, err := testgoogle.NewFakeAssetServer(c.response, c.responseErr)
+			if err != nil {
+				tt.Fatal(err)
+			}
+
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			if err != nil {
+				tt.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err = realProvider.Init()
+				if err != nil {
+					tt.Fatal(err)
+				}
+				provider.ShouldUpdate()
+			}
+
+			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeSubnetworkEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			alerter.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+			test.TestAgainstGoldenFile(got, resType.String(), c.dirName, provider, deserializer, shouldUpdate, tt)
+		})
+	}
+}

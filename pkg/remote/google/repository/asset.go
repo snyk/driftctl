@@ -18,6 +18,7 @@ const (
 	computeRouterAssetType        = "compute.googleapis.com/Router"
 	computeInstanceAssetType      = "compute.googleapis.com/Instance"
 	computeNetworkAssetType       = "compute.googleapis.com/Network"
+	computeSubnetworkAssetType    = "compute.googleapis.com/Subnetwork"
 	dnsManagedZoneAssetType       = "dns.googleapis.com/ManagedZone"
 	computeInstanceGroupAssetType = "compute.googleapis.com/InstanceGroup"
 	bigqueryDatasetAssetType      = "bigquery.googleapis.com/Dataset"
@@ -38,6 +39,7 @@ type AssetRepository interface {
 	SearchAllTables() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllAddresses() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllFunctions() ([]*assetpb.Asset, error)
+	SearchAllSubnetworks() ([]*assetpb.ResourceSearchResult, error)
 }
 
 type assetRepository struct {
@@ -105,6 +107,7 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 			computeRouterAssetType,
 			computeInstanceAssetType,
 			computeNetworkAssetType,
+			computeSubnetworkAssetType,
 			dnsManagedZoneAssetType,
 			computeInstanceGroupAssetType,
 			bigqueryDatasetAssetType,
@@ -188,4 +191,8 @@ func (s assetRepository) SearchAllAddresses() ([]*assetpb.ResourceSearchResult, 
 
 func (s assetRepository) SearchAllFunctions() ([]*assetpb.Asset, error) {
 	return s.listAllResources(cloudFunctionsFunction)
+}
+
+func (s assetRepository) SearchAllSubnetworks() ([]*assetpb.ResourceSearchResult, error) {
+	return s.searchAllResources(computeSubnetworkAssetType)
 }

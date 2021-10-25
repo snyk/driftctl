@@ -162,6 +162,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 		"google_project_iam_member",
 	}},
 	"google_compute_address":         {},
+	"google_compute_subnetwork":      {},
 	"google_cloudfunctions_function": {},
 
 	"azurerm_storage_account":   {},

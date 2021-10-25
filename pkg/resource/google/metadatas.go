@@ -13,4 +13,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initGoogleBigqueryTableMetadata(resourceSchemaRepository)
 	initGoogleProjectIAMMemberMetadata(resourceSchemaRepository)
 	initGoogleComputeAddressMetadata(resourceSchemaRepository)
+	initGoogleComputeSubnetworkMetadata(resourceSchemaRepository)
 }
