@@ -1,0 +1,13 @@
+[
+ {
+  "Id": "agmr-vryjzimtj1-oy4dqf-GET-200",
+  "Type": "aws_api_gateway_method_response",
+  "Attrs": {
+   "http_method": "GET",
+   "id": "agmr-vryjzimtj1-oy4dqf-GET-200",
+   "resource_id": "oy4dqf",
+   "rest_api_id": "vryjzimtj1",
+   "status_code": "200"
+  }
+ }
+]

@@ -1205,3 +1205,118 @@ func TestApiGatewayModel(t *testing.T) {
 		})
 	}
 }
+
+func TestApiGatewayMethodResponse(t *testing.T) {
+	dummyError := errors.New("this is an error")
+	apis := []*apigateway.RestApi{
+		{Id: awssdk.String("vryjzimtj1")},
+	}
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "no api gateway method responses",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllRestApis").Return(apis, nil)
+				repo.On("ListAllRestApiResources", *apis[0].Id).Return([]*apigateway.Resource{
+					{Id: awssdk.String("hl7ksq"), Path: awssdk.String("/foo"), ResourceMethods: map[string]*apigateway.Method{
+						"GET": {},
+					}},
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "multiple api gateway method responses",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllRestApis").Return(apis, nil)
+				repo.On("ListAllRestApiResources", *apis[0].Id).Return([]*apigateway.Resource{
+					{Id: awssdk.String("hl7ksq"), Path: awssdk.String("/foo"), ResourceMethods: map[string]*apigateway.Method{
+						"GET": {MethodResponses: map[string]*apigateway.MethodResponse{
+							"200": {},
+							"404": {},
+							"503": {},
+						}},
+					}},
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				// We need to sort the slice of resources to have consistent test results because at
+				// the creation we iterate over a map[string]*apigateway.MethodResponse.
+				sort.Slice(got, func(i, j int) bool {
+					return got[i].ResourceId() < got[j].ResourceId()
+				})
+
+				assert.Equal(t, got[0].ResourceId(), "agmr-vryjzimtj1-hl7ksq-GET-200")
+				assert.Equal(t, got[0].ResourceType(), resourceaws.AwsApiGatewayMethodResponseResourceType)
+
+				assert.Equal(t, got[1].ResourceId(), "agmr-vryjzimtj1-hl7ksq-GET-404")
+				assert.Equal(t, got[1].ResourceType(), resourceaws.AwsApiGatewayMethodResponseResourceType)
+
+				assert.Equal(t, got[2].ResourceId(), "agmr-vryjzimtj1-hl7ksq-GET-503")
+				assert.Equal(t, got[2].ResourceType(), resourceaws.AwsApiGatewayMethodResponseResourceType)
+			},
+		},
+		{
+			test: "cannot list rest apis",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllRestApis").Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResponseResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResponseResourceType, resourceaws.AwsApiGatewayRestApiResourceType),
+		},
+		{
+			test: "cannot list api gateway resources",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllRestApis").Return(apis, nil)
+				repo.On("ListAllRestApiResources", *apis[0].Id).Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResponseResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResponseResourceType, resourceaws.AwsApiGatewayResourceResourceType),
+		},
+	}
+
+	providerVersion := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.ApiGatewayRepository = fakeRepo
+
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayMethodResponseEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+		})
+	}
+}
