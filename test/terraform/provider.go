@@ -25,7 +25,7 @@ func InitTestAwsProvider(providerLibrary *terraform.ProviderLibrary, version str
 func InitTestGithubProvider(providerLibrary *terraform.ProviderLibrary, version string) (*github.GithubTerraformProvider, error) {
 	progress := &output.MockProgress{}
 	progress.On("Inc").Maybe().Return()
-	provider, err := github.NewGithubTerraformProvider(version, progress, "")
+	provider, err := github.NewGithubTerraformProvider(version, progress, os.TempDir())
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func InitTestGithubProvider(providerLibrary *terraform.ProviderLibrary, version 
 func InitTestGoogleProvider(providerLibrary *terraform.ProviderLibrary, version string) (*google.GCPTerraformProvider, error) {
 	progress := &output.MockProgress{}
 	progress.On("Inc").Maybe().Return()
-	provider, err := google.NewGCPTerraformProvider(version, progress, "")
+	provider, err := google.NewGCPTerraformProvider(version, progress, os.TempDir())
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func InitTestGoogleProvider(providerLibrary *terraform.ProviderLibrary, version 
 func InitTestAzureProvider(providerLibrary *terraform.ProviderLibrary, version string) (*azurerm.AzureTerraformProvider, error) {
 	progress := &output.MockProgress{}
 	progress.On("Inc").Maybe().Return()
-	provider, err := azurerm.NewAzureTerraformProvider(version, progress, "")
+	provider, err := azurerm.NewAzureTerraformProvider(version, progress, os.TempDir())
 	if err != nil {
 		return nil, err
 	}
