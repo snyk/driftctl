@@ -1,0 +1,13 @@
+[
+ {
+  "Id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/TESTRESGROUP/providers/Microsoft.Compute/sshPublicKeys/example-key",
+  "Type": "azurerm_ssh_public_key",
+  "Attrs": {
+   "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/TESTRESGROUP/providers/Microsoft.Compute/sshPublicKeys/example-key",
+   "location": "westeurope",
+   "name": "example-key",
+   "public_key": "data",
+   "resource_group_name": "TESTRESGROUP"
+  }
+ }
+]
