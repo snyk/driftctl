@@ -39,7 +39,7 @@ func (e *GoogleBigqueryDatasetEnumerator) Enumerate() ([]*resource.Resource, err
 				string(e.SupportedType()),
 				trimResourceName(res.GetName()),
 				map[string]interface{}{
-					"name": res.DisplayName,
+					"friendly_name": res.DisplayName,
 				},
 			),
 		)
