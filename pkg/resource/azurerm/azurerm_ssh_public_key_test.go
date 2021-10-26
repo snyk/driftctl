@@ -14,6 +14,7 @@ func TestAcc_Azure_SSHPublicKey(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "azure+tf",
+			"--deep",
 		},
 		Checks: []acceptance.AccCheck{
 			{
