@@ -108,6 +108,7 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 				return
 			}
 
+			got = resource.Sort(got)
 			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
