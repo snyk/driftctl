@@ -602,6 +602,74 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "create gateway responses based on OpenAPI v2 and v3",
+			mocks: func(factory *terraform.MockResourceFactory) {
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayGatewayResponseResourceType,
+					"aggr-v3-MISSING_AUTHENTICATION_TOKEN",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "aggr-v3-MISSING_AUTHENTICATION_TOKEN",
+					Type:  aws.AwsApiGatewayGatewayResponseResourceType,
+					Attrs: &resource.Attributes{},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayGatewayResponseResourceType,
+					"aggr-v2-MISSING_AUTHENTICATION_TOKEN",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "aggr-v2-MISSING_AUTHENTICATION_TOKEN",
+					Type:  aws.AwsApiGatewayGatewayResponseResourceType,
+					Attrs: &resource.Attributes{},
+				})
+			},
+			resourcesFromState: []*resource.Resource{
+				{
+					Id:   "v3",
+					Type: aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": "{\"info\":{\"title\":\"example\",\"version\":\"1.0\"},\"openapi\":\"3.0.1\",\"paths\":{\"/path1\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}}},\"x-amazon-apigateway-gateway-responses\":{\"MISSING_AUTHENTICATION_TOKEN\":{\"responseParameters\":{\"gatewayresponse.header.Access-Control-Allow-Origin\":\"'a.b.c'\"},\"responseTemplates\":{\"application/json\":\"{\\n     \\\"message\\\": $context.error.messageString,\\n     \\\"type\\\":  \\\"$context.error.responseType\\\",\\n     \\\"stage\\\":  \\\"$context.stage\\\",\\n     \\\"resourcePath\\\":  \\\"$context.resourcePath\\\",\\n     \\\"stageVariables.a\\\":  \\\"$stageVariables.a\\\",\\n     \\\"statusCode\\\": \\\"'403'\\\"\\n}\"},\"statusCode\":403}}}",
+					},
+				},
+				{
+					Id:   "v2",
+					Type: aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": "{\"info\":{\"title\":\"test\",\"version\":\"2017-04-20T04:08:08Z\"},\"paths\":{\"/test\":{\"get\":{\"responses\":{\"200\":{\"description\":\"OK\"}},\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"responses\":{\"default\":{\"statusCode\":200}},\"type\":\"HTTP\",\"uri\":\"https://aws.amazon.com/\"}}}},\"schemes\":[\"https\"],\"swagger\":\"2.0\",\"x-amazon-apigateway-gateway-responses\":{\"MISSING_AUTHENTICATION_TOKEN\":{\"responseParameters\":{\"gatewayresponse.header.Access-Control-Allow-Origin\":\"'a.b.c'\"},\"responseTemplates\":{\"application/json\":\"{\\n     \\\"message\\\": $context.error.messageString,\\n     \\\"type\\\":  \\\"$context.error.responseType\\\",\\n     \\\"stage\\\":  \\\"$context.stage\\\",\\n     \\\"resourcePath\\\":  \\\"$context.resourcePath\\\",\\n     \\\"stageVariables.a\\\":  \\\"$stageVariables.a\\\",\\n     \\\"statusCode\\\": \\\"'403'\\\"\\n}\"},\"statusCode\":403}}}",
+					},
+				},
+			},
+			remoteResources: []*resource.Resource{},
+			expected: []*resource.Resource{
+				{
+					Id:   "v3",
+					Type: aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": "{\"info\":{\"title\":\"example\",\"version\":\"1.0\"},\"openapi\":\"3.0.1\",\"paths\":{\"/path1\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}}},\"x-amazon-apigateway-gateway-responses\":{\"MISSING_AUTHENTICATION_TOKEN\":{\"responseParameters\":{\"gatewayresponse.header.Access-Control-Allow-Origin\":\"'a.b.c'\"},\"responseTemplates\":{\"application/json\":\"{\\n     \\\"message\\\": $context.error.messageString,\\n     \\\"type\\\":  \\\"$context.error.responseType\\\",\\n     \\\"stage\\\":  \\\"$context.stage\\\",\\n     \\\"resourcePath\\\":  \\\"$context.resourcePath\\\",\\n     \\\"stageVariables.a\\\":  \\\"$stageVariables.a\\\",\\n     \\\"statusCode\\\": \\\"'403'\\\"\\n}\"},\"statusCode\":403}}}",
+					},
+				},
+				{
+					Id:    "aggr-v3-MISSING_AUTHENTICATION_TOKEN",
+					Type:  aws.AwsApiGatewayGatewayResponseResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:   "v2",
+					Type: aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": "{\"info\":{\"title\":\"test\",\"version\":\"2017-04-20T04:08:08Z\"},\"paths\":{\"/test\":{\"get\":{\"responses\":{\"200\":{\"description\":\"OK\"}},\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"responses\":{\"default\":{\"statusCode\":200}},\"type\":\"HTTP\",\"uri\":\"https://aws.amazon.com/\"}}}},\"schemes\":[\"https\"],\"swagger\":\"2.0\",\"x-amazon-apigateway-gateway-responses\":{\"MISSING_AUTHENTICATION_TOKEN\":{\"responseParameters\":{\"gatewayresponse.header.Access-Control-Allow-Origin\":\"'a.b.c'\"},\"responseTemplates\":{\"application/json\":\"{\\n     \\\"message\\\": $context.error.messageString,\\n     \\\"type\\\":  \\\"$context.error.responseType\\\",\\n     \\\"stage\\\":  \\\"$context.stage\\\",\\n     \\\"resourcePath\\\":  \\\"$context.resourcePath\\\",\\n     \\\"stageVariables.a\\\":  \\\"$stageVariables.a\\\",\\n     \\\"statusCode\\\": \\\"'403'\\\"\\n}\"},\"statusCode\":403}}}",
+					},
+				},
+				{
+					Id:    "aggr-v2-MISSING_AUTHENTICATION_TOKEN",
+					Type:  aws.AwsApiGatewayGatewayResponseResourceType,
+					Attrs: &resource.Attributes{},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
