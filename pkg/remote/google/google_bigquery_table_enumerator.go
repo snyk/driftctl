@@ -39,7 +39,7 @@ func (e *GoogleBigqueryTableEnumerator) Enumerate() ([]*resource.Resource, error
 				string(e.SupportedType()),
 				trimResourceName(res.GetName()),
 				map[string]interface{}{
-					"name": res.DisplayName,
+					"friendly_name": res.DisplayName,
 				},
 			),
 		)
