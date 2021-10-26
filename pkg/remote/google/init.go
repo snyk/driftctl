@@ -93,6 +93,7 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewGoogleComputeDiskEnumerator(assetRepository, factory))
 	remoteLibrary.AddEnumerator(NewGoogleBigTableInstanceEnumerator(assetRepository, factory))
 	remoteLibrary.AddEnumerator(NewGoogleBigtableTableEnumerator(assetRepository, factory))
+	remoteLibrary.AddEnumerator(NewGoogleSQLDatabaseInstanceEnumerator(assetRepository, factory))
 
 	err = resourceSchemaRepository.Init(terraform.GOOGLE, provider.Version(), provider.Schema())
 	if err != nil {
