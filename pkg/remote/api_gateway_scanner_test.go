@@ -1405,3 +1405,108 @@ func TestApiGatewayGatewayResponse(t *testing.T) {
 		})
 	}
 }
+
+func TestApiGatewayMethodSettings(t *testing.T) {
+	dummyError := errors.New("this is an error")
+	apis := []*apigateway.RestApi{
+		{Id: awssdk.String("vryjzimtj1")},
+	}
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "no api gateway method settings",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllRestApis").Return(apis, nil)
+				repo.On("ListAllRestApiStages", *apis[0].Id).Return([]*apigateway.Stage{
+					{StageName: awssdk.String("foo"), MethodSettings: map[string]*apigateway.MethodSetting{}},
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "multiple api gateway method settings",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllRestApis").Return(apis, nil)
+				repo.On("ListAllRestApiStages", *apis[0].Id).Return([]*apigateway.Stage{
+					{StageName: awssdk.String("foo"), MethodSettings: map[string]*apigateway.MethodSetting{
+						"*/*":        {},
+						"foo/GET":    {},
+						"foo/DELETE": {},
+					}},
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, got[0].ResourceId(), "vryjzimtj1-foo-*/*")
+				assert.Equal(t, got[0].ResourceType(), resourceaws.AwsApiGatewayMethodSettingsResourceType)
+
+				assert.Equal(t, got[1].ResourceId(), "vryjzimtj1-foo-foo/DELETE")
+				assert.Equal(t, got[1].ResourceType(), resourceaws.AwsApiGatewayMethodSettingsResourceType)
+
+				assert.Equal(t, got[2].ResourceId(), "vryjzimtj1-foo-foo/GET")
+				assert.Equal(t, got[2].ResourceType(), resourceaws.AwsApiGatewayMethodSettingsResourceType)
+			},
+		},
+		{
+			test: "cannot list rest apis",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllRestApis").Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodSettingsResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodSettingsResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodSettingsResourceType, resourceaws.AwsApiGatewayRestApiResourceType),
+		},
+		{
+			test: "cannot list api gateway settings",
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllRestApis").Return(apis, nil)
+				repo.On("ListAllRestApiStages", *apis[0].Id).Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodSettingsResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodSettingsResourceType, resourceaws.AwsApiGatewayStageResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodSettingsResourceType, resourceaws.AwsApiGatewayStageResourceType),
+		},
+	}
+
+	providerVersion := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.ApiGatewayRepository = fakeRepo
+
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayMethodSettingsEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := remote.NewSortableScanner(NewScanner(remoteLibrary, alerter, scanOptions, testFilter))
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+		})
+	}
+}

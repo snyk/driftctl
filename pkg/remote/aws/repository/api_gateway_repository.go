@@ -116,7 +116,9 @@ func (r *apigatewayRepository) ListAllRestApiAuthorizers(apiId string) ([]*apiga
 
 func (r *apigatewayRepository) ListAllRestApiStages(apiId string) ([]*apigateway.Stage, error) {
 	cacheKey := fmt.Sprintf("apigatewayListAllRestApiStages_api_%s", apiId)
-	if v := r.cache.Get(cacheKey); v != nil {
+	v := r.cache.GetAndLock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*apigateway.Stage), nil
 	}
 
