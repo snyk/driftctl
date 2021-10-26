@@ -70,6 +70,8 @@ func Init(
 	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSZoneEnumerator(privateDNSRepo, factory))
 	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSZoneResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSZoneResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewAzurermImageEnumerator(computeRepo, factory))
+	remoteLibrary.AddEnumerator(NewAzurermSSHPublicKeyEnumerator(computeRepo, factory))
+	remoteLibrary.AddDetailsFetcher(azurerm.AzureSSHPublicKeyResourceType, common.NewGenericDetailsFetcher(azurerm.AzureSSHPublicKeyResourceType, provider, deserializer))
 
 	err = resourceSchemaRepository.Init(terraform.AZURE, provider.Version(), provider.Schema())
 	if err != nil {

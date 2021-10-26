@@ -142,3 +142,134 @@ func Test_Compute_ListAllImages(t *testing.T) {
 		})
 	}
 }
+
+func Test_Compute_ListAllSSHPublicKeys(t *testing.T) {
+	expectedResults := []*armcompute.SSHPublicKeyResource{
+		{
+			Resource: armcompute.Resource{
+				ID:   to.StringPtr("/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/TESTRESGROUP/providers/Microsoft.Compute/sshPublicKeys/key1"),
+				Name: to.StringPtr("key1"),
+			},
+		},
+		{
+			Resource: armcompute.Resource{
+				ID:   to.StringPtr("/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/TESTRESGROUP/providers/Microsoft.Compute/sshPublicKeys/key2"),
+				Name: to.StringPtr("key2"),
+			},
+		},
+		{
+			Resource: armcompute.Resource{
+				ID:   to.StringPtr("/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/TESTRESGROUP/providers/Microsoft.Compute/sshPublicKeys/key3"),
+				Name: to.StringPtr("key3"),
+			},
+		},
+	}
+
+	testcases := []struct {
+		name     string
+		mocks    func(*mockSshPublicKeyListPager, *cache.MockCache)
+		expected []*armcompute.SSHPublicKeyResource
+		wantErr  string
+	}{
+		{
+			name: "should return SSH public keys",
+			mocks: func(mockPager *mockSshPublicKeyListPager, mockCache *cache.MockCache) {
+				mockPager.On("Err").Return(nil).Times(3)
+				mockPager.On("NextPage", mock.Anything).Return(true).Times(2)
+				mockPager.On("NextPage", mock.Anything).Return(false).Times(1)
+				mockPager.On("PageResponse").Return(armcompute.SSHPublicKeysListBySubscriptionResponse{
+					SSHPublicKeysListBySubscriptionResult: armcompute.SSHPublicKeysListBySubscriptionResult{
+						SSHPublicKeysGroupListResult: armcompute.SSHPublicKeysGroupListResult{
+							Value: expectedResults[:2],
+						},
+					},
+				}).Times(1)
+				mockPager.On("PageResponse").Return(armcompute.SSHPublicKeysListBySubscriptionResponse{
+					SSHPublicKeysListBySubscriptionResult: armcompute.SSHPublicKeysListBySubscriptionResult{
+						SSHPublicKeysGroupListResult: armcompute.SSHPublicKeysGroupListResult{
+							Value: expectedResults[2:],
+						},
+					},
+				}).Times(1)
+
+				mockCache.On("Get", "computeListAllSSHPublicKeys").Return(nil).Times(1)
+				mockCache.On("Put", "computeListAllSSHPublicKeys", expectedResults).Return(false).Times(1)
+			},
+			expected: expectedResults,
+		},
+		{
+			name: "should hit cache and return SSH public keys",
+			mocks: func(mockPager *mockSshPublicKeyListPager, mockCache *cache.MockCache) {
+				mockCache.On("Get", "computeListAllSSHPublicKeys").Return(expectedResults).Times(1)
+			},
+			expected: expectedResults,
+		},
+		{
+			name: "should return remote error",
+			mocks: func(mockPager *mockSshPublicKeyListPager, mockCache *cache.MockCache) {
+				mockPager.On("NextPage", mock.Anything).Return(true).Times(1)
+				mockPager.On("PageResponse").Return(armcompute.SSHPublicKeysListBySubscriptionResponse{
+					SSHPublicKeysListBySubscriptionResult: armcompute.SSHPublicKeysListBySubscriptionResult{
+						SSHPublicKeysGroupListResult: armcompute.SSHPublicKeysGroupListResult{
+							Value: []*armcompute.SSHPublicKeyResource{},
+						},
+					},
+				}).Times(1)
+				mockPager.On("Err").Return(errors.New("remote error")).Times(1)
+
+				mockCache.On("Get", "computeListAllSSHPublicKeys").Return(nil).Times(1)
+			},
+			wantErr: "remote error",
+		},
+		{
+			name: "should return remote error after fetching all pages",
+			mocks: func(mockPager *mockSshPublicKeyListPager, mockCache *cache.MockCache) {
+				mockPager.On("NextPage", mock.Anything).Return(true).Times(1)
+				mockPager.On("NextPage", mock.Anything).Return(false).Times(1)
+				mockPager.On("PageResponse").Return(armcompute.SSHPublicKeysListBySubscriptionResponse{
+					SSHPublicKeysListBySubscriptionResult: armcompute.SSHPublicKeysListBySubscriptionResult{
+						SSHPublicKeysGroupListResult: armcompute.SSHPublicKeysGroupListResult{
+							Value: []*armcompute.SSHPublicKeyResource{},
+						},
+					},
+				}).Times(1)
+				mockPager.On("Err").Return(nil).Times(1)
+				mockPager.On("Err").Return(errors.New("remote error")).Times(1)
+
+				mockCache.On("Get", "computeListAllSSHPublicKeys").Return(nil).Times(1)
+			},
+			wantErr: "remote error",
+		},
+	}
+
+	for _, tt := range testcases {
+		t.Run(tt.name, func(t *testing.T) {
+			fakeClient := &mockSshPublicKeyClient{}
+			mockPager := &mockSshPublicKeyListPager{}
+			mockCache := &cache.MockCache{}
+
+			fakeClient.On("ListBySubscription", mock.Anything).Maybe().Return(mockPager)
+
+			tt.mocks(mockPager, mockCache)
+
+			s := &computeRepository{
+				sshPublicKeyClient: fakeClient,
+				cache:              mockCache,
+			}
+			got, err := s.ListAllSSHPublicKeys()
+			if tt.wantErr != "" {
+				assert.EqualError(t, err, tt.wantErr)
+			} else {
+				assert.Nil(t, err)
+			}
+
+			fakeClient.AssertExpectations(t)
+			mockPager.AssertExpectations(t)
+			mockCache.AssertExpectations(t)
+
+			if !reflect.DeepEqual(got, tt.expected) {
+				t.Errorf("ListAllResourceGroups() got = %v, want %v", got, tt.expected)
+			}
+		})
+	}
+}
