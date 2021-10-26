@@ -348,6 +348,7 @@ func TestTerraformStateReader_Google_Resources(t *testing.T) {
 		{name: "bigquery dataset", dirName: "google_bigquery_dataset", wantErr: false},
 		{name: "bigquery table", dirName: "google_bigquery_table", wantErr: false},
 		{name: "compute address", dirName: "google_compute_address", wantErr: false},
+		{name: "compute global address", dirName: "google_compute_global_address", wantErr: false},
 		{name: "cloudfunctions function", dirName: "google_cloudfunctions_function", wantErr: false},
 		{name: "compute subnetwork", dirName: "google_compute_subnetwork", wantErr: false},
 		{name: "compute disk", dirName: "google_compute_disk", wantErr: false},

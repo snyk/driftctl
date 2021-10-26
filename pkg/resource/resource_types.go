@@ -175,6 +175,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"google_sql_database_instance":   {},
 	"google_compute_image":           {},
 	"google_compute_health_check":    {},
+	"google_compute_global_address":  {},
 
 	"azurerm_storage_account":   {},
 	"azurerm_storage_container": {},

@@ -1,0 +1,20 @@
+[
+ {
+  "Id": "projects/cloudskiff-dev-elie/global/addresses/global-appserver-ip",
+  "Type": "google_compute_global_address",
+  "Attrs": {
+   "address": "107.178.250.143",
+   "address_type": "EXTERNAL",
+   "creation_timestamp": "2021-10-26T07:43:18.117-07:00",
+   "description": "",
+   "id": "projects/cloudskiff-dev-elie/global/addresses/global-appserver-ip",
+   "ip_version": "",
+   "name": "global-appserver-ip",
+   "network": "",
+   "prefix_length": 0,
+   "project": "cloudskiff-dev-elie",
+   "purpose": "",
+   "self_link": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-elie/global/addresses/global-appserver-ip"
+  }
+ }
+]

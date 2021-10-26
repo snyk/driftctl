@@ -26,6 +26,7 @@ const (
 	bigqueryDatasetAssetType      = "bigquery.googleapis.com/Dataset"
 	bigqueryTableAssetType        = "bigquery.googleapis.com/Table"
 	computeAddressAssetType       = "compute.googleapis.com/Address"
+	computeGlobalAddressAssetType = "compute.googleapis.com/GlobalAddress"
 	cloudFunctionsFunction        = "cloudfunctions.googleapis.com/CloudFunction"
 	bigtableInstanceAssetType     = "bigtableadmin.googleapis.com/Instance"
 	bigtableTableAssetType        = "bigtableadmin.googleapis.com/Table"
@@ -46,6 +47,7 @@ type AssetRepository interface {
 	SearchAllDatasets() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllTables() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllAddresses() ([]*assetpb.ResourceSearchResult, error)
+	SearchAllGlobalAddresses() ([]*assetpb.Asset, error)
 	SearchAllFunctions() ([]*assetpb.Asset, error)
 	SearchAllSubnetworks() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllBigtableInstances() ([]*assetpb.Asset, error)
@@ -77,6 +79,7 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 			bigtableInstanceAssetType,
 			bigtableTableAssetType,
 			sqlDatabaseInstanceAssetType,
+			computeGlobalAddressAssetType,
 		},
 	}
 	var results []*assetpb.Asset
@@ -205,6 +208,10 @@ func (s assetRepository) SearchAllTables() ([]*assetpb.ResourceSearchResult, err
 
 func (s assetRepository) SearchAllAddresses() ([]*assetpb.ResourceSearchResult, error) {
 	return s.searchAllResources(computeAddressAssetType)
+}
+
+func (s assetRepository) SearchAllGlobalAddresses() ([]*assetpb.Asset, error) {
+	return s.listAllResources(computeGlobalAddressAssetType)
 }
 
 func (s assetRepository) SearchAllFunctions() ([]*assetpb.Asset, error) {
