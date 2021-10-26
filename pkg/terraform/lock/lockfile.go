@@ -50,5 +50,9 @@ func ReadLocksFromFile(filename string) (*Lockfile, error) {
 
 	diags = gohcl.DecodeBody(f.Body, nil, &lock)
 
-	return &lock, diags
+	if diags.HasErrors() {
+		return &lock, diags
+	}
+
+	return &lock, nil
 }

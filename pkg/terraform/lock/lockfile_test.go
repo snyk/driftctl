@@ -41,7 +41,7 @@ func Test_ReadLockFile(t *testing.T) {
 				assert.Equal(tt, "3.47.0", provider.Version)
 				assert.Equal(tt, "registry.terraform.io/hashicorp/aws", provider.Address)
 				assert.Equal(tt, "~> 3.47.0", provider.Constraints)
-				assert.Nil(tt, err)
+				assert.Equal(tt, false, err != nil)
 			},
 		},
 		{
