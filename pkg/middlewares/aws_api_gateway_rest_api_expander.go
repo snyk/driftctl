@@ -82,6 +82,7 @@ func (m *AwsApiGatewayRestApiExpander) handleBodyV3(apiId string, doc *openapi3.
 				for statusCode := range method.Responses {
 					m.createApiGatewayMethodResponse(apiId, res.ResourceId(), httpMethod, statusCode, results)
 				}
+				m.createApiGatewayIntegration(apiId, res.ResourceId(), httpMethod, results)
 			}
 		}
 	}
@@ -100,6 +101,7 @@ func (m *AwsApiGatewayRestApiExpander) handleBodyV2(apiId string, doc *openapi2.
 				for statusCode := range method.Responses {
 					m.createApiGatewayMethodResponse(apiId, res.ResourceId(), httpMethod, statusCode, results)
 				}
+				m.createApiGatewayIntegration(apiId, res.ResourceId(), httpMethod, results)
 			}
 		}
 	}
@@ -195,4 +197,14 @@ func decodeExtensions(extensions map[string]interface{}) (*OpenAPIAwsExtensions,
 		return nil, err
 	}
 	return decodedExtensions, nil
+}
+
+// Create aws_api_gateway_integration resource
+func (m *AwsApiGatewayRestApiExpander) createApiGatewayIntegration(apiId, resourceId, httpMethod string, results *[]*resource.Resource) {
+	newResource := m.resourceFactory.CreateAbstractResource(
+		aws.AwsApiGatewayIntegrationResourceType,
+		strings.Join([]string{"agi", apiId, resourceId, httpMethod}, "-"),
+		map[string]interface{}{},
+	)
+	*results = append(*results, newResource)
 }
