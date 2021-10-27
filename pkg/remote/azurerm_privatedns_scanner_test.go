@@ -14,6 +14,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceazure "github.com/cloudskiff/driftctl/pkg/resource/azurerm"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/cloudskiff/driftctl/test/remote"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -101,7 +102,7 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := remote.NewSortableScanner(NewScanner(remoteLibrary, alerter, scanOptions, testFilter))
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
