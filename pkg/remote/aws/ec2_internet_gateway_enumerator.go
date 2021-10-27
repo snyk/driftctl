@@ -29,7 +29,7 @@ func (e *EC2InternetGatewayEnumerator) Enumerate() ([]*resource.Resource, error)
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(internetGateways))
+	results := make([]*resource.Resource, 0, len(internetGateways))
 
 	for _, internetGateway := range internetGateways {
 		data := map[string]interface{}{}

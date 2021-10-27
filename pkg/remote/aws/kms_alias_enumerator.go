@@ -29,7 +29,7 @@ func (e *KMSAliasEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(aliases))
+	results := make([]*resource.Resource, 0, len(aliases))
 
 	for _, alias := range aliases {
 		results = append(

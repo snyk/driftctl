@@ -29,7 +29,7 @@ func (e *CloudfrontDistributionEnumerator) Enumerate() ([]*resource.Resource, er
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(distributions))
+	results := make([]*resource.Resource, 0, len(distributions))
 
 	for _, distribution := range distributions {
 		results = append(

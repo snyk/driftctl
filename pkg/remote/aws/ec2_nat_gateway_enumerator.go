@@ -29,7 +29,7 @@ func (e *EC2NatGatewayEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(natGateways))
+	results := make([]*resource.Resource, 0, len(natGateways))
 
 	for _, natGateway := range natGateways {
 

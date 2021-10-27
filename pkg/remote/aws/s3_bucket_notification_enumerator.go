@@ -38,7 +38,7 @@ func (e *S3BucketNotificationEnumerator) Enumerate() ([]*resource.Resource, erro
 		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), aws.AwsS3BucketResourceType)
 	}
 
-	results := make([]*resource.Resource, len(buckets))
+	results := make([]*resource.Resource, 0, len(buckets))
 
 	for _, bucket := range buckets {
 		region, err := e.repository.GetBucketLocation(*bucket.Name)

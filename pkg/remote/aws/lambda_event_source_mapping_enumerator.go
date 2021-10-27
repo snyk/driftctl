@@ -29,7 +29,7 @@ func (e *LambdaEventSourceMappingEnumerator) Enumerate() ([]*resource.Resource, 
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(eventSourceMappings))
+	results := make([]*resource.Resource, 0, len(eventSourceMappings))
 
 	for _, eventSourceMapping := range eventSourceMappings {
 		results = append(

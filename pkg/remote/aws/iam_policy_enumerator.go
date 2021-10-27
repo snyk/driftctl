@@ -30,7 +30,7 @@ func (e *IamPolicyEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(policies))
+	results := make([]*resource.Resource, 0, len(policies))
 
 	for _, policy := range policies {
 		results = append(

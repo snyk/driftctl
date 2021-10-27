@@ -29,7 +29,7 @@ func (e *EC2EipEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(addresses))
+	results := make([]*resource.Resource, 0, len(addresses))
 
 	for _, address := range addresses {
 		results = append(

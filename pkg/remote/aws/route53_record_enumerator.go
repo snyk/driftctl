@@ -34,7 +34,7 @@ func (e *Route53RecordEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), resourceaws.AwsRoute53ZoneResourceType)
 	}
 
-	results := make([]*resource.Resource, len(zones))
+	results := make([]*resource.Resource, 0, len(zones))
 
 	for _, hostedZone := range zones {
 		records, err := e.listRecordsForZone(strings.TrimPrefix(*hostedZone.Id, "/hostedzone/"))
@@ -55,7 +55,7 @@ func (e *Route53RecordEnumerator) listRecordsForZone(zoneId string) ([]*resource
 		return nil, err
 	}
 
-	results := make([]*resource.Resource, len(records))
+	results := make([]*resource.Resource, 0, len(records))
 
 	for _, raw := range records {
 		rawType := *raw.Type

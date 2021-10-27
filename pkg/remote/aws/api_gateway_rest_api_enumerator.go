@@ -29,7 +29,7 @@ func (e *ApiGatewayRestApiEnumerator) Enumerate() ([]*resource.Resource, error) 
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(apis))
+	results := make([]*resource.Resource, 0, len(apis))
 
 	for _, api := range apis {
 		results = append(

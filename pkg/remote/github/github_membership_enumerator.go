@@ -28,7 +28,7 @@ func (g *GithubMembershipEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(g.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(ids))
+	results := make([]*resource.Resource, 0, len(ids))
 
 	for _, id := range ids {
 		results = append(

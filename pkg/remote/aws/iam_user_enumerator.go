@@ -30,7 +30,7 @@ func (e *IamUserEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(users))
+	results := make([]*resource.Resource, 0, len(users))
 
 	for _, user := range users {
 		results = append(

@@ -29,7 +29,7 @@ func (e *KMSKeyEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(keys))
+	results := make([]*resource.Resource, 0, len(keys))
 
 	for _, key := range keys {
 		results = append(

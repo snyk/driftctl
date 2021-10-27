@@ -33,7 +33,7 @@ func (e *Route53ZoneSupplier) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(zones))
+	results := make([]*resource.Resource, 0, len(zones))
 
 	for _, hostedZone := range zones {
 		results = append(

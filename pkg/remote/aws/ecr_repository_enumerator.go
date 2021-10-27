@@ -29,7 +29,7 @@ func (e *ECRRepositoryEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(repos))
+	results := make([]*resource.Resource, 0, len(repos))
 
 	for _, repo := range repos {
 		results = append(

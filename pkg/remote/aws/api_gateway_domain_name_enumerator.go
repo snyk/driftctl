@@ -29,7 +29,7 @@ func (e *ApiGatewayDomainNameEnumerator) Enumerate() ([]*resource.Resource, erro
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(domainNames))
+	results := make([]*resource.Resource, 0, len(domainNames))
 
 	for _, domainName := range domainNames {
 		results = append(

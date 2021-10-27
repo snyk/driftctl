@@ -29,7 +29,7 @@ func (e *SNSTopicPolicyEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), aws.AwsSnsTopicResourceType)
 	}
 
-	results := make([]*resource.Resource, len(topics))
+	results := make([]*resource.Resource, 0, len(topics))
 
 	for _, topic := range topics {
 		results = append(

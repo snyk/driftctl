@@ -31,7 +31,7 @@ func (e *SQSQueueEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(queues))
+	results := make([]*resource.Resource, 0, len(queues))
 
 	for _, queue := range queues {
 		results = append(

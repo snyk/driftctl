@@ -30,7 +30,7 @@ func (e *CloudformationStackEnumerator) Enumerate() ([]*resource.Resource, error
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(stacks))
+	results := make([]*resource.Resource, 0, len(stacks))
 
 	for _, stack := range stacks {
 		attrs := map[string]interface{}{}
