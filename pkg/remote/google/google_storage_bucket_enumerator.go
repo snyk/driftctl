@@ -30,7 +30,7 @@ func (e *GoogleStorageBucketEnumerator) Enumerate() ([]*resource.Resource, error
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(resources))
+	results := make([]*resource.Resource, 0, len(resources))
 
 	for _, res := range resources {
 		results = append(

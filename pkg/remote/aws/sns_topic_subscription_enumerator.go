@@ -61,7 +61,7 @@ func (e *SNSTopicSubscriptionEnumerator) Enumerate() ([]*resource.Resource, erro
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(allSubscriptions))
+	results := make([]*resource.Resource, 0, len(allSubscriptions))
 
 	for _, subscription := range allSubscriptions {
 		if subscription.SubscriptionArn == nil || !arn.IsARN(*subscription.SubscriptionArn) {

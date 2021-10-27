@@ -29,7 +29,7 @@ func (e *EC2KeyPairEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(keyPairs))
+	results := make([]*resource.Resource, 0, len(keyPairs))
 
 	for _, keyPair := range keyPairs {
 		results = append(

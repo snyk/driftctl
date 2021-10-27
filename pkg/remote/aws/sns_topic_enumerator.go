@@ -29,7 +29,7 @@ func (e *SNSTopicEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(topics))
+	results := make([]*resource.Resource, 0, len(topics))
 
 	for _, topic := range topics {
 		results = append(

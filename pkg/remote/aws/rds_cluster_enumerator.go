@@ -29,7 +29,7 @@ func (e *RDSClusterEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(clusters))
+	results := make([]*resource.Resource, 0, len(clusters))
 
 	for _, cluster := range clusters {
 		var databaseName string

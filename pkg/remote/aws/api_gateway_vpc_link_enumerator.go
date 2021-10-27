@@ -29,7 +29,7 @@ func (e *ApiGatewayVpcLinkEnumerator) Enumerate() ([]*resource.Resource, error) 
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(vpcLinks))
+	results := make([]*resource.Resource, 0, len(vpcLinks))
 
 	for _, vpcLink := range vpcLinks {
 		results = append(

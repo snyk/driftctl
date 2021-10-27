@@ -30,7 +30,7 @@ func (g *GithubTeamEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(g.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(resourceList))
+	results := make([]*resource.Resource, 0, len(resourceList))
 
 	for _, team := range resourceList {
 		results = append(

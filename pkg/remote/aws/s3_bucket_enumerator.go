@@ -38,7 +38,7 @@ func (e *S3BucketEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(buckets))
+	results := make([]*resource.Resource, 0, len(buckets))
 
 	for _, bucket := range buckets {
 		region, err := e.repository.GetBucketLocation(*bucket.Name)

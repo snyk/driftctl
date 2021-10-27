@@ -29,7 +29,7 @@ func (e *DynamoDBTableEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(tables))
+	results := make([]*resource.Resource, 0, len(tables))
 
 	for _, table := range tables {
 		results = append(

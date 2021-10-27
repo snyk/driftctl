@@ -29,7 +29,7 @@ func (e *ApiGatewayAccountEnumerator) Enumerate() ([]*resource.Resource, error) 
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, 1)
+	results := make([]*resource.Resource, 0, 1)
 
 	if account != nil {
 		results = append(

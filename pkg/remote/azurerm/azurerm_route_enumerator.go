@@ -29,7 +29,7 @@ func (e *AzurermRouteEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), azurerm.AzureRouteTableResourceType)
 	}
 
-	results := make([]*resource.Resource, len(resources))
+	results := make([]*resource.Resource, 0, len(resources))
 
 	for _, res := range resources {
 		for _, route := range res.Properties.Routes {

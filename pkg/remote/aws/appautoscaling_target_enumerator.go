@@ -35,7 +35,7 @@ func (e *AppAutoscalingTargetEnumerator) Enumerate() ([]*resource.Resource, erro
 		targets = append(targets, results...)
 	}
 
-	results := make([]*resource.Resource, len(targets))
+	results := make([]*resource.Resource, 0, len(targets))
 
 	for _, target := range targets {
 		results = append(

@@ -29,7 +29,7 @@ func (e *EC2InstanceEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(instances))
+	results := make([]*resource.Resource, 0, len(instances))
 
 	for _, instance := range instances {
 		results = append(

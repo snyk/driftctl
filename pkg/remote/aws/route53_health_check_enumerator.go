@@ -29,7 +29,7 @@ func (e *Route53HealthCheckEnumerator) Enumerate() ([]*resource.Resource, error)
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(healthChecks))
+	results := make([]*resource.Resource, 0, len(healthChecks))
 
 	for _, healthCheck := range healthChecks {
 		results = append(

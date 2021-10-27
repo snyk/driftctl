@@ -29,7 +29,7 @@ func (e *EC2EbsSnapshotEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(snapshots))
+	results := make([]*resource.Resource, 0, len(snapshots))
 
 	for _, snapshot := range snapshots {
 		results = append(

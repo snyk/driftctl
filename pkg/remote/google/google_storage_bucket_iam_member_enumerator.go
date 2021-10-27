@@ -33,7 +33,7 @@ func (e *GoogleStorageBucketIamMemberEnumerator) Enumerate() ([]*resource.Resour
 		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), google.GoogleStorageBucketResourceType)
 	}
 
-	results := make([]*resource.Resource, len(resources))
+	results := make([]*resource.Resource, 0, len(resources))
 
 	for _, bucket := range resources {
 		bindings, err := e.storageRepository.ListAllBindings(bucket.DisplayName)

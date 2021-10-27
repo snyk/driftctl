@@ -29,7 +29,7 @@ func (e *RDSDBSubnetGroupEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(subnetGroups))
+	results := make([]*resource.Resource, 0, len(subnetGroups))
 
 	for _, subnetGroup := range subnetGroups {
 		results = append(

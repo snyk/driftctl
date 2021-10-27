@@ -29,7 +29,7 @@ func (e *EC2AmiEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(images))
+	results := make([]*resource.Resource, 0, len(images))
 
 	for _, image := range images {
 		results = append(

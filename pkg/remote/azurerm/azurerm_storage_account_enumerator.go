@@ -29,7 +29,7 @@ func (e *AzurermStorageAccountEnumerator) Enumerate() ([]*resource.Resource, err
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(accounts))
+	results := make([]*resource.Resource, 0, len(accounts))
 
 	for _, account := range accounts {
 		results = append(

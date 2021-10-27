@@ -29,7 +29,7 @@ func (e *LambdaFunctionEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(functions))
+	results := make([]*resource.Resource, 0, len(functions))
 
 	for _, function := range functions {
 		results = append(

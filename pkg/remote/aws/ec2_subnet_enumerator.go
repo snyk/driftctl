@@ -29,7 +29,7 @@ func (e *EC2SubnetEnumerator) Enumerate() ([]*resource.Resource, error) {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, len(subnets))
+	results := make([]*resource.Resource, 0, len(subnets))
 
 	for _, subnet := range subnets {
 		results = append(
