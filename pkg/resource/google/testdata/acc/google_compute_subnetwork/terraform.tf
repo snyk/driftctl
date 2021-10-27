@@ -10,15 +10,15 @@ terraform {
 }
 
 resource "random_string" "net-id" {
-    length  = 12
-    upper   = false
-    special = false
+  length  = 12
+  upper   = false
+  special = false
 }
 
 resource "random_string" "subnet-id" {
-    length  = 12
-    upper   = false
-    special = false
+  length  = 12
+  upper   = false
+  special = false
 }
 
 resource "google_compute_network" "default" {
@@ -30,6 +30,7 @@ resource "google_compute_subnetwork" "network-with-private-secondary-ip-ranges" 
   name          = "driftctl-acc-subnet-${random_string.subnet-id.result}"
   ip_cidr_range = "10.2.0.0/16"
   network       = google_compute_network.default.id
+  region        = "us-central1"
   secondary_ip_range {
     range_name    = "tf-test-secondary-range-update1"
     ip_cidr_range = "192.168.10.0/24"
