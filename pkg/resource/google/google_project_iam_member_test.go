@@ -13,7 +13,7 @@ func TestAcc_Google_ProjectIAMMember(t *testing.T) {
 		Paths:            []string{"./testdata/acc/google_project_iam_member"},
 		Args: []string{
 			"scan",
-			"--to", "gcp+tf",
+			"--to", "gcp+tf", "--deep",
 		},
 		Checks: []acceptance.AccCheck{
 			{
@@ -21,7 +21,6 @@ func TestAcc_Google_ProjectIAMMember(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					result.AssertInfrastructureIsInSync()
 					result.AssertManagedCount(2)
 				},
 			},
