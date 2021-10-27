@@ -1,7 +1,6 @@
 package remote
 
 import (
-	"sort"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
@@ -16,6 +15,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/cloudskiff/driftctl/test/remote"
 	testresource "github.com/cloudskiff/driftctl/test/resource"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -1037,12 +1037,6 @@ func TestApiGatewayMethod(t *testing.T) {
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
 				assert.Len(t, got, 3)
 
-				// We need to sort the slice of resources to have consistent test results because at
-				// the creation we iterate over a map[string]*apigateway.Method.
-				sort.Slice(got, func(i, j int) bool {
-					return got[i].ResourceId() < got[j].ResourceId()
-				})
-
 				assert.Equal(t, got[0].ResourceId(), "agm-vryjzimtj1-hl7ksq-DELETE")
 				assert.Equal(t, got[0].ResourceType(), resourceaws.AwsApiGatewayMethodResourceType)
 
@@ -1094,7 +1088,7 @@ func TestApiGatewayMethod(t *testing.T) {
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := remote.NewSortableScanner(NewScanner(remoteLibrary, alerter, scanOptions, testFilter))
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1249,12 +1243,6 @@ func TestApiGatewayMethodResponse(t *testing.T) {
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
 				assert.Len(t, got, 3)
 
-				// We need to sort the slice of resources to have consistent test results because at
-				// the creation we iterate over a map[string]*apigateway.MethodResponse.
-				sort.Slice(got, func(i, j int) bool {
-					return got[i].ResourceId() < got[j].ResourceId()
-				})
-
 				assert.Equal(t, got[0].ResourceId(), "agmr-vryjzimtj1-hl7ksq-GET-200")
 				assert.Equal(t, got[0].ResourceType(), resourceaws.AwsApiGatewayMethodResponseResourceType)
 
@@ -1306,7 +1294,7 @@ func TestApiGatewayMethodResponse(t *testing.T) {
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := remote.NewSortableScanner(NewScanner(remoteLibrary, alerter, scanOptions, testFilter))
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
