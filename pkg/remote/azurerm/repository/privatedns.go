@@ -66,7 +66,7 @@ func NewPrivateDNSRepository(con *arm.Connection, config common.AzureProviderCon
 }
 
 func (s *privateDNSRepository) listAllRecords(zone *armprivatedns.PrivateZone) ([]*armprivatedns.RecordSet, error) {
-	cacheKey := fmt.Sprintf("listAllRecords-%s", *zone.ID)
+	cacheKey := fmt.Sprintf("privateDNSlistAllRecords-%s", *zone.ID)
 	v := s.cache.GetAndLock(cacheKey)
 	defer s.cache.Unlock(cacheKey)
 	if v != nil {
@@ -116,11 +116,13 @@ func (s *privateDNSRepository) ListAllARecords(zone *armprivatedns.PrivateZone) 
 
 	}
 
+	s.cache.Put(cacheKey, results)
+
 	return results, nil
 }
 
 func (s *privateDNSRepository) ListAllAAAARecords(zone *armprivatedns.PrivateZone) ([]*armprivatedns.RecordSet, error) {
-	cacheKey := fmt.Sprintf("ListAllAAAARecords-%s", *zone.ID)
+	cacheKey := fmt.Sprintf("privateDNSListAllAAAARecords-%s", *zone.ID)
 	if v := s.cache.Get(cacheKey); v != nil {
 		return v.([]*armprivatedns.RecordSet), nil
 	}
@@ -137,6 +139,8 @@ func (s *privateDNSRepository) ListAllAAAARecords(zone *armprivatedns.PrivateZon
 		results = append(results, record)
 
 	}
+
+	s.cache.Put(cacheKey, results)
 
 	return results, nil
 }
