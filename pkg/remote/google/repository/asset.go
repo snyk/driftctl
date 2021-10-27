@@ -28,6 +28,7 @@ const (
 	cloudFunctionsFunction        = "cloudfunctions.googleapis.com/CloudFunction"
 	bigtableInstanceAssetType     = "bigtableadmin.googleapis.com/Instance"
 	bigtableTableAssetType        = "bigtableadmin.googleapis.com/Table"
+	sqlDatabaseInstanceAssetType  = "sqladmin.googleapis.com/Instance"
 )
 
 type AssetRepository interface {
@@ -46,6 +47,7 @@ type AssetRepository interface {
 	SearchAllSubnetworks() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllBigtableInstances() ([]*assetpb.Asset, error)
 	SearchAllBigtableTables() ([]*assetpb.Asset, error)
+	SearchAllSQLDatabaseInstances() ([]*assetpb.Asset, error)
 }
 
 type assetRepository struct {
@@ -70,6 +72,7 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 			cloudFunctionsFunction,
 			bigtableInstanceAssetType,
 			bigtableTableAssetType,
+			sqlDatabaseInstanceAssetType,
 		},
 	}
 	var results []*assetpb.Asset
@@ -216,4 +219,8 @@ func (s assetRepository) SearchAllBigtableInstances() ([]*assetpb.Asset, error) 
 
 func (s assetRepository) SearchAllBigtableTables() ([]*assetpb.Asset, error) {
 	return s.listAllResources(bigtableTableAssetType)
+}
+
+func (s assetRepository) SearchAllSQLDatabaseInstances() ([]*assetpb.Asset, error) {
+	return s.listAllResources(sqlDatabaseInstanceAssetType)
 }
