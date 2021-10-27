@@ -1,2 +1,5 @@
 *
 !google_storage_bucket
+# Theses buckets are used by cloud function, so let's ignore them
+google_storage_bucket.us.artifacts.driftctl-qa-1.appspot.com
+google_storage_bucket.gcf-sources-679778860012-us-central1
