@@ -18,7 +18,7 @@ func TestAcc_Google_CloudFunctionsFunction(t *testing.T) {
 		},
 		Checks: []acceptance.AccCheck{
 			{
-				// New cloud function resources are not visible immediatly on GCP api after an apply
+				// New resources are not visible immediately on GCP api after an apply
 				// Logic below retry driftctl scan until we can retrieve the results (infra will be in sync) and for maximum 60 seconds
 				ShouldRetry: func(result *test.ScanResult, retryDuration time.Duration, retryCount uint8) bool {
 					return !result.IsSync() && retryDuration < time.Minute
