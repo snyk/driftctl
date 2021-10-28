@@ -127,6 +127,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	}},
 	"aws_api_gateway_method_response":  {},
 	"aws_api_gateway_gateway_response": {},
+	"aws_api_gateway_method_settings":  {},
 	"aws_appautoscaling_target":        {},
 	"aws_rds_cluster_instance": {children: []ResourceType{
 		"aws_db_instance",

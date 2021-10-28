@@ -304,7 +304,8 @@ func Test_apigatewayRepository_ListAllRestApiStages(t *testing.T) {
 						RestApiId: aws.String("restapi1"),
 					}).Return(&apigateway.GetStagesOutput{Item: apiStages}, nil).Once()
 
-				store.On("Get", "apigatewayListAllRestApiStages_api_restapi1").Return(nil).Times(1)
+				store.On("GetAndLock", "apigatewayListAllRestApiStages_api_restapi1").Return(nil).Times(1)
+				store.On("Unlock", "apigatewayListAllRestApiStages_api_restapi1").Times(1)
 				store.On("Put", "apigatewayListAllRestApiStages_api_restapi1", apiStages).Return(false).Times(1)
 			},
 			want: apiStages,
@@ -312,7 +313,8 @@ func Test_apigatewayRepository_ListAllRestApiStages(t *testing.T) {
 		{
 			name: "should hit cache",
 			mocks: func(client *awstest.MockFakeApiGateway, store *cache.MockCache) {
-				store.On("Get", "apigatewayListAllRestApiStages_api_restapi1").Return(apiStages).Times(1)
+				store.On("GetAndLock", "apigatewayListAllRestApiStages_api_restapi1").Return(apiStages).Times(1)
+				store.On("Unlock", "apigatewayListAllRestApiStages_api_restapi1").Times(1)
 			},
 			want: apiStages,
 		},
