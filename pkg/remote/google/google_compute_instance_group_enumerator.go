@@ -46,9 +46,9 @@ func (e *GoogleComputeInstanceGroupEnumerator) Enumerate() ([]*resource.Resource
 				string(e.SupportedType()),
 				trimResourceName(res.GetName()),
 				map[string]interface{}{
-					"display_name": res.GetDisplayName(),
-					"project":      project,
-					"location":     res.GetLocation(),
+					"name":     res.GetDisplayName(),
+					"project":  project,
+					"location": res.GetLocation(),
 				},
 			),
 		)
