@@ -170,6 +170,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"google_bigtable_instance":       {},
 	"google_bigtable_table":          {},
 	"google_sql_database_instance":   {},
+	"google_compute_image":           {},
 
 	"azurerm_storage_account":   {},
 	"azurerm_storage_container": {},
