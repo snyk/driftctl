@@ -10,14 +10,14 @@ func initGoogleComputeInstanceGroupMetadata(resourceSchemaRepository resource.Sc
 	})
 	resourceSchemaRepository.SetResolveReadAttributesFunc(GoogleComputeInstanceGroupResourceType, func(res *resource.Resource) map[string]string {
 		return map[string]string{
-			"name":    *res.Attributes().GetString("display_name"),
+			"name":    *res.Attributes().GetString("name"),
 			"project": *res.Attributes().GetString("project"),
 			"zone":    *res.Attributes().GetString("location"),
 		}
 	})
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(GoogleComputeInstanceGroupResourceType, func(res *resource.Resource) map[string]string {
 		attrs := make(map[string]string)
-		if v := res.Attributes().GetString("display_name"); v != nil && *v != "" {
+		if v := res.Attributes().GetString("name"); v != nil && *v != "" {
 			attrs["Name"] = *v
 		}
 		return attrs
