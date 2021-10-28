@@ -115,6 +115,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_api_gateway_stage": {},
 	"aws_api_gateway_resource": {children: []ResourceType{
 		"aws_api_gateway_method",
+		"aws_api_gateway_integration",
 	}},
 	"aws_api_gateway_domain_name":       {},
 	"aws_api_gateway_vpc_link":          {},
@@ -128,6 +129,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_api_gateway_method_response":  {},
 	"aws_api_gateway_gateway_response": {},
 	"aws_api_gateway_method_settings":  {},
+	"aws_api_gateway_integration":      {},
 	"aws_appautoscaling_target":        {},
 	"aws_rds_cluster_instance": {children: []ResourceType{
 		"aws_db_instance",

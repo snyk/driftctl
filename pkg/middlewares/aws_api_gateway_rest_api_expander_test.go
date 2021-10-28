@@ -85,6 +85,26 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 					Type:  aws.AwsApiGatewayMethodResponseResourceType,
 					Attrs: &resource.Attributes{},
 				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayIntegrationResourceType,
+					"agi-foo-bar-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agi-foo-bar-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayIntegrationResourceType,
+					"agi-foo-baz-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agi-foo-baz-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				})
 			},
 			resourcesFromState: []*resource.Resource{
 				{
@@ -127,6 +147,16 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 					Type:  aws.AwsApiGatewayMethodResponseResourceType,
 					Attrs: &resource.Attributes{},
 				},
+				{
+					Id:    "agi-foo-bar-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agi-foo-baz-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				},
 			},
 			expected: []*resource.Resource{
 				{
@@ -165,6 +195,16 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 				{
 					Id:    "agmr-foo-bar-GET-200",
 					Type:  aws.AwsApiGatewayMethodResponseResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agi-foo-bar-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agi-foo-baz-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
 					Attrs: &resource.Attributes{},
 				},
 			},
@@ -208,6 +248,16 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 					Type:  aws.AwsApiGatewayMethodResponseResourceType,
 					Attrs: &resource.Attributes{},
 				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayIntegrationResourceType,
+					"agi-foo-bar-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agi-foo-bar-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				})
 			},
 			resourcesFromState: []*resource.Resource{
 				{
@@ -237,6 +287,11 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 					Type:  aws.AwsApiGatewayMethodResponseResourceType,
 					Attrs: &resource.Attributes{},
 				},
+				{
+					Id:    "agi-foo-bar-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				},
 			},
 			expected: []*resource.Resource{
 				{
@@ -262,6 +317,11 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 				{
 					Id:    "agmr-foo-bar-GET-200",
 					Type:  aws.AwsApiGatewayMethodResponseResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agi-foo-bar-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
 					Attrs: &resource.Attributes{},
 				},
 			},
@@ -462,6 +522,46 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 					Type:  aws.AwsApiGatewayMethodResourceType,
 					Attrs: &resource.Attributes{},
 				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayIntegrationResourceType,
+					"agi-foo-foo-path1-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agi-foo-foo-path1-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayIntegrationResourceType,
+					"agi-foo-foo-path1-path2-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agi-foo-foo-path1-path2-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayIntegrationResourceType,
+					"agi-bar-bar-path1-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agi-bar-bar-path1-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayIntegrationResourceType,
+					"agi-bar-bar-path1-path2-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agi-bar-bar-path1-path2-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				})
 			},
 			resourcesFromState: []*resource.Resource{
 				{
@@ -532,6 +632,26 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 					Type:  aws.AwsApiGatewayMethodResourceType,
 					Attrs: &resource.Attributes{},
 				},
+				{
+					Id:    "agi-foo-foo-path1-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agi-foo-foo-path1-path2-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agi-bar-bar-path1-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agi-bar-bar-path1-path2-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				},
 			},
 			expected: []*resource.Resource{
 				{
@@ -598,6 +718,26 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 				{
 					Id:    "agm-bar-bar-path1-path2-GET",
 					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agi-foo-foo-path1-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agi-foo-foo-path1-path2-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agi-bar-bar-path1-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agi-bar-bar-path1-path2-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
 					Attrs: &resource.Attributes{},
 				},
 			},
