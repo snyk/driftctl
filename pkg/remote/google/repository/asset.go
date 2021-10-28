@@ -30,6 +30,7 @@ const (
 	bigtableInstanceAssetType     = "bigtableadmin.googleapis.com/Instance"
 	bigtableTableAssetType        = "bigtableadmin.googleapis.com/Table"
 	sqlDatabaseInstanceAssetType  = "sqladmin.googleapis.com/Instance"
+	healthCheckAssetType          = "compute.googleapis.com/HealthCheck"
 )
 
 type AssetRepository interface {
@@ -50,6 +51,7 @@ type AssetRepository interface {
 	SearchAllBigtableInstances() ([]*assetpb.Asset, error)
 	SearchAllBigtableTables() ([]*assetpb.Asset, error)
 	SearchAllSQLDatabaseInstances() ([]*assetpb.Asset, error)
+	SearchAllHealthChecks() ([]*assetpb.ResourceSearchResult, error)
 }
 
 type assetRepository struct {
@@ -128,6 +130,7 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 			computeAddressAssetType,
 			computeDiskAssetType,
 			computeImageAssetType,
+			healthCheckAssetType,
 		},
 	}
 	var results []*assetpb.ResourceSearchResult
@@ -230,4 +233,8 @@ func (s assetRepository) SearchAllBigtableTables() ([]*assetpb.Asset, error) {
 
 func (s assetRepository) SearchAllSQLDatabaseInstances() ([]*assetpb.Asset, error) {
 	return s.listAllResources(sqlDatabaseInstanceAssetType)
+}
+
+func (s assetRepository) SearchAllHealthChecks() ([]*assetpb.ResourceSearchResult, error) {
+	return s.searchAllResources(healthCheckAssetType)
 }

@@ -16,4 +16,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initGoogleComputeSubnetworkMetadata(resourceSchemaRepository)
 	initGoogleComputeDiskMetadata(resourceSchemaRepository)
 	initGoogleComputeImageMetadata(resourceSchemaRepository)
+	initGoogleComputeHealthCheckMetadata(resourceSchemaRepository)
 }
