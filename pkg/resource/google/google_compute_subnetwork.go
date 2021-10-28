@@ -7,7 +7,7 @@ const GoogleComputeSubnetworkResourceType = "google_compute_subnetwork"
 func initGoogleComputeSubnetworkMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetResolveReadAttributesFunc(GoogleComputeSubnetworkResourceType, func(res *resource.Resource) map[string]string {
 		return map[string]string{
-			"name":   *res.Attributes().GetString("display_name"),
+			"name":   *res.Attributes().GetString("name"),
 			"region": *res.Attributes().GetString("location"),
 		}
 	})
@@ -18,7 +18,7 @@ func initGoogleComputeSubnetworkMetadata(resourceSchemaRepository resource.Schem
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(GoogleComputeSubnetworkResourceType, func(res *resource.Resource) map[string]string {
 		attrs := make(map[string]string)
 
-		if v := res.Attributes().GetString("display_name"); v != nil && *v != "" {
+		if v := res.Attributes().GetString("name"); v != nil && *v != "" {
 			attrs["Name"] = *v
 		}
 		return attrs
