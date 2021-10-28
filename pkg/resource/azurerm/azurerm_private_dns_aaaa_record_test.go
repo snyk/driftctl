@@ -21,11 +21,8 @@ func TestAcc_Azure_PrivateDNSAAAARecord(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					result.AssertInfrastructureIsNotSync()
+					result.AssertInfrastructureIsInSync()
 					result.AssertManagedCount(3)
-					result.AssertUnmanagedCount(1)
-					result.AssertDriftCountTotal(0)
-					result.AssertCoverage(60)
 				},
 			},
 		},
