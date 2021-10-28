@@ -37,7 +37,7 @@ func (e *GoogleComputeHealthCheckEnumerator) Enumerate() ([]*resource.Resource, 
 				string(e.SupportedType()),
 				trimResourceName(res.GetName()),
 				map[string]interface{}{
-					"display_name": res.GetDisplayName(),
+					"name": res.GetDisplayName(),
 				},
 			),
 		)
