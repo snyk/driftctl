@@ -272,7 +272,7 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 
 			if shouldUpdate {
 				var err error
-				realProvider, err = github.NewGithubTerraformProvider("", progress, "")
+				realProvider, err = github.NewGithubTerraformProvider("", progress, os.TempDir())
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -367,7 +367,7 @@ func TestTerraformStateReader_Google_Resources(t *testing.T) {
 			var realProvider *google.GCPTerraformProvider
 			providerVersion := "3.78.0"
 			var err error
-			realProvider, err = google.NewGCPTerraformProvider(providerVersion, progress, "")
+			realProvider, err = google.NewGCPTerraformProvider(providerVersion, progress, os.TempDir())
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -453,7 +453,7 @@ func TestTerraformStateReader_Azure_Resources(t *testing.T) {
 			var realProvider *azurerm.AzureTerraformProvider
 			providerVersion := "2.71.0"
 			var err error
-			realProvider, err = azurerm.NewAzureTerraformProvider(providerVersion, progress, "")
+			realProvider, err = azurerm.NewAzureTerraformProvider(providerVersion, progress, os.TempDir())
 			if err != nil {
 				t.Fatal(err)
 			}
