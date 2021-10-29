@@ -659,6 +659,10 @@ func TestGoogleComputeAddress(t *testing.T) {
 				},
 				{
 					AssetType: "compute.googleapis.com/Address",
+					Location:  "global", // Global addresses should be ignored
+				},
+				{
+					AssetType: "compute.googleapis.com/Address",
 					Name:      "//compute.googleapis.com/projects/cloudskiff-dev-elie/regions/us-central1/addresses/my-address-2",
 					AdditionalAttributes: func() *structpb.Struct {
 						str, _ := structpb.NewStruct(map[string]interface{}{
@@ -722,6 +726,132 @@ func TestGoogleComputeAddress(t *testing.T) {
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeAddressEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			alerter.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+			if c.assertExpected != nil {
+				c.assertExpected(t, got)
+			}
+		})
+	}
+}
+
+func TestGoogleComputeGlobalAddress(t *testing.T) {
+
+	cases := []struct {
+		test             string
+		assertExpected   func(t *testing.T, got []*resource.Resource)
+		response         []*assetpb.Asset
+		responseErr      error
+		setupAlerterMock func(alerter *mocks.AlerterInterface)
+		wantErr          error
+	}{
+		{
+			test:     "no resource",
+			response: []*assetpb.Asset{},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "one resource returned",
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+				assert.Equal(t, "projects/cloudskiff-dev-elie/global/addresses/global-appserver-ip", got[0].ResourceId())
+				assert.Equal(t, "google_compute_global_address", got[0].ResourceType())
+			},
+			response: []*assetpb.Asset{
+				{
+					AssetType: "compute.googleapis.com/GlobalAddress",
+					Name:      "//compute.googleapis.com/projects/cloudskiff-dev-elie/global/addresses/global-appserver-ip",
+					Resource: &assetpb.Resource{
+						Data: func() *structpb.Struct {
+							v, err := structpb.NewStruct(map[string]interface{}{
+								"name": "projects/cloudskiff-dev-elie/global/addresses/global-appserver-ip",
+							})
+							if err != nil {
+								t.Fatal(err)
+							}
+							return v
+						}(),
+					},
+				},
+			},
+		},
+		{
+			test: "one resource without resource data",
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+			response: []*assetpb.Asset{
+				{
+					AssetType: "compute.googleapis.com/GlobalAddress",
+					Name:      "//compute.googleapis.com/projects/cloudskiff-dev-elie/global/addresses/global-appserver-ip",
+				},
+			},
+		},
+		{
+			test: "cannot list cloud functions",
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+			responseErr: status.Error(codes.PermissionDenied, "The caller does not have permission"),
+			setupAlerterMock: func(alerter *mocks.AlerterInterface) {
+				alerter.On(
+					"SendAlert",
+					"google_compute_global_address",
+					alerts.NewRemoteAccessDeniedAlert(
+						common.RemoteGoogleTerraform,
+						remoteerr.NewResourceListingError(
+							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							"google_compute_global_address",
+						),
+						alerts.EnumerationPhase,
+					),
+				).Once()
+			},
+		},
+	}
+
+	providerVersion := "3.78.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
+	googleresource.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range cases {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			if c.setupAlerterMock != nil {
+				c.setupAlerterMock(alerter)
+			}
+
+			assetClient, err := testgoogle.NewFakeAssertServerWithList(c.response, c.responseErr)
+			if err != nil {
+				tt.Fatal(err)
+			}
+
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			if err != nil {
+				tt.Fatal(err)
+			}
+
+			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeGlobalAddressEnumerator(repo, factory))
 
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

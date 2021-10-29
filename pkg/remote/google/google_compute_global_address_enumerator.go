@@ -5,26 +5,27 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/remote/google/repository"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/resource/google"
+	"github.com/sirupsen/logrus"
 )
 
-type GoogleComputeAddressEnumerator struct {
+type GoogleComputeGlobalAddressEnumerator struct {
 	repository repository.AssetRepository
 	factory    resource.ResourceFactory
 }
 
-func NewGoogleComputeAddressEnumerator(repo repository.AssetRepository, factory resource.ResourceFactory) *GoogleComputeAddressEnumerator {
-	return &GoogleComputeAddressEnumerator{
+func NewGoogleComputeGlobalAddressEnumerator(repo repository.AssetRepository, factory resource.ResourceFactory) *GoogleComputeGlobalAddressEnumerator {
+	return &GoogleComputeGlobalAddressEnumerator{
 		repository: repo,
 		factory:    factory,
 	}
 }
 
-func (e *GoogleComputeAddressEnumerator) SupportedType() resource.ResourceType {
-	return google.GoogleComputeAddressResourceType
+func (e *GoogleComputeGlobalAddressEnumerator) SupportedType() resource.ResourceType {
+	return google.GoogleComputeGlobalAddressResourceType
 }
 
-func (e *GoogleComputeAddressEnumerator) Enumerate() ([]*resource.Resource, error) {
-	resources, err := e.repository.SearchAllAddresses()
+func (e *GoogleComputeGlobalAddressEnumerator) Enumerate() ([]*resource.Resource, error) {
+	resources, err := e.repository.SearchAllGlobalAddresses()
 
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
@@ -33,12 +34,13 @@ func (e *GoogleComputeAddressEnumerator) Enumerate() ([]*resource.Resource, erro
 	results := make([]*resource.Resource, 0, len(resources))
 
 	for _, res := range resources {
-		// Global addresses are handled as a dedicated resource
-		if res.GetLocation() == "global" {
+		name, exist := res.GetResource().GetData().GetFields()["name"]
+		if !exist || name.GetStringValue() == "" {
+			logrus.WithField("name", res.GetName()).Warn("Unable to retrieve resource name")
 			continue
 		}
 		address := ""
-		if addr, exist := res.GetAdditionalAttributes().GetFields()["address"]; exist {
+		if addr, exist := res.GetResource().GetData().GetFields()["address"]; exist {
 			address = addr.GetStringValue()
 		}
 		results = append(
@@ -47,7 +49,7 @@ func (e *GoogleComputeAddressEnumerator) Enumerate() ([]*resource.Resource, erro
 				string(e.SupportedType()),
 				trimResourceName(res.GetName()),
 				map[string]interface{}{
-					"name":    res.GetDisplayName(),
+					"name":    name.GetStringValue(),
 					"address": address,
 				},
 			),
