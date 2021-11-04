@@ -211,7 +211,7 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 func scanRun(opts *pkg.ScanOptions) error {
 	store := memstore.New()
 
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
 	alerter := alerter.NewAlerter()
