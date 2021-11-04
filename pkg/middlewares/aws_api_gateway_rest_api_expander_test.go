@@ -21,7 +21,7 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 		expected           []*resource.Resource
 	}{
 		{
-			name: "create aws_api_gateway_resource from OpenAPI v3 document",
+			name: "create aws_api_gateway_resource from OpenAPI v3 JSON document",
 			mocks: func(factory *terraform.MockResourceFactory) {
 				factory.On(
 					"CreateAbstractResource",
@@ -210,7 +210,7 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 			},
 		},
 		{
-			name: "create aws_api_gateway_resource from OpenAPI v2 document",
+			name: "create aws_api_gateway_resource from OpenAPI v2 JSON document",
 			mocks: func(factory *terraform.MockResourceFactory) {
 				factory.On(
 					"CreateAbstractResource",
@@ -806,6 +806,220 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 				{
 					Id:    "aggr-v2-MISSING_AUTHENTICATION_TOKEN",
 					Type:  aws.AwsApiGatewayGatewayResponseResourceType,
+					Attrs: &resource.Attributes{},
+				},
+			},
+		},
+		{
+			name: "create api gateway resources from OpenAPI v3 YAML document",
+			mocks: func(factory *terraform.MockResourceFactory) {
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayResourceResourceType,
+					"bar",
+					map[string]interface{}{
+						"rest_api_id": "foo",
+						"path":        "/{path+}",
+					},
+				).Once().Return(&resource.Resource{
+					Id:   "bar",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "foo",
+						"path":        "/{path+}",
+					},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayMethodResourceType,
+					"agm-foo-bar-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agm-foo-bar-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayMethodResponseResourceType,
+					"agmr-foo-bar-GET-200",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agmr-foo-bar-GET-200",
+					Type:  aws.AwsApiGatewayMethodResponseResourceType,
+					Attrs: &resource.Attributes{},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayIntegrationResourceType,
+					"agi-foo-bar-GET",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agi-foo-bar-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				})
+			},
+			resourcesFromState: []*resource.Resource{
+				{
+					Id:   "foo",
+					Type: aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": "---\nopenapi: \"3.0.1\"\ninfo:\n  title: baz\n  description: ComputelessBlog\npaths:\n  /{path+}:\n    get:\n      responses:\n        200:\n          description: \"200 response\"\n          content:\n            text/html:\n              schema:\n                $ref: \"#/components/schemas/Empty\"\n      x-amazon-apigateway-integration:\n        type: \"mock\"\n        responses:\n          default:\n            statusCode: \"200\"\n        passthroughBehavior: \"never\"\n        httpMethod: \"POST\"\ncomponents:\n  schemas:\n    Empty:\n      type: object\n      title: Empty Schema\n      description: Empty Schema",
+					},
+				},
+			},
+			remoteResources: []*resource.Resource{
+				{
+					Id:    "foo",
+					Type:  aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:   "bar",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "foo",
+						"path":        "/{path+}",
+					},
+				},
+			},
+			expected: []*resource.Resource{
+				{
+					Id:   "foo",
+					Type: aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": "---\nopenapi: \"3.0.1\"\ninfo:\n  title: baz\n  description: ComputelessBlog\npaths:\n  /{path+}:\n    get:\n      responses:\n        200:\n          description: \"200 response\"\n          content:\n            text/html:\n              schema:\n                $ref: \"#/components/schemas/Empty\"\n      x-amazon-apigateway-integration:\n        type: \"mock\"\n        responses:\n          default:\n            statusCode: \"200\"\n        passthroughBehavior: \"never\"\n        httpMethod: \"POST\"\ncomponents:\n  schemas:\n    Empty:\n      type: object\n      title: Empty Schema\n      description: Empty Schema",
+					},
+				},
+				{
+					Id:   "bar",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "foo",
+						"path":        "/{path+}",
+					},
+				},
+				{
+					Id:    "agm-foo-bar-GET",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agmr-foo-bar-GET-200",
+					Type:  aws.AwsApiGatewayMethodResponseResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agi-foo-bar-GET",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				},
+			},
+		},
+		{
+			name: "create api gateway resources from OpenAPI v2 YAML document",
+			mocks: func(factory *terraform.MockResourceFactory) {
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayResourceResourceType,
+					"bar",
+					map[string]interface{}{
+						"rest_api_id": "foo",
+						"path":        "/webhook",
+					},
+				).Once().Return(&resource.Resource{
+					Id:   "bar",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "foo",
+						"path":        "/webhook",
+					},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayMethodResourceType,
+					"agm-foo-bar-OPTIONS",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agm-foo-bar-OPTIONS",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayMethodResponseResourceType,
+					"agmr-foo-bar-OPTIONS-200",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agmr-foo-bar-OPTIONS-200",
+					Type:  aws.AwsApiGatewayMethodResponseResourceType,
+					Attrs: &resource.Attributes{},
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsApiGatewayIntegrationResourceType,
+					"agi-foo-bar-OPTIONS",
+					map[string]interface{}{},
+				).Once().Return(&resource.Resource{
+					Id:    "agi-foo-bar-OPTIONS",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
+					Attrs: &resource.Attributes{},
+				})
+			},
+			resourcesFromState: []*resource.Resource{
+				{
+					Id:   "foo",
+					Type: aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": "---\nswagger: '2.0'\ninfo:\n  version: '1.0'\n  title: test\nschemes:\n  - https\npaths:\n  /webhook:\n    options:\n      consumes:\n        - application/json\n      produces:\n        - application/json\n      responses:\n        '200':\n          description: 200 response\n          schema:\n            $ref: \\\"#/definitions/Empty\\\"\n      x-amazon-apigateway-integration:\n        responses:\n          default:\n            statusCode: '200'\n        requestTemplates:\n          application/json: '{\\\"statusCode\\\": 200}'\n        passthroughBehavior: when_no_match\n        type: mock\n\n",
+					},
+				},
+			},
+			remoteResources: []*resource.Resource{
+				{
+					Id:    "foo",
+					Type:  aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:   "bar",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "foo",
+						"path":        "/webhook",
+					},
+				},
+			},
+			expected: []*resource.Resource{
+				{
+					Id:   "foo",
+					Type: aws.AwsApiGatewayRestApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": "---\nswagger: '2.0'\ninfo:\n  version: '1.0'\n  title: test\nschemes:\n  - https\npaths:\n  /webhook:\n    options:\n      consumes:\n        - application/json\n      produces:\n        - application/json\n      responses:\n        '200':\n          description: 200 response\n          schema:\n            $ref: \\\"#/definitions/Empty\\\"\n      x-amazon-apigateway-integration:\n        responses:\n          default:\n            statusCode: '200'\n        requestTemplates:\n          application/json: '{\\\"statusCode\\\": 200}'\n        passthroughBehavior: when_no_match\n        type: mock\n\n",
+					},
+				},
+				{
+					Id:   "bar",
+					Type: aws.AwsApiGatewayResourceResourceType,
+					Attrs: &resource.Attributes{
+						"rest_api_id": "foo",
+						"path":        "/webhook",
+					},
+				},
+				{
+					Id:    "agm-foo-bar-OPTIONS",
+					Type:  aws.AwsApiGatewayMethodResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agmr-foo-bar-OPTIONS-200",
+					Type:  aws.AwsApiGatewayMethodResponseResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "agi-foo-bar-OPTIONS",
+					Type:  aws.AwsApiGatewayIntegrationResourceType,
 					Attrs: &resource.Attributes{},
 				},
 			},
