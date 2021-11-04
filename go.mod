@@ -21,6 +21,7 @@ require (
 	github.com/fatih/color v1.9.0
 	github.com/getkin/kin-openapi v0.75.0
 	github.com/getsentry/sentry-go v0.10.0
+	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/hashicorp/go-getter v1.5.3
 	github.com/hashicorp/go-hclog v0.9.2
