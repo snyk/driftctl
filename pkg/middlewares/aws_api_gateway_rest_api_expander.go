@@ -8,6 +8,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/getkin/kin-openapi/openapi2"
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 )
 
@@ -54,7 +55,12 @@ func (m *AwsApiGatewayRestApiExpander) handleBody(api *resource.Resource, result
 
 	docV3 := &openapi3.T{}
 	if err := json.Unmarshal([]byte(*body), &docV3); err != nil {
-		return err
+		if _, ok := err.(*json.SyntaxError); ok {
+			err = yaml.Unmarshal([]byte(*body), &docV3)
+		}
+		if err != nil {
+			return err
+		}
 	}
 	// It's an OpenAPI v3 document
 	if docV3.OpenAPI != "" {
@@ -63,7 +69,12 @@ func (m *AwsApiGatewayRestApiExpander) handleBody(api *resource.Resource, result
 
 	docV2 := &openapi2.T{}
 	if err := json.Unmarshal([]byte(*body), &docV2); err != nil {
-		return err
+		if _, ok := err.(*json.SyntaxError); ok {
+			err = yaml.Unmarshal([]byte(*body), &docV2)
+		}
+		if err != nil {
+			return err
+		}
 	}
 	// It's an OpenAPI v2 document
 	if docV2.Swagger != "" {
