@@ -55,12 +55,6 @@ func TestGenDriftIgnoreCmd_Input(t *testing.T) {
 			output: "./testdata/output_stdin_valid_filter2.txt",
 			err:    errors.New("open doesnotexist: no such file or directory"),
 		},
-		{
-			name:   "test error when input flag is not specified",
-			args:   []string{},
-			output: "",
-			err:    errors.New("Error: you must specify an input to parse JSON from. Use driftctl gen-driftignore -i <drifts.json>\nGenerate a JSON file using the output flag: driftctl scan -o json://path/to/drifts.json"),
-		},
 	}
 
 	for _, c := range cases {
@@ -120,7 +114,7 @@ func TestGenDriftIgnoreCmd_ValidFlags(t *testing.T) {
 		{args: []string{"gen-driftignore", "--exclude-missing"}},
 		{args: []string{"gen-driftignore", "--exclude-changed"}},
 		{args: []string{"gen-driftignore", "--exclude-changed=false", "--exclude-missing=false", "--exclude-unmanaged=true"}},
-		{args: []string{"gen-driftignore", "--input", "/dev/stdin"}},
+		{args: []string{"gen-driftignore", "--input", "-"}},
 		{args: []string{"gen-driftignore", "-i", "/dev/stdout"}},
 	}
 

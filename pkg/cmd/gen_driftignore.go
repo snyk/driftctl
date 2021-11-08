@@ -3,10 +3,10 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -16,14 +16,20 @@ func NewGenDriftIgnoreCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "gen-driftignore",
 		Short: "Generate a .driftignore file based on your scan result",
-		Long:  "This command will generate a new .driftignore file containing your current drifts and send output to /dev/stdout\n\nExample: driftctl scan -o json://stdout | driftctl gen-driftignore -i /dev/stdin > .driftignore",
+		Long:  "This command will generate a new .driftignore file containing your current drifts and send output to /dev/stdout\n\nExample: driftctl scan -o json://stdout | driftctl gen-driftignore > .driftignore",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.InputPath == "" {
-				return errors.New("Error: you must specify an input to parse JSON from. Use driftctl gen-driftignore -i <drifts.json>\nGenerate a JSON file using the output flag: driftctl scan -o json://path/to/drifts.json")
+			driftFile := os.Stdin
+			if opts.InputPath != "-" {
+				var err error
+				driftFile, err = os.Open(opts.InputPath)
+				if err != nil {
+					return err
+				}
+				defer driftFile.Close()
 			}
 
-			_, list, err := genDriftIgnore(opts)
+			_, list, err := genDriftIgnore(opts, driftFile)
 			if err != nil {
 				return err
 			}
@@ -39,13 +45,13 @@ func NewGenDriftIgnoreCmd() *cobra.Command {
 	fl.BoolVar(&opts.ExcludeUnmanaged, "exclude-unmanaged", false, "Exclude resources not managed by IaC")
 	fl.BoolVar(&opts.ExcludeDeleted, "exclude-missing", false, "Exclude missing resources")
 	fl.BoolVar(&opts.ExcludeDrifted, "exclude-changed", false, "Exclude resources that changed on cloud provider")
-	fl.StringVarP(&opts.InputPath, "input", "i", "", "Input where the JSON should be parsed from")
+	fl.StringVarP(&opts.InputPath, "input", "i", "-", "Input where the JSON should be parsed from. Defaults to stdin.")
 
 	return cmd
 }
 
-func genDriftIgnore(opts *analyser.GenDriftIgnoreOptions) (int, string, error) {
-	input, err := os.ReadFile(opts.InputPath)
+func genDriftIgnore(opts *analyser.GenDriftIgnoreOptions, drift *os.File) (int, string, error) {
+	input, err := io.ReadAll(drift)
 	if err != nil {
 		return 0, "", err
 	}
