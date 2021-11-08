@@ -69,6 +69,7 @@ type GenDriftIgnoreOptions struct {
 	ExcludeDeleted   bool
 	ExcludeDrifted   bool
 	InputPath        string
+	OutputPath       string
 }
 
 func (a Analysis) MarshalJSON() ([]byte, error) {
