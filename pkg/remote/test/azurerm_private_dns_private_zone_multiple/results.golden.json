@@ -1,0 +1,79 @@
+[
+ {
+  "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf2.com",
+  "max_number_of_record_sets": 25000,
+  "max_number_of_virtual_network_links": 1000,
+  "max_number_of_virtual_network_links_with_registration": 100,
+  "name": "thisisatestusingtf2.com",
+  "number_of_record_sets": null,
+  "resource_group_name": "martin-dev",
+  "soa_record": [
+   {
+    "email": "azureprivatedns-host.microsoft.com",
+    "expire_time": 2419200,
+    "fqdn": "thisisatestusingtf2.com.",
+    "host_name": "azureprivatedns.net",
+    "minimum_ttl": 10,
+    "refresh_time": 3600,
+    "retry_time": 300,
+    "serial_number": 1,
+    "tags": null,
+    "ttl": 3600
+   }
+  ],
+  "tags": null,
+  "timeouts": null
+ },
+ {
+  "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/testmartin.com",
+  "max_number_of_record_sets": 25000,
+  "max_number_of_virtual_network_links": 1000,
+  "max_number_of_virtual_network_links_with_registration": 100,
+  "name": "testmartin.com",
+  "number_of_record_sets": null,
+  "resource_group_name": "martin-dev",
+  "soa_record": [
+   {
+    "email": "azureprivatedns-host.microsoft.com",
+    "expire_time": 2419200,
+    "fqdn": "testmartin.com.",
+    "host_name": "azureprivatedns.net",
+    "minimum_ttl": 10,
+    "refresh_time": 3600,
+    "retry_time": 300,
+    "serial_number": 1,
+    "tags": null,
+    "ttl": 3600
+   }
+  ],
+  "tags": {
+   "test": "test"
+  },
+  "timeouts": null
+ },
+ {
+  "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com",
+  "max_number_of_record_sets": 25000,
+  "max_number_of_virtual_network_links": 1000,
+  "max_number_of_virtual_network_links_with_registration": 100,
+  "name": "thisisatestusingtf.com",
+  "number_of_record_sets": null,
+  "resource_group_name": "martin-dev",
+  "soa_record": [
+   {
+    "email": "azureprivatedns-host.microsoft.com",
+    "expire_time": 2419200,
+    "fqdn": "thisisatestusingtf.com.",
+    "host_name": "azureprivatedns.net",
+    "minimum_ttl": 10,
+    "refresh_time": 3600,
+    "retry_time": 300,
+    "serial_number": 1,
+    "tags": null,
+    "ttl": 3600
+   }
+  ],
+  "tags": null,
+  "timeouts": null
+ }
+]

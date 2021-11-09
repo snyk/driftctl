@@ -67,8 +67,14 @@ func Init(
 	remoteLibrary.AddEnumerator(NewAzurermNetworkSecurityGroupEnumerator(networkRepo, factory))
 	remoteLibrary.AddDetailsFetcher(azurerm.AzureNetworkSecurityGroupResourceType, common.NewGenericDetailsFetcher(azurerm.AzureNetworkSecurityGroupResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewAzurermLoadBalancerEnumerator(networkRepo, factory))
+
 	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSZoneEnumerator(privateDNSRepo, factory))
 	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSZoneResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSZoneResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSARecordEnumerator(privateDNSRepo, factory))
+	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSARecordResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSARecordResourceType, provider, deserializer))
+	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSAAAARecordEnumerator(privateDNSRepo, factory))
+	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSAAAARecordResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSAAAARecordResourceType, provider, deserializer))
+
 	remoteLibrary.AddEnumerator(NewAzurermImageEnumerator(computeRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermSSHPublicKeyEnumerator(computeRepo, factory))
 	remoteLibrary.AddDetailsFetcher(azurerm.AzureSSHPublicKeyResourceType, common.NewGenericDetailsFetcher(azurerm.AzureSSHPublicKeyResourceType, provider, deserializer))
