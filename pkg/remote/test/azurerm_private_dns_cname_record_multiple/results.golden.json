@@ -1,0 +1,24 @@
+[
+ {
+  "fqdn": "test.thisisatestusingtf.com.",
+  "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/CNAME/test",
+  "name": "test",
+  "record": "test.com",
+  "resource_group_name": "martin-dev",
+  "tags": null,
+  "timeouts": null,
+  "ttl": 300,
+  "zone_name": "thisisatestusingtf.com"
+ },
+ {
+  "fqdn": "othertest.thisisatestusingtf.com.",
+  "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/CNAME/othertest",
+  "name": "othertest",
+  "record": "othertest.com",
+  "resource_group_name": "martin-dev",
+  "tags": null,
+  "timeouts": null,
+  "ttl": 300,
+  "zone_name": "thisisatestusingtf.com"
+ }
+]

@@ -456,3 +456,146 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 		})
 	}
 }
+
+func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
+
+	dummyError := errors.New("this is an error")
+
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		wantErr error
+	}{
+		{
+			test:    "no private cname record",
+			dirName: "azurerm_private_dns_cname_record_empty",
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
+			},
+		},
+		{
+			test:    "error listing private zone",
+			dirName: "azurerm_private_dns_cname_record_empty",
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllPrivateZones").Return(nil, dummyError)
+			},
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePrivateDNSCNameRecordResourceType, resourceazure.AzurePrivateDNSZoneResourceType),
+		},
+		{
+			test:    "error listing private cname records",
+			dirName: "azurerm_private_dns_cname_record_empty",
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
+					{
+						TrackedResource: armprivatedns.TrackedResource{
+							Resource: armprivatedns.Resource{
+								ID:   to.StringPtr("/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com"),
+								Name: to.StringPtr("thisisatestusingtf.com"),
+							},
+						},
+					},
+				}, nil)
+				repository.On("ListAllCNAMERecords", mock.Anything).Return(nil, dummyError)
+			},
+			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzurePrivateDNSCNameRecordResourceType),
+		},
+		{
+			test:    "multiple private cname records",
+			dirName: "azurerm_private_dns_cname_record_multiple",
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
+					{
+						TrackedResource: armprivatedns.TrackedResource{
+							Resource: armprivatedns.Resource{
+								ID:   to.StringPtr("/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com"),
+								Name: to.StringPtr("thisisatestusingtf.com"),
+							},
+						},
+					},
+				}, nil)
+
+				repository.On("ListAllCNAMERecords", mock.Anything).Return([]*armprivatedns.RecordSet{
+					{
+						ProxyResource: armprivatedns.ProxyResource{
+							Resource: armprivatedns.Resource{
+								ID:   to.StringPtr("/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/CNAME/test"),
+								Name: to.StringPtr("test"),
+							},
+						},
+					},
+					{
+						ProxyResource: armprivatedns.ProxyResource{
+							Resource: armprivatedns.Resource{
+								ID:   to.StringPtr("/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/CNAME/othertest"),
+								Name: to.StringPtr("othertest"),
+							},
+						},
+					},
+				}, nil).Once()
+			},
+		},
+	}
+
+	providerVersion := "2.71.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
+	resourceazure.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockPrivateDNSRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.PrivateDNSRepository = fakeRepo
+			providerVersion := "2.71.0"
+			realProvider, err := terraformtest.InitTestAzureProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraformtest.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				cred, err := azidentity.NewDefaultAzureCredential(&azidentity.DefaultAzureCredentialOptions{})
+				if err != nil {
+					t.Fatal(err)
+				}
+				con := arm.NewDefaultConnection(cred, nil)
+				repo = repository.NewPrivateDNSRepository(con, realProvider.GetConfig(), cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSCNameRecordEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSCNameRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSCNameRecordResourceType, provider, deserializer))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, c.wantErr, err)
+
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceazure.AzurePrivateDNSCNameRecordResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+		})
+	}
+}
