@@ -26,6 +26,8 @@ func TestAzureMetadata_Flags(t *testing.T) {
 		AzureNetworkSecurityGroupResourceType: {resource.FlagDeepMode},
 		AzureLoadBalancerResourceType:         {},
 		AzurePrivateDNSZoneResourceType:       {resource.FlagDeepMode},
+		AzurePrivateDNSARecordResourceType:    {resource.FlagDeepMode},
+		AzurePrivateDNSAAAARecordResourceType: {resource.FlagDeepMode},
 		AzureImageResourceType:                {},
 		AzureSSHPublicKeyResourceType:         {resource.FlagDeepMode},
 	}
