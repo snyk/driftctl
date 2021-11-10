@@ -75,6 +75,9 @@ func Init(
 	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSAAAARecordEnumerator(privateDNSRepo, factory))
 	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSAAAARecordResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSAAAARecordResourceType, provider, deserializer))
 
+	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSCNameRecordEnumerator(privateDNSRepo, factory))
+	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSCNameRecordResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSCNameRecordResourceType, provider, deserializer))
+
 	remoteLibrary.AddEnumerator(NewAzurermImageEnumerator(computeRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermSSHPublicKeyEnumerator(computeRepo, factory))
 	remoteLibrary.AddDetailsFetcher(azurerm.AzureSSHPublicKeyResourceType, common.NewGenericDetailsFetcher(azurerm.AzureSSHPublicKeyResourceType, provider, deserializer))
