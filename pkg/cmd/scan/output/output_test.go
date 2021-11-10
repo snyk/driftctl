@@ -522,3 +522,54 @@ func TestGetPrinter(t *testing.T) {
 		})
 	}
 }
+
+func TestShouldPrint(t *testing.T) {
+	tests := []struct {
+		name    string
+		outputs []OutputConfig
+		quiet   bool
+		want    bool
+	}{
+		{
+			name: "test stdout prevents printing",
+			outputs: []OutputConfig{
+				{
+					Path: "stdout",
+					Key:  JSONOutputType,
+				},
+			},
+			want: false,
+		},
+		{
+			name: "test output to file doesn't prevent printing",
+			outputs: []OutputConfig{
+				{
+					Path: "result.json",
+					Key:  JSONOutputType,
+				},
+			},
+			want: true,
+		},
+		{
+			name: "test stdout prevents printing",
+			outputs: []OutputConfig{
+				{
+					Path: "result.json",
+					Key:  JSONOutputType,
+				},
+				{
+					Path: "stdout",
+					Key:  PlanOutputType,
+				},
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ShouldPrint(tt.outputs, tt.quiet); got != tt.want {
+				t.Errorf("ShouldPrint() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

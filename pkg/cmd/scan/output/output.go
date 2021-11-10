@@ -47,9 +47,7 @@ func IsSupported(key string) bool {
 	return false
 }
 
-func GetOutput(config OutputConfig, quiet bool) Output {
-	output.ChangePrinter(GetPrinter(config, quiet))
-
+func GetOutput(config OutputConfig) Output {
 	switch config.Key {
 	case JSONOutputType:
 		return NewJSON(config.Path)
@@ -62,6 +60,16 @@ func GetOutput(config OutputConfig, quiet bool) Output {
 	default:
 		return NewConsole()
 	}
+}
+
+func ShouldPrint(outputs []OutputConfig, quiet bool) bool {
+	for _, c := range outputs {
+		p := GetPrinter(c, quiet)
+		if _, ok := p.(*output.VoidPrinter); ok {
+			return false
+		}
+	}
+	return true
 }
 
 func GetPrinter(config OutputConfig, quiet bool) output.Printer {

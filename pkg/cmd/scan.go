@@ -216,6 +216,12 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	alerter := alerter.NewAlerter()
 
+	// For now, we only use the global printer to print progress and information about the current scan, so unless one
+	// of the configured output should silence global output we simply use console by default.
+	if output.ShouldPrint(opts.Output, opts.Quiet) {
+		globaloutput.ChangePrinter(globaloutput.NewConsolePrinter())
+	}
+
 	providerLibrary := terraform.NewProviderLibrary()
 	remoteLibrary := common.NewRemoteLibrary()
 
@@ -278,7 +284,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	validOutput := false
 	for _, o := range opts.Output {
-		if err = output.GetOutput(o, opts.Quiet).Write(analysis); err != nil {
+		if err = output.GetOutput(o).Write(analysis); err != nil {
 			logrus.Errorf("Error writing to output %s: %v", o.String(), err.Error())
 			continue
 		}
