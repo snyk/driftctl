@@ -56,7 +56,7 @@ func NewTerraformProvider(installer *tf.ProviderInstaller, config TerraformProvi
 
 func (p *TerraformProvider) Init() error {
 	stopCh := make(chan bool)
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		select {
