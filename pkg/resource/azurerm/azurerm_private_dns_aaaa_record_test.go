@@ -22,7 +22,7 @@ func TestAcc_Azure_PrivateDNSAAAARecord(t *testing.T) {
 						t.Fatal(err)
 					}
 					result.AssertInfrastructureIsInSync()
-					result.AssertManagedCount(3)
+					result.AssertManagedCount(2)
 				},
 			},
 		},
