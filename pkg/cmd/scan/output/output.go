@@ -62,6 +62,7 @@ func GetOutput(config OutputConfig) Output {
 	}
 }
 
+// ShouldPrint indicate if we should use the global output or not (e.g. when outputting to stdout).
 func ShouldPrint(outputs []OutputConfig, quiet bool) bool {
 	for _, c := range outputs {
 		p := GetPrinter(c, quiet)
