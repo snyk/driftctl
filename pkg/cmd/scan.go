@@ -168,7 +168,7 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 		"Terraform Cloud / Enterprise API token.\n"+
 			"Only used with tfstate+tfcloud backend.\n",
 	)
-	fl.StringVar(&opts.BackendOptions.TFCloudAPI,
+	fl.StringVar(&opts.BackendOptions.TFCloudEndpoint,
 		"tfc-endpoint",
 		"https://app.terraform.io/api/v2",
 		"Terraform Cloud / Enterprise API endpoint.\n"+

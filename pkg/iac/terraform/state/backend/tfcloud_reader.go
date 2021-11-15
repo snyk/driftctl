@@ -35,7 +35,7 @@ type TFCloudBackend struct {
 }
 
 func NewTFCloudReader(client pkghttp.HTTPClient, workspaceId string, opts *Options) (*TFCloudBackend, error) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/workspaces/%s/current-state-version", opts.TFCloudAPI, workspaceId), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/workspaces/%s/current-state-version", opts.TFCloudEndpoint, workspaceId), nil)
 	if err != nil {
 		return nil, err
 	}
