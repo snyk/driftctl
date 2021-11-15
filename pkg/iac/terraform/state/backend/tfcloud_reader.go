@@ -35,11 +35,6 @@ type TFCloudBackend struct {
 }
 
 func NewTFCloudReader(client pkghttp.HTTPClient, workspaceId string, opts *Options) (*TFCloudBackend, error) {
-	// Assume if it was not set that the end-point is Terraform Cloud
-	if opts.TFCloudAPI == "" {
-		opts.TFCloudAPI = "https://app.terraform.io/api/v2"
-	}
-
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/workspaces/%s/current-state-version", opts.TFCloudAPI, workspaceId), nil)
 	if err != nil {
 		return nil, err

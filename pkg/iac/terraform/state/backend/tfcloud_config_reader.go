@@ -13,11 +13,11 @@ import (
 )
 
 type container struct {
-	Credentials map[string]containerToken `json:"credentials"`
+	Credentials map[string]containerToken
 }
 
 type containerToken struct {
-	Token string `json:"token"`
+	Token string
 }
 
 type tfCloudConfigReader struct {

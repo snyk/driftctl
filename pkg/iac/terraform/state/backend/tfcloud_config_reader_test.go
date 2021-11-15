@@ -44,7 +44,7 @@ func TestTFCloudConfigReader_GetToken(t *testing.T) {
 			readerCloser := ioutil.NopCloser(strings.NewReader(tt.src))
 			defer readerCloser.Close()
 			r := NewTFCloudConfigReader(readerCloser)
-			got, err := r.GetToken(`app.terraform.io`)
+			got, err := r.GetToken("app.terraform.io")
 			if err != nil && err.Error() != tt.wantErr.Error() {
 				t.Errorf("GetToken() error = %v, wantErr %v", err, tt.wantErr)
 				return
