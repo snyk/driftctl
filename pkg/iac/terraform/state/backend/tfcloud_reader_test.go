@@ -29,7 +29,8 @@ func TestTFCloudBackend_Read(t *testing.T) {
 			args: args{
 				workspaceId: "workspaceId",
 				options: &Options{
-					TFCloudToken: "TOKEN",
+					TFCloudToken:    "TOKEN",
+					TFCloudEndpoint: "https://app.terraform.io/api/v2",
 				},
 			},
 			url:      "https://app.terraform.io/api/v2/workspaces/workspaceId/current-state-version",
@@ -54,7 +55,8 @@ func TestTFCloudBackend_Read(t *testing.T) {
 			args: args{
 				workspaceId: "wrong_workspaceId",
 				options: &Options{
-					TFCloudToken: "TOKEN",
+					TFCloudToken:    "TOKEN",
+					TFCloudEndpoint: "https://app.terraform.io/api/v2",
 				},
 			},
 			url: "https://app.terraform.io/api/v2/workspaces/wrong_workspaceId/current-state-version",
@@ -73,7 +75,8 @@ func TestTFCloudBackend_Read(t *testing.T) {
 			args: args{
 				workspaceId: "workspaceId",
 				options: &Options{
-					TFCloudToken: "TOKEN",
+					TFCloudToken:    "TOKEN",
+					TFCloudEndpoint: "https://app.terraform.io/api/v2",
 				},
 			},
 			url: "https://app.terraform.io/api/v2/workspaces/workspaceId/current-state-version",
