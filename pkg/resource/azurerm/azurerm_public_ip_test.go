@@ -14,10 +14,10 @@ func TestAcc_Azure_PublicIP(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "azure+tf",
-			"--filter", "Type=='azurerm_public_ip'",
 		},
 		Checks: []acceptance.AccCheck{
 			{
+				UseDefaultRetry: true,
 				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)

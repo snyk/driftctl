@@ -33,12 +33,13 @@ import (
 )
 
 type AccCheck struct {
-	PreExec     func()
-	PostExec    func()
-	Env         map[string]string
-	Args        func() []string
-	ShouldRetry func(result *test.ScanResult, retryDuration time.Duration, retryCount uint8) bool
-	Check       func(result *test.ScanResult, stdout string, err error)
+	PreExec         func()
+	PostExec        func()
+	Env             map[string]string
+	Args            func() []string
+	UseDefaultRetry bool
+	ShouldRetry     func(result *test.ScanResult, retryDuration time.Duration, retryCount uint8) bool
+	Check           func(result *test.ScanResult, stdout string, err error)
 }
 
 type RetryConfig struct {
@@ -435,6 +436,15 @@ func Run(t *testing.T, c AccTestCase) {
 		result := c.getResult(t)
 		var retryCount uint8 = 0
 		timeBeforeRetry := time.Now()
+		// New resources may not be visible immediately on cloud providers api's after apply
+		// Default logic below retry driftctl scan until we can retrieve the results (infra will be in sync) and for
+		// a maximum of 300 seconds
+		if check.UseDefaultRetry {
+			check.ShouldRetry = func(result *test.ScanResult, retryDuration time.Duration, retryCount uint8) bool {
+				time.Sleep(10 * time.Second)
+				return !result.IsSync() && retryDuration < 5*time.Minute
+			}
+		}
 		for {
 			if check.ShouldRetry == nil || !check.ShouldRetry(result, time.Since(timeBeforeRetry), retryCount) {
 				break

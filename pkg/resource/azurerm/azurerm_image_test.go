@@ -17,6 +17,7 @@ func TestAcc_Azure_Image(t *testing.T) {
 		},
 		Checks: []acceptance.AccCheck{
 			{
+				UseDefaultRetry: true,
 				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
