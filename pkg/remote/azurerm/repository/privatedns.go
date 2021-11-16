@@ -99,11 +99,6 @@ func (s *privateDNSRepository) listAllRecords(zone *armprivatedns.PrivateZone) (
 }
 
 func (s *privateDNSRepository) ListAllARecords(zone *armprivatedns.PrivateZone) ([]*armprivatedns.RecordSet, error) {
-	cacheKey := fmt.Sprintf("privateDNSListAllARecords-%s", *zone.ID)
-	if v := s.cache.Get(cacheKey); v != nil {
-		return v.([]*armprivatedns.RecordSet), nil
-	}
-
 	records, err := s.listAllRecords(zone)
 	if err != nil {
 		return nil, err
@@ -116,18 +111,10 @@ func (s *privateDNSRepository) ListAllARecords(zone *armprivatedns.PrivateZone) 
 		results = append(results, record)
 
 	}
-
-	s.cache.Put(cacheKey, results)
-
 	return results, nil
 }
 
 func (s *privateDNSRepository) ListAllAAAARecords(zone *armprivatedns.PrivateZone) ([]*armprivatedns.RecordSet, error) {
-	cacheKey := fmt.Sprintf("privateDNSListAllAAAARecords-%s", *zone.ID)
-	if v := s.cache.Get(cacheKey); v != nil {
-		return v.([]*armprivatedns.RecordSet), nil
-	}
-
 	records, err := s.listAllRecords(zone)
 	if err != nil {
 		return nil, err
@@ -140,18 +127,10 @@ func (s *privateDNSRepository) ListAllAAAARecords(zone *armprivatedns.PrivateZon
 		results = append(results, record)
 
 	}
-
-	s.cache.Put(cacheKey, results)
-
 	return results, nil
 }
 
 func (s *privateDNSRepository) ListAllCNAMERecords(zone *armprivatedns.PrivateZone) ([]*armprivatedns.RecordSet, error) {
-	cacheKey := fmt.Sprintf("privateDNSListAllCNAMERecords-%s", *zone.ID)
-	if v := s.cache.Get(cacheKey); v != nil {
-		return v.([]*armprivatedns.RecordSet), nil
-	}
-
 	records, err := s.listAllRecords(zone)
 	if err != nil {
 		return nil, err
@@ -164,15 +143,14 @@ func (s *privateDNSRepository) ListAllCNAMERecords(zone *armprivatedns.PrivateZo
 		results = append(results, record)
 
 	}
-
-	s.cache.Put(cacheKey, results)
-
 	return results, nil
 }
 
 func (s *privateDNSRepository) ListAllPrivateZones() ([]*armprivatedns.PrivateZone, error) {
 	cacheKey := "privateDNSListAllPrivateZones"
-	if v := s.cache.Get(cacheKey); v != nil {
+	v := s.cache.GetAndLock(cacheKey)
+	defer s.cache.Unlock(cacheKey)
+	if v != nil {
 		return v.([]*armprivatedns.PrivateZone), nil
 	}
 

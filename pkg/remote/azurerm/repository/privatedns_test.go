@@ -100,7 +100,8 @@ func Test_ListAllPrivateZones_MultiplesResults(t *testing.T) {
 	fakeClient.On("List", mock.Anything).Return(mockPager)
 
 	c := &cache.MockCache{}
-	c.On("Get", "privateDNSListAllPrivateZones").Return(nil).Times(1)
+	c.On("GetAndLock", "privateDNSListAllPrivateZones").Return(nil).Times(1)
+	c.On("Unlock", "privateDNSListAllPrivateZones").Times(1)
 	c.On("Put", "privateDNSListAllPrivateZones", expected).Return(true).Times(1)
 	s := &privateDNSRepository{
 		zoneClient: fakeClient,
@@ -136,7 +137,9 @@ func Test_ListAllPrivateZones_MultiplesResults_WithCache(t *testing.T) {
 	fakeClient := &mockPrivateZonesClient{}
 
 	c := &cache.MockCache{}
-	c.On("Get", "privateDNSListAllPrivateZones").Return(expected).Times(1)
+	c.On("GetAndLock", "privateDNSListAllPrivateZones").Return(expected).Times(1)
+	c.On("Unlock", "privateDNSListAllPrivateZones").Times(1)
+
 	s := &privateDNSRepository{
 		zoneClient: fakeClient,
 		cache:      c,
@@ -279,8 +282,6 @@ func Test_ListAllARecords_MultiplesResults(t *testing.T) {
 	fakeRecordSetClient.On("List", "rgid", "zone", (*armprivatedns.RecordSetsListOptions)(nil)).Return(mockPager)
 
 	c := &cache.MockCache{}
-	c.On("Get", "privateDNSListAllARecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(nil).Times(1)
-	c.On("Put", "privateDNSListAllARecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com", expected).Return(true).Times(1)
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(nil).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return().Times(1)
 	c.On("Put", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com", mock.Anything).Return(true).Times(1)
@@ -319,13 +320,19 @@ func Test_ListAllARecords_MultiplesResults_WithCache(t *testing.T) {
 					ID: to.StringPtr("record1"),
 				},
 			},
+			Properties: &armprivatedns.RecordSetProperties{
+				ARecords: []*armprivatedns.ARecord{
+					{IPv4Address: to.StringPtr("ip")},
+				},
+			},
 		},
 	}
 
 	fakeRecordSetClient := &mockPrivateRecordSetClient{}
 
 	c := &cache.MockCache{}
-	c.On("Get", "privateDNSListAllARecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(expected).Times(1)
+	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(expected).Times(1)
+	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Times(1)
 	s := &privateDNSRepository{
 		recordClient: fakeRecordSetClient,
 		cache:        c,
@@ -482,8 +489,6 @@ func Test_ListAllAAAARecords_MultiplesResults(t *testing.T) {
 	fakeRecordSetClient.On("List", "rgid", "zone", (*armprivatedns.RecordSetsListOptions)(nil)).Return(mockPager)
 
 	c := &cache.MockCache{}
-	c.On("Get", "privateDNSListAllAAAARecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(nil).Times(1)
-	c.On("Put", "privateDNSListAllAAAARecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com", expected).Return(true).Times(1)
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(nil).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return().Times(1)
 	c.On("Put", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com", mock.Anything).Return(true).Times(1)
@@ -522,13 +527,19 @@ func Test_ListAllAAAARecords_MultiplesResults_WithCache(t *testing.T) {
 					ID: to.StringPtr("record1"),
 				},
 			},
+			Properties: &armprivatedns.RecordSetProperties{
+				AaaaRecords: []*armprivatedns.AaaaRecord{
+					{IPv6Address: to.StringPtr("ip")},
+				},
+			},
 		},
 	}
 
 	fakeRecordSetClient := &mockPrivateRecordSetClient{}
 
 	c := &cache.MockCache{}
-	c.On("Get", "privateDNSListAllAAAARecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(expected).Times(1)
+	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(expected).Times(1)
+	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Times(1)
 	s := &privateDNSRepository{
 		recordClient: fakeRecordSetClient,
 		cache:        c,
@@ -685,8 +696,6 @@ func Test_ListAllCNAMERecords_MultiplesResults(t *testing.T) {
 	fakeRecordSetClient.On("List", "rgid", "zone", (*armprivatedns.RecordSetsListOptions)(nil)).Return(mockPager)
 
 	c := &cache.MockCache{}
-	c.On("Get", "privateDNSListAllCNAMERecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(nil).Times(1)
-	c.On("Put", "privateDNSListAllCNAMERecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com", expected).Return(true).Times(1)
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(nil).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return().Times(1)
 	c.On("Put", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com", mock.Anything).Return(true).Times(1)
@@ -725,13 +734,21 @@ func Test_ListAllCNAMERecords_MultiplesResults_WithCache(t *testing.T) {
 					ID: to.StringPtr("record1"),
 				},
 			},
+			Properties: &armprivatedns.RecordSetProperties{
+				CnameRecord: &armprivatedns.CnameRecord{
+					Cname: to.StringPtr("cname"),
+				},
+			},
 		},
 	}
 
 	fakeRecordSetClient := &mockPrivateRecordSetClient{}
 
 	c := &cache.MockCache{}
-	c.On("Get", "privateDNSListAllCNAMERecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(expected).Times(1)
+
+	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(expected).Times(1)
+	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return().Times(1)
+
 	s := &privateDNSRepository{
 		recordClient: fakeRecordSetClient,
 		cache:        c,
