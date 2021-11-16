@@ -38,11 +38,12 @@ func NewAzureTerraformProvider(version string, progress output.Progress, configD
 		Name: p.name,
 		GetProviderConfig: func(_ string) interface{} {
 			c := p.GetConfig()
-			return map[string]string{
-				"subscription_id": c.SubscriptionID,
-				"tenant_id":       c.TenantID,
-				"client_id":       c.ClientID,
-				"client_secret":   c.ClientSecret,
+			return map[string]interface{}{
+				"subscription_id":            c.SubscriptionID,
+				"tenant_id":                  c.TenantID,
+				"client_id":                  c.ClientID,
+				"client_secret":              c.ClientSecret,
+				"skip_provider_registration": true,
 			}
 		},
 	}, progress)
