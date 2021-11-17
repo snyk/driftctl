@@ -34,3 +34,26 @@ func (_m *MockApiGatewayV2Repository) ListAllApis() ([]*apigatewayv2.Api, error)
 
 	return r0, r1
 }
+
+// ListAllVpcLinks provides a mock function with given fields:
+func (_m *MockApiGatewayV2Repository) ListAllVpcLinks() ([]*apigatewayv2.VpcLink, error) {
+	ret := _m.Called()
+
+	var r0 []*apigatewayv2.VpcLink
+	if rf, ok := ret.Get(0).(func() []*apigatewayv2.VpcLink); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*apigatewayv2.VpcLink)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

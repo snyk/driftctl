@@ -9,6 +9,7 @@ import (
 
 type ApiGatewayV2Repository interface {
 	ListAllApis() ([]*apigatewayv2.Api, error)
+	ListAllVpcLinks() ([]*apigatewayv2.VpcLink, error)
 }
 
 type apigatewayv2Repository struct {
@@ -38,5 +39,20 @@ func (r *apigatewayv2Repository) ListAllApis() ([]*apigatewayv2.Api, error) {
 	}
 
 	r.cache.Put(cacheKey, resources.Items)
+	return resources.Items, nil
+}
+
+func (r *apigatewayv2Repository) ListAllVpcLinks() ([]*apigatewayv2.VpcLink, error) {
+	if v := r.cache.Get("apigatewayv2ListAllVpcLinks"); v != nil {
+		return v.([]*apigatewayv2.VpcLink), nil
+	}
+
+	input := apigatewayv2.GetVpcLinksInput{}
+	resources, err := r.client.GetVpcLinks(&input)
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put("apigatewayv2ListAllVpcLinks", resources.Items)
 	return resources.Items, nil
 }
