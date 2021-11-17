@@ -168,6 +168,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "Api Gateway gateway response", dirName: "api_gateway_gateway_response", wantErr: false},
 		{name: "Api Gateway method settings", dirName: "api_gateway_method_settings", wantErr: false},
 		{name: "Api Gateway integration", dirName: "api_gateway_integration", wantErr: false},
+		{name: "Api Gateway integration response", dirName: "api_gateway_integration_response", wantErr: false},
 		{name: "AppAutoScaling Targets", dirName: "aws_appautoscaling_target", wantErr: false},
 		{name: "network acl", dirName: "aws_network_acl", wantErr: false},
 		{name: "network acl rule", dirName: "aws_network_acl_rule", wantErr: false},
