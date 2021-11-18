@@ -81,6 +81,29 @@ func (_m *MockPrivateDNSRepository) ListAllCNAMERecords(zone *armprivatedns.Priv
 	return r0, r1
 }
 
+// ListAllMXRecords provides a mock function with given fields: zone
+func (_m *MockPrivateDNSRepository) ListAllMXRecords(zone *armprivatedns.PrivateZone) ([]*armprivatedns.RecordSet, error) {
+	ret := _m.Called(zone)
+
+	var r0 []*armprivatedns.RecordSet
+	if rf, ok := ret.Get(0).(func(*armprivatedns.PrivateZone) []*armprivatedns.RecordSet); ok {
+		r0 = rf(zone)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*armprivatedns.RecordSet)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(*armprivatedns.PrivateZone) error); ok {
+		r1 = rf(zone)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListAllPTRRecords provides a mock function with given fields: zone
 func (_m *MockPrivateDNSRepository) ListAllPTRRecords(zone *armprivatedns.PrivateZone) ([]*armprivatedns.RecordSet, error) {
 	ret := _m.Called(zone)
