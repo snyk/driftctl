@@ -16,6 +16,7 @@ type PrivateDNSRepository interface {
 	ListAllARecords(zone *armprivatedns.PrivateZone) ([]*armprivatedns.RecordSet, error)
 	ListAllAAAARecords(zone *armprivatedns.PrivateZone) ([]*armprivatedns.RecordSet, error)
 	ListAllCNAMERecords(zone *armprivatedns.PrivateZone) ([]*armprivatedns.RecordSet, error)
+	ListAllPTRRecords(zone *armprivatedns.PrivateZone) ([]*armprivatedns.RecordSet, error)
 }
 
 type privateDNSZoneListPager interface {
@@ -122,6 +123,22 @@ func (s *privateDNSRepository) ListAllAAAARecords(zone *armprivatedns.PrivateZon
 	results := make([]*armprivatedns.RecordSet, 0)
 	for _, record := range records {
 		if record.Properties.AaaaRecords == nil {
+			continue
+		}
+		results = append(results, record)
+
+	}
+	return results, nil
+}
+
+func (s *privateDNSRepository) ListAllPTRRecords(zone *armprivatedns.PrivateZone) ([]*armprivatedns.RecordSet, error) {
+	records, err := s.listAllRecords(zone)
+	if err != nil {
+		return nil, err
+	}
+	results := make([]*armprivatedns.RecordSet, 0)
+	for _, record := range records {
+		if record.Properties.PtrRecords == nil {
 			continue
 		}
 		results = append(results, record)

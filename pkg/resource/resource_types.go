@@ -203,6 +203,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"azurerm_private_dns_a_record":     {},
 	"azurerm_private_dns_aaaa_record":  {},
 	"azurerm_private_dns_cname_record": {},
+	"azurerm_private_dns_ptr_record":   {},
 	"azurerm_image":                    {},
 	"azurerm_ssh_public_key":           {},
 }
