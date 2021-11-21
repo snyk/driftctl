@@ -1,0 +1,19 @@
+[
+ {
+  "Id": "f5vdrg12tk",
+  "Type": "aws_apigatewayv2_api",
+  "Attrs": {
+   "api_endpoint": "wss://f5vdrg12tk.execute-api.us-east-2.amazonaws.com",
+   "api_key_selection_expression": "$request.header.x-api-key",
+   "arn": "arn:aws:apigateway:us-east-2::/apis/f5vdrg12tk",
+   "description": "",
+   "disable_execute_api_endpoint": false,
+   "execution_arn": "arn:aws:execute-api:us-east-2:070182406464:f5vdrg12tk",
+   "id": "f5vdrg12tk",
+   "name": "example-websocket-api",
+   "protocol_type": "WEBSOCKET",
+   "route_selection_expression": "$request.body.action",
+   "version": ""
+  }
+ }
+]
