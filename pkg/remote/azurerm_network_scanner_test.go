@@ -882,3 +882,131 @@ func TestAzurermLoadBalancers(t *testing.T) {
 		})
 	}
 }
+
+func TestAzurermLoadBalancerRules(t *testing.T) {
+
+	dummyError := errors.New("this is an error")
+
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
+		wantErr error
+	}{
+		{
+			test:    "no load balancer rule",
+			dirName: "azurerm_lb_rule_empty",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				loadbalancer := &armnetwork.LoadBalancer{
+					Resource: armnetwork.Resource{
+						ID:   to.StringPtr("/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/frontendIPConfigurations/PublicIPAddress"),
+						Name: to.StringPtr("testlb"),
+					},
+				}
+
+				repository.On("ListAllLoadBalancers").Return([]*armnetwork.LoadBalancer{loadbalancer}, nil)
+
+				repository.On("ListLoadBalancerRules", loadbalancer).Return([]*armnetwork.LoadBalancingRule{}, nil)
+			},
+		},
+		{
+			test:    "error listing load balancer rules",
+			dirName: "azurerm_lb_rule_empty",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllLoadBalancers").Return(nil, dummyError)
+			},
+			wantErr: error2.NewResourceListingErrorWithType(dummyError, resourceazure.AzureLoadBalancerRuleResourceType, resourceazure.AzureLoadBalancerResourceType),
+		},
+		{
+			test:    "multiple load balancer rules",
+			dirName: "azurerm_lb_rule_multiple",
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+				loadbalancer := &armnetwork.LoadBalancer{
+					Resource: armnetwork.Resource{
+						ID:   to.StringPtr("/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/frontendIPConfigurations/PublicIPAddress"),
+						Name: to.StringPtr("TestLoadBalancer"),
+					},
+				}
+
+				repository.On("ListAllLoadBalancers").Return([]*armnetwork.LoadBalancer{loadbalancer}, nil)
+
+				repository.On("ListLoadBalancerRules", loadbalancer).Return([]*armnetwork.LoadBalancingRule{
+					{
+						SubResource: armnetwork.SubResource{
+							ID: to.StringPtr("/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/loadBalancingRules/LBRule"),
+						},
+						Name: to.StringPtr("LBRule"),
+					},
+					{
+						SubResource: armnetwork.SubResource{
+							ID: to.StringPtr("/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/loadBalancingRules/LBRule2"),
+						},
+						Name: to.StringPtr("LBRule2"),
+					},
+				}, nil).Once()
+			},
+		},
+	}
+
+	providerVersion := "2.71.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
+	resourceazure.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockNetworkRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.NetworkRepository = fakeRepo
+			providerVersion := "2.71.0"
+			realProvider, err := terraform2.InitTestAzureProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				cred, err := azidentity.NewDefaultAzureCredential(&azidentity.DefaultAzureCredentialOptions{})
+				if err != nil {
+					t.Fatal(err)
+				}
+				con := arm.NewDefaultConnection(cred, nil)
+				repo = repository.NewNetworkRepository(con, realProvider.GetConfig(), cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermLoadBalancerRuleEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceazure.AzureLoadBalancerRuleResourceType, common.NewGenericDetailsFetcher(resourceazure.AzureLoadBalancerRuleResourceType, provider, deserializer))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, c.wantErr, err)
+
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceazure.AzureLoadBalancerRuleResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+		})
+	}
+}
