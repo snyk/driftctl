@@ -44,7 +44,8 @@ func (e *AzurermPrivateDNSARecordEnumerator) Enumerate() ([]*resource.Resource, 
 					string(e.SupportedType()),
 					*record.ID,
 					map[string]interface{}{
-						"name": record.Name,
+						"name":      *record.Name,
+						"zone_name": *zone.Name,
 					},
 				),
 			)
