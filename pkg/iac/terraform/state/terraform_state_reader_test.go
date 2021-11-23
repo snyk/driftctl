@@ -449,6 +449,7 @@ func TestTerraformStateReader_Azure_Resources(t *testing.T) {
 		{name: "private dns ptr record", dirName: "azurerm_private_dns_ptr_record", wantErr: false},
 		{name: "private dns mx record", dirName: "azurerm_private_dns_mx_record", wantErr: false},
 		{name: "private dns srv record", dirName: "azurerm_private_dns_srv_record", wantErr: false},
+		{name: "private dns txt record", dirName: "azurerm_private_dns_txt_record", wantErr: false},
 		{name: "images", dirName: "azurerm_image", wantErr: false},
 		{name: "ssh public key", dirName: "azurerm_ssh_public_key", wantErr: false},
 	}
