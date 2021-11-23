@@ -1,7 +1,13 @@
 version: 2.1
+only_branches: &only_branches
+  filters:
+    branches:
+      ignore:
+        - main
 orbs:
   go: circleci/go@1.5.0
   codecov: codecov/codecov@3.1.0
+  snyk: snyk/snyk@1.1.2
 jobs:
   test_acc:
     parameters:
@@ -147,6 +153,16 @@ jobs:
               ./lambda-env-updater_linux_amd64\
                 -name ${FUNCTION_NAME}\
                 -env "LATEST_VERSION=${CIRCLE_TAG}"
+  security-oss:
+      docker:
+          - image: cimg/go:1.17.2
+      steps:
+          - checkout
+          - snyk/scan:
+                severity-threshold: medium
+                monitor-on-build: true
+                project: ${CIRCLE_PROJECT_REPONAME}
+                organization: snyk-iac-group-seceng
 workflows:
   nightly:
     jobs:
@@ -171,15 +187,14 @@ workflows:
   pullrequest:
     jobs:
       - lint:
-          filters:
-            branches:
-              ignore:
-                - main
+          <<: *only_branches
       - test:
-          filters:
-            branches:
-              ignore:
-                - main
+          <<: *only_branches
+      - security-oss:
+          name: Snyk test
+          context:
+            - snyk
+          <<: *only_branches
   pullrequest_acc:
     jobs:
       - hold:
