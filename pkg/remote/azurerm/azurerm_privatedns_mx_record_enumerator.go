@@ -43,7 +43,10 @@ func (e *AzurermPrivateDNSMXRecordEnumerator) Enumerate() ([]*resource.Resource,
 				e.factory.CreateAbstractResource(
 					string(e.SupportedType()),
 					*record.ID,
-					map[string]interface{}{},
+					map[string]interface{}{
+						"name":      *record.Name,
+						"zone_name": *zone.Name,
+					},
 				),
 			)
 		}
