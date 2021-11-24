@@ -30,6 +30,7 @@ Thank you to all the people who have already contributed to driftctl.
     <td align="center"><a href="https://orenleung.com"><img src="https://avatars.githubusercontent.com/u/47992694?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Oren Leung</b></sub></a><br /><a href="https://github.com/cloudskiff/driftctl/commits?author=OrenLeung" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/craigfurman"><img src="https://avatars.githubusercontent.com/u/4772216?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Craig Furman</b></sub></a><br /><a href="https://github.com/cloudskiff/driftctl/commits?author=craigfurman" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/cbowman0"><img src="https://avatars.githubusercontent.com/u/1764481?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Christopher Bowman</b></sub></a><br /><a href="https://github.com/cloudskiff/driftctl/commits?author=cbowman0" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/karniwl"><img src="https://avatars.githubusercontent.com/u/42895464?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Karni Wolf</b></sub></a><br /><a href="https://github.com/cloudskiff/driftctl/commits?author=karniwl" title="Code">💻</a></td>
   </tr>
 </table>
 
