@@ -51,6 +51,7 @@ func Init(version string, alerter *alerter.Alerter,
 	cloudformationRepository := repository.NewCloudformationRepository(provider.session, repositoryCache)
 	apigatewayRepository := repository.NewApiGatewayRepository(provider.session, repositoryCache)
 	appAutoScalingRepository := repository.NewAppAutoScalingRepository(provider.session, repositoryCache)
+	apigatewayv2Repository := repository.NewApiGatewayV2Repository(provider.session, repositoryCache)
 
 	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.AWS, provider)
@@ -200,6 +201,8 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewApiGatewayMethodSettingsEnumerator(apigatewayRepository, factory))
 	remoteLibrary.AddEnumerator(NewApiGatewayIntegrationEnumerator(apigatewayRepository, factory))
 	remoteLibrary.AddEnumerator(NewApiGatewayIntegrationResponseEnumerator(apigatewayRepository, factory))
+
+	remoteLibrary.AddEnumerator(NewApiGatewayV2ApiEnumerator(apigatewayv2Repository, factory))
 
 	remoteLibrary.AddEnumerator(NewAppAutoscalingTargetEnumerator(appAutoScalingRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsAppAutoscalingTargetResourceType, common.NewGenericDetailsFetcher(aws.AwsAppAutoscalingTargetResourceType, provider, deserializer))
