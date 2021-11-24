@@ -163,6 +163,17 @@ jobs:
                 monitor-on-build: true
                 project: ${CIRCLE_PROJECT_REPONAME}
                 organization: snyk-iac-group-seceng
+  security-code:
+      docker:
+          - image: cimg/go:1.17.2
+      steps:
+          - checkout
+          - snyk/scan:
+                command: code test
+                severity-threshold: medium
+                monitor-on-build: false
+                project: ${CIRCLE_PROJECT_REPONAME}
+                organization: snyk-iac-group-seceng
 workflows:
   nightly:
     jobs:
@@ -189,6 +200,11 @@ workflows:
       - lint:
           <<: *only_branches
       - test:
+          <<: *only_branches
+      - security-code:
+          name: Snyk code
+          context:
+            - snyk
           <<: *only_branches
       - security-oss:
           name: Snyk test
