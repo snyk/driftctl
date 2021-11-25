@@ -109,7 +109,7 @@ func fakeAnalysis(opts analyser.AnalyzerOptions) *analyser.Analysis {
 		}})
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
-	return &a
+	return a
 }
 
 func fakeAnalysisWithAlerts() *analyser.Analysis {
@@ -196,7 +196,7 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 		}})
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
-	return &a
+	return a
 }
 
 func fakeAnalysisWithoutAttrs() *analyser.Analysis {
@@ -229,7 +229,7 @@ func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 	)
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
-	return &a
+	return a
 }
 
 func fakeAnalysisWithStringerResources() *analyser.Analysis {
@@ -298,7 +298,7 @@ func fakeAnalysisWithStringerResources() *analyser.Analysis {
 	}})
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
-	return &a
+	return a
 }
 
 func fakeAnalysisWithComputedFields() *analyser.Analysis {
@@ -380,7 +380,7 @@ func fakeAnalysisWithComputedFields() *analyser.Analysis {
 	})
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
-	return &a
+	return a
 }
 
 func fakeAnalysisWithAWSEnumerationError() *analyser.Analysis {
