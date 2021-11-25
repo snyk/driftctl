@@ -179,6 +179,6 @@ Then, add a call to this function in the `remote/<provider>/init.go` file you cr
 
 You also need to create a test schema for upcoming tests.
 
-Please use `TestCreateNewSchema` located in `test/schemas/schemas_test.go` to generate a schema file that will be used for the mocked provider.
+Please use `TestCreateNewSchema` located in `test/terraform/schemas_test.go` to generate a schema file that will be used for the mocked provider.
 
 Everything is now ready, you should [start adding new resources](new-resource.md)!

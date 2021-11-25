@@ -1,6 +1,7 @@
 package schemas
 
 import (
+	"embed"
 	gojson "encoding/json"
 	"io/ioutil"
 	"os"
@@ -11,7 +12,10 @@ import (
 	"github.com/hashicorp/terraform/providers"
 )
 
-func writeTestSchema(schema map[string]providers.Schema, provider, version string) error {
+//go:embed */*/schema.json
+var fakeSchemaFS embed.FS
+
+func WriteTestSchema(schema map[string]providers.Schema, provider, version string) error {
 	_, relativeFilePath, _, _ := runtime.Caller(0)
 	fileName := path.Join(path.Dir(relativeFilePath), provider, version, "schema.json")
 	content, _ := gojson.Marshal(schema)
@@ -27,8 +31,7 @@ func writeTestSchema(schema map[string]providers.Schema, provider, version strin
 }
 
 func ReadTestSchema(provider, version string) (map[string]providers.Schema, error) {
-	_, filename, _, _ := runtime.Caller(0)
-	content, err := ioutil.ReadFile(path.Join(path.Dir(filename), provider, version, "schema.json"))
+	content, err := fakeSchemaFS.ReadFile(path.Join(provider, version, "schema.json"))
 	if err != nil {
 		return nil, err
 	}

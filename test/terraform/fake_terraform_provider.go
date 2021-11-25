@@ -6,9 +6,9 @@ import (
 	"sort"
 
 	"github.com/cloudskiff/driftctl/pkg/terraform"
-	"github.com/cloudskiff/driftctl/test"
 	"github.com/cloudskiff/driftctl/test/goldenfile"
 	"github.com/cloudskiff/driftctl/test/mocks"
+	"github.com/cloudskiff/driftctl/test/schemas"
 	"github.com/hashicorp/terraform/providers"
 	"github.com/pkg/errors"
 	"github.com/zclconf/go-cty/cty"
@@ -51,12 +51,8 @@ func (p *FakeTerraformProvider) ReadResource(args terraform.ReadResourceArgs) (*
 }
 
 func (p *FakeTerraformProvider) readSchema() map[string]providers.Schema {
-	content, err := test.ReadTestFile(fmt.Sprintf("../schemas/%s/%s/schema.json", p.realProvider.Name(), p.realProvider.Version()))
+	schema, err := schemas.ReadTestSchema(p.realProvider.Name(), p.realProvider.Version())
 	if err != nil {
-		panic(err)
-	}
-	var schema map[string]providers.Schema
-	if err := gojson.Unmarshal(content, &schema); err != nil {
 		panic(err)
 	}
 	return schema
