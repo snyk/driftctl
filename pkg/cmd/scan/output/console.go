@@ -207,7 +207,9 @@ func (c Console) writeSummary(analysis *analyser.Analysis) {
 		if analysis.Summary().TotalDrifted > 0 {
 			drifted = errorWriter.Sprintf("%d", analysis.Summary().TotalDrifted)
 		}
-		fmt.Printf("     - %s resource(s) out of sync with Terraform state\n", boldWriter.Sprintf("%s/%d", drifted, analysis.Summary().TotalManaged))
+		if analysis.Options().Deep {
+			fmt.Printf("     - %s resource(s) out of sync with Terraform state\n", boldWriter.Sprintf("%s/%d", drifted, analysis.Summary().TotalManaged))
+		}
 
 		unmanaged := successWriter.Sprintf("0")
 		if analysis.Summary().TotalUnmanaged > 0 {
