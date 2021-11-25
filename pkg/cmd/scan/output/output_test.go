@@ -449,6 +449,22 @@ func fakeAnalysisForJSONPlan() *analyser.Analysis {
 	return &a
 }
 
+func fakeAnalysisWithoutDeep() *analyser.Analysis {
+	a := analyser.Analysis{}
+	a.AddUnmanaged(
+		&resource.Resource{
+			Id:   "unmanaged-id-1",
+			Type: "aws_unmanaged_resource",
+			Attrs: &resource.Attributes{
+				"name": "First unmanaged resource",
+			},
+		},
+	)
+	a.ProviderName = "AWS"
+	a.ProviderVersion = "3.19.0"
+	return &a
+}
+
 func TestGetPrinter(t *testing.T) {
 	tests := []struct {
 		name  string

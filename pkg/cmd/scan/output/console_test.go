@@ -108,6 +108,12 @@ func TestConsole_Write(t *testing.T) {
 			args:       args{analysis: fakeAnalysisWithGithubEnumerationError()},
 			wantErr:    false,
 		},
+		{
+			name:       "test console output without deep mode",
+			goldenfile: "output_without_deep.txt",
+			args:       args{analysis: fakeAnalysisWithoutDeep()},
+			wantErr:    false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
