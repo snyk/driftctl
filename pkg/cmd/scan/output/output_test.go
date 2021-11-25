@@ -17,6 +17,9 @@ import (
 )
 
 func fakeAnalysis(opts analyser.AnalyzerOptions) *analyser.Analysis {
+	if opts == (analyser.AnalyzerOptions{}) {
+		opts = analyser.AnalyzerOptions{Deep: true}
+	}
 	a := analyser.NewAnalysis(opts)
 	a.AddUnmanaged(
 		&resource.Resource{
@@ -136,7 +139,7 @@ func fakeAnalysisNoDrift() *analyser.Analysis {
 }
 
 func fakeAnalysisWithJsonFields() *analyser.Analysis {
-	a := analyser.Analysis{}
+	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
 	a.AddManaged(
 		&resource.Resource{
 			Id:   "diff-id-1",
@@ -197,7 +200,7 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 }
 
 func fakeAnalysisWithoutAttrs() *analyser.Analysis {
-	a := analyser.Analysis{}
+	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
 	a.AddDeleted(
 		&resource.Resource{
 			Id:    "dfjkgnbsgj",
@@ -230,7 +233,7 @@ func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 }
 
 func fakeAnalysisWithStringerResources() *analyser.Analysis {
-	a := analyser.Analysis{}
+	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
 	schema := &resource.Schema{HumanReadableAttributesFunc: func(res *resource.Resource) map[string]string {
 		return map[string]string{
 			"Name": (*res.Attrs)["name"].(string),
@@ -299,7 +302,7 @@ func fakeAnalysisWithStringerResources() *analyser.Analysis {
 }
 
 func fakeAnalysisWithComputedFields() *analyser.Analysis {
-	a := analyser.Analysis{}
+	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
 	a.AddManaged(
 		&resource.Resource{
 			Id:   "diff-id-1",
