@@ -16,8 +16,8 @@ import (
 	"github.com/r3labs/diff/v2"
 )
 
-func fakeAnalysis() *analyser.Analysis {
-	a := analyser.Analysis{}
+func fakeAnalysis(opts analyser.AnalyzerOptions) *analyser.Analysis {
+	a := analyser.NewAnalysis(opts)
 	a.AddUnmanaged(
 		&resource.Resource{
 			Id:   "unmanaged-id-1",
@@ -110,7 +110,7 @@ func fakeAnalysis() *analyser.Analysis {
 }
 
 func fakeAnalysisWithAlerts() *analyser.Analysis {
-	a := fakeAnalysis()
+	a := fakeAnalysis(analyser.AnalyzerOptions{})
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
 			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("dummy error"), "aws_vpc", "aws_vpc"), alerts.EnumerationPhase),

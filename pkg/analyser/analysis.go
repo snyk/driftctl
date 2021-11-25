@@ -73,6 +73,10 @@ type GenDriftIgnoreOptions struct {
 	OutputPath       string
 }
 
+func NewAnalysis(options AnalyzerOptions) Analysis {
+	return Analysis{options: options}
+}
+
 func (a Analysis) MarshalJSON() ([]byte, error) {
 	bla := serializableAnalysis{}
 	for _, m := range a.managed {

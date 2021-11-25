@@ -31,7 +31,7 @@ func TestConsole_Write(t *testing.T) {
 			name:       "test console output",
 			goldenfile: "output.txt",
 			args: args{analysis: func() *analyser.Analysis {
-				a := fakeAnalysis()
+				a := fakeAnalysis(analyser.AnalyzerOptions{})
 				a.AddDeleted(
 					&resource.Resource{
 						Id:   "test-id-1",
