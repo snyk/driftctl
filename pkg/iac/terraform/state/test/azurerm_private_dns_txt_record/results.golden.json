@@ -1,0 +1,39 @@
+[
+ {
+  "Id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/TXT/othertesttxt",
+  "Type": "azurerm_private_dns_txt_record",
+  "Attrs": {
+   "fqdn": "othertesttxt.thisisatestusingtf.com.",
+   "id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/TXT/othertesttxt",
+   "name": "othertesttxt",
+   "record": [
+    {
+     "value": "this is value line 1"
+    },
+    {
+     "value": "this is value line 2"
+    }
+   ],
+   "resource_group_name": "martin-dev",
+   "ttl": 300,
+   "zone_name": "thisisatestusingtf.com"
+  }
+ },
+ {
+  "Id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/TXT/testtxt",
+  "Type": "azurerm_private_dns_txt_record",
+  "Attrs": {
+   "fqdn": "testtxt.thisisatestusingtf.com.",
+   "id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/TXT/testtxt",
+   "name": "testtxt",
+   "record": [
+    {
+     "value": "this is value line 3"
+    }
+   ],
+   "resource_group_name": "martin-dev",
+   "ttl": 300,
+   "zone_name": "thisisatestusingtf.com"
+  }
+ }
+]
