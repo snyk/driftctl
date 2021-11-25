@@ -165,73 +165,91 @@ func TestDriftctlCmd_Invalid(t *testing.T) {
 
 func TestDriftctlCmd_ShouldCheckVersion(t *testing.T) {
 	cases := []struct {
-		Name      string
-		IsRelease bool
-		args      []string
-		env       map[string]string
-		expected  bool
+		Name        string
+		IsRelease   bool
+		UsageReport bool
+		args        []string
+		env         map[string]string
+		expected    bool
 	}{
 		{
-			Name:      "When we are in release mode and no args, should check for update",
-			IsRelease: true,
-			args:      []string{""},
-			expected:  true,
+			Name:        "When we are in release mode and no args, should check for update",
+			IsRelease:   true,
+			UsageReport: true,
+			args:        []string{""},
+			expected:    true,
 		},
 		{
-			Name:      "Don't check for update for version cmd",
-			IsRelease: true,
-			args:      []string{"version"},
-			expected:  false,
+			Name:        "Do not check for update when usage reporting is disabled",
+			IsRelease:   true,
+			UsageReport: false,
+			args:        []string{""},
+			expected:    false,
 		},
 		{
-			Name:      "Don't check for update for help cmd",
-			IsRelease: true,
-			args:      []string{"help"},
-			expected:  false,
+			Name:        "Don't check for update for version cmd",
+			IsRelease:   true,
+			UsageReport: true,
+			args:        []string{"version"},
+			expected:    false,
 		},
 		{
-			Name:      "Don't check for update for cmd --help",
-			IsRelease: true,
-			args:      []string{"scan", "--help"},
-			expected:  false,
+			Name:        "Don't check for update for help cmd",
+			IsRelease:   true,
+			UsageReport: true,
+			args:        []string{"help"},
+			expected:    false,
 		},
 		{
-			Name:      "Don't check for update for cmd -h",
-			IsRelease: true,
-			args:      []string{"scan", "-h"},
-			expected:  false,
+			Name:        "Don't check for update for cmd --help",
+			IsRelease:   true,
+			UsageReport: true,
+			args:        []string{"scan", "--help"},
+			expected:    false,
 		},
 		{
-			Name:      "Don't check for update when no check flag present",
-			IsRelease: true,
-			args:      []string{"--no-version-check"},
-			expected:  false,
+			Name:        "Don't check for update for cmd -h",
+			IsRelease:   true,
+			UsageReport: true,
+			args:        []string{"scan", "-h"},
+			expected:    false,
 		},
 		{
-			Name:      "Don't check for update in dev mode",
-			IsRelease: false,
-			args:      []string{""},
-			expected:  false,
+			Name:        "Don't check for update when no check flag present",
+			IsRelease:   true,
+			UsageReport: true,
+			args:        []string{"--no-version-check"},
+			expected:    false,
 		},
 		{
-			Name:      "Don't check for update when env DCTL_NO_VERSION_CHECK set",
-			IsRelease: true,
+			Name:        "Don't check for update in dev mode",
+			IsRelease:   false,
+			UsageReport: true,
+			args:        []string{""},
+			expected:    false,
+		},
+		{
+			Name:        "Don't check for update when env DCTL_NO_VERSION_CHECK set",
+			IsRelease:   true,
+			UsageReport: true,
 			env: map[string]string{
 				"DCTL_NO_VERSION_CHECK": "foo",
 			},
 			expected: false,
 		},
 		{
-			Name:      "Should not return error when launching sub command",
-			IsRelease: false,
-			args:      []string{"scan", "--from", "tfstate://terraform.tfstate"},
-			expected:  false,
+			Name:        "Should not return error when launching sub command",
+			IsRelease:   false,
+			UsageReport: true,
+			args:        []string{"scan", "--from", "tfstate://terraform.tfstate"},
+			expected:    false,
 		},
 		{
-			Name:      "Don't check for update for completion cmd",
-			IsRelease: true,
-			args:      []string{"completion", "bash"},
-			expected:  false,
+			Name:        "Don't check for update for completion cmd",
+			IsRelease:   true,
+			UsageReport: true,
+			args:        []string{"completion", "bash"},
+			expected:    false,
 		},
 	}
 
@@ -244,7 +262,7 @@ func TestDriftctlCmd_ShouldCheckVersion(t *testing.T) {
 				os.Setenv(key, val)
 			}
 
-			cmd := NewDriftctlCmd(mocks.MockBuild{Release: c.IsRelease})
+			cmd := NewDriftctlCmd(mocks.MockBuild{Release: c.IsRelease, UsageReporting: c.UsageReport})
 			os.Args = append([]string{"driftctl"}, c.args...)
 			result := cmd.ShouldCheckVersion()
 

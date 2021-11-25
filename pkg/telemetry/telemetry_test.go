@@ -11,6 +11,7 @@ import (
 	"github.com/cloudskiff/driftctl/pkg/memstore"
 	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/cloudskiff/driftctl/pkg/version"
+	"github.com/cloudskiff/driftctl/test/mocks"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 )
@@ -126,7 +127,24 @@ func TestSendTelemetry(t *testing.T) {
 					},
 				)
 			}
-			SendTelemetry(store)
+			tl := NewTelemetry(mocks.MockBuild{UsageReporting: true})
+			tl.SendTelemetry(store)
 		})
 	}
+}
+
+func TestTelemetryNotSend(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+	store := memstore.New().Bucket(memstore.TelemetryBucket)
+
+	httpmock.RegisterResponder(
+		"POST",
+		"https://2lvzgmrf2e.execute-api.eu-west-3.amazonaws.com/telemetry",
+		httpmock.NewErrorResponder(nil),
+	)
+	tl := NewTelemetry(mocks.MockBuild{UsageReporting: false})
+	tl.SendTelemetry(store)
+
+	assert.Zero(t, httpmock.GetTotalCallCount())
 }
