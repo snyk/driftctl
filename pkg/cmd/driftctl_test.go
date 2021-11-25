@@ -41,23 +41,6 @@ func TestDriftctlCmd_Help(t *testing.T) {
 	}
 }
 
-func TestDriftctlCmd_Version(t *testing.T) {
-	cmd := NewDriftctlCmd(mocks.MockBuild{})
-
-	output, err := test.Execute(&cmd.Command, "version")
-	if output == "" {
-		t.Errorf("Unexpected output: %v", output)
-	}
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
-
-	expected := "dev-dev\n"
-	if output != expected {
-		t.Errorf("Expected %v, got %v", expected, output)
-	}
-}
-
 func TestDriftctlCmd_Completion(t *testing.T) {
 	cmd := NewDriftctlCmd(mocks.MockBuild{})
 
