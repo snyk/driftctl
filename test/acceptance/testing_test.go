@@ -48,7 +48,7 @@ func TestRetryFor(t *testing.T) {
 	}{
 		{
 			name:    "success on first try",
-			timeout: 1 * time.Millisecond,
+			timeout: 100 * time.Millisecond,
 			f: func(c chan struct{}) error {
 				c <- struct{}{}
 				return nil
