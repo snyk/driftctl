@@ -16,8 +16,11 @@ import (
 	"github.com/r3labs/diff/v2"
 )
 
-func fakeAnalysis() *analyser.Analysis {
-	a := analyser.Analysis{}
+func fakeAnalysis(opts analyser.AnalyzerOptions) *analyser.Analysis {
+	if opts == (analyser.AnalyzerOptions{}) {
+		opts = analyser.AnalyzerOptions{Deep: true}
+	}
+	a := analyser.NewAnalysis(opts)
 	a.AddUnmanaged(
 		&resource.Resource{
 			Id:   "unmanaged-id-1",
@@ -106,11 +109,11 @@ func fakeAnalysis() *analyser.Analysis {
 		}})
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
-	return &a
+	return a
 }
 
 func fakeAnalysisWithAlerts() *analyser.Analysis {
-	a := fakeAnalysis()
+	a := fakeAnalysis(analyser.AnalyzerOptions{})
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
 			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("dummy error"), "aws_vpc", "aws_vpc"), alerts.EnumerationPhase),
@@ -136,7 +139,7 @@ func fakeAnalysisNoDrift() *analyser.Analysis {
 }
 
 func fakeAnalysisWithJsonFields() *analyser.Analysis {
-	a := analyser.Analysis{}
+	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
 	a.AddManaged(
 		&resource.Resource{
 			Id:   "diff-id-1",
@@ -193,11 +196,11 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 		}})
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
-	return &a
+	return a
 }
 
 func fakeAnalysisWithoutAttrs() *analyser.Analysis {
-	a := analyser.Analysis{}
+	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
 	a.AddDeleted(
 		&resource.Resource{
 			Id:    "dfjkgnbsgj",
@@ -226,11 +229,11 @@ func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 	)
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
-	return &a
+	return a
 }
 
 func fakeAnalysisWithStringerResources() *analyser.Analysis {
-	a := analyser.Analysis{}
+	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
 	schema := &resource.Schema{HumanReadableAttributesFunc: func(res *resource.Resource) map[string]string {
 		return map[string]string{
 			"Name": (*res.Attrs)["name"].(string),
@@ -295,11 +298,11 @@ func fakeAnalysisWithStringerResources() *analyser.Analysis {
 	}})
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
-	return &a
+	return a
 }
 
 func fakeAnalysisWithComputedFields() *analyser.Analysis {
-	a := analyser.Analysis{}
+	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
 	a.AddManaged(
 		&resource.Resource{
 			Id:   "diff-id-1",
@@ -377,7 +380,7 @@ func fakeAnalysisWithComputedFields() *analyser.Analysis {
 	})
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
-	return &a
+	return a
 }
 
 func fakeAnalysisWithAWSEnumerationError() *analyser.Analysis {
@@ -438,6 +441,22 @@ func fakeAnalysisForJSONPlan() *analyser.Analysis {
 			Type: "aws_managed_resource",
 			Attrs: &resource.Attributes{
 				"name": "Second managed resource",
+			},
+		},
+	)
+	a.ProviderName = "AWS"
+	a.ProviderVersion = "3.19.0"
+	return &a
+}
+
+func fakeAnalysisWithoutDeep() *analyser.Analysis {
+	a := analyser.Analysis{}
+	a.AddUnmanaged(
+		&resource.Resource{
+			Id:   "unmanaged-id-1",
+			Type: "aws_unmanaged_resource",
+			Attrs: &resource.Attributes{
+				"name": "First unmanaged resource",
 			},
 		},
 	)

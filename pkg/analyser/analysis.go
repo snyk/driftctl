@@ -39,6 +39,7 @@ type Analysis struct {
 	managed         []*resource.Resource
 	deleted         []*resource.Resource
 	differences     []Difference
+	options         AnalyzerOptions
 	summary         Summary
 	alerts          alerter.Alerts
 	Duration        time.Duration
@@ -70,6 +71,10 @@ type GenDriftIgnoreOptions struct {
 	ExcludeDrifted   bool
 	InputPath        string
 	OutputPath       string
+}
+
+func NewAnalysis(options AnalyzerOptions) *Analysis {
+	return &Analysis{options: options}
 }
 
 func (a Analysis) MarshalJSON() ([]byte, error) {
@@ -154,6 +159,10 @@ func (a *Analysis) UnmarshalJSON(bytes []byte) error {
 
 func (a *Analysis) IsSync() bool {
 	return a.summary.TotalDrifted == 0 && a.summary.TotalUnmanaged == 0 && a.summary.TotalDeleted == 0
+}
+
+func (a *Analysis) Options() AnalyzerOptions {
+	return a.options
 }
 
 func (a *Analysis) AddDeleted(resources ...*resource.Resource) {

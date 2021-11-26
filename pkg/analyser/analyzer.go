@@ -52,7 +52,7 @@ func NewAnalyzer(alerter *alerter.Alerter, options AnalyzerOptions, filter filte
 }
 
 func (a Analyzer) Analyze(remoteResources, resourcesFromState []*resource.Resource) (Analysis, error) {
-	analysis := Analysis{}
+	analysis := Analysis{options: a.options}
 
 	// Iterate on remote resources and filter ignored resources
 	filteredRemoteResource := make([]*resource.Resource, 0, len(remoteResources))

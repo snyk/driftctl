@@ -28,7 +28,7 @@ func TestJSON_Write(t *testing.T) {
 			name:       "test json output",
 			goldenfile: "output.json",
 			args: args{
-				analysis: fakeAnalysis(),
+				analysis: fakeAnalysis(analyser.AnalyzerOptions{}),
 			},
 			wantErr: false,
 		},
@@ -103,7 +103,7 @@ func TestJSON_Write_stdout(t *testing.T) {
 			goldenfile: "output.json",
 			path:       "stdout",
 			args: args{
-				analysis: fakeAnalysis(),
+				analysis: fakeAnalysis(analyser.AnalyzerOptions{}),
 			},
 			wantErr: false,
 		},
@@ -113,7 +113,7 @@ func TestJSON_Write_stdout(t *testing.T) {
 			goldenfile: "output.json",
 			path:       "/dev/stdout",
 			args: args{
-				analysis: fakeAnalysis(),
+				analysis: fakeAnalysis(analyser.AnalyzerOptions{}),
 			},
 			wantErr: false,
 		},
@@ -160,7 +160,7 @@ func TestJSON_Write_stdout(t *testing.T) {
 
 func TestJSON_WriteMultiplesTimesInSameFile(t *testing.T) {
 	emptyAnalysis := &analyser.Analysis{}
-	longerAnalysis := fakeAnalysis()
+	longerAnalysis := fakeAnalysis(analyser.AnalyzerOptions{})
 	tempDir := t.TempDir()
 	tempFile, err := ioutil.TempFile(tempDir, "result")
 	if err != nil {
