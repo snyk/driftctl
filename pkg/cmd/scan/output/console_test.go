@@ -31,7 +31,7 @@ func TestConsole_Write(t *testing.T) {
 			name:       "test console output",
 			goldenfile: "output.txt",
 			args: args{analysis: func() *analyser.Analysis {
-				a := fakeAnalysis()
+				a := fakeAnalysis(analyser.AnalyzerOptions{})
 				a.AddDeleted(
 					&resource.Resource{
 						Id:   "test-id-1",
@@ -106,6 +106,12 @@ func TestConsole_Write(t *testing.T) {
 			name:       "test console output with Github enumeration alerts",
 			goldenfile: "output_access_denied_alert_github.txt",
 			args:       args{analysis: fakeAnalysisWithGithubEnumerationError()},
+			wantErr:    false,
+		},
+		{
+			name:       "test console output without deep mode",
+			goldenfile: "output_without_deep.txt",
+			args:       args{analysis: fakeAnalysisWithoutDeep()},
 			wantErr:    false,
 		},
 	}
