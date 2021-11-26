@@ -22,7 +22,7 @@ func TestAcc_Azure_LoadBalancerRules(t *testing.T) {
 						t.Fatal(err)
 					}
 					result.AssertInfrastructureIsInSync()
-					result.AssertManagedCount(2)
+					result.AssertManagedCount(1)
 				},
 			},
 		},
