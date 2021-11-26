@@ -32,6 +32,7 @@ func TestAzureMetadata_Flags(t *testing.T) {
 		AzurePrivateDNSPTRRecordResourceType:   {resource.FlagDeepMode},
 		AzurePrivateDNSMXRecordResourceType:    {resource.FlagDeepMode},
 		AzurePrivateDNSSRVRecordResourceType:   {resource.FlagDeepMode},
+		AzurePrivateDNSTXTRecordResourceType:   {resource.FlagDeepMode},
 		AzureImageResourceType:                 {},
 		AzureSSHPublicKeyResourceType:          {resource.FlagDeepMode},
 	}
