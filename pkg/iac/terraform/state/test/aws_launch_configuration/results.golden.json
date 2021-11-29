@@ -1,0 +1,21 @@
+[
+ {
+  "Id": "web_config",
+  "Type": "aws_launch_configuration",
+  "Attrs": {
+   "arn": "arn:aws:autoscaling:us-east-1:533948124879:launchConfiguration:2cbee675-0d59-454b-866d-e9476e69381d:launchConfigurationName/web_config",
+   "associate_public_ip_address": false,
+   "ebs_optimized": false,
+   "enable_monitoring": true,
+   "iam_instance_profile": "",
+   "id": "web_config",
+   "image_id": "ami-022d4249382309a48",
+   "instance_type": "t3.micro",
+   "key_name": "",
+   "name": "web_config",
+   "name_prefix": "",
+   "spot_price": "",
+   "vpc_classic_link_id": ""
+  }
+ }
+]

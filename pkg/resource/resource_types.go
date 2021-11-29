@@ -143,6 +143,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_apigatewayv2_vpc_link":           {},
 	"aws_apigatewayv2_authorizer":         {},
 	"aws_launch_template":                 {},
+	"aws_launch_configuration":            {},
 
 	"github_branch_protection": {},
 	"github_membership":        {},
