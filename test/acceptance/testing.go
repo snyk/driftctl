@@ -396,7 +396,6 @@ func Run(t *testing.T, c AccTestCase) {
 		c.Args = append(c.Args,
 			"--output", fmt.Sprintf("json://%s", c.getResultFilePath()),
 		)
-		c.Args = append(c.Args, "--disable-telemetry")
 	}
 
 	for _, check := range c.Checks {
