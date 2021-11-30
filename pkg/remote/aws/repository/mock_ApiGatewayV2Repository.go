@@ -12,6 +12,29 @@ type MockApiGatewayV2Repository struct {
 	mock.Mock
 }
 
+// ListAllApiAuthorizers provides a mock function with given fields: _a0
+func (_m *MockApiGatewayV2Repository) ListAllApiAuthorizers(_a0 string) ([]*apigatewayv2.Authorizer, error) {
+	ret := _m.Called(_a0)
+
+	var r0 []*apigatewayv2.Authorizer
+	if rf, ok := ret.Get(0).(func(string) []*apigatewayv2.Authorizer); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*apigatewayv2.Authorizer)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListAllApis provides a mock function with given fields:
 func (_m *MockApiGatewayV2Repository) ListAllApis() ([]*apigatewayv2.Api, error) {
 	ret := _m.Called()

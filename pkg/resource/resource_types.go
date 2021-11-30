@@ -141,6 +141,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_appautoscaling_scheduled_action": {},
 	"aws_apigatewayv2_api":                {},
 	"aws_apigatewayv2_vpc_link":           {},
+	"aws_apigatewayv2_authorizer":         {},
 
 	"github_branch_protection": {},
 	"github_membership":        {},
