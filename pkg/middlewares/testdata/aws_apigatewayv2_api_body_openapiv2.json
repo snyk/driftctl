@@ -1,0 +1,25 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "example-api",
+    "version": "2021-12-07 14:33:56UTC"
+  },
+  "host": "abcd.execute-api.eu-west-1.amazonaws.com",
+  "basePath": "/%7BbasePath%7D",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/example": {
+      "get": {
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "Default response for GET /example"
+          }
+        }
+      }
+    }
+  }
+}
+

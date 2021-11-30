@@ -1,0 +1,18 @@
+[
+ {
+  "Id": "dcab",
+  "Type": "aws_apigatewayv2_route",
+  "Attrs": {
+   "api_id": "abcd",
+   "api_key_required": false,
+   "authorization_type": "NONE",
+   "authorizer_id": "",
+   "id": "dcab",
+   "model_selection_expression": "",
+   "operation_name": "",
+   "route_key": "$default",
+   "route_response_selection_expression": "",
+   "target": ""
+  }
+ }
+]
