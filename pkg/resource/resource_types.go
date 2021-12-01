@@ -201,6 +201,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"azurerm_public_ip":                {},
 	"azurerm_network_security_group":   {},
 	"azurerm_lb":                       {},
+	"azurerm_lb_rule":                  {},
 	"azurerm_private_dns_zone":         {},
 	"azurerm_private_dns_a_record":     {},
 	"azurerm_private_dns_aaaa_record":  {},

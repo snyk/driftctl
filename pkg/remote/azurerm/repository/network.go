@@ -19,6 +19,7 @@ type NetworkRepository interface {
 	ListAllPublicIPAddresses() ([]*armnetwork.PublicIPAddress, error)
 	ListAllSecurityGroups() ([]*armnetwork.NetworkSecurityGroup, error)
 	ListAllLoadBalancers() ([]*armnetwork.LoadBalancer, error)
+	ListLoadBalancerRules(*armnetwork.LoadBalancer) ([]*armnetwork.LoadBalancingRule, error)
 }
 
 type publicIPAddressesClient interface {
@@ -140,6 +141,23 @@ func (s loadBalancersClientImpl) ListAll(options *armnetwork.LoadBalancersListAl
 	return s.client.ListAll(options)
 }
 
+type loadBalancerRulesListAllPager interface {
+	pager
+	PageResponse() armnetwork.LoadBalancerLoadBalancingRulesListResponse
+}
+
+type loadBalancerRulesClient interface {
+	List(string, string, *armnetwork.LoadBalancerLoadBalancingRulesListOptions) loadBalancerRulesListAllPager
+}
+
+type loadBalancerRulesClientImpl struct {
+	client *armnetwork.LoadBalancerLoadBalancingRulesClient
+}
+
+func (s loadBalancerRulesClientImpl) List(resourceGroupName string, loadBalancerName string, options *armnetwork.LoadBalancerLoadBalancingRulesListOptions) loadBalancerRulesListAllPager {
+	return s.client.List(resourceGroupName, loadBalancerName, options)
+}
+
 type networkRepository struct {
 	virtualNetworksClient       virtualNetworksClient
 	routeTableClient            routeTablesClient
@@ -147,7 +165,8 @@ type networkRepository struct {
 	firewallsClient             firewallsClient
 	publicIPAddressesClient     publicIPAddressesClient
 	networkSecurityGroupsClient networkSecurityGroupsClient
-	loadbalancersClient         loadBalancersClient
+	loadBalancersClient         loadBalancersClient
+	loadBalancerRulesClient     loadBalancerRulesClient
 	cache                       cache.Cache
 }
 
@@ -160,6 +179,7 @@ func NewNetworkRepository(con *arm.Connection, config common.AzureProviderConfig
 		&publicIPAddressesClientImpl{client: armnetwork.NewPublicIPAddressesClient(con, config.SubscriptionID)},
 		&networkSecurityGroupsClientImpl{client: armnetwork.NewNetworkSecurityGroupsClient(con, config.SubscriptionID)},
 		&loadBalancersClientImpl{client: armnetwork.NewLoadBalancersClient(con, config.SubscriptionID)},
+		&loadBalancerRulesClientImpl{armnetwork.NewLoadBalancerLoadBalancingRulesClient(con, config.SubscriptionID)},
 		cache,
 	}
 }
@@ -331,12 +351,42 @@ func (s *networkRepository) ListAllSecurityGroups() ([]*armnetwork.NetworkSecuri
 
 func (s *networkRepository) ListAllLoadBalancers() ([]*armnetwork.LoadBalancer, error) {
 	cacheKey := "networkListAllLoadBalancers"
-	if v := s.cache.Get(cacheKey); v != nil {
+	defer s.cache.Unlock(cacheKey)
+	if v := s.cache.GetAndLock(cacheKey); v != nil {
 		return v.([]*armnetwork.LoadBalancer), nil
 	}
 
-	pager := s.loadbalancersClient.ListAll(nil)
+	pager := s.loadBalancersClient.ListAll(nil)
 	results := make([]*armnetwork.LoadBalancer, 0)
+	for pager.NextPage(context.Background()) {
+		resp := pager.PageResponse()
+		if err := pager.Err(); err != nil {
+			return nil, err
+		}
+		results = append(results, resp.Value...)
+	}
+
+	if err := pager.Err(); err != nil {
+		return nil, err
+	}
+
+	s.cache.Put(cacheKey, results)
+	return results, nil
+}
+
+func (s *networkRepository) ListLoadBalancerRules(loadBalancer *armnetwork.LoadBalancer) ([]*armnetwork.LoadBalancingRule, error) {
+	cacheKey := fmt.Sprintf("networkListLoadBalancerRules_%s", *loadBalancer.ID)
+	if v := s.cache.Get(cacheKey); v != nil {
+		return v.([]*armnetwork.LoadBalancingRule), nil
+	}
+
+	loadBalancerResource, err := azure.ParseResourceID(*loadBalancer.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	pager := s.loadBalancerRulesClient.List(loadBalancerResource.ResourceGroup, loadBalancerResource.ResourceName, &armnetwork.LoadBalancerLoadBalancingRulesListOptions{})
+	results := make([]*armnetwork.LoadBalancingRule, 0)
 	for pager.NextPage(context.Background()) {
 		resp := pager.PageResponse()
 		if err := pager.Err(); err != nil {

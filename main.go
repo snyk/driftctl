@@ -31,8 +31,14 @@ func run() int {
 
 	config.Init()
 	logger.Init()
+	build := build.Build{}
+	logrus.WithFields(logrus.Fields{
+		"isRelease":               fmt.Sprintf("%t", build.IsRelease()),
+		"isUsageReportingEnabled": fmt.Sprintf("%t", build.IsUsageReportingEnabled()),
+		"version":                 version.Current(),
+	}).Debug("Build info")
 
-	driftctlCmd := cmd.NewDriftctlCmd(build.Build{})
+	driftctlCmd := cmd.NewDriftctlCmd(build)
 
 	checkVersion := driftctlCmd.ShouldCheckVersion()
 	latestVersionChan := make(chan string)
