@@ -1,8 +1,10 @@
 package terraform
 
 import (
+	"crypto/sha1"
 	gojson "encoding/json"
 	"fmt"
+	"io"
 	"sort"
 
 	"github.com/cloudskiff/driftctl/pkg/terraform"
@@ -93,7 +95,20 @@ func (p *FakeTerraformProvider) getFileName(args terraform.ReadResourceArgs) str
 	for _, k := range keys {
 		suffix = fmt.Sprintf("%s-%s", suffix, args.Attributes[k])
 	}
-	fileName := fmt.Sprintf("%s-%s%s.res.golden.json", args.Ty, args.ID, suffix)
+
+	// ext4 and many other filesystems has a maximum filename length of 255 bytes
+	// See https://en.wikipedia.org/wiki/Comparison_of_file_systems#Limits
+	// Solution: we create a SHA1 hash of the filename so the length stay constant
+	// We should do that no matter the length, but it requires to regenerate every single file
+	// TODO: Use SHA1 filenames for all resource golden files
+	resourceUID := fmt.Sprintf("%s-%s%s", args.Ty, args.ID, suffix)
+	if len(resourceUID) > 239 {
+		h := sha1.New()
+		_, _ = io.WriteString(h, resourceUID)
+		resourceUID = fmt.Sprintf("%x", h.Sum(nil))
+	}
+
+	fileName := fmt.Sprintf("%s.res.golden.json", resourceUID)
 	return fileName
 }
 

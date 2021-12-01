@@ -67,6 +67,9 @@ func Init(
 	remoteLibrary.AddEnumerator(NewAzurermNetworkSecurityGroupEnumerator(networkRepo, factory))
 	remoteLibrary.AddDetailsFetcher(azurerm.AzureNetworkSecurityGroupResourceType, common.NewGenericDetailsFetcher(azurerm.AzureNetworkSecurityGroupResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewAzurermLoadBalancerEnumerator(networkRepo, factory))
+	remoteLibrary.AddEnumerator(NewAzurermLoadBalancerRuleEnumerator(networkRepo, factory))
+	remoteLibrary.AddDetailsFetcher(azurerm.AzureLoadBalancerRuleResourceType, common.NewGenericDetailsFetcher(azurerm.AzureLoadBalancerRuleResourceType, provider, deserializer))
+
 	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSZoneEnumerator(privateDNSRepo, factory))
 	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSZoneResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSZoneResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSARecordEnumerator(privateDNSRepo, factory))

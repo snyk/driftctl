@@ -1006,15 +1006,17 @@ func Test_Network_ListAllLoadBalancers(t *testing.T) {
 				}).Times(1)
 				pager.On("Err").Return(nil).Times(2)
 
-				mockCache.On("Get", "networkListAllLoadBalancers").Return(nil).Times(1)
+				mockCache.On("GetAndLock", "networkListAllLoadBalancers").Return(nil).Times(1)
 				mockCache.On("Put", "networkListAllLoadBalancers", expectedResults).Return(false).Times(1)
+				mockCache.On("Unlock", "networkListAllLoadBalancers").Return(nil).Times(1)
 			},
 			expected: expectedResults,
 		},
 		{
 			name: "should hit cache and return load balancers",
 			mocks: func(pager *mockLoadBalancersListAllPager, mockCache *cache.MockCache) {
-				mockCache.On("Get", "networkListAllLoadBalancers").Return(expectedResults).Times(1)
+				mockCache.On("GetAndLock", "networkListAllLoadBalancers").Return(expectedResults).Times(1)
+				mockCache.On("Unlock", "networkListAllLoadBalancers").Return(nil).Times(1)
 			},
 			expected: expectedResults,
 		},
@@ -1026,7 +1028,8 @@ func Test_Network_ListAllLoadBalancers(t *testing.T) {
 				pager.On("PageResponse").Return(armnetwork.LoadBalancersListAllResponse{}).Times(1)
 				pager.On("Err").Return(errors.New("remote error")).Times(1)
 
-				mockCache.On("Get", "networkListAllLoadBalancers").Return(nil).Times(1)
+				mockCache.On("GetAndLock", "networkListAllLoadBalancers").Return(nil).Times(1)
+				mockCache.On("Unlock", "networkListAllLoadBalancers").Return(nil).Times(1)
 			},
 			wantErr: "remote error",
 		},
@@ -1043,10 +1046,115 @@ func Test_Network_ListAllLoadBalancers(t *testing.T) {
 			tt.mocks(fakePager, mockCache)
 
 			s := &networkRepository{
-				loadbalancersClient: fakeClient,
+				loadBalancersClient: fakeClient,
 				cache:               mockCache,
 			}
 			got, err := s.ListAllLoadBalancers()
+			if tt.wantErr != "" {
+				assert.EqualError(t, err, tt.wantErr)
+			} else {
+				assert.Nil(t, err)
+			}
+
+			fakeClient.AssertExpectations(t)
+			mockCache.AssertExpectations(t)
+
+			if !reflect.DeepEqual(got, tt.expected) {
+				t.Errorf("ListAllLoadBalancers() got = %v, want %v", got, tt.expected)
+			}
+		})
+	}
+}
+
+func Test_Network_ListLoadBalancerRules(t *testing.T) {
+	expectedResults := []*armnetwork.LoadBalancingRule{
+		{
+			SubResource: armnetwork.SubResource{
+				ID: to.StringPtr("lbrule-1"),
+			},
+			Name: to.StringPtr("lbrule-1"),
+		},
+		{
+			SubResource: armnetwork.SubResource{
+				ID: to.StringPtr("lbrule-1"),
+			},
+			Name: to.StringPtr("lbrule-1"),
+		},
+	}
+
+	testcases := []struct {
+		name         string
+		loadBalancer *armnetwork.LoadBalancer
+		mocks        func(*mockLoadBalancerRulesClient, *mockLoadBalancerRulesListAllPager, *cache.MockCache)
+		expected     []*armnetwork.LoadBalancingRule
+		wantErr      string
+	}{
+		{
+			name: "should return load balancer rules",
+			loadBalancer: &armnetwork.LoadBalancer{
+				Resource: armnetwork.Resource{ID: to.StringPtr("/subscriptions/xxx/resourceGroups/driftctl/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/frontendIPConfigurations/PublicIPAddress")},
+			},
+			mocks: func(client *mockLoadBalancerRulesClient, pager *mockLoadBalancerRulesListAllPager, mockCache *cache.MockCache) {
+				client.On("List", "driftctl", "PublicIPAddress", &armnetwork.LoadBalancerLoadBalancingRulesListOptions{}).Return(pager)
+
+				pager.On("NextPage", context.Background()).Return(true).Times(1)
+				pager.On("NextPage", context.Background()).Return(false).Times(1)
+				pager.On("PageResponse").Return(armnetwork.LoadBalancerLoadBalancingRulesListResponse{
+					LoadBalancerLoadBalancingRulesListResult: armnetwork.LoadBalancerLoadBalancingRulesListResult{
+						LoadBalancerLoadBalancingRuleListResult: armnetwork.LoadBalancerLoadBalancingRuleListResult{
+							Value: expectedResults,
+						},
+					},
+				}).Times(1)
+				pager.On("Err").Return(nil).Times(2)
+
+				mockCache.On("Get", "networkListLoadBalancerRules_/subscriptions/xxx/resourceGroups/driftctl/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/frontendIPConfigurations/PublicIPAddress").Return(nil).Times(1)
+				mockCache.On("Put", "networkListLoadBalancerRules_/subscriptions/xxx/resourceGroups/driftctl/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/frontendIPConfigurations/PublicIPAddress", expectedResults).Return(false).Times(1)
+			},
+			expected: expectedResults,
+		},
+		{
+			name: "should hit cache and return load balancers",
+			loadBalancer: &armnetwork.LoadBalancer{
+				Resource: armnetwork.Resource{ID: to.StringPtr("lb-1")},
+			},
+			mocks: func(client *mockLoadBalancerRulesClient, pager *mockLoadBalancerRulesListAllPager, mockCache *cache.MockCache) {
+				mockCache.On("Get", "networkListLoadBalancerRules_lb-1").Return(expectedResults).Times(1)
+			},
+			expected: expectedResults,
+		},
+		{
+			name: "should return remote error",
+			loadBalancer: &armnetwork.LoadBalancer{
+				Resource: armnetwork.Resource{ID: to.StringPtr("/subscriptions/xxx/resourceGroups/driftctl/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/frontendIPConfigurations/PublicIPAddress")},
+			},
+			mocks: func(client *mockLoadBalancerRulesClient, pager *mockLoadBalancerRulesListAllPager, mockCache *cache.MockCache) {
+				client.On("List", "driftctl", "PublicIPAddress", &armnetwork.LoadBalancerLoadBalancingRulesListOptions{}).Return(pager)
+
+				pager.On("NextPage", context.Background()).Return(true).Times(1)
+				pager.On("NextPage", context.Background()).Return(false).Times(1)
+				pager.On("PageResponse").Return(armnetwork.LoadBalancerLoadBalancingRulesListResponse{}).Times(1)
+				pager.On("Err").Return(errors.New("remote error")).Times(1)
+
+				mockCache.On("Get", "networkListLoadBalancerRules_/subscriptions/xxx/resourceGroups/driftctl/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/frontendIPConfigurations/PublicIPAddress").Return(nil).Times(1)
+			},
+			wantErr: "remote error",
+		},
+	}
+
+	for _, tt := range testcases {
+		t.Run(tt.name, func(t *testing.T) {
+			fakePager := &mockLoadBalancerRulesListAllPager{}
+			fakeClient := &mockLoadBalancerRulesClient{}
+			mockCache := &cache.MockCache{}
+
+			tt.mocks(fakeClient, fakePager, mockCache)
+
+			s := &networkRepository{
+				loadBalancerRulesClient: fakeClient,
+				cache:                   mockCache,
+			}
+			got, err := s.ListLoadBalancerRules(tt.loadBalancer)
 			if tt.wantErr != "" {
 				assert.EqualError(t, err, tt.wantErr)
 			} else {
