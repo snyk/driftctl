@@ -9,7 +9,6 @@
   <img src="https://img.shields.io/github/v/release/cloudskiff/driftctl">
   <img src="https://img.shields.io/github/go-mod/go-version/cloudskiff/driftctl">
   <img src="https://img.shields.io/github/downloads/cloudskiff/driftctl/total.svg"/>
-  <img src="https://img.shields.io/bintray/dt/homebrew/bottles/driftctl?label=homebrew"/>
   <a href="https://codecov.io/gh/cloudskiff/driftctl">
     <img src="https://codecov.io/gh/cloudskiff/driftctl/branch/main/graph/badge.svg?token=8C5R02G5S7"/>
   </a>
@@ -36,7 +35,7 @@
 ## Why driftctl ?
 
 Infrastructure drift is a blind spot and a source of potential security issues.
-Drift can have multiple causes: from team members creating or updating infrastructure through the web console without backporting changes to Terraform, to unexpected actions from authenticated apps and services. 
+Drift can have multiple causes: from team members creating or updating infrastructure through the web console without backporting changes to Terraform, to unexpected actions from authenticated apps and services.
 
 You can't efficiently improve what you don't track. We track coverage for unit tests, why not infrastructure as code coverage?
 

@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/cloudskiff/driftctl/pkg/version"
 	"github.com/cloudskiff/driftctl/test"
 
 	"github.com/spf13/cobra"
@@ -20,7 +22,7 @@ func TestVersionCmd(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	expected := "dev-dev\n"
+	expected := fmt.Sprintf("%s\n", version.Current())
 	if output != expected {
 		t.Errorf("Expected %v, got %v", expected, output)
 	}

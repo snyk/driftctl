@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"runtime"
 
+	"github.com/cloudskiff/driftctl/build"
 	"github.com/cloudskiff/driftctl/pkg/memstore"
 	"github.com/cloudskiff/driftctl/pkg/version"
 	"github.com/sirupsen/logrus"
@@ -21,7 +22,21 @@ type telemetry struct {
 	ProviderName   string `json:"provider_name"`
 }
 
-func SendTelemetry(store memstore.Bucket) {
+type Telemetry struct {
+	build build.BuildInterface
+}
+
+func NewTelemetry(build build.BuildInterface) *Telemetry {
+	return &Telemetry{build: build}
+}
+
+func (te Telemetry) SendTelemetry(store memstore.Bucket) {
+
+	if !te.build.IsUsageReportingEnabled() {
+		logrus.Debug("Usage reporting is disabled on this build, telemetry skipped")
+		return
+	}
+
 	t := &telemetry{
 		Version: version.Current(),
 		Os:      runtime.GOOS,

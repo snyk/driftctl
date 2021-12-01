@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/cloudskiff/driftctl/build"
 	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/cloudskiff/driftctl/pkg/memstore"
 	"github.com/cloudskiff/driftctl/pkg/remote/common"
@@ -309,7 +310,8 @@ func scanRun(opts *pkg.ScanOptions) error {
 	globaloutput.Printf(color.WhiteString("Provider version used to scan: %s. Use --tf-provider-version to use another version.\n"), resourceSchemaRepository.ProviderVersion.String())
 
 	if !opts.DisableTelemetry {
-		telemetry.SendTelemetry(store.Bucket(memstore.TelemetryBucket))
+		tl := telemetry.NewTelemetry(&build.Build{})
+		tl.SendTelemetry(store.Bucket(memstore.TelemetryBucket))
 	}
 
 	if !analysis.IsSync() {
