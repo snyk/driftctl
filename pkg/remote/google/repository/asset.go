@@ -33,6 +33,7 @@ const (
 	sqlDatabaseInstanceAssetType  = "sqladmin.googleapis.com/Instance"
 	healthCheckAssetType          = "compute.googleapis.com/HealthCheck"
 	cloudRunServiceAssetType      = "run.googleapis.com/Service"
+	nodeGroupAssetType            = "compute.googleapis.com/NodeGroup"
 )
 
 type AssetRepository interface {
@@ -56,6 +57,7 @@ type AssetRepository interface {
 	SearchAllSQLDatabaseInstances() ([]*assetpb.Asset, error)
 	SearchAllHealthChecks() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllCloudRunServices() ([]*assetpb.ResourceSearchResult, error)
+	SearchAllNodeGroups() ([]*assetpb.Asset, error)
 }
 
 type assetRepository struct {
@@ -82,6 +84,7 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 			bigtableTableAssetType,
 			sqlDatabaseInstanceAssetType,
 			computeGlobalAddressAssetType,
+			nodeGroupAssetType,
 		},
 	}
 	var results []*assetpb.Asset
@@ -251,4 +254,8 @@ func (s assetRepository) SearchAllHealthChecks() ([]*assetpb.ResourceSearchResul
 
 func (s assetRepository) SearchAllCloudRunServices() ([]*assetpb.ResourceSearchResult, error) {
 	return s.searchAllResources(cloudRunServiceAssetType)
+}
+
+func (s assetRepository) SearchAllNodeGroups() ([]*assetpb.Asset, error) {
+	return s.listAllResources(nodeGroupAssetType)
 }
