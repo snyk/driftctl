@@ -218,7 +218,6 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewLaunchTemplateEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsLaunchTemplateResourceType, common.NewGenericDetailsFetcher(aws.AwsLaunchTemplateResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewLaunchConfigurationEnumerator(autoscalingRepository, factory))
-	remoteLibrary.AddDetailsFetcher(aws.AwsLaunchConfigurationResourceType, common.NewGenericDetailsFetcher(aws.AwsLaunchConfigurationResourceType, provider, deserializer))
 
 	err = resourceSchemaRepository.Init(terraform.AWS, provider.Version(), provider.Schema())
 	if err != nil {
