@@ -29,12 +29,16 @@ func (r *autoScalingRepository) DescribeLaunchConfigurations() ([]*autoscaling.L
 		return v.([]*autoscaling.LaunchConfiguration), nil
 	}
 
+	var results []*autoscaling.LaunchConfiguration
 	input := &autoscaling.DescribeLaunchConfigurationsInput{}
-	result, err := r.client.DescribeLaunchConfigurations(input)
+	err := r.client.DescribeLaunchConfigurationsPages(input, func(resp *autoscaling.DescribeLaunchConfigurationsOutput, lastPage bool) bool {
+		results = append(results, resp.LaunchConfigurations...)
+		return !lastPage
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	r.cache.Put(cacheKey, result.LaunchConfigurations)
-	return result.LaunchConfigurations, nil
+	r.cache.Put(cacheKey, results)
+	return results, nil
 }

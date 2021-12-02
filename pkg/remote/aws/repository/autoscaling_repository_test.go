@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/autoscaling"
 	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	awstest "github.com/cloudskiff/driftctl/test/aws"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/aws/aws-sdk-go/aws"
 
@@ -18,37 +19,58 @@ import (
 func Test_AutoscalingRepository_DescribeLaunchConfigurations(t *testing.T) {
 	dummryError := errors.New("dummy error")
 
+	expectedLaunchConfigurations := []*autoscaling.LaunchConfiguration{
+		{ImageId: aws.String("1")},
+		{ImageId: aws.String("2")},
+		{ImageId: aws.String("3")},
+		{ImageId: aws.String("4")},
+	}
+
 	tests := []struct {
 		name    string
-		mocks   func(client *awstest.MockFakeAutoscaling)
+		mocks   func(*awstest.MockFakeAutoscaling, *cache.MockCache)
 		want    []*autoscaling.LaunchConfiguration
 		wantErr error
 	}{
 		{
 			name: "List all launch configurations",
-			mocks: func(client *awstest.MockFakeAutoscaling) {
-				client.On("DescribeLaunchConfigurations",
-					&autoscaling.DescribeLaunchConfigurationsInput{}).Return(&autoscaling.DescribeLaunchConfigurationsOutput{
-					LaunchConfigurations: []*autoscaling.LaunchConfiguration{
-						{ImageId: aws.String("1")},
-						{ImageId: aws.String("2")},
-						{ImageId: aws.String("3")},
-						{ImageId: aws.String("4")},
-					},
-				}, nil).Once()
+			mocks: func(client *awstest.MockFakeAutoscaling, store *cache.MockCache) {
+				store.On("Get", "DescribeLaunchConfigurations").Return(nil).Once()
+
+				client.On("DescribeLaunchConfigurationsPages",
+					&autoscaling.DescribeLaunchConfigurationsInput{},
+					mock.MatchedBy(func(callback func(res *autoscaling.DescribeLaunchConfigurationsOutput, lastPage bool) bool) bool {
+						callback(&autoscaling.DescribeLaunchConfigurationsOutput{
+							LaunchConfigurations: expectedLaunchConfigurations[:2],
+						}, false)
+						callback(&autoscaling.DescribeLaunchConfigurationsOutput{
+							LaunchConfigurations: expectedLaunchConfigurations[2:],
+						}, true)
+						return true
+					})).Return(nil).Once()
+
+				store.On("Put", "DescribeLaunchConfigurations", expectedLaunchConfigurations).Return(false).Once()
 			},
-			want: []*autoscaling.LaunchConfiguration{
-				{ImageId: aws.String("1")},
-				{ImageId: aws.String("2")},
-				{ImageId: aws.String("3")},
-				{ImageId: aws.String("4")},
+			want: expectedLaunchConfigurations,
+		},
+		{
+			name: "Hit cache and list all launch configurations",
+			mocks: func(client *awstest.MockFakeAutoscaling, store *cache.MockCache) {
+				store.On("Get", "DescribeLaunchConfigurations").Return(expectedLaunchConfigurations).Once()
 			},
+			want: expectedLaunchConfigurations,
 		},
 		{
 			name: "Error listing all launch configurations",
-			mocks: func(client *awstest.MockFakeAutoscaling) {
-				client.On("DescribeLaunchConfigurations",
-					&autoscaling.DescribeLaunchConfigurationsInput{}).Return(nil, dummryError).Once()
+			mocks: func(client *awstest.MockFakeAutoscaling, store *cache.MockCache) {
+				store.On("Get", "DescribeLaunchConfigurations").Return(nil).Once()
+
+				client.On("DescribeLaunchConfigurationsPages", &autoscaling.DescribeLaunchConfigurationsInput{}, mock.MatchedBy(func(callback func(res *autoscaling.DescribeLaunchConfigurationsOutput, lastPage bool) bool) bool {
+					callback(&autoscaling.DescribeLaunchConfigurationsOutput{
+						LaunchConfigurations: []*autoscaling.LaunchConfiguration{},
+					}, true)
+					return true
+				})).Return(dummryError).Once()
 			},
 			want:    nil,
 			wantErr: dummryError,
@@ -56,23 +78,15 @@ func Test_AutoscalingRepository_DescribeLaunchConfigurations(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache.New(1)
+			store := &cache.MockCache{}
 			client := &awstest.MockFakeAutoscaling{}
-			tt.mocks(client)
+			tt.mocks(client, store)
 			r := &autoScalingRepository{
 				client: client,
 				cache:  store,
 			}
 			got, err := r.DescribeLaunchConfigurations()
 			assert.Equal(t, tt.wantErr, err)
-
-			if err == nil {
-				// Check that results were cached
-				cachedData, err := r.DescribeLaunchConfigurations()
-				assert.NoError(t, err)
-				assert.Equal(t, got, cachedData)
-				assert.IsType(t, []*autoscaling.LaunchConfiguration{}, store.Get("DescribeLaunchConfigurations"))
-			}
 
 			changelog, err := diff.Diff(got, tt.want)
 			assert.Nil(t, err)
@@ -82,6 +96,9 @@ func Test_AutoscalingRepository_DescribeLaunchConfigurations(t *testing.T) {
 				}
 				t.Fail()
 			}
+
+			store.AssertExpectations(t)
+			client.AssertExpectations(t)
 		})
 	}
 }
