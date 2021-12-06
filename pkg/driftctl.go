@@ -4,19 +4,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cloudskiff/driftctl/pkg/memstore"
-	globaloutput "github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/jmespath/go-jmespath"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/memstore"
+	globaloutput "github.com/snyk/driftctl/pkg/output"
 
-	"github.com/cloudskiff/driftctl/pkg/alerter"
-	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/pkg/cmd/scan/output"
-	"github.com/cloudskiff/driftctl/pkg/filter"
-	"github.com/cloudskiff/driftctl/pkg/iac/config"
-	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
-	"github.com/cloudskiff/driftctl/pkg/middlewares"
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/pkg/analyser"
+	"github.com/snyk/driftctl/pkg/cmd/scan/output"
+	"github.com/snyk/driftctl/pkg/filter"
+	"github.com/snyk/driftctl/pkg/iac/config"
+	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend"
+	"github.com/snyk/driftctl/pkg/middlewares"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 type ScanOptions struct {

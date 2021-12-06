@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"runtime"
 
-	"github.com/cloudskiff/driftctl/build"
-	"github.com/cloudskiff/driftctl/pkg/memstore"
-	"github.com/cloudskiff/driftctl/pkg/version"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/build"
+	"github.com/snyk/driftctl/pkg/memstore"
+	"github.com/snyk/driftctl/pkg/version"
 )
 
 type telemetry struct {

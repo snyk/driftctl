@@ -5,12 +5,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg"
-	"github.com/cloudskiff/driftctl/pkg/cmd/scan/output"
+	"github.com/snyk/driftctl/pkg"
+	"github.com/snyk/driftctl/pkg/cmd/scan/output"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/cloudskiff/driftctl/pkg/iac/config"
-	"github.com/cloudskiff/driftctl/test"
+	"github.com/snyk/driftctl/pkg/iac/config"
+	"github.com/snyk/driftctl/test"
 
 	"github.com/spf13/cobra"
 )

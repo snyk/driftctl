@@ -3,9 +3,9 @@ package github
 import (
 	"fmt"
 
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/github"
+	remoteerror "github.com/snyk/driftctl/pkg/remote/error"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/github"
 )
 
 type GithubTeamEnumerator struct {

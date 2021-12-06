@@ -6,10 +6,10 @@ import (
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/remote/aws/client"
+	"github.com/snyk/driftctl/pkg/remote/cache"
 )
 
 type S3Repository interface {

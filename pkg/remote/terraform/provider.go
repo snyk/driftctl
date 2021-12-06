@@ -8,7 +8,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/cloudskiff/driftctl/pkg/output"
 	"github.com/eapache/go-resiliency/retrier"
 	"github.com/hashicorp/terraform/plugin"
 	"github.com/hashicorp/terraform/plugin/discovery"
@@ -16,11 +15,12 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/output"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
-	"github.com/cloudskiff/driftctl/pkg/parallel"
-	tf "github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/pkg/parallel"
+	tf "github.com/snyk/driftctl/pkg/terraform"
 )
 
 // "alias" in these struct are a way to namespace gRPC clients.

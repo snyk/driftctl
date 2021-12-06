@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 var callCounters map[string]int

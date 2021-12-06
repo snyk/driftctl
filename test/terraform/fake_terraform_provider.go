@@ -7,12 +7,12 @@ import (
 	"io"
 	"sort"
 
-	"github.com/cloudskiff/driftctl/pkg/terraform"
-	"github.com/cloudskiff/driftctl/test/goldenfile"
-	"github.com/cloudskiff/driftctl/test/mocks"
-	"github.com/cloudskiff/driftctl/test/schemas"
 	"github.com/hashicorp/terraform/providers"
 	"github.com/pkg/errors"
+	"github.com/snyk/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/test/goldenfile"
+	"github.com/snyk/driftctl/test/mocks"
+	"github.com/snyk/driftctl/test/schemas"
 	"github.com/zclconf/go-cty/cty"
 )
 

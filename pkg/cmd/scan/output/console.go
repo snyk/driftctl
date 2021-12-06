@@ -9,15 +9,15 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
 	"github.com/fatih/color"
 	"github.com/mattn/go-isatty"
 	"github.com/r3labs/diff/v2"
+	"github.com/snyk/driftctl/pkg/remote/alerts"
 	"github.com/yudai/gojsondiff"
 	"github.com/yudai/gojsondiff/formatter"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/analyser"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const ConsoleOutputType = "console"

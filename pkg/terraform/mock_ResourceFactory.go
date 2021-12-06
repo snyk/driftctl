@@ -3,7 +3,7 @@
 package terraform
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource"
 	mock "github.com/stretchr/testify/mock"
 	cty "github.com/zclconf/go-cty/cty"
 )

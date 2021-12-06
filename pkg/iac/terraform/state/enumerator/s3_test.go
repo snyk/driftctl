@@ -8,8 +8,8 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/cloudskiff/driftctl/pkg/iac/config"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
+	"github.com/snyk/driftctl/pkg/iac/config"
+	awstest "github.com/snyk/driftctl/test/aws"
 	"github.com/stretchr/testify/mock"
 )
 

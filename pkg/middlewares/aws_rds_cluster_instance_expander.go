@@ -1,9 +1,9 @@
 package middlewares
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // AwsRDSClusterInstanceExpander search for cluster instances from state to import corresponding remote db instances.

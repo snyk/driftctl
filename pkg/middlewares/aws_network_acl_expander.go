@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // This middelware goal is to explode aws_network_acl ingress and egress block into a set of aws_network_acl_rule

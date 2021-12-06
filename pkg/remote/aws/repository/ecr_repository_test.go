@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/ecr"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
+	"github.com/snyk/driftctl/pkg/remote/cache"
+	awstest "github.com/snyk/driftctl/test/aws"
 
 	"github.com/aws/aws-sdk-go/aws"
 

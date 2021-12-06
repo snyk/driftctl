@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/apigateway/apigatewayiface"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	"github.com/snyk/driftctl/pkg/remote/cache"
 )
 
 type ApiGatewayRepository interface {

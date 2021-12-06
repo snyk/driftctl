@@ -3,8 +3,8 @@ package middlewares
 import (
 	"strings"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // Create a aws_api_gateway_stage resource from a aws_api_gateway_deployment resource and ignore the latter resource

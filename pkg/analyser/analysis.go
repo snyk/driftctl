@@ -9,8 +9,8 @@ import (
 
 	"github.com/r3labs/diff/v2"
 
-	"github.com/cloudskiff/driftctl/pkg/alerter"
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 type Change struct {

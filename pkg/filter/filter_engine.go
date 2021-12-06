@@ -3,8 +3,8 @@ package filter
 import (
 	"errors"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/jmespath/go-jmespath"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 type FilterEngine struct {

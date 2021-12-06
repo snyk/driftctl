@@ -1,9 +1,9 @@
 package middlewares
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // Each region has a default vpc which has an internet gateway attached and thus the route table of this

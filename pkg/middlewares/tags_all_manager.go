@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 // Manage tags_all attribute on each compatible resources

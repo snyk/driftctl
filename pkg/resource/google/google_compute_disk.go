@@ -1,6 +1,6 @@
 package google
 
-import "github.com/cloudskiff/driftctl/pkg/resource"
+import "github.com/snyk/driftctl/pkg/resource"
 
 const GoogleComputeDiskResourceType = "google_compute_disk"
 

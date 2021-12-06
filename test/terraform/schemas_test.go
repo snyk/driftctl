@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/terraform"
-	"github.com/cloudskiff/driftctl/test/schemas"
+	"github.com/snyk/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/test/schemas"
 )
 
 // You can use this test function to create a schema file for a given provider in a given version

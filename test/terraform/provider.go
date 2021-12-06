@@ -3,12 +3,12 @@ package terraform
 import (
 	"os"
 
-	"github.com/cloudskiff/driftctl/pkg/output"
-	"github.com/cloudskiff/driftctl/pkg/remote/aws"
-	"github.com/cloudskiff/driftctl/pkg/remote/azurerm"
-	"github.com/cloudskiff/driftctl/pkg/remote/github"
-	"github.com/cloudskiff/driftctl/pkg/remote/google"
-	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/pkg/output"
+	"github.com/snyk/driftctl/pkg/remote/aws"
+	"github.com/snyk/driftctl/pkg/remote/azurerm"
+	"github.com/snyk/driftctl/pkg/remote/github"
+	"github.com/snyk/driftctl/pkg/remote/google"
+	"github.com/snyk/driftctl/pkg/terraform"
 )
 
 func InitTestAwsProvider(providerLibrary *terraform.ProviderLibrary, version string) (*aws.AWSTerraformProvider, error) {

@@ -5,13 +5,13 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/alerter"
-	"github.com/cloudskiff/driftctl/pkg/filter"
-	"github.com/cloudskiff/driftctl/pkg/iac/config"
-	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
-	"github.com/cloudskiff/driftctl/pkg/output"
-	"github.com/cloudskiff/driftctl/pkg/terraform"
-	"github.com/cloudskiff/driftctl/test/resource"
+	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/pkg/filter"
+	"github.com/snyk/driftctl/pkg/iac/config"
+	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend"
+	"github.com/snyk/driftctl/pkg/output"
+	"github.com/snyk/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/test/resource"
 )
 
 func TestGetIACSupplier(t *testing.T) {

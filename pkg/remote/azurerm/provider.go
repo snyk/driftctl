@@ -3,10 +3,10 @@ package azurerm
 import (
 	"os"
 
-	"github.com/cloudskiff/driftctl/pkg/output"
-	"github.com/cloudskiff/driftctl/pkg/remote/azurerm/common"
-	"github.com/cloudskiff/driftctl/pkg/remote/terraform"
-	tf "github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/pkg/output"
+	"github.com/snyk/driftctl/pkg/remote/azurerm/common"
+	"github.com/snyk/driftctl/pkg/remote/terraform"
+	tf "github.com/snyk/driftctl/pkg/terraform"
 )
 
 type AzureTerraformProvider struct {

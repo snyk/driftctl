@@ -3,7 +3,7 @@ package cmd
 import (
 	"text/template"
 
-	"github.com/cloudskiff/driftctl/pkg/version"
+	"github.com/snyk/driftctl/pkg/version"
 
 	"github.com/spf13/cobra"
 )

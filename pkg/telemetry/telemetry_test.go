@@ -7,12 +7,12 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/pkg/memstore"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/version"
-	"github.com/cloudskiff/driftctl/test/mocks"
 	"github.com/jarcoal/httpmock"
+	"github.com/snyk/driftctl/pkg/analyser"
+	"github.com/snyk/driftctl/pkg/memstore"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/version"
+	"github.com/snyk/driftctl/test/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

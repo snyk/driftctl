@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
+	"github.com/snyk/driftctl/pkg/analyser"
 
 	"github.com/stretchr/testify/require"
 )

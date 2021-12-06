@@ -1,8 +1,8 @@
 package aws
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/hashicorp/go-version"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const AwsInstanceResourceType = "aws_instance"

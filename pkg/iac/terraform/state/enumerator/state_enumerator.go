@@ -1,9 +1,9 @@
 package enumerator
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/iac/config"
-	"github.com/cloudskiff/driftctl/pkg/iac/terraform/state/backend"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/iac/config"
+	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend"
 )
 
 type StateEnumerator interface {

@@ -4,10 +4,10 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/cloudskiff/driftctl/pkg/alerter"
-	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
-	"github.com/cloudskiff/driftctl/pkg/remote/common"
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
+	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/pkg/remote/alerts"
+	"github.com/snyk/driftctl/pkg/remote/common"
+	remoteerror "github.com/snyk/driftctl/pkg/remote/error"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

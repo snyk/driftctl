@@ -5,18 +5,18 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/filter"
+	"github.com/snyk/driftctl/pkg/filter"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/stretchr/testify/assert"
 
-	testresource "github.com/cloudskiff/driftctl/test/resource"
+	testresource "github.com/snyk/driftctl/test/resource"
 
-	"github.com/cloudskiff/driftctl/test/goldenfile"
+	"github.com/snyk/driftctl/test/goldenfile"
 
-	"github.com/cloudskiff/driftctl/pkg/alerter"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 
 	"github.com/r3labs/diff/v2"
 )

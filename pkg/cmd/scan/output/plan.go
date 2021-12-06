@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/analyser"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const FormatVersion = "0.1"

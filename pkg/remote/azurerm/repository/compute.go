@@ -5,8 +5,8 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute"
-	"github.com/cloudskiff/driftctl/pkg/remote/azurerm/common"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	"github.com/snyk/driftctl/pkg/remote/azurerm/common"
+	"github.com/snyk/driftctl/pkg/remote/cache"
 )
 
 type ComputeRepository interface {

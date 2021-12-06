@@ -3,9 +3,9 @@ package middlewares
 import (
 	"strings"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/google"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/google"
 )
 
 // Creating buckets add legacy role bindings, this middleware will filter them unless they are managed.

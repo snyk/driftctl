@@ -3,8 +3,8 @@ package azurerm_test
 import (
 	"testing"
 
-	"github.com/cloudskiff/driftctl/test"
-	"github.com/cloudskiff/driftctl/test/acceptance"
+	"github.com/snyk/driftctl/test"
+	"github.com/snyk/driftctl/test/acceptance"
 )
 
 func TestAcc_Azure_PrivateDNSTXTRecord(t *testing.T) {

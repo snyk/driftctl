@@ -3,9 +3,9 @@ package middlewares
 import (
 	"fmt"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // The role of this middleware is to expand policy contained in `managed_policy_arns` to dedicated `aws_iam_policy_attachment`

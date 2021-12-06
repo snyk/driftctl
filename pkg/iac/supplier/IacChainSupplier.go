@@ -4,9 +4,9 @@ import (
 	"context"
 	"runtime"
 
-	"github.com/cloudskiff/driftctl/pkg/iac"
-	"github.com/cloudskiff/driftctl/pkg/parallel"
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/iac"
+	"github.com/snyk/driftctl/pkg/parallel"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 type IacChainSupplier struct {

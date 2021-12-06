@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/version"
-	"github.com/cloudskiff/driftctl/test"
+	"github.com/snyk/driftctl/pkg/version"
+	"github.com/snyk/driftctl/test"
 
 	"github.com/spf13/cobra"
 )

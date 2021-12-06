@@ -9,11 +9,11 @@ import (
 	"runtime"
 	"strings"
 
-	error2 "github.com/cloudskiff/driftctl/pkg/terraform/error"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	error2 "github.com/snyk/driftctl/pkg/terraform/error"
 
-	"github.com/cloudskiff/driftctl/pkg/output"
+	"github.com/snyk/driftctl/pkg/output"
 )
 
 type HomeDirInterface interface {

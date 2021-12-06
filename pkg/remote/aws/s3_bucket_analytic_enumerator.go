@@ -3,15 +3,15 @@ package aws
 import (
 	"fmt"
 
-	"github.com/cloudskiff/driftctl/pkg/alerter"
-	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
-	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	"github.com/cloudskiff/driftctl/pkg/remote/common"
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	tf "github.com/cloudskiff/driftctl/pkg/remote/terraform"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/pkg/remote/alerts"
+	"github.com/snyk/driftctl/pkg/remote/aws/repository"
+	"github.com/snyk/driftctl/pkg/remote/common"
+	remoteerror "github.com/snyk/driftctl/pkg/remote/error"
+	tf "github.com/snyk/driftctl/pkg/remote/terraform"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 type S3BucketAnalyticEnumerator struct {

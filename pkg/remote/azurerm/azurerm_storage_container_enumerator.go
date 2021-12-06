@@ -1,10 +1,10 @@
 package azurerm
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/remote/azurerm/repository"
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/azurerm"
+	"github.com/snyk/driftctl/pkg/remote/azurerm/repository"
+	remoteerror "github.com/snyk/driftctl/pkg/remote/error"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/azurerm"
 )
 
 type AzurermStorageContainerEnumerator struct {

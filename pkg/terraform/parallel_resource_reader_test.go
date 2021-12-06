@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/parallel"
 	"github.com/r3labs/diff/v2"
+	"github.com/snyk/driftctl/pkg/parallel"
 
 	"github.com/stretchr/testify/assert"
 

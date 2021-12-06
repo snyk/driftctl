@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
 	"github.com/pkg/errors"
+	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/spf13/cobra"
 )
 

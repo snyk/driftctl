@@ -7,8 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/route53"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
+	"github.com/snyk/driftctl/pkg/remote/cache"
+	awstest "github.com/snyk/driftctl/test/aws"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/r3labs/diff/v2"

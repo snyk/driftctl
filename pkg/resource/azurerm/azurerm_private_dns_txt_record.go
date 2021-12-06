@@ -1,7 +1,7 @@
 package azurerm
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const AzurePrivateDNSTXTRecordResourceType = "azurerm_private_dns_txt_record"

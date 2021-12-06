@@ -3,8 +3,8 @@ package output
 import (
 	"sort"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/pkg/output"
+	"github.com/snyk/driftctl/pkg/analyser"
+	"github.com/snyk/driftctl/pkg/output"
 )
 
 type Output interface {

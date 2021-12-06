@@ -5,17 +5,17 @@ import (
 	"os"
 	"time"
 
-	"github.com/cloudskiff/driftctl/build"
-	"github.com/cloudskiff/driftctl/logger"
-	"github.com/cloudskiff/driftctl/pkg/cmd"
-	cmderrors "github.com/cloudskiff/driftctl/pkg/cmd/errors"
-	"github.com/cloudskiff/driftctl/pkg/config"
-	"github.com/cloudskiff/driftctl/pkg/version"
-	"github.com/cloudskiff/driftctl/sentry"
 	"github.com/fatih/color"
 	gosentry "github.com/getsentry/sentry-go"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/build"
+	"github.com/snyk/driftctl/logger"
+	"github.com/snyk/driftctl/pkg/cmd"
+	cmderrors "github.com/snyk/driftctl/pkg/cmd/errors"
+	"github.com/snyk/driftctl/pkg/config"
+	"github.com/snyk/driftctl/pkg/version"
+	"github.com/snyk/driftctl/sentry"
 )
 
 func init() {

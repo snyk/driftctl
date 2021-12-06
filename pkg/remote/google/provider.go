@@ -3,10 +3,10 @@ package google
 import (
 	"os"
 
-	"github.com/cloudskiff/driftctl/pkg/output"
-	"github.com/cloudskiff/driftctl/pkg/remote/google/config"
-	"github.com/cloudskiff/driftctl/pkg/remote/terraform"
-	tf "github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/pkg/output"
+	"github.com/snyk/driftctl/pkg/remote/google/config"
+	"github.com/snyk/driftctl/pkg/remote/terraform"
+	tf "github.com/snyk/driftctl/pkg/terraform"
 )
 
 type GCPTerraformProvider struct {

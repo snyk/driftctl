@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cloudskiff/driftctl/pkg/iac/config"
+	"github.com/snyk/driftctl/pkg/iac/config"
 )
 
 type FileEnumeratorConfig struct {

@@ -3,7 +3,7 @@
 package common
 
 import (
-	resource "github.com/cloudskiff/driftctl/pkg/resource"
+	resource "github.com/snyk/driftctl/pkg/resource"
 	mock "github.com/stretchr/testify/mock"
 )
 

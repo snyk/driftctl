@@ -3,8 +3,8 @@ package middlewares
 import (
 	"github.com/sirupsen/logrus"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // Explodes policy found in aws_s3_bucket.policy from state resources to dedicated resources

@@ -14,19 +14,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
-	cmderrors "github.com/cloudskiff/driftctl/pkg/cmd/errors"
 	"github.com/eapache/go-resiliency/retrier"
 	"github.com/pkg/errors"
+	"github.com/snyk/driftctl/pkg/analyser"
+	cmderrors "github.com/snyk/driftctl/pkg/cmd/errors"
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/cloudskiff/driftctl/test"
+	"github.com/snyk/driftctl/test"
 
 	"github.com/spf13/cobra"
 
-	"github.com/cloudskiff/driftctl/logger"
-	"github.com/cloudskiff/driftctl/pkg/cmd"
+	"github.com/snyk/driftctl/logger"
+	"github.com/snyk/driftctl/pkg/cmd"
 
 	"github.com/hashicorp/terraform-exec/tfexec"
 	"github.com/hashicorp/terraform-exec/tfinstall"

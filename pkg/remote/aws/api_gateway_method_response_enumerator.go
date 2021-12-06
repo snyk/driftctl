@@ -3,10 +3,10 @@ package aws
 import (
 	"strings"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/pkg/remote/aws/repository"
+	remoteerror "github.com/snyk/driftctl/pkg/remote/error"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 type ApiGatewayMethodResponseEnumerator struct {

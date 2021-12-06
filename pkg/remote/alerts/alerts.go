@@ -3,10 +3,10 @@ package alerts
 import (
 	"fmt"
 
-	"github.com/cloudskiff/driftctl/pkg/alerter"
-	"github.com/cloudskiff/driftctl/pkg/remote/common"
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/pkg/remote/common"
+	remoteerror "github.com/snyk/driftctl/pkg/remote/error"
 )
 
 type ScanningPhase int

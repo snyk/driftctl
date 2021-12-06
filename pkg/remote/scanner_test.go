@@ -3,10 +3,10 @@ package remote
 import (
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/alerter"
-	"github.com/cloudskiff/driftctl/pkg/filter"
-	"github.com/cloudskiff/driftctl/pkg/remote/common"
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/pkg/filter"
+	"github.com/snyk/driftctl/pkg/remote/common"
+	"github.com/snyk/driftctl/pkg/resource"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,12 +1,12 @@
 package analyser
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/filter"
-	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
 	"github.com/r3labs/diff/v2"
+	"github.com/snyk/driftctl/pkg/filter"
+	resourceaws "github.com/snyk/driftctl/pkg/resource/aws"
 
-	"github.com/cloudskiff/driftctl/pkg/alerter"
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 type UnmanagedSecurityGroupRulesAlert struct{}

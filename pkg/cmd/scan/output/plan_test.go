@@ -8,8 +8,8 @@ import (
 	"path"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/test/goldenfile"
+	"github.com/snyk/driftctl/pkg/analyser"
+	"github.com/snyk/driftctl/test/goldenfile"
 	"github.com/stretchr/testify/assert"
 )
 

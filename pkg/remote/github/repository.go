@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/shurcooL/githubv4"
+	"github.com/snyk/driftctl/pkg/remote/cache"
 	"golang.org/x/oauth2"
 )
 

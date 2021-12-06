@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
-	"github.com/cloudskiff/driftctl/pkg/remote/google/config"
+	"github.com/snyk/driftctl/pkg/remote/cache"
+	"github.com/snyk/driftctl/pkg/remote/google/config"
 	"google.golang.org/api/cloudresourcemanager/v1"
 )
 

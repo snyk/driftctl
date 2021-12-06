@@ -10,8 +10,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/test/goldenfile"
+	"github.com/snyk/driftctl/pkg/analyser"
+	"github.com/snyk/driftctl/test/goldenfile"
 )
 
 func TestJSON_Write(t *testing.T) {

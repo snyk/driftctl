@@ -1,4 +1,4 @@
-module github.com/cloudskiff/driftctl
+module github.com/snyk/driftctl
 
 go 1.16
 

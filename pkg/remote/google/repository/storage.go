@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"cloud.google.com/go/storage"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	"github.com/snyk/driftctl/pkg/remote/cache"
 )
 
 type StorageRepository interface {

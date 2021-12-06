@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/mocks"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/pkg/errors"
 	"github.com/shurcooL/githubv4"
+	"github.com/snyk/driftctl/mocks"
+	"github.com/snyk/driftctl/pkg/remote/cache"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

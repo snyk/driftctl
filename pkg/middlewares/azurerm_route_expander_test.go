@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/azurerm"
-	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/r3labs/diff/v2"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/azurerm"
+	"github.com/snyk/driftctl/pkg/terraform"
 )
 
 func TestAzurermRouteExpander_Execute(t *testing.T) {
