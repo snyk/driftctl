@@ -1277,3 +1277,174 @@ func Test_ec2Repository_ListAllNetworkACLs(t *testing.T) {
 		})
 	}
 }
+
+func Test_ec2Repository_DescribeLaunchTemplates(t *testing.T) {
+
+	testErr := errors.New("test")
+
+	tests := []struct {
+		name    string
+		mocks   func(client *awstest.MockFakeEC2)
+		want    []*ec2.LaunchTemplate
+		wantErr error
+	}{
+		{
+			name: "List with 1 pages",
+			mocks: func(client *awstest.MockFakeEC2) {
+				client.On("DescribeLaunchTemplates",
+					&ec2.DescribeLaunchTemplatesInput{},
+				).Return(&ec2.DescribeLaunchTemplatesOutput{
+					LaunchTemplates: []*ec2.LaunchTemplate{
+						{
+							LaunchTemplateId: aws.String("id1"),
+						},
+						{
+							LaunchTemplateId: aws.String("id2"),
+						},
+					},
+				}, nil).Once()
+			},
+			want: []*ec2.LaunchTemplate{
+				{
+					LaunchTemplateId: aws.String("id1"),
+				},
+				{
+					LaunchTemplateId: aws.String("id2"),
+				},
+			},
+		},
+		{
+			name: "List return error",
+			mocks: func(client *awstest.MockFakeEC2) {
+				client.On("DescribeLaunchTemplates",
+					&ec2.DescribeLaunchTemplatesInput{},
+				).Return(nil, testErr)
+			},
+			wantErr: testErr,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
+			client := &awstest.MockFakeEC2{}
+			tt.mocks(client)
+			r := &ec2Repository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.DescribeLaunchTemplates()
+			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.DescribeLaunchTemplates()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*ec2.LaunchTemplate{}, store.Get("DescribeLaunchTemplates"))
+			}
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+			client.AssertExpectations(t)
+		})
+	}
+}
+
+func Test_ec2Repository_DescribeLaunchTemplateVersions(t *testing.T) {
+
+	testErr := errors.New("test")
+
+	tests := []struct {
+		name    string
+		tmpl    *ec2.LaunchTemplate
+		mocks   func(client *awstest.MockFakeEC2)
+		want    []*ec2.LaunchTemplateVersion
+		wantErr error
+	}{
+		{
+			name: "List with 1 pages",
+			tmpl: &ec2.LaunchTemplate{
+				LaunchTemplateId:    aws.String("id1"),
+				LatestVersionNumber: aws.Int64(1),
+			},
+			mocks: func(client *awstest.MockFakeEC2) {
+				client.On("DescribeLaunchTemplateVersions",
+					&ec2.DescribeLaunchTemplateVersionsInput{
+						LaunchTemplateId: aws.String("id1"),
+						Versions:         []*string{aws.String("1")},
+					},
+				).Return(&ec2.DescribeLaunchTemplateVersionsOutput{
+					LaunchTemplateVersions: []*ec2.LaunchTemplateVersion{
+						{
+							LaunchTemplateId: aws.String("id1"),
+						},
+						{
+							LaunchTemplateId: aws.String("id2"),
+						},
+					},
+				}, nil).Once()
+			},
+			want: []*ec2.LaunchTemplateVersion{
+				{
+					LaunchTemplateId: aws.String("id1"),
+				},
+				{
+					LaunchTemplateId: aws.String("id2"),
+				},
+			},
+		},
+		{
+			name: "List return error",
+			tmpl: &ec2.LaunchTemplate{
+				LaunchTemplateId:    aws.String("id1"),
+				LatestVersionNumber: aws.Int64(1),
+			},
+			mocks: func(client *awstest.MockFakeEC2) {
+				client.On("DescribeLaunchTemplateVersions",
+					&ec2.DescribeLaunchTemplateVersionsInput{
+						LaunchTemplateId: aws.String("id1"),
+						Versions:         []*string{aws.String("1")},
+					},
+				).Return(nil, testErr)
+			},
+			wantErr: testErr,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
+			client := &awstest.MockFakeEC2{}
+			tt.mocks(client)
+			r := &ec2Repository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.DescribeLaunchTemplateVersions(tt.tmpl)
+			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.DescribeLaunchTemplateVersions(tt.tmpl)
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*ec2.LaunchTemplateVersion{}, store.Get("DescribeLaunchTemplateVersions_id1"))
+			}
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+			client.AssertExpectations(t)
+		})
+	}
+}

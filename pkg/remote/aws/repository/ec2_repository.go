@@ -1,6 +1,9 @@
 package repository
 
 import (
+	"fmt"
+	"strconv"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -23,6 +26,8 @@ type EC2Repository interface {
 	ListAllVPCs() ([]*ec2.Vpc, []*ec2.Vpc, error)
 	ListAllSecurityGroups() ([]*ec2.SecurityGroup, []*ec2.SecurityGroup, error)
 	ListAllNetworkACLs() ([]*ec2.NetworkAcl, error)
+	DescribeLaunchTemplates() ([]*ec2.LaunchTemplate, error)
+	DescribeLaunchTemplateVersions(*ec2.LaunchTemplate) ([]*ec2.LaunchTemplateVersion, error)
 }
 
 type ec2Repository struct {
@@ -373,4 +378,41 @@ func (r *ec2Repository) ListAllNetworkACLs() ([]*ec2.NetworkAcl, error) {
 
 	r.cache.Put(cacheKey, ACLs)
 	return ACLs, nil
+}
+
+func (r *ec2Repository) DescribeLaunchTemplates() ([]*ec2.LaunchTemplate, error) {
+	cacheKey := "DescribeLaunchTemplates"
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*ec2.LaunchTemplate), nil
+	}
+
+	input := ec2.DescribeLaunchTemplatesInput{}
+	resp, err := r.client.DescribeLaunchTemplates(&input)
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put(cacheKey, resp.LaunchTemplates)
+	return resp.LaunchTemplates, nil
+}
+
+func (r *ec2Repository) DescribeLaunchTemplateVersions(tmpl *ec2.LaunchTemplate) ([]*ec2.LaunchTemplateVersion, error) {
+	cacheKey := fmt.Sprintf("DescribeLaunchTemplateVersions_%s", *tmpl.LaunchTemplateId)
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*ec2.LaunchTemplateVersion), nil
+	}
+
+	version := strconv.Itoa(int(*tmpl.LatestVersionNumber))
+
+	input := ec2.DescribeLaunchTemplateVersionsInput{
+		LaunchTemplateId: tmpl.LaunchTemplateId,
+		Versions:         []*string{&version},
+	}
+	resp, err := r.client.DescribeLaunchTemplateVersions(&input)
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put(cacheKey, resp.LaunchTemplateVersions)
+	return resp.LaunchTemplateVersions, nil
 }
