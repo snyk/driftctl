@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/google"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/google"
 )
 
 // Some service accounts are created by default when activating APIs, this middleware will filter them unless they are managed.

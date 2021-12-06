@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const AwsIamPolicyAttachmentResourceType = "aws_iam_policy_attachment"

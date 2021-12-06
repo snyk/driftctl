@@ -6,9 +6,9 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/pkg/terraform"
 
 	"github.com/r3labs/diff/v2"
 )

@@ -4,7 +4,7 @@ package github
 import (
 	"encoding/base64"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const GithubBranchProtectionResourceType = "github_branch_protection"

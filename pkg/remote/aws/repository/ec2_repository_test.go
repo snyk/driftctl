@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
 	"github.com/pkg/errors"
+	"github.com/snyk/driftctl/pkg/remote/cache"
+	awstest "github.com/snyk/driftctl/test/aws"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/aws/aws-sdk-go/service/ec2"

@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/cloudskiff/driftctl/pkg/helpers"
-	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/hashicorp/terraform/flatmap"
 	"github.com/hashicorp/terraform/helper/hashcode"
+	"github.com/snyk/driftctl/pkg/helpers"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const AwsSecurityGroupRuleResourceType = "aws_security_group_rule"

@@ -3,14 +3,14 @@ package azurerm
 import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
-	"github.com/cloudskiff/driftctl/pkg/alerter"
-	"github.com/cloudskiff/driftctl/pkg/output"
-	"github.com/cloudskiff/driftctl/pkg/remote/azurerm/repository"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
-	"github.com/cloudskiff/driftctl/pkg/remote/common"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/azurerm"
-	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/pkg/output"
+	"github.com/snyk/driftctl/pkg/remote/azurerm/repository"
+	"github.com/snyk/driftctl/pkg/remote/cache"
+	"github.com/snyk/driftctl/pkg/remote/common"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/azurerm"
+	"github.com/snyk/driftctl/pkg/terraform"
 )
 
 func Init(

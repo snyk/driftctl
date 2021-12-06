@@ -1,6 +1,6 @@
 package google
 
-import "github.com/cloudskiff/driftctl/pkg/resource"
+import "github.com/snyk/driftctl/pkg/resource"
 
 const GoogleProjectIamMemberResourceType = "google_project_iam_member"
 

@@ -5,14 +5,14 @@ import (
 
 	asset "cloud.google.com/go/asset/apiv1"
 	"cloud.google.com/go/storage"
-	"github.com/cloudskiff/driftctl/pkg/alerter"
-	"github.com/cloudskiff/driftctl/pkg/output"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
-	"github.com/cloudskiff/driftctl/pkg/remote/common"
-	"github.com/cloudskiff/driftctl/pkg/remote/google/repository"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/google"
-	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/pkg/output"
+	"github.com/snyk/driftctl/pkg/remote/cache"
+	"github.com/snyk/driftctl/pkg/remote/common"
+	"github.com/snyk/driftctl/pkg/remote/google/repository"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/google"
+	"github.com/snyk/driftctl/pkg/terraform"
 	"google.golang.org/api/cloudresourcemanager/v1"
 )
 

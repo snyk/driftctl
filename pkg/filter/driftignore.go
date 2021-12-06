@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/go-git/go-git/v5/plumbing/format/gitignore"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const separator = "_-_"

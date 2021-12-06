@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/cloudskiff/driftctl/test"
-	"github.com/cloudskiff/driftctl/test/acceptance"
-	"github.com/cloudskiff/driftctl/test/acceptance/awsutils"
+	"github.com/snyk/driftctl/test"
+	"github.com/snyk/driftctl/test/acceptance"
+	"github.com/snyk/driftctl/test/acceptance/awsutils"
 )
 
 func TestAcc_StateReader_WithMultipleStatesInDirectory(t *testing.T) {

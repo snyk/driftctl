@@ -1,10 +1,10 @@
 package google
 
 import (
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	"github.com/cloudskiff/driftctl/pkg/remote/google/repository"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/google"
+	remoteerror "github.com/snyk/driftctl/pkg/remote/error"
+	"github.com/snyk/driftctl/pkg/remote/google/repository"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/google"
 )
 
 type GoogleStorageBucketEnumerator struct {

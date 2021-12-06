@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	asset "cloud.google.com/go/asset/apiv1"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
-	"github.com/cloudskiff/driftctl/pkg/remote/google/config"
+	"github.com/snyk/driftctl/pkg/remote/cache"
+	"github.com/snyk/driftctl/pkg/remote/google/config"
 	"google.golang.org/api/iterator"
 	assetpb "google.golang.org/genproto/googleapis/cloud/asset/v1"
 )

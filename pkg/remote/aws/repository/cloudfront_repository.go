@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudfront"
 	"github.com/aws/aws-sdk-go/service/cloudfront/cloudfrontiface"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	"github.com/snyk/driftctl/pkg/remote/cache"
 )
 
 type CloudfrontRepository interface {

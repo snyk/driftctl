@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
+	awstest "github.com/snyk/driftctl/test/aws"
 
 	"github.com/aws/aws-sdk-go/service/s3"
 

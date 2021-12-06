@@ -1,8 +1,8 @@
 package common
 
 import (
-	tf "github.com/cloudskiff/driftctl/pkg/terraform"
-	"github.com/cloudskiff/driftctl/pkg/terraform/lock"
+	tf "github.com/snyk/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/pkg/terraform/lock"
 )
 
 type RemoteParameter string

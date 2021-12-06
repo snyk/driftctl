@@ -1,6 +1,6 @@
 package aws
 
-import "github.com/cloudskiff/driftctl/pkg/resource"
+import "github.com/snyk/driftctl/pkg/resource"
 
 const AwsIamRolePolicyAttachmentResourceType = "aws_iam_role_policy_attachment"
 

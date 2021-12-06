@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/hashicorp/terraform/helper/hashcode"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const AwsNetworkACLRuleResourceType = "aws_network_acl_rule"

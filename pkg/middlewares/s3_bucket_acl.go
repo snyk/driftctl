@@ -3,8 +3,8 @@ package middlewares
 import (
 	"github.com/sirupsen/logrus"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // Remove grant field on remote resources when acl field != private in state

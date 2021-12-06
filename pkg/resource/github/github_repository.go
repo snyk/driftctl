@@ -1,6 +1,6 @@
 package github
 
-import "github.com/cloudskiff/driftctl/pkg/resource"
+import "github.com/snyk/driftctl/pkg/resource"
 
 const GithubRepositoryResourceType = "github_repository"
 

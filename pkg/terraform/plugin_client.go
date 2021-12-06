@@ -3,8 +3,8 @@ package terraform
 import (
 	"os/exec"
 
-	"github.com/cloudskiff/driftctl/logger"
 	tfplugin "github.com/hashicorp/terraform/plugin"
+	"github.com/snyk/driftctl/logger"
 
 	"github.com/hashicorp/go-plugin"
 	"github.com/hashicorp/terraform/plugin/discovery"

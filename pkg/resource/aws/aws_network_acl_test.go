@@ -3,8 +3,8 @@ package aws_test
 import (
 	"testing"
 
-	"github.com/cloudskiff/driftctl/test"
-	"github.com/cloudskiff/driftctl/test/acceptance"
+	"github.com/snyk/driftctl/test"
+	"github.com/snyk/driftctl/test/acceptance"
 )
 
 // This test cover both aws_network_acl and `aws_network_acl_rule`

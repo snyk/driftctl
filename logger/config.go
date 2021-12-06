@@ -1,8 +1,8 @@
 package logger
 
 import (
-	"github.com/cloudskiff/driftctl/build"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/build"
 	"github.com/spf13/viper"
 )
 

@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/iac/config"
+	"github.com/snyk/driftctl/pkg/iac/config"
 	"github.com/stretchr/testify/assert"
 )
 

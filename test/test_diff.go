@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/terraform"
-	"github.com/cloudskiff/driftctl/test/goldenfile"
 	"github.com/r3labs/diff/v2"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/test/goldenfile"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 	"github.com/zclconf/go-cty/cty/json"

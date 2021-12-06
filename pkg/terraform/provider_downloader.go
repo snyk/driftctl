@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"os"
 
-	error2 "github.com/cloudskiff/driftctl/pkg/terraform/error"
 	"github.com/hashicorp/go-getter"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	error2 "github.com/snyk/driftctl/pkg/terraform/error"
 )
 
 type ProviderDownloaderInterface interface {

@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/google"
 	"github.com/r3labs/diff/v2"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/google"
 )
 
 func TestGoogleDefaultIAMMember_Execute(t *testing.T) {

@@ -1,16 +1,16 @@
 package remote
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/alerter"
-	"github.com/cloudskiff/driftctl/pkg/output"
-	"github.com/cloudskiff/driftctl/pkg/remote/aws"
-	"github.com/cloudskiff/driftctl/pkg/remote/azurerm"
-	"github.com/cloudskiff/driftctl/pkg/remote/common"
-	"github.com/cloudskiff/driftctl/pkg/remote/github"
-	"github.com/cloudskiff/driftctl/pkg/remote/google"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/terraform"
 	"github.com/pkg/errors"
+	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/pkg/output"
+	"github.com/snyk/driftctl/pkg/remote/aws"
+	"github.com/snyk/driftctl/pkg/remote/azurerm"
+	"github.com/snyk/driftctl/pkg/remote/common"
+	"github.com/snyk/driftctl/pkg/remote/github"
+	"github.com/snyk/driftctl/pkg/remote/google"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/terraform"
 )
 
 var supportedRemotes = []string{

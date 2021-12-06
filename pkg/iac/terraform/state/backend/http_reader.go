@@ -1,9 +1,9 @@
 package backend
 
 import (
-	pkghttp "github.com/cloudskiff/driftctl/pkg/http"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	pkghttp "github.com/snyk/driftctl/pkg/http"
 
 	"io"
 	"net/http"

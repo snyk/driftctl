@@ -3,8 +3,8 @@ package aws
 import (
 	"strconv"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/hashicorp/terraform/flatmap"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const AwsCloudformationStackResourceType = "aws_cloudformation_stack"

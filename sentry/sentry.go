@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"reflect"
 
-	cmderrors "github.com/cloudskiff/driftctl/pkg/cmd/errors"
-	"github.com/cloudskiff/driftctl/pkg/version"
 	gosentry "github.com/getsentry/sentry-go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	cmderrors "github.com/snyk/driftctl/pkg/cmd/errors"
+	"github.com/snyk/driftctl/pkg/version"
 )
 
 var excludedErrorTypes = []error{

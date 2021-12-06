@@ -6,12 +6,12 @@ import (
 	"github.com/aws/aws-sdk-go/service/route53"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/cloudskiff/driftctl/pkg/analyser"
-	awsresources "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	"github.com/cloudskiff/driftctl/test"
-	"github.com/cloudskiff/driftctl/test/acceptance"
-	"github.com/cloudskiff/driftctl/test/acceptance/awsutils"
 	"github.com/r3labs/diff/v2"
+	"github.com/snyk/driftctl/pkg/analyser"
+	awsresources "github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/test"
+	"github.com/snyk/driftctl/test/acceptance"
+	"github.com/snyk/driftctl/test/acceptance/awsutils"
 )
 
 func TestAcc_AwsRoute53HealthCheck(t *testing.T) {

@@ -3,9 +3,9 @@ package middlewares
 import (
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/pkg/terraform"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -5,15 +5,15 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/alerter"
-	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/pkg/output"
-	"github.com/cloudskiff/driftctl/pkg/remote/alerts"
-	"github.com/cloudskiff/driftctl/pkg/remote/common"
-	remoteerr "github.com/cloudskiff/driftctl/pkg/remote/error"
-	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/pkg/errors"
 	"github.com/r3labs/diff/v2"
+	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/pkg/analyser"
+	"github.com/snyk/driftctl/pkg/output"
+	"github.com/snyk/driftctl/pkg/remote/alerts"
+	"github.com/snyk/driftctl/pkg/remote/common"
+	remoteerr "github.com/snyk/driftctl/pkg/remote/error"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 func fakeAnalysis(opts analyser.AnalyzerOptions) *analyser.Analysis {

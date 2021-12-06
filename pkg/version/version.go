@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"runtime"
 
-	"github.com/cloudskiff/driftctl/build"
+	"github.com/snyk/driftctl/build"
 
 	goversion "github.com/hashicorp/go-version"
 	"github.com/sirupsen/logrus"

@@ -3,15 +3,15 @@ package aws_test
 import (
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/test"
+	"github.com/snyk/driftctl/pkg/analyser"
+	"github.com/snyk/driftctl/test"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	awsresources "github.com/cloudskiff/driftctl/pkg/resource/aws"
-	"github.com/cloudskiff/driftctl/test/acceptance"
-	"github.com/cloudskiff/driftctl/test/acceptance/awsutils"
 	"github.com/r3labs/diff/v2"
+	awsresources "github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/test/acceptance"
+	"github.com/snyk/driftctl/test/acceptance/awsutils"
 )
 
 func TestAcc_AwsInstance(t *testing.T) {

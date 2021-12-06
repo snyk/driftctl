@@ -3,8 +3,8 @@ package sentry
 import (
 	"testing"
 
-	cmderrors "github.com/cloudskiff/driftctl/pkg/cmd/errors"
 	"github.com/pkg/errors"
+	cmderrors "github.com/snyk/driftctl/pkg/cmd/errors"
 )
 
 func Test_shouldCaptureException(t *testing.T) {

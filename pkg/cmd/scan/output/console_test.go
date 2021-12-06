@@ -8,13 +8,13 @@ import (
 	"path"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	"github.com/cloudskiff/driftctl/test/goldenfile"
-	testresource "github.com/cloudskiff/driftctl/test/resource"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/test/goldenfile"
+	testresource "github.com/snyk/driftctl/test/resource"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
+	"github.com/snyk/driftctl/pkg/analyser"
 )
 
 func TestConsole_Write(t *testing.T) {

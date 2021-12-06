@@ -5,8 +5,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/cloudskiff/driftctl/pkg/iac/config"
 	"github.com/pkg/errors"
+	"github.com/snyk/driftctl/pkg/iac/config"
 )
 
 var supportedBackends = []string{

@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	remoteerror "github.com/cloudskiff/driftctl/pkg/remote/error"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	resourceaws "github.com/cloudskiff/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/pkg/remote/aws/repository"
+	remoteerror "github.com/snyk/driftctl/pkg/remote/error"
+	"github.com/snyk/driftctl/pkg/resource"
+	resourceaws "github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 type IamRolePolicyAttachmentEnumerator struct {

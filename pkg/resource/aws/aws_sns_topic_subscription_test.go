@@ -4,12 +4,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
-	"github.com/cloudskiff/driftctl/test"
-	"github.com/cloudskiff/driftctl/test/acceptance"
-	"github.com/cloudskiff/driftctl/test/acceptance/awsutils"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/remote/aws/repository"
+	"github.com/snyk/driftctl/pkg/remote/cache"
+	"github.com/snyk/driftctl/test"
+	"github.com/snyk/driftctl/test/acceptance"
+	"github.com/snyk/driftctl/test/acceptance/awsutils"
 )
 
 func TestAcc_AwsSNSTopicSubscription(t *testing.T) {

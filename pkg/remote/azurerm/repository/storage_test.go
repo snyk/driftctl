@@ -6,8 +6,8 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/armstorage"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/pkg/errors"
+	"github.com/snyk/driftctl/pkg/remote/cache"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

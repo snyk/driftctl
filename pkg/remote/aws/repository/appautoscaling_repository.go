@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/applicationautoscaling"
 	"github.com/aws/aws-sdk-go/service/applicationautoscaling/applicationautoscalingiface"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	"github.com/snyk/driftctl/pkg/remote/cache"
 )
 
 type AppAutoScalingRepository interface {

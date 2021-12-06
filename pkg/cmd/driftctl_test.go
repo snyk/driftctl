@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/config"
-	"github.com/cloudskiff/driftctl/test"
-	"github.com/cloudskiff/driftctl/test/mocks"
+	"github.com/snyk/driftctl/pkg/config"
+	"github.com/snyk/driftctl/test"
+	"github.com/snyk/driftctl/test/mocks"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )

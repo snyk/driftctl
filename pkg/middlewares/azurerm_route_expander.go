@@ -3,8 +3,8 @@ package middlewares
 import (
 	"strings"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/azurerm"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/azurerm"
 )
 
 // Explodes routes found in azurerm_route_table.route from state resources to dedicated resources

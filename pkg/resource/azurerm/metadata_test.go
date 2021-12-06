@@ -3,9 +3,9 @@ package azurerm
 import (
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	tf "github.com/cloudskiff/driftctl/pkg/terraform"
-	testresource "github.com/cloudskiff/driftctl/test/resource"
+	"github.com/snyk/driftctl/pkg/resource"
+	tf "github.com/snyk/driftctl/pkg/terraform"
+	testresource "github.com/snyk/driftctl/test/resource"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -3,8 +3,8 @@ package aws
 import (
 	"fmt"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/hashicorp/terraform/helper/hashcode"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const AwsRouteResourceType = "aws_route"

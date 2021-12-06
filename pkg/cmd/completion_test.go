@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/test"
+	"github.com/snyk/driftctl/test"
 
 	"github.com/spf13/cobra"
 )

@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/pkg/errors"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 func TestIacChainSupplier_Resources(t *testing.T) {

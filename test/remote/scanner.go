@@ -1,7 +1,7 @@
 package remote
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 type SortableScanner struct {

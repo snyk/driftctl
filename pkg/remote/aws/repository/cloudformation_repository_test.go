@@ -6,8 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
+	"github.com/snyk/driftctl/pkg/remote/cache"
+	awstest "github.com/snyk/driftctl/test/aws"
 
 	"github.com/stretchr/testify/mock"
 

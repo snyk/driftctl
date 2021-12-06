@@ -1,15 +1,15 @@
 package aws
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/alerter"
-	"github.com/cloudskiff/driftctl/pkg/output"
-	"github.com/cloudskiff/driftctl/pkg/remote/aws/client"
-	"github.com/cloudskiff/driftctl/pkg/remote/aws/repository"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
-	"github.com/cloudskiff/driftctl/pkg/remote/common"
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/aws"
-	"github.com/cloudskiff/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/pkg/output"
+	"github.com/snyk/driftctl/pkg/remote/aws/client"
+	"github.com/snyk/driftctl/pkg/remote/aws/repository"
+	"github.com/snyk/driftctl/pkg/remote/cache"
+	"github.com/snyk/driftctl/pkg/remote/common"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/pkg/terraform"
 )
 
 /**

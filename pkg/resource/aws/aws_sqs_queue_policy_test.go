@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/cloudskiff/driftctl/test"
-	"github.com/cloudskiff/driftctl/test/acceptance/awsutils"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/test"
+	"github.com/snyk/driftctl/test/acceptance/awsutils"
 
-	"github.com/cloudskiff/driftctl/test/acceptance"
+	"github.com/snyk/driftctl/test/acceptance"
 )
 
 func TestAcc_AwsSQSQueuePolicy(t *testing.T) {

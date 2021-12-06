@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
+	"github.com/snyk/driftctl/pkg/analyser"
 )
 
 const JSONOutputType = "json"

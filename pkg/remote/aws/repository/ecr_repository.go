@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
+	"github.com/snyk/driftctl/pkg/remote/cache"
 )
 
 type ECRRepository interface {

@@ -7,8 +7,8 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/cloudskiff/driftctl/mocks"
-	terraformError "github.com/cloudskiff/driftctl/pkg/terraform/error"
+	"github.com/snyk/driftctl/mocks"
+	terraformError "github.com/snyk/driftctl/pkg/terraform/error"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/stretchr/testify/assert"

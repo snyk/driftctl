@@ -3,7 +3,7 @@ package aws
 import (
 	"fmt"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const AwsRoute53HealthCheckResourceType = "aws_route53_health_check"

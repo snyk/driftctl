@@ -3,8 +3,8 @@ package middlewares
 import (
 	"fmt"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 type Chain []Middleware

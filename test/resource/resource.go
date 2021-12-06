@@ -1,9 +1,9 @@
 package resource
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/test/schemas"
 	"github.com/hashicorp/terraform/providers"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/test/schemas"
 )
 
 func InitFakeSchemaRepository(provider, version string) resource.SchemaRepositoryInterface {

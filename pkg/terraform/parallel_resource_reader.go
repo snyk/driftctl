@@ -1,7 +1,7 @@
 package terraform
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/parallel"
+	"github.com/snyk/driftctl/pkg/parallel"
 
 	"github.com/zclconf/go-cty/cty"
 )

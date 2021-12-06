@@ -6,12 +6,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
 	"github.com/r3labs/diff/v2"
+	"github.com/snyk/driftctl/pkg/resource"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/cloudskiff/driftctl/pkg/analyser"
-	"github.com/cloudskiff/driftctl/test/goldenfile"
+	"github.com/snyk/driftctl/pkg/analyser"
+	"github.com/snyk/driftctl/test/goldenfile"
 )
 
 func TestHTML_Write(t *testing.T) {

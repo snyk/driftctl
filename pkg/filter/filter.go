@@ -1,6 +1,6 @@
 package filter
 
-import "github.com/cloudskiff/driftctl/pkg/resource"
+import "github.com/snyk/driftctl/pkg/resource"
 
 type Filter interface {
 	IsTypeIgnored(ty resource.ResourceType) bool

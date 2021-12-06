@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	pkghttp "github.com/cloudskiff/driftctl/pkg/http"
+	pkghttp "github.com/snyk/driftctl/pkg/http"
 	"github.com/stretchr/testify/assert"
 )
 

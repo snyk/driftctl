@@ -4,10 +4,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cloudskiff/driftctl/build"
-	"github.com/cloudskiff/driftctl/pkg"
-	"github.com/cloudskiff/driftctl/sentry"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/build"
+	"github.com/snyk/driftctl/pkg"
+	"github.com/snyk/driftctl/sentry"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"

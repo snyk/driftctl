@@ -1,8 +1,8 @@
 package aws
 
 import (
-	"github.com/cloudskiff/driftctl/pkg/helpers"
-	"github.com/cloudskiff/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/helpers"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const AwsSnsTopicSubscriptionResourceType = "aws_sns_topic_subscription"

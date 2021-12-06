@@ -9,8 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/aws/aws-sdk-go/service/kms/kmsiface"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/remote/cache"
 )
 
 type KMSRepository interface {

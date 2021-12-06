@@ -3,8 +3,8 @@ package middlewares
 import (
 	"fmt"
 
-	"github.com/cloudskiff/driftctl/pkg/resource"
-	"github.com/cloudskiff/driftctl/pkg/resource/google"
+	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/google"
 )
 
 // GoogleStorageBucketIAMBindingTransformer Transforms Bucket IAM binding in bucket iam member to ease comparison.

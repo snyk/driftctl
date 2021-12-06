@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	alerter "github.com/cloudskiff/driftctl/pkg/alerter"
+	alerter "github.com/snyk/driftctl/pkg/alerter"
 	mock "github.com/stretchr/testify/mock"
 )
 

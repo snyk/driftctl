@@ -3,9 +3,9 @@ package repository
 import (
 	"testing"
 
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
-	"github.com/cloudskiff/driftctl/pkg/remote/google/config"
-	"github.com/cloudskiff/driftctl/test/google"
+	"github.com/snyk/driftctl/pkg/remote/cache"
+	"github.com/snyk/driftctl/pkg/remote/google/config"
+	"github.com/snyk/driftctl/test/google"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	assetpb "google.golang.org/genproto/googleapis/cloud/asset/v1"
