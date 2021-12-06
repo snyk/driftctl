@@ -82,7 +82,7 @@ func TestDriftctlCmd_Scan(t *testing.T) {
 			env: map[string]string{
 				"DCTL_FROM": "test",
 			},
-			err: fmt.Errorf("Unable to parse from flag 'test': \nAccepted schemes are: tfstate://,tfstate+s3://,tfstate+http://,tfstate+https://,tfstate+tfcloud://"),
+			err: fmt.Errorf("Unable to parse from flag 'test': \nAccepted schemes are: tfstate://,tfstate+s3://,tfstate+http://,tfstate+https://,tfstate+tfcloud://,tfstate+gs://"),
 		},
 		{
 			env: map[string]string{
