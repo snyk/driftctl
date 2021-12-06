@@ -2,7 +2,7 @@ project_name: driftctl
 dist: bin
 release:
     github:
-        owner: cloudskiff
+        owner: snyk
         name: driftctl
     draft: false
     prerelease: auto

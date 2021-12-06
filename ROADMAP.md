@@ -32,4 +32,4 @@ This roadmap does not describe all the work that will be included within this ti
 
 ## Disclosures
 
-The product-development initiatives in this document reflect Cloudskiff's current plans and are subject to change and/or cancellation in Cloudskiff's sole discretion.
+The product-development initiatives in this document reflect Snyk's current plans and are subject to change and/or cancellation in Snyk's sole discretion.

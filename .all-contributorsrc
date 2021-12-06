@@ -6,7 +6,7 @@
   "contributorsPerLine": 8,
   "commit": false,
   "projectName": "driftctl",
-  "projectOwner": "cloudskiff",
+  "projectOwner": "snyk",
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true,

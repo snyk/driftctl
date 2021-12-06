@@ -3,17 +3,17 @@
 </p>
 
 <p align="center">
-  <img src="https://circleci.com/gh/cloudskiff/driftctl.svg?style=shield"/>
-  <img src="https://goreportcard.com/badge/github.com/cloudskiff/driftctl"/>
-  <img src="https://img.shields.io/github/license/cloudskiff/driftctl">
-  <img src="https://img.shields.io/github/v/release/cloudskiff/driftctl">
-  <img src="https://img.shields.io/github/go-mod/go-version/cloudskiff/driftctl">
-  <img src="https://img.shields.io/github/downloads/cloudskiff/driftctl/total.svg"/>
-  <a href="https://codecov.io/gh/cloudskiff/driftctl">
-    <img src="https://codecov.io/gh/cloudskiff/driftctl/branch/main/graph/badge.svg?token=8C5R02G5S7"/>
+  <img src="https://circleci.com/gh/snyk/driftctl.svg?style=shield"/>
+  <img src="https://goreportcard.com/badge/github.com/snyk/driftctl"/>
+  <img src="https://img.shields.io/github/license/snyk/driftctl">
+  <img src="https://img.shields.io/github/v/release/snyk/driftctl">
+  <img src="https://img.shields.io/github/go-mod/go-version/snyk/driftctl">
+  <img src="https://img.shields.io/github/downloads/snyk/driftctl/total.svg"/>
+  <a href="https://codecov.io/gh/snyk/driftctl">
+    <img src="https://codecov.io/gh/snyk/driftctl/branch/main/graph/badge.svg?token=8C5R02G5S7"/>
   </a>
-  <img src="https://img.shields.io/docker/pulls/cloudskiff/driftctl"/>
-  <img src="https://img.shields.io/docker/image-size/cloudskiff/driftctl"/>
+  <img src="https://img.shields.io/docker/pulls/snyk/driftctl"/>
+  <img src="https://img.shields.io/docker/image-size/snyk/driftctl"/>
   <a href="https://discord.gg/NMCBxtD7Nd">
     <img src="https://img.shields.io/discord/783720783469871124?color=%237289da&label=discord&logo=discord"/>
   </a>
