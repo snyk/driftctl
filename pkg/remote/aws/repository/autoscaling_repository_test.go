@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/autoscaling"
-	"github.com/cloudskiff/driftctl/pkg/remote/cache"
-	awstest "github.com/cloudskiff/driftctl/test/aws"
+	"github.com/snyk/driftctl/pkg/remote/cache"
+	awstest "github.com/snyk/driftctl/test/aws"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/aws/aws-sdk-go/aws"
