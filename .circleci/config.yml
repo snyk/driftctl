@@ -95,7 +95,7 @@ jobs:
           name: "Ensure GnuPG is available"
           command: gpg --version
       - run:
-          name: "Import cloudskiff signing key"
+          name: "Import signing key"
           command: |
             echo ${SIGNINGKEY} | base64 -d | gpg --import
       - run:
@@ -149,7 +149,7 @@ jobs:
       - run:
           name: "Update Lambda version"
           command: |
-              wget "https://github.com/cloudskiff/lambda-env-updater/releases/download/v1.0.0/lambda-env-updater_linux_amd64" && chmod +x lambda-env-updater_linux_amd64
+              wget "https://github.com/snyk/lambda-env-updater/releases/download/v1.0.0/lambda-env-updater_linux_amd64" && chmod +x lambda-env-updater_linux_amd64
               ./lambda-env-updater_linux_amd64\
                 -name ${FUNCTION_NAME}\
                 -env "LATEST_VERSION=${CIRCLE_TAG}"
@@ -255,8 +255,8 @@ workflows:
               ignore: /.*/
       - release:
           context:
-              - driftctl
-              - cloudskiff-signing
+              - driftctl-snyk
+              - driftctl-signing
           requires:
               - lint
               - test
