@@ -8,6 +8,7 @@ import (
 )
 
 func TestAcc_Google_ComputeNodeGroup(t *testing.T) {
+	t.Skip("Skipping acc test for Google_ComputeNodeGroup due to pricing of the sole tenant resources")
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/google_compute_node_group"},
