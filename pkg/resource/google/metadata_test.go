@@ -30,6 +30,7 @@ func TestGoogle_Metadata_Flags(t *testing.T) {
 		GoogleBigTableInstanceResourceType:        {},
 		GoogleComputeGlobalAddressResourceType:    {},
 		GoogleCloudRunServiceResourceType:         {},
+		GoogleComputeNodeGroupResourceType:        {},
 	}
 
 	schemaRepository := testresource.InitFakeSchemaRepository(tf.GOOGLE, "3.78.0")

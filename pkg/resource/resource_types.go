@@ -181,6 +181,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"google_compute_image":           {},
 	"google_compute_health_check":    {},
 	"google_compute_global_address":  {},
+	"google_compute_node_group":      {},
 	"google_cloud_run_service":       {},
 
 	"azurerm_storage_account":   {},

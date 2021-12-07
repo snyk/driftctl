@@ -380,6 +380,29 @@ func (_m *MockAssetRepository) SearchAllNetworks() ([]*asset.ResourceSearchResul
 	return r0, r1
 }
 
+// SearchAllNodeGroups provides a mock function with given fields:
+func (_m *MockAssetRepository) SearchAllNodeGroups() ([]*asset.Asset, error) {
+	ret := _m.Called()
+
+	var r0 []*asset.Asset
+	if rf, ok := ret.Get(0).(func() []*asset.Asset); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*asset.Asset)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // SearchAllRouters provides a mock function with given fields:
 func (_m *MockAssetRepository) SearchAllRouters() ([]*asset.ResourceSearchResult, error) {
 	ret := _m.Called()
