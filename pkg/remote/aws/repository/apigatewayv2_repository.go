@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/apigatewayv2"
 	"github.com/aws/aws-sdk-go/service/apigatewayv2/apigatewayv2iface"
@@ -10,6 +12,7 @@ import (
 type ApiGatewayV2Repository interface {
 	ListAllApis() ([]*apigatewayv2.Api, error)
 	ListAllVpcLinks() ([]*apigatewayv2.VpcLink, error)
+	ListAllApiAuthorizers(string) ([]*apigatewayv2.Authorizer, error)
 }
 
 type apigatewayv2Repository struct {
@@ -26,8 +29,8 @@ func NewApiGatewayV2Repository(session *session.Session, c cache.Cache) *apigate
 
 func (r *apigatewayv2Repository) ListAllApis() ([]*apigatewayv2.Api, error) {
 	cacheKey := "apigatewayv2ListAllApis"
-	v := r.cache.Get(cacheKey)
-
+	v := r.cache.GetAndLock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
 	if v != nil {
 		return v.([]*apigatewayv2.Api), nil
 	}
@@ -54,5 +57,23 @@ func (r *apigatewayv2Repository) ListAllVpcLinks() ([]*apigatewayv2.VpcLink, err
 	}
 
 	r.cache.Put("apigatewayv2ListAllVpcLinks", resources.Items)
+	return resources.Items, nil
+}
+
+func (r *apigatewayv2Repository) ListAllApiAuthorizers(apiId string) ([]*apigatewayv2.Authorizer, error) {
+	cacheKey := fmt.Sprintf("apigatewayv2ListAllApiAuthorizers_api_%s", apiId)
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*apigatewayv2.Authorizer), nil
+	}
+
+	input := apigatewayv2.GetAuthorizersInput{
+		ApiId: &apiId,
+	}
+	resources, err := r.client.GetAuthorizers(&input)
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put(cacheKey, resources.Items)
 	return resources.Items, nil
 }
