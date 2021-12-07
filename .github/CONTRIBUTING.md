@@ -106,6 +106,12 @@ Because of this, prior to working on a system covered by acceptance tests it's i
 
 More details on acceptance on the [contributing guide](../docs/README.md)
 
+## Generated Code
+
+Some files in the driftctl codebase are generated (resources DTO).
+Generation is done by an external tool that read schemas from terraform providers and output golang structures with proper tags.
+Currently, we have not open-sourced it, but we plan to do it very soon as it will save us lots of time when adding new resources.
+
 ## External Dependencies
 
 Terraform uses Go Modules for dependency management.
