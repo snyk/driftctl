@@ -23,6 +23,7 @@ type EC2Repository interface {
 	ListAllVPCs() ([]*ec2.Vpc, []*ec2.Vpc, error)
 	ListAllSecurityGroups() ([]*ec2.SecurityGroup, []*ec2.SecurityGroup, error)
 	ListAllNetworkACLs() ([]*ec2.NetworkAcl, error)
+	DescribeLaunchTemplates() ([]*ec2.LaunchTemplate, error)
 }
 
 type ec2Repository struct {
@@ -373,4 +374,20 @@ func (r *ec2Repository) ListAllNetworkACLs() ([]*ec2.NetworkAcl, error) {
 
 	r.cache.Put(cacheKey, ACLs)
 	return ACLs, nil
+}
+
+func (r *ec2Repository) DescribeLaunchTemplates() ([]*ec2.LaunchTemplate, error) {
+	cacheKey := "DescribeLaunchTemplates"
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*ec2.LaunchTemplate), nil
+	}
+
+	input := ec2.DescribeLaunchTemplatesInput{}
+	resp, err := r.client.DescribeLaunchTemplates(&input)
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put(cacheKey, resp.LaunchTemplates)
+	return resp.LaunchTemplates, nil
 }

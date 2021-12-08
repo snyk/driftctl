@@ -2714,3 +2714,103 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 		})
 	}
 }
+
+func TestEC2LaunchTemplate(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
+		wantErr error
+	}{
+		{
+			test:    "no launch template",
+			dirName: "aws_launch_template",
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("DescribeLaunchTemplates").Return([]*ec2.LaunchTemplate{}, nil)
+			},
+		},
+		{
+			test:    "multiple launch templates",
+			dirName: "aws_launch_template_multiple",
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
+				launchTemplates := []*ec2.LaunchTemplate{
+					{LaunchTemplateId: awssdk.String("lt-0ed993d09ce6afc67"), LatestVersionNumber: awssdk.Int64(1)},
+					{LaunchTemplateId: awssdk.String("lt-00b2d18c6cee7fe23"), LatestVersionNumber: awssdk.Int64(1)},
+				}
+
+				repository.On("DescribeLaunchTemplates").Return(launchTemplates, nil)
+			},
+		},
+		{
+			test:    "cannot list launch templates",
+			dirName: "aws_launch_template",
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("DescribeLaunchTemplates").Return(nil, awsError)
+
+				alerter.On("SendAlert", resourceaws.AwsLaunchTemplateResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLaunchTemplateResourceType, resourceaws.AwsLaunchTemplateResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: nil,
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewLaunchTemplateEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsLaunchTemplateResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsLaunchTemplateResourceType, provider, deserializer))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsLaunchTemplateResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+		})
+	}
+}
