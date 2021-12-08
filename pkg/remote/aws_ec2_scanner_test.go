@@ -2739,22 +2739,6 @@ func TestEC2LaunchTemplate(t *testing.T) {
 				}
 
 				repository.On("DescribeLaunchTemplates").Return(launchTemplates, nil)
-
-				repository.On("DescribeLaunchTemplateVersions", launchTemplates[0]).Return([]*ec2.LaunchTemplateVersion{
-					{
-						LaunchTemplateData: &ec2.ResponseLaunchTemplateData{
-							CreditSpecification: &ec2.CreditSpecification{CpuCredits: awssdk.String("standard")},
-						},
-					},
-				}, nil).Once()
-
-				repository.On("DescribeLaunchTemplateVersions", launchTemplates[1]).Return([]*ec2.LaunchTemplateVersion{
-					{
-						LaunchTemplateData: &ec2.ResponseLaunchTemplateData{
-							CreditSpecification: &ec2.CreditSpecification{CpuCredits: awssdk.String("standard")},
-						},
-					},
-				}, nil).Once()
 			},
 		},
 		{
@@ -2767,24 +2751,6 @@ func TestEC2LaunchTemplate(t *testing.T) {
 				alerter.On("SendAlert", resourceaws.AwsLaunchTemplateResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLaunchTemplateResourceType, resourceaws.AwsLaunchTemplateResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
-		},
-		{
-			test:    "cannot list launch template versions",
-			dirName: "aws_launch_template",
-			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
-
-				launchTemplates := []*ec2.LaunchTemplate{
-					{LaunchTemplateId: awssdk.String("lt-0ed993d09ce6afc67"), LatestVersionNumber: awssdk.Int64(1)},
-					{LaunchTemplateId: awssdk.String("lt-00b2d18c6cee7fe23"), LatestVersionNumber: awssdk.Int64(1)},
-				}
-
-				repository.On("DescribeLaunchTemplates").Return(launchTemplates, nil)
-
-				repository.On("DescribeLaunchTemplateVersions", launchTemplates[0]).Return(nil, awsError).Once()
-
-				alerter.On("SendAlert", resourceaws.AwsLaunchTemplateResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLaunchTemplateResourceType, resourceaws.AwsLaunchTemplateResourceType), alerts.EnumerationPhase)).Return()
-			},
 		},
 	}
 
