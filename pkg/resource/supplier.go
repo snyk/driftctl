@@ -5,6 +5,12 @@ type Supplier interface {
 	Resources() ([]*Resource, error)
 }
 
+type RemoteSupplier interface {
+	Supplier
+	EnumerateResources() ([]*Resource, error)
+	ReadResources([]*Resource) ([]*Resource, error)
+}
+
 type StoppableSupplier interface {
 	Supplier
 	Stop()

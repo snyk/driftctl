@@ -37,7 +37,7 @@ type ScanOptions struct {
 }
 
 type DriftCTL struct {
-	remoteSupplier           resource.Supplier
+	remoteSupplier           resource.RemoteSupplier
 	iacSupplier              resource.Supplier
 	alerter                  alerter.AlerterInterface
 	analyzer                 *analyser.Analyzer
@@ -49,7 +49,7 @@ type DriftCTL struct {
 	store                    memstore.Store
 }
 
-func NewDriftCTL(remoteSupplier resource.Supplier,
+func NewDriftCTL(remoteSupplier resource.RemoteSupplier,
 	iacSupplier resource.Supplier,
 	alerter *alerter.Alerter,
 	analyzer *analyser.Analyzer,
@@ -75,7 +75,7 @@ func NewDriftCTL(remoteSupplier resource.Supplier,
 
 func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	start := time.Now()
-	remoteResources, resourcesFromState, err := d.scan()
+	remoteResources, resourcesFromState, err := d.enumerateResources()
 	if err != nil {
 		return nil, err
 	}
@@ -149,10 +149,22 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		}
 	}
 
-	analysis, err := d.analyzer.Analyze(remoteResources, resourcesFromState)
+	analysis := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: d.opts.Deep})
+	analysis = d.analyzer.CompareEnumeration(analysis, remoteResources, resourcesFromState)
 	if err != nil {
 		return nil, err
 	}
+
+	managedResources, err := d.readResources(analysis.Managed())
+	if err != nil {
+		return nil, err
+	}
+
+	analysis = d.analyzer.CompleteAnalysis(analysis, managedResources, resourcesFromState)
+
+	// Sort resources by Terraform Id
+	// The purpose is to have a predictable output
+	analysis.SortResources()
 
 	analysis.Duration = time.Since(start)
 	analysis.Date = time.Now()
@@ -161,7 +173,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	d.store.Bucket(memstore.TelemetryBucket).Set("total_managed", analysis.Summary().TotalManaged)
 	d.store.Bucket(memstore.TelemetryBucket).Set("duration", uint(analysis.Duration.Seconds()+0.5))
 
-	return &analysis, nil
+	return analysis, nil
 }
 
 func (d DriftCTL) Stop() {
@@ -179,7 +191,7 @@ func (d DriftCTL) Stop() {
 	}
 }
 
-func (d DriftCTL) scan() (remoteResources []*resource.Resource, resourcesFromState []*resource.Resource, err error) {
+func (d DriftCTL) enumerateResources() (remoteResources []*resource.Resource, resourcesFromState []*resource.Resource, err error) {
 	logrus.Info("Start reading IaC")
 	d.iacProgress.Start()
 	resourcesFromState, err = d.iacSupplier.Resources()
@@ -188,13 +200,20 @@ func (d DriftCTL) scan() (remoteResources []*resource.Resource, resourcesFromSta
 		return nil, nil, err
 	}
 
-	logrus.Info("Start scanning cloud provider")
+	logrus.Info("Start enumerating cloud provider resources")
 	d.scanProgress.Start()
 	defer d.scanProgress.Stop()
-	remoteResources, err = d.remoteSupplier.Resources()
+	remoteResources, err = d.remoteSupplier.EnumerateResources()
 	if err != nil {
 		return nil, nil, err
 	}
 
 	return remoteResources, resourcesFromState, err
+}
+
+func (d DriftCTL) readResources(managedResources []*resource.Resource) ([]*resource.Resource, error) {
+	logrus.WithField("count", len(managedResources)).Info("Fetching details of managed resources")
+	d.scanProgress.Start()
+	defer d.scanProgress.Stop()
+	return d.remoteSupplier.ReadResources(managedResources)
 }

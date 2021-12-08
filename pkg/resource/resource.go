@@ -318,3 +318,12 @@ func (a *Attributes) sanitize(path string, original, copy reflect.Value) bool {
 	}
 	return true
 }
+
+func FindCorrespondingRes(resources []*Resource, res *Resource) (int, *Resource, bool) {
+	for i, r := range resources {
+		if res.Equal(r) {
+			return i, r, true
+		}
+	}
+	return -1, nil, false
+}
