@@ -179,6 +179,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "App autoscaling scheduled action", dirName: "aws_appautoscaling_scheduled_action", wantErr: false},
 		{name: "App gateway v2 vpc link", dirName: "apigatewayv2_vpc_link", wantErr: false},
 		{name: "Launch template", dirName: "aws_launch_template", wantErr: false},
+		{name: "Launch configuration", dirName: "aws_launch_configuration", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
