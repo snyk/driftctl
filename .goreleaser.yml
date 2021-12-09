@@ -6,9 +6,15 @@ release:
         name: driftctl
     draft: false
     prerelease: auto
+    extra_files:
+        - glob: ./acknowledgements.tar.gz
 before:
     hooks:
         - go generate ./...
+        - go install github.com/google/go-licenses@latest
+        - go-licenses save . --save_path=./acknowledgements
+        - tar -cvf ./acknowledgements.tar.gz -C ./acknowledgements .
+        - rm -rf ./acknowledgements
 signs:
     - signature: "${artifact}.gpg"
       artifacts: checksum
