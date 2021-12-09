@@ -3,11 +3,23 @@
 # Please note that this script only work with Github repositories.
 # Prerequisites: git, github cli
 
-GHCLI_BIN="ghcli"
-REPO="cloudskiff/driftctl"
+GHCLI_BIN="gh"
+REPO="snyk/driftctl"
 LATEST_TAG=$(git describe --abbrev=0) # Get the least created tag
-DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
+DEFAULT_BRANCH=origin/HEAD
 BASE=$DEFAULT_BRANCH # Change this if you don't want to use the default branch as base
+
+# Check GH cli is installed
+if ! which $GHCLI_BIN &> /dev/null; then
+    echo "GitHub CLI ($GHCLI_BIN) is not installed, visit https://github.com/cli/cli#installation"
+    exit 1
+fi
+
+# Check GH authentication
+if ! $GHCLI_BIN auth status &> /dev/null; then
+    echo "You are not logged into any GitHub hosts. Run gh auth login to authenticate."
+    exit 1
+fi
 
 # Compare $BASE branch with the latest tag
 # Keep IDs of merged pull requests
@@ -44,5 +56,3 @@ for change in "${CHANGES[@]}"; do
         echo $change | sed "s/\[map\[$PARTITION_COLUMN.*//"
     fi
 done
-
-exit 0
