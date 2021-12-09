@@ -204,6 +204,7 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewApiGatewayIntegrationResponseEnumerator(apigatewayRepository, factory))
 
 	remoteLibrary.AddEnumerator(NewApiGatewayV2ApiEnumerator(apigatewayv2Repository, factory))
+	remoteLibrary.AddEnumerator(NewApiGatewayV2RouteEnumerator(apigatewayv2Repository, factory))
 	remoteLibrary.AddEnumerator(NewApiGatewayV2VpcLinkEnumerator(apigatewayv2Repository, factory))
 	remoteLibrary.AddEnumerator(NewApiGatewayV2AuthorizerEnumerator(apigatewayv2Repository, factory))
 
