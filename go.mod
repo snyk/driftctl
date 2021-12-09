@@ -26,7 +26,7 @@ require (
 	github.com/hashicorp/go-getter v1.5.3
 	github.com/hashicorp/go-hclog v0.9.2
 	github.com/hashicorp/go-plugin v1.3.0
-	github.com/hashicorp/go-tfe v0.8.1
+	github.com/hashicorp/go-tfe v0.20.0
 	github.com/hashicorp/go-version v1.3.0
 	github.com/hashicorp/hcl/v2 v2.7.2
 	github.com/hashicorp/terraform v0.14.0

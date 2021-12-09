@@ -61,6 +61,29 @@ func (_m *StateVersions) Current(ctx context.Context, workspaceID string) (*tfe.
 	return r0, r1
 }
 
+// CurrentWithOptions provides a mock function with given fields: ctx, workspaceID, options
+func (_m *StateVersions) CurrentWithOptions(ctx context.Context, workspaceID string, options *tfe.StateVersionCurrentOptions) (*tfe.StateVersion, error) {
+	ret := _m.Called(ctx, workspaceID, options)
+
+	var r0 *tfe.StateVersion
+	if rf, ok := ret.Get(0).(func(context.Context, string, *tfe.StateVersionCurrentOptions) *tfe.StateVersion); ok {
+		r0 = rf(ctx, workspaceID, options)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*tfe.StateVersion)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, *tfe.StateVersionCurrentOptions) error); ok {
+		r1 = rf(ctx, workspaceID, options)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Download provides a mock function with given fields: ctx, url
 func (_m *StateVersions) Download(ctx context.Context, url string) ([]byte, error) {
 	ret := _m.Called(ctx, url)
@@ -107,6 +130,29 @@ func (_m *StateVersions) List(ctx context.Context, options tfe.StateVersionListO
 	return r0, r1
 }
 
+// Outputs provides a mock function with given fields: ctx, svID, options
+func (_m *StateVersions) Outputs(ctx context.Context, svID string, options tfe.StateVersionOutputsListOptions) ([]*tfe.StateVersionOutput, error) {
+	ret := _m.Called(ctx, svID, options)
+
+	var r0 []*tfe.StateVersionOutput
+	if rf, ok := ret.Get(0).(func(context.Context, string, tfe.StateVersionOutputsListOptions) []*tfe.StateVersionOutput); ok {
+		r0 = rf(ctx, svID, options)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*tfe.StateVersionOutput)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, tfe.StateVersionOutputsListOptions) error); ok {
+		r1 = rf(ctx, svID, options)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Read provides a mock function with given fields: ctx, svID
 func (_m *StateVersions) Read(ctx context.Context, svID string) (*tfe.StateVersion, error) {
 	ret := _m.Called(ctx, svID)
@@ -123,6 +169,29 @@ func (_m *StateVersions) Read(ctx context.Context, svID string) (*tfe.StateVersi
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
 		r1 = rf(ctx, svID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ReadWithOptions provides a mock function with given fields: ctx, svID, options
+func (_m *StateVersions) ReadWithOptions(ctx context.Context, svID string, options *tfe.StateVersionReadOptions) (*tfe.StateVersion, error) {
+	ret := _m.Called(ctx, svID, options)
+
+	var r0 *tfe.StateVersion
+	if rf, ok := ret.Get(0).(func(context.Context, string, *tfe.StateVersionReadOptions) *tfe.StateVersion); ok {
+		r0 = rf(ctx, svID, options)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*tfe.StateVersion)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, *tfe.StateVersionReadOptions) error); ok {
+		r1 = rf(ctx, svID, options)
 	} else {
 		r1 = ret.Error(1)
 	}
