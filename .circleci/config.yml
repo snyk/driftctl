@@ -4,6 +4,11 @@ only_branches: &only_branches
     branches:
       ignore:
         - main
+only_maintainers: &only_maintainers
+  filters:
+    branches:
+      # Forked pull requests have CIRCLE_BRANCH set to pull/XXX
+      ignore: /pull\/[0-9]+/
 orbs:
   go: circleci/go@1.5.0
   codecov: codecov/codecov@3.1.0
@@ -201,18 +206,16 @@ workflows:
           <<: *only_branches
       - test:
           <<: *only_branches
-# Disabled since it fail for contributors because of the snyk token stored in a private context
-#      - security-code:
-#          name: Snyk code
-#          context:
-#            - snyk
-#          <<: *only_branches
-#      - security-oss:
-#          name: Snyk test
-#          context:
-#            - snyk
-#          <<: *only_branches
-
+      - security-code:
+          name: Snyk code
+          context:
+            - driftctl-snyk
+          <<: *only_maintainers
+      - security-oss:
+          name: Snyk test
+          context:
+            - driftctl-snyk
+          <<: *only_maintainers
 # Disabled since it makes every PR to stay in "pending" state
 # https://ideas.circleci.com/cloud-feature-requests/p/show-overall-all-checks-have-passed-status-in-github-even-on-builds-with-incompl
 #  pullrequest_acc:
