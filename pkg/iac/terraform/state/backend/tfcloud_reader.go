@@ -1,16 +1,16 @@
 package backend
 
 import (
-	"encoding/json"
-	"fmt"
+	"bytes"
+	"context"
 	"io"
-	"io/ioutil"
-	"net/http"
+	"net/url"
 	"os"
+	"regexp"
+	"strings"
 
+	tfe "github.com/hashicorp/go-tfe"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	pkghttp "github.com/snyk/driftctl/pkg/http"
 )
 
 const BackendKeyTFCloud = "tfcloud"
@@ -28,72 +28,103 @@ type TFCloudBody struct {
 }
 
 type TFCloudBackend struct {
-	request *http.Request
-	client  pkghttp.HTTPClient
-	reader  io.ReadCloser
-	opts    *Options
+	client        *tfe.Client
+	reader        io.ReadCloser
+	opts          *Options
+	workspacePath string
 }
 
-func NewTFCloudReader(client pkghttp.HTTPClient, workspaceId string, opts *Options) (*TFCloudBackend, error) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/workspaces/%s/current-state-version", opts.TFCloudEndpoint, workspaceId), nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("Content-Type", "application/vnd.api+json")
-	return &TFCloudBackend{req, client, nil, opts}, nil
+func NewTFCloudReader(workspacePath string, opts *Options) *TFCloudBackend {
+	return &TFCloudBackend{opts: opts, workspacePath: workspacePath}
 }
 
-func (t *TFCloudBackend) authorize() error {
+func (t *TFCloudBackend) getToken() (string, error) {
 	token := t.opts.TFCloudToken
 	if token == "" {
 		tfConfigFile, err := getTerraformConfigFile()
 		if err != nil {
-			return err
+			return "", err
 		}
+
 		file, err := os.Open(tfConfigFile)
 		if err != nil {
-			return err
+			return "", err
 		}
 		defer file.Close()
 		reader := NewTFCloudConfigReader(file)
-		token, err = reader.GetToken(t.request.URL.Host)
+
+		u, err := url.Parse(t.opts.TFCloudEndpoint)
 		if err != nil {
-			return err
+			return "", err
 		}
+		return reader.GetToken(u.Host)
 	}
-	t.request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+	return token, nil
+}
+
+// A regular expression used to validate string workspace ID patterns.
+var reStringID = regexp.MustCompile(`^ws-[a-zA-Z0-9\-\._]+$`)
+
+// isValidWorkspaceID checks if the given input is present and non-empty.
+func isValidWorkspaceID(v string) bool {
+	return v != "" && reStringID.MatchString(v)
+}
+
+func (t *TFCloudBackend) getWorkspaceId() (string, error) {
+	if isValidWorkspaceID(t.workspacePath) {
+		return t.workspacePath, nil
+	}
+	workspacePath := strings.Split(t.workspacePath, "/")
+	if len(workspacePath) != 2 {
+		return "", errors.New("unable to parse terraform cloud workspace, it should be either a workspace id (ws-xxxxx) or a {org}/{workspaceName}")
+	}
+	workspace, err := t.client.Workspaces.Read(context.Background(), workspacePath[0], workspacePath[1])
+	if err != nil {
+		return "", errors.Errorf("unable to read terraform workspace id: %s", err.Error())
+	}
+	return workspace.ID, nil
+}
+
+func (t *TFCloudBackend) initTFEClient() error {
+	token, err := t.getToken()
+	if err != nil {
+		return err
+	}
+	config := &tfe.Config{
+		Token:   token,
+		Address: t.opts.TFCloudEndpoint,
+	}
+	tfcClient, err := tfe.NewClient(config)
+	if err != nil {
+		return err
+	}
+	t.client = tfcClient
 	return nil
 }
 
 func (t *TFCloudBackend) Read(p []byte) (n int, err error) {
 	if t.reader == nil {
-		if err := t.authorize(); err != nil {
-			return 0, err
+		if t.client == nil {
+			if err := t.initTFEClient(); err != nil {
+				return 0, err
+			}
 		}
-		res, err := t.client.Do(t.request)
+
+		workspaceId, err := t.getWorkspaceId()
 		if err != nil {
 			return 0, err
 		}
 
-		if res.StatusCode < 200 || res.StatusCode >= 400 {
-			return 0, errors.Errorf("error requesting terraform cloud backend state: status code: %d", res.StatusCode)
-		}
-
-		body := TFCloudBody{}
-		bodyBytes, _ := ioutil.ReadAll(res.Body)
-		err = json.Unmarshal(bodyBytes, &body)
+		stateVersion, err := t.client.StateVersions.Current(context.Background(), workspaceId)
 		if err != nil {
-			return 0, err
+			return 0, errors.Errorf("unable to read current state version: %s", err.Error())
 		}
 
-		rawURL := body.Data.Attributes.HostedStateDownloadUrl
-		logrus.WithFields(logrus.Fields{"hosted-state-download-url": rawURL}).Trace("Terraform Cloud backend response")
-
-		h, err := NewHTTPReader(t.client, rawURL, &Options{})
+		state, err := t.client.StateVersions.Download(context.Background(), stateVersion.DownloadURL)
 		if err != nil {
-			return 0, err
+			return 0, errors.Errorf("unable to download current state content: %s", err.Error())
 		}
-		t.reader = h
+		t.reader = io.NopCloser(bytes.NewReader(state))
 	}
 	return t.reader.Read(p)
 }
