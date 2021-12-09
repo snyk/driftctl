@@ -32,6 +32,7 @@ Thank you to all the people who have already contributed to driftctl.
     <td align="center"><a href="https://github.com/cbowman0"><img src="https://avatars.githubusercontent.com/u/1764481?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Christopher Bowman</b></sub></a><br /><a href="https://github.com/snyk/driftctl/commits?author=cbowman0" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/karniwl"><img src="https://avatars.githubusercontent.com/u/42895464?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Karni Wolf</b></sub></a><br /><a href="https://github.com/snyk/driftctl/commits?author=karniwl" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/smaftoul"><img src="https://avatars.githubusercontent.com/u/239203?v=4?s=80" width="80px;" alt=""/><br /><sub><b>smaftoul</b></sub></a><br /><a href="https://github.com/snyk/driftctl/commits?author=smaftoul" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/p0tr3c"><img src="https://avatars.githubusercontent.com/u/12850042?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Kamil Potrec</b></sub></a><br /><a href="https://github.com/snyk/driftctl/commits?author=p0tr3c" title="Code">💻</a></td>
   </tr>
 </table>
 
