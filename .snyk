@@ -3,8 +3,101 @@ version: v1.22.1
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
   SNYK-GOLANG-GITHUBCOMDGRIJALVAJWTGO-596515:
-    - 'github.com/Azure/go-autorest/autorest/azure@0.11.3 > github.com/Azure/go-autorest/autorest@0.11.3 > github.com/Azure/go-autorest/autorest/adal@0.9.0 > github.com/dgrijalva/jwt-go@3.2.0':
-        reason: "This vuln is ignored since it is related to JWT in azure SDK and we are not concerned by this code"
+    - github.com/Azure/go-autorest/autorest/azure@0.11.3 > github.com/Azure/go-autorest/autorest@0.11.3 > github.com/Azure/go-autorest/autorest/adal@0.9.0 > github.com/dgrijalva/jwt-go@3.2.0:
+        reason: >-
+          This vuln is ignored since it is related to JWT in azure SDK and we
+          are not concerned by this code
         expires: 2030-12-22T16:25:33.572Z
         created: 2030-11-22T16:25:33.580Z
+  'snyk:lic:golang:github.com:hashicorp:go-checkpoint:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:go-cleanhttp:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:go-getter:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:go-multierror:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:go-plugin:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:go-retryablehttp:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:go-safetemp:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:go-slug:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:go-tfe:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:go-uuid:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:go-version:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:hcl:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:hcl:v2:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:terraform-json:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:terraform-svchost:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:yamux:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:r3labs:diff:v2:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
+  'snyk:lic:golang:github.com:hashicorp:errwrap:MPL-2.0':
+    - '*':
+        reason: >-
+          This license is addressed by including acknowledgments in each release
+        created: 2021-12-09T16:40:21.832Z
 patch: {}
+
