@@ -312,3 +312,82 @@ func Test_apigatewayv2Repository_ListAllApiAuthorizers(t *testing.T) {
 		})
 	}
 }
+
+func Test_apigatewayv2Repository_ListAllApiIntegrations(t *testing.T) {
+	api := &apigatewayv2.Api{
+		ApiId: aws.String("api1"),
+	}
+
+	apiIntegrations := []*apigatewayv2.Integration{
+		{IntegrationId: aws.String("integration1")},
+		{IntegrationId: aws.String("integration2")},
+		{IntegrationId: aws.String("integration3")},
+		{IntegrationId: aws.String("integration4")},
+	}
+
+	remoteError := errors.New("remote error")
+
+	tests := []struct {
+		name    string
+		mocks   func(client *awstest.MockFakeApiGatewayV2, store *cache.MockCache)
+		want    []*apigatewayv2.Integration
+		wantErr error
+	}{
+		{
+			name: "list multiple api integrations",
+			mocks: func(client *awstest.MockFakeApiGatewayV2, store *cache.MockCache) {
+				client.On("GetIntegrations",
+					&apigatewayv2.GetIntegrationsInput{
+						ApiId: aws.String("api1"),
+					}).Return(&apigatewayv2.GetIntegrationsOutput{Items: apiIntegrations}, nil).Once()
+
+				store.On("Get", "apigatewayv2ListAllApiIntegrations_api_api1").Return(nil).Times(1)
+				store.On("Put", "apigatewayv2ListAllApiIntegrations_api_api1", apiIntegrations).Return(false).Times(1)
+			},
+			want: apiIntegrations,
+		},
+		{
+			name: "should hit cache",
+			mocks: func(client *awstest.MockFakeApiGatewayV2, store *cache.MockCache) {
+				store.On("Get", "apigatewayv2ListAllApiIntegrations_api_api1").Return(apiIntegrations).Times(1)
+			},
+			want: apiIntegrations,
+		},
+		{
+			name: "should return remote error",
+			mocks: func(client *awstest.MockFakeApiGatewayV2, store *cache.MockCache) {
+				client.On("GetIntegrations",
+					&apigatewayv2.GetIntegrationsInput{
+						ApiId: aws.String("api1"),
+					}).Return(nil, remoteError).Once()
+
+				store.On("Get", "apigatewayv2ListAllApiIntegrations_api_api1").Return(nil).Times(1)
+			},
+			wantErr: remoteError,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := &cache.MockCache{}
+			client := &awstest.MockFakeApiGatewayV2{}
+			tt.mocks(client, store)
+			r := &apigatewayv2Repository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.ListAllApiIntegrations(*api.ApiId)
+			assert.Equal(t, tt.wantErr, err)
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+			store.AssertExpectations(t)
+			client.AssertExpectations(t)
+		})
+	}
+}
