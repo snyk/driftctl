@@ -18,6 +18,7 @@ import (
 	"github.com/snyk/driftctl/sentry"
 )
 
+// Test
 func init() {
 	_ = godotenv.Load(".env.local")
 	_ = godotenv.Load() // The Original .env
