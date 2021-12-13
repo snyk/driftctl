@@ -34,7 +34,7 @@ func CheckLatest() string {
 
 	client := &http.Client{}
 
-	req, _ := http.NewRequest("GET", "https://2lvzgmrf2e.execute-api.eu-west-3.amazonaws.com/version", nil)
+	req, _ := http.NewRequest("GET", "https://telemetry.driftctl.com/version", nil)
 	req.Header.Set("driftctl-version", Current())
 	req.Header.Set("driftctl-os", runtime.GOOS)
 	req.Header.Set("driftctl-arch", runtime.GOARCH)

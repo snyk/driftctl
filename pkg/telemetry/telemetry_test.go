@@ -104,7 +104,7 @@ func TestSendTelemetry(t *testing.T) {
 			if tt.expectedBody != nil {
 				httpmock.RegisterResponder(
 					"POST",
-					"https://2lvzgmrf2e.execute-api.eu-west-3.amazonaws.com/telemetry",
+					"https://telemetry.driftctl.com/telemetry",
 					func(req *http.Request) (*http.Response, error) {
 
 						requestTelemetry := &telemetry{}
@@ -140,7 +140,7 @@ func TestTelemetryNotSend(t *testing.T) {
 
 	httpmock.RegisterResponder(
 		"POST",
-		"https://2lvzgmrf2e.execute-api.eu-west-3.amazonaws.com/telemetry",
+		"https://telemetry.driftctl.com/telemetry",
 		httpmock.NewErrorResponder(nil),
 	)
 	tl := NewTelemetry(mocks.MockBuild{UsageReporting: false})
