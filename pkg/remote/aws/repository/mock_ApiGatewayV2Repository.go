@@ -58,6 +58,29 @@ func (_m *MockApiGatewayV2Repository) ListAllApiDeployments(apiId *string) ([]*a
 	return r0, r1
 }
 
+// ListAllApiIntegrationResponses provides a mock function with given fields: _a0, _a1
+func (_m *MockApiGatewayV2Repository) ListAllApiIntegrationResponses(_a0 string, _a1 string) ([]*apigatewayv2.IntegrationResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 []*apigatewayv2.IntegrationResponse
+	if rf, ok := ret.Get(0).(func(string, string) []*apigatewayv2.IntegrationResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*apigatewayv2.IntegrationResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListAllApiIntegrations provides a mock function with given fields: _a0
 func (_m *MockApiGatewayV2Repository) ListAllApiIntegrations(_a0 string) ([]*apigatewayv2.Integration, error) {
 	ret := _m.Called(_a0)

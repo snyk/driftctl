@@ -1,0 +1,14 @@
+[
+ {
+  "Id": "sf67ti7",
+  "Type": "aws_apigatewayv2_integration_response",
+  "Attrs": {
+   "api_id": "yw28nwdf34",
+   "content_handling_strategy": "",
+   "id": "sf67ti7",
+   "integration_id": "fmezvlh",
+   "integration_response_key": "/200/",
+   "template_selection_expression": ""
+  }
+ }
+]

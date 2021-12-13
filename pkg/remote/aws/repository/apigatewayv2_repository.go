@@ -20,8 +20,8 @@ type ApiGatewayV2Repository interface {
 	ListAllApiStages(string) ([]*apigatewayv2.Stage, error)
 	ListAllApiRouteResponses(string, string) ([]*apigatewayv2.RouteResponse, error)
 	ListAllApiMappings(string) ([]*apigatewayv2.ApiMapping, error)
+	ListAllApiIntegrationResponses(string, string) ([]*apigatewayv2.IntegrationResponse, error)
 }
-
 type apigatewayv2Repository struct {
 	client apigatewayv2iface.ApiGatewayV2API
 	cache  cache.Cache
@@ -169,6 +169,24 @@ func (r *apigatewayv2Repository) ListAllApiStages(apiId string) ([]*apigatewayv2
 		return nil, err
 	}
 
+	r.cache.Put(cacheKey, resources.Items)
+	return resources.Items, nil
+}
+
+func (r *apigatewayv2Repository) ListAllApiIntegrationResponses(apiId, integrationId string) ([]*apigatewayv2.IntegrationResponse, error) {
+	cacheKey := fmt.Sprintf("apigatewayv2ListAllApiIntegrationResponses_api_%s_integration_%s", apiId, integrationId)
+	v := r.cache.Get(cacheKey)
+	if v != nil {
+		return v.([]*apigatewayv2.IntegrationResponse), nil
+	}
+	input := apigatewayv2.GetIntegrationResponsesInput{
+		ApiId:         &apiId,
+		IntegrationId: &integrationId,
+	}
+	resources, err := r.client.GetIntegrationResponses(&input)
+	if err != nil {
+		return nil, err
+	}
 	r.cache.Put(cacheKey, resources.Items)
 	return resources.Items, nil
 }
