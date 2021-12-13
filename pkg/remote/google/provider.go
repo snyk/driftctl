@@ -57,8 +57,9 @@ func (p *GCPTerraformProvider) Version() string {
 
 func (p *GCPTerraformProvider) GetConfig() config.GCPTerraformConfig {
 	return config.GCPTerraformConfig{
-		Project: os.Getenv("CLOUDSDK_CORE_PROJECT"),
-		Region:  os.Getenv("CLOUDSDK_COMPUTE_REGION"),
-		Zone:    os.Getenv("CLOUDSDK_COMPUTE_ZONE"),
+		Organization: os.Getenv("CLOUDSDK_ORGANIZATION"),
+		Project:      os.Getenv("CLOUDSDK_CORE_PROJECT"),
+		Region:       os.Getenv("CLOUDSDK_COMPUTE_REGION"),
+		Zone:         os.Getenv("CLOUDSDK_COMPUTE_ZONE"),
 	}
 }

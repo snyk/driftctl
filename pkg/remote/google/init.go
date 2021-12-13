@@ -99,6 +99,7 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewGoogleComputeHealthCheckEnumerator(assetRepository, factory))
 	remoteLibrary.AddEnumerator(NewGoogleCloudRunServiceEnumerator(assetRepository, factory))
 	remoteLibrary.AddEnumerator(NewGoogleComputeNodeGroupEnumerator(assetRepository, factory))
+	remoteLibrary.AddEnumerator(NewGoogleFolderEnumerator(assetRepository, factory))
 
 	err = resourceSchemaRepository.Init(terraform.GOOGLE, provider.Version(), provider.Schema())
 	if err != nil {
