@@ -17,6 +17,7 @@ type ApiGatewayV2Repository interface {
 	ListAllApiIntegrations(string) ([]*apigatewayv2.Integration, error)
 	ListAllApiModels(string) ([]*apigatewayv2.Model, error)
 	ListAllApiStages(string) ([]*apigatewayv2.Stage, error)
+	ListAllApiRouteResponses(string, string) ([]*apigatewayv2.RouteResponse, error)
 }
 
 type apigatewayv2Repository struct {
@@ -51,8 +52,8 @@ func (r *apigatewayv2Repository) ListAllApis() ([]*apigatewayv2.Api, error) {
 
 func (r *apigatewayv2Repository) ListAllApiRoutes(apiID *string) ([]*apigatewayv2.Route, error) {
 	cacheKey := fmt.Sprintf("apigatewayv2ListAllApiRoutes_api_%s", *apiID)
-	v := r.cache.Get(cacheKey)
-
+	v := r.cache.GetAndLock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
 	if v != nil {
 		return v.([]*apigatewayv2.Route), nil
 	}
@@ -150,6 +151,24 @@ func (r *apigatewayv2Repository) ListAllApiStages(apiId string) ([]*apigatewayv2
 		return nil, err
 	}
 
+	r.cache.Put(cacheKey, resources.Items)
+	return resources.Items, nil
+}
+
+func (r *apigatewayv2Repository) ListAllApiRouteResponses(apiId, routeId string) ([]*apigatewayv2.RouteResponse, error) {
+	cacheKey := fmt.Sprintf("apigatewayv2ListAllApiRouteResponses_api_%s_route_%s", apiId, routeId)
+	v := r.cache.Get(cacheKey)
+	if v != nil {
+		return v.([]*apigatewayv2.RouteResponse), nil
+	}
+	input := apigatewayv2.GetRouteResponsesInput{
+		ApiId:   &apiId,
+		RouteId: &routeId,
+	}
+	resources, err := r.client.GetRouteResponses(&input)
+	if err != nil {
+		return nil, err
+	}
 	r.cache.Put(cacheKey, resources.Items)
 	return resources.Items, nil
 }

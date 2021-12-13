@@ -671,3 +671,124 @@ func TestApiGatewayV2Stage(t *testing.T) {
 		})
 	}
 }
+
+func TestApiGatewayV2RouteResponse(t *testing.T) {
+	dummyError := errors.New("this is an error")
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockApiGatewayV2Repository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "no api gateway v2 route responses",
+			mocks: func(repository *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllApis").Return([]*apigatewayv2.Api{
+					{ApiId: awssdk.String("77ooqulkke")},
+				}, nil)
+				repository.On("ListAllApiRoutes", awssdk.String("77ooqulkke")).
+					Return([]*apigatewayv2.Route{
+						{RouteId: awssdk.String("liqc5u4")},
+					}, nil)
+				repository.On("ListAllApiRouteResponses", "77ooqulkke", "liqc5u4").
+					Return([]*apigatewayv2.RouteResponse{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "single api gateway v2 route with one route response",
+			mocks: func(repository *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllApis").Return([]*apigatewayv2.Api{
+					{ApiId: awssdk.String("77ooqulkke")},
+				}, nil)
+				repository.On("ListAllApiRoutes", awssdk.String("77ooqulkke")).
+					Return([]*apigatewayv2.Route{
+						{RouteId: awssdk.String("liqc5u4")},
+					}, nil)
+				repository.On("ListAllApiRouteResponses", "77ooqulkke", "liqc5u4").
+					Return([]*apigatewayv2.RouteResponse{
+						{RouteResponseId: awssdk.String("nbw7vw")},
+					}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+
+				assert.Equal(t, got[0].ResourceId(), "nbw7vw")
+				assert.Equal(t, got[0].ResourceType(), resourceaws.AwsApiGatewayV2RouteResponseResourceType)
+			},
+		},
+		{
+			test: "cannot list api gateway v2 apis",
+			mocks: func(repository *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllApis").Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayV2RouteResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayV2ApiResourceType, resourceaws.AwsApiGatewayV2RouteResponseResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayV2RouteResponseResourceType, resourceaws.AwsApiGatewayV2ApiResourceType),
+		},
+		{
+			test: "cannot list api gateway v2 routes",
+			mocks: func(repository *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllApis").Return([]*apigatewayv2.Api{
+					{ApiId: awssdk.String("77ooqulkke")},
+				}, nil)
+				repository.On("ListAllApiRoutes", awssdk.String("77ooqulkke")).Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayV2RouteResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayV2RouteResourceType, resourceaws.AwsApiGatewayV2RouteResponseResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayV2RouteResponseResourceType, resourceaws.AwsApiGatewayV2RouteResourceType),
+		},
+		{
+			test: "cannot list api gateway v2 route responses",
+			mocks: func(repository *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllApis").Return([]*apigatewayv2.Api{
+					{ApiId: awssdk.String("77ooqulkke")},
+				}, nil)
+				repository.On("ListAllApiRoutes", awssdk.String("77ooqulkke")).
+					Return([]*apigatewayv2.Route{
+						{RouteId: awssdk.String("liqc5u4")},
+					}, nil)
+				repository.On("ListAllApiRouteResponses", "77ooqulkke", "liqc5u4").Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayV2RouteResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayV2RouteResponseResourceType, resourceaws.AwsApiGatewayV2RouteResponseResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayV2RouteResponseResourceType, resourceaws.AwsApiGatewayV2RouteResponseResourceType),
+		},
+	}
+
+	providerVersion := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockApiGatewayV2Repository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.ApiGatewayV2Repository = fakeRepo
+
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayV2RouteResponseEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+		})
+	}
+}
