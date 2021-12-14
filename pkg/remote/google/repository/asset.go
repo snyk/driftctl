@@ -180,45 +180,47 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 }
 
 func (s assetRepository) searchAllOrgResources(ty string) ([]*assetpb.ResourceSearchResult, error) {
-
-	req := &assetpb.SearchAllResourcesRequest{
-		Scope: fmt.Sprintf("organizations/%s", s.config.Organization),
-		AssetTypes: []string{
-			resourcemanagerFolderAssetType,
-		},
-	}
-	var results []*assetpb.ResourceSearchResult
-
-	cacheKey := "SearchAllOrgResources"
-	cachedResults := s.cache.GetAndLock(cacheKey)
-	defer s.cache.Unlock(cacheKey)
-	if cachedResults != nil {
-		results = cachedResults.([]*assetpb.ResourceSearchResult)
-	}
-
-	if results == nil {
-		it := s.client.SearchAllResources(context.Background(), req)
-		for {
-			resource, err := it.Next()
-			if err == iterator.Done {
-				break
-			}
-			if err != nil {
-				return nil, err
-			}
-			results = append(results, resource)
+	if len(s.config.Organization) > 0 {
+		req := &assetpb.SearchAllResourcesRequest{
+			Scope: fmt.Sprintf("organizations/%s", s.config.Organization),
+			AssetTypes: []string{
+				resourcemanagerFolderAssetType,
+			},
 		}
-		s.cache.Put(cacheKey, results)
-	}
+		var results []*assetpb.ResourceSearchResult
 
-	filteredResults := []*assetpb.ResourceSearchResult{}
-	for _, result := range results {
-		if result.AssetType == ty {
-			filteredResults = append(filteredResults, result)
+		cacheKey := "SearchAllOrgResources"
+		cachedResults := s.cache.GetAndLock(cacheKey)
+		defer s.cache.Unlock(cacheKey)
+		if cachedResults != nil {
+			results = cachedResults.([]*assetpb.ResourceSearchResult)
 		}
-	}
 
-	return filteredResults, nil
+		if results == nil {
+			it := s.client.SearchAllResources(context.Background(), req)
+			for {
+				resource, err := it.Next()
+				if err == iterator.Done {
+					break
+				}
+				if err != nil {
+					return nil, err
+				}
+				results = append(results, resource)
+			}
+			s.cache.Put(cacheKey, results)
+		}
+
+		filteredResults := []*assetpb.ResourceSearchResult{}
+		for _, result := range results {
+			if result.AssetType == ty {
+				filteredResults = append(filteredResults, result)
+			}
+		}
+
+		return filteredResults, nil
+	}
+	return nil, nil
 }
 
 func (s assetRepository) SearchAllBuckets() ([]*assetpb.ResourceSearchResult, error) {

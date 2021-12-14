@@ -63,3 +63,12 @@ func (p *GCPTerraformProvider) GetConfig() config.GCPTerraformConfig {
 		Zone:         os.Getenv("CLOUDSDK_COMPUTE_ZONE"),
 	}
 }
+
+func (p *GCPTerraformProvider) SetConfig(organization string, project string, region string, zone string) config.GCPTerraformConfig {
+	return config.GCPTerraformConfig{
+		Organization: organization,
+		Project:      project,
+		Region:       region,
+		Zone:         zone,
+	}
+}
