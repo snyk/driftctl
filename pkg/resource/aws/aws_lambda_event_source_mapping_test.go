@@ -7,6 +7,9 @@ import (
 	"github.com/snyk/driftctl/test/acceptance"
 )
 
+// aws lambda list-event-source-mappings to list all event source mappings
+// aws lambda delete-event-source-mapping --uuid xxx to delete a specific event source mapping
+
 func TestAcc_AwsLambdaEventSourceMapping(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
