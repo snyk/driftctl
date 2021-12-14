@@ -1220,6 +1220,126 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 				})
 			},
 		},
+		{
+			name: "creates routes and integration from OpenAPI v2 JSON document",
+			resourcesFromState: []*resource.Resource{
+				{
+					Id:   "a-gateway",
+					Type: aws.AwsApiGatewayV2ApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": readFile(t, filepath.Join("testdata", "aws_apigatewayv2_api_body_integration_openapiv2.json")),
+					},
+				},
+			},
+			remoteResources: []*resource.Resource{
+				{
+					Id:   "openapi-derived-route-from-remote",
+					Type: aws.AwsApiGatewayV2RouteResourceType,
+					Attrs: &resource.Attributes{
+						"api_id":    "a-gateway",
+						"route_key": "GET /example",
+					},
+				},
+				{
+					Id:   "openapi-derived-integration-from-remote",
+					Type: aws.AwsApiGatewayV2IntegrationResourceType,
+					Attrs: &resource.Attributes{
+						"api_id":             "a-gateway",
+						"integration_type":   "HTTP_PROXY",
+						"integration_method": "GET",
+					},
+				},
+			},
+			expected: []*resource.Resource{
+				{
+					Id:   "a-gateway",
+					Type: aws.AwsApiGatewayV2ApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": readFile(t, filepath.Join("testdata", "aws_apigatewayv2_api_body_integration_openapiv2.json")),
+					},
+				},
+				{
+					Id:   "openapi-derived-route-from-remote",
+					Type: aws.AwsApiGatewayV2RouteResourceType,
+				},
+				{
+					Id:   "openapi-derived-integration-from-remote",
+					Type: aws.AwsApiGatewayV2IntegrationResourceType,
+				},
+			},
+			mocks: func(factory *terraform.MockResourceFactory) {
+				factory.On("CreateAbstractResource", aws.AwsApiGatewayV2RouteResourceType, "openapi-derived-route-from-remote", map[string]interface{}{}).
+					Once().Return(&resource.Resource{
+					Id:   "openapi-derived-route-from-remote",
+					Type: aws.AwsApiGatewayV2RouteResourceType,
+				})
+				factory.On("CreateAbstractResource", aws.AwsApiGatewayV2IntegrationResourceType, "openapi-derived-integration-from-remote", map[string]interface{}{}).
+					Once().Return(&resource.Resource{
+					Id:   "openapi-derived-integration-from-remote",
+					Type: aws.AwsApiGatewayV2IntegrationResourceType,
+				})
+			},
+		},
+		{
+			name: "creates routes and integrations from OpenAPI v3 YAML document",
+			resourcesFromState: []*resource.Resource{
+				{
+					Id:   "a-gateway",
+					Type: aws.AwsApiGatewayV2ApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": readFile(t, filepath.Join("testdata", "aws_apigatewayv2_api_body_integration_openapiv3.yml")),
+					},
+				},
+			},
+			remoteResources: []*resource.Resource{
+				{
+					Id:   "openapi-derived-route-from-remote",
+					Type: aws.AwsApiGatewayV2RouteResourceType,
+					Attrs: &resource.Attributes{
+						"api_id":    "a-gateway",
+						"route_key": "GET /example",
+					},
+				},
+				{
+					Id:   "openapi-derived-integration-from-remote",
+					Type: aws.AwsApiGatewayV2IntegrationResourceType,
+					Attrs: &resource.Attributes{
+						"api_id":             "a-gateway",
+						"integration_type":   "HTTP_PROXY",
+						"integration_method": "GET",
+					},
+				},
+			},
+			expected: []*resource.Resource{
+				{
+					Id:   "a-gateway",
+					Type: aws.AwsApiGatewayV2ApiResourceType,
+					Attrs: &resource.Attributes{
+						"body": readFile(t, filepath.Join("testdata", "aws_apigatewayv2_api_body_integration_openapiv3.yml")),
+					},
+				},
+				{
+					Id:   "openapi-derived-route-from-remote",
+					Type: aws.AwsApiGatewayV2RouteResourceType,
+				},
+				{
+					Id:   "openapi-derived-integration-from-remote",
+					Type: aws.AwsApiGatewayV2IntegrationResourceType,
+				},
+			},
+			mocks: func(factory *terraform.MockResourceFactory) {
+				factory.On("CreateAbstractResource", aws.AwsApiGatewayV2RouteResourceType, "openapi-derived-route-from-remote", map[string]interface{}{}).
+					Once().Return(&resource.Resource{
+					Id:   "openapi-derived-route-from-remote",
+					Type: aws.AwsApiGatewayV2RouteResourceType,
+				})
+				factory.On("CreateAbstractResource", aws.AwsApiGatewayV2IntegrationResourceType, "openapi-derived-integration-from-remote", map[string]interface{}{}).
+					Once().Return(&resource.Resource{
+					Id:   "openapi-derived-integration-from-remote",
+					Type: aws.AwsApiGatewayV2IntegrationResourceType,
+				})
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

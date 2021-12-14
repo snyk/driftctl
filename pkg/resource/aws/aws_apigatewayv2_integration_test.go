@@ -22,7 +22,7 @@ func TestAcc_Aws_ApiGatewayV2Integration(t *testing.T) {
 						t.Fatal(err)
 					}
 					result.AssertInfrastructureIsInSync()
-					result.AssertManagedCount(1)
+					result.AssertManagedCount(2)
 				},
 			},
 		},

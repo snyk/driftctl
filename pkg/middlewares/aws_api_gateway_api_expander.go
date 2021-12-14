@@ -119,7 +119,7 @@ func (m *AwsApiGatewayRestApiExpander) handleBodyOpenAPIv3(api *resource.Resourc
 }
 
 func (m *AwsApiGatewayRestApiExpander) handleBodyOpenAPIv3GatewayV2(api *resource.Resource, doc *openapi3.T, results, remoteResources *[]*resource.Resource) error {
-	for path := range doc.Paths {
+	for path, pathValue := range doc.Paths {
 		for method := range doc.Paths[path].Operations() {
 			openAPIDerivedRoute := findMatchingOpenAPIDerivedRoute(api.ResourceId(), path, method, remoteResources)
 			if openAPIDerivedRoute != nil {
@@ -130,6 +130,25 @@ func (m *AwsApiGatewayRestApiExpander) handleBodyOpenAPIv3GatewayV2(api *resourc
 				)
 				*results = append(*results, dummy)
 			}
+
+			for _, operation := range pathValue.Operations() {
+				integ, err := decodeMethodExtensions(operation.Extensions)
+				if err != nil {
+					continue
+				}
+
+				openAPIDerivedIntegration := findMatchingOpenAPIDerivedIntegration(api.ResourceId(),
+					integ,
+					remoteResources)
+				if openAPIDerivedIntegration != nil {
+					dummy := m.resourceFactory.CreateAbstractResource(
+						aws.AwsApiGatewayV2IntegrationResourceType,
+						openAPIDerivedIntegration.ResourceId(),
+						map[string]interface{}{},
+					)
+					*results = append(*results, dummy)
+				}
+			}
 		}
 	}
 	return nil
@@ -139,7 +158,7 @@ func (m *AwsApiGatewayRestApiExpander) handleBodyOpenAPIv3GatewayV2(api *resourc
 // libraries, but without generics we can't really de-dup this witout code
 // generation, which isn't worth it for this short function.
 func (m *AwsApiGatewayRestApiExpander) handleBodyOpenAPIv2GatewayV2(api *resource.Resource, doc *openapi2.T, results, remoteResources *[]*resource.Resource) error {
-	for path := range doc.Paths {
+	for path, pathValue := range doc.Paths {
 		for method := range doc.Paths[path].Operations() {
 			openAPIDerivedRoute := findMatchingOpenAPIDerivedRoute(api.ResourceId(), path, method, remoteResources)
 			if openAPIDerivedRoute != nil {
@@ -149,6 +168,25 @@ func (m *AwsApiGatewayRestApiExpander) handleBodyOpenAPIv2GatewayV2(api *resourc
 					map[string]interface{}{},
 				)
 				*results = append(*results, dummy)
+			}
+
+			for _, operation := range pathValue.Operations() {
+				integ, err := decodeMethodExtensions(operation.Extensions)
+				if err != nil {
+					continue
+				}
+
+				openAPIDerivedIntegration := findMatchingOpenAPIDerivedIntegration(api.ResourceId(),
+					integ,
+					remoteResources)
+				if openAPIDerivedIntegration != nil {
+					dummy := m.resourceFactory.CreateAbstractResource(
+						aws.AwsApiGatewayV2IntegrationResourceType,
+						openAPIDerivedIntegration.ResourceId(),
+						map[string]interface{}{},
+					)
+					*results = append(*results, dummy)
+				}
 			}
 		}
 	}
@@ -164,6 +202,32 @@ func findMatchingOpenAPIDerivedRoute(desiredApiID, desiredPath, desiredMethod st
 		routeKey := *remoteResource.Attributes().GetString("route_key")
 		apiID := *remoteResource.Attributes().GetString("api_id")
 		if desiredApiID == apiID && routeKey == desiredRouteKey {
+			return remoteResource
+		}
+	}
+	return nil
+}
+
+func findMatchingOpenAPIDerivedIntegration(desiredApiID string, desiredIntegration *OpenAPIAwsMethodExtensions, remoteResources *[]*resource.Resource) *resource.Resource {
+	desiredType := desiredIntegration.Integration["type"]
+	desiredMethod := desiredIntegration.Integration["httpMethod"]
+
+	if desiredType == nil || desiredMethod == nil {
+		return nil
+	}
+
+	for _, remoteResource := range *remoteResources {
+		if remoteResource.ResourceType() != aws.AwsApiGatewayV2IntegrationResourceType {
+			continue
+		}
+		apiID := *remoteResource.Attributes().GetString("api_id")
+		integrationType := *remoteResource.Attributes().GetString("integration_type")
+		if remoteResource.Attributes().GetString("integration_method") == nil {
+			// This is nilable in MOCK type only, and they cannot be embedded
+			continue
+		}
+		integrationMethod := *remoteResource.Attributes().GetString("integration_method")
+		if desiredApiID == apiID && integrationType == desiredType && integrationMethod == desiredMethod {
 			return remoteResource
 		}
 	}

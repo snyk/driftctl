@@ -1,0 +1,21 @@
+openapi: "3.0.1"
+info:
+  title: "example-api"
+  version: "2021-12-07 13:55:09UTC"
+servers:
+- url: "https://abcd.execute-api.eu-west-1.amazonaws.com/{basePath}"
+  variables:
+    basePath:
+      default: ""
+paths:
+  /example:
+    get:
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "1.0"
+        type: "HTTP_PROXY"
+        httpMethod: "GET"
+        uri: "https://example.com"
+        connectionType: "INTERNET"
+      responses:
+        default:
+          description: "Default response for GET /example"

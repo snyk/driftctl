@@ -400,10 +400,16 @@ func TestApiGatewayV2Integration(t *testing.T) {
 			mocks: func(repo *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllApis").Return(apis, nil)
 				repo.On("ListAllApiIntegrations", *apis[0].ApiId).Return([]*apigatewayv2.Integration{
-					{IntegrationId: awssdk.String("xaappu")},
+					{
+						IntegrationId:   awssdk.String("xaappu"),
+						IntegrationType: awssdk.String("MOCK"),
+					},
 				}, nil).Once()
 				repo.On("ListAllApiIntegrations", *apis[1].ApiId).Return([]*apigatewayv2.Integration{
-					{IntegrationId: awssdk.String("bwhebj")},
+					{
+						IntegrationId:   awssdk.String("bwhebj"),
+						IntegrationType: awssdk.String("MOCK"),
+					},
 				}, nil).Once()
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {

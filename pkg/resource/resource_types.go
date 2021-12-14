@@ -141,6 +141,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_appautoscaling_scheduled_action": {},
 	"aws_apigatewayv2_api": {children: []ResourceType{
 		"aws_apigatewayv2_route",
+		"aws_apigatewayv2_integration",
 	}},
 	"aws_apigatewayv2_route":       {},
 	"aws_apigatewayv2_vpc_link":    {},

@@ -39,12 +39,22 @@ func (e *ApiGatewayV2IntegrationEnumerator) Enumerate() ([]*resource.Resource, e
 		}
 
 		for _, integration := range integrations {
+			data := map[string]interface{}{
+				"api_id":           *api.ApiId,
+				"integration_type": *integration.IntegrationType,
+			}
+
+			if integration.IntegrationMethod != nil {
+				// this is needed to discriminate in middleware. But it is nil when the type is mock...
+				data["integration_method"] = *integration.IntegrationMethod
+			}
+
 			results = append(
 				results,
 				e.factory.CreateAbstractResource(
 					string(e.SupportedType()),
 					*integration.IntegrationId,
-					map[string]interface{}{},
+					data,
 				),
 			)
 		}

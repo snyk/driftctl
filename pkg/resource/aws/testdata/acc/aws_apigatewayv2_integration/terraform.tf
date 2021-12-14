@@ -8,6 +8,32 @@ terraform {
   }
 }
 
+resource "aws_apigatewayv2_api" "test" {
+    name          = "test"
+    protocol_type = "HTTP"
+    body = jsonencode({
+        openapi = "3.0.1"
+        paths = {
+            "/path1" = {
+                get = {
+                    "x-amazon-apigateway-integration": {
+                        "payloadFormatVersion": "1.0",
+                        "type": "HTTP_PROXY",
+                        "httpMethod": "GET",
+                        "uri": "https://example.com",
+                        "connectionType": "INTERNET"
+                    },
+                    "responses" : {
+                        "default" : {
+                            "description" : "Default response for GET /path1"
+                        }
+                    },
+                }
+            }
+        }
+    })
+}
+
 resource "aws_apigatewayv2_api" "example" {
     name                       = "example-websocket-api"
     protocol_type              = "WEBSOCKET"
