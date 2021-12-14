@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"reflect"
 	"testing"
 
@@ -34,6 +35,8 @@ func TestGSBackendInvalid(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			_ = os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "testdata/gcp_application_default_credentials.json")
+
 			got, err := NewGSReader(tt.args.path)
 			if err.Error() != tt.wantErr.Error() {
 				t.Errorf("NewGSReader() error = '%s', wantErr '%s'", err, tt.wantErr)
