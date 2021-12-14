@@ -76,7 +76,7 @@ func TestS3Bucket(t *testing.T) {
 			},
 		},
 		{
-			test: "cannot list bucket", dirName: "s3_bucket_list",
+			test: "cannot list bucket", dirName: "aws_s3_bucket_list",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllBuckets").Return(nil, awsError)
@@ -158,7 +158,7 @@ func TestS3BucketInventory(t *testing.T) {
 		wantErr error
 	}{
 		{
-			test: "multiple bucket with multiple inventories", dirName: "s3_bucket_inventories_multiple",
+			test: "multiple bucket with multiple inventories", dirName: "aws_s3_bucket_inventories_multiple",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
@@ -206,7 +206,7 @@ func TestS3BucketInventory(t *testing.T) {
 			},
 		},
 		{
-			test: "cannot list bucket", dirName: "s3_bucket_inventories_list_bucket",
+			test: "cannot list bucket", dirName: "aws_s3_bucket_inventories_list_bucket",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllBuckets").Return(nil, awsError)
@@ -216,7 +216,7 @@ func TestS3BucketInventory(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			test: "cannot list bucket inventories", dirName: "s3_bucket_inventories_list_inventories",
+			test: "cannot list bucket inventories", dirName: "aws_s3_bucket_inventories_list_inventories",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return(
 					[]*s3.Bucket{
@@ -319,7 +319,7 @@ func TestS3BucketNotification(t *testing.T) {
 	}{
 		{
 			test:    "single bucket without notifications",
-			dirName: "s3_bucket_notifications_no_notif",
+			dirName: "aws_s3_bucket_notifications_no_notif",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
@@ -346,7 +346,7 @@ func TestS3BucketNotification(t *testing.T) {
 			},
 		},
 		{
-			test: "multiple bucket with notifications", dirName: "s3_bucket_notifications_multiple",
+			test: "multiple bucket with notifications", dirName: "aws_s3_bucket_notifications_multiple",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
@@ -400,7 +400,7 @@ func TestS3BucketNotification(t *testing.T) {
 			},
 		},
 		{
-			test: "Cannot get bucket notification", dirName: "s3_bucket_notifications_list_bucket",
+			test: "Cannot get bucket notification", dirName: "aws_s3_bucket_notifications_list_bucket",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
@@ -422,7 +422,7 @@ func TestS3BucketNotification(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			test: "Cannot list bucket", dirName: "s3_bucket_notifications_list_bucket",
+			test: "Cannot list bucket", dirName: "aws_s3_bucket_notifications_list_bucket",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllBuckets").Return(nil, awsError)
@@ -504,7 +504,7 @@ func TestS3BucketMetrics(t *testing.T) {
 		wantErr error
 	}{
 		{
-			test: "multiple bucket with multiple metrics", dirName: "s3_bucket_metrics_multiple",
+			test: "multiple bucket with multiple metrics", dirName: "aws_s3_bucket_metrics_multiple",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
@@ -552,7 +552,7 @@ func TestS3BucketMetrics(t *testing.T) {
 			},
 		},
 		{
-			test: "cannot list bucket", dirName: "s3_bucket_metrics_list_bucket",
+			test: "cannot list bucket", dirName: "aws_s3_bucket_metrics_list_bucket",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllBuckets").Return(nil, awsError)
@@ -562,7 +562,7 @@ func TestS3BucketMetrics(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			test: "cannot list metrics", dirName: "s3_bucket_metrics_list_metrics",
+			test: "cannot list metrics", dirName: "aws_s3_bucket_metrics_list_metrics",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return(
 					[]*s3.Bucket{
@@ -666,7 +666,7 @@ func TestS3BucketPolicy(t *testing.T) {
 	}{
 		{
 			test:    "single bucket without policy",
-			dirName: "s3_bucket_policy_no_policy",
+			dirName: "aws_s3_bucket_policy_no_policy",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
@@ -693,7 +693,7 @@ func TestS3BucketPolicy(t *testing.T) {
 			},
 		},
 		{
-			test: "multiple bucket with policies", dirName: "s3_bucket_policies_multiple",
+			test: "multiple bucket with policies", dirName: "aws_s3_bucket_policies_multiple",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
@@ -741,7 +741,7 @@ func TestS3BucketPolicy(t *testing.T) {
 			},
 		},
 		{
-			test: "cannot list bucket", dirName: "s3_bucket_policies_list_bucket",
+			test: "cannot list bucket", dirName: "aws_s3_bucket_policies_list_bucket",
 			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllBuckets").Return(nil, awsError)
