@@ -51,37 +51,57 @@ func NewAnalyzer(alerter *alerter.Alerter, options AnalyzerOptions, filter filte
 	return &Analyzer{alerter, options, filter}
 }
 
-func (a Analyzer) Analyze(remoteResources, resourcesFromState []*resource.Resource) (Analysis, error) {
-	analysis := Analysis{options: a.options}
-
+func (a Analyzer) CompareEnumeration(analysis *Analysis, remoteResources, resourcesFromState []*resource.Resource) *Analysis {
 	// Iterate on remote resources and filter ignored resources
-	filteredRemoteResource := make([]*resource.Resource, 0, len(remoteResources))
+	filteredRemoteResources := make([]*resource.Resource, 0, len(remoteResources))
 	for _, remoteRes := range remoteResources {
 		if a.filter.IsResourceIgnored(remoteRes) || a.alerter.IsResourceIgnored(remoteRes) {
 			continue
 		}
-		filteredRemoteResource = append(filteredRemoteResource, remoteRes)
+		filteredRemoteResources = append(filteredRemoteResources, remoteRes)
 	}
 
-	haveComputedDiff := false
 	for _, stateRes := range resourcesFromState {
-		i, remoteRes, found := findCorrespondingRes(filteredRemoteResource, stateRes)
-
 		if a.filter.IsResourceIgnored(stateRes) || a.alerter.IsResourceIgnored(stateRes) {
 			continue
 		}
 
+		i, _, found := resource.FindCorrespondingRes(filteredRemoteResources, stateRes)
 		if !found {
 			analysis.AddDeleted(stateRes)
 			continue
 		}
 
 		// Remove managed resources, so it will remain only unmanaged ones
-		filteredRemoteResource = removeResourceByIndex(i, filteredRemoteResource)
+		filteredRemoteResources = removeResourceByIndex(i, filteredRemoteResources)
 		analysis.AddManaged(stateRes)
+	}
 
-		// Stop there if we are not in deep mode, we do not want to compute diffs
-		if !a.options.Deep {
+	if a.hasUnmanagedSecurityGroupRules(filteredRemoteResources) {
+		a.alerter.SendAlert("", newUnmanagedSecurityGroupRulesAlert())
+	}
+
+	// Add remaining unmanaged resources
+	analysis.AddUnmanaged(filteredRemoteResources...)
+
+	return analysis
+}
+
+func (a Analyzer) CompleteAnalysis(analysis *Analysis, managedResources, resourcesFromState []*resource.Resource) *Analysis {
+	// Stop there if we are not in deep mode, we do not want to compute diffs
+	if !a.options.Deep {
+		a.setAlerts(analysis)
+		return analysis
+	}
+
+	haveComputedDiff := false
+	for _, remoteRes := range managedResources {
+		if a.filter.IsResourceIgnored(remoteRes) || a.alerter.IsResourceIgnored(remoteRes) {
+			continue
+		}
+
+		_, stateRes, found := resource.FindCorrespondingRes(resourcesFromState, remoteRes)
+		if !found {
 			continue
 		}
 
@@ -121,33 +141,17 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []*resource.Resour
 		}
 	}
 
-	if a.hasUnmanagedSecurityGroupRules(filteredRemoteResource) {
-		a.alerter.SendAlert("", newUnmanagedSecurityGroupRulesAlert())
-	}
-
 	if haveComputedDiff {
 		a.alerter.SendAlert("", NewComputedDiffAlert())
 	}
 
-	// Add remaining unmanaged resources
-	analysis.AddUnmanaged(filteredRemoteResource...)
+	a.setAlerts(analysis)
 
-	// Sort resources by Terraform Id
-	// The purpose is to have a predictable output
-	analysis.SortResources()
-
-	analysis.SetAlerts(a.alerter.Retrieve())
-
-	return analysis, nil
+	return analysis
 }
 
-func findCorrespondingRes(resources []*resource.Resource, res *resource.Resource) (int, *resource.Resource, bool) {
-	for i, r := range resources {
-		if res.Equal(r) {
-			return i, r, true
-		}
-	}
-	return -1, nil, false
+func (a Analyzer) setAlerts(analysis *Analysis) {
+	analysis.SetAlerts(a.alerter.Retrieve())
 }
 
 func removeResourceByIndex(i int, resources []*resource.Resource) []*resource.Resource {
