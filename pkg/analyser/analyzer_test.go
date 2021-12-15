@@ -1026,18 +1026,21 @@ func TestAnalyze(t *testing.T) {
 				addSchemaToRes(drift.res, repo)
 			}
 
-			result, err := analyzer.Analyze(c.cloud, c.iac)
+			analysis := NewAnalysis(AnalyzerOptions{Deep: true})
+			analysis = analyzer.CompareEnumeration(analysis, c.cloud, c.iac)
+			analysis = analyzer.CompleteAnalysis(analysis, c.cloud, c.iac)
+			analysis.SortResources()
 
 			if err != nil {
 				t.Error(err)
 				return
 			}
 
-			if result.IsSync() == c.hasDrifted {
-				t.Errorf("Drifted state does not match, got %t expected %t", result.IsSync(), !c.hasDrifted)
+			if analysis.IsSync() == c.hasDrifted {
+				t.Errorf("Drifted state does not match, got %t expected %t", analysis.IsSync(), !c.hasDrifted)
 			}
 
-			managedChanges, err := differ.Diff(result.Managed(), c.expected.Managed())
+			managedChanges, err := differ.Diff(analysis.Managed(), c.expected.Managed())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -1047,7 +1050,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			unmanagedChanges, err := differ.Diff(result.Unmanaged(), c.expected.Unmanaged())
+			unmanagedChanges, err := differ.Diff(analysis.Unmanaged(), c.expected.Unmanaged())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -1057,7 +1060,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			deletedChanges, err := differ.Diff(result.Deleted(), c.expected.Deleted())
+			deletedChanges, err := differ.Diff(analysis.Deleted(), c.expected.Deleted())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -1067,7 +1070,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			diffChanges, err := differ.Diff(result.Differences(), c.expected.Differences())
+			diffChanges, err := differ.Diff(analysis.Differences(), c.expected.Differences())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -1077,7 +1080,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			summaryChanges, err := differ.Diff(c.expected.Summary(), result.Summary())
+			summaryChanges, err := differ.Diff(c.expected.Summary(), analysis.Summary())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}
@@ -1087,7 +1090,7 @@ func TestAnalyze(t *testing.T) {
 				}
 			}
 
-			alertsChanges, err := differ.Diff(result.Alerts(), c.expected.Alerts())
+			alertsChanges, err := differ.Diff(analysis.Alerts(), c.expected.Alerts())
 			if err != nil {
 				t.Fatalf("Unable to compare %+v", err)
 			}

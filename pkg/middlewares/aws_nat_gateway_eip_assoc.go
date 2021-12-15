@@ -16,7 +16,7 @@ func NewAwsNatGatewayEipAssoc() AwsNatGatewayEipAssoc {
 // It implies that driftctl read a aws_eip_association resource from remote
 // As we cannot use aws_eip_association in terraform to assign an eip to an aws_nat_gateway
 // we should remove this association to ensure we do not output noise in unmanaged resources
-func (a AwsNatGatewayEipAssoc) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
+func (a AwsNatGatewayEipAssoc) Execute(remoteResources, _ *[]*resource.Resource) error {
 	newRemoteResources := make([]*resource.Resource, 0, len(*remoteResources))
 
 	for _, remoteResource := range *remoteResources {
