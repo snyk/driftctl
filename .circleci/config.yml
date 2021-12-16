@@ -32,6 +32,8 @@ jobs:
       - checkout
       - go/install:
           version: "1.16.2"
+      - go/load-cache:
+          key: test_acc
       - run: make install-tools
       - run:
           name: Setup Google credentials
@@ -53,6 +55,9 @@ jobs:
               -H "Content-Type: application/json" \
               -d "{\"content\": \"❌ Acceptance tests failed\nSuite: ${ACC_PATTERN}\n<${CIRCLE_BUILD_URL}>\" }"\
               ${DISCORD_WEBHOOK}
+      - go/save-cache:
+          key: test_acc
+          path: /home/circleci/.go_workspace/pkg/mod
       - store_test_results:
           path: ./
   lint:
@@ -79,14 +84,17 @@ jobs:
       image: ubuntu-2004:202107-02
     steps:
       - checkout
+      - go/install:
+          version: "1.16.2"
+      - go/load-cache:
+          key: test
+      - run: make install-tools
       - run:
           name: Run tests
-          command: |
-            docker run\
-              -v$(pwd):/app\
-              -w /app\
-              golang:1.16\
-              bash -c 'make install-tools && make test'
+          command: make test
+      - go/save-cache:
+          key: test
+          path: /home/circleci/.go_workspace/pkg/mod
       - codecov/upload:
           flags: unit
       - store_test_results:
