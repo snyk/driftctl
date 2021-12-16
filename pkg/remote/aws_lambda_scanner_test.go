@@ -39,7 +39,7 @@ func TestScanLambdaFunction(t *testing.T) {
 	}{
 		{
 			test:    "no lambda functions",
-			dirName: "lambda_function_empty",
+			dirName: "aws_lambda_function_empty",
 			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllLambdaFunctions").Return([]*lambda.FunctionConfiguration{}, nil)
 			},
@@ -47,7 +47,7 @@ func TestScanLambdaFunction(t *testing.T) {
 		},
 		{
 			test:    "with lambda functions",
-			dirName: "lambda_function_multiple",
+			dirName: "aws_lambda_function_multiple",
 			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllLambdaFunctions").Return([]*lambda.FunctionConfiguration{
 					{
@@ -62,7 +62,7 @@ func TestScanLambdaFunction(t *testing.T) {
 		},
 		{
 			test:    "One lambda with signing",
-			dirName: "lambda_function_signed",
+			dirName: "aws_lambda_function_signed",
 			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllLambdaFunctions").Return([]*lambda.FunctionConfiguration{
 					{
@@ -74,7 +74,7 @@ func TestScanLambdaFunction(t *testing.T) {
 		},
 		{
 			test:    "cannot list lambda functions",
-			dirName: "lambda_function_empty",
+			dirName: "aws_lambda_function_empty",
 			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllLambdaFunctions").Return([]*lambda.FunctionConfiguration{}, awsError)
@@ -155,7 +155,7 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 	}{
 		{
 			test:    "no EventSourceMapping",
-			dirName: "lambda_source_mapping_empty",
+			dirName: "aws_lambda_source_mapping_empty",
 			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllLambdaEventSourceMappings").Return([]*lambda.EventSourceMappingConfiguration{}, nil)
 			},
@@ -163,7 +163,7 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 		},
 		{
 			test:    "with 2 sqs EventSourceMapping",
-			dirName: "lambda_source_mapping_sqs_multiple",
+			dirName: "aws_lambda_source_mapping_sqs_multiple",
 			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllLambdaEventSourceMappings").Return([]*lambda.EventSourceMappingConfiguration{
 					{
@@ -178,7 +178,7 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 		},
 		{
 			test:    "with dynamo EventSourceMapping",
-			dirName: "lambda_source_mapping_dynamo_multiple",
+			dirName: "aws_lambda_source_mapping_dynamo_multiple",
 			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllLambdaEventSourceMappings").Return([]*lambda.EventSourceMappingConfiguration{
 					{
@@ -190,7 +190,7 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 		},
 		{
 			test:    "cannot list lambda functions",
-			dirName: "lambda_function_empty",
+			dirName: "aws_lambda_function_empty",
 			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllLambdaEventSourceMappings").Return([]*lambda.EventSourceMappingConfiguration{}, awsError)

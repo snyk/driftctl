@@ -39,7 +39,7 @@ func TestScanSNSTopic(t *testing.T) {
 	}{
 		{
 			test:    "no SNS Topic",
-			dirName: "sns_topic_empty",
+			dirName: "aws_sns_topic_empty",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTopics").Return([]*sns.Topic{}, nil)
 			},
@@ -47,7 +47,7 @@ func TestScanSNSTopic(t *testing.T) {
 		},
 		{
 			test:    "Multiple SNSTopic",
-			dirName: "sns_topic_multiple",
+			dirName: "aws_sns_topic_multiple",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTopics").Return([]*sns.Topic{
 					{TopicArn: awssdk.String("arn:aws:sns:eu-west-3:526954929923:user-updates-topic")},
@@ -59,7 +59,7 @@ func TestScanSNSTopic(t *testing.T) {
 		},
 		{
 			test:    "cannot list SNSTopic",
-			dirName: "sns_topic_empty",
+			dirName: "aws_sns_topic_empty",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllTopics").Return(nil, awsError)
@@ -140,7 +140,7 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 	}{
 		{
 			test:    "no SNS Topic policy",
-			dirName: "sns_topic_policy_empty",
+			dirName: "aws_sns_topic_policy_empty",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTopics").Return([]*sns.Topic{}, nil)
 			},
@@ -148,7 +148,7 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 		},
 		{
 			test:    "Multiple SNSTopicPolicy",
-			dirName: "sns_topic_policy_multiple",
+			dirName: "aws_sns_topic_policy_multiple",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTopics").Return([]*sns.Topic{
 					{TopicArn: awssdk.String("arn:aws:sns:us-east-1:526954929923:my-topic-with-policy")},
@@ -159,7 +159,7 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 		},
 		{
 			test:    "cannot list SNSTopic",
-			dirName: "sns_topic_policy_topic_list",
+			dirName: "aws_sns_topic_policy_topic_list",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllTopics").Return(nil, awsError)
@@ -240,7 +240,7 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 	}{
 		{
 			test:    "no SNS Topic Subscription",
-			dirName: "sns_topic_subscription_empty",
+			dirName: "aws_sns_topic_subscription_empty",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSubscriptions").Return([]*sns.Subscription{}, nil)
 			},
@@ -248,7 +248,7 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 		},
 		{
 			test:    "Multiple SNSTopic Subscription",
-			dirName: "sns_topic_subscription_multiple",
+			dirName: "aws_sns_topic_subscription_multiple",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSubscriptions").Return([]*sns.Subscription{
 					{SubscriptionArn: awssdk.String("arn:aws:sns:us-east-1:526954929923:user-updates-topic2:c0f794c5-a009-4db4-9147-4c55959787fa")},
@@ -259,7 +259,7 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 		},
 		{
 			test:    "Multiple SNSTopic Subscription with one pending and one incorrect",
-			dirName: "sns_topic_subscription_multiple",
+			dirName: "aws_sns_topic_subscription_multiple",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSubscriptions").Return([]*sns.Subscription{
 					{SubscriptionArn: awssdk.String("PendingConfirmation"), Endpoint: awssdk.String("TEST")},
@@ -276,7 +276,7 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 		},
 		{
 			test:    "cannot list SNSTopic subscription",
-			dirName: "sns_topic_subscription_list",
+			dirName: "aws_sns_topic_subscription_list",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllSubscriptions").Return(nil, awsError)

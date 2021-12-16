@@ -36,7 +36,7 @@ func TestSQSQueue(t *testing.T) {
 	}{
 		{
 			test:    "no sqs queues",
-			dirName: "sqs_queue_empty",
+			dirName: "aws_sqs_queue_empty",
 			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{}, nil)
 			},
@@ -44,7 +44,7 @@ func TestSQSQueue(t *testing.T) {
 		},
 		{
 			test:    "multiple sqs queues",
-			dirName: "sqs_queue_multiple",
+			dirName: "aws_sqs_queue_multiple",
 			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo"),
@@ -55,7 +55,7 @@ func TestSQSQueue(t *testing.T) {
 		},
 		{
 			test:    "cannot list sqs queues",
-			dirName: "sqs_queue_empty",
+			dirName: "aws_sqs_queue_empty",
 			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllQueues").Return(nil, awsError)
@@ -136,7 +136,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 			// sqs queue with no policy case is not possible
 			// as a default SQSDefaultPolicy (e.g. policy="") will always be present in each queue
 			test:    "no sqs queue policies",
-			dirName: "sqs_queue_policy_empty",
+			dirName: "aws_sqs_queue_policy_empty",
 			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{}, nil)
 			},
@@ -144,7 +144,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 		},
 		{
 			test:    "multiple sqs queue policies (default or not)",
-			dirName: "sqs_queue_policy_multiple",
+			dirName: "aws_sqs_queue_policy_multiple",
 			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo"),
@@ -165,7 +165,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 		},
 		{
 			test:    "multiple sqs queue policies (with nil attributes)",
-			dirName: "sqs_queue_policy_multiple",
+			dirName: "aws_sqs_queue_policy_multiple",
 			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo"),
@@ -182,7 +182,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 		},
 		{
 			test:    "cannot list sqs queues, thus sqs queue policies",
-			dirName: "sqs_queue_policy_empty",
+			dirName: "aws_sqs_queue_policy_empty",
 			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllQueues").Return(nil, awsError)

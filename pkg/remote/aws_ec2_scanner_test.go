@@ -825,7 +825,7 @@ func TestVPC(t *testing.T) {
 	}{
 		{
 			test:    "no VPC",
-			dirName: "vpc_empty",
+			dirName: "aws_vpc_empty",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllVPCs").Once().Return([]*ec2.Vpc{}, []*ec2.Vpc{}, nil)
 			},
@@ -833,7 +833,7 @@ func TestVPC(t *testing.T) {
 		},
 		{
 			test:    "VPC results",
-			dirName: "vpc",
+			dirName: "aws_vpc",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllVPCs").Once().Return([]*ec2.Vpc{
 					{
@@ -858,7 +858,7 @@ func TestVPC(t *testing.T) {
 		},
 		{
 			test:    "cannot list VPC",
-			dirName: "vpc_empty",
+			dirName: "aws_vpc_empty",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllVPCs").Once().Return(nil, nil, awsError)
@@ -939,7 +939,7 @@ func TestDefaultVPC(t *testing.T) {
 	}{
 		{
 			test:    "no VPC",
-			dirName: "vpc_empty",
+			dirName: "aws_vpc_empty",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllVPCs").Once().Return([]*ec2.Vpc{}, []*ec2.Vpc{}, nil)
 			},
@@ -947,7 +947,7 @@ func TestDefaultVPC(t *testing.T) {
 		},
 		{
 			test:    "default VPC results",
-			dirName: "default_vpc",
+			dirName: "aws_default_vpc",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllVPCs").Once().Return([]*ec2.Vpc{
 					{
@@ -969,7 +969,7 @@ func TestDefaultVPC(t *testing.T) {
 		},
 		{
 			test:    "cannot list VPC",
-			dirName: "vpc_empty",
+			dirName: "aws_vpc_empty",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllVPCs").Once().Return(nil, nil, awsError)
@@ -1670,7 +1670,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 	}{
 		{
 			test:    "no security groups",
-			dirName: "vpc_security_group_empty",
+			dirName: "aws_vpc_security_group_empty",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{}, []*ec2.SecurityGroup{}, nil)
 			},
@@ -1678,7 +1678,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 		},
 		{
 			test:    "with security groups",
-			dirName: "vpc_security_group_multiple",
+			dirName: "aws_vpc_security_group_multiple",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{
 					{
@@ -1696,7 +1696,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 		},
 		{
 			test:    "cannot list security groups",
-			dirName: "vpc_security_group_empty",
+			dirName: "aws_vpc_security_group_empty",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllSecurityGroups").Return(nil, nil, awsError)
@@ -1777,7 +1777,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 	}{
 		{
 			test:    "no security groups",
-			dirName: "vpc_default_security_group_empty",
+			dirName: "aws_vpc_default_security_group_empty",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{}, []*ec2.SecurityGroup{}, nil)
 			},
@@ -1785,7 +1785,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 		},
 		{
 			test:    "with security groups",
-			dirName: "vpc_default_security_group_multiple",
+			dirName: "aws_vpc_default_security_group_multiple",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{
 					{
@@ -1803,7 +1803,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 		},
 		{
 			test:    "cannot list security groups",
-			dirName: "vpc_default_security_group_empty",
+			dirName: "aws_vpc_default_security_group_empty",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllSecurityGroups").Return(nil, nil, awsError)
@@ -2534,7 +2534,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 	}{
 		{
 			test:    "no security group rules",
-			dirName: "vpc_security_group_rule_empty",
+			dirName: "aws_vpc_security_group_rule_empty",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{
 					{
@@ -2548,7 +2548,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 		},
 		{
 			test:    "with security group rules",
-			dirName: "vpc_security_group_rule_multiple",
+			dirName: "aws_vpc_security_group_rule_multiple",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{
 					{
@@ -2644,7 +2644,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 		},
 		{
 			test:    "cannot list security group rules",
-			dirName: "vpc_security_group_rule_empty",
+			dirName: "aws_vpc_security_group_rule_empty",
 			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllSecurityGroups").Once().Return(nil, nil, awsError)

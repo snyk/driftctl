@@ -35,7 +35,7 @@ func TestDynamoDBTable(t *testing.T) {
 	}{
 		{
 			test:    "no DynamoDB Table",
-			dirName: "dynamodb_table_empty",
+			dirName: "aws_dynamodb_table_empty",
 			mocks: func(client *repository.MockDynamoDBRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTables").Return([]*string{}, nil)
 			},
@@ -43,7 +43,7 @@ func TestDynamoDBTable(t *testing.T) {
 		},
 		{
 			test:    "Multiple DynamoDB Table",
-			dirName: "dynamodb_table_multiple",
+			dirName: "aws_dynamodb_table_multiple",
 			mocks: func(client *repository.MockDynamoDBRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTables").Return([]*string{
 					awssdk.String("GameScores"),
@@ -54,7 +54,7 @@ func TestDynamoDBTable(t *testing.T) {
 		},
 		{
 			test:    "cannot list DynamoDB Table",
-			dirName: "dynamodb_table_list",
+			dirName: "aws_dynamodb_table_list",
 			mocks: func(client *repository.MockDynamoDBRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 400, "")
 				client.On("ListAllTables").Return(nil, awsError)
