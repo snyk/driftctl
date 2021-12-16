@@ -18,6 +18,7 @@ jobs:
     parameters:
       pattern:
         type: string
+    resource_class: large
     machine:
       image: ubuntu-2004:202010-01
     environment:
@@ -75,6 +76,7 @@ jobs:
       - run: make install-tools
       - run: make lint
   test:
+    resource_class: large
     machine:
       image: ubuntu-2004:202107-02
     steps:
@@ -92,6 +94,7 @@ jobs:
       - store_test_results:
           path: ./
   release:
+    resource_class: large
     docker:
       - image: golang:1.16
     steps:
