@@ -13,7 +13,7 @@ func initGoogleComputeNetworkMetadata(resourceSchemaRepository resource.SchemaRe
 	})
 	resourceSchemaRepository.SetResolveReadAttributesFunc(GoogleComputeNetworkResourceType, func(res *resource.Resource) map[string]string {
 		return map[string]string{
-			"name": *res.Attributes().GetString("display_name"),
+			"name": *res.Attributes().GetString("name"),
 		}
 	})
 	resourceSchemaRepository.SetFlags(GoogleComputeNetworkResourceType, resource.FlagDeepMode)
