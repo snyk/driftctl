@@ -38,7 +38,7 @@ func (e *GoogleComputeNetworkEnumerator) Enumerate() ([]*resource.Resource, erro
 				string(e.SupportedType()),
 				trimResourceName(res.GetName()),
 				map[string]interface{}{
-					"display_name": res.DisplayName,
+					"name": res.DisplayName,
 				},
 			),
 		)
