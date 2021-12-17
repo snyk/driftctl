@@ -80,21 +80,19 @@ jobs:
       - run: make lint
   test:
     resource_class: large
-    machine:
-      image: ubuntu-2004:202107-02
+    executor:
+        name: go/default
+        tag: '1.16.2'
     steps:
       - checkout
-      - go/install:
-          version: "1.16.2"
       - go/load-cache:
-          key: test
+          key: test-docker
       - run: make install-tools
       - run:
           name: Run tests
           command: make test
       - go/save-cache:
-          key: test
-          path: /home/circleci/.go_workspace/pkg/mod
+          key: test-docker
       - codecov/upload:
           flags: unit
       - store_test_results:
