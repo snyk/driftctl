@@ -38,8 +38,8 @@ func (e *GoogleComputeSubnetworkEnumerator) Enumerate() ([]*resource.Resource, e
 				string(e.SupportedType()),
 				trimResourceName(res.GetName()),
 				map[string]interface{}{
-					"name":     res.GetDisplayName(),
-					"location": res.GetLocation(),
+					"name":   res.GetDisplayName(),
+					"region": res.GetLocation(),
 				},
 			),
 		)

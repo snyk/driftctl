@@ -8,7 +8,7 @@ func initGoogleComputeSubnetworkMetadata(resourceSchemaRepository resource.Schem
 	resourceSchemaRepository.SetResolveReadAttributesFunc(GoogleComputeSubnetworkResourceType, func(res *resource.Resource) map[string]string {
 		return map[string]string{
 			"name":   *res.Attributes().GetString("name"),
-			"region": *res.Attributes().GetString("location"),
+			"region": *res.Attributes().GetString("region"),
 		}
 	})
 	resourceSchemaRepository.SetNormalizeFunc(GoogleComputeSubnetworkResourceType, func(res *resource.Resource) {
