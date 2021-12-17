@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"reflect"
 	"testing"
 
@@ -14,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGSBackendInvalid(t *testing.T) {
+func TestGSBackend_NewGSReader(t *testing.T) {
 	type args struct {
 		path string
 	}
@@ -24,6 +23,16 @@ func TestGSBackendInvalid(t *testing.T) {
 		want    *GSBackend
 		wantErr error
 	}{
+		{
+			name: "valid path",
+			args: args{
+				path: "bucket-1/path/to/terraform.tfstate",
+			},
+			want: &GSBackend{
+				bucketName: "bucket-1",
+				path:       "path/to/terraform.tfstate",
+			},
+		},
 		{
 			name: "invalid path",
 			args: args{
@@ -35,12 +44,12 @@ func TestGSBackendInvalid(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_ = os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "testdata/gcp_application_default_credentials.json")
-
 			got, err := NewGSReader(tt.args.path)
-			if err.Error() != tt.wantErr.Error() {
-				t.Errorf("NewGSReader() error = '%s', wantErr '%s'", err, tt.wantErr)
+			if tt.wantErr != nil {
+				assert.EqualError(t, err, tt.wantErr.Error())
 				return
+			} else {
+				assert.NoError(t, err)
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewGSReader() got = %v, want %v", got, tt.want)
@@ -122,21 +131,23 @@ func TestGSBackend_Read(t *testing.T) {
 func TestGSBackend_Close(t *testing.T) {
 	tests := []struct {
 		name    string
-		reader  io.ReadCloser
+		reader  *MockReaderMock
 		client  *storage.Client
 		wantErr error
 	}{
 		{
 			name: "should fail to close reader",
-			reader: func() io.ReadCloser {
-				return nil
+			reader: func() *MockReaderMock {
+				m := &MockReaderMock{}
+				m.On("Close").Return(errors.New("dummy error"))
+				return m
 			}(),
 			client:  &storage.Client{},
-			wantErr: errors.New("Unable to close reader as nothing was opened"),
+			wantErr: errors.New("dummy error"),
 		},
 		{
 			name: "should close reader",
-			reader: func() io.ReadCloser {
+			reader: func() *MockReaderMock {
 				m := &MockReaderMock{}
 				m.On("Close").Return(nil)
 				return m
@@ -156,6 +167,8 @@ func TestGSBackend_Close(t *testing.T) {
 			} else {
 				assert.EqualError(t, err, tt.wantErr.Error())
 			}
+
+			tt.reader.AssertExpectations(t)
 		})
 	}
 }
