@@ -1,8 +1,6 @@
 package google
 
 import (
-	"os"
-
 	"github.com/snyk/driftctl/pkg/output"
 	"github.com/snyk/driftctl/pkg/remote/google/config"
 	"github.com/snyk/driftctl/pkg/remote/terraform"
@@ -34,7 +32,7 @@ func NewGCPTerraformProvider(version string, progress output.Progress, configDir
 	tfProvider, err := terraform.NewTerraformProvider(installer, terraform.TerraformProviderConfig{
 		Name: p.name,
 		GetProviderConfig: func(alias string) interface{} {
-			return p.GetConfig()
+			return p.SetConfig(nil)
 		},
 	}, progress)
 
@@ -55,20 +53,8 @@ func (p *GCPTerraformProvider) Version() string {
 	return p.version
 }
 
-func (p *GCPTerraformProvider) GetConfig() config.GCPTerraformConfig {
+func (p *GCPTerraformProvider) SetConfig(scope []string) config.GCPTerraformConfig {
 	return config.GCPTerraformConfig{
-		Organization: os.Getenv("CLOUDSDK_ORGANIZATION"),
-		Project:      os.Getenv("CLOUDSDK_CORE_PROJECT"),
-		Region:       os.Getenv("CLOUDSDK_COMPUTE_REGION"),
-		Zone:         os.Getenv("CLOUDSDK_COMPUTE_ZONE"),
-	}
-}
-
-func (p *GCPTerraformProvider) SetConfig(organization string, project string, region string, zone string) config.GCPTerraformConfig {
-	return config.GCPTerraformConfig{
-		Organization: organization,
-		Project:      project,
-		Region:       region,
-		Zone:         zone,
+		Scope: scope,
 	}
 }

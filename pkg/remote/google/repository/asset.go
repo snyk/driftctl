@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"fmt"
+	"strings"
 
 	asset "cloud.google.com/go/asset/apiv1"
 	"github.com/snyk/driftctl/pkg/remote/cache"
@@ -77,121 +77,89 @@ func NewAssetRepository(client *asset.Client, config config.GCPTerraformConfig, 
 }
 
 func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
-	req := &assetpb.ListAssetsRequest{
-		Parent:      fmt.Sprintf("projects/%s", s.config.Project),
-		ContentType: assetpb.ContentType_RESOURCE,
-		AssetTypes: []string{
-			cloudFunctionsFunction,
-			bigtableInstanceAssetType,
-			bigtableTableAssetType,
-			sqlDatabaseInstanceAssetType,
-			computeGlobalAddressAssetType,
-			nodeGroupAssetType,
-		},
-	}
-	var results []*assetpb.Asset
-
-	cacheKey := "listAllResources"
-	cachedResults := s.cache.GetAndLock(cacheKey)
-	defer s.cache.Unlock(cacheKey)
-	if cachedResults != nil {
-		results = cachedResults.([]*assetpb.Asset)
-	}
-
-	if results == nil {
-		it := s.client.ListAssets(context.Background(), req)
-		for {
-			resource, err := it.Next()
-			if err == iterator.Done {
-				break
-			}
-			if err != nil {
-				return nil, err
-			}
-			results = append(results, resource)
-		}
-		s.cache.Put(cacheKey, results)
-	}
 
 	filteredResults := []*assetpb.Asset{}
-	for _, result := range results {
-		if result.AssetType == ty {
-			filteredResults = append(filteredResults, result)
+
+	for _, scope := range s.config.Scope {
+		cacheKey := "listAllResources" + scope
+		cachedResults := s.cache.GetAndLock(cacheKey)
+		defer s.cache.Unlock(cacheKey)
+
+		req := &assetpb.ListAssetsRequest{
+			Parent:      scope,
+			ContentType: assetpb.ContentType_RESOURCE,
+			AssetTypes: []string{
+				cloudFunctionsFunction,
+				bigtableInstanceAssetType,
+				bigtableTableAssetType,
+				sqlDatabaseInstanceAssetType,
+				computeGlobalAddressAssetType,
+				nodeGroupAssetType,
+			},
+		}
+
+		var results []*assetpb.Asset
+
+		if cachedResults != nil {
+			results = cachedResults.([]*assetpb.Asset)
+		}
+
+		if results == nil {
+			it := s.client.ListAssets(context.Background(), req)
+			for {
+				resource, err := it.Next()
+				if err == iterator.Done {
+					break
+				}
+				if err != nil {
+					return nil, err
+				}
+				results = append(results, resource)
+			}
+			s.cache.Put(cacheKey, results)
+		}
+
+		for _, result := range results {
+			if result.AssetType == ty {
+				filteredResults = append(filteredResults, result)
+			}
 		}
 	}
-
 	return filteredResults, nil
 }
 
 func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearchResult, error) {
-	req := &assetpb.SearchAllResourcesRequest{
-		Scope: fmt.Sprintf("projects/%s", s.config.Project),
-		AssetTypes: []string{
-			storageBucketAssetType,
-			computeFirewallAssetType,
-			computeRouterAssetType,
-			computeInstanceAssetType,
-			computeNetworkAssetType,
-			computeSubnetworkAssetType,
-			dnsManagedZoneAssetType,
-			computeInstanceGroupAssetType,
-			bigqueryDatasetAssetType,
-			bigqueryTableAssetType,
-			computeAddressAssetType,
-			computeDiskAssetType,
-			computeImageAssetType,
-			healthCheckAssetType,
-			cloudRunServiceAssetType,
-			resourcemanagerFolderAssetType,
-		},
-	}
-	var results []*assetpb.ResourceSearchResult
-
-	cacheKey := "SearchAllResources"
-	cachedResults := s.cache.GetAndLock(cacheKey)
-	defer s.cache.Unlock(cacheKey)
-	if cachedResults != nil {
-		results = cachedResults.([]*assetpb.ResourceSearchResult)
-	}
-
-	if results == nil {
-		it := s.client.SearchAllResources(context.Background(), req)
-		for {
-			resource, err := it.Next()
-			if err == iterator.Done {
-				break
-			}
-			if err != nil {
-				return nil, err
-			}
-			results = append(results, resource)
-		}
-		s.cache.Put(cacheKey, results)
-	}
 
 	filteredResults := []*assetpb.ResourceSearchResult{}
-	for _, result := range results {
-		if result.AssetType == ty {
-			filteredResults = append(filteredResults, result)
-		}
-	}
 
-	return filteredResults, nil
-}
+	for _, scope := range s.config.Scope {
+		cacheKey := "SearchAllResources" + scope
+		cachedResults := s.cache.GetAndLock(cacheKey)
+		defer s.cache.Unlock(cacheKey)
 
-func (s assetRepository) searchAllOrgResources(ty string) ([]*assetpb.ResourceSearchResult, error) {
-	if len(s.config.Organization) > 0 {
 		req := &assetpb.SearchAllResourcesRequest{
-			Scope: fmt.Sprintf("organizations/%s", s.config.Organization),
+			Scope: scope,
 			AssetTypes: []string{
+				storageBucketAssetType,
+				computeFirewallAssetType,
+				computeRouterAssetType,
+				computeInstanceAssetType,
+				computeNetworkAssetType,
+				computeSubnetworkAssetType,
+				dnsManagedZoneAssetType,
+				computeInstanceGroupAssetType,
+				bigqueryDatasetAssetType,
+				bigqueryTableAssetType,
+				computeAddressAssetType,
+				computeDiskAssetType,
+				computeImageAssetType,
+				healthCheckAssetType,
+				cloudRunServiceAssetType,
 				resourcemanagerFolderAssetType,
 			},
 		}
 		var results []*assetpb.ResourceSearchResult
 
-		cacheKey := "SearchAllOrgResources"
-		cachedResults := s.cache.GetAndLock(cacheKey)
-		defer s.cache.Unlock(cacheKey)
 		if cachedResults != nil {
 			results = cachedResults.([]*assetpb.ResourceSearchResult)
 		}
@@ -211,16 +179,62 @@ func (s assetRepository) searchAllOrgResources(ty string) ([]*assetpb.ResourceSe
 			s.cache.Put(cacheKey, results)
 		}
 
-		filteredResults := []*assetpb.ResourceSearchResult{}
 		for _, result := range results {
 			if result.AssetType == ty {
 				filteredResults = append(filteredResults, result)
 			}
 		}
-
-		return filteredResults, nil
 	}
-	return nil, nil
+
+	return filteredResults, nil
+}
+
+func (s assetRepository) searchAllOrgResources(ty string) ([]*assetpb.ResourceSearchResult, error) {
+
+	filteredResults := []*assetpb.ResourceSearchResult{}
+
+	for _, scope := range s.config.Scope {
+		if strings.Contains(scope, "organizations/") {
+			cacheKey := "SearchAllOrgResources" + scope
+			cachedResults := s.cache.GetAndLock(cacheKey)
+			defer s.cache.Unlock(cacheKey)
+
+			req := &assetpb.SearchAllResourcesRequest{
+				Scope: scope,
+				AssetTypes: []string{
+					resourcemanagerFolderAssetType,
+				},
+			}
+			var results []*assetpb.ResourceSearchResult
+
+			if cachedResults != nil {
+				results = cachedResults.([]*assetpb.ResourceSearchResult)
+			}
+
+			if results == nil {
+				it := s.client.SearchAllResources(context.Background(), req)
+				for {
+					resource, err := it.Next()
+					if err == iterator.Done {
+						break
+					}
+					if err != nil {
+						return nil, err
+					}
+					results = append(results, resource)
+				}
+				s.cache.Put(cacheKey, results)
+			}
+
+			for _, result := range results {
+				if result.AssetType == ty {
+					filteredResults = append(filteredResults, result)
+				}
+			}
+		}
+	}
+
+	return filteredResults, nil
 }
 
 func (s assetRepository) SearchAllBuckets() ([]*assetpb.ResourceSearchResult, error) {

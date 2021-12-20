@@ -1,13 +1,15 @@
 package repository
 
 import (
+	"strings"
+
 	"github.com/snyk/driftctl/pkg/remote/cache"
 	"github.com/snyk/driftctl/pkg/remote/google/config"
 	"google.golang.org/api/cloudresourcemanager/v1"
 )
 
 type CloudResourceManagerRepository interface {
-	ListProjectsBindings() (map[string]map[string][]string, error)
+	ListProjectsBindings() (map[string]map[string][]string, map[string]error)
 }
 
 type cloudResourceManagerRepository struct {
@@ -24,27 +26,33 @@ func NewCloudResourceManagerRepository(service *cloudresourcemanager.Service, co
 	}
 }
 
-func (s *cloudResourceManagerRepository) ListProjectsBindings() (map[string]map[string][]string, error) {
-	if cachedResults := s.cache.Get("ListProjectsBindings"); cachedResults != nil {
-		return cachedResults.(map[string]map[string][]string), nil
-	}
-
-	request := new(cloudresourcemanager.GetIamPolicyRequest)
-	policy, err := s.service.Projects.GetIamPolicy(s.config.Project, request).Do()
-	if err != nil {
-		return nil, err
-	}
-
-	bindings := make(map[string][]string)
-
-	for _, binding := range policy.Bindings {
-		bindings[binding.Role] = binding.Members
-	}
+func (s *cloudResourceManagerRepository) ListProjectsBindings() (map[string]map[string][]string, map[string]error) {
 
 	bindingsByProject := make(map[string]map[string][]string)
-	bindingsByProject[s.config.Project] = bindings
+	errorsByProject := make(map[string]error)
 
-	s.cache.Put("ListProjectsBindings", bindingsByProject)
+	for _, scope := range s.config.Scope {
+		if strings.Contains(scope, "projects/") {
+			project := strings.Split(scope, "projects/")[1]
+			request := new(cloudresourcemanager.GetIamPolicyRequest)
+			policy, err := s.service.Projects.GetIamPolicy(project, request).Do()
+			if err != nil {
+				errorsByProject[project] = err
+				bindingsByProject[project] = nil
+				continue
+			}
 
-	return bindingsByProject, nil
+			bindings := make(map[string][]string)
+			for _, binding := range policy.Bindings {
+				bindings[binding.Role] = binding.Members
+			}
+			
+			bindingsByProject[project] = bindings
+			
+			s.cache.Put("ListProjectsBindings", bindingsByProject)
+
+		}
+	}
+
+	return bindingsByProject, errorsByProject
 }

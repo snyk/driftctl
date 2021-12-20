@@ -3,7 +3,7 @@ package google
 import (
 	"fmt"
 
-	remoteerror "github.com/snyk/driftctl/pkg/remote/error"
+	"github.com/sirupsen/logrus"
 	"github.com/snyk/driftctl/pkg/remote/google/repository"
 	"github.com/snyk/driftctl/pkg/resource"
 	"github.com/snyk/driftctl/pkg/resource/google"
@@ -27,12 +27,17 @@ func (e *GoogleProjectIamMemberEnumerator) SupportedType() resource.ResourceType
 
 func (e *GoogleProjectIamMemberEnumerator) Enumerate() ([]*resource.Resource, error) {
 	results := make([]*resource.Resource, 0)
+	errorsByProject := make(map[string]error)
 
-	bindingsByProject, err := e.repository.ListProjectsBindings()
-	if err != nil {
-		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
-	}
+	bindingsByProject, errorsByProject := e.repository.ListProjectsBindings()
+
 	for project, bindings := range bindingsByProject {
+		if val, ok := errorsByProject[project]; ok {
+			logrus.WithFields(logrus.Fields{
+				"project": project,
+				"error":   val.Error(),
+			}).Debug("When trying to get project IAM members")
+		}
 		for roleName, members := range bindings {
 			for _, member := range members {
 				id := fmt.Sprintf("%s/%s/%s", project, roleName, member)
@@ -53,5 +58,5 @@ func (e *GoogleProjectIamMemberEnumerator) Enumerate() ([]*resource.Resource, er
 		}
 	}
 
-	return results, err
+	return results, nil
 }
