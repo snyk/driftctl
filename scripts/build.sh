@@ -39,6 +39,11 @@ if [ "$CI" != true ]; then
     FLAGS+="--snapshot "
 fi
 
+if [ "$CI" == true ] && [ "$CMD" == "release" ]; then
+    ./scripts/changelog.sh > CHANGELOG.md
+    FLAGS+="--release-notes CHANGELOG.md "
+fi
+
 CMD="goreleaser ${CMD} ${FLAGS}"
 
 echo "+ Building using goreleaser"
