@@ -76,3 +76,12 @@ Build with ❤️️ from 🇫🇷 🇬🇧 🇯🇵 🇬🇷 🇸🇪 🇺🇸 
 We have 30 min slots for 1:1 [tech discussions and overviews](https://calendly.com/stephanejourdan/30min) twice a day to help you get started and collect users feedback.
 
 Feel free to book a slot.
+
+---
+
+## Security notice
+
+All Terraform state and Terraform files in this repository are for unit test
+purposes only. No running code attempts to access these resources (except to
+create and destroy them, in the case of acceptance tests). They are just opaque
+strings.
