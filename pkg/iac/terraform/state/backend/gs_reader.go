@@ -19,11 +19,6 @@ type GSBackend struct {
 }
 
 func NewGSReader(path string) (*GSBackend, error) {
-	storageClient, err := storage.NewClient(context.Background())
-	if err != nil {
-		return nil, err
-	}
-
 	bucketPath := strings.Split(path, "/")
 	if len(bucketPath) < 2 {
 		return nil, errors.Errorf("Unable to parse Google Storage path: %s. Must be BUCKET_NAME/PATH/TO/OBJECT", path)
@@ -32,14 +27,21 @@ func NewGSReader(path string) (*GSBackend, error) {
 	key := strings.Join(bucketPath[1:], "/")
 
 	return &GSBackend{
-		bucketName:    bucketName,
-		path:          key,
-		storageClient: storageClient,
+		bucketName: bucketName,
+		path:       key,
 	}, nil
 }
 
 func (s *GSBackend) Read(p []byte) (int, error) {
 	if s.reader == nil {
+		if s.storageClient == nil {
+			client, err := storage.NewClient(context.Background())
+			if err != nil {
+				return 0, err
+			}
+			s.storageClient = client
+		}
+
 		ctx := context.Background()
 		rc, err := s.storageClient.Bucket(s.bucketName).Object(s.path).NewReader(ctx)
 		if err != nil {

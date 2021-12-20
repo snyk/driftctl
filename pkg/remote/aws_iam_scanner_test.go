@@ -37,7 +37,7 @@ func TestIamUser(t *testing.T) {
 	}{
 		{
 			test:    "no iam user",
-			dirName: "iam_user_empty",
+			dirName: "aws_iam_user_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllUsers").Return([]*iam.User{}, nil)
 			},
@@ -45,7 +45,7 @@ func TestIamUser(t *testing.T) {
 		},
 		{
 			test:    "iam multiples users",
-			dirName: "iam_user_multiple",
+			dirName: "aws_iam_user_multiple",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllUsers").Return([]*iam.User{
 					{
@@ -63,7 +63,7 @@ func TestIamUser(t *testing.T) {
 		},
 		{
 			test:    "cannot list iam user",
-			dirName: "iam_user_empty",
+			dirName: "aws_iam_user_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllUsers").Return(nil, awsError)
@@ -143,7 +143,7 @@ func TestIamUserPolicy(t *testing.T) {
 	}{
 		{
 			test:    "no iam user policy",
-			dirName: "iam_user_policy_empty",
+			dirName: "aws_iam_user_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				users := []*iam.User{
 					{
@@ -157,7 +157,7 @@ func TestIamUserPolicy(t *testing.T) {
 		},
 		{
 			test:    "iam multiples users multiple policies",
-			dirName: "iam_user_policy_multiple",
+			dirName: "aws_iam_user_policy_multiple",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				users := []*iam.User{
 					{
@@ -190,7 +190,7 @@ func TestIamUserPolicy(t *testing.T) {
 		},
 		{
 			test:    "cannot list user",
-			dirName: "iam_user_policy_empty",
+			dirName: "aws_iam_user_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllUsers").Return(nil, awsError)
@@ -201,7 +201,7 @@ func TestIamUserPolicy(t *testing.T) {
 		},
 		{
 			test:    "cannot list user policy",
-			dirName: "iam_user_policy_empty",
+			dirName: "aws_iam_user_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllUsers").Once().Return([]*iam.User{}, nil)
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
@@ -282,7 +282,7 @@ func TestIamPolicy(t *testing.T) {
 	}{
 		{
 			test:    "no iam custom policies",
-			dirName: "iam_policy_empty",
+			dirName: "aws_iam_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllPolicies").Once().Return([]*iam.Policy{}, nil)
 			},
@@ -290,7 +290,7 @@ func TestIamPolicy(t *testing.T) {
 		},
 		{
 			test:    "iam multiples custom policies",
-			dirName: "iam_policy_multiple",
+			dirName: "aws_iam_policy_multiple",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllPolicies").Once().Return([]*iam.Policy{
 					{
@@ -308,7 +308,7 @@ func TestIamPolicy(t *testing.T) {
 		},
 		{
 			test:    "cannot list iam custom policies",
-			dirName: "iam_policy_empty",
+			dirName: "aws_iam_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllPolicies").Once().Return(nil, awsError)
@@ -389,7 +389,7 @@ func TestIamRole(t *testing.T) {
 	}{
 		{
 			test:    "no iam roles",
-			dirName: "iam_role_empty",
+			dirName: "aws_iam_role_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRoles").Return([]*iam.Role{}, nil)
 			},
@@ -397,7 +397,7 @@ func TestIamRole(t *testing.T) {
 		},
 		{
 			test:    "iam multiples roles",
-			dirName: "iam_role_multiple",
+			dirName: "aws_iam_role_multiple",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRoles").Return([]*iam.Role{
 					{
@@ -418,7 +418,7 @@ func TestIamRole(t *testing.T) {
 		},
 		{
 			test:    "iam roles ignore services roles",
-			dirName: "iam_role_ignore_services_roles",
+			dirName: "aws_iam_role_ignore_services_roles",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRoles").Return([]*iam.Role{
 					{
@@ -509,7 +509,7 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 	}{
 		{
 			test:    "no iam role policy",
-			dirName: "aws_iam_role_policy_empty",
+			dirName: "aws_aws_iam_role_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				roles := []*iam.Role{
 					{
@@ -692,7 +692,7 @@ func TestIamAccessKey(t *testing.T) {
 	}{
 		{
 			test:    "no iam access_key",
-			dirName: "iam_access_key_empty",
+			dirName: "aws_iam_access_key_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				users := []*iam.User{
 					{
@@ -706,7 +706,7 @@ func TestIamAccessKey(t *testing.T) {
 		},
 		{
 			test:    "iam multiples keys for multiples users",
-			dirName: "iam_access_key_multiple",
+			dirName: "aws_iam_access_key_multiple",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				users := []*iam.User{
 					{
@@ -737,7 +737,7 @@ func TestIamAccessKey(t *testing.T) {
 		},
 		{
 			test:    "Cannot list iam user",
-			dirName: "iam_access_key_empty",
+			dirName: "aws_iam_access_key_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllUsers").Once().Return(nil, awsError)
@@ -748,7 +748,7 @@ func TestIamAccessKey(t *testing.T) {
 		},
 		{
 			test:    "Cannot list iam access_key",
-			dirName: "iam_access_key_empty",
+			dirName: "aws_iam_access_key_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllUsers").Once().Return([]*iam.User{}, nil)
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
@@ -830,7 +830,7 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 	}{
 		{
 			test:    "no iam user policy",
-			dirName: "iam_user_policy_empty",
+			dirName: "aws_iam_user_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				users := []*iam.User{
 					{
@@ -844,7 +844,7 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 		},
 		{
 			test:    "iam multiples users multiple policies",
-			dirName: "iam_user_policy_attachment_multiple",
+			dirName: "aws_iam_user_policy_attachment_multiple",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				users := []*iam.User{
 					{
@@ -950,7 +950,7 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 		},
 		{
 			test:    "cannot list user",
-			dirName: "iam_user_policy_empty",
+			dirName: "aws_iam_user_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllUsers").Return(nil, awsError)
@@ -961,7 +961,7 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 		},
 		{
 			test:    "cannot list user policies attachment",
-			dirName: "iam_user_policy_empty",
+			dirName: "aws_iam_user_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllUsers").Once().Return([]*iam.User{}, nil)
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
@@ -1043,7 +1043,7 @@ func TestIamRolePolicy(t *testing.T) {
 	}{
 		{
 			test:    "no iam role policy",
-			dirName: "iam_role_policy_empty",
+			dirName: "aws_iam_role_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				roles := []*iam.Role{
 					{
@@ -1057,7 +1057,7 @@ func TestIamRolePolicy(t *testing.T) {
 		},
 		{
 			test:    "multiples roles with inline policies",
-			dirName: "iam_role_policy_multiple",
+			dirName: "aws_iam_role_policy_multiple",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				roles := []*iam.Role{
 					{
@@ -1081,7 +1081,7 @@ func TestIamRolePolicy(t *testing.T) {
 		},
 		{
 			test:    "Cannot list roles",
-			dirName: "iam_role_policy_empty",
+			dirName: "aws_iam_role_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllRoles").Once().Return(nil, awsError)
@@ -1092,7 +1092,7 @@ func TestIamRolePolicy(t *testing.T) {
 		},
 		{
 			test:    "cannot list role policy",
-			dirName: "iam_role_policy_empty",
+			dirName: "aws_iam_role_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRoles").Once().Return([]*iam.Role{}, nil)
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")

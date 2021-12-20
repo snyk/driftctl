@@ -39,7 +39,7 @@ func TestRoute53_HealthCheck(t *testing.T) {
 	}{
 		{
 			test:    "no health check",
-			dirName: "route53_health_check_empty",
+			dirName: "aws_route53_health_check_empty",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllHealthChecks").Return([]*route53.HealthCheck{}, nil)
 			},
@@ -47,7 +47,7 @@ func TestRoute53_HealthCheck(t *testing.T) {
 		},
 		{
 			test:    "Multiple health check",
-			dirName: "route53_health_check_multiple",
+			dirName: "aws_route53_health_check_multiple",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllHealthChecks").Return([]*route53.HealthCheck{
 					{Id: awssdk.String("7001a9df-ded4-4802-9909-668eb80b972b")},
@@ -58,7 +58,7 @@ func TestRoute53_HealthCheck(t *testing.T) {
 		},
 		{
 			test:    "cannot list health check",
-			dirName: "route53_health_check_empty",
+			dirName: "aws_route53_health_check_empty",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllHealthChecks").Return(nil, awsError)
@@ -139,7 +139,7 @@ func TestRoute53_Zone(t *testing.T) {
 	}{
 		{
 			test:    "no zones",
-			dirName: "route53_zone_empty",
+			dirName: "aws_route53_zone_empty",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{},
@@ -150,7 +150,7 @@ func TestRoute53_Zone(t *testing.T) {
 		},
 		{
 			test:    "single zone",
-			dirName: "route53_zone_single",
+			dirName: "aws_route53_zone_single",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{
@@ -166,7 +166,7 @@ func TestRoute53_Zone(t *testing.T) {
 		},
 		{
 			test:    "multiples zone (test pagination)",
-			dirName: "route53_zone_multiples",
+			dirName: "aws_route53_zone_multiples",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{
@@ -190,7 +190,7 @@ func TestRoute53_Zone(t *testing.T) {
 		},
 		{
 			test:    "cannot list zones",
-			dirName: "route53_zone_empty",
+			dirName: "aws_route53_zone_empty",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllZones").Return(
@@ -274,7 +274,7 @@ func TestRoute53_Record(t *testing.T) {
 	}{
 		{
 			test:    "no records",
-			dirName: "route53_zone_with_no_record",
+			dirName: "aws_route53_zone_with_no_record",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{
@@ -291,7 +291,7 @@ func TestRoute53_Record(t *testing.T) {
 		},
 		{
 			test:    "multiples records in multiples zones",
-			dirName: "route53_record_multiples",
+			dirName: "aws_route53_record_multiples",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{
@@ -339,7 +339,7 @@ func TestRoute53_Record(t *testing.T) {
 		},
 		{
 			test:    "explicit subdomain records",
-			dirName: "route53_record_explicit_subdomain",
+			dirName: "aws_route53_record_explicit_subdomain",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{
@@ -381,7 +381,7 @@ func TestRoute53_Record(t *testing.T) {
 		},
 		{
 			test:    "cannot list zones",
-			dirName: "route53_zone_with_no_record",
+			dirName: "aws_route53_zone_with_no_record",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllZones").Return(
@@ -394,7 +394,7 @@ func TestRoute53_Record(t *testing.T) {
 		},
 		{
 			test:    "cannot list records",
-			dirName: "route53_zone_with_no_record",
+			dirName: "aws_route53_zone_with_no_record",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllZones").Return(
 					[]*route53.HostedZone{
