@@ -13,6 +13,7 @@ orbs:
   go: circleci/go@1.7.0
   codecov: codecov/codecov@3.1.0
   snyk: snyk/snyk@1.1.2
+  gh: circleci/github-cli@1.1.0
 jobs:
   test_acc:
     parameters:
@@ -103,6 +104,8 @@ jobs:
       - image: golang:1.16
     steps:
       - checkout
+      - gh/setup:
+            version: 2.2.0
       - run:
           name: "Ensure GnuPG is available"
           command: gpg --version
