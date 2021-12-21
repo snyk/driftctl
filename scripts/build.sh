@@ -7,7 +7,7 @@ set -eo pipefail
 
 if ! which goreleaser >/dev/null; then
     echo "+ Installing goreleaser..."
-    go install github.com/goreleaser/goreleaser@v0.173.2
+    go install github.com/goreleaser/goreleaser@v1.1.0
 fi
 
 export ENV="${ENV:-dev}"
@@ -40,7 +40,9 @@ if [ "$CI" != true ]; then
 fi
 
 if [ "$CI" == true ] && [ "$CMD" == "release" ]; then
+    echo "Generating changelog..."
     ./scripts/changelog.sh > CHANGELOG.md
+    cat CHANGELOG.md
     FLAGS+="--release-notes CHANGELOG.md "
 fi
 
