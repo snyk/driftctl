@@ -48,9 +48,9 @@ func (s *cloudResourceManagerRepository) ListProjectsBindings() (map[string]map[
 			for _, binding := range policy.Bindings {
 				bindings[binding.Role] = binding.Members
 			}
-			
+
 			bindingsByProject[project] = bindings
-			
+
 			s.cache.Put("ListProjectsBindings", bindingsByProject)
 
 		}
