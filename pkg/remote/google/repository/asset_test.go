@@ -27,7 +27,7 @@ func Test_assetRepository_searchAllResources_CacheHit(t *testing.T) {
 	c := &cache.MockCache{}
 	c.On("GetAndLock", "SearchAllResources").Return(expectedResults).Times(1)
 	c.On("Unlock", "SearchAllResources").Times(1)
-	repo := NewAssetRepository(nil, config.GCPTerraformConfig{Project: ""}, c)
+	repo := NewAssetRepository(nil, config.GCPTerraformConfig{Scope: []string{""}}, c)
 
 	got, err := repo.searchAllResources("google_fake_type")
 	c.AssertExpectations(t)
@@ -55,7 +55,7 @@ func Test_assetRepository_searchAllResources_CacheMiss(t *testing.T) {
 	c.On("GetAndLock", "SearchAllResources").Return(nil).Times(1)
 	c.On("Unlock", "SearchAllResources").Times(1)
 	c.On("Put", "SearchAllResources", mock.IsType([]*assetpb.ResourceSearchResult{})).Return(false).Times(1)
-	repo := NewAssetRepository(assetClient, config.GCPTerraformConfig{Project: ""}, c)
+	repo := NewAssetRepository(assetClient, config.GCPTerraformConfig{Scope: []string{""}}, c)
 
 	got, err := repo.searchAllResources("google_fake_type")
 	c.AssertExpectations(t)

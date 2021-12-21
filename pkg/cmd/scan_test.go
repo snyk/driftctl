@@ -356,14 +356,14 @@ func Test_Options(t *testing.T) {
 		},
 		{
 			name: "should not find provider version in lockfile",
-			args: []string{"scan", "--to", "gcp+tf", "--tf-lockfile", "testdata/terraform_valid.lock.hcl"},
+			args: []string{"scan", "--to", "gcp+tf", "--gcp-scope", "organizations/123", "--tf-lockfile", "testdata/terraform_valid.lock.hcl"},
 			assertOptions: func(t *testing.T, opts *pkg.ScanOptions) {
 				assert.Equal(t, "", opts.ProviderVersion)
 			},
 		},
 		{
 			name: "should fail to read lockfile with silent error",
-			args: []string{"scan", "--to", "gcp+tf", "--tf-lockfile", "testdata/terraform_invalid.lock.hcl"},
+			args: []string{"scan", "--to", "gcp+tf", "--gcp-scope", "organizations/123", "--tf-lockfile", "testdata/terraform_invalid.lock.hcl"},
 			assertOptions: func(t *testing.T, opts *pkg.ScanOptions) {
 				assert.Equal(t, "", opts.ProviderVersion)
 			},

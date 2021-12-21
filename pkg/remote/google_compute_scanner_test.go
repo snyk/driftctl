@@ -129,7 +129,7 @@ func TestGoogleComputeFirewall(t *testing.T) {
 				provider.ShouldUpdate()
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeFirewallEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
@@ -252,7 +252,7 @@ func TestGoogleComputeRouter(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeRouterEnumerator(repo, factory))
 
@@ -356,7 +356,7 @@ func TestGoogleComputeInstance(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeInstanceEnumerator(repo, factory))
 
@@ -480,7 +480,7 @@ func TestGoogleComputeNetwork(t *testing.T) {
 				provider.ShouldUpdate()
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeNetworkEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
@@ -602,7 +602,7 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 				provider.ShouldUpdate()
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeInstanceGroupEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(googleresource.GoogleComputeInstanceGroupResourceType, common.NewGenericDetailsFetcher(googleresource.GoogleComputeInstanceGroupResourceType, provider, deserializer))
@@ -723,7 +723,7 @@ func TestGoogleComputeAddress(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeAddressEnumerator(repo, factory))
 
@@ -849,7 +849,7 @@ func TestGoogleComputeGlobalAddress(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeGlobalAddressEnumerator(repo, factory))
 
@@ -973,7 +973,7 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 				provider.ShouldUpdate()
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeSubnetworkEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
@@ -1082,7 +1082,7 @@ func TestGoogleComputeDisk(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeDiskEnumerator(repo, factory))
 
@@ -1192,7 +1192,7 @@ func TestGoogleComputeImage(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeImageEnumerator(repo, factory))
 
@@ -1302,7 +1302,7 @@ func TestGoogleComputeHealthCheck(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeHealthCheckEnumerator(repo, factory))
 
@@ -1412,7 +1412,7 @@ func TestGoogleComputeNodeGroup(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeNodeGroupEnumerator(repo, factory))
 

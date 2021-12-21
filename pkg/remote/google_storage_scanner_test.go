@@ -138,7 +138,7 @@ func TestGoogleStorageBucket(t *testing.T) {
 				provider.ShouldUpdate()
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleStorageBucketEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))

@@ -127,7 +127,7 @@ func TestGoogleSQLDatabaseInstance(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleSQLDatabaseInstanceEnumerator(repo, factory))
 

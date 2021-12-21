@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/snyk/driftctl/pkg/remote/cache"
@@ -9,7 +10,7 @@ import (
 )
 
 type CloudResourceManagerRepository interface {
-	ListProjectsBindings() (map[string]map[string][]string, map[string]error)
+	ListProjectsBindings() (map[string]map[string][]string, error)
 }
 
 type cloudResourceManagerRepository struct {
@@ -26,10 +27,11 @@ func NewCloudResourceManagerRepository(service *cloudresourcemanager.Service, co
 	}
 }
 
-func (s *cloudResourceManagerRepository) ListProjectsBindings() (map[string]map[string][]string, map[string]error) {
+func (s *cloudResourceManagerRepository) ListProjectsBindings() (map[string]map[string][]string, error) {
 
 	bindingsByProject := make(map[string]map[string][]string)
 	errorsByProject := make(map[string]error)
+	var erorsString string
 
 	for _, scope := range s.config.Scope {
 		if strings.Contains(scope, "projects/") {
@@ -54,5 +56,12 @@ func (s *cloudResourceManagerRepository) ListProjectsBindings() (map[string]map[
 		}
 	}
 
-	return bindingsByProject, errorsByProject
+	if len(errorsByProject) > 0 {
+		for project, errval := range errorsByProject {
+			erorsString = erorsString + "Project: " + project + " had the following error: " + errval.Error() + "; "
+		}
+		return bindingsByProject, errors.New(erorsString)
+	} else {
+		return bindingsByProject, nil
+	}
 }

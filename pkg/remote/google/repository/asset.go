@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"strings"
 
 	asset "cloud.google.com/go/asset/apiv1"
 	"github.com/snyk/driftctl/pkg/remote/cache"
@@ -13,28 +12,27 @@ import (
 
 // https://cloud.google.com/asset-inventory/docs/supported-asset-types#supported_resource_types
 const (
-	storageBucketAssetType         = "storage.googleapis.com/Bucket"
-	computeFirewallAssetType       = "compute.googleapis.com/Firewall"
-	computeRouterAssetType         = "compute.googleapis.com/Router"
-	computeInstanceAssetType       = "compute.googleapis.com/Instance"
-	computeNetworkAssetType        = "compute.googleapis.com/Network"
-	computeSubnetworkAssetType     = "compute.googleapis.com/Subnetwork"
-	computeDiskAssetType           = "compute.googleapis.com/Disk"
-	computeImageAssetType          = "compute.googleapis.com/Image"
-	dnsManagedZoneAssetType        = "dns.googleapis.com/ManagedZone"
-	computeInstanceGroupAssetType  = "compute.googleapis.com/InstanceGroup"
-	bigqueryDatasetAssetType       = "bigquery.googleapis.com/Dataset"
-	bigqueryTableAssetType         = "bigquery.googleapis.com/Table"
-	computeAddressAssetType        = "compute.googleapis.com/Address"
-	computeGlobalAddressAssetType  = "compute.googleapis.com/GlobalAddress"
-	cloudFunctionsFunction         = "cloudfunctions.googleapis.com/CloudFunction"
-	bigtableInstanceAssetType      = "bigtableadmin.googleapis.com/Instance"
-	bigtableTableAssetType         = "bigtableadmin.googleapis.com/Table"
-	sqlDatabaseInstanceAssetType   = "sqladmin.googleapis.com/Instance"
-	healthCheckAssetType           = "compute.googleapis.com/HealthCheck"
-	cloudRunServiceAssetType       = "run.googleapis.com/Service"
-	nodeGroupAssetType             = "compute.googleapis.com/NodeGroup"
-	resourcemanagerFolderAssetType = "cloudresourcemanager.googleapis.com/Folder"
+	storageBucketAssetType          = "storage.googleapis.com/Bucket"
+	computeFirewallAssetType        = "compute.googleapis.com/Firewall"
+	computeRouterAssetType          = "compute.googleapis.com/Router"
+	computeInstanceAssetType        = "compute.googleapis.com/Instance"
+	computeNetworkAssetType         = "compute.googleapis.com/Network"
+	computeSubnetworkAssetType      = "compute.googleapis.com/Subnetwork"
+	computeDiskAssetType            = "compute.googleapis.com/Disk"
+	computeImageAssetType           = "compute.googleapis.com/Image"
+	dnsManagedZoneAssetType         = "dns.googleapis.com/ManagedZone"
+	computeInstanceGroupAssetType   = "compute.googleapis.com/InstanceGroup"
+	bigqueryDatasetAssetType        = "bigquery.googleapis.com/Dataset"
+	bigqueryTableAssetType          = "bigquery.googleapis.com/Table"
+	computeAddressAssetType         = "compute.googleapis.com/Address"
+	computeGlobalAddressAssetType   = "compute.googleapis.com/GlobalAddress"
+	cloudFunctionsFunction          = "cloudfunctions.googleapis.com/CloudFunction"
+	bigtableInstanceAssetType       = "bigtableadmin.googleapis.com/Instance"
+	bigtableTableAssetType          = "bigtableadmin.googleapis.com/Table"
+	sqlDatabaseInstanceAssetType    = "sqladmin.googleapis.com/Instance"
+	healthCheckAssetType            = "compute.googleapis.com/HealthCheck"
+	cloudRunServiceAssetType        = "run.googleapis.com/Service"
+	nodeGroupAssetType              = "compute.googleapis.com/NodeGroup"
 )
 
 type AssetRepository interface {
@@ -59,7 +57,6 @@ type AssetRepository interface {
 	SearchAllHealthChecks() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllCloudRunServices() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllNodeGroups() ([]*assetpb.Asset, error)
-	SearchAllFolders() ([]*assetpb.ResourceSearchResult, error)
 }
 
 type assetRepository struct {
@@ -155,7 +152,6 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 				computeImageAssetType,
 				healthCheckAssetType,
 				cloudRunServiceAssetType,
-				resourcemanagerFolderAssetType,
 			},
 		}
 		var results []*assetpb.ResourceSearchResult
@@ -182,54 +178,6 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 		for _, result := range results {
 			if result.AssetType == ty {
 				filteredResults = append(filteredResults, result)
-			}
-		}
-	}
-
-	return filteredResults, nil
-}
-
-func (s assetRepository) searchAllOrgResources(ty string) ([]*assetpb.ResourceSearchResult, error) {
-
-	filteredResults := []*assetpb.ResourceSearchResult{}
-
-	for _, scope := range s.config.Scope {
-		if strings.Contains(scope, "organizations/") {
-			cacheKey := "SearchAllOrgResources" + scope
-			cachedResults := s.cache.GetAndLock(cacheKey)
-			defer s.cache.Unlock(cacheKey)
-
-			req := &assetpb.SearchAllResourcesRequest{
-				Scope: scope,
-				AssetTypes: []string{
-					resourcemanagerFolderAssetType,
-				},
-			}
-			var results []*assetpb.ResourceSearchResult
-
-			if cachedResults != nil {
-				results = cachedResults.([]*assetpb.ResourceSearchResult)
-			}
-
-			if results == nil {
-				it := s.client.SearchAllResources(context.Background(), req)
-				for {
-					resource, err := it.Next()
-					if err == iterator.Done {
-						break
-					}
-					if err != nil {
-						return nil, err
-					}
-					results = append(results, resource)
-				}
-				s.cache.Put(cacheKey, results)
-			}
-
-			for _, result := range results {
-				if result.AssetType == ty {
-					filteredResults = append(filteredResults, result)
-				}
 			}
 		}
 	}
@@ -319,8 +267,4 @@ func (s assetRepository) SearchAllCloudRunServices() ([]*assetpb.ResourceSearchR
 
 func (s assetRepository) SearchAllNodeGroups() ([]*assetpb.Asset, error) {
 	return s.listAllResources(nodeGroupAssetType)
-}
-
-func (s assetRepository) SearchAllFolders() ([]*assetpb.ResourceSearchResult, error) {
-	return s.searchAllOrgResources(resourcemanagerFolderAssetType)
 }

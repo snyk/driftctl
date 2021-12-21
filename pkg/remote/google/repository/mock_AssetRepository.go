@@ -219,29 +219,6 @@ func (_m *MockAssetRepository) SearchAllFirewalls() ([]*asset.ResourceSearchResu
 	return r0, r1
 }
 
-// SearchAllFolders provides a mock function with given fields:
-func (_m *MockAssetRepository) SearchAllFolders() ([]*asset.ResourceSearchResult, error) {
-	ret := _m.Called()
-
-	var r0 []*asset.ResourceSearchResult
-	if rf, ok := ret.Get(0).(func() []*asset.ResourceSearchResult); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*asset.ResourceSearchResult)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // SearchAllFunctions provides a mock function with given fields:
 func (_m *MockAssetRepository) SearchAllFunctions() ([]*asset.Asset, error) {
 	ret := _m.Called()
