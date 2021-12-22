@@ -73,10 +73,8 @@ func runTest(t *testing.T, cases TestCases) {
 				schema, _ := repo.GetSchema(res.ResourceType())
 				res.Sch = schema
 			}
-
-			remoteSupplier := &resource.MockRemoteSupplier{}
-			remoteSupplier.On("EnumerateResources").Return(c.remoteResources, nil)
-			remoteSupplier.On("ReadResources", mock.IsType([]*resource.Resource{})).Return(c.remoteResources, nil)
+			remoteSupplier := &resource.MockSupplier{}
+			remoteSupplier.On("Resources").Return(c.remoteResources, nil)
 
 			var resourceFactory resource.ResourceFactory = terraform.NewTerraformResourceFactory(repo)
 
@@ -90,8 +88,8 @@ func runTest(t *testing.T, cases TestCases) {
 			}
 
 			scanProgress := &output.MockProgress{}
-			scanProgress.On("Start").Return().Times(2)
-			scanProgress.On("Stop").Return().Times(2)
+			scanProgress.On("Start").Return().Once()
+			scanProgress.On("Stop").Return().Once()
 
 			iacProgress := &output.MockProgress{}
 			iacProgress.On("Start").Return().Once()
