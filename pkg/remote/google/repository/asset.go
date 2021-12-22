@@ -111,11 +111,11 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 				if err == iterator.Done {
 					break
 				}
-				if err != nil && resource != nil{
+				if err != nil && resource != nil {
 					erorString = erorString + fmt.Sprintf("For scope %s on resource %s got error: %s; ", scope, resource.AssetType, err.Error())
 					continue
 				}
-				if err != nil && resource == nil{
+				if err != nil && resource == nil {
 					return nil, err
 				}
 				results = append(results, resource)
@@ -180,11 +180,11 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 				if err == iterator.Done {
 					break
 				}
-				if err != nil && resource != nil{
+				if err != nil && resource != nil {
 					erorString = erorString + fmt.Sprintf("For scope %s on resource %s got error: %s; ", scope, resource.AssetType, err.Error())
 					continue
 				}
-				if err != nil && resource == nil{
+				if err != nil && resource == nil {
 					return nil, err
 				}
 				results = append(results, resource)
