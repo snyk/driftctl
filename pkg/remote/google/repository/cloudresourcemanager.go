@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/snyk/driftctl/pkg/remote/cache"
@@ -31,9 +32,9 @@ func (s *cloudResourceManagerRepository) ListProjectsBindings() (map[string]map[
 
 	bindingsByProject := make(map[string]map[string][]string)
 	errorsByProject := make(map[string]error)
-	var erorsString string
+	var erorString string
 
-	for _, scope := range s.config.Scope {
+	for _, scope := range s.config.Scopes {
 		if strings.Contains(scope, "projects/") {
 			project := strings.Split(scope, "projects/")[1]
 			request := new(cloudresourcemanager.GetIamPolicyRequest)
@@ -58,10 +59,10 @@ func (s *cloudResourceManagerRepository) ListProjectsBindings() (map[string]map[
 
 	if len(errorsByProject) > 0 {
 		for project, errval := range errorsByProject {
-			erorsString = erorsString + "Project: " + project + " had the following error: " + errval.Error() + "; "
+			erorString = erorString + fmt.Sprintf("Project: %s had the following error: %s; ", project, errval.Error())
 		}
-		return bindingsByProject, errors.New(erorsString)
-	} else {
-		return bindingsByProject, nil
+		return bindingsByProject, errors.New(erorString)
 	}
+
+	return bindingsByProject, nil
 }

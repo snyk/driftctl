@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	asset "cloud.google.com/go/asset/apiv1"
 	"github.com/snyk/driftctl/pkg/remote/cache"
@@ -76,9 +78,10 @@ func NewAssetRepository(client *asset.Client, config config.GCPTerraformConfig, 
 func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 
 	filteredResults := []*assetpb.Asset{}
+	var erorString string
 
-	for _, scope := range s.config.Scope {
-		cacheKey := "listAllResources" + scope
+	for _, scope := range s.config.Scopes {
+		cacheKey := fmt.Sprintf("listAllResources_%s", scope)
 		cachedResults := s.cache.GetAndLock(cacheKey)
 		defer s.cache.Unlock(cacheKey)
 
@@ -108,7 +111,11 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 				if err == iterator.Done {
 					break
 				}
-				if err != nil {
+				if err != nil && resource != nil{
+					erorString = erorString + fmt.Sprintf("For scope %s on resource %s got error: %s; ", scope, resource.AssetType, err.Error())
+					continue
+				}
+				if err != nil && resource == nil{
 					return nil, err
 				}
 				results = append(results, resource)
@@ -122,15 +129,21 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 			}
 		}
 	}
+
+	if len(erorString) > 0 {
+		return filteredResults, errors.New(erorString)
+	}
+
 	return filteredResults, nil
 }
 
 func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearchResult, error) {
 
 	filteredResults := []*assetpb.ResourceSearchResult{}
+	var erorString string
 
-	for _, scope := range s.config.Scope {
-		cacheKey := "SearchAllResources" + scope
+	for _, scope := range s.config.Scopes {
+		cacheKey := fmt.Sprintf("SearchAllResources_%s", scope)
 		cachedResults := s.cache.GetAndLock(cacheKey)
 		defer s.cache.Unlock(cacheKey)
 
@@ -167,7 +180,11 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 				if err == iterator.Done {
 					break
 				}
-				if err != nil {
+				if err != nil && resource != nil{
+					erorString = erorString + fmt.Sprintf("For scope %s on resource %s got error: %s; ", scope, resource.AssetType, err.Error())
+					continue
+				}
+				if err != nil && resource == nil{
 					return nil, err
 				}
 				results = append(results, resource)
@@ -180,6 +197,10 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 				filteredResults = append(filteredResults, result)
 			}
 		}
+	}
+
+	if len(erorString) > 0 {
+		return filteredResults, errors.New(erorString)
 	}
 
 	return filteredResults, nil

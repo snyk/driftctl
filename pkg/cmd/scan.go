@@ -142,7 +142,7 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 	)
 	fl.StringSliceP(
 		"gcp-scope",
-		"s",
+		"",
 		[]string{},
 		"Set the GCP scope for search",
 	)
@@ -347,7 +347,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 func parseScopeFlag(scope []string) ([]string, error) {
 
-	scopeRegex := `projects/\S*$|folders/\d*$|organizations/\S*$`
+	scopeRegex := `projects/\S*$|folders/\d*$|organizations/\d*$`
 	r := regexp.MustCompile(scopeRegex)
 
 	for _, v := range scope {

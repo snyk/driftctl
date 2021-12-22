@@ -53,8 +53,8 @@ func (p *GCPTerraformProvider) Version() string {
 	return p.version
 }
 
-func (p *GCPTerraformProvider) SetConfig(scope []string) config.GCPTerraformConfig {
+func (p *GCPTerraformProvider) SetConfig(scopes []string) config.GCPTerraformConfig {
 	return config.GCPTerraformConfig{
-		Scope: scope,
+		Scopes: scopes,
 	}
 }
