@@ -226,25 +226,23 @@ workflows:
           context:
             - driftctl-snyk
           <<: *only_maintainers
-# Disabled since it makes every PR to stay in "pending" state
-# https://ideas.circleci.com/cloud-feature-requests/p/show-overall-all-checks-have-passed-status-in-github-even-on-builds-with-incompl
-#  pullrequest_acc:
-#    jobs:
-#      - hold:
-#          type: approval # presents manual approval button in the UI
-#      - test_acc:
-#          name: "Acceptance tests: << matrix.pattern >>"
-#          requires:
-#            - hold
-#          matrix:
-#            parameters:
-#              pattern:
-#                - TestAcc_Aws
-#                - TestAcc_Github_
-#                - TestAcc_Google
-#                - TestAcc_Azure_
-#          context:
-#            - driftctl-acc
+  pullrequest_acc:
+    jobs:
+      - hold:
+          type: approval # presents manual approval button in the UI
+      - test_acc:
+          name: "Acceptance tests: << matrix.pattern >>"
+          requires:
+            - hold
+          matrix:
+            parameters:
+              pattern:
+                - TestAcc_Aws
+                - TestAcc_Github_
+                - TestAcc_Google
+                - TestAcc_Azure_
+          context:
+            - driftctl-acc
   push:
     jobs:
       - test:
