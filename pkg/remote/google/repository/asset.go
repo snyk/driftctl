@@ -78,7 +78,7 @@ func NewAssetRepository(client *asset.Client, config config.GCPTerraformConfig, 
 func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 
 	filteredResults := []*assetpb.Asset{}
-	var erorString string
+	var errorString string
 
 	for _, scope := range s.config.Scopes {
 		cacheKey := fmt.Sprintf("listAllResources_%s", scope)
@@ -112,7 +112,7 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 					break
 				}
 				if err != nil && resource != nil {
-					erorString = erorString + fmt.Sprintf("For scope %s on resource %s got error: %s; ", scope, resource.AssetType, err.Error())
+					errorString = errorString + fmt.Sprintf("For scope %s on resource %s got error: %s; ", scope, resource.AssetType, err.Error())
 					continue
 				}
 				if err != nil && resource == nil {
@@ -130,8 +130,8 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 		}
 	}
 
-	if len(erorString) > 0 {
-		return filteredResults, errors.New(erorString)
+	if len(errorString) > 0 {
+		return filteredResults, errors.New(errorString)
 	}
 
 	return filteredResults, nil
@@ -140,7 +140,7 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearchResult, error) {
 
 	filteredResults := []*assetpb.ResourceSearchResult{}
-	var erorString string
+	var errorString string
 
 	for _, scope := range s.config.Scopes {
 		cacheKey := fmt.Sprintf("SearchAllResources_%s", scope)
@@ -181,7 +181,7 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 					break
 				}
 				if err != nil && resource != nil {
-					erorString = erorString + fmt.Sprintf("For scope %s on resource %s got error: %s; ", scope, resource.AssetType, err.Error())
+					errorString = errorString + fmt.Sprintf("For scope %s on resource %s got error: %s; ", scope, resource.AssetType, err.Error())
 					continue
 				}
 				if err != nil && resource == nil {
@@ -199,8 +199,8 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 		}
 	}
 
-	if len(erorString) > 0 {
-		return filteredResults, errors.New(erorString)
+	if len(errorString) > 0 {
+		return filteredResults, errors.New(errorString)
 	}
 
 	return filteredResults, nil

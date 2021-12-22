@@ -140,9 +140,8 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 		false,
 		"Do not display anything but scan results",
 	)
-	fl.StringSliceP(
+	fl.StringSlice(
 		"gcp-scope",
-		"",
 		[]string{},
 		"Set the GCP scope for search",
 	)
