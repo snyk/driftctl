@@ -74,14 +74,7 @@ type GenDriftIgnoreOptions struct {
 }
 
 func NewAnalysis(options AnalyzerOptions) *Analysis {
-	return &Analysis{
-		unmanaged:   []*resource.Resource{},
-		managed:     []*resource.Resource{},
-		deleted:     []*resource.Resource{},
-		differences: []Difference{},
-		alerts:      alerter.Alerts{},
-		options:     options,
-	}
+	return &Analysis{options: options}
 }
 
 func (a Analysis) MarshalJSON() ([]byte, error) {
