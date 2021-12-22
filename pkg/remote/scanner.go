@@ -58,7 +58,7 @@ loop:
 	return results, runner.Err()
 }
 
-func (s *Scanner) EnumerateResources() ([]*resource.Resource, error) {
+func (s *Scanner) scan() ([]*resource.Resource, error) {
 	for _, enumerator := range s.remoteLibrary.Enumerators() {
 		if s.filter.IsTypeIgnored(enumerator.SupportedType()) {
 			logrus.WithFields(logrus.Fields{
@@ -89,11 +89,16 @@ func (s *Scanner) EnumerateResources() ([]*resource.Resource, error) {
 		})
 	}
 
-	return s.retrieveRunnerResults(s.enumeratorRunner)
-}
+	enumerationResult, err := s.retrieveRunnerResults(s.enumeratorRunner)
+	if err != nil {
+		return nil, err
+	}
 
-func (s *Scanner) ReadResources(managedResources []*resource.Resource) ([]*resource.Resource, error) {
-	for _, res := range managedResources {
+	if !s.options.Deep {
+		return enumerationResult, nil
+	}
+
+	for _, res := range enumerationResult {
 		res := res
 		s.detailsFetcherRunner.Run(func() (interface{}, error) {
 			fetcher := s.remoteLibrary.GetDetailsFetcher(resource.ResourceType(res.ResourceType()))
@@ -116,17 +121,7 @@ func (s *Scanner) ReadResources(managedResources []*resource.Resource) ([]*resou
 }
 
 func (s *Scanner) Resources() ([]*resource.Resource, error) {
-	resources, err := s.EnumerateResources()
-	if err != nil {
-		return nil, err
-	}
-
-	if !s.options.Deep {
-		return resources, nil
-	}
-
-	// Be aware that this call will read all resources, no matter they're managed or not
-	resources, err = s.ReadResources(resources)
+	resources, err := s.scan()
 	if err != nil {
 		return nil, err
 	}
