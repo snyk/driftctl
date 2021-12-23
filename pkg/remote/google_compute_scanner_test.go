@@ -76,7 +76,7 @@ func TestGoogleComputeFirewall(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_firewall",
 						),
 						alerts.EnumerationPhase,
@@ -212,7 +212,7 @@ func TestGoogleComputeRouter(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							googleresource.GoogleComputeRouterResourceType,
 						),
 						alerts.EnumerationPhase,
@@ -319,7 +319,7 @@ func TestGoogleComputeInstance(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_instance",
 						),
 						alerts.EnumerationPhase,
@@ -427,7 +427,7 @@ func TestGoogleComputeNetwork(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_network",
 						),
 						alerts.EnumerationPhase,
@@ -549,7 +549,7 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_instance_group",
 						),
 						alerts.EnumerationPhase,
@@ -686,7 +686,7 @@ func TestGoogleComputeAddress(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_address",
 						),
 						alerts.EnumerationPhase,
@@ -812,7 +812,7 @@ func TestGoogleComputeGlobalAddress(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_global_address",
 						),
 						alerts.EnumerationPhase,
@@ -920,7 +920,7 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_subnetwork",
 						),
 						alerts.EnumerationPhase,
@@ -1045,7 +1045,7 @@ func TestGoogleComputeDisk(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_disk",
 						),
 						alerts.EnumerationPhase,
@@ -1155,7 +1155,7 @@ func TestGoogleComputeImage(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_image",
 						),
 						alerts.EnumerationPhase,
@@ -1265,7 +1265,7 @@ func TestGoogleComputeHealthCheck(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_health_check",
 						),
 						alerts.EnumerationPhase,
@@ -1375,7 +1375,7 @@ func TestGoogleComputeNodeGroup(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_node_group",
 						),
 						alerts.EnumerationPhase,

@@ -10,6 +10,8 @@ import (
 	"github.com/snyk/driftctl/pkg/remote/google/config"
 	"google.golang.org/api/iterator"
 	assetpb "google.golang.org/genproto/googleapis/cloud/asset/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // https://cloud.google.com/asset-inventory/docs/supported-asset-types#supported_resource_types
@@ -79,6 +81,7 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 
 	filteredResults := []*assetpb.Asset{}
 	var errorString string
+	var errCode codes.Code
 
 	for _, scope := range s.config.Scopes {
 		cacheKey := fmt.Sprintf("listAllResources_%s", scope)
@@ -116,7 +119,9 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 					continue
 				}
 				if err != nil && resource == nil {
-					return nil, err
+					errorString = errorString + fmt.Sprintf("For scope %s got error: %s; ", scope, err.Error())
+					errCode = status.Code(err)
+					break
 				}
 				results = append(results, resource)
 			}
@@ -130,8 +135,12 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 		}
 	}
 
-	if len(errorString) > 0 {
+	if len(errorString) > 0 && len(filteredResults) > 0 {
 		return filteredResults, errors.New(errorString)
+	}
+
+	if len(errorString) > 0 && len(filteredResults) == 0 {
+		return nil, status.Error(errCode, errorString)
 	}
 
 	return filteredResults, nil
@@ -141,6 +150,7 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 
 	filteredResults := []*assetpb.ResourceSearchResult{}
 	var errorString string
+	var errCode codes.Code
 
 	for _, scope := range s.config.Scopes {
 		cacheKey := fmt.Sprintf("SearchAllResources_%s", scope)
@@ -185,7 +195,9 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 					continue
 				}
 				if err != nil && resource == nil {
-					return nil, err
+					errorString = errorString + fmt.Sprintf("For scope %s got error: %s; ", scope, err.Error())
+					errCode = status.Code(err)
+					break
 				}
 				results = append(results, resource)
 			}
@@ -199,8 +211,12 @@ func (s assetRepository) searchAllResources(ty string) ([]*assetpb.ResourceSearc
 		}
 	}
 
-	if len(errorString) > 0 {
+	if len(errorString) > 0 && len(filteredResults) > 0 {
 		return filteredResults, errors.New(errorString)
+	}
+
+	if len(errorString) > 0 && len(filteredResults) == 0 {
+		return nil, status.Error(errCode, errorString)
 	}
 
 	return filteredResults, nil

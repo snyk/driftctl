@@ -90,7 +90,7 @@ func TestGoogleDNSNanagedZone(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							googleresource.GoogleDNSManagedZoneResourceType,
 						),
 						alerts.EnumerationPhase,
