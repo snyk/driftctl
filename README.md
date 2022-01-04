@@ -21,7 +21,7 @@
 
 <p align="center">
   Measures infrastructure as code coverage, and tracks infrastructure drift.<br>
-  <strong>IaC:</strong> Terraform, <strong>Cloud providers:</strong> AWS, GitHub (Azure and GCP on the roadmap for 2021).<br>
+  <strong>IaC:</strong> Terraform. <strong>Cloud providers:</strong> AWS, GitHub, Azure, GCP.<br>
   :warning: <strong>This tool is still in beta state and will evolve in the future with potential breaking changes</strong> :warning:
 </p>
 
@@ -49,7 +49,7 @@ Spot discrepancies as they happen: driftctl is a free and open-source CLI that w
 - Allow users to **ignore** resources
 - Multiple output formats
 
----
+## Links
 
 **[Get Started](https://driftctl.com/product/quick-tutorial/)**
 
@@ -59,8 +59,6 @@ Spot discrepancies as they happen: driftctl is a free and open-source CLI that w
 
 **[Discord](https://discord.gg/7zHQ8r2PgP)**
 
----
-
 ## Contribute
 
 To learn more about compiling driftctl and contributing, please refer to the [contribution guidelines](.github/CONTRIBUTING.md) and the [contributing guide](docs/README.md) for technical details.
@@ -69,15 +67,11 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 Build with ❤️️ from 🇫🇷 🇬🇧 🇯🇵 🇬🇷 🇸🇪 🇺🇸 🇷🇪 🇨🇦 🇮🇱
 
----
-
 ## Helping you get started
 
 We have 30 min slots for 1:1 [tech discussions and overviews](https://calendly.com/stephanejourdan/30min) twice a day to help you get started and collect users feedback.
 
 Feel free to book a slot.
-
----
 
 ## Security notice
 
