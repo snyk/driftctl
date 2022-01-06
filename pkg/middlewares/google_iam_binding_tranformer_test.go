@@ -19,6 +19,29 @@ func TestGoogleProjectIAMBindingTransformer_Execute(t *testing.T) {
 		mock               func(factory *terraform.MockResourceFactory)
 	}{
 		{
+			name: "Test that bindings with nil members does not cause any crash",
+			resourcesFromState: []*resource.Resource{
+				{
+					Type: google.GoogleStorageBucketIamBindingResourceType,
+					Attrs: &resource.Attributes{
+						"bucket":  "hey",
+						"role":    "storage.admin",
+						"members": nil,
+					},
+				},
+				{
+					Type: google.GoogleProjectIamBindingResourceType,
+					Attrs: &resource.Attributes{
+						"project": "coucou",
+						"role":    "storage.admin",
+						"members": nil,
+					},
+				},
+			},
+			expected: []*resource.Resource{},
+			mock:     nil,
+		},
+		{
 			"Test that project bindings are transformed into member",
 			[]*resource.Resource{
 				{
