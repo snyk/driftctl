@@ -766,8 +766,8 @@ func TestAzurermSecurityGroups(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				con := arm.NewDefaultConnection(cred, nil)
-				repo = repository.NewNetworkRepository(con, realProvider.GetConfig(), cache.New(0))
+				clientOptions := &arm.ClientOptions{}
+				repo = repository.NewNetworkRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermNetworkSecurityGroupEnumerator(repo, factory))
@@ -987,8 +987,8 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				con := arm.NewDefaultConnection(cred, nil)
-				repo = repository.NewNetworkRepository(con, realProvider.GetConfig(), cache.New(0))
+				clientOptions := &arm.ClientOptions{}
+				repo = repository.NewNetworkRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermLoadBalancerRuleEnumerator(repo, factory))
