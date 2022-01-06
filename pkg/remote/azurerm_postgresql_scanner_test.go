@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
-	"github.com/Azure/azure-sdk-for-go/sdk/postgresql/armpostgresql"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/postgresql/armpostgresql"
 	"github.com/pkg/errors"
 	"github.com/snyk/driftctl/mocks"
 	"github.com/snyk/driftctl/pkg/filter"

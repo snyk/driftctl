@@ -3,7 +3,7 @@
 package repository
 
 import (
-	armnetwork "github.com/Azure/azure-sdk-for-go/sdk/network/armnetwork"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork"
 	mock "github.com/stretchr/testify/mock"
 )
 

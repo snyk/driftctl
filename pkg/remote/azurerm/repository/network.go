@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
-	"github.com/Azure/azure-sdk-for-go/sdk/network/armnetwork"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/snyk/driftctl/pkg/remote/azurerm/common"
 	"github.com/snyk/driftctl/pkg/remote/cache"
@@ -170,16 +171,16 @@ type networkRepository struct {
 	cache                       cache.Cache
 }
 
-func NewNetworkRepository(con *arm.Connection, config common.AzureProviderConfig, cache cache.Cache) *networkRepository {
+func NewNetworkRepository(cred azcore.TokenCredential, options *arm.ClientOptions, config common.AzureProviderConfig, cache cache.Cache) *networkRepository {
 	return &networkRepository{
-		&virtualNetworksClientImpl{client: armnetwork.NewVirtualNetworksClient(con, config.SubscriptionID)},
-		&routeTablesClientImpl{client: armnetwork.NewRouteTablesClient(con, config.SubscriptionID)},
-		&subnetsClientImpl{client: armnetwork.NewSubnetsClient(con, config.SubscriptionID)},
-		&firewallsClientImpl{client: armnetwork.NewAzureFirewallsClient(con, config.SubscriptionID)},
-		&publicIPAddressesClientImpl{client: armnetwork.NewPublicIPAddressesClient(con, config.SubscriptionID)},
-		&networkSecurityGroupsClientImpl{client: armnetwork.NewNetworkSecurityGroupsClient(con, config.SubscriptionID)},
-		&loadBalancersClientImpl{client: armnetwork.NewLoadBalancersClient(con, config.SubscriptionID)},
-		&loadBalancerRulesClientImpl{armnetwork.NewLoadBalancerLoadBalancingRulesClient(con, config.SubscriptionID)},
+		&virtualNetworksClientImpl{client: armnetwork.NewVirtualNetworksClient(config.SubscriptionID, cred, options)},
+		&routeTablesClientImpl{client: armnetwork.NewRouteTablesClient(config.SubscriptionID, cred, options)},
+		&subnetsClientImpl{client: armnetwork.NewSubnetsClient(config.SubscriptionID, cred, options)},
+		&firewallsClientImpl{client: armnetwork.NewAzureFirewallsClient(config.SubscriptionID, cred, options)},
+		&publicIPAddressesClientImpl{client: armnetwork.NewPublicIPAddressesClient(config.SubscriptionID, cred, options)},
+		&networkSecurityGroupsClientImpl{client: armnetwork.NewNetworkSecurityGroupsClient(config.SubscriptionID, cred, options)},
+		&loadBalancersClientImpl{client: armnetwork.NewLoadBalancersClient(config.SubscriptionID, cred, options)},
+		&loadBalancerRulesClientImpl{armnetwork.NewLoadBalancerLoadBalancingRulesClient(config.SubscriptionID, cred, options)},
 		cache,
 	}
 }

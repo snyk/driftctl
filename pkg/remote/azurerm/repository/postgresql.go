@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
-	"github.com/Azure/azure-sdk-for-go/sdk/postgresql/armpostgresql"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/postgresql/armpostgresql"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/snyk/driftctl/pkg/remote/azurerm/common"
 	"github.com/snyk/driftctl/pkg/remote/cache"
@@ -46,10 +47,10 @@ type postgresqlRepository struct {
 	cache          cache.Cache
 }
 
-func NewPostgresqlRepository(con *arm.Connection, config common.AzureProviderConfig, cache cache.Cache) *postgresqlRepository {
+func NewPostgresqlRepository(cred azcore.TokenCredential, options *arm.ClientOptions, config common.AzureProviderConfig, cache cache.Cache) *postgresqlRepository {
 	return &postgresqlRepository{
-		postgresqlServersClientImpl{client: armpostgresql.NewServersClient(con, config.SubscriptionID)},
-		postgresqlDatabaseClientImpl{client: armpostgresql.NewDatabasesClient(con, config.SubscriptionID)},
+		postgresqlServersClientImpl{client: armpostgresql.NewServersClient(config.SubscriptionID, cred, options)},
+		postgresqlDatabaseClientImpl{client: armpostgresql.NewDatabasesClient(config.SubscriptionID, cred, options)},
 		cache,
 	}
 }
