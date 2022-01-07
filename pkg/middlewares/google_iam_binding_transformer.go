@@ -39,7 +39,11 @@ func (m *GoogleIAMBindingTransformer) Execute(_, resourcesFromState *[]*resource
 
 		resName := *stateRes.Attrs.GetString(resField)
 		roleName := *stateRes.Attrs.GetString("role")
-		members, _ := stateRes.Attrs.Get("members")
+		members, exist := stateRes.Attrs.Get("members")
+
+		if !exist || members == nil {
+			continue
+		}
 
 		for _, member := range members.([]interface{}) {
 			id := fmt.Sprintf("%s/%s/%s", resName, roleName, member)
