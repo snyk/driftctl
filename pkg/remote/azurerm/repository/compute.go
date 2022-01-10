@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute"
 	"github.com/snyk/driftctl/pkg/remote/azurerm/common"
@@ -54,10 +55,10 @@ type computeRepository struct {
 	cache              cache.Cache
 }
 
-func NewComputeRepository(con *arm.Connection, config common.AzureProviderConfig, cache cache.Cache) *computeRepository {
+func NewComputeRepository(cred azcore.TokenCredential, options *arm.ClientOptions, config common.AzureProviderConfig, cache cache.Cache) *computeRepository {
 	return &computeRepository{
-		&imagesClientImpl{armcompute.NewImagesClient(con, config.SubscriptionID)},
-		&sshPublicKeyClientImpl{armcompute.NewSSHPublicKeysClient(con, config.SubscriptionID)},
+		&imagesClientImpl{armcompute.NewImagesClient(config.SubscriptionID, cred, options)},
+		&sshPublicKeyClientImpl{armcompute.NewSSHPublicKeysClient(config.SubscriptionID, cred, options)},
 		cache,
 	}
 }

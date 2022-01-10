@@ -3,7 +3,7 @@
 package repository
 
 import (
-	armresources "github.com/Azure/azure-sdk-for-go/sdk/resources/armresources"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	mock "github.com/stretchr/testify/mock"
 )
 

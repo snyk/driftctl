@@ -124,8 +124,8 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				con := arm.NewDefaultConnection(cred, nil)
-				repo = repository.NewPrivateDNSRepository(con, realProvider.GetConfig(), cache.New(0))
+				clientOptions := &arm.ClientOptions{}
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSZoneEnumerator(repo, factory))
@@ -278,8 +278,8 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				con := arm.NewDefaultConnection(cred, nil)
-				repo = repository.NewPrivateDNSRepository(con, realProvider.GetConfig(), cache.New(0))
+				clientOptions := &arm.ClientOptions{}
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSARecordEnumerator(repo, factory))
@@ -433,8 +433,8 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				con := arm.NewDefaultConnection(cred, nil)
-				repo = repository.NewPrivateDNSRepository(con, realProvider.GetConfig(), cache.New(0))
+				clientOptions := &arm.ClientOptions{}
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSAAAARecordEnumerator(repo, factory))
@@ -576,8 +576,8 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				con := arm.NewDefaultConnection(cred, nil)
-				repo = repository.NewPrivateDNSRepository(con, realProvider.GetConfig(), cache.New(0))
+				clientOptions := &arm.ClientOptions{}
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSCNameRecordEnumerator(repo, factory))
@@ -730,8 +730,8 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				con := arm.NewDefaultConnection(cred, nil)
-				repo = repository.NewPrivateDNSRepository(con, realProvider.GetConfig(), cache.New(0))
+				clientOptions := &arm.ClientOptions{}
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSPTRRecordEnumerator(repo, factory))
@@ -885,8 +885,8 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				con := arm.NewDefaultConnection(cred, nil)
-				repo = repository.NewPrivateDNSRepository(con, realProvider.GetConfig(), cache.New(0))
+				clientOptions := &arm.ClientOptions{}
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSMXRecordEnumerator(repo, factory))
@@ -1039,8 +1039,8 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				con := arm.NewDefaultConnection(cred, nil)
-				repo = repository.NewPrivateDNSRepository(con, realProvider.GetConfig(), cache.New(0))
+				clientOptions := &arm.ClientOptions{}
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSSRVRecordEnumerator(repo, factory))
@@ -1193,8 +1193,8 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				con := arm.NewDefaultConnection(cred, nil)
-				repo = repository.NewPrivateDNSRepository(con, realProvider.GetConfig(), cache.New(0))
+				clientOptions := &arm.ClientOptions{}
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSTXTRecordEnumerator(repo, factory))

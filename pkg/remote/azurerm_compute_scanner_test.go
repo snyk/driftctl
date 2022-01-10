@@ -208,8 +208,8 @@ func TestAzurermCompute_SSHPublicKey(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				con := arm.NewDefaultConnection(cred, nil)
-				repo = repository.NewComputeRepository(con, realProvider.GetConfig(), cache.New(0))
+				clientOptions := &arm.ClientOptions{}
+				repo = repository.NewComputeRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermSSHPublicKeyEnumerator(repo, factory))

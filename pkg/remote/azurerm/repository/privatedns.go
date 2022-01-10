@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/privatedns/armprivatedns"
 	"github.com/Azure/go-autorest/autorest/azure"
@@ -62,10 +63,10 @@ type privateDNSRepository struct {
 	cache        cache.Cache
 }
 
-func NewPrivateDNSRepository(con *arm.Connection, config common.AzureProviderConfig, cache cache.Cache) *privateDNSRepository {
+func NewPrivateDNSRepository(cred azcore.TokenCredential, options *arm.ClientOptions, config common.AzureProviderConfig, cache cache.Cache) *privateDNSRepository {
 	return &privateDNSRepository{
-		&privateZonesClientImpl{armprivatedns.NewPrivateZonesClient(con, config.SubscriptionID)},
-		&privateRecordSetClientImpl{armprivatedns.NewRecordSetsClient(con, config.SubscriptionID)},
+		&privateZonesClientImpl{armprivatedns.NewPrivateZonesClient(config.SubscriptionID, cred, options)},
+		&privateRecordSetClientImpl{armprivatedns.NewRecordSetsClient(config.SubscriptionID, cred, options)},
 		cache,
 	}
 }

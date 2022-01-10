@@ -37,17 +37,17 @@ func Init(
 	if err != nil {
 		return err
 	}
-	con := arm.NewDefaultConnection(cred, nil)
+	clientOptions := &arm.ClientOptions{}
 
 	c := cache.New(100)
 
-	storageAccountRepo := repository.NewStorageRepository(con, providerConfig, c)
-	networkRepo := repository.NewNetworkRepository(con, providerConfig, c)
-	resourcesRepo := repository.NewResourcesRepository(con, providerConfig, c)
-	containerRegistryRepo := repository.NewContainerRegistryRepository(con, providerConfig, c)
-	postgresqlRepo := repository.NewPostgresqlRepository(con, providerConfig, c)
-	privateDNSRepo := repository.NewPrivateDNSRepository(con, providerConfig, c)
-	computeRepo := repository.NewComputeRepository(con, providerConfig, c)
+	storageAccountRepo := repository.NewStorageRepository(cred, clientOptions, providerConfig, c)
+	networkRepo := repository.NewNetworkRepository(cred, clientOptions, providerConfig, c)
+	resourcesRepo := repository.NewResourcesRepository(cred, clientOptions, providerConfig, c)
+	containerRegistryRepo := repository.NewContainerRegistryRepository(cred, clientOptions, providerConfig, c)
+	postgresqlRepo := repository.NewPostgresqlRepository(cred, clientOptions, providerConfig, c)
+	privateDNSRepo := repository.NewPrivateDNSRepository(cred, clientOptions, providerConfig, c)
+	computeRepo := repository.NewComputeRepository(cred, clientOptions, providerConfig, c)
 
 	providerLibrary.AddProvider(terraform.AZURE, provider)
 	deserializer := resource.NewDeserializer(factory)

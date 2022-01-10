@@ -6,7 +6,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
-	"github.com/Azure/azure-sdk-for-go/sdk/network/armnetwork"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork"
 	"github.com/pkg/errors"
 	"github.com/snyk/driftctl/mocks"
 	"github.com/snyk/driftctl/pkg/filter"
@@ -766,8 +766,8 @@ func TestAzurermSecurityGroups(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				con := arm.NewDefaultConnection(cred, nil)
-				repo = repository.NewNetworkRepository(con, realProvider.GetConfig(), cache.New(0))
+				clientOptions := &arm.ClientOptions{}
+				repo = repository.NewNetworkRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermNetworkSecurityGroupEnumerator(repo, factory))
@@ -987,8 +987,8 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				con := arm.NewDefaultConnection(cred, nil)
-				repo = repository.NewNetworkRepository(con, realProvider.GetConfig(), cache.New(0))
+				clientOptions := &arm.ClientOptions{}
+				repo = repository.NewNetworkRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermLoadBalancerRuleEnumerator(repo, factory))

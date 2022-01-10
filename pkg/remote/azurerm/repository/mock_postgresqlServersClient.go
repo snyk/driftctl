@@ -5,7 +5,7 @@ package repository
 import (
 	context "context"
 
-	armpostgresql "github.com/Azure/azure-sdk-for-go/sdk/postgresql/armpostgresql"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/postgresql/armpostgresql"
 
 	mock "github.com/stretchr/testify/mock"
 )

@@ -3,8 +3,9 @@ package repository
 import (
 	"context"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
-	"github.com/Azure/azure-sdk-for-go/sdk/resources/armresources"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	"github.com/snyk/driftctl/pkg/remote/azurerm/common"
 	"github.com/snyk/driftctl/pkg/remote/cache"
 )
@@ -35,9 +36,9 @@ type resourcesRepository struct {
 	cache  cache.Cache
 }
 
-func NewResourcesRepository(con *arm.Connection, config common.AzureProviderConfig, cache cache.Cache) *resourcesRepository {
+func NewResourcesRepository(cred azcore.TokenCredential, options *arm.ClientOptions, config common.AzureProviderConfig, cache cache.Cache) *resourcesRepository {
 	return &resourcesRepository{
-		&resourcesClientImpl{armresources.NewResourceGroupsClient(con, config.SubscriptionID)},
+		&resourcesClientImpl{armresources.NewResourceGroupsClient(config.SubscriptionID, cred, options)},
 		cache,
 	}
 }
