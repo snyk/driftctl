@@ -3,8 +3,9 @@ package repository
 import (
 	"context"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
-	"github.com/Azure/azure-sdk-for-go/sdk/containerregistry/armcontainerregistry"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerregistry/armcontainerregistry"
 	"github.com/snyk/driftctl/pkg/remote/azurerm/common"
 	"github.com/snyk/driftctl/pkg/remote/cache"
 )
@@ -35,9 +36,9 @@ type containerRegistryRepository struct {
 	cache          cache.Cache
 }
 
-func NewContainerRegistryRepository(con *arm.Connection, config common.AzureProviderConfig, cache cache.Cache) *containerRegistryRepository {
+func NewContainerRegistryRepository(cred azcore.TokenCredential, options *arm.ClientOptions, config common.AzureProviderConfig, cache cache.Cache) *containerRegistryRepository {
 	return &containerRegistryRepository{
-		&registryClientImpl{client: armcontainerregistry.NewRegistriesClient(con, config.SubscriptionID)},
+		&registryClientImpl{client: armcontainerregistry.NewRegistriesClient(config.SubscriptionID, cred, options)},
 		cache,
 	}
 }

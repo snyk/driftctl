@@ -3,7 +3,7 @@
 package repository
 
 import (
-	armcontainerregistry "github.com/Azure/azure-sdk-for-go/sdk/containerregistry/armcontainerregistry"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerregistry/armcontainerregistry"
 	mock "github.com/stretchr/testify/mock"
 )
 

@@ -5,7 +5,7 @@ package repository
 import (
 	context "context"
 
-	armstorage "github.com/Azure/azure-sdk-for-go/sdk/storage/armstorage"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
 
 	mock "github.com/stretchr/testify/mock"
 )

@@ -3,7 +3,7 @@ package remote
 import (
 	"testing"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/storage/armstorage"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
 	"github.com/pkg/errors"
 	"github.com/snyk/driftctl/mocks"
 	"github.com/snyk/driftctl/pkg/filter"

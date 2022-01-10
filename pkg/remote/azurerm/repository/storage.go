@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
-	"github.com/Azure/azure-sdk-for-go/sdk/storage/armstorage"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/snyk/driftctl/pkg/remote/azurerm/common"
 	"github.com/snyk/driftctl/pkg/remote/cache"
@@ -57,10 +58,10 @@ type storageRepository struct {
 	cache                 cache.Cache
 }
 
-func NewStorageRepository(con *arm.Connection, config common.AzureProviderConfig, cache cache.Cache) *storageRepository {
+func NewStorageRepository(cred azcore.TokenCredential, options *arm.ClientOptions, config common.AzureProviderConfig, cache cache.Cache) *storageRepository {
 	return &storageRepository{
-		storageAccountClientImpl{client: armstorage.NewStorageAccountsClient(con, config.SubscriptionID)},
-		blobContainerClientImpl{client: armstorage.NewBlobContainersClient(con, config.SubscriptionID)},
+		storageAccountClientImpl{client: armstorage.NewStorageAccountsClient(config.SubscriptionID, cred, options)},
+		blobContainerClientImpl{client: armstorage.NewBlobContainersClient(config.SubscriptionID, cred, options)},
 		cache,
 	}
 }
