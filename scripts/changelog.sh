@@ -6,9 +6,9 @@
 
 GHCLI_BIN="gh"
 REPO="snyk/driftctl"
-LATEST_TAG=$(git describe --abbrev=0) # Get the last created tag
-DEFAULT_BRANCH=origin/HEAD
-BASE=$(git for-each-ref --sort=-taggerdate --format '%(tag)' refs/tags | sed -n 2p) # Use $DEFAULT_BRANCH instead to get a pre-release changelog
+LATEST_TAG=$(git for-each-ref --sort=-taggerdate --format '%(tag)' refs/tags | sed -n 1p) # Get the last created tag
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+BASE=$(git for-each-ref --sort=-taggerdate --format '%(tag)' refs/tags | sed -n 2p) # Use $CURRENT_BRANCH instead to get a pre-release changelog
 
 # Check GH cli is installed
 if ! which $GHCLI_BIN &> /dev/null; then
