@@ -14,6 +14,7 @@ type ApiGatewayV2Repository interface {
 	ListAllApiRoutes(apiId *string) ([]*apigatewayv2.Route, error)
 	ListAllVpcLinks() ([]*apigatewayv2.VpcLink, error)
 	ListAllApiAuthorizers(string) ([]*apigatewayv2.Authorizer, error)
+	ListAllApiIntegrations(string) ([]*apigatewayv2.Integration, error)
 }
 
 type apigatewayv2Repository struct {
@@ -87,6 +88,25 @@ func (r *apigatewayv2Repository) ListAllApiAuthorizers(apiId string) ([]*apigate
 		ApiId: &apiId,
 	}
 	resources, err := r.client.GetAuthorizers(&input)
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put(cacheKey, resources.Items)
+	return resources.Items, nil
+}
+
+func (r *apigatewayv2Repository) ListAllApiIntegrations(apiId string) ([]*apigatewayv2.Integration, error) {
+	cacheKey := fmt.Sprintf("apigatewayv2ListAllApiIntegrations_api_%s", apiId)
+
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*apigatewayv2.Integration), nil
+	}
+
+	input := apigatewayv2.GetIntegrationsInput{
+		ApiId: &apiId,
+	}
+	resources, err := r.client.GetIntegrations(&input)
 	if err != nil {
 		return nil, err
 	}
