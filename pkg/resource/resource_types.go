@@ -149,6 +149,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_apigatewayv2_integration": {},
 	"aws_launch_template":          {},
 	"aws_launch_configuration":     {},
+	"aws_apigatewayv2_model":       {},
 
 	"github_branch_protection": {},
 	"github_membership":        {},

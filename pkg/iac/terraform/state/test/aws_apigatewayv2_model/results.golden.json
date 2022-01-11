@@ -1,0 +1,14 @@
+[
+ {
+  "Id": "vdw6up",
+  "Type": "aws_apigatewayv2_model",
+  "Attrs": {
+   "api_id": "ci51xtkpsg",
+   "content_type": "application/json",
+   "description": "",
+   "id": "vdw6up",
+   "name": "example",
+   "schema": "{\n  \"$schema\": \"http://json-schema.org/draft-04/schema#\",\n  \"title\": \"ExampleModel\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"id\": { \"type\": \"string\" }\n  }\n}\n"
+  }
+ }
+]
