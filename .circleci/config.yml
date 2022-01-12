@@ -155,6 +155,19 @@ jobs:
             git add PKGBUILD .SRCINFO
             git commit -m "Updated to version ${CIRCLE_TAG}"
             git push
+  release-docs:
+    docker:
+        - image: cimg/base:2020.01
+    steps:
+        - checkout
+        - attach_workspace:
+            at: ~/project
+        - run:
+            name: Trigger driftctl-docs new version
+            command: |
+              curl -X POST https://api.github.com/repos/snyk/driftctl-docs/dispatches \
+                -d '{"event_type": "new_version"}' \
+                -H 'Authorization: token $GITHUB_TOKEN'
   update-lambda:
     environment:
         FUNCTION_NAME: driftctl-version
@@ -296,3 +309,13 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
+      - release-docs:
+          context:
+              - driftctl
+          requires:
+              - release
+          filters:
+              tags:
+                only: /^v.*/
+              branches:
+                ignore: /.*/
