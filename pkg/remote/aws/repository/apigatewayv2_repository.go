@@ -16,6 +16,7 @@ type ApiGatewayV2Repository interface {
 	ListAllApiAuthorizers(string) ([]*apigatewayv2.Authorizer, error)
 	ListAllApiIntegrations(string) ([]*apigatewayv2.Integration, error)
 	ListAllApiModels(string) ([]*apigatewayv2.Model, error)
+	ListAllApiStages(string) ([]*apigatewayv2.Stage, error)
 }
 
 type apigatewayv2Repository struct {
@@ -127,6 +128,24 @@ func (r *apigatewayv2Repository) ListAllApiModels(apiId string) ([]*apigatewayv2
 		ApiId: &apiId,
 	}
 	resources, err := r.client.GetModels(&input)
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put(cacheKey, resources.Items)
+	return resources.Items, nil
+}
+
+func (r *apigatewayv2Repository) ListAllApiStages(apiId string) ([]*apigatewayv2.Stage, error) {
+	cacheKey := fmt.Sprintf("apigatewayv2ListAllApiStages_api_%s", apiId)
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*apigatewayv2.Stage), nil
+	}
+
+	input := apigatewayv2.GetStagesInput{
+		ApiId: &apiId,
+	}
+	resources, err := r.client.GetStages(&input)
 	if err != nil {
 		return nil, err
 	}
