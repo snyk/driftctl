@@ -164,6 +164,77 @@ func Test_apigatewayv2Repository_ListAllApiRoutes(t *testing.T) {
 	}
 }
 
+func Test_apigatewayv2Repository_ListAllApiDeployments(t *testing.T) {
+	deployments := []*apigatewayv2.Deployment{
+		{DeploymentId: aws.String("id1")},
+		{DeploymentId: aws.String("id2")},
+		{DeploymentId: aws.String("id3")},
+	}
+
+	remoteError := errors.New("remote error")
+
+	tests := []struct {
+		name    string
+		mocks   func(client *awstest.MockFakeApiGatewayV2, store *cache.MockCache)
+		want    []*apigatewayv2.Deployment
+		wantErr error
+	}{
+		{
+			name: "list multiple deployments",
+			mocks: func(client *awstest.MockFakeApiGatewayV2, store *cache.MockCache) {
+				client.On("GetDeployments",
+					&apigatewayv2.GetDeploymentsInput{ApiId: aws.String("an-id")}).
+					Return(&apigatewayv2.GetDeploymentsOutput{Items: deployments}, nil).Once()
+
+				store.On("Get", "apigatewayv2ListAllApiDeployments_api_an-id").Return(nil).Times(1)
+				store.On("Put", "apigatewayv2ListAllApiDeployments_api_an-id", deployments).Return(false).Times(1)
+			},
+			want: deployments,
+		},
+		{
+			name: "should hit cache",
+			mocks: func(client *awstest.MockFakeApiGatewayV2, store *cache.MockCache) {
+				store.On("Get", "apigatewayv2ListAllApiDeployments_api_an-id").Return(deployments).Times(1)
+			},
+			want: deployments,
+		},
+		{
+			name: "should return remote error",
+			mocks: func(client *awstest.MockFakeApiGatewayV2, store *cache.MockCache) {
+				client.On("GetDeployments",
+					&apigatewayv2.GetDeploymentsInput{ApiId: aws.String("an-id")}).Return(nil, remoteError).Once()
+
+				store.On("Get", "apigatewayv2ListAllApiDeployments_api_an-id").Return(nil).Times(1)
+			},
+			wantErr: remoteError,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := &cache.MockCache{}
+			client := &awstest.MockFakeApiGatewayV2{}
+			tt.mocks(client, store)
+			r := &apigatewayv2Repository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.ListAllApiDeployments(aws.String("an-id"))
+			assert.Equal(t, tt.wantErr, err)
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+			store.AssertExpectations(t)
+			client.AssertExpectations(t)
+		})
+	}
+}
+
 func Test_apigatewayv2Repository_ListAllVpcLinks(t *testing.T) {
 	vpcLinks := []*apigatewayv2.VpcLink{
 		{VpcLinkId: aws.String("vpcLink1")},
