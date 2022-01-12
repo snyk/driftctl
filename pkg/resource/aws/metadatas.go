@@ -63,4 +63,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsAppAutoscalingTargetMetaData(resourceSchemaRepository)
 	initAwsAppAutoscalingPolicyMetaData(resourceSchemaRepository)
 	initAwsLaunchTemplateMetaData(resourceSchemaRepository)
+	initAwsApiGatewayV2ModelMetaData(resourceSchemaRepository)
 }

@@ -477,3 +477,114 @@ func TestApiGatewayV2Integration(t *testing.T) {
 		})
 	}
 }
+
+func TestApiGatewayV2Model(t *testing.T) {
+	dummyError := errors.New("this is an error")
+
+	apis := []*apigatewayv2.Api{
+		{ApiId: awssdk.String("bmyl5c6huh")},
+		{ApiId: awssdk.String("blghshbgte")},
+	}
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockApiGatewayV2Repository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "no api gateway v2 models",
+			mocks: func(repo *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllApis").Return(apis, nil)
+				repo.On("ListAllApiModels", *apis[0].ApiId).Return([]*apigatewayv2.Model{}, nil).Once()
+				repo.On("ListAllApiModels", *apis[1].ApiId).Return([]*apigatewayv2.Model{}, nil).Once()
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "multiple api gateway v2 models",
+			mocks: func(repo *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllApis").Return(apis, nil)
+				repo.On("ListAllApiModels", *apis[0].ApiId).Return([]*apigatewayv2.Model{
+					{
+						ModelId: awssdk.String("vdw6up"),
+						Name:    awssdk.String("model1"),
+					},
+				}, nil).Once()
+				repo.On("ListAllApiModels", *apis[1].ApiId).Return([]*apigatewayv2.Model{
+					{
+						ModelId: awssdk.String("bwhebj"),
+						Name:    awssdk.String("model2"),
+					},
+				}, nil).Once()
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, got[0].ResourceId(), "vdw6up")
+				assert.Equal(t, got[0].ResourceType(), resourceaws.AwsApiGatewayV2ModelResourceType)
+				assert.Equal(t, "model1", *got[0].Attributes().GetString("name"))
+
+				assert.Equal(t, got[1].ResourceId(), "bwhebj")
+				assert.Equal(t, got[1].ResourceType(), resourceaws.AwsApiGatewayV2ModelResourceType)
+				assert.Equal(t, "model2", *got[1].Attributes().GetString("name"))
+
+			},
+		},
+		{
+			test: "cannot list apis",
+			mocks: func(repo *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllApis").Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayV2ModelResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayV2ModelResourceType, resourceaws.AwsApiGatewayV2ApiResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayV2ModelResourceType, resourceaws.AwsApiGatewayV2ApiResourceType),
+		},
+		{
+			test: "cannot list api gateway v2 model",
+			mocks: func(repo *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repo.On("ListAllApis").Return(apis, nil)
+				repo.On("ListAllApiModels", *apis[0].ApiId).Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayV2ModelResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayV2ModelResourceType, resourceaws.AwsApiGatewayV2ModelResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayV2ModelResourceType),
+		},
+	}
+
+	providerVersion := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockApiGatewayV2Repository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.ApiGatewayV2Repository = fakeRepo
+
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayV2ModelEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+		})
+	}
+}
