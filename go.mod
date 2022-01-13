@@ -1,6 +1,6 @@
 module github.com/snyk/driftctl
 
-go 1.16
+go 1.17
 
 require (
 	cloud.google.com/go/asset v0.1.0
