@@ -112,7 +112,8 @@ func Test_apigatewayv2Repository_ListAllApiRoutes(t *testing.T) {
 					&apigatewayv2.GetRoutesInput{ApiId: aws.String("an-id")}).
 					Return(&apigatewayv2.GetRoutesOutput{Items: routes}, nil).Once()
 
-				store.On("Get", "apigatewayv2ListAllApiRoutes_api_an-id").Return(nil).Times(1)
+				store.On("GetAndLock", "apigatewayv2ListAllApiRoutes_api_an-id").Return(nil).Times(1)
+				store.On("Unlock", "apigatewayv2ListAllApiRoutes_api_an-id").Times(1)
 				store.On("Put", "apigatewayv2ListAllApiRoutes_api_an-id", routes).Return(false).Times(1)
 			},
 			want: routes,
@@ -120,7 +121,8 @@ func Test_apigatewayv2Repository_ListAllApiRoutes(t *testing.T) {
 		{
 			name: "should hit cache",
 			mocks: func(client *awstest.MockFakeApiGatewayV2, store *cache.MockCache) {
-				store.On("Get", "apigatewayv2ListAllApiRoutes_api_an-id").Return(routes).Times(1)
+				store.On("GetAndLock", "apigatewayv2ListAllApiRoutes_api_an-id").Return(routes).Times(1)
+				store.On("Unlock", "apigatewayv2ListAllApiRoutes_api_an-id").Times(1)
 			},
 			want: routes,
 		},
@@ -130,7 +132,8 @@ func Test_apigatewayv2Repository_ListAllApiRoutes(t *testing.T) {
 				client.On("GetRoutes",
 					&apigatewayv2.GetRoutesInput{ApiId: aws.String("an-id")}).Return(nil, remoteError).Once()
 
-				store.On("Get", "apigatewayv2ListAllApiRoutes_api_an-id").Return(nil).Times(1)
+				store.On("GetAndLock", "apigatewayv2ListAllApiRoutes_api_an-id").Return(nil).Times(1)
+				store.On("Unlock", "apigatewayv2ListAllApiRoutes_api_an-id").Times(1)
 			},
 			wantErr: remoteError,
 		},
@@ -376,6 +379,91 @@ func Test_apigatewayv2Repository_ListAllApiIntegrations(t *testing.T) {
 				cache:  store,
 			}
 			got, err := r.ListAllApiIntegrations(*api.ApiId)
+			assert.Equal(t, tt.wantErr, err)
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %s -> %s", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+			store.AssertExpectations(t)
+			client.AssertExpectations(t)
+		})
+	}
+}
+
+func Test_apigatewayv2Repository_ListAllApiRouteResponses(t *testing.T) {
+	api := &apigatewayv2.Api{
+		ApiId: aws.String("api1"),
+	}
+
+	route := &apigatewayv2.Route{
+		RouteId: aws.String("route1"),
+	}
+
+	responses := []*apigatewayv2.RouteResponse{
+		{RouteResponseId: aws.String("response1")},
+		{RouteResponseId: aws.String("response2")},
+		{RouteResponseId: aws.String("response3")},
+		{RouteResponseId: aws.String("response4")},
+	}
+
+	remoteError := errors.New("remote error")
+
+	tests := []struct {
+		name    string
+		mocks   func(client *awstest.MockFakeApiGatewayV2, store *cache.MockCache)
+		want    []*apigatewayv2.RouteResponse
+		wantErr error
+	}{
+		{
+			name: "list multiple api route responses",
+			mocks: func(client *awstest.MockFakeApiGatewayV2, store *cache.MockCache) {
+				client.On("GetRouteResponses",
+					&apigatewayv2.GetRouteResponsesInput{
+						ApiId:   aws.String("api1"),
+						RouteId: aws.String("route1"),
+					}).Return(&apigatewayv2.GetRouteResponsesOutput{Items: responses}, nil).Once()
+
+				store.On("Get", "apigatewayv2ListAllApiRouteResponses_api_api1_route_route1").Return(nil).Times(1)
+				store.On("Put", "apigatewayv2ListAllApiRouteResponses_api_api1_route_route1", responses).Return(false).Times(1)
+			},
+			want: responses,
+		},
+		{
+			name: "should hit cache",
+			mocks: func(client *awstest.MockFakeApiGatewayV2, store *cache.MockCache) {
+				store.On("Get", "apigatewayv2ListAllApiRouteResponses_api_api1_route_route1").Return(responses).Times(1)
+			},
+			want: responses,
+		},
+		{
+			name: "should return remote error",
+			mocks: func(client *awstest.MockFakeApiGatewayV2, store *cache.MockCache) {
+				client.On("GetRouteResponses",
+					&apigatewayv2.GetRouteResponsesInput{
+						ApiId:   aws.String("api1"),
+						RouteId: aws.String("route1"),
+					}).Return(nil, remoteError).Once()
+
+				store.On("Get", "apigatewayv2ListAllApiRouteResponses_api_api1_route_route1").Return(nil).Times(1)
+			},
+			wantErr: remoteError,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := &cache.MockCache{}
+			client := &awstest.MockFakeApiGatewayV2{}
+			tt.mocks(client, store)
+			r := &apigatewayv2Repository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.ListAllApiRouteResponses(*api.ApiId, *route.RouteId)
 			assert.Equal(t, tt.wantErr, err)
 
 			changelog, err := diff.Diff(got, tt.want)
