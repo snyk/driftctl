@@ -112,7 +112,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		middlewares.NewRDSClusterInstanceExpander(d.resourceFactory),
 		middlewares.NewAwsApiGatewayDeploymentExpander(d.resourceFactory),
 		middlewares.NewAwsApiGatewayResourceExpander(d.resourceFactory),
-		middlewares.NewAwsApiGatewayRestApiExpander(d.resourceFactory),
+		middlewares.NewAwsApiGatewayApiExpander(d.resourceFactory),
 		middlewares.NewAwsApiGatewayRestApiPolicyExpander(d.resourceFactory),
 		middlewares.NewAwsConsoleApiGatewayGatewayResponse(),
 
