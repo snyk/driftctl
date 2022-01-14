@@ -32,7 +32,7 @@ jobs:
     steps:
       - checkout
       - go/install:
-          version: "1.16.2"
+          version: "1.17.6"
       - go/load-cache:
           key: test_acc
       - run: make install-tools
@@ -63,7 +63,7 @@ jobs:
           path: ./
   lint:
     docker:
-      - image: golang:1.16
+      - image: golang:1.17
     steps:
       - checkout
       - run:
@@ -83,7 +83,7 @@ jobs:
     resource_class: large
     executor:
         name: go/default
-        tag: '1.16.2'
+        tag: '1.17.6'
     steps:
       - checkout
       - go/load-cache:
@@ -101,7 +101,7 @@ jobs:
   release:
     resource_class: large
     docker:
-      - image: golang:1.16
+      - image: golang:1.17
     steps:
       - checkout
       - gh/setup:
