@@ -12,7 +12,7 @@ import (
 	"github.com/snyk/driftctl/pkg/terraform"
 )
 
-func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
+func TestAwsApiGatewayApiExpander_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
 		resourcesFromState []*resource.Resource
@@ -1095,7 +1095,7 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 			},
 		},
 		{
-			name: "creates routes from OpenAPI v3 YAML document",
+			name: "creates routes from OpenAPI v3 YAML document (apigatewayv2)",
 			resourcesFromState: []*resource.Resource{
 				{
 					Id:   "a-gateway",
@@ -1179,7 +1179,7 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 			},
 		},
 		{
-			name: "creates routes from OpenAPI v2 JSON document",
+			name: "creates routes from OpenAPI v2 JSON document (apigatewayv2)",
 			resourcesFromState: []*resource.Resource{
 				{
 					Id:   "a-gateway",
@@ -1221,7 +1221,7 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 			},
 		},
 		{
-			name: "creates routes and integration from OpenAPI v2 JSON document",
+			name: "creates routes and integration from OpenAPI v2 JSON document (apigatewayv2)",
 			resourcesFromState: []*resource.Resource{
 				{
 					Id:   "a-gateway",
@@ -1281,7 +1281,7 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 			},
 		},
 		{
-			name: "creates routes and integrations from OpenAPI v3 YAML document",
+			name: "creates routes and integrations from OpenAPI v3 YAML document (apigatewayv2)",
 			resourcesFromState: []*resource.Resource{
 				{
 					Id:   "a-gateway",
@@ -1348,7 +1348,7 @@ func TestAwsApiGatewayRestApiExpander_Execute(t *testing.T) {
 				tt.mocks(factory)
 			}
 
-			m := NewAwsApiGatewayRestApiExpander(factory)
+			m := NewAwsApiGatewayApiExpander(factory)
 			err := m.Execute(&tt.remoteResources, &tt.resourcesFromState)
 			if err != nil {
 				t.Fatal(err)
