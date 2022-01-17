@@ -58,6 +58,29 @@ func (_m *MockApiGatewayV2Repository) ListAllApiIntegrations(_a0 string) ([]*api
 	return r0, r1
 }
 
+// ListAllApiMappings provides a mock function with given fields: _a0
+func (_m *MockApiGatewayV2Repository) ListAllApiMappings(_a0 string) ([]*apigatewayv2.ApiMapping, error) {
+	ret := _m.Called(_a0)
+
+	var r0 []*apigatewayv2.ApiMapping
+	if rf, ok := ret.Get(0).(func(string) []*apigatewayv2.ApiMapping); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*apigatewayv2.ApiMapping)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListAllApiModels provides a mock function with given fields: _a0
 func (_m *MockApiGatewayV2Repository) ListAllApiModels(_a0 string) ([]*apigatewayv2.Model, error) {
 	ret := _m.Called(_a0)

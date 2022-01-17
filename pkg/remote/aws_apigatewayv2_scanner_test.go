@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/apigatewayv2"
 	"github.com/pkg/errors"
 	"github.com/snyk/driftctl/mocks"
@@ -788,6 +789,103 @@ func TestApiGatewayV2RouteResponse(t *testing.T) {
 			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+		})
+	}
+}
+
+func TestApiGatewayV2Mapping(t *testing.T) {
+	dummyError := errors.New("this is an error")
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockApiGatewayRepository, *repository.MockApiGatewayV2Repository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "no api gateway v2 domains",
+			mocks: func(repositoryV1 *repository.MockApiGatewayRepository, repository *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repositoryV1.On("ListAllDomainNames").Return([]*apigateway.DomainName{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "single api gateway v2 domain with a single mapping",
+			mocks: func(repositoryV1 *repository.MockApiGatewayRepository, repository *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repositoryV1.On("ListAllDomainNames").Return([]*apigateway.DomainName{
+					{DomainName: awssdk.String("example.com")},
+				}, nil)
+				repository.On("ListAllApiMappings", "example.com").
+					Return([]*apigatewayv2.ApiMapping{{
+						Stage:        awssdk.String("a-stage"),
+						ApiId:        awssdk.String("foobar"),
+						ApiMappingId: awssdk.String("barfoo"),
+					}}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+
+				assert.Equal(t, "barfoo", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsApiGatewayV2MappingResourceType, got[0].ResourceType())
+			},
+		},
+		{
+			test: "cannot list api gateway v2 domains",
+			mocks: func(repositoryV1 *repository.MockApiGatewayRepository, repository *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repositoryV1.On("ListAllDomainNames").Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayV2MappingResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayDomainNameResourceType, resourceaws.AwsApiGatewayV2MappingResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayV2MappingResourceType, resourceaws.AwsApiGatewayDomainNameResourceType),
+		},
+		{
+			test: "cannot list api gateway v2 mappings",
+			mocks: func(repositoryV1 *repository.MockApiGatewayRepository, repository *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repositoryV1.On("ListAllDomainNames").Return([]*apigateway.DomainName{
+					{DomainName: awssdk.String("example.com")},
+				}, nil)
+				repository.On("ListAllApiMappings", "example.com").
+					Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayV2MappingResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayV2MappingResourceType, resourceaws.AwsApiGatewayV2MappingResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayV2MappingResourceType),
+		},
+	}
+
+	providerVersion := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepoV1 := &repository.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayV2Repository{}
+			c.mocks(fakeRepoV1, fakeRepo, alerter)
+
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayV2MappingEnumerator(fakeRepo, fakeRepoV1, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			fakeRepoV1.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 		})
 	}

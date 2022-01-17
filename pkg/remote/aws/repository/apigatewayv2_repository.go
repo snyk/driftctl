@@ -18,6 +18,7 @@ type ApiGatewayV2Repository interface {
 	ListAllApiModels(string) ([]*apigatewayv2.Model, error)
 	ListAllApiStages(string) ([]*apigatewayv2.Stage, error)
 	ListAllApiRouteResponses(string, string) ([]*apigatewayv2.RouteResponse, error)
+	ListAllApiMappings(string) ([]*apigatewayv2.ApiMapping, error)
 }
 
 type apigatewayv2Repository struct {
@@ -169,6 +170,24 @@ func (r *apigatewayv2Repository) ListAllApiRouteResponses(apiId, routeId string)
 	if err != nil {
 		return nil, err
 	}
+	r.cache.Put(cacheKey, resources.Items)
+	return resources.Items, nil
+}
+
+func (r *apigatewayv2Repository) ListAllApiMappings(domainName string) ([]*apigatewayv2.ApiMapping, error) {
+	cacheKey := fmt.Sprintf("apigatewayv2ListAllApiMappings_api_%s", domainName)
+	if v := r.cache.Get(cacheKey); v != nil {
+		return v.([]*apigatewayv2.ApiMapping), nil
+	}
+
+	input := apigatewayv2.GetApiMappingsInput{
+		DomainName: &domainName,
+	}
+	resources, err := r.client.GetApiMappings(&input)
+	if err != nil {
+		return nil, err
+	}
+
 	r.cache.Put(cacheKey, resources.Items)
 	return resources.Items, nil
 }
