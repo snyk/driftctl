@@ -12,6 +12,7 @@ import (
 type ApiGatewayV2Repository interface {
 	ListAllApis() ([]*apigatewayv2.Api, error)
 	ListAllApiRoutes(apiId *string) ([]*apigatewayv2.Route, error)
+	ListAllApiDeployments(apiId *string) ([]*apigatewayv2.Deployment, error)
 	ListAllVpcLinks() ([]*apigatewayv2.VpcLink, error)
 	ListAllApiAuthorizers(string) ([]*apigatewayv2.Authorizer, error)
 	ListAllApiIntegrations(string) ([]*apigatewayv2.Integration, error)
@@ -60,6 +61,22 @@ func (r *apigatewayv2Repository) ListAllApiRoutes(apiID *string) ([]*apigatewayv
 	}
 
 	resources, err := r.client.GetRoutes(&apigatewayv2.GetRoutesInput{ApiId: apiID})
+	if err != nil {
+		return nil, err
+	}
+	r.cache.Put(cacheKey, resources.Items)
+	return resources.Items, nil
+}
+
+func (r *apigatewayv2Repository) ListAllApiDeployments(apiID *string) ([]*apigatewayv2.Deployment, error) {
+	cacheKey := fmt.Sprintf("apigatewayv2ListAllApiDeployments_api_%s", *apiID)
+	v := r.cache.Get(cacheKey)
+
+	if v != nil {
+		return v.([]*apigatewayv2.Deployment), nil
+	}
+
+	resources, err := r.client.GetDeployments(&apigatewayv2.GetDeploymentsInput{ApiId: apiID})
 	if err != nil {
 		return nil, err
 	}

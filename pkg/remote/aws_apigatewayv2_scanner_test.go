@@ -190,6 +190,115 @@ func TestApiGatewayV2Route(t *testing.T) {
 	}
 }
 
+func TestApiGatewayV2Deployment(t *testing.T) {
+	dummyError := errors.New("this is an error")
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockApiGatewayV2Repository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "single api gateway v2 api with a single deployment",
+			mocks: func(repository *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllApis").Return([]*apigatewayv2.Api{
+					{ApiId: awssdk.String("a-gateway")},
+				}, nil)
+				repository.On("ListAllApiDeployments", awssdk.String("a-gateway")).
+					Return([]*apigatewayv2.Deployment{{
+						DeploymentId: awssdk.String("a-deployment"),
+					}}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+
+				assert.Equal(t, "a-deployment", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsApiGatewayV2DeploymentResourceType, got[0].ResourceType())
+				expectedAttrs := &resource.Attributes{}
+				assert.Equal(t, expectedAttrs, got[0].Attributes())
+			},
+		},
+		{
+			test: "no API gateways",
+			mocks: func(repository *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllApis").Return([]*apigatewayv2.Api{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "single API gateway with no deployments",
+			mocks: func(repository *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllApis").Return([]*apigatewayv2.Api{
+					{ApiId: awssdk.String("a-gateway")},
+				}, nil)
+				repository.On("ListAllApiDeployments", awssdk.String("a-gateway")).
+					Return([]*apigatewayv2.Deployment{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "error listing API gateways",
+			mocks: func(repository *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllApis").Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayV2DeploymentResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayV2ApiResourceType, resourceaws.AwsApiGatewayV2RouteResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayV2DeploymentResourceType, resourceaws.AwsApiGatewayV2ApiResourceType),
+		},
+		{
+			test: "error listing deployments of an API",
+			mocks: func(repository *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllApis").Return([]*apigatewayv2.Api{
+					{ApiId: awssdk.String("a-gateway")},
+				}, nil)
+				repository.On("ListAllApiDeployments", awssdk.String("a-gateway")).Return(nil, dummyError)
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayV2DeploymentResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayV2DeploymentResourceType, resourceaws.AwsApiGatewayV2DeploymentResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayV2DeploymentResourceType, resourceaws.AwsApiGatewayV2DeploymentResourceType),
+		},
+	}
+
+	providerVersion := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockApiGatewayV2Repository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.ApiGatewayV2Repository = fakeRepo
+
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayV2DeploymentEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+		})
+	}
+}
+
 func TestApiGatewayV2VpcLink(t *testing.T) {
 	dummyError := errors.New("this is an error")
 
