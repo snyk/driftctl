@@ -115,6 +115,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		middlewares.NewAwsApiGatewayApiExpander(d.resourceFactory),
 		middlewares.NewAwsApiGatewayRestApiPolicyExpander(d.resourceFactory),
 		middlewares.NewAwsConsoleApiGatewayGatewayResponse(),
+		middlewares.NewAwsApiGatewayDomainNamesReconciler(),
 
 		middlewares.NewGoogleIAMBindingTransformer(d.resourceFactory),
 		middlewares.NewGoogleIAMPolicyTransformer(d.resourceFactory),

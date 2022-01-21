@@ -37,6 +37,7 @@ func TestAWS_Metadata_Flags(t *testing.T) {
 		AwsApiGatewayV2VpcLinkResourceType:            {},
 		AwsApiGatewayV2AuthorizerResourceType:         {},
 		AwsApiGatewayV2RouteResponseResourceType:      {},
+		AwsApiGatewayV2DomainNameResourceType:         {},
 		AwsAppAutoscalingPolicyResourceType:           {resource.FlagDeepMode},
 		AwsAppAutoscalingScheduledActionResourceType:  {},
 		AwsAppAutoscalingTargetResourceType:           {resource.FlagDeepMode},

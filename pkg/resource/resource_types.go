@@ -151,6 +151,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_apigatewayv2_stage":          {},
 	"aws_apigatewayv2_route_response": {},
 	"aws_apigatewayv2_deployment":     {},
+	"aws_apigatewayv2_domain_name":    {},
 	"aws_launch_template":             {},
 	"aws_launch_configuration":        {},
 	"aws_apigatewayv2_api_mapping":    {},
