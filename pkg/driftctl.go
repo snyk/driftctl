@@ -129,6 +129,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 			middlewares.NewAwsDefaults(),
 			middlewares.NewGoogleLegacyBucketIAMMember(),
 			middlewares.NewGoogleDefaultIAMMember(),
+			middlewares.NewAwsDefaultApiGatewayAccount(),
 		)
 	}
 
