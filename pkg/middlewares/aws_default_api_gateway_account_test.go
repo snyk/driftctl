@@ -19,7 +19,7 @@ func TestAwsDefaultApiGatewayAccount_Execute(t *testing.T) {
 		expected           []*resource.Resource
 	}{
 		{
-			"test that default account are not ignored when managed by IaC",
+			"test that default account is not ignored when managed by IaC",
 			[]*resource.Resource{
 				{
 					Id: "fake",
@@ -54,7 +54,7 @@ func TestAwsDefaultApiGatewayAccount_Execute(t *testing.T) {
 			},
 		},
 		{
-			"test that default account are ignored when not managed by IaC",
+			"test that default account is ignored when not managed by IaC",
 			[]*resource.Resource{
 				{
 					Id: "fake",

@@ -6,7 +6,7 @@ import (
 	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
-// AwsDefaultApiGatewayAccount is a middleware that ignores default API gateway account resources in the current region
+// AwsDefaultApiGatewayAccount is a middleware that ignores the default API Gateway account resource in the current region.
 type AwsDefaultApiGatewayAccount struct{}
 
 func NewAwsDefaultApiGatewayAccount() AwsDefaultApiGatewayAccount {
