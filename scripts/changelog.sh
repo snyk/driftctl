@@ -24,23 +24,23 @@ fi
 
 # Compare $BASE branch with the latest tag
 # Keep IDs of merged pull requests
-PRs=$(git log --pretty=oneline $BASE...$LATEST_TAG | grep 'Merge pull request #' | grep -oP '#[0-9]+' | sed 's/#//')
+PRs=$(git log --pretty=oneline "$BASE"..."$LATEST_TAG" | grep 'Merge pull request #' | grep -oP '#[0-9]+' | sed 's/#//')
 
 # Generating changelog for commits from $BASE to $LATEST_TAG
 CHANGES=()
 for pr in $PRs; do
-    str=$($GHCLI_BIN pr view $pr --repo $REPO -t '- {{ .title }} (#{{ .number }}) @{{ .author.login }} {{.labels}}' --json title,number,author,labels)
+    str=$($GHCLI_BIN pr view "$pr" --repo $REPO -t '- {{ .title }} (#{{ .number }}) @{{ .author.login }} {{.labels}}' --json title,number,author,labels)
     CHANGES+=("$str")
 done
 
 print_changes() {
     local label=$1
     local title=$2
-    if [[ "${CHANGES[@]}" =~ $label ]]; then
-        echo -e $title
+    if [[ "${CHANGES[*]}" =~ $label ]]; then
+        echo -e "$title"
         for change in "${CHANGES[@]}"; do
             if [[ $change =~ $label ]]; then
-                echo $change | sed "s/\[map\[$PARTITION_COLUMN.*//"
+                echo "$change" | sed "s/\[map\[$PARTITION_COLUMN.*//"
             fi
         done
     fi
