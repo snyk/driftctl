@@ -18,10 +18,15 @@ func TestAcc_Google_BigtableTable(t *testing.T) {
 		},
 		Checks: []acceptance.AccCheck{
 			{
-				// New resources are not visible immediately on GCP api after an apply
-				// Logic below retry driftctl scan until we can retrieve the results (infra will be in sync) and for maximum 60 seconds
+				// New resources are not visible immediately through GCP API after an apply operation.
+				// Logic below retries driftctl scan using a back-off strategy of retrying 'n' times
+				// and doubling the amount of time waited after each one.
 				ShouldRetry: func(result *test.ScanResult, retryDuration time.Duration, retryCount uint8) bool {
-					return !result.IsSync() && retryDuration < time.Minute
+					if result.IsSync() || retryDuration > 10*time.Minute {
+						return false
+					}
+					time.Sleep((2 * time.Duration(retryCount)) * time.Minute)
+					return true
 				},
 				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
