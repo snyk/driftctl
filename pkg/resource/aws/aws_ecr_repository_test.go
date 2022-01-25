@@ -15,7 +15,7 @@ import (
 	"github.com/snyk/driftctl/test/acceptance/awsutils"
 )
 
-func TestAcc_AwsECRRepository(t *testing.T) {
+func TestAcc_Aws_ECRRepository(t *testing.T) {
 	var mutatedRepositoryID string
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",

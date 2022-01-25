@@ -8,7 +8,7 @@ import (
 	"github.com/snyk/driftctl/test/acceptance"
 )
 
-func TestAcc_AwsInternetGateway(t *testing.T) {
+func TestAcc_Aws_InternetGateway(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_internet_gateway"},

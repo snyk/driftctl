@@ -14,7 +14,7 @@ import (
 	"github.com/snyk/driftctl/test/acceptance/awsutils"
 )
 
-func TestAcc_AwsRoute53HealthCheck(t *testing.T) {
+func TestAcc_Aws_Route53HealthCheck(t *testing.T) {
 	var mutatedHealthCheckID string
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",

@@ -19,7 +19,7 @@ import (
 	"github.com/snyk/driftctl/test/acceptance/awsutils"
 )
 
-func TestAcc_AwsSQSQueue(t *testing.T) {
+func TestAcc_Aws_SQSQueue(t *testing.T) {
 	var mutatedQueue string
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
