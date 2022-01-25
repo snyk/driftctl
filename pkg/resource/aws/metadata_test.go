@@ -38,6 +38,11 @@ func TestAWS_Metadata_Flags(t *testing.T) {
 		AwsApiGatewayV2AuthorizerResourceType:          {},
 		AwsApiGatewayV2RouteResponseResourceType:       {},
 		AwsApiGatewayV2DomainNameResourceType:          {},
+		AwsApiGatewayV2ModelResourceType:               {},
+		AwsApiGatewayV2StageResourceType:               {},
+		AwsApiGatewayV2MappingResourceType:             {},
+		AwsApiGatewayV2IntegrationResourceType:         {},
+		AwsApiGatewayV2IntegrationResponseResourceType: {},
 		AwsAppAutoscalingPolicyResourceType:            {resource.FlagDeepMode},
 		AwsAppAutoscalingScheduledActionResourceType:   {},
 		AwsAppAutoscalingTargetResourceType:            {resource.FlagDeepMode},
@@ -100,10 +105,6 @@ func TestAWS_Metadata_Flags(t *testing.T) {
 		AwsNetworkACLRuleResourceType:                  {resource.FlagDeepMode},
 		AwsLaunchTemplateResourceType:                  {resource.FlagDeepMode},
 		AwsLaunchConfigurationResourceType:             {},
-		AwsApiGatewayV2ModelResourceType:               {},
-		AwsApiGatewayV2StageResourceType:               {},
-		AwsApiGatewayV2MappingResourceType:             {},
-		AwsApiGatewayV2IntegrationResponseResourceType: {},
 	}
 
 	schemaRepository := testresource.InitFakeSchemaRepository(tf.AWS, "3.19.0")
