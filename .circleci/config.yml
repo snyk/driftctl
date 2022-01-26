@@ -167,7 +167,7 @@ jobs:
             command: |
               curl -X POST https://api.github.com/repos/snyk/driftctl-docs/dispatches \
                 -d '{"event_type": "new_version"}' \
-                -H 'Authorization: token $GITHUB_TOKEN'
+                -H "Authorization: token ${GITHUB_TOKEN}"
   update-lambda:
     environment:
         FUNCTION_NAME: driftctl-version
