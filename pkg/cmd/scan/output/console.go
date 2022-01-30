@@ -201,7 +201,7 @@ func (c Console) writeSummary(analysis *analyser.Analysis) {
 		if analysis.Summary().TotalManaged > 0 {
 			managed = warningWriter.Sprintf("%d", analysis.Summary().TotalManaged)
 		}
-		fmt.Printf(" - %s resource(s) managed by terraform\n", managed)
+		fmt.Printf(" - %s resource(s) managed by Terraform\n", managed)
 
 		drifted := successWriter.Sprintf("0")
 		if analysis.Summary().TotalDrifted > 0 {
