@@ -77,7 +77,7 @@ func run() int {
 	if checkVersion {
 		newVersion := <-latestVersionChan
 		if newVersion != "" {
-			_, _ = fmt.Fprintln(os.Stderr, "\n\nYour version of driftctl is outdated, please upgrade !")
+			_, _ = fmt.Fprintln(os.Stderr, "\n\nYour version of driftctl is outdated, please upgrade!")
 			_, _ = fmt.Fprintf(os.Stderr, "Current: %s; Latest: %s\n", version.Current(), newVersion)
 		}
 	}
