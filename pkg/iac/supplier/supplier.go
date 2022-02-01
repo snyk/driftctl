@@ -37,7 +37,7 @@ func GetIACSupplier(configs []config.SupplierConfig,
 	progress output.Progress,
 	alerter *alerter.Alerter,
 	factory resource.ResourceFactory,
-	filter filter.Filter) (resource.Supplier, error) {
+	filter filter.Filter) (resource.IaCSupplier, error) {
 
 	chainSupplier := NewIacChainSupplier()
 	for _, config := range configs {
@@ -47,7 +47,7 @@ func GetIACSupplier(configs []config.SupplierConfig,
 
 		deserializer := resource.NewDeserializer(factory)
 
-		var supplier resource.Supplier
+		var supplier resource.IaCSupplier
 		var err error
 		switch config.Key {
 		case state.TerraformStateReaderSupplier:

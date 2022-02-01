@@ -62,8 +62,9 @@ func runTest(t *testing.T, cases TestCases) {
 				res.Sch = schema
 			}
 
-			stateSupplier := &resource.MockSupplier{}
+			stateSupplier := &resource.MockIaCSupplier{}
 			stateSupplier.On("Resources").Return(c.stateResources, nil)
+			stateSupplier.On("SourceCount").Return(uint(2))
 
 			if c.remoteResources == nil {
 				c.remoteResources = []*resource.Resource{}
@@ -138,6 +139,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				assert.Equal(t, 0, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
 				assert.Equal(t, 0, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
 				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
+				assert.Equal(t, uint(2), store.Bucket(memstore.TelemetryBucket).Get("iac_source_count"))
 			},
 		},
 		{
@@ -155,6 +157,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
 				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
 				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
+				assert.Equal(t, uint(2), store.Bucket(memstore.TelemetryBucket).Get("iac_source_count"))
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{Deep: true}
@@ -173,6 +176,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
 				assert.Equal(t, 0, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
 				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
+				assert.Equal(t, uint(2), store.Bucket(memstore.TelemetryBucket).Get("iac_source_count"))
 			},
 		},
 		{
@@ -226,6 +230,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
 				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
 				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
+				assert.Equal(t, uint(2), store.Bucket(memstore.TelemetryBucket).Get("iac_source_count"))
 			},
 		},
 		{
@@ -264,6 +269,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
 				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
 				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
+				assert.Equal(t, uint(2), store.Bucket(memstore.TelemetryBucket).Get("iac_source_count"))
 			},
 		},
 		{
@@ -304,6 +310,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
 				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
 				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
+				assert.Equal(t, uint(2), store.Bucket(memstore.TelemetryBucket).Get("iac_source_count"))
 			},
 		},
 		{
@@ -344,6 +351,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
 				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
 				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
+				assert.Equal(t, uint(2), store.Bucket(memstore.TelemetryBucket).Get("iac_source_count"))
 			},
 		},
 		{
@@ -434,6 +442,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				assert.Equal(t, 4, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
 				assert.Equal(t, 2, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
 				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
+				assert.Equal(t, uint(2), store.Bucket(memstore.TelemetryBucket).Get("iac_source_count"))
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{
@@ -530,6 +539,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				assert.Equal(t, 6, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
 				assert.Equal(t, 2, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
 				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
+				assert.Equal(t, uint(2), store.Bucket(memstore.TelemetryBucket).Get("iac_source_count"))
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{
@@ -628,6 +638,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
 				assert.Equal(t, 0, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
 				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
+				assert.Equal(t, uint(2), store.Bucket(memstore.TelemetryBucket).Get("iac_source_count"))
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				filterStr := "Id=='role-test-1'"

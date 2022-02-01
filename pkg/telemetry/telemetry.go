@@ -20,6 +20,7 @@ type telemetry struct {
 	TotalManaged   int    `json:"total_managed"`
 	Duration       uint   `json:"duration"`
 	ProviderName   string `json:"provider_name"`
+	IaCSourceCount uint   `json:"iac_source_count"`
 }
 
 type Telemetry struct {
@@ -57,6 +58,10 @@ func (te Telemetry) SendTelemetry(store memstore.Bucket) {
 
 	if val, ok := store.Get("provider_name").(string); ok {
 		t.ProviderName = val
+	}
+
+	if val, ok := store.Get("iac_source_count").(uint); ok {
+		t.IaCSourceCount = val
 	}
 
 	body, err := json.Marshal(t)
