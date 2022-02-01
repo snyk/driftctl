@@ -2,6 +2,7 @@ package google_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/acceptance"
@@ -17,6 +18,16 @@ func TestAcc_Google_ComputeGlobalAddress(t *testing.T) {
 		},
 		Checks: []acceptance.AccCheck{
 			{
+				// New resources are not visible immediately through GCP API after an apply operation.
+				// Logic below retries driftctl scan using a back-off strategy of retrying 'n' times
+				// and doubling the amount of time waited after each one.
+				ShouldRetry: func(result *test.ScanResult, retryDuration time.Duration, retryCount uint8) bool {
+					if result.IsSync() || retryDuration > 10*time.Minute {
+						return false
+					}
+					time.Sleep((2 * time.Duration(retryCount)) * time.Minute)
+					return true
+				},
 				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
