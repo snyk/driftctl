@@ -14,7 +14,7 @@ import (
 	"github.com/snyk/driftctl/test/acceptance/awsutils"
 )
 
-func TestAcc_AwsInstance(t *testing.T) {
+func TestAcc_Aws_Instance(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_instance_default"},
@@ -39,7 +39,7 @@ func TestAcc_AwsInstance(t *testing.T) {
 	})
 }
 
-func TestAcc_AwsInstance_WithBlockDevices(t *testing.T) {
+func TestAcc_Aws_Instance_WithBlockDevices(t *testing.T) {
 	var mutatedInstanceId string
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",

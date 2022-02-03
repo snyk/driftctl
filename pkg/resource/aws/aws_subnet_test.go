@@ -7,7 +7,7 @@ import (
 	"github.com/snyk/driftctl/test/acceptance"
 )
 
-func TestAcc_AwsSubnet(t *testing.T) {
+func TestAcc_Aws_Subnet(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_subnet"},

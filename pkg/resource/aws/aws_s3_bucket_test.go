@@ -7,7 +7,7 @@ import (
 	"github.com/snyk/driftctl/test/acceptance"
 )
 
-func TestAcc_AwsS3Bucket_BucketInUsEast1(t *testing.T) {
+func TestAcc_Aws_S3Bucket_BucketInUsEast1(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_s3_bucket"},

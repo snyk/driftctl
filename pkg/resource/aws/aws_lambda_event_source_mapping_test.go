@@ -10,7 +10,7 @@ import (
 // aws lambda list-event-source-mappings to list all event source mappings
 // aws lambda delete-event-source-mapping --uuid xxx to delete a specific event source mapping
 
-func TestAcc_AwsLambdaEventSourceMapping(t *testing.T) {
+func TestAcc_Aws_LambdaEventSourceMapping(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_lambda_event_source_mapping"},

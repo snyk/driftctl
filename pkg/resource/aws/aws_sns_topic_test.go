@@ -21,7 +21,7 @@ import (
 	"github.com/snyk/driftctl/test/acceptance/awsutils"
 )
 
-func TestAcc_AwsSNSTopic(t *testing.T) {
+func TestAcc_Aws_SNSTopic(t *testing.T) {
 	var mutatedTopicArn string
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
