@@ -41,6 +41,7 @@ type TerraformStateReader struct {
 	progress       output.Progress
 	filter         filter.Filter
 	alerter        *alerter.Alerter
+	sourceCount    uint
 }
 
 func (r *TerraformStateReader) initReader() error {
@@ -49,7 +50,16 @@ func (r *TerraformStateReader) initReader() error {
 }
 
 func NewReader(config config.SupplierConfig, library *terraform.ProviderLibrary, backendOpts *backend.Options, progress output.Progress, alerter *alerter.Alerter, deserializer *resource.Deserializer, filter filter.Filter) (*TerraformStateReader, error) {
-	reader := TerraformStateReader{library: library, config: config, deserializer: deserializer, backendOptions: backendOpts, progress: progress, alerter: alerter, filter: filter}
+	reader := TerraformStateReader{
+		library:        library,
+		config:         config,
+		deserializer:   deserializer,
+		backendOptions: backendOpts,
+		progress:       progress,
+		alerter:        alerter,
+		filter:         filter,
+		sourceCount:    0,
+	}
 	err := reader.initReader()
 	if err != nil {
 		return nil, err
@@ -214,8 +224,13 @@ func (r *TerraformStateReader) Resources() ([]*resource.Resource, error) {
 	return r.retrieveMultiplesStates()
 }
 
+func (r *TerraformStateReader) SourceCount() uint {
+	return r.sourceCount
+}
+
 func (r *TerraformStateReader) retrieveForState(path string) ([]*resource.Resource, error) {
 	r.config.Path = path
+	r.sourceCount += 1
 	logrus.WithFields(logrus.Fields{
 		"path":    r.config.Path,
 		"backend": r.config.Backend,

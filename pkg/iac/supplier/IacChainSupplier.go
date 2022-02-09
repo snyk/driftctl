@@ -10,7 +10,7 @@ import (
 )
 
 type IacChainSupplier struct {
-	suppliers []resource.Supplier
+	suppliers []resource.IaCSupplier
 	runner    *parallel.ParallelRunner
 }
 
@@ -20,7 +20,15 @@ func NewIacChainSupplier() *IacChainSupplier {
 	}
 }
 
-func (r *IacChainSupplier) AddSupplier(supplier resource.Supplier) {
+func (r *IacChainSupplier) SourceCount() uint {
+	count := uint(0)
+	for _, supplier := range r.suppliers {
+		count += supplier.SourceCount()
+	}
+	return count
+}
+
+func (r *IacChainSupplier) AddSupplier(supplier resource.IaCSupplier) {
 	r.suppliers = append(r.suppliers, supplier)
 }
 

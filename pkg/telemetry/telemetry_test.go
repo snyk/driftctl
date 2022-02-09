@@ -44,12 +44,14 @@ func TestSendTelemetry(t *testing.T) {
 				TotalManaged:   1,
 				Duration:       123,
 				ProviderName:   "aws",
+				IaCSourceCount: 2,
 			},
 			setStoreValues: func(s memstore.Bucket, a *analyser.Analysis) {
 				s.Set("total_resources", a.Summary().TotalResources)
 				s.Set("total_managed", a.Summary().TotalManaged)
 				s.Set("duration", uint(a.Duration.Seconds()+0.5))
 				s.Set("provider_name", "aws")
+				s.Set("iac_source_count", uint(2))
 			},
 		},
 		{

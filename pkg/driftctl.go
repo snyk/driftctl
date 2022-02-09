@@ -38,7 +38,7 @@ type ScanOptions struct {
 
 type DriftCTL struct {
 	remoteSupplier           resource.Supplier
-	iacSupplier              resource.Supplier
+	iacSupplier              resource.IaCSupplier
 	alerter                  alerter.AlerterInterface
 	analyzer                 *analyser.Analyzer
 	resourceFactory          resource.ResourceFactory
@@ -50,7 +50,7 @@ type DriftCTL struct {
 }
 
 func NewDriftCTL(remoteSupplier resource.Supplier,
-	iacSupplier resource.Supplier,
+	iacSupplier resource.IaCSupplier,
 	alerter *alerter.Alerter,
 	analyzer *analyser.Analyzer,
 	resFactory resource.ResourceFactory,
@@ -189,6 +189,7 @@ func (d DriftCTL) scan() (remoteResources []*resource.Resource, resourcesFromSta
 	if err != nil {
 		return nil, nil, err
 	}
+	d.store.Bucket(memstore.TelemetryBucket).Set("iac_source_count", d.iacSupplier.SourceCount())
 
 	logrus.Info("Start scanning cloud provider")
 	d.scanProgress.Start()
