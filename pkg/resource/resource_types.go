@@ -2,8 +2,15 @@ package resource
 
 type ResourceType string
 
+type ServiceType string
+
+const (
+	aws_s3  ServiceType = "s3"
+	aws_ec2             = "ec2"
+)
+
 var supportedTypes = map[string]ResourceTypeMeta{
-	"aws_ami":                     {},
+	"aws_ami":                     {services: []ServiceType{aws_ec2}},
 	"aws_cloudfront_distribution": {},
 	"aws_db_instance":             {},
 	"aws_db_subnet_group":         {},
@@ -22,13 +29,13 @@ var supportedTypes = map[string]ResourceTypeMeta{
 		"aws_internet_gateway",
 	}},
 	"aws_dynamodb_table": {},
-	"aws_ebs_snapshot":   {},
-	"aws_ebs_volume":     {},
+	"aws_ebs_snapshot":   {services: []ServiceType{aws_ec2}},
+	"aws_ebs_volume":     {services: []ServiceType{aws_ec2}},
 	"aws_ecr_repository": {},
 	"aws_eip": {children: []ResourceType{
 		"aws_eip_association",
-	}},
-	"aws_eip_association":       {},
+	}, services: []ServiceType{aws_ec2}},
+	"aws_eip_association":       {services: []ServiceType{aws_ec2}},
 	"aws_iam_access_key":        {},
 	"aws_iam_policy":            {},
 	"aws_iam_policy_attachment": {},
@@ -53,12 +60,12 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	}},
 	"aws_instance": {children: []ResourceType{
 		"aws_ebs_volume",
-	}},
+	}, services: []ServiceType{aws_ec2}},
 	"aws_internet_gateway": {children: []ResourceType{
 		// This is used to determine internet gateway default rule
 		"aws_route",
 	}},
-	"aws_key_pair":                    {},
+	"aws_key_pair":                    {services: []ServiceType{aws_ec2}},
 	"aws_kms_alias":                   {},
 	"aws_kms_key":                     {},
 	"aws_lambda_event_source_mapping": {},
@@ -78,12 +85,12 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_route_table_association": {},
 	"aws_s3_bucket": {children: []ResourceType{
 		"aws_s3_bucket_policy",
-	}},
-	"aws_s3_bucket_analytics_configuration": {},
-	"aws_s3_bucket_inventory":               {},
-	"aws_s3_bucket_metric":                  {},
-	"aws_s3_bucket_notification":            {},
-	"aws_s3_bucket_policy":                  {},
+	}, services: []ServiceType{aws_s3}},
+	"aws_s3_bucket_analytics_configuration": {services: []ServiceType{aws_s3}},
+	"aws_s3_bucket_inventory":               {services: []ServiceType{aws_s3}},
+	"aws_s3_bucket_metric":                  {services: []ServiceType{aws_s3}},
+	"aws_s3_bucket_notification":            {services: []ServiceType{aws_s3}},
+	"aws_s3_bucket_policy":                  {services: []ServiceType{aws_s3}},
 	"aws_security_group": {children: []ResourceType{
 		"aws_security_group_rule",
 	}},
@@ -245,8 +252,46 @@ func GetMeta(ty ResourceType) ResourceTypeMeta {
 
 type ResourceTypeMeta struct {
 	children []ResourceType
+	services []ServiceType
 }
 
 func (ty ResourceTypeMeta) GetChildrenTypes() []ResourceType {
 	return ty.children
+}
+
+func FindResourcesForServiceType(ty string) []string {
+	var res []string
+	for r, meta := range supportedTypes {
+		for _, s := range meta.services {
+			if string(s) == ty {
+				res = append(res, r)
+			}
+		}
+	}
+	return res
+}
+
+func GetServiceTypes() []string {
+	var res []string
+	for _, meta := range supportedTypes {
+		for _, s := range meta.services {
+			if !findInSlice(res, string(s)) {
+				res = append(res, string(s))
+			}
+		}
+	}
+	return res
+}
+
+func IsServiceTypeSupported(ty string) bool {
+	return findInSlice(GetServiceTypes(), ty)
+}
+
+func findInSlice(slice []string, s string) bool {
+	for _, item := range slice {
+		if item == s {
+			return true
+		}
+	}
+	return false
 }

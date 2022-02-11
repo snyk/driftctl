@@ -84,6 +84,29 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 				opts.Filter = expr
 			}
 
+			serviceFlag, _ := cmd.Flags().GetStringSlice("service")
+			for _, service := range serviceFlag {
+				if !resource.IsServiceTypeSupported(service) {
+					return errors.Errorf("Unsupported service: %s", service)
+				}
+			}
+
+			var targetResources []string
+			for _, s := range serviceFlag {
+				if s != "" {
+					// TODO could do some normalization here, same resource type can be part of multiple services
+					targetResources = append(targetResources, resource.FindResourcesForServiceType(s)...)
+				}
+			}
+
+			if len(targetResources) > 0 {
+				ignoresForService := []string{"*"}
+				for _, r := range targetResources {
+					ignoresForService = append(ignoresForService, fmt.Sprintf("!%s", r))
+				}
+				opts.Driftignores = ignoresForService
+			}
+
 			providerVersion, _ := cmd.Flags().GetString("tf-provider-version")
 			if err := validateTfProviderVersionString(providerVersion); err != nil {
 				return err
@@ -202,6 +225,17 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 		"Terraform lock file to get the provider's version from. Will be ignored if the file doesn't exist.\n",
 	)
 
+	fl.StringSlice(
+		"service",
+		[]string{},
+		fmt.Sprintf("%s Specify a service to target specific resources\n", warn("EXPERIMENTAL:"))+
+			"Available services are: "+strings.Join(resource.GetServiceTypes(), ",")+"\n"+
+			"A service represents a group of resources e.g. aws_s3 service represents the following resources: \n"+
+			"  - aws_s3_bucket\n  - aws_s3_bucket_analytics_configuration\n  - aws_s3_bucket_inventory\n"+
+			"  - aws_s3_bucket_metric\n  - aws_s3_bucket_notification\n  - aws_s3_bucket_policy\n "+
+			"When using this parameter the driftignore file is ignored",
+	)
+
 	configDir, err := homedir.Dir()
 	if err != nil {
 		configDir = os.TempDir()
@@ -252,7 +286,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 	}()
 
 	logrus.Debug("Checking for driftignore")
-	driftIgnore := filter.NewDriftIgnore(opts.DriftignorePath)
+	driftIgnore := filter.NewDriftIgnore(opts.DriftignorePath, opts.Driftignores...)
 
 	scanner := remote.NewScanner(remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep}, driftIgnore)
 
