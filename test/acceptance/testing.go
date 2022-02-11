@@ -438,7 +438,10 @@ func Run(t *testing.T, c AccTestCase) {
 			if check.ShouldRetry == nil || !check.ShouldRetry(result, time.Since(timeBeforeRetry), retryCount) {
 				break
 			}
-			logrus.WithField("count", fmt.Sprintf("%d", retryCount)).Debug("Retrying scan ...")
+			logrus.
+				WithField("count", fmt.Sprintf("%d", retryCount)).
+				WithField("retry_duration", time.Since(timeBeforeRetry).Round(time.Second)).
+				Debug("Retrying scan ...")
 			_, _, _ = runDriftCtlCmd(driftctlCmd)
 			result = c.getResult(t)
 			retryCount++
