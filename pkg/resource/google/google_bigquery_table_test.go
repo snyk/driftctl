@@ -22,7 +22,7 @@ func TestAcc_Google_BigqueryTable(t *testing.T) {
 				// Logic below retries driftctl scan using a back-off strategy of retrying 'n' times
 				// and doubling the amount of time waited after each one.
 				ShouldRetry: func(result *test.ScanResult, retryDuration time.Duration, retryCount uint8) bool {
-					if result.IsSync() || retryDuration > 10*time.Minute {
+					if result.IsSync() || retryDuration > 15*time.Minute {
 						return false
 					}
 					time.Sleep((2 * time.Duration(retryCount)) * time.Minute)
