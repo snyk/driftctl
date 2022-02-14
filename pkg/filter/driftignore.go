@@ -15,15 +15,23 @@ const separator = "_-_"
 
 type DriftIgnore struct {
 	driftignorePath string
+	ignorePatterns  []string
 	matcher         gitignore.Matcher
 }
 
-func NewDriftIgnore(path string) *DriftIgnore {
+func NewDriftIgnore(path string, ignorePatterns ...string) *DriftIgnore {
 	d := DriftIgnore{
 		driftignorePath: path,
+		ignorePatterns:  ignorePatterns,
 		matcher:         gitignore.NewMatcher(nil),
 	}
-	err := d.readIgnoreFile()
+	var err error
+	if len(ignorePatterns) > 0 {
+		err = d.parseIgnorePatterns()
+	} else {
+		err = d.readIgnoreFile()
+	}
+
 	if err != nil {
 		logrus.Debug(err)
 	}
@@ -41,21 +49,7 @@ func (r *DriftIgnore) readIgnoreFile() error {
 	scanner := bufio.NewScanner(file)
 	for lineNumber := 1; scanner.Scan(); lineNumber++ {
 		line := scanner.Text()
-
-		if len(strings.ReplaceAll(line, " ", "")) <= 0 {
-			continue // empty
-		}
-
-		if strings.HasPrefix(line, "#") {
-			continue // this is a comment
-		}
-		line = strings.ReplaceAll(line, "/", separator)
-
-		lines = append(lines, gitignore.ParsePattern(line, nil))
-		if !strings.HasSuffix(line, "*") {
-			line := fmt.Sprintf("%s.*", line)
-			lines = append(lines, gitignore.ParsePattern(line, nil))
-		}
+		r.parseIgnorePattern(line, &lines)
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -65,6 +59,32 @@ func (r *DriftIgnore) readIgnoreFile() error {
 	r.matcher = gitignore.NewMatcher(lines)
 
 	return nil
+}
+
+func (r *DriftIgnore) parseIgnorePatterns() error {
+	var lines []gitignore.Pattern
+	for _, p := range r.ignorePatterns {
+		r.parseIgnorePattern(p, &lines)
+	}
+	r.matcher = gitignore.NewMatcher(lines)
+	return nil
+}
+
+func (r *DriftIgnore) parseIgnorePattern(line string, patterns *[]gitignore.Pattern) {
+	if len(strings.ReplaceAll(line, " ", "")) <= 0 {
+		return // empty
+	}
+
+	if strings.HasPrefix(line, "#") {
+		return // this is a comment
+	}
+	line = strings.ReplaceAll(line, "/", separator)
+
+	*patterns = append(*patterns, gitignore.ParsePattern(line, nil))
+	if !strings.HasSuffix(line, "*") {
+		line := fmt.Sprintf("%s.*", line)
+		*patterns = append(*patterns, gitignore.ParsePattern(line, nil))
+	}
 }
 
 func (r *DriftIgnore) isAnyOfChildrenTypesNotIgnored(ty resource.ResourceType) bool {

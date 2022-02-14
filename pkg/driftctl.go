@@ -33,6 +33,7 @@ type ScanOptions struct {
 	ProviderVersion  string
 	ConfigDir        string
 	DriftignorePath  string
+	Driftignores     []string
 	Deep             bool
 }
 

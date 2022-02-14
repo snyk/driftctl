@@ -196,6 +196,12 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 		".driftignore",
 		"Path to the driftignore file",
 	)
+	fl.StringSliceVar(&opts.Driftignores,
+		"ignores",
+		[]string{},
+		fmt.Sprintf("%s Patterns to be used for ignoring resources\n", warn("EXPERIMENTAL:"))+
+			"Example: *,!aws_s3* \n"+
+			"When using this parameter the driftignore file is not used")
 	fl.String(
 		"tf-lockfile",
 		".terraform.lock.hcl",
@@ -252,7 +258,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 	}()
 
 	logrus.Debug("Checking for driftignore")
-	driftIgnore := filter.NewDriftIgnore(opts.DriftignorePath)
+	driftIgnore := filter.NewDriftIgnore(opts.DriftignorePath, opts.Driftignores...)
 
 	scanner := remote.NewScanner(remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep}, driftIgnore)
 
