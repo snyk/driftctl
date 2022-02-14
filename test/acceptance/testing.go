@@ -32,12 +32,14 @@ import (
 	"github.com/hashicorp/terraform-exec/tfinstall"
 )
 
+type ShouldRetryFunc func(result *test.ScanResult, retryDuration time.Duration, retryCount uint8) bool
+
 type AccCheck struct {
 	PreExec     func()
 	PostExec    func()
 	Env         map[string]string
 	Args        func() []string
-	ShouldRetry func(result *test.ScanResult, retryDuration time.Duration, retryCount uint8) bool
+	ShouldRetry ShouldRetryFunc
 	Check       func(result *test.ScanResult, stdout string, err error)
 }
 
@@ -497,5 +499,18 @@ func RetryFor(timeout time.Duration, f func(c chan struct{}) error) error {
 		return err
 	case <-ctx.Done():
 		return ctx.Err()
+	}
+}
+
+// LinearBackoff returns a function that retries using
+// a back-off strategy of retrying 'n' times and doubling the
+// amount of time waited after each one.
+func LinearBackoff(limit time.Duration) ShouldRetryFunc {
+	return func(result *test.ScanResult, retryDuration time.Duration, retryCount uint8) bool {
+		if result.IsSync() || retryDuration > limit {
+			return false
+		}
+		time.Sleep((2 * time.Duration(retryCount)) * time.Minute)
+		return true
 	}
 }
