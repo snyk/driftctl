@@ -167,7 +167,20 @@ jobs:
             command: |
               curl -X POST https://api.github.com/repos/snyk/driftctl-docs/dispatches \
                 -d '{"event_type": "new_version"}' \
-                -H "Authorization: token ${GITHUB_TOKEN}"
+                -H "Authorization: token $GITHUB_TOKEN"
+  issue-tagging:
+      machine:
+          image: ubuntu-2004:202010-01
+      steps:
+          - checkout
+          - gh/setup:
+                version: 2.2.0
+          - attach_workspace:
+                at: ~/project
+          - run:
+                name: Auto label issues with the newly released version
+                command: |
+                    ./scripts/issue-tagging.sh
   update-lambda:
     environment:
         FUNCTION_NAME: driftctl-version
@@ -319,3 +332,13 @@ workflows:
                 only: /^v.*/
               branches:
                 ignore: /.*/
+      - issue-tagging:
+            context:
+                - driftctl
+            requires:
+                - release
+            filters:
+                tags:
+                    only: /^v.*/
+                branches:
+                    ignore: /.*/
