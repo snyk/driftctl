@@ -534,3 +534,51 @@ func TestDriftIgnore_IsTypeIgnored(t *testing.T) {
 		})
 	}
 }
+
+func TestDriftIgnore_IsTypeIgnoredWhenUsingIgnoreParams(t *testing.T) {
+	tests := []struct {
+		name      string
+		resources []*resource.Resource
+		want      []bool
+		path      string
+		ignores   []string
+	}{
+		{
+			name: "drift_ignore_type_exclude_with_child_1_nesting",
+			resources: []*resource.Resource{
+				{
+					Type: "aws_s3_access_point",
+				},
+				{
+					Type: "aws_s3_bucket",
+				},
+				{
+					Type: "aws_s3_bucket_acl",
+				},
+				{
+					Type: "aws_route53_delegation_set",
+				},
+			},
+			want: []bool{
+				false,
+				false,
+				false,
+				true,
+			},
+			path: "testdata/drift_ignore_all/.driftignore",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cwd, _ := os.Getwd()
+			defer func() { _ = os.Chdir(cwd) }()
+
+			r := NewDriftIgnore(tt.path, "*", "!aws_s3*")
+			got := make([]bool, 0, len(tt.want))
+			for _, res := range tt.resources {
+				got = append(got, r.IsTypeIgnored(resource.ResourceType(res.ResourceType())))
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
