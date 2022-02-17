@@ -15,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/pkg/cmd/scan"
 	"github.com/snyk/driftctl/pkg/output"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
@@ -63,7 +64,7 @@ func (p *TerraformProvider) Init() error {
 		case <-c:
 			logrus.Warn("Detected interrupt during terraform provider configuration, cleanup ...")
 			p.Cleanup()
-			os.Exit(1)
+			os.Exit(scan.EXIT_ERROR)
 		case <-stopCh:
 			return
 		}
