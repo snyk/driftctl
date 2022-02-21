@@ -13,6 +13,7 @@ import (
 	"github.com/snyk/driftctl/logger"
 	"github.com/snyk/driftctl/pkg/cmd"
 	cmderrors "github.com/snyk/driftctl/pkg/cmd/errors"
+	"github.com/snyk/driftctl/pkg/cmd/scan"
 	"github.com/snyk/driftctl/pkg/config"
 	"github.com/snyk/driftctl/pkg/version"
 	"github.com/snyk/driftctl/sentry"
@@ -57,7 +58,7 @@ func run() int {
 				gosentry.CurrentHub().Recover(err)
 				flushSentry()
 				logrus.Fatalf("Captured panic: %s", err)
-				os.Exit(2)
+				os.Exit(scan.EXIT_ERROR)
 			}
 			flushSentry()
 		}
@@ -65,13 +66,13 @@ func run() int {
 
 	if _, err := driftctlCmd.ExecuteC(); err != nil {
 		if _, isNotInSync := err.(cmderrors.InfrastructureNotInSync); isNotInSync {
-			return 1
+			return scan.EXIT_NOT_IN_SYNC
 		}
 		if cmd.IsReportingEnabled(&driftctlCmd.Command) {
 			sentry.CaptureException(err)
 		}
 		_, _ = fmt.Fprintln(os.Stderr, color.RedString("%s", err))
-		return 1
+		return scan.EXIT_ERROR
 	}
 
 	if checkVersion {
@@ -82,7 +83,7 @@ func run() int {
 		}
 	}
 
-	return 0
+	return scan.EXIT_IN_SYNC
 }
 
 func flushSentry() {
