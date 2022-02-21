@@ -544,7 +544,7 @@ func TestDriftIgnore_IsDriftfileIgnoredWhenUsingIgnoreParams(t *testing.T) {
 		ignores   []string
 	}{
 		{
-			name: "drift_ignore_type_exclude_with_child_1_nesting",
+			name: "drift_ignore_non_aws_s3_resources",
 			resources: []*resource.Resource{
 				{
 					Type: "aws_s3_access_point",
@@ -565,7 +565,8 @@ func TestDriftIgnore_IsDriftfileIgnoredWhenUsingIgnoreParams(t *testing.T) {
 				false,
 				true,
 			},
-			path: "testdata/drift_ignore_all/.driftignore",
+			path:    "testdata/drift_ignore_all/.driftignore",
+			ignores: []string{"*", "!aws_s3*"},
 		},
 	}
 	for _, tt := range tests {
@@ -573,7 +574,7 @@ func TestDriftIgnore_IsDriftfileIgnoredWhenUsingIgnoreParams(t *testing.T) {
 			cwd, _ := os.Getwd()
 			defer func() { _ = os.Chdir(cwd) }()
 
-			r := NewDriftIgnore(tt.path, "*", "!aws_s3*")
+			r := NewDriftIgnore(tt.path, tt.ignores...)
 			got := make([]bool, 0, len(tt.want))
 			for _, res := range tt.resources {
 				got = append(got, r.IsTypeIgnored(resource.ResourceType(res.ResourceType())))
