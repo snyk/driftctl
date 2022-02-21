@@ -99,9 +99,10 @@ type ResourceFactory interface {
 }
 
 type SerializableResource struct {
-	Id     string              `json:"id"`
-	Type   string              `json:"type"`
-	Source *SerializableSource `json:"source,omitempty"`
+	Id                 string              `json:"id"`
+	Type               string              `json:"type"`
+	ReadableAttributes map[string]string   `json:"human_readable_attributes,omitempty"`
+	Source             *SerializableSource `json:"source,omitempty"`
 }
 
 func NewSerializableResource(res *Resource) *SerializableResource {
@@ -114,10 +115,18 @@ func NewSerializableResource(res *Resource) *SerializableResource {
 		}
 	}
 	return &SerializableResource{
-		Id:     res.ResourceId(),
-		Type:   res.ResourceType(),
-		Source: src,
+		Id:                 res.ResourceId(),
+		Type:               res.ResourceType(),
+		ReadableAttributes: formatReadableAttributes(res),
+		Source:             src,
 	}
+}
+
+func formatReadableAttributes(res *Resource) map[string]string {
+	if res.Schema() == nil || res.Schema().HumanReadableAttributesFunc == nil {
+		return map[string]string{}
+	}
+	return res.Schema().HumanReadableAttributesFunc(res)
 }
 
 type NormalizedResource interface {
