@@ -535,7 +535,7 @@ func TestDriftIgnore_IsTypeIgnored(t *testing.T) {
 	}
 }
 
-func TestDriftIgnore_IsTypeIgnoredWhenUsingIgnoreParams(t *testing.T) {
+func TestDriftIgnore_IsDriftfileIgnoredWhenUsingIgnoreParams(t *testing.T) {
 	tests := []struct {
 		name      string
 		resources []*resource.Resource
