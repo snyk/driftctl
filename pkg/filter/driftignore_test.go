@@ -16,6 +16,7 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 		resources []*resource.Resource
 		want      []bool
 		path      string
+		ignores   []string
 	}{
 		{
 			name: "drift_ignore_no_file",
@@ -215,13 +216,80 @@ func TestDriftIgnore_IsResourceIgnored(t *testing.T) {
 			},
 			path: "testdata/drift_ignore_all_exclude/.driftignore",
 		},
+		{
+			name: "drift_ignore_all_exclude_with_ignore_patterns",
+			resources: []*resource.Resource{
+				{
+					Type: "type1",
+					Id:   "id1",
+				},
+				{
+					Type: "type2",
+					Id:   "id1",
+				},
+				{
+					Type: "type2",
+					Id:   "id11",
+				},
+				{
+					Type: "type2",
+					Id:   "id2",
+				},
+				{
+					Type: "type3",
+					Id:   "id100",
+				},
+				{
+					Type: "type3",
+					Id:   "id101",
+				},
+				{
+					Type: "iam_user",
+					Id:   "id\\WithBac*slash***\\*\\",
+				},
+				{
+					Type: "some_type",
+					Id:   "idwith/slash",
+				},
+				{
+					Type: "some_type",
+					Id:   "idwith/slash/",
+				},
+			},
+			want: []bool{
+				true,
+				true,
+				true,
+				true,
+				true,
+				true,
+				false,
+				false,
+				true,
+			},
+			path:    "testdata/drift_ignore_all/.driftignore",
+			ignores: []string{"*", "!iam_user.*", "!some_type.idwith/slash"},
+		},
+		{
+			name: "drift_ignore_none_with_ignore_patterns",
+			resources: []*resource.Resource{
+				{
+					Type: "aws_s3_access_point",
+				},
+			},
+			want: []bool{
+				false,
+			},
+			path:    "testdata/drift_ignore_all/.driftignore",
+			ignores: []string{"!*"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cwd, _ := os.Getwd()
 			defer func() { _ = os.Chdir(cwd) }()
 
-			r := NewDriftIgnore(tt.path)
+			r := NewDriftIgnore(tt.path, tt.ignores...)
 			got := make([]bool, 0, len(tt.want))
 			for _, res := range tt.resources {
 				got = append(got, r.IsResourceIgnored(res))
@@ -240,9 +308,10 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 	}
 
 	tests := []struct {
-		name string
-		args []Args
-		path string
+		name    string
+		args    []Args
+		path    string
+		ignores []string
 	}{
 		{
 			name: "drift_ignore_no_file",
@@ -419,13 +488,86 @@ func TestDriftIgnore_IsFieldIgnored(t *testing.T) {
 			},
 			path: "testdata/drift_ignore_all_exclude_field/.driftignore",
 		},
+		{
+			name: "drift_ignore_all_exclude_field_with_ignore_patterns",
+			args: []Args{
+				{
+					Res:  &resource.Resource{Type: "res_type", Id: "full_drift_ignored"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource.Resource{Type: "res_type", Id: "full_drift_ignored"},
+					Path: []string{"foobar"},
+					Want: true,
+				},
+				{
+					Res:  &resource.Resource{Type: "res_type", Id: "partial_drift_ignored"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource.Resource{Type: "res_type", Id: "partial_drift_ignored"},
+					Path: []string{"foobar"},
+					Want: true,
+				},
+				{
+					Res:  &resource.Resource{Type: "resource_type", Id: "id.with.dots"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource.Resource{Type: "resource_type", Id: "id.with.dots"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource.Resource{Type: "resource_type", Id: "idwith\\"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource.Resource{Type: "resource_type", Id: "idwith\\backslashes"},
+					Path: []string{"json"},
+					Want: true,
+				},
+				{
+					Res:  &resource.Resource{Type: "resource_type", Id: "idwith\\backslashes"},
+					Path: []string{"foobar"},
+					Want: true,
+				},
+				{
+					Res:  &resource.Resource{Type: "res_type", Id: "wildcard_drift_ignored"},
+					Path: []string{"struct", "baz"},
+					Want: true,
+				},
+				{
+					Res:  &resource.Resource{Type: "res_type", Id: "wildcard_drift_ignored"},
+					Path: []string{"struct", "bar"},
+					Want: false,
+				},
+				{
+					Res:  &resource.Resource{Type: "res_type", Id: "endofpath_drift_ignored"},
+					Path: []string{"struct", "baz"},
+					Want: true,
+				},
+				{
+					Res:  &resource.Resource{Type: "res_type", Id: "endofpath_drift_ignored"},
+					Path: []string{"struct", "bar"},
+					Want: false,
+				},
+			},
+			path:    "testdata/drift_ignore_all/.driftignore",
+			ignores: []string{"*", "!*.bar"},
+		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cwd, _ := os.Getwd()
 			defer func() { _ = os.Chdir(cwd) }()
 
-			r := NewDriftIgnore(tt.path)
+			r := NewDriftIgnore(tt.path, tt.ignores...)
 			for _, arg := range tt.args {
 				got := r.IsFieldIgnored(arg.Res, arg.Path)
 				if arg.Want != got {
@@ -442,6 +584,7 @@ func TestDriftIgnore_IsTypeIgnored(t *testing.T) {
 		resources []*resource.Resource
 		want      []bool
 		path      string
+		ignores   []string
 	}{
 		{
 			name: "drift_ignore_type_exclude_with_child_1_nesting",
@@ -519,13 +662,63 @@ func TestDriftIgnore_IsTypeIgnored(t *testing.T) {
 			},
 			path: "testdata/drift_ignore_type/.driftignore",
 		},
+		{
+			name: "drift_ignore_non_aws_s3_resources",
+			resources: []*resource.Resource{
+				{
+					Type: "aws_s3_access_point",
+				},
+				{
+					Type: "aws_s3_bucket",
+				},
+				{
+					Type: "aws_s3_bucket_acl",
+				},
+				{
+					Type: "aws_route53_delegation_set",
+				},
+			},
+			want: []bool{
+				false,
+				false,
+				false,
+				true,
+			},
+			path:    "testdata/drift_ignore_all/.driftignore",
+			ignores: []string{"*", "!aws_s3*"},
+		},
+		{
+			name: "drift_ignore_non_aws_s3_and_non_route53_resources",
+			resources: []*resource.Resource{
+				{
+					Type: "aws_s3_access_point",
+				},
+				{
+					Type: "aws_s3_bucket",
+				},
+				{
+					Type: "aws_s3_bucket_acl",
+				},
+				{
+					Type: "aws_route53_delegation_set",
+				},
+			},
+			want: []bool{
+				false,
+				false,
+				false,
+				false,
+			},
+			path:    "testdata/drift_ignore_all/.driftignore",
+			ignores: []string{"*", "!aws_s3*", "!aws_route53*"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cwd, _ := os.Getwd()
 			defer func() { _ = os.Chdir(cwd) }()
 
-			r := NewDriftIgnore(tt.path)
+			r := NewDriftIgnore(tt.path, tt.ignores...)
 			got := make([]bool, 0, len(tt.want))
 			for _, res := range tt.resources {
 				got = append(got, r.IsTypeIgnored(resource.ResourceType(res.ResourceType())))
