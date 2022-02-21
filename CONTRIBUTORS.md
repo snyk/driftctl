@@ -34,6 +34,7 @@ Thank you to all the people who have already contributed to driftctl.
     <td align="center"><a href="https://github.com/smaftoul"><img src="https://avatars.githubusercontent.com/u/239203?v=4?s=80" width="80px;" alt=""/><br /><sub><b>smaftoul</b></sub></a><br /><a href="https://github.com/snyk/driftctl/commits?author=smaftoul" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/p0tr3c"><img src="https://avatars.githubusercontent.com/u/12850042?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Kamil Potrec</b></sub></a><br /><a href="https://github.com/snyk/driftctl/commits?author=p0tr3c" title="Code">💻</a></td>
     <td align="center"><a href="http://jaskula.pl"><img src="https://avatars.githubusercontent.com/u/5229238?v=4?s=80" width="80px;" alt=""/><br /><sub><b>AJ</b></sub></a><br /><a href="https://github.com/snyk/driftctl/commits?author=wakeful" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/muratcelep"><img src="https://avatars.githubusercontent.com/u/94377726?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Murat Celep</b></sub></a><br /><a href="https://github.com/snyk/driftctl/commits?author=muratcelep" title="Code">💻</a></td>
   </tr>
 </table>
 
