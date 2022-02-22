@@ -16,6 +16,7 @@ var supportedBackends = []string{
 	BackendKeyHTTPS,
 	BackendKeyTFCloud,
 	BackendKeyGS,
+	BackendKeyAzureRM,
 }
 
 type Backend io.ReadCloser
@@ -56,6 +57,8 @@ func GetBackend(config config.SupplierConfig, opts *Options) (Backend, error) {
 		return NewTFCloudReader(config.Path, opts), nil
 	case BackendKeyGS:
 		return NewGSReader(config.Path)
+	case BackendKeyAzureRM:
+		return NewAzureRMReader(config.Path)
 	default:
 		return nil, errors.Errorf("Unsupported backend '%s'", backend)
 	}
