@@ -128,10 +128,22 @@ func (a *Analysis) UnmarshalJSON(bytes []byte) error {
 		})
 	}
 	for _, m := range bla.Managed {
-		a.AddManaged(&resource.Resource{
+		res := &resource.Resource{
 			Id:   m.Id,
 			Type: m.Type,
-		})
+		}
+		if m.Source != nil {
+			// We loose the source type in the serialization process, for now everything is serialized back to a
+			// TerraformStateSource.
+			// TODO: Add a discriminator field to be able to serialize back to the right type
+			// when we'll introduce a new source type
+			res.Source = &resource.TerraformStateSource{
+				State:  m.Source.S,
+				Module: m.Source.Ns,
+				Name:   m.Source.Name,
+			}
+		}
+		a.AddManaged(res)
 	}
 	for _, di := range bla.Differences {
 		a.AddDifference(Difference{
