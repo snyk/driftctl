@@ -45,7 +45,11 @@ type TerraformStateReader struct {
 }
 
 func (r *TerraformStateReader) initReader() error {
-	r.enumerator = enumerator.GetEnumerator(r.config)
+	enumerator, err := enumerator.GetEnumerator(r.config)
+	if err != nil {
+		return err
+	}
+	r.enumerator = enumerator
 	return nil
 }
 
