@@ -59,6 +59,7 @@ require (
 	cloud.google.com/go v0.92.1 // indirect
 	github.com/Azure/azure-sdk-for-go v59.0.0+incompatible // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v0.8.1 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.2.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.9.0 // indirect
 	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
@@ -132,7 +133,7 @@ require (
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/net v0.0.0-20210913180222-943fd674d43e // indirect
 	golang.org/x/sys v0.0.0-20210806184541-e5e7981a1069 // indirect
-	golang.org/x/text v0.3.6 // indirect
+	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect
