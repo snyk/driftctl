@@ -114,6 +114,18 @@ func TestConsole_Write(t *testing.T) {
 			args:       args{analysis: fakeAnalysisWithoutDeep()},
 			wantErr:    false,
 		},
+		{
+			name:       "test console output with --only-managed",
+			goldenfile: "output_with_only_managed.txt",
+			args:       args{analysis: fakeAnalysisWithOnlyManagedFlag()},
+			wantErr:    false,
+		},
+		{
+			name:       "test console output with --only-unmanaged",
+			goldenfile: "output_with_only_unmanaged.txt",
+			args:       args{analysis: fakeAnalysisWithOnlyUnmanagedFlag()},
+			wantErr:    false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

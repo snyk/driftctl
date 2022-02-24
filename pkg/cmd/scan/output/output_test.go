@@ -14,6 +14,7 @@ import (
 	"github.com/snyk/driftctl/pkg/remote/common"
 	remoteerr "github.com/snyk/driftctl/pkg/remote/error"
 	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 func fakeAnalysis(opts analyser.AnalyzerOptions) *analyser.Analysis {
@@ -457,6 +458,84 @@ func fakeAnalysisWithoutDeep() *analyser.Analysis {
 			Type: "aws_unmanaged_resource",
 			Attrs: &resource.Attributes{
 				"name": "First unmanaged resource",
+			},
+		},
+	)
+	a.ProviderName = "AWS"
+	a.ProviderVersion = "3.19.0"
+	return &a
+}
+
+func fakeAnalysisWithOnlyManagedFlag() *analyser.Analysis {
+	a := analyser.Analysis{}
+	a.SetOptions(analyser.AnalyzerOptions{
+		OnlyManaged: true,
+	})
+	a.AddManaged(
+		&resource.Resource{
+			Id:   "foo",
+			Type: aws.AwsInstanceResourceType,
+			Attrs: &resource.Attributes{
+				"instance_type": "test2",
+			},
+		},
+	)
+	a.AddDifference(
+		analyser.Difference{
+			Res: &resource.Resource{
+				Id:   "foo",
+				Type: aws.AwsInstanceResourceType,
+				Attrs: &resource.Attributes{
+					"instance_type": "test2",
+				},
+			},
+			Changelog: []analyser.Change{
+				{
+					Change: diff.Change{
+						Type: "update",
+						From: "test2",
+						To:   "test1",
+						Path: []string{
+							"instance_type",
+						},
+					},
+				},
+			},
+		})
+	a.AddDeleted(
+		&resource.Resource{
+			Id:   "baz",
+			Type: aws.AwsInstanceResourceType,
+			Attrs: &resource.Attributes{
+				"instance_type": "test3",
+			},
+		},
+	)
+	a.ProviderName = "AWS"
+	a.ProviderVersion = "3.19.0"
+	return &a
+}
+
+func fakeAnalysisWithOnlyUnmanagedFlag() *analyser.Analysis {
+	a := analyser.Analysis{}
+	a.SetOptions(analyser.AnalyzerOptions{
+		OnlyUnmanaged: true,
+	})
+	a.AddManaged(
+		&resource.Resource{
+			Id:   "foo",
+			Type: aws.AwsInstanceResourceType,
+			Attrs: &resource.Attributes{
+				"instance_type": "test2",
+			},
+		},
+	)
+	a.AddUnmanaged(
+		&resource.Resource{
+			Id:   "bar",
+			Type: aws.AwsInstanceResourceType,
+			Attrs: &resource.Attributes{
+				"instance_type": "test2",
 			},
 		},
 	)

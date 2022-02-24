@@ -228,6 +228,16 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 		configDir,
 		"Directory path that driftctl uses for configuration.\n",
 	)
+	fl.BoolVar(&opts.OnlyManaged,
+		"only-managed",
+		false,
+		"Report only what's managed by your IaC\n",
+	)
+	fl.BoolVar(&opts.OnlyUnmanaged,
+		"only-unmanaged",
+		false,
+		"Report only what's not managed by your IaC\n",
+	)
 
 	return cmd
 }
@@ -271,7 +281,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 	logrus.Debug("Checking for driftignore")
 	driftIgnore := filter.NewDriftIgnore(opts.DriftignorePath, opts.Driftignores...)
 
-	scanner := remote.NewScanner(remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep}, driftIgnore)
+	scanner := remote.NewScanner(remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep, OnlyManaged: opts.OnlyManaged}, driftIgnore)
 
 	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, alerter, resFactory, driftIgnore)
 	if err != nil {
@@ -282,7 +292,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		scanner,
 		iacSupplier,
 		alerter,
-		analyser.NewAnalyzer(alerter, analyser.AnalyzerOptions{Deep: opts.Deep}, driftIgnore),
+		analyser.NewAnalyzer(alerter, analyser.AnalyzerOptions{Deep: opts.Deep, OnlyManaged: opts.OnlyManaged, OnlyUnmanaged: opts.OnlyUnmanaged}, driftIgnore),
 		resFactory,
 		opts,
 		scanProgress,

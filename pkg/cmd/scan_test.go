@@ -52,6 +52,8 @@ func TestScanCmd_Valid(t *testing.T) {
 		{args: []string{"scan", "--driftignore", ".driftignore"}},
 		{args: []string{"scan", "-o", "html://result.html", "-o", "json://result.json"}},
 		{args: []string{"scan", "--tf-lockfile", "../.terraform.lock.hcl"}},
+		{args: []string{"scan", "--only-managed"}},
+		{args: []string{"scan", "--only-unmanaged"}},
 	}
 
 	for _, tt := range cases {

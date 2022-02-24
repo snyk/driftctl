@@ -38,7 +38,9 @@ func (c *ComputedDiffAlert) ShouldIgnoreResource() bool {
 }
 
 type AnalyzerOptions struct {
-	Deep bool
+	Deep          bool
+	OnlyManaged   bool
+	OnlyUnmanaged bool
 }
 
 type Analyzer struct {
@@ -72,7 +74,9 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []*resource.Resour
 		}
 
 		if !found {
-			analysis.AddDeleted(stateRes)
+			if !analysis.Options().OnlyUnmanaged {
+				analysis.AddDeleted(stateRes)
+			}
 			continue
 		}
 
@@ -80,8 +84,8 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []*resource.Resour
 		filteredRemoteResource = removeResourceByIndex(i, filteredRemoteResource)
 		analysis.AddManaged(stateRes)
 
-		// Stop there if we are not in deep mode, we do not want to compute diffs
-		if !a.options.Deep {
+		// Stop there if we are not in deep mode or in only-managed mode, we do not want to compute diffs
+		if !a.options.Deep && !a.options.OnlyManaged {
 			continue
 		}
 
@@ -130,7 +134,9 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []*resource.Resour
 	}
 
 	// Add remaining unmanaged resources
-	analysis.AddUnmanaged(filteredRemoteResource...)
+	if !analysis.Options().OnlyManaged {
+		analysis.AddUnmanaged(filteredRemoteResource...)
+	}
 
 	// Sort resources by Terraform Id
 	// The purpose is to have a predictable output

@@ -34,6 +34,7 @@ func TestAnalyze(t *testing.T) {
 		alerts     alerter.Alerts
 		expected   Analysis
 		hasDrifted bool
+		options    *AnalyzerOptions
 	}{
 		{
 			name:     "TestNilValues", // Cover division by zero case
@@ -980,6 +981,161 @@ func TestAnalyze(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "Test --only-managed flag",
+			iac: []*resource.Resource{
+				{
+					Id:   "foo",
+					Type: aws.AwsInstanceResourceType,
+					Attrs: &resource.Attributes{
+						"instance_type": "test2",
+					},
+				},
+				{
+					Id:   "baz",
+					Type: aws.AwsInstanceResourceType,
+					Attrs: &resource.Attributes{
+						"instance_type": "test3",
+					},
+				},
+			},
+			cloud: []*resource.Resource{
+				{
+					Id:   "foo",
+					Type: aws.AwsInstanceResourceType,
+					Attrs: &resource.Attributes{
+						"instance_type": "test1",
+					},
+				},
+				{
+					Id:   "bar",
+					Type: aws.AwsInstanceResourceType,
+					Attrs: &resource.Attributes{
+						"instance_type": "test2",
+					},
+				},
+			},
+			hasDrifted: true,
+			expected: Analysis{
+				managed: []*resource.Resource{
+					{
+						Id:   "foo",
+						Type: aws.AwsInstanceResourceType,
+						Attrs: &resource.Attributes{
+							"instance_type": "test2",
+						},
+					},
+				},
+				deleted: []*resource.Resource{
+					{
+						Id:   "baz",
+						Type: aws.AwsInstanceResourceType,
+						Attrs: &resource.Attributes{
+							"instance_type": "test3",
+						},
+					},
+				},
+				differences: []Difference{
+					{
+						Res: &resource.Resource{
+							Id:   "foo",
+							Type: aws.AwsInstanceResourceType,
+							Attrs: &resource.Attributes{
+								"instance_type": "test2",
+							},
+						},
+						Changelog: Changelog{
+							{
+								Change: diff.Change{
+									Type: "update",
+									From: "test2",
+									To:   "test1",
+									Path: []string{
+										"instance_type",
+									},
+								},
+							},
+						},
+					},
+				},
+				summary: Summary{
+					TotalResources: 2,
+					TotalManaged:   1,
+					TotalUnmanaged: 0,
+					TotalDeleted:   1,
+					TotalDrifted:   1,
+				},
+			},
+			options: &AnalyzerOptions{
+				OnlyManaged: true,
+			},
+		},
+		{
+			name: "Test --only-unmanaged flag",
+			iac: []*resource.Resource{
+				{
+					Id:   "foo",
+					Type: aws.AwsInstanceResourceType,
+					Attrs: &resource.Attributes{
+						"instance_type": "test2",
+					},
+				},
+				{
+					Id:   "baz",
+					Type: aws.AwsInstanceResourceType,
+					Attrs: &resource.Attributes{
+						"instance_type": "test3",
+					},
+				},
+			},
+			cloud: []*resource.Resource{
+				{
+					Id:   "foo",
+					Type: aws.AwsInstanceResourceType,
+					Attrs: &resource.Attributes{
+						"instance_type": "test1",
+					},
+				},
+				{
+					Id:   "bar",
+					Type: aws.AwsInstanceResourceType,
+					Attrs: &resource.Attributes{
+						"instance_type": "test2",
+					},
+				},
+			},
+			hasDrifted: true,
+			expected: Analysis{
+				managed: []*resource.Resource{
+					{
+						Id:   "foo",
+						Type: aws.AwsInstanceResourceType,
+						Attrs: &resource.Attributes{
+							"instance_type": "test2",
+						},
+					},
+				},
+				unmanaged: []*resource.Resource{
+					{
+						Id:   "bar",
+						Type: aws.AwsInstanceResourceType,
+						Attrs: &resource.Attributes{
+							"instance_type": "test2",
+						},
+					},
+				},
+				summary: Summary{
+					TotalResources: 2,
+					TotalManaged:   1,
+					TotalUnmanaged: 1,
+					TotalDeleted:   0,
+					TotalDrifted:   0,
+				},
+			},
+			options: &AnalyzerOptions{
+				OnlyUnmanaged: true,
+			},
+		},
 	}
 
 	differ, err := diff.NewDiffer(diff.SliceOrdering(true))
@@ -1008,7 +1164,12 @@ func TestAnalyze(t *testing.T) {
 			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 			aws.InitResourcesMetadata(repo)
 
-			analyzer := NewAnalyzer(al, AnalyzerOptions{Deep: true}, testFilter)
+			options := AnalyzerOptions{Deep: true}
+			if c.options != nil {
+				options = *c.options
+			}
+
+			analyzer := NewAnalyzer(al, options, testFilter)
 
 			for _, res := range c.cloud {
 				addSchemaToRes(res, repo)

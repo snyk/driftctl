@@ -13,7 +13,8 @@ import (
 )
 
 type ScannerOptions struct {
-	Deep bool
+	Deep        bool
+	OnlyManaged bool
 }
 
 type Scanner struct {
@@ -94,7 +95,7 @@ func (s *Scanner) scan() ([]*resource.Resource, error) {
 		return nil, err
 	}
 
-	if !s.options.Deep {
+	if !s.options.Deep && !s.options.OnlyManaged {
 		return enumerationResult, nil
 	}
 
