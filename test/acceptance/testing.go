@@ -49,6 +49,7 @@ type RetryConfig struct {
 }
 
 type AccTestCase struct {
+	DoNotRunTerraform          bool
 	TerraformVersion           string
 	WorkingDir                 string
 	Paths                      []string
@@ -115,7 +116,7 @@ func (c *AccTestCase) validate() error {
 		return fmt.Errorf("checks attribute must be defined")
 	}
 
-	if len(c.Paths) < 1 {
+	if len(c.Paths) < 1 && !c.DoNotRunTerraform {
 		return fmt.Errorf("Paths attribute must be defined")
 	}
 
@@ -346,29 +347,31 @@ func Run(t *testing.T, c AccTestCase) {
 	checkpoint := os.Getenv("CHECKPOINT_DISABLE")
 	os.Setenv("CHECKPOINT_DISABLE", "true")
 
-	// Execute terraform init if .terraform folder is not found in test folder
-	err := c.terraformInit()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	defer func() {
-		c.restoreEnv()
-		err := c.terraformDestroy()
-		os.Setenv("CHECKPOINT_DISABLE", checkpoint)
+	if !c.DoNotRunTerraform {
+		// Execute terraform init if .terraform folder is not found in test folder
+		err := c.terraformInit()
 		if err != nil {
 			t.Fatal(err)
 		}
-	}()
 
-	err = c.terraformApply()
-	if err != nil {
-		t.Fatal(err)
-	}
+		defer func() {
+			c.restoreEnv()
+			err := c.terraformDestroy()
+			os.Setenv("CHECKPOINT_DISABLE", checkpoint)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}()
 
-	err = c.createResultFile(t)
-	if err != nil {
-		t.Fatal(err)
+		err = c.terraformApply()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		err = c.createResultFile(t)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	// If the path contains only one element, we switch to this directory for driftctl execution
@@ -395,9 +398,11 @@ func Run(t *testing.T, c AccTestCase) {
 				)
 			}
 		}
-		c.Args = append(c.Args,
-			"--output", fmt.Sprintf("json://%s", c.getResultFilePath()),
-		)
+		if c.getResultFilePath() != "" {
+			c.Args = append(c.Args,
+				"--output", fmt.Sprintf("json://%s", c.getResultFilePath()),
+			)
+		}
 	}
 
 	for _, check := range c.Checks {
@@ -423,7 +428,7 @@ func Run(t *testing.T, c AccTestCase) {
 		wd, _ := os.Getwd()
 		if c.WorkingDir != "" {
 			logrus.WithField("dir", c.WorkingDir).Debug("Switching working directory for driftctl execution")
-			err = os.Chdir(c.WorkingDir)
+			err := os.Chdir(c.WorkingDir)
 			if err != nil {
 				logrus.WithFields(logrus.Fields{
 					"from": wd,
@@ -450,7 +455,7 @@ func Run(t *testing.T, c AccTestCase) {
 		}
 		// Restore original working directory
 		if c.WorkingDir != "" {
-			err = os.Chdir(wd)
+			err := os.Chdir(wd)
 			if err != nil {
 				logrus.WithFields(logrus.Fields{
 					"to":   wd,
