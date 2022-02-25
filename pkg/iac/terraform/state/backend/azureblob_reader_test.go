@@ -4,40 +4,23 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend/options"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewAzureRMReader(t *testing.T) {
 	tests := []struct {
 		name    string
+		options options.AzureRMBackendOptions
 		path    string
-		preTest func(t *testing.T)
 		wantErr assert.ErrorAssertionFunc
 	}{
 		{
 			name: "invalid path",
 			path: "containerName/",
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+				assert.NotNil(t, err)
 				assert.Equal(t, "Unable to parse azurerm backend storage path: containerName/. Must be CONTAINER/PATH/TO/OBJECT", err.Error())
-				return true
-			},
-		},
-		{
-			name: "valid path but missing AZURE_STORAGE_ACCOUNT",
-			path: "containerName/valid.tfstate",
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				assert.Equal(t, "AZURE_STORAGE_ACCOUNT should be defined to be able to read state from azure backend", err.Error())
-				return true
-			},
-		},
-		{
-			name: "valid path but missing AZURE_STORAGE_KEY",
-			path: "containerName/valid.tfstate",
-			preTest: func(t *testing.T) {
-				t.Setenv("AZURE_STORAGE_ACCOUNT", "foobar")
-			},
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				assert.Equal(t, "AZURE_STORAGE_KEY should be defined to be able to read state from azure backend", err.Error())
 				return true
 			},
 		},
@@ -47,10 +30,6 @@ func TestNewAzureRMReader(t *testing.T) {
 		{
 			name: "valid",
 			path: "containerName/valid.tfstate",
-			preTest: func(t *testing.T) {
-				t.Setenv("AZURE_STORAGE_ACCOUNT", "foobar")
-				t.Setenv("AZURE_STORAGE_KEY", "barfoo")
-			},
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return false
 			},
@@ -58,10 +37,7 @@ func TestNewAzureRMReader(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.preTest != nil {
-				tt.preTest(t)
-			}
-			_, err := NewAzureRMReader(tt.path)
+			_, err := NewAzureRMReader(tt.path, tt.options)
 			if !tt.wantErr(t, err, fmt.Sprintf("NewAzureRMReader(%v)", tt.path)) {
 				return
 			}

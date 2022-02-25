@@ -8,8 +8,8 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	"github.com/bmatcuk/doublestar/v4"
 	"github.com/pkg/errors"
-	"github.com/snyk/driftctl/pkg/helpers/azure"
 	"github.com/snyk/driftctl/pkg/iac/config"
+	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend/options"
 )
 
 type AzureRMEnumerator struct {
@@ -18,7 +18,7 @@ type AzureRMEnumerator struct {
 	origin                    string
 }
 
-func NewAzureRMEnumerator(config config.SupplierConfig) (*AzureRMEnumerator, error) {
+func NewAzureRMEnumerator(config config.SupplierConfig, opts options.AzureRMBackendOptions) (*AzureRMEnumerator, error) {
 	splitPath := strings.Split(config.Path, "/")
 	if len(splitPath) < 2 || splitPath[1] == "" {
 		return nil, errors.Errorf("Unable to parse azurerm backend storage splitPath: %s. Must be CONTAINER/PATH/TO/OBJECT", config.Path)
@@ -26,7 +26,10 @@ func NewAzureRMEnumerator(config config.SupplierConfig) (*AzureRMEnumerator, err
 	containerName := splitPath[0]
 	objectPath := strings.Join(splitPath[1:], "/")
 
-	credential, err := azure.GetBlobSharedKey()
+	if opts.StorageKey == "" || opts.StorageAccount == "" {
+		return nil, errors.New("AZURE_STORAGE_ACCOUNT and AZURE_STORAGE_KEY should be defined to be able to read state from azure backend")
+	}
+	credential, err := azblob.NewSharedKeyCredential(opts.StorageAccount, opts.StorageKey)
 	if err != nil {
 		return nil, err
 	}

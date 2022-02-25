@@ -11,7 +11,7 @@ type StateEnumerator interface {
 	Enumerate() ([]string, error)
 }
 
-func GetEnumerator(config config.SupplierConfig) (StateEnumerator, error) {
+func GetEnumerator(config config.SupplierConfig, opts *backend.Options) (StateEnumerator, error) {
 
 	switch config.Backend {
 	case backend.BackendKeyFile:
@@ -19,7 +19,7 @@ func GetEnumerator(config config.SupplierConfig) (StateEnumerator, error) {
 	case backend.BackendKeyS3:
 		return NewS3Enumerator(config), nil
 	case backend.BackendKeyAzureRM:
-		return NewAzureRMEnumerator(config)
+		return NewAzureRMEnumerator(config, opts.AzureRMBackendOptions)
 	}
 
 	logrus.WithFields(logrus.Fields{

@@ -13,7 +13,36 @@ import (
 	"github.com/snyk/driftctl/pkg/helpers/azure"
 	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/acceptance"
+	"github.com/stretchr/testify/assert"
 )
+
+func TestAcc_StateReader_AzureRMBackendWithoutCredentials(t *testing.T) {
+	acceptance.Run(t, acceptance.AccTestCase{
+		DoNotRunTerraform: true,
+		Args: []string{
+			"scan",
+			"--from", "tfstate+azurerm://foobar/state.tfstate",
+			"--to", "azure+tf",
+		},
+		Checks: []acceptance.AccCheck{
+			{
+				Check: func(result *test.ScanResult, stdout string, err error) {
+					assert.NotNil(t, err)
+					assert.Equal(t, "AZURE_STORAGE_ACCOUNT and AZURE_STORAGE_KEY should be defined to be able to read state from azure backend", err.Error())
+				},
+			},
+			{
+				Env: map[string]string{
+					"AZURE_STORAGE_ACCOUNT": "foobar",
+				},
+				Check: func(result *test.ScanResult, stdout string, err error) {
+					assert.NotNil(t, err)
+					assert.Equal(t, "AZURE_STORAGE_ACCOUNT and AZURE_STORAGE_KEY should be defined to be able to read state from azure backend", err.Error())
+				},
+			},
+		},
+	})
+}
 
 func TestAcc_StateReader_WithMultiplesStatesInAzure(t *testing.T) {
 	// WARNING: If you change the resource group you also have to change it in terraform files

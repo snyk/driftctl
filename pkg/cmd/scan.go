@@ -175,6 +175,16 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 		"Terraform Cloud / Enterprise API endpoint.\n"+
 			"Only used with tfstate+tfcloud backend.\n",
 	)
+	fl.StringVar(&opts.BackendOptions.AzureRMBackendOptions.StorageAccount,
+		"azurerm-storage-account",
+		os.Getenv("AZURE_STORAGE_ACCOUNT"),
+		"Azure storage account name for state backend.\n",
+	)
+	fl.StringVar(&opts.BackendOptions.AzureRMBackendOptions.StorageKey,
+		"azurerm-account-key",
+		os.Getenv("AZURE_STORAGE_KEY"),
+		"Azure storage account key for state backend.\n",
+	)
 	fl.String(
 		"tf-provider-version",
 		"",

@@ -8,7 +8,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	"github.com/pkg/errors"
-	"github.com/snyk/driftctl/pkg/helpers/azure"
+	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend/options"
 )
 
 const BackendKeyAzureRM = "azurerm"
@@ -18,7 +18,7 @@ type AzureRMBackend struct {
 	storageClient azblob.BlockBlobClient
 }
 
-func NewAzureRMReader(path string) (*AzureRMBackend, error) {
+func NewAzureRMReader(path string, opts options.AzureRMBackendOptions) (*AzureRMBackend, error) {
 	bucketPath := strings.Split(path, "/")
 	if len(bucketPath) < 2 || bucketPath[1] == "" {
 		return nil, errors.Errorf("Unable to parse azurerm backend storage path: %s. Must be CONTAINER/PATH/TO/OBJECT", path)
@@ -26,10 +26,11 @@ func NewAzureRMReader(path string) (*AzureRMBackend, error) {
 	containerName := bucketPath[0]
 	objectPath := strings.Join(bucketPath[1:], "/")
 
-	credential, err := azure.GetBlobSharedKey()
+	credential, err := azblob.NewSharedKeyCredential(opts.StorageAccount, opts.StorageKey)
 	if err != nil {
 		return nil, err
 	}
+
 	blobClient, err := azblob.NewBlockBlobClientWithSharedKey(
 		fmt.Sprintf(
 			"https://%s.blob.core.windows.net/%s/%s",

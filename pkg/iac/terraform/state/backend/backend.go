@@ -7,6 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/snyk/driftctl/pkg/iac/config"
+	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend/options"
 )
 
 var supportedBackends = []string{
@@ -25,6 +26,7 @@ type Options struct {
 	Headers         map[string]string
 	TFCloudToken    string
 	TFCloudEndpoint string
+	options.AzureRMBackendOptions
 }
 
 func IsSupported(backend string) bool {
@@ -58,7 +60,7 @@ func GetBackend(config config.SupplierConfig, opts *Options) (Backend, error) {
 	case BackendKeyGS:
 		return NewGSReader(config.Path)
 	case BackendKeyAzureRM:
-		return NewAzureRMReader(config.Path)
+		return NewAzureRMReader(config.Path, opts.AzureRMBackendOptions)
 	default:
 		return nil, errors.Errorf("Unsupported backend '%s'", backend)
 	}
