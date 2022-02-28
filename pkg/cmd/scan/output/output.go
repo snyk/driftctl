@@ -89,6 +89,11 @@ func GetPrinter(config OutputConfig, quiet bool) output.Printer {
 			return &output.VoidPrinter{}
 		}
 		fallthrough
+	case HTMLOutputType:
+		if isStdOut(config.Path) {
+			return &output.VoidPrinter{}
+		}
+		fallthrough
 	case ConsoleOutputType:
 		fallthrough
 	default:
