@@ -10,7 +10,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "driftctl-acc-test-only"
+    bucket = "driftctl-acc-statereader-multiples-states"
     key    = "states/s3/state1"
     region = "us-east-1"
   }
