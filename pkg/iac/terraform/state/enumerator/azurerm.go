@@ -82,6 +82,9 @@ func (s *AzureRMEnumerator) Enumerate() ([]string, error) {
 	}
 
 	if err := pager.Err(); err != nil {
+		if storageErr, ok := err.(azblob.ResponseError); ok && storageErr.RawResponse() != nil {
+			return nil, errors.WithMessage(err, storageErr.RawResponse().Status)
+		}
 		return nil, err
 	}
 

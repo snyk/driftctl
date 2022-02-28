@@ -406,7 +406,6 @@ func Run(t *testing.T, c AccTestCase) {
 	}
 
 	for _, check := range c.Checks {
-		driftctlCmd := cmd.NewDriftctlCmd(test.Build{})
 		if check.Check == nil {
 			t.Fatal("Check attribute must be defined")
 		}
@@ -437,6 +436,7 @@ func Run(t *testing.T, c AccTestCase) {
 			}
 		}
 		logrus.WithField("args", fmt.Sprintf("%+v", os.Args)).Debug("Running driftctl")
+		driftctlCmd := cmd.NewDriftctlCmd(test.Build{})
 		_, out, cmdErr := runDriftCtlCmd(driftctlCmd)
 		result := c.getResult(t)
 		var retryCount uint8 = 0

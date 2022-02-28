@@ -56,7 +56,10 @@ func TestAcc_StateReader_WithMultiplesStatesInAzure(t *testing.T) {
 		TerraformVersion: "0.15.5",
 		OnStart: func() {
 			// Remove existing storage account if it already exists
-			_ = removeAzureStorageAccount(resourceGroupName, storageAccount)
+			err := removeAzureStorageAccount(resourceGroupName, storageAccount)
+			if err != nil {
+				t.Fatal(err)
+			}
 			key, err := createAzureStorageContainer(resourceGroupName, storageAccount, containerName)
 			if err != nil {
 				t.Fatal(err)
