@@ -1068,6 +1068,7 @@ func TestAnalyze(t *testing.T) {
 			},
 			options: &AnalyzerOptions{
 				OnlyManaged: true,
+				Deep:        true,
 			},
 		},
 		{

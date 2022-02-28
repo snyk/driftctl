@@ -109,6 +109,10 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 
 			opts.ConfigDir, _ = cmd.Flags().GetString("config-dir")
 
+			if onlyManaged, _ := cmd.Flags().GetBool("only-managed"); onlyManaged {
+				opts.Deep = true
+			}
+
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -281,7 +285,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 	logrus.Debug("Checking for driftignore")
 	driftIgnore := filter.NewDriftIgnore(opts.DriftignorePath, opts.Driftignores...)
 
-	scanner := remote.NewScanner(remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep, OnlyManaged: opts.OnlyManaged}, driftIgnore)
+	scanner := remote.NewScanner(remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep}, driftIgnore)
 
 	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, alerter, resFactory, driftIgnore)
 	if err != nil {

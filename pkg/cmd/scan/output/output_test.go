@@ -470,6 +470,7 @@ func fakeAnalysisWithOnlyManagedFlag() *analyser.Analysis {
 	a := analyser.Analysis{}
 	a.SetOptions(analyser.AnalyzerOptions{
 		OnlyManaged: true,
+		Deep:        true,
 	})
 	a.AddManaged(
 		&resource.Resource{

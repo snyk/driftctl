@@ -84,8 +84,8 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []*resource.Resour
 		filteredRemoteResource = removeResourceByIndex(i, filteredRemoteResource)
 		analysis.AddManaged(stateRes)
 
-		// Stop there if we are not in deep mode or in only-managed mode, we do not want to compute diffs
-		if !a.options.Deep && !a.options.OnlyManaged {
+		// Stop there if we are not in deep mode, we do not want to compute diffs
+		if !a.options.Deep {
 			continue
 		}
 
