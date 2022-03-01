@@ -2,13 +2,7 @@
 
 # This script compare merged pull requests between the two most recent tags
 # Please note that this script only work with Github repositories.
-# Prerequisites: git, github cli
-
-format_change() {
-    # First sed: extract title
-    # 2nd sed: hack to remove ugly `[]` from PRs with no labels
-    echo "$1" | sed "s/\[map\[$PARTITION_COLUMN.*//" | sed 's/ \[\]$//'
-}
+# Prerequisites: git, jq, github cli
 
 print_changelist() {
   title=$1
@@ -22,6 +16,7 @@ print_changelist() {
 }
 
 GHCLI_BIN="gh"
+JQ_BIN="jq"
 REPO="snyk/driftctl"
 LATEST_TAG=$(git for-each-ref --sort=-taggerdate --format '%(tag)' refs/tags | sed -n 1p) # Get the last created tag
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
@@ -30,6 +25,12 @@ BASE=$(git for-each-ref --sort=-taggerdate --format '%(tag)' refs/tags | sed -n 
 # Check GH cli is installed
 if ! which $GHCLI_BIN &> /dev/null; then
     echo "GitHub CLI ($GHCLI_BIN) is not installed, visit https://github.com/cli/cli#installation"
+    exit 1
+fi
+
+# Check jq is installed
+if ! which $JQ_BIN &> /dev/null; then
+    echo "jq ($JQ_BIN) is not installed"
     exit 1
 fi
 
@@ -44,28 +45,30 @@ fi
 PRs=$(git log --pretty=oneline "$BASE"..."$LATEST_TAG" | grep 'Merge pull request #' | grep -oP '#[0-9]+' | sed 's/#//')
 
 # Generating changelog for commits from $BASE to $LATEST_TAG
-CHANGES=()
-for pr in $PRs; do
-    str=$($GHCLI_BIN pr view "$pr" --repo $REPO -t '- {{ .title }} (#{{ .number }}) @{{ .author.login }} {{.labels}}' --json title,number,author,labels)
-    CHANGES+=("$str")
-done
-
 enchancements=()
 fixes=()
 maintenance=()
 uncategorised=()
 
+for pr in $PRs; do
+    json=$($GHCLI_BIN pr view "$pr" --repo $REPO --json title,number,author,labels)
 
-for change in "${CHANGES[@]}"; do
-  if [[ $change =~ "kind/enhancement" ]]; then
-    enchancements+=("$(format_change "$change")")
-  elif [[ $change =~ "kind/bug" ]]; then
-    fixes+=("$(format_change "$change")")
-  elif [[ $change =~ "kind/maintenance" ]]; then
-    maintenance+=("$(format_change "$change")")
-  else
-    uncategorised+=("$(format_change "$change")")
-  fi
+    labels=$(echo "$json" | jq .labels[].name)
+    title=$(echo "$json" | jq -r .title)
+    number=$(echo "$json" | jq -r .number)
+    author=$(echo "$json" | jq -r .author.login)
+
+    str="- $title (#$number) @$author"
+
+    if [[ $labels =~ "kind/enhancement" ]]; then
+        enchancements+=("$str")
+    elif [[ $labels =~ "kind/bug" ]]; then
+        fixes+=("$str")
+    elif [[ $labels =~ "kind/maintenance" ]]; then
+        maintenance+=("$str")
+    else
+        uncategorised+=("$str")
+    fi
 done
 
 print_changelist "## 🚀 Enhancements" "${enchancements[@]}"
