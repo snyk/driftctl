@@ -35,28 +35,28 @@ PRs=$(git log --pretty=oneline "$BASE_TAG"..."$LATEST_TAG" | grep 'Merge pull re
 # Find fixed issues from $BASE_TAG to $LATEST_TAG
 ISSUES=()
 for pr in $PRs; do
-    id=$($GHCLI_BIN pr view "$pr" --json body | grep -oE 'Related issues | #[0-9]+' | sed 's/[^[:digit:]]//g' | sed -z 's/\n//g')
+    id=$($GHCLI_BIN pr view "$pr" --json body | grep -oE 'Related issues | (.*)?[0-9]+(.*)?\|' | sed 's/[^[:digit:]]//g' | sed -z 's/\n//g' || true)
+    if [ -z "$id" ]; then
+        continue
+    fi
     ISSUES+=("$id")
 done
 
-echo "Creating milestone $BASE_TAG in github.com/$REPO"
+echo "Creating milestone $LATEST_TAG in github.com/$REPO"
 curl -X POST \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Authorization: token $GITHUB_TOKEN" \
-    --data "{\"title\":\"$BASE_TAG\"}" \
-    "https://api.github.com/repos/$REPO/milestone"
+    --data "{\"title\":\"$LATEST_TAG\"}" \
+    "https://api.github.com/repos/$REPO/milestones"
 
 for issue in "${ISSUES[@]}"; do
-    if [ -z "$issue" ]; then
-        continue
-    fi
-    echo "Adding milestone $BASE_TAG to issue #$issue"
-    gh issue edit "$issue" -m "$BASE_TAG"
+    echo "Adding milestone $LATEST_TAG to issue #$issue"
+    gh issue edit "$issue" -m "$LATEST_TAG"
 
     curl -X POST \
         -H "Accept: application/vnd.github.v3+json" \
         -H "Authorization: token $GITHUB_TOKEN" \
-        --data "{\"body\":\"This issue has been referenced in the latest release $BASE_TAG.\"}" \
+        --data "{\"body\":\"This issue has been referenced in the latest release $LATEST_TAG.\"}" \
         "https://api.github.com/repos/$REPO/issues/$issue/comments"
 done
 
