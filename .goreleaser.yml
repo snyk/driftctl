@@ -6,6 +6,7 @@ release:
         name: driftctl
     draft: false
     prerelease: auto
+    discussion_category_name: Q&A
 before:
     hooks:
         - go generate ./...
