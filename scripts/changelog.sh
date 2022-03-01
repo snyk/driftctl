@@ -4,6 +4,23 @@
 # Please note that this script only work with Github repositories.
 # Prerequisites: git, github cli
 
+format_change() {
+    # First sed: extract title
+    # 2nd sed: hack to remove ugly `[]` from PRs with no labels
+    echo "$1" | sed "s/\[map\[$PARTITION_COLUMN.*//" | sed 's/ \[\]$//'
+}
+
+print_changelist() {
+  title=$1
+  shift
+  list=("$@")
+
+  echo -e "$title"
+  for change in "${list[@]}"; do
+    echo "$change"
+  done
+}
+
 GHCLI_BIN="gh"
 REPO="snyk/driftctl"
 LATEST_TAG=$(git for-each-ref --sort=-taggerdate --format '%(tag)' refs/tags | sed -n 1p) # Get the last created tag
@@ -33,19 +50,25 @@ for pr in $PRs; do
     CHANGES+=("$str")
 done
 
-print_changes() {
-    local label=$1
-    local title=$2
-    if [[ "${CHANGES[*]}" =~ $label ]]; then
-        echo -e "$title"
-        for change in "${CHANGES[@]}"; do
-            if [[ $change =~ $label ]]; then
-                echo "$change" | sed "s/\[map\[$PARTITION_COLUMN.*//"
-            fi
-        done
-    fi
-}
+enchancements=()
+fixes=()
+maintenance=()
+uncategorised=()
 
-print_changes "kind/enhancement" "## 🚀 Enhancements"
-print_changes "kind/bug" "## 🐛 Bug Fixes"
-print_changes "kind/maintenance" "## 🔨 Maintenance"
+
+for change in "${CHANGES[@]}"; do
+  if [[ $change =~ "kind/enhancement" ]]; then
+    enchancements+=("$(format_change "$change")")
+  elif [[ $change =~ "kind/bug" ]]; then
+    fixes+=("$(format_change "$change")")
+  elif [[ $change =~ "kind/maintenance" ]]; then
+    maintenance+=("$(format_change "$change")")
+  else
+    uncategorised+=("$(format_change "$change")")
+  fi
+done
+
+print_changelist "## 🚀 Enhancements" "${enchancements[@]}"
+print_changelist "## 🐛 Bug Fixes" "${fixes[@]}"
+print_changelist "## 🔨 Maintenance" "${maintenance[@]}"
+print_changelist "## Uncategorised" "${uncategorised[@]}"
