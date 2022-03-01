@@ -109,6 +109,10 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 
 			opts.ConfigDir, _ = cmd.Flags().GetString("config-dir")
 
+			if onlyManaged, _ := cmd.Flags().GetBool("only-managed"); onlyManaged {
+				opts.Deep = true
+			}
+
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -228,6 +232,16 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 		configDir,
 		"Directory path that driftctl uses for configuration.\n",
 	)
+	fl.BoolVar(&opts.OnlyManaged,
+		"only-managed",
+		false,
+		"Report only what's managed by your IaC\n",
+	)
+	fl.BoolVar(&opts.OnlyUnmanaged,
+		"only-unmanaged",
+		false,
+		"Report only what's not managed by your IaC\n",
+	)
 
 	return cmd
 }
@@ -282,7 +296,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		scanner,
 		iacSupplier,
 		alerter,
-		analyser.NewAnalyzer(alerter, analyser.AnalyzerOptions{Deep: opts.Deep}, driftIgnore),
+		analyser.NewAnalyzer(alerter, analyser.AnalyzerOptions{Deep: opts.Deep, OnlyManaged: opts.OnlyManaged, OnlyUnmanaged: opts.OnlyUnmanaged}, driftIgnore),
 		resFactory,
 		opts,
 		scanProgress,

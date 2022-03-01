@@ -204,6 +204,10 @@ func (a *Analysis) SetAlerts(alerts alerter.Alerts) {
 	a.alerts = alerts
 }
 
+func (a *Analysis) SetOptions(options AnalyzerOptions) {
+	a.options = options
+}
+
 func (a *Analysis) Coverage() int {
 	if a.summary.TotalResources > 0 {
 		return int((float32(a.summary.TotalManaged) / float32(a.summary.TotalResources)) * 100.0)

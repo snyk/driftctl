@@ -215,13 +215,17 @@ func (c Console) writeSummary(analysis *analyser.Analysis) {
 		if analysis.Summary().TotalUnmanaged > 0 {
 			unmanaged = warningWriter.Sprintf("%d", analysis.Summary().TotalUnmanaged)
 		}
-		fmt.Printf(" - %s resource(s) not managed by Terraform\n", unmanaged)
+		if !analysis.Options().OnlyManaged {
+			fmt.Printf(" - %s resource(s) not managed by Terraform\n", unmanaged)
+		}
 
 		deleted := successWriter.Sprintf("0")
 		if analysis.Summary().TotalDeleted > 0 {
 			deleted = errorWriter.Sprintf("%d", analysis.Summary().TotalDeleted)
 		}
-		fmt.Printf(" - %s resource(s) found in a Terraform state but missing on the cloud provider\n", deleted)
+		if !analysis.Options().OnlyUnmanaged {
+			fmt.Printf(" - %s resource(s) found in a Terraform state but missing on the cloud provider\n", deleted)
+		}
 	}
 	if analysis.IsSync() {
 		fmt.Println(color.GreenString("Congrats! Your infrastructure is fully in sync."))

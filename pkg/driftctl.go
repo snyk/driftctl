@@ -35,6 +35,8 @@ type ScanOptions struct {
 	DriftignorePath  string
 	Driftignores     []string
 	Deep             bool
+	OnlyManaged      bool
+	OnlyUnmanaged    bool
 }
 
 type DriftCTL struct {
