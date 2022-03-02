@@ -9,6 +9,10 @@ print_changelist() {
   shift
   list=("$@")
 
+  if [ ${#list[@]} -eq 0 ]; then
+    return
+  fi
+
   echo -e "$title"
   for change in "${list[@]}"; do
     echo "$change"
@@ -74,4 +78,4 @@ done
 print_changelist "## 🚀 Enhancements" "${enchancements[@]}"
 print_changelist "## 🐛 Bug Fixes" "${fixes[@]}"
 print_changelist "## 🔨 Maintenance" "${maintenance[@]}"
-print_changelist "## Uncategorised" "${uncategorised[@]}"
+print_changelist "## Other contributions" "${uncategorised[@]}"
