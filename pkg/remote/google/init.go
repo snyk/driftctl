@@ -16,7 +16,7 @@ import (
 	"google.golang.org/api/cloudresourcemanager/v1"
 )
 
-func Init(version string, alerter *alerter.Alerter,
+func Init(version string, gcpScope []string, alerter *alerter.Alerter,
 	providerLibrary *terraform.ProviderLibrary,
 	remoteLibrary *common.RemoteLibrary,
 	progress output.Progress,
@@ -51,9 +51,9 @@ func Init(version string, alerter *alerter.Alerter,
 		return err
 	}
 
-	assetRepository := repository.NewAssetRepository(assetClient, provider.GetConfig(), repositoryCache)
+	assetRepository := repository.NewAssetRepository(assetClient, provider.SetConfig(gcpScope), repositoryCache)
 	storageRepository := repository.NewStorageRepository(storageClient, repositoryCache)
-	iamRepository := repository.NewCloudResourceManagerRepository(crmService, provider.GetConfig(), repositoryCache)
+	iamRepository := repository.NewCloudResourceManagerRepository(crmService, provider.SetConfig(gcpScope), repositoryCache)
 
 	providerLibrary.AddProvider(terraform.GOOGLE, provider)
 	deserializer := resource.NewDeserializer(factory)

@@ -29,7 +29,7 @@ func IsSupported(remote string) bool {
 	return false
 }
 
-func Activate(remote, version string, alerter *alerter.Alerter,
+func Activate(remote, version string, gcpScope []string, alerter *alerter.Alerter,
 	providerLibrary *terraform.ProviderLibrary,
 	remoteLibrary *common.RemoteLibrary,
 	progress output.Progress,
@@ -42,7 +42,7 @@ func Activate(remote, version string, alerter *alerter.Alerter,
 	case common.RemoteGithubTerraform:
 		return github.Init(version, alerter, providerLibrary, remoteLibrary, progress, resourceSchemaRepository, factory, configDir)
 	case common.RemoteGoogleTerraform:
-		return google.Init(version, alerter, providerLibrary, remoteLibrary, progress, resourceSchemaRepository, factory, configDir)
+		return google.Init(version, gcpScope, alerter, providerLibrary, remoteLibrary, progress, resourceSchemaRepository, factory, configDir)
 	case common.RemoteAzureTerraform:
 		return azurerm.Init(version, alerter, providerLibrary, remoteLibrary, progress, resourceSchemaRepository, factory, configDir)
 

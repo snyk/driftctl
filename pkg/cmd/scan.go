@@ -62,6 +62,22 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 				)
 			}
 
+			GCPScope, _ := cmd.Flags().GetStringSlice("gcp-scope")
+			limitScope := make([]string, 0)
+
+			if to == common.RemoteGoogleTerraform && len(GCPScope) > 0 {
+				limitScope, err = parseScopeFlag(GCPScope)
+				if err != nil {
+					return err
+				}
+			} else if to != common.RemoteGoogleTerraform && len(GCPScope) > 0 {
+				return errors.New("gcp-scope can only be utilized when using " + common.RemoteGoogleTerraform + " flag")
+			} else if to == common.RemoteGoogleTerraform && len(GCPScope) == 0 {
+				return errors.New("gcp-scope must be specified when using " + common.RemoteGoogleTerraform + " flag")
+			}
+
+			opts.GCPScope = limitScope
+
 			outputFlag, _ := cmd.Flags().GetStringSlice("output")
 
 			out, err := parseOutputFlags(outputFlag)
@@ -127,6 +143,11 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 		"quiet",
 		false,
 		"Do not display anything but scan results",
+	)
+	fl.StringSlice(
+		"gcp-scope",
+		[]string{},
+		"Set the GCP scope for search",
 	)
 	fl.StringArray(
 		"filter",
@@ -270,7 +291,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	resFactory := terraform.NewTerraformResourceFactory(resourceSchemaRepository)
 
-	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, remoteLibrary, scanProgress, resourceSchemaRepository, resFactory, opts.ConfigDir)
+	err := remote.Activate(opts.To, opts.ProviderVersion, opts.GCPScope, alerter, providerLibrary, remoteLibrary, scanProgress, resourceSchemaRepository, resFactory, opts.ConfigDir)
 	if err != nil {
 		return err
 	}
@@ -352,6 +373,26 @@ func scanRun(opts *pkg.ScanOptions) error {
 	}
 
 	return nil
+}
+
+func parseScopeFlag(scope []string) ([]string, error) {
+
+	scopeRegex := `projects/\S*$|folders/\d*$|organizations/\d*$`
+	r := regexp.MustCompile(scopeRegex)
+
+	for _, v := range scope {
+		if !r.MatchString(v) {
+			return nil, errors.Wrapf(
+				cmderrors.NewUsageError(
+					"\nAccepted formats are: projects/<project-id>, folders/<folder-number>, organizations/<org-id>",
+				),
+				"Unable to parse GCP scope '%s'",
+				v,
+			)
+		}
+	}
+
+	return scope, nil
 }
 
 func parseFromFlag(from []string) ([]config.SupplierConfig, error) {

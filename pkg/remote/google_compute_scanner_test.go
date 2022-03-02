@@ -76,7 +76,7 @@ func TestGoogleComputeFirewall(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_firewall",
 						),
 						alerts.EnumerationPhase,
@@ -129,7 +129,7 @@ func TestGoogleComputeFirewall(t *testing.T) {
 				provider.ShouldUpdate()
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeFirewallEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
@@ -212,7 +212,7 @@ func TestGoogleComputeRouter(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							googleresource.GoogleComputeRouterResourceType,
 						),
 						alerts.EnumerationPhase,
@@ -252,7 +252,7 @@ func TestGoogleComputeRouter(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeRouterEnumerator(repo, factory))
 
@@ -319,7 +319,7 @@ func TestGoogleComputeInstance(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_instance",
 						),
 						alerts.EnumerationPhase,
@@ -356,7 +356,7 @@ func TestGoogleComputeInstance(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeInstanceEnumerator(repo, factory))
 
@@ -427,7 +427,7 @@ func TestGoogleComputeNetwork(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_network",
 						),
 						alerts.EnumerationPhase,
@@ -480,7 +480,7 @@ func TestGoogleComputeNetwork(t *testing.T) {
 				provider.ShouldUpdate()
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeNetworkEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
@@ -549,7 +549,7 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_instance_group",
 						),
 						alerts.EnumerationPhase,
@@ -602,7 +602,7 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 				provider.ShouldUpdate()
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeInstanceGroupEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(googleresource.GoogleComputeInstanceGroupResourceType, common.NewGenericDetailsFetcher(googleresource.GoogleComputeInstanceGroupResourceType, provider, deserializer))
@@ -686,7 +686,7 @@ func TestGoogleComputeAddress(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_address",
 						),
 						alerts.EnumerationPhase,
@@ -723,7 +723,7 @@ func TestGoogleComputeAddress(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeAddressEnumerator(repo, factory))
 
@@ -812,7 +812,7 @@ func TestGoogleComputeGlobalAddress(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_global_address",
 						),
 						alerts.EnumerationPhase,
@@ -849,7 +849,7 @@ func TestGoogleComputeGlobalAddress(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeGlobalAddressEnumerator(repo, factory))
 
@@ -920,7 +920,7 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_subnetwork",
 						),
 						alerts.EnumerationPhase,
@@ -973,7 +973,7 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 				provider.ShouldUpdate()
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeSubnetworkEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
@@ -1045,7 +1045,7 @@ func TestGoogleComputeDisk(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_disk",
 						),
 						alerts.EnumerationPhase,
@@ -1082,7 +1082,7 @@ func TestGoogleComputeDisk(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeDiskEnumerator(repo, factory))
 
@@ -1155,7 +1155,7 @@ func TestGoogleComputeImage(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_image",
 						),
 						alerts.EnumerationPhase,
@@ -1192,7 +1192,7 @@ func TestGoogleComputeImage(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeImageEnumerator(repo, factory))
 
@@ -1265,7 +1265,7 @@ func TestGoogleComputeHealthCheck(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_health_check",
 						),
 						alerts.EnumerationPhase,
@@ -1302,7 +1302,7 @@ func TestGoogleComputeHealthCheck(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeHealthCheckEnumerator(repo, factory))
 
@@ -1375,7 +1375,7 @@ func TestGoogleComputeNodeGroup(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_compute_node_group",
 						),
 						alerts.EnumerationPhase,
@@ -1412,7 +1412,7 @@ func TestGoogleComputeNodeGroup(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeNodeGroupEnumerator(repo, factory))
 

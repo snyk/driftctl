@@ -90,7 +90,7 @@ func TestGoogleSQLDatabaseInstance(t *testing.T) {
 					alerts.NewRemoteAccessDeniedAlert(
 						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
-							status.Error(codes.PermissionDenied, "The caller does not have permission"),
+							status.Error(codes.PermissionDenied, "For scope projects/123456 got error: "+status.Error(codes.PermissionDenied, "The caller does not have permission").Error()+"; "),
 							"google_sql_database_instance",
 						),
 						alerts.EnumerationPhase,
@@ -127,7 +127,7 @@ func TestGoogleSQLDatabaseInstance(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.SetConfig([]string{"projects/123456"}), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleSQLDatabaseInstanceEnumerator(repo, factory))
 

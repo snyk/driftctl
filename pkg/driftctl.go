@@ -24,6 +24,7 @@ type ScanOptions struct {
 	Detect           bool
 	From             []config.SupplierConfig
 	To               string
+	GCPScope         []string
 	Output           []output.OutputConfig
 	Filter           *jmespath.JMESPath
 	Quiet            bool
