@@ -101,7 +101,7 @@ jobs:
   release:
     resource_class: large
     docker:
-      - image: golang:1.17
+      - image: cimg/go:1.17
     steps:
       - checkout
       - gh/setup:
