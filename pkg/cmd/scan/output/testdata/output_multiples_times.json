@@ -4,7 +4,8 @@
 		"total_changed": 0,
 		"total_unmanaged": 0,
 		"total_missing": 0,
-		"total_managed": 0
+		"total_managed": 0,
+		"total_iac_source_count": 0
 	},
 	"managed": null,
 	"unmanaged": null,

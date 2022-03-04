@@ -22,6 +22,7 @@ func fakeAnalysis(opts analyser.AnalyzerOptions) *analyser.Analysis {
 		opts = analyser.AnalyzerOptions{Deep: true}
 	}
 	a := analyser.NewAnalysis(opts)
+	a.SetIaCSourceCount(3)
 	a.AddUnmanaged(
 		&resource.Resource{
 			Id:   "unmanaged-id-1",

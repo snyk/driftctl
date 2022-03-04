@@ -4,7 +4,8 @@
 		"total_changed": 1,
 		"total_unmanaged": 2,
 		"total_missing": 2,
-		"total_managed": 2
+		"total_managed": 2,
+		"total_iac_source_count": 1
 	},
 	"managed": [
 		{
