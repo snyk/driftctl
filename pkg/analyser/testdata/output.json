@@ -70,5 +70,6 @@
 		]
 	},
 	"provider_name": "AWS",
-	"provider_version": "2.18.5"
+	"provider_version": "2.18.5",
+	"scan_duration": 241
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"testing"
+	"time"
 
 	"github.com/snyk/driftctl/pkg/filter"
 	"github.com/stretchr/testify/mock"
@@ -1269,7 +1270,9 @@ func addSchemaToRes(res *resource.Resource, repo resource.SchemaRepositoryInterf
 
 func TestAnalysis_MarshalJSON(t *testing.T) {
 	goldenFile := "./testdata/output.json"
-	analysis := Analysis{}
+	analysis := Analysis{
+		Duration: 241 * time.Second,
+	}
 	analysis.SetIaCSourceCount(1)
 	analysis.AddManaged(
 		&resource.Resource{

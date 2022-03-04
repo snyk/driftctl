@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/r3labs/diff/v2"
@@ -23,6 +24,7 @@ func fakeAnalysis(opts analyser.AnalyzerOptions) *analyser.Analysis {
 	}
 	a := analyser.NewAnalysis(opts)
 	a.SetIaCSourceCount(3)
+	a.Duration = 12 * time.Second
 	a.AddUnmanaged(
 		&resource.Resource{
 			Id:   "unmanaged-id-1",

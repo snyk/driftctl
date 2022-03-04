@@ -64,6 +64,7 @@ type serializableAnalysis struct {
 	Alerts          map[string][]alerter.SerializableAlert `json:"alerts"`
 	ProviderName    string                                 `json:"provider_name"`
 	ProviderVersion string                                 `json:"provider_version"`
+	Duration        int                                    `json:"scan_duration"`
 }
 
 type GenDriftIgnoreOptions struct {
@@ -107,6 +108,7 @@ func (a Analysis) MarshalJSON() ([]byte, error) {
 	bla.Coverage = a.Coverage()
 	bla.ProviderName = a.ProviderName
 	bla.ProviderVersion = a.ProviderVersion
+	bla.Duration = int(a.Duration.Seconds())
 
 	return json.Marshal(bla)
 }
@@ -167,7 +169,8 @@ func (a *Analysis) UnmarshalJSON(bytes []byte) error {
 	}
 	a.ProviderName = bla.ProviderName
 	a.ProviderVersion = bla.ProviderVersion
-	a.summary.TotalIaCSourceCount = bla.Summary.TotalIaCSourceCount
+	a.SetIaCSourceCount(bla.Summary.TotalIaCSourceCount)
+	a.Duration = time.Duration(bla.Duration) * time.Second
 	return nil
 }
 
