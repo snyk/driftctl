@@ -1,0 +1,30 @@
+Found missing resources:
+  - testuser1 (aws_iam_user)
+  - testrole1 (aws_iam_role)
+Found resources not covered by IaC:
+  aws_iam_access_key:
+    - AKIAXYUOJZ3H5YCXF34G
+    - AKIAXYUOJZ3HV2LTLXD2
+    - AKIAXYUOJZ3HUSPPQQ4L
+  aws_iam_role:
+    - OrganizationAccountAccessRole
+    - driftctl_assume\_role
+  aws_iam_role_policy:
+    - OrganizationAccountAccessRole:AdministratorAccess
+    - driftctl_assume_role:driftctl_policy.10
+  aws_iam_user:
+    - driftctl
+    - sundowndev
+    - test_user
+  aws_iam_user_policy:
+    - driftctl:driftctlrole
+Found changed resources:
+  - test-20210416154114486700000001 (aws_s3_bucket):
+      ~ BucketPrefix: "test-" => <nil>
+      + Tags.tag2: <nil> => "value"
+      ~ Tags.test: "test" => "test1"
+Found 14 resource(s)
+ - 7% coverage
+ - 1 resource(s) managed by Terraform
+ - 11 resource(s) not managed by Terraform
+ - 2 resource(s) found in a Terraform state but missing on the cloud provider
