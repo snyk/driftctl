@@ -573,13 +573,13 @@ func TestGetPrinter(t *testing.T) {
 			name: "json stdout output",
 			path: "stdout",
 			key:  JSONOutputType,
-			want: &output.VoidPrinter{},
+			want: &output.ConsolePrinter{},
 		},
 		{
 			name: "json /dev/stdout output",
 			path: "/dev/stdout",
 			key:  JSONOutputType,
-			want: &output.VoidPrinter{},
+			want: &output.ConsolePrinter{},
 		},
 		{
 			name: "console stdout output",
@@ -604,25 +604,25 @@ func TestGetPrinter(t *testing.T) {
 			name: "jsonplan stdout output",
 			path: "stdout",
 			key:  PlanOutputType,
-			want: &output.VoidPrinter{},
+			want: &output.ConsolePrinter{},
 		},
 		{
 			name: "jsonplan /dev/stdout output",
 			path: "/dev/stdout",
 			key:  PlanOutputType,
-			want: &output.VoidPrinter{},
+			want: &output.ConsolePrinter{},
 		},
 		{
 			name: "html stdout output",
 			path: "stdout",
 			key:  HTMLOutputType,
-			want: &output.VoidPrinter{},
+			want: &output.ConsolePrinter{},
 		},
 		{
 			name: "html /dev/stdout output",
 			path: "/dev/stdout",
 			key:  HTMLOutputType,
-			want: &output.VoidPrinter{},
+			want: &output.ConsolePrinter{},
 		},
 	}
 	for _, tt := range tests {
@@ -645,14 +645,14 @@ func TestShouldPrint(t *testing.T) {
 		want    bool
 	}{
 		{
-			name: "test stdout prevents printing",
+			name: "test stdout should not prevents printing",
 			outputs: []OutputConfig{
 				{
 					Path: "stdout",
 					Key:  JSONOutputType,
 				},
 			},
-			want: false,
+			want: true,
 		},
 		{
 			name: "test output to file doesn't prevent printing",
@@ -665,7 +665,18 @@ func TestShouldPrint(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "test stdout prevents printing",
+			name: "test quiet should prevents printing",
+			outputs: []OutputConfig{
+				{
+					Path: "result.json",
+					Key:  JSONOutputType,
+				},
+			},
+			quiet: true,
+			want:  false,
+		},
+		{
+			name: "test stdout should not prevents printing",
 			outputs: []OutputConfig{
 				{
 					Path: "result.json",
@@ -676,7 +687,7 @@ func TestShouldPrint(t *testing.T) {
 					Key:  PlanOutputType,
 				},
 			},
-			want: false,
+			want: true,
 		},
 	}
 	for _, tt := range tests {

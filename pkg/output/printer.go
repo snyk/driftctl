@@ -1,6 +1,9 @@
 package output
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 var globalPrinter Printer = &VoidPrinter{}
 
@@ -23,7 +26,7 @@ func NewConsolePrinter() *ConsolePrinter {
 }
 
 func (c *ConsolePrinter) Printf(format string, args ...interface{}) {
-	fmt.Printf(format, args...)
+	_, _ = fmt.Fprintf(os.Stderr, format, args...)
 }
 
 type VoidPrinter struct{}
