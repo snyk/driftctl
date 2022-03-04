@@ -27,11 +27,12 @@ type Difference struct {
 }
 
 type Summary struct {
-	TotalResources int `json:"total_resources"`
-	TotalDrifted   int `json:"total_changed"`
-	TotalUnmanaged int `json:"total_unmanaged"`
-	TotalDeleted   int `json:"total_missing"`
-	TotalManaged   int `json:"total_managed"`
+	TotalResources      int  `json:"total_resources"`
+	TotalDrifted        int  `json:"total_changed"`
+	TotalUnmanaged      int  `json:"total_unmanaged"`
+	TotalDeleted        int  `json:"total_missing"`
+	TotalManaged        int  `json:"total_managed"`
+	TotalIaCSourceCount uint `json:"total_iac_source_count"`
 }
 
 type Analysis struct {
@@ -166,6 +167,7 @@ func (a *Analysis) UnmarshalJSON(bytes []byte) error {
 	}
 	a.ProviderName = bla.ProviderName
 	a.ProviderVersion = bla.ProviderVersion
+	a.summary.TotalIaCSourceCount = bla.Summary.TotalIaCSourceCount
 	return nil
 }
 
@@ -206,6 +208,10 @@ func (a *Analysis) SetAlerts(alerts alerter.Alerts) {
 
 func (a *Analysis) SetOptions(options AnalyzerOptions) {
 	a.options = options
+}
+
+func (a *Analysis) SetIaCSourceCount(i uint) {
+	a.summary.TotalIaCSourceCount = i
 }
 
 func (a *Analysis) Coverage() int {

@@ -159,12 +159,14 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		return nil, err
 	}
 
+	analysis.SetIaCSourceCount(d.iacSupplier.SourceCount())
 	analysis.Duration = time.Since(start)
 	analysis.Date = time.Now()
 
 	d.store.Bucket(memstore.TelemetryBucket).Set("total_resources", analysis.Summary().TotalResources)
 	d.store.Bucket(memstore.TelemetryBucket).Set("total_managed", analysis.Summary().TotalManaged)
 	d.store.Bucket(memstore.TelemetryBucket).Set("duration", uint(analysis.Duration.Seconds()+0.5))
+	d.store.Bucket(memstore.TelemetryBucket).Set("iac_source_count", d.iacSupplier.SourceCount())
 
 	return &analysis, nil
 }
@@ -192,7 +194,6 @@ func (d DriftCTL) scan() (remoteResources []*resource.Resource, resourcesFromSta
 	if err != nil {
 		return nil, nil, err
 	}
-	d.store.Bucket(memstore.TelemetryBucket).Set("iac_source_count", d.iacSupplier.SourceCount())
 
 	logrus.Info("Start scanning cloud provider")
 	d.scanProgress.Start()

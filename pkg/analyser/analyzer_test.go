@@ -1270,6 +1270,7 @@ func addSchemaToRes(res *resource.Resource, repo resource.SchemaRepositoryInterf
 func TestAnalysis_MarshalJSON(t *testing.T) {
 	goldenFile := "./testdata/output.json"
 	analysis := Analysis{}
+	analysis.SetIaCSourceCount(1)
 	analysis.AddManaged(
 		&resource.Resource{
 			Id:   "AKIA5QYBVVD25KFXJHYJ",
@@ -1350,11 +1351,12 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 func TestAnalysis_UnmarshalJSON(t *testing.T) {
 	expected := Analysis{
 		summary: Summary{
-			TotalResources: 6,
-			TotalDrifted:   1,
-			TotalUnmanaged: 2,
-			TotalDeleted:   2,
-			TotalManaged:   2,
+			TotalResources:      6,
+			TotalDrifted:        1,
+			TotalUnmanaged:      2,
+			TotalDeleted:        2,
+			TotalManaged:        2,
+			TotalIaCSourceCount: 3,
 		},
 		managed: []*resource.Resource{
 			{
@@ -1431,6 +1433,7 @@ func TestAnalysis_UnmarshalJSON(t *testing.T) {
 	assert.Equal(t, 2, got.Summary().TotalDeleted)
 	assert.Equal(t, 6, got.Summary().TotalResources)
 	assert.Equal(t, 1, got.Summary().TotalDrifted)
+	assert.Equal(t, uint(3), got.Summary().TotalIaCSourceCount)
 	assert.Len(t, got.alerts, 1)
 	assert.Equal(t, got.alerts["aws_iam_access_key"][0].Message(), "This is an alert")
 }
