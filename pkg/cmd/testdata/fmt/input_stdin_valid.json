@@ -1,4 +1,9 @@
 {
+  "options": {
+    "deep": false,
+    "only_managed": false,
+    "only_unmanaged": true
+  },
   "summary": {
     "total_resources": 12,
     "total_changed": 1,

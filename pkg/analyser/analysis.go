@@ -54,6 +54,7 @@ type serializableDifference struct {
 }
 
 type serializableAnalysis struct {
+	Options         AnalyzerOptions                        `json:"options"`
 	Summary         Summary                                `json:"summary"`
 	Managed         []resource.SerializableResource        `json:"managed"`
 	Unmanaged       []resource.SerializableResource        `json:"unmanaged"`
@@ -108,6 +109,7 @@ func (a Analysis) MarshalJSON() ([]byte, error) {
 	bla.ProviderName = a.ProviderName
 	bla.ProviderVersion = a.ProviderVersion
 	bla.ScanDuration = uint(a.Duration.Seconds())
+	bla.Options = a.Options()
 
 	return json.Marshal(bla)
 }
@@ -170,6 +172,7 @@ func (a *Analysis) UnmarshalJSON(bytes []byte) error {
 	a.ProviderVersion = bla.ProviderVersion
 	a.SetIaCSourceCount(bla.Summary.TotalIaCSourceCount)
 	a.Duration = time.Duration(bla.ScanDuration) * time.Second
+	a.options = bla.Options
 	return nil
 }
 
