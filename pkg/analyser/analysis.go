@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/r3labs/diff/v2"
-
 	"github.com/snyk/driftctl/pkg/alerter"
 	"github.com/snyk/driftctl/pkg/resource"
 )
@@ -64,7 +63,7 @@ type serializableAnalysis struct {
 	Alerts          map[string][]alerter.SerializableAlert `json:"alerts"`
 	ProviderName    string                                 `json:"provider_name"`
 	ProviderVersion string                                 `json:"provider_version"`
-	Duration        int                                    `json:"scan_duration"`
+	ScanDuration    uint                                   `json:"scan_duration,omitempty"`
 }
 
 type GenDriftIgnoreOptions struct {
@@ -108,7 +107,7 @@ func (a Analysis) MarshalJSON() ([]byte, error) {
 	bla.Coverage = a.Coverage()
 	bla.ProviderName = a.ProviderName
 	bla.ProviderVersion = a.ProviderVersion
-	bla.Duration = int(a.Duration.Seconds())
+	bla.ScanDuration = uint(a.Duration.Seconds())
 
 	return json.Marshal(bla)
 }
@@ -170,7 +169,7 @@ func (a *Analysis) UnmarshalJSON(bytes []byte) error {
 	a.ProviderName = bla.ProviderName
 	a.ProviderVersion = bla.ProviderVersion
 	a.SetIaCSourceCount(bla.Summary.TotalIaCSourceCount)
-	a.Duration = time.Duration(bla.Duration) * time.Second
+	a.Duration = time.Duration(bla.ScanDuration) * time.Second
 	return nil
 }
 

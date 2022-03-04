@@ -91,6 +91,5 @@
 		]
 	},
 	"provider_name": "AWS",
-	"provider_version": "3.19.0",
-	"scan_duration": 0
+	"provider_version": "3.19.0"
 }

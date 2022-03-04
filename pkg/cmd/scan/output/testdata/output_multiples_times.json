@@ -14,6 +14,5 @@
 	"coverage": 0,
 	"alerts": null,
 	"provider_name": "",
-	"provider_version": "",
-	"scan_duration": 0
+	"provider_version": ""
 }
