@@ -19,6 +19,10 @@ import (
 	"github.com/snyk/driftctl/pkg/resource"
 )
 
+type FmtOptions struct {
+	Output output.OutputConfig
+}
+
 type ScanOptions struct {
 	Coverage         bool
 	Detect           bool

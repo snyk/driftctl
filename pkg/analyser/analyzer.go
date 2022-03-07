@@ -38,9 +38,9 @@ func (c *ComputedDiffAlert) ShouldIgnoreResource() bool {
 }
 
 type AnalyzerOptions struct {
-	Deep          bool
-	OnlyManaged   bool
-	OnlyUnmanaged bool
+	Deep          bool `json:"deep"`
+	OnlyManaged   bool `json:"only_managed"`
+	OnlyUnmanaged bool `json:"only_unmanaged"`
 }
 
 type Analyzer struct {

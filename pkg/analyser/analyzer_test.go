@@ -1353,6 +1353,9 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 
 func TestAnalysis_UnmarshalJSON(t *testing.T) {
 	expected := Analysis{
+		options: AnalyzerOptions{
+			Deep: true,
+		},
 		summary: Summary{
 			TotalResources:      6,
 			TotalDrifted:        1,
@@ -1430,6 +1433,7 @@ func TestAnalysis_UnmarshalJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, expected, got)
+	assert.True(t, got.Options().Deep)
 	assert.Equal(t, 33, got.Coverage())
 	assert.Equal(t, 2, got.Summary().TotalUnmanaged)
 	assert.Equal(t, 2, got.Summary().TotalManaged)
