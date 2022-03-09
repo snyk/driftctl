@@ -80,19 +80,10 @@ func GetPrinter(config OutputConfig, quiet bool) output.Printer {
 
 	switch config.Key {
 	case JSONOutputType:
-		if isStdOut(config.Path) {
-			return &output.VoidPrinter{}
-		}
 		fallthrough
 	case PlanOutputType:
-		if isStdOut(config.Path) {
-			return &output.VoidPrinter{}
-		}
 		fallthrough
 	case HTMLOutputType:
-		if isStdOut(config.Path) {
-			return &output.VoidPrinter{}
-		}
 		fallthrough
 	case ConsoleOutputType:
 		fallthrough

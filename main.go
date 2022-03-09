@@ -17,6 +17,7 @@ import (
 	"github.com/snyk/driftctl/pkg/config"
 	"github.com/snyk/driftctl/pkg/version"
 	"github.com/snyk/driftctl/sentry"
+	"github.com/spf13/viper"
 )
 
 func init() {
@@ -33,11 +34,19 @@ func run() int {
 	config.Init()
 	logger.Init()
 	build := build.Build{}
+	// Check whether driftCTL is run under Snyk CLI
+	isSnyk := viper.GetBool("IS_SNYK")
 	logrus.WithFields(logrus.Fields{
 		"isRelease":               fmt.Sprintf("%t", build.IsRelease()),
 		"isUsageReportingEnabled": fmt.Sprintf("%t", build.IsUsageReportingEnabled()),
 		"version":                 version.Current(),
+		"isSnyk":                  fmt.Sprintf("%t", isSnyk),
 	}).Debug("Build info")
+
+	// Enable colorization when driftctl is launched under snyk cli (piped)
+	if isSnyk {
+		color.NoColor = false
+	}
 
 	driftctlCmd := cmd.NewDriftctlCmd(build)
 
