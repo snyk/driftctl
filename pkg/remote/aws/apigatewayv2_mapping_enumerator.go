@@ -38,15 +38,21 @@ func (e *ApiGatewayV2MappingEnumerator) Enumerate() ([]*resource.Resource, error
 			return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 		}
 		for _, mapping := range mappings {
+			attrs := make(map[string]interface{})
+
+			if mapping.ApiId != nil {
+				attrs["api_id"] = *mapping.ApiId
+			}
+			if mapping.Stage != nil {
+				attrs["stage"] = *mapping.Stage
+			}
+
 			results = append(
 				results,
 				e.factory.CreateAbstractResource(
 					string(e.SupportedType()),
 					*mapping.ApiMappingId,
-					map[string]interface{}{
-						"stage":  *mapping.Stage,
-						"api_id": *mapping.ApiId,
-					},
+					attrs,
 				),
 			)
 		}

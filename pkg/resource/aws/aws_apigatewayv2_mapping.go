@@ -8,10 +8,16 @@ func initAwsApiGatewayV2MappingMetaData(resourceSchemaRepository resource.Schema
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(
 		AwsApiGatewayV2MappingResourceType,
 		func(res *resource.Resource) map[string]string {
-			return map[string]string{
-				"Api":   *res.Attributes().GetString("api_id"),
-				"Stage": *res.Attributes().GetString("stage"),
+			attrs := make(map[string]string)
+
+			if v := res.Attributes().GetString("api_id"); v != nil {
+				attrs["Api"] = *v
 			}
+			if v := res.Attributes().GetString("stage"); v != nil {
+				attrs["Stage"] = *v
+			}
+
+			return attrs
 		},
 	)
 }

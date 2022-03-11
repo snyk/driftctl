@@ -961,6 +961,34 @@ func TestApiGatewayV2Mapping(t *testing.T) {
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayV2MappingResourceType),
 		},
+		{
+			test: "returning mapping with invalid attributes",
+			mocks: func(repositoryV1 *repository.MockApiGatewayRepository, repository *repository.MockApiGatewayV2Repository, alerter *mocks.AlerterInterface) {
+				repositoryV1.On("ListAllDomainNames").Return([]*apigateway.DomainName{
+					{DomainName: awssdk.String("example.com")},
+				}, nil)
+				repository.On("ListAllApiMappings", "example.com").
+					Return([]*apigatewayv2.ApiMapping{
+						{
+							ApiMappingId: awssdk.String("barfoo"),
+						},
+						{
+							Stage:        awssdk.String("a-stage"),
+							ApiId:        awssdk.String("foobar"),
+							ApiMappingId: awssdk.String("foobar"),
+						},
+					}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "barfoo", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsApiGatewayV2MappingResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "foobar", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsApiGatewayV2MappingResourceType, got[1].ResourceType())
+			},
+		},
 	}
 
 	providerVersion := "3.19.0"
