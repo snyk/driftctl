@@ -41,8 +41,16 @@ header {
     padding: 12px 0;
 }
 
-svg {
+#brand_logo {
     margin-right: 20px;
+    width: 100px;
+    height: 81px;
+    display: inline-block;
+}
+
+#brand_logo svg {
+    width: 100%;
+    height: 100%;
 }
 
 input::placeholder {
