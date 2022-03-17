@@ -324,7 +324,7 @@ func TestRoute53_Record(t *testing.T) {
 						Type: awssdk.String("A"),
 					},
 					{
-						Name: awssdk.String("test3"),
+						Name: awssdk.String("\\052.test4."),
 						Type: awssdk.String("A"),
 					},
 				}, nil)
