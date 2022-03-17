@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/snyk/driftctl/pkg/remote/aws/repository"
@@ -75,7 +76,7 @@ func (e *Route53RecordEnumerator) listRecordsForZone(zoneId string) ([]*resource
 			results,
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
-				strings.Join(vars, "_"),
+				e.cleanRecordName(strings.Join(vars, "_")),
 				map[string]interface{}{
 					"type": rawType,
 				},
@@ -84,4 +85,17 @@ func (e *Route53RecordEnumerator) listRecordsForZone(zoneId string) ([]*resource
 	}
 
 	return results, nil
+}
+
+// cleanRecordName
+// Route 53 stores certain characters with the octal equivalent in ASCII format.
+// This function converts all of these characters back into the original character.
+// E.g. "*" is stored as "\\052" and "@" as "\\100"
+func (e *Route53RecordEnumerator) cleanRecordName(name string) string {
+	str := name
+	s, err := strconv.Unquote(`"` + str + `"`)
+	if err != nil {
+		return str
+	}
+	return s
 }
