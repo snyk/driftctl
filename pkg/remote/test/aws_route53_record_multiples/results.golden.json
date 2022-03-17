@@ -86,13 +86,13 @@
     "alias": null,
     "allow_overwrite": null,
     "failover_routing_policy": null,
-    "fqdn": "test3.foo-0.com",
+    "fqdn": "*.test4.foo-0.com",
     "geolocation_routing_policy": null,
     "health_check_id": "",
-    "id": "Z1035360GLIB82T1EH2G_test3_A",
+    "id": "Z1035360GLIB82T1EH2G_*.test4._A",
     "latency_routing_policy": null,
     "multivalue_answer_routing_policy": null,
-    "name": "test3",
+    "name": "*.test4",
     "records": [
       "1.2.3.4"
     ],

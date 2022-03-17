@@ -65,3 +65,11 @@ resource "aws_route53_record" "foo-record-4-a" {
   ttl     = 300
   records = ["192.0.1.5"]
 }
+
+resource "aws_route53_record" "foo-record-4-b" {
+  zone_id = aws_route53_zone.foo-zone.zone_id
+  name    = "*.test4."
+  type    = "A"
+  ttl     = 300
+  records = ["192.0.1.5"]
+}
