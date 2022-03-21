@@ -13,27 +13,28 @@ import (
 
 // https://cloud.google.com/asset-inventory/docs/supported-asset-types#supported_resource_types
 const (
-	storageBucketAssetType        = "storage.googleapis.com/Bucket"
-	computeFirewallAssetType      = "compute.googleapis.com/Firewall"
-	computeRouterAssetType        = "compute.googleapis.com/Router"
-	computeInstanceAssetType      = "compute.googleapis.com/Instance"
-	computeNetworkAssetType       = "compute.googleapis.com/Network"
-	computeSubnetworkAssetType    = "compute.googleapis.com/Subnetwork"
-	computeDiskAssetType          = "compute.googleapis.com/Disk"
-	computeImageAssetType         = "compute.googleapis.com/Image"
-	dnsManagedZoneAssetType       = "dns.googleapis.com/ManagedZone"
-	computeInstanceGroupAssetType = "compute.googleapis.com/InstanceGroup"
-	bigqueryDatasetAssetType      = "bigquery.googleapis.com/Dataset"
-	bigqueryTableAssetType        = "bigquery.googleapis.com/Table"
-	computeAddressAssetType       = "compute.googleapis.com/Address"
-	computeGlobalAddressAssetType = "compute.googleapis.com/GlobalAddress"
-	cloudFunctionsFunction        = "cloudfunctions.googleapis.com/CloudFunction"
-	bigtableInstanceAssetType     = "bigtableadmin.googleapis.com/Instance"
-	bigtableTableAssetType        = "bigtableadmin.googleapis.com/Table"
-	sqlDatabaseInstanceAssetType  = "sqladmin.googleapis.com/Instance"
-	healthCheckAssetType          = "compute.googleapis.com/HealthCheck"
-	cloudRunServiceAssetType      = "run.googleapis.com/Service"
-	nodeGroupAssetType            = "compute.googleapis.com/NodeGroup"
+	storageBucketAssetType         = "storage.googleapis.com/Bucket"
+	computeFirewallAssetType       = "compute.googleapis.com/Firewall"
+	computeRouterAssetType         = "compute.googleapis.com/Router"
+	computeInstanceAssetType       = "compute.googleapis.com/Instance"
+	computeNetworkAssetType        = "compute.googleapis.com/Network"
+	computeSubnetworkAssetType     = "compute.googleapis.com/Subnetwork"
+	computeDiskAssetType           = "compute.googleapis.com/Disk"
+	computeImageAssetType          = "compute.googleapis.com/Image"
+	dnsManagedZoneAssetType        = "dns.googleapis.com/ManagedZone"
+	computeInstanceGroupAssetType  = "compute.googleapis.com/InstanceGroup"
+	bigqueryDatasetAssetType       = "bigquery.googleapis.com/Dataset"
+	bigqueryTableAssetType         = "bigquery.googleapis.com/Table"
+	computeAddressAssetType        = "compute.googleapis.com/Address"
+	computeGlobalAddressAssetType  = "compute.googleapis.com/GlobalAddress"
+	cloudFunctionsFunction         = "cloudfunctions.googleapis.com/CloudFunction"
+	bigtableInstanceAssetType      = "bigtableadmin.googleapis.com/Instance"
+	bigtableTableAssetType         = "bigtableadmin.googleapis.com/Table"
+	sqlDatabaseInstanceAssetType   = "sqladmin.googleapis.com/Instance"
+	healthCheckAssetType           = "compute.googleapis.com/HealthCheck"
+	cloudRunServiceAssetType       = "run.googleapis.com/Service"
+	nodeGroupAssetType             = "compute.googleapis.com/NodeGroup"
+	computeForwardingRuleAssetType = "compute.googleapis.com/ForwardingRule"
 )
 
 type AssetRepository interface {
@@ -58,6 +59,7 @@ type AssetRepository interface {
 	SearchAllHealthChecks() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllCloudRunServices() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllNodeGroups() ([]*assetpb.Asset, error)
+	SearchAllForwardingRules() ([]*assetpb.Asset, error)
 }
 
 type assetRepository struct {
@@ -85,6 +87,7 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 			sqlDatabaseInstanceAssetType,
 			computeGlobalAddressAssetType,
 			nodeGroupAssetType,
+			computeForwardingRuleAssetType,
 		},
 	}
 	var results []*assetpb.Asset
@@ -258,4 +261,8 @@ func (s assetRepository) SearchAllCloudRunServices() ([]*assetpb.ResourceSearchR
 
 func (s assetRepository) SearchAllNodeGroups() ([]*assetpb.Asset, error) {
 	return s.listAllResources(nodeGroupAssetType)
+}
+
+func (s assetRepository) SearchAllForwardingRules() ([]*assetpb.Asset, error) {
+	return s.listAllResources(computeForwardingRuleAssetType)
 }

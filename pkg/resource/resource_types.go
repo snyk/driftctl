@@ -198,6 +198,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"google_compute_global_address":  {},
 	"google_compute_node_group":      {},
 	"google_cloud_run_service":       {},
+	"google_compute_forwarding_rule": {},
 
 	"azurerm_storage_account":   {},
 	"azurerm_storage_container": {},
