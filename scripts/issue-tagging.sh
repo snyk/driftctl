@@ -36,7 +36,7 @@ PRs=$(git log --pretty=oneline "$BASE_TAG"..."$LATEST_TAG" | grep 'Merge pull re
 EXIT_CODE=0
 ISSUES=()
 for pr in $PRs; do
-    id=$($GHCLI_BIN pr view "$pr" --json body | grep -oE 'Related issues | (.*)?[0-9]+(.*)?\|' | sed 's/[^[:digit:]]//g' | sed -z 's/\n//g' || true)
+    id=$($GHCLI_BIN pr view "$pr" --json body | grep -oE '(Related issues \| )(.*)?[0-9]+(.*|\r|\n)?(\|)' | sed 's/[^[:digit:]]//g' | sed -z 's/\n//g' || true)
     if [ -z "$id" ]; then
         continue
     fi
