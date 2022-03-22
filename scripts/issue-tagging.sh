@@ -28,6 +28,8 @@ if ! $GHCLI_BIN auth status &> /dev/null; then
     exit 1
 fi
 
+echo "Finding merged pull requests between $BASE_TAG and $LATEST_TAG..."
+
 # Compare $BASE_TAG branch with the latest tag
 # Keep IDs of merged pull requests
 PRs=$(git log --pretty=oneline "$BASE_TAG"..."$LATEST_TAG" | grep 'Merge pull request #' | grep -oE '#[0-9]+' | sed 's/#//')
@@ -47,6 +49,10 @@ for pr in $PRs; do
     fi
     ISSUES+=("$id")
 done
+
+# Remove duplicate IDs
+# This can happen when we release using a separate branch (e.g. patch releases)
+mapfile -t ISSUES < <(printf "%s\n" "${ISSUES[@]}" | sort -u)
 
 echo "Creating milestone $LATEST_TAG in github.com/$REPO"
 curl -X POST \
