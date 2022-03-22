@@ -39,3 +39,8 @@ checksum:
     algorithm: sha256
 snapshot:
     name_template: "{{ .Tag }}-next"
+blobs:
+    - provider: s3
+      bucket: snyk-assets
+      region: us-east-1
+      folder: "cli/driftctl/{{.Tag}}"
