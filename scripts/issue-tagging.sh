@@ -33,10 +33,16 @@ fi
 PRs=$(git log --pretty=oneline "$BASE_TAG"..."$LATEST_TAG" | grep 'Merge pull request #' | grep -oE '#[0-9]+' | sed 's/#//')
 
 # Find fixed issues from $BASE_TAG to $LATEST_TAG
+EXIT_CODE=0
 ISSUES=()
 for pr in $PRs; do
     id=$($GHCLI_BIN pr view "$pr" --json body | grep -oE 'Related issues | (.*)?[0-9]+(.*)?\|' | sed 's/[^[:digit:]]//g' | sed -z 's/\n//g' || true)
     if [ -z "$id" ]; then
+        continue
+    fi
+    if ! $GHCLI_BIN issue view "$id" --json title &> /dev/null; then
+        echo "Invalid issue $id for pull request $pr. Skipping."
+        EXIT_CODE=1
         continue
     fi
     ISSUES+=("$id")
@@ -56,8 +62,9 @@ for issue in "${ISSUES[@]}"; do
     curl -X POST \
         -H "Accept: application/vnd.github.v3+json" \
         -H "Authorization: token $GITHUB_TOKEN" \
-        --data "{\"body\":\"This issue has been referenced in the latest release $LATEST_TAG.\"}" \
+        --data "{\"body\":\"This issue has been referenced in the [$LATEST_TAG release](https://github.com/$REPO/releases/tag/$LATEST_TAG).\"}" \
         "https://api.github.com/repos/$REPO/issues/$issue/comments"
 done
 
 echo "Done."
+exit $EXIT_CODE
