@@ -126,6 +126,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 
 		middlewares.NewGoogleIAMBindingTransformer(d.resourceFactory),
 		middlewares.NewGoogleIAMPolicyTransformer(d.resourceFactory),
+		middlewares.NewGoogleComputeInstanceGroupManagerInstances(),
 
 		middlewares.NewAzurermRouteExpander(d.resourceFactory),
 		middlewares.NewAzurermSubnetExpander(d.resourceFactory),
