@@ -5,16 +5,16 @@ import (
 	"github.com/snyk/driftctl/pkg/resource/google"
 )
 
-type GoogleComputeInstanceGroupManagerInstances struct{}
+type GoogleComputeInstanceGroupManagerReconciler struct{}
 
-// NewGoogleComputeInstanceGroupManagerInstances imports remote instance groups when they're managed by a managed instance group manager.
+// NewGoogleComputeInstanceGroupManagerReconciler imports remote instance groups when they're managed by a managed instance group manager.
 // Creating a "google_compute_instance_group_manager" resource via Terraform leads to having several unmanaged instance groups.
 // This middleware adds remote instance groups to the state by matching them with managed instance group managers.
-func NewGoogleComputeInstanceGroupManagerInstances() *GoogleComputeInstanceGroupManagerInstances {
-	return &GoogleComputeInstanceGroupManagerInstances{}
+func NewGoogleComputeInstanceGroupManagerReconciler() *GoogleComputeInstanceGroupManagerReconciler {
+	return &GoogleComputeInstanceGroupManagerReconciler{}
 }
 
-func (a GoogleComputeInstanceGroupManagerInstances) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
+func (a GoogleComputeInstanceGroupManagerReconciler) Execute(remoteResources, resourcesFromState *[]*resource.Resource) error {
 	var newStateResources []*resource.Resource
 
 	instanceGroups := make([]*resource.Resource, 0)
