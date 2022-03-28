@@ -24,6 +24,7 @@ type EC2Repository interface {
 	ListAllSecurityGroups() ([]*ec2.SecurityGroup, []*ec2.SecurityGroup, error)
 	ListAllNetworkACLs() ([]*ec2.NetworkAcl, error)
 	DescribeLaunchTemplates() ([]*ec2.LaunchTemplate, error)
+	IsEbsEncryptionEnabledByDefault() (bool, error)
 }
 
 type ec2Repository struct {
@@ -390,4 +391,18 @@ func (r *ec2Repository) DescribeLaunchTemplates() ([]*ec2.LaunchTemplate, error)
 
 	r.cache.Put(cacheKey, resp.LaunchTemplates)
 	return resp.LaunchTemplates, nil
+}
+
+func (r *ec2Repository) IsEbsEncryptionEnabledByDefault() (bool, error) {
+	if v := r.cache.Get("ec2IsEbsEncryptionEnabledByDefault"); v != nil {
+		return v.(bool), nil
+	}
+
+	input := &ec2.GetEbsEncryptionByDefaultInput{}
+	resp, err := r.client.GetEbsEncryptionByDefault(input)
+	if err != nil {
+		return false, err
+	}
+	r.cache.Put("ec2IsEbsEncryptionEnabledByDefault", *resp.EbsEncryptionByDefault)
+	return *resp.EbsEncryptionByDefault, err
 }

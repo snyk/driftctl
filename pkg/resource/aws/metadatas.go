@@ -65,4 +65,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsLaunchTemplateMetaData(resourceSchemaRepository)
 	initAwsApiGatewayV2ModelMetaData(resourceSchemaRepository)
 	initAwsApiGatewayV2MappingMetaData(resourceSchemaRepository)
+	initAwsEbsEncryptionByDefaultMetaData(resourceSchemaRepository)
 }

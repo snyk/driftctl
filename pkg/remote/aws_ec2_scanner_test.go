@@ -2814,3 +2814,90 @@ func TestEC2LaunchTemplate(t *testing.T) {
 		})
 	}
 }
+
+func TestEC2EbsEncryptionByDefault(t *testing.T) {
+	tests := []struct {
+		test    string
+		dirName string
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
+		wantErr error
+	}{
+		{
+			test:    "no encryption by default resource",
+			dirName: "aws_ebs_encryption_by_default_list",
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("IsEbsEncryptionEnabledByDefault").Return(false, nil)
+			},
+		},
+		{
+			test:    "cannot list encryption by default resources",
+			dirName: "aws_ebs_encryption_by_default_error",
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("IsEbsEncryptionEnabledByDefault").Return(false, awsError)
+
+				alerter.On("SendAlert", resourceaws.AwsEbsEncryptionByDefaultResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEbsEncryptionByDefaultResourceType, resourceaws.AwsEbsEncryptionByDefaultResourceType), alerts.EnumerationPhase)).Return()
+			},
+			wantErr: nil,
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	deserializer := resource.NewDeserializer(factory)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			shouldUpdate := c.dirName == *goldenfile.Update
+
+			sess := session.Must(session.NewSessionWithOptions(session.Options{
+				SharedConfigState: session.SharedConfigEnable,
+			}))
+
+			scanOptions := ScannerOptions{Deep: true}
+			providerLibrary := terraform.NewProviderLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockEC2Repository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.EC2Repository = fakeRepo
+			providerVersion := "3.19.0"
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provider := terraform2.NewFakeTerraformProvider(realProvider)
+			provider.WithResponse(c.dirName)
+
+			// Replace mock by real resources if we are in update mode
+			if shouldUpdate {
+				err := realProvider.Init()
+				if err != nil {
+					t.Fatal(err)
+				}
+				provider.ShouldUpdate()
+				repo = repository.NewEC2Repository(sess, cache.New(0))
+			}
+
+			remoteLibrary.AddEnumerator(aws.NewEC2EbsEncryptionByDefaultEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsEncryptionByDefaultResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEbsEncryptionByDefaultResourceType, provider, deserializer))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.wantErr)
+			if err != nil {
+				return
+			}
+			test.TestAgainstGoldenFile(got, resourceaws.AwsEbsEncryptionByDefaultResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+		})
+	}
+}
