@@ -18,4 +18,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initGoogleComputeDiskMetadata(resourceSchemaRepository)
 	initGoogleComputeImageMetadata(resourceSchemaRepository)
 	initGoogleComputeHealthCheckMetadata(resourceSchemaRepository)
+	initComputeInstanceGroupManagerMetadata(resourceSchemaRepository)
 }

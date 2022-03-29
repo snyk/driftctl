@@ -378,6 +378,7 @@ func TestTerraformStateReader_Google_Resources(t *testing.T) {
 		{name: "cloudrun service", dirName: "google_cloudrun_service", wantErr: false},
 		{name: "compute node group", dirName: "google_compute_node_group", wantErr: false},
 		{name: "compute forwarding rule", dirName: "google_compute_forwarding_rule", wantErr: false},
+		{name: "compute instance group manager", dirName: "google_compute_instance_group_manager", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

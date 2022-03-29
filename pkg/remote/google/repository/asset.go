@@ -35,6 +35,7 @@ const (
 	cloudRunServiceAssetType       = "run.googleapis.com/Service"
 	nodeGroupAssetType             = "compute.googleapis.com/NodeGroup"
 	computeForwardingRuleAssetType = "compute.googleapis.com/ForwardingRule"
+	instanceGroupManagerAssetType  = "compute.googleapis.com/InstanceGroupManager"
 )
 
 type AssetRepository interface {
@@ -60,6 +61,7 @@ type AssetRepository interface {
 	SearchAllCloudRunServices() ([]*assetpb.ResourceSearchResult, error)
 	SearchAllNodeGroups() ([]*assetpb.Asset, error)
 	SearchAllForwardingRules() ([]*assetpb.Asset, error)
+	SearchAllInstanceGroupManagers() ([]*assetpb.Asset, error)
 }
 
 type assetRepository struct {
@@ -88,6 +90,7 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 			computeGlobalAddressAssetType,
 			nodeGroupAssetType,
 			computeForwardingRuleAssetType,
+			instanceGroupManagerAssetType,
 		},
 	}
 	var results []*assetpb.Asset
@@ -265,4 +268,8 @@ func (s assetRepository) SearchAllNodeGroups() ([]*assetpb.Asset, error) {
 
 func (s assetRepository) SearchAllForwardingRules() ([]*assetpb.Asset, error) {
 	return s.listAllResources(computeForwardingRuleAssetType)
+}
+
+func (s assetRepository) SearchAllInstanceGroupManagers() ([]*assetpb.Asset, error) {
+	return s.listAllResources(instanceGroupManagerAssetType)
 }
