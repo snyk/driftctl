@@ -345,8 +345,6 @@ func scanRun(opts *pkg.ScanOptions) error {
 	}
 
 	if !analysis.IsSync() {
-		globaloutput.Printf("\nHint: use gen-driftignore command to generate a .driftignore file based on your drifts\n")
-
 		return cmderrors.InfrastructureNotInSync{}
 	}
 
