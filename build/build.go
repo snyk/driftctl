@@ -20,5 +20,5 @@ func (b Build) IsRelease() bool {
 }
 
 func (b Build) IsUsageReportingEnabled() bool {
-	return enableUsageReporting == "true"
+	return b.IsRelease() && enableUsageReporting == "true"
 }
