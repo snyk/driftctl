@@ -13,29 +13,30 @@ import (
 
 // https://cloud.google.com/asset-inventory/docs/supported-asset-types#supported_resource_types
 const (
-	storageBucketAssetType         = "storage.googleapis.com/Bucket"
-	computeFirewallAssetType       = "compute.googleapis.com/Firewall"
-	computeRouterAssetType         = "compute.googleapis.com/Router"
-	computeInstanceAssetType       = "compute.googleapis.com/Instance"
-	computeNetworkAssetType        = "compute.googleapis.com/Network"
-	computeSubnetworkAssetType     = "compute.googleapis.com/Subnetwork"
-	computeDiskAssetType           = "compute.googleapis.com/Disk"
-	computeImageAssetType          = "compute.googleapis.com/Image"
-	dnsManagedZoneAssetType        = "dns.googleapis.com/ManagedZone"
-	computeInstanceGroupAssetType  = "compute.googleapis.com/InstanceGroup"
-	bigqueryDatasetAssetType       = "bigquery.googleapis.com/Dataset"
-	bigqueryTableAssetType         = "bigquery.googleapis.com/Table"
-	computeAddressAssetType        = "compute.googleapis.com/Address"
-	computeGlobalAddressAssetType  = "compute.googleapis.com/GlobalAddress"
-	cloudFunctionsFunction         = "cloudfunctions.googleapis.com/CloudFunction"
-	bigtableInstanceAssetType      = "bigtableadmin.googleapis.com/Instance"
-	bigtableTableAssetType         = "bigtableadmin.googleapis.com/Table"
-	sqlDatabaseInstanceAssetType   = "sqladmin.googleapis.com/Instance"
-	healthCheckAssetType           = "compute.googleapis.com/HealthCheck"
-	cloudRunServiceAssetType       = "run.googleapis.com/Service"
-	nodeGroupAssetType             = "compute.googleapis.com/NodeGroup"
-	computeForwardingRuleAssetType = "compute.googleapis.com/ForwardingRule"
-	instanceGroupManagerAssetType  = "compute.googleapis.com/InstanceGroupManager"
+	storageBucketAssetType               = "storage.googleapis.com/Bucket"
+	computeFirewallAssetType             = "compute.googleapis.com/Firewall"
+	computeRouterAssetType               = "compute.googleapis.com/Router"
+	computeInstanceAssetType             = "compute.googleapis.com/Instance"
+	computeNetworkAssetType              = "compute.googleapis.com/Network"
+	computeSubnetworkAssetType           = "compute.googleapis.com/Subnetwork"
+	computeDiskAssetType                 = "compute.googleapis.com/Disk"
+	computeImageAssetType                = "compute.googleapis.com/Image"
+	dnsManagedZoneAssetType              = "dns.googleapis.com/ManagedZone"
+	computeInstanceGroupAssetType        = "compute.googleapis.com/InstanceGroup"
+	bigqueryDatasetAssetType             = "bigquery.googleapis.com/Dataset"
+	bigqueryTableAssetType               = "bigquery.googleapis.com/Table"
+	computeAddressAssetType              = "compute.googleapis.com/Address"
+	computeGlobalAddressAssetType        = "compute.googleapis.com/GlobalAddress"
+	cloudFunctionsFunction               = "cloudfunctions.googleapis.com/CloudFunction"
+	bigtableInstanceAssetType            = "bigtableadmin.googleapis.com/Instance"
+	bigtableTableAssetType               = "bigtableadmin.googleapis.com/Table"
+	sqlDatabaseInstanceAssetType         = "sqladmin.googleapis.com/Instance"
+	healthCheckAssetType                 = "compute.googleapis.com/HealthCheck"
+	cloudRunServiceAssetType             = "run.googleapis.com/Service"
+	nodeGroupAssetType                   = "compute.googleapis.com/NodeGroup"
+	computeForwardingRuleAssetType       = "compute.googleapis.com/ForwardingRule"
+	instanceGroupManagerAssetType        = "compute.googleapis.com/InstanceGroupManager"
+	computeGlobalForwardingRuleAssetType = "compute.googleapis.com/GlobalForwardingRule"
 )
 
 type AssetRepository interface {
@@ -62,6 +63,7 @@ type AssetRepository interface {
 	SearchAllNodeGroups() ([]*assetpb.Asset, error)
 	SearchAllForwardingRules() ([]*assetpb.Asset, error)
 	SearchAllInstanceGroupManagers() ([]*assetpb.Asset, error)
+	SearchAllGlobalForwardingRules() ([]*assetpb.Asset, error)
 }
 
 type assetRepository struct {
@@ -91,6 +93,7 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 			nodeGroupAssetType,
 			computeForwardingRuleAssetType,
 			instanceGroupManagerAssetType,
+			computeGlobalForwardingRuleAssetType,
 		},
 	}
 	var results []*assetpb.Asset
@@ -272,4 +275,8 @@ func (s assetRepository) SearchAllForwardingRules() ([]*assetpb.Asset, error) {
 
 func (s assetRepository) SearchAllInstanceGroupManagers() ([]*assetpb.Asset, error) {
 	return s.listAllResources(instanceGroupManagerAssetType)
+}
+
+func (s assetRepository) SearchAllGlobalForwardingRules() ([]*assetpb.Asset, error) {
+	return s.listAllResources(computeGlobalForwardingRuleAssetType)
 }
