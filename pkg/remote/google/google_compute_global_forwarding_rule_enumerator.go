@@ -24,14 +24,14 @@ func (e *GoogleComputeGlobalForwardingRuleEnumerator) SupportedType() resource.R
 }
 
 func (e *GoogleComputeGlobalForwardingRuleEnumerator) Enumerate() ([]*resource.Resource, error) {
-	nodeGroups, err := e.repository.SearchAllGlobalForwardingRules() //Change the name
+	globalForwardingRules, err := e.repository.SearchAllGlobalForwardingRules()
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
 
-	results := make([]*resource.Resource, 0, len(nodeGroups))
+	results := make([]*resource.Resource, 0, len(globalForwardingRules))
 
-	for _, res := range nodeGroups {
+	for _, res := range globalForwardingRules {
 		results = append(
 			results,
 			e.factory.CreateAbstractResource(
