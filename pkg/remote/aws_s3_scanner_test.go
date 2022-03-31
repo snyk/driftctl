@@ -814,6 +814,111 @@ func TestS3BucketPolicy(t *testing.T) {
 	}
 }
 
+func TestS3BucketPublicAccessBlock(t *testing.T) {
+	dummyError := errors.New("this is an error")
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockS3Repository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "multiple bucket, one with access block",
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllBuckets").Return([]*s3.Bucket{
+					{Name: awssdk.String("bucket-with-public-access-block")},
+					{Name: awssdk.String("bucket-without-public-access-block")},
+				}, nil)
+
+				repository.On("GetBucketLocation", "bucket-with-public-access-block").
+					Return("us-east-1", nil)
+				repository.On("GetBucketLocation", "bucket-without-public-access-block").
+					Return("us-east-1", nil)
+
+				repository.On("GetBucketPublicAccessBlock", "bucket-with-public-access-block", "us-east-1").
+					Return(&s3.PublicAccessBlockConfiguration{
+						BlockPublicAcls:   awssdk.Bool(true),
+						BlockPublicPolicy: awssdk.Bool(false),
+					}, nil)
+
+				repository.On("GetBucketPublicAccessBlock", "bucket-without-public-access-block", "us-east-1").
+					Return(nil, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+				assert.Equal(t, got[0].ResourceId(), "bucket-with-public-access-block")
+				assert.Equal(t, got[0].ResourceType(), resourceaws.AwsS3BucketPublicAccessBlockResourceType)
+				assert.Equal(t, got[0].Attributes(), &resource.Attributes{
+					"block_public_acls":       true,
+					"block_public_policy":     false,
+					"ignore_public_acls":      false,
+					"restrict_public_buckets": false,
+				})
+			},
+		},
+		{
+			test: "cannot list bucket",
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllBuckets").Return(nil, dummyError)
+			},
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsS3BucketPublicAccessBlockResourceType, resourceaws.AwsS3BucketResourceType),
+		},
+		{
+			test: "cannot list public access block",
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllBuckets").Return([]*s3.Bucket{{Name: awssdk.String("foobar")}}, nil)
+				repository.On("GetBucketLocation", "foobar").Return("us-east-1", nil)
+				repository.On("GetBucketPublicAccessBlock", "foobar", "us-east-1").Return(nil, dummyError)
+				alerter.On("SendAlert", "aws_s3_bucket_public_access_block.foobar", alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceScanningError(dummyError, resourceaws.AwsS3BucketPublicAccessBlockResourceType, "foobar"), alerts.EnumerationPhase)).Return()
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+	}
+
+	providerVersion := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockS3Repository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.S3Repository = fakeRepo
+
+			remoteLibrary.AddEnumerator(aws.NewS3BucketPublicAccessBlockEnumerator(
+				repo, factory,
+				tf.TerraformProviderConfig{DefaultAlias: "us-east-1"},
+				alerter,
+			))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, c.wantErr, err)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+		})
+	}
+}
+
 func TestS3BucketAnalytic(t *testing.T) {
 
 	tests := []struct {

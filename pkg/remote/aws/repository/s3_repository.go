@@ -16,6 +16,7 @@ type S3Repository interface {
 	ListAllBuckets() ([]*s3.Bucket, error)
 	GetBucketNotification(bucketName, region string) (*s3.NotificationConfiguration, error)
 	GetBucketPolicy(bucketName, region string) (*string, error)
+	GetBucketPublicAccessBlock(bucketName, region string) (*s3.PublicAccessBlockConfiguration, error)
 	ListBucketInventoryConfigurations(bucket *s3.Bucket, region string) ([]*s3.InventoryConfiguration, error)
 	ListBucketMetricsConfigurations(bucket *s3.Bucket, region string) ([]*s3.MetricsConfiguration, error)
 	ListBucketAnalyticsConfigurations(bucket *s3.Bucket, region string) ([]*s3.AnalyticsConfiguration, error)
@@ -77,6 +78,34 @@ func (s *s3Repository) GetBucketPolicy(bucketName, region string) (*string, erro
 	if result != nil && *result == "" {
 		result = nil
 	}
+
+	s.cache.Put(cacheKey, result)
+	return result, nil
+}
+
+func (s *s3Repository) GetBucketPublicAccessBlock(bucketName, region string) (*s3.PublicAccessBlockConfiguration, error) {
+	cacheKey := fmt.Sprintf("s3GetBucketPublicAccessBlock_%s_%s", bucketName, region)
+	if v := s.cache.Get(cacheKey); v != nil {
+		return v.(*s3.PublicAccessBlockConfiguration), nil
+	}
+	response, err := s.clientFactory.
+		GetS3Client(&awssdk.Config{Region: &region}).
+		GetPublicAccessBlock(&s3.GetPublicAccessBlockInput{Bucket: &bucketName})
+
+	if err != nil {
+		if awsErr, ok := err.(awserr.Error); ok {
+			if awsErr.Code() == "NoSuchPublicAccessBlockConfiguration" {
+				return nil, nil
+			}
+		}
+		return nil, errors.Wrapf(
+			err,
+			"Error listing bucket public access block %s",
+			bucketName,
+		)
+	}
+
+	result := response.PublicAccessBlockConfiguration
 
 	s.cache.Put(cacheKey, result)
 	return result, nil
