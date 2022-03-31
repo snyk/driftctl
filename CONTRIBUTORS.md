@@ -36,6 +36,9 @@ Thank you to all the people who have already contributed to driftctl.
     <td align="center"><a href="http://jaskula.pl"><img src="https://avatars.githubusercontent.com/u/5229238?v=4?s=80" width="80px;" alt=""/><br /><sub><b>AJ</b></sub></a><br /><a href="https://github.com/snyk/driftctl/commits?author=wakeful" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/muratcelep"><img src="https://avatars.githubusercontent.com/u/94377726?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Murat Celep</b></sub></a><br /><a href="https://github.com/snyk/driftctl/commits?author=muratcelep" title="Code">💻</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/almog27"><img src="https://avatars.githubusercontent.com/u/1466549?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Almog Ben David</b></sub></a><br /><a href="https://github.com/snyk/driftctl/commits?author=almog27" title="Code">💻</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->
