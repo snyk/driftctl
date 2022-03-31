@@ -200,6 +200,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"google_cloud_run_service":              {},
 	"google_compute_forwarding_rule":        {},
 	"google_compute_instance_group_manager": {},
+	"google_compute_global_forwarding_rule": {},
 
 	"azurerm_storage_account":   {},
 	"azurerm_storage_container": {},
