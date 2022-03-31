@@ -21,8 +21,8 @@ func TestAwsEbsEncryptionByDefaultReconciler_Execute(t *testing.T) {
 		expected           []*resource.Resource
 	}{
 		{
-			"test encryption by default is managed",
-			func(factory *terraform.MockResourceFactory) {
+			name: "test encryption by default is managed",
+			mocks: func(factory *terraform.MockResourceFactory) {
 				factory.On("CreateAbstractResource",
 					aws.AwsEbsEncryptionByDefaultResourceType,
 					"terraform-20220328091515068500000001",
@@ -38,7 +38,7 @@ func TestAwsEbsEncryptionByDefaultReconciler_Execute(t *testing.T) {
 					},
 				}).Once()
 			},
-			[]*resource.Resource{
+			remoteResources: []*resource.Resource{
 				{
 					Id:    "bucket-1",
 					Type:  aws.AwsS3BucketResourceType,
@@ -52,7 +52,7 @@ func TestAwsEbsEncryptionByDefaultReconciler_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]*resource.Resource{
+			resourcesFromState: []*resource.Resource{
 				{
 					Id:    "bucket-1",
 					Type:  aws.AwsS3BucketResourceType,
@@ -67,7 +67,7 @@ func TestAwsEbsEncryptionByDefaultReconciler_Execute(t *testing.T) {
 					},
 				},
 			},
-			[]*resource.Resource{
+			expected: []*resource.Resource{
 				{
 					Id:    "bucket-1",
 					Type:  aws.AwsS3BucketResourceType,

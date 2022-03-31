@@ -118,7 +118,6 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddDetailsFetcher(aws.AwsSecurityGroupRuleResourceType, common.NewGenericDetailsFetcher(aws.AwsSecurityGroupRuleResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewLaunchTemplateEnumerator(ec2repository, factory))
 	remoteLibrary.AddEnumerator(NewEC2EbsEncryptionByDefaultEnumerator(ec2repository, factory))
-	remoteLibrary.AddDetailsFetcher(aws.AwsEbsEncryptionByDefaultResourceType, common.NewGenericDetailsFetcher(aws.AwsEbsEncryptionByDefaultResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewKMSKeyEnumerator(kmsRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsKmsKeyResourceType, common.NewGenericDetailsFetcher(aws.AwsKmsKeyResourceType, provider, deserializer))
