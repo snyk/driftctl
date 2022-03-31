@@ -83,6 +83,77 @@ func TestAwsEbsEncryptionByDefaultReconciler_Execute(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:  "test encryption by default is enabled and unmanaged",
+			mocks: func(factory *terraform.MockResourceFactory) {},
+			remoteResources: []*resource.Resource{
+				{
+					Id:    "bucket-1",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:   "test-encryption",
+					Type: aws.AwsEbsEncryptionByDefaultResourceType,
+					Attrs: &resource.Attributes{
+						"enabled": true,
+					},
+				},
+			},
+			resourcesFromState: []*resource.Resource{
+				{
+					Id:    "bucket-1",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
+				},
+			},
+			expected: []*resource.Resource{
+				{
+					Id:    "bucket-1",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:   "test-encryption",
+					Type: aws.AwsEbsEncryptionByDefaultResourceType,
+					Attrs: &resource.Attributes{
+						"enabled": true,
+					},
+				},
+			},
+		},
+		{
+			name:  "test encryption by default is disabled and unmanaged",
+			mocks: func(factory *terraform.MockResourceFactory) {},
+			remoteResources: []*resource.Resource{
+				{
+					Id:    "bucket-1",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:   "test-encryption",
+					Type: aws.AwsEbsEncryptionByDefaultResourceType,
+					Attrs: &resource.Attributes{
+						"enabled": false,
+					},
+				},
+			},
+			resourcesFromState: []*resource.Resource{
+				{
+					Id:    "bucket-1",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
+				},
+			},
+			expected: []*resource.Resource{
+				{
+					Id:    "bucket-1",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

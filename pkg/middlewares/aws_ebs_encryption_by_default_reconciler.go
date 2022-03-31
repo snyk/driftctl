@@ -22,6 +22,7 @@ func (m AwsEbsEncryptionByDefaultReconciler) Execute(remoteResources, resourcesF
 	newStateResources := make([]*resource.Resource, 0)
 	newRemoteResources := make([]*resource.Resource, 0)
 
+	var found bool
 	var defaultEbsEncryption *resource.Resource
 
 	for _, res := range *remoteResources {
@@ -51,6 +52,11 @@ func (m AwsEbsEncryptionByDefaultReconciler) Execute(remoteResources, resourcesF
 				"enabled": *defaultEbsEncryption.Attributes().GetBool("enabled"),
 			},
 		))
+		found = true
+	}
+
+	if defaultEbsEncryption != nil && !found && *defaultEbsEncryption.Attributes().GetBool("enabled") {
+		newRemoteResources = append(newRemoteResources, defaultEbsEncryption)
 	}
 
 	*resourcesFromState = newStateResources
