@@ -65,7 +65,7 @@ func (r *iamRepository) ListAllUsers() ([]*iam.User, error) {
 
 	cacheKey := "iamListAllUsers"
 	v := r.cache.GetAndLock(cacheKey)
-	r.cache.Unlock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
 	if v != nil {
 		return v.([]*iam.User), nil
 	}
@@ -108,7 +108,7 @@ func (r *iamRepository) ListAllPolicies() ([]*iam.Policy, error) {
 func (r *iamRepository) ListAllRoles() ([]*iam.Role, error) {
 	cacheKey := "iamListAllRoles"
 	v := r.cache.GetAndLock(cacheKey)
-	r.cache.Unlock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
 	if v != nil {
 		return v.([]*iam.Role), nil
 	}
