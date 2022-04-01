@@ -915,3 +915,186 @@ func Test_IAMRepository_ListAllUserPolicies(t *testing.T) {
 		})
 	}
 }
+
+func Test_IAMRepository_ListAllGroups(t *testing.T) {
+	tests := []struct {
+		name    string
+		mocks   func(client *awstest.MockFakeIAM)
+		want    []*iam.Group
+		wantErr error
+	}{
+		{
+			name: "List groups with multiple pages",
+			mocks: func(client *awstest.MockFakeIAM) {
+
+				client.On("ListGroupsPages",
+					&iam.ListGroupsInput{},
+					mock.MatchedBy(func(callback func(res *iam.ListGroupsOutput, lastPage bool) bool) bool {
+						callback(&iam.ListGroupsOutput{Groups: []*iam.Group{
+							{
+								GroupName: aws.String("group1"),
+							},
+							{
+								GroupName: aws.String("group2"),
+							},
+						}}, false)
+						callback(&iam.ListGroupsOutput{Groups: []*iam.Group{
+							{
+								GroupName: aws.String("group3"),
+							},
+							{
+								GroupName: aws.String("group4"),
+							},
+						}}, true)
+						return true
+					})).Return(nil).Once()
+			},
+			want: []*iam.Group{
+				{
+					GroupName: aws.String("group1"),
+				},
+				{
+					GroupName: aws.String("group2"),
+				},
+				{
+					GroupName: aws.String("group3"),
+				},
+				{
+					GroupName: aws.String("group4"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(1)
+			client := &awstest.MockFakeIAM{}
+			tt.mocks(client)
+			r := &iamRepository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.ListAllGroups()
+			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllGroups()
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				assert.IsType(t, []*iam.Group{}, store.Get("iamListAllGroups"))
+			}
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %v -> %v", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}
+
+func Test_IAMRepository_ListAllGroupPolicies(t *testing.T) {
+	tests := []struct {
+		name    string
+		groups  []*iam.Group
+		mocks   func(client *awstest.MockFakeIAM)
+		want    []string
+		wantErr error
+	}{
+		{
+			name: "List only group policies with multiple pages",
+			groups: []*iam.Group{
+				{
+					GroupName: aws.String("group1"),
+				},
+				{
+					GroupName: aws.String("group2"),
+				},
+			},
+			mocks: func(client *awstest.MockFakeIAM) {
+				firstMockCalled := false
+				client.On("ListGroupPoliciesPages",
+					&iam.ListGroupPoliciesInput{
+						GroupName: aws.String("group1"),
+					},
+					mock.MatchedBy(func(callback func(res *iam.ListGroupPoliciesOutput, lastPage bool) bool) bool {
+						if firstMockCalled {
+							return false
+						}
+						callback(&iam.ListGroupPoliciesOutput{PolicyNames: []*string{
+							aws.String("policy1"),
+							aws.String("policy2"),
+							aws.String("policy3"),
+						}}, false)
+						callback(&iam.ListGroupPoliciesOutput{PolicyNames: []*string{
+							aws.String("policy4"),
+						}}, true)
+						firstMockCalled = true
+						return true
+					})).Return(nil).Once()
+
+				client.On("ListGroupPoliciesPages",
+					&iam.ListGroupPoliciesInput{
+						GroupName: aws.String("group2"),
+					},
+					mock.MatchedBy(func(callback func(res *iam.ListGroupPoliciesOutput, lastPage bool) bool) bool {
+						callback(&iam.ListGroupPoliciesOutput{PolicyNames: []*string{
+							aws.String("policy2"),
+							aws.String("policy22"),
+							aws.String("policy23"),
+						}}, false)
+						callback(&iam.ListGroupPoliciesOutput{PolicyNames: []*string{
+							aws.String("policy24"),
+						}}, true)
+						return true
+					})).Return(nil).Once()
+			},
+			want: []string{
+				*aws.String("group1:policy1"),
+				*aws.String("group1:policy2"),
+				*aws.String("group1:policy3"),
+				*aws.String("group1:policy4"),
+				*aws.String("group2:policy2"),
+				*aws.String("group2:policy22"),
+				*aws.String("group2:policy23"),
+				*aws.String("group2:policy24"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := cache.New(2)
+			client := &awstest.MockFakeIAM{}
+			tt.mocks(client)
+			r := &iamRepository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.ListAllGroupPolicies(tt.groups)
+			assert.Equal(t, tt.wantErr, err)
+
+			if err == nil {
+				// Check that results were cached
+				cachedData, err := r.ListAllGroupPolicies(tt.groups)
+				assert.NoError(t, err)
+				assert.Equal(t, got, cachedData)
+				for _, group := range tt.groups {
+					assert.IsType(t, []string{}, store.Get(fmt.Sprintf("iamListAllGroupPolicies_group_%s", *group.GroupName)))
+				}
+			}
+
+			changelog, err := diff.Diff(got, tt.want)
+			assert.Nil(t, err)
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s: %v -> %v", strings.Join(change.Path, "."), change.From, change.To)
+				}
+				t.Fail()
+			}
+		})
+	}
+}

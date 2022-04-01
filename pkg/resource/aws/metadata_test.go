@@ -70,6 +70,7 @@ func TestAWS_Metadata_Flags(t *testing.T) {
 		AwsIamUserResourceType:                         {resource.FlagDeepMode},
 		AwsIamUserPolicyResourceType:                   {resource.FlagDeepMode},
 		AwsIamUserPolicyAttachmentResourceType:         {resource.FlagDeepMode},
+		AwsIamGroupPolicyResourceType:                  {},
 		AwsInstanceResourceType:                        {resource.FlagDeepMode},
 		AwsInternetGatewayResourceType:                 {resource.FlagDeepMode},
 		AwsKeyPairResourceType:                         {resource.FlagDeepMode},

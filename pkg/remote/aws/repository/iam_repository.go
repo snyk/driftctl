@@ -19,6 +19,8 @@ type IAMRepository interface {
 	ListAllRolePolicies([]*iam.Role) ([]RolePolicy, error)
 	ListAllUserPolicyAttachments([]*iam.User) ([]*AttachedUserPolicy, error)
 	ListAllUserPolicies([]*iam.User) ([]string, error)
+	ListAllGroups() ([]*iam.Group, error)
+	ListAllGroupPolicies([]*iam.Group) ([]string, error)
 }
 
 type iamRepository struct {
@@ -250,6 +252,60 @@ func (r *iamRepository) ListAllUserPolicies(users []*iam.User) ([]string, error)
 
 		r.cache.Put(cacheKey, userResources)
 		resources = append(resources, userResources...)
+	}
+
+	return resources, nil
+}
+
+func (r *iamRepository) ListAllGroups() ([]*iam.Group, error) {
+
+	cacheKey := "iamListAllGroups"
+	v := r.cache.GetAndLock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
+
+	if v != nil {
+		return v.([]*iam.Group), nil
+	}
+
+	var resources []*iam.Group
+	input := &iam.ListGroupsInput{}
+	err := r.client.ListGroupsPages(input, func(res *iam.ListGroupsOutput, lastPage bool) bool {
+		resources = append(resources, res.Groups...)
+		return !lastPage
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	r.cache.Put(cacheKey, resources)
+	return resources, nil
+}
+
+func (r *iamRepository) ListAllGroupPolicies(groups []*iam.Group) ([]string, error) {
+	var resources []string
+	for _, group := range groups {
+		cacheKey := fmt.Sprintf("iamListAllGroupPolicies_group_%s", *group.GroupName)
+		if v := r.cache.Get(cacheKey); v != nil {
+			resources = append(resources, v.([]string)...)
+			continue
+		}
+
+		groupResources := make([]string, 0)
+		input := &iam.ListGroupPoliciesInput{
+			GroupName: group.GroupName,
+		}
+		err := r.client.ListGroupPoliciesPages(input, func(res *iam.ListGroupPoliciesOutput, lastPage bool) bool {
+			for _, polName := range res.PolicyNames {
+				groupResources = append(groupResources, fmt.Sprintf("%s:%s", *input.GroupName, *polName))
+			}
+			return !lastPage
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		r.cache.Put(cacheKey, groupResources)
+		resources = append(resources, groupResources...)
 	}
 
 	return resources, nil
