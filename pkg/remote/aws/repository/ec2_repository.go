@@ -321,10 +321,10 @@ func (r *ec2Repository) ListAllVPCs() ([]*ec2.Vpc, []*ec2.Vpc, error) {
 func (r *ec2Repository) ListAllSecurityGroups() ([]*ec2.SecurityGroup, []*ec2.SecurityGroup, error) {
 	cacheKey := "ec2ListAllSecurityGroups"
 	cacheSecurityGroups := r.cache.GetAndLock(cacheKey)
-	r.cache.Unlock(cacheKey)
+	defer r.cache.Unlock(cacheKey)
 	defaultCacheKey := "ec2ListAllDefaultSecurityGroups"
 	cacheDefaultSecurityGroups := r.cache.GetAndLock(defaultCacheKey)
-	r.cache.Unlock(defaultCacheKey)
+	defer r.cache.Unlock(defaultCacheKey)
 	if cacheSecurityGroups != nil && cacheDefaultSecurityGroups != nil {
 		return cacheSecurityGroups.([]*ec2.SecurityGroup), cacheDefaultSecurityGroups.([]*ec2.SecurityGroup), nil
 	}
