@@ -1,0 +1,12 @@
+[
+ {
+  "Id": "developers:my_developer_policy",
+  "Type": "aws_iam_group_policy",
+  "Attrs": {
+   "group": "developers",
+   "id": "developers:my_developer_policy",
+   "name": "my_developer_policy",
+   "policy": "{\"Statement\":[{\"Action\":[\"ec2:Describe*\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}"
+  }
+ }
+]

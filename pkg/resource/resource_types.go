@@ -52,6 +52,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_iam_user_policy_attachment": {children: []ResourceType{
 		"aws_iam_policy_attachment",
 	}},
+	"aws_iam_group_policy": {},
 	"aws_instance": {children: []ResourceType{
 		"aws_ebs_volume",
 	}},
