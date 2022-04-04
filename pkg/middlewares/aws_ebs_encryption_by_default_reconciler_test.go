@@ -14,11 +14,12 @@ import (
 
 func TestAwsEbsEncryptionByDefaultReconciler_Execute(t *testing.T) {
 	tests := []struct {
-		name               string
-		mocks              func(*terraform.MockResourceFactory)
-		remoteResources    []*resource.Resource
-		resourcesFromState []*resource.Resource
-		expected           []*resource.Resource
+		name                    string
+		mocks                   func(*terraform.MockResourceFactory)
+		remoteResources         []*resource.Resource
+		resourcesFromState      []*resource.Resource
+		expectedRemoteResources []*resource.Resource
+		expectedStateResources  []*resource.Resource
 	}{
 		{
 			name: "test encryption by default is managed",
@@ -67,7 +68,22 @@ func TestAwsEbsEncryptionByDefaultReconciler_Execute(t *testing.T) {
 					},
 				},
 			},
-			expected: []*resource.Resource{
+			expectedRemoteResources: []*resource.Resource{
+				{
+					Id:    "bucket-1",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:   "terraform-20220328091515068500000001",
+					Type: aws.AwsEbsEncryptionByDefaultResourceType,
+					Attrs: &resource.Attributes{
+						"id":      "terraform-20220328091515068500000001",
+						"enabled": true,
+					},
+				},
+			},
+			expectedStateResources: []*resource.Resource{
 				{
 					Id:    "bucket-1",
 					Type:  aws.AwsS3BucketResourceType,
@@ -107,7 +123,7 @@ func TestAwsEbsEncryptionByDefaultReconciler_Execute(t *testing.T) {
 					Attrs: &resource.Attributes{},
 				},
 			},
-			expected: []*resource.Resource{
+			expectedRemoteResources: []*resource.Resource{
 				{
 					Id:    "bucket-1",
 					Type:  aws.AwsS3BucketResourceType,
@@ -119,6 +135,13 @@ func TestAwsEbsEncryptionByDefaultReconciler_Execute(t *testing.T) {
 					Attrs: &resource.Attributes{
 						"enabled": true,
 					},
+				},
+			},
+			expectedStateResources: []*resource.Resource{
+				{
+					Id:    "bucket-1",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
 				},
 			},
 		},
@@ -146,11 +169,74 @@ func TestAwsEbsEncryptionByDefaultReconciler_Execute(t *testing.T) {
 					Attrs: &resource.Attributes{},
 				},
 			},
-			expected: []*resource.Resource{
+			expectedRemoteResources: []*resource.Resource{
 				{
 					Id:    "bucket-1",
 					Type:  aws.AwsS3BucketResourceType,
 					Attrs: &resource.Attributes{},
+				},
+			},
+			expectedStateResources: []*resource.Resource{
+				{
+					Id:    "bucket-1",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
+				},
+			},
+		},
+		{
+			name:  "test encryption by default doesn't exist",
+			mocks: func(factory *terraform.MockResourceFactory) {},
+			remoteResources: []*resource.Resource{
+				{
+					Id:    "bucket-1",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
+				},
+			},
+			resourcesFromState: []*resource.Resource{
+				{
+					Id:    "bucket-1",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "bucket-2",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:   "test-encryption",
+					Type: aws.AwsEbsEncryptionByDefaultResourceType,
+					Attrs: &resource.Attributes{
+						"enabled": true,
+					},
+				},
+			},
+			expectedRemoteResources: []*resource.Resource{
+				{
+					Id:    "bucket-1",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
+				},
+			},
+			expectedStateResources: []*resource.Resource{
+				{
+					Id:    "bucket-1",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:    "bucket-2",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
+				},
+				{
+					Id:   "test-encryption",
+					Type: aws.AwsEbsEncryptionByDefaultResourceType,
+					Attrs: &resource.Attributes{
+						"enabled": true,
+					},
 				},
 			},
 		},
@@ -168,7 +254,7 @@ func TestAwsEbsEncryptionByDefaultReconciler_Execute(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			changelog, err := diff.Diff(tt.remoteResources, tt.expected)
+			changelog, err := diff.Diff(tt.remoteResources, tt.expectedRemoteResources)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -178,6 +264,15 @@ func TestAwsEbsEncryptionByDefaultReconciler_Execute(t *testing.T) {
 				}
 			}
 
+			changelog, err = diff.Diff(tt.resourcesFromState, tt.expectedStateResources)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(changelog) > 0 {
+				for _, change := range changelog {
+					t.Errorf("%s got = %v, want %v", strings.Join(change.Path, "."), awsutil.Prettify(change.From), awsutil.Prettify(change.To))
+				}
+			}
 		})
 	}
 }

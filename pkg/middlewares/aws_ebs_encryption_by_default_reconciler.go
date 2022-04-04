@@ -35,6 +35,11 @@ func (m AwsEbsEncryptionByDefaultReconciler) Execute(remoteResources, resourcesF
 		break
 	}
 
+	// We can encounter this case when we don't have permission to get this setting from AWS.
+	if defaultEbsEncryption == nil {
+		return nil
+	}
+
 	for _, res := range *resourcesFromState {
 		newStateResources = append(newStateResources, res)
 
