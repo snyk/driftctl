@@ -117,6 +117,7 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewVPCSecurityGroupRuleEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsSecurityGroupRuleResourceType, common.NewGenericDetailsFetcher(aws.AwsSecurityGroupRuleResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewLaunchTemplateEnumerator(ec2repository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsLaunchTemplateResourceType, common.NewGenericDetailsFetcher(aws.AwsLaunchTemplateResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewEC2EbsEncryptionByDefaultEnumerator(ec2repository, factory))
 
 	remoteLibrary.AddEnumerator(NewKMSKeyEnumerator(kmsRepository, factory))
@@ -226,7 +227,6 @@ func Init(version string, alerter *alerter.Alerter,
 
 	remoteLibrary.AddEnumerator(NewAppAutoscalingScheduledActionEnumerator(appAutoScalingRepository, factory))
 
-	remoteLibrary.AddDetailsFetcher(aws.AwsLaunchTemplateResourceType, common.NewGenericDetailsFetcher(aws.AwsLaunchTemplateResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewLaunchConfigurationEnumerator(autoscalingRepository, factory))
 
 	err = resourceSchemaRepository.Init(terraform.AWS, provider.Version(), provider.Schema())
