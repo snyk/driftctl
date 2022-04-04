@@ -1355,3 +1355,75 @@ func Test_ec2Repository_DescribeLaunchTemplates(t *testing.T) {
 		})
 	}
 }
+
+func Test_ec2Repository_IsEbsEncryptionEnabledByDefault(t *testing.T) {
+
+	testErr := errors.New("test")
+
+	tests := []struct {
+		name    string
+		mocks   func(client *awstest.MockFakeEC2, store *cache.MockCache)
+		want    bool
+		wantErr error
+	}{
+		{
+			name: "test that encryption enabled by default",
+			mocks: func(client *awstest.MockFakeEC2, store *cache.MockCache) {
+				store.On("Get", "ec2IsEbsEncryptionEnabledByDefault").
+					Return(nil).
+					Once()
+
+				client.On("GetEbsEncryptionByDefault",
+					&ec2.GetEbsEncryptionByDefaultInput{},
+				).Return(&ec2.GetEbsEncryptionByDefaultOutput{
+					EbsEncryptionByDefault: aws.Bool(true),
+				}, nil).Once()
+
+				store.On("Put", "ec2IsEbsEncryptionEnabledByDefault", true).
+					Return(false).
+					Once()
+			},
+			want: true,
+		},
+		{
+			name: "test that encryption enabled by default (cached)",
+			mocks: func(client *awstest.MockFakeEC2, store *cache.MockCache) {
+				store.On("Get", "ec2IsEbsEncryptionEnabledByDefault").
+					Return(false).
+					Once()
+			},
+			want: false,
+		},
+		{
+			name: "error while getting default encryption value",
+			mocks: func(client *awstest.MockFakeEC2, store *cache.MockCache) {
+				store.On("Get", "ec2IsEbsEncryptionEnabledByDefault").
+					Return(nil).
+					Once()
+
+				client.On("GetEbsEncryptionByDefault",
+					&ec2.GetEbsEncryptionByDefaultInput{},
+				).Return(nil, testErr).Once()
+			},
+			wantErr: testErr,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := &cache.MockCache{}
+			client := &awstest.MockFakeEC2{}
+			tt.mocks(client, store)
+			r := &ec2Repository{
+				client: client,
+				cache:  store,
+			}
+			got, err := r.IsEbsEncryptionEnabledByDefault()
+
+			assert.Equal(t, tt.wantErr, err)
+			assert.Equal(t, tt.want, got)
+
+			client.AssertExpectations(t)
+			store.AssertExpectations(t)
+		})
+	}
+}

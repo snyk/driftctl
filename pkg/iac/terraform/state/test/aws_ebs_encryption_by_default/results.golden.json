@@ -1,0 +1,10 @@
+[
+ {
+  "Id": "terraform-20220328091515068500000001",
+  "Type": "aws_ebs_encryption_by_default",
+  "Attrs": {
+   "enabled": true,
+   "id": "terraform-20220328091515068500000001"
+  }
+ }
+]
