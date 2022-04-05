@@ -150,16 +150,16 @@ func TestAwsEbsEncryptionByDefaultReconciler_Execute(t *testing.T) {
 			mocks: func(factory *terraform.MockResourceFactory) {},
 			remoteResources: []*resource.Resource{
 				{
-					Id:    "bucket-1",
-					Type:  aws.AwsS3BucketResourceType,
-					Attrs: &resource.Attributes{},
-				},
-				{
 					Id:   "test-encryption",
 					Type: aws.AwsEbsEncryptionByDefaultResourceType,
 					Attrs: &resource.Attributes{
 						"enabled": false,
 					},
+				},
+				{
+					Id:    "bucket-1",
+					Type:  aws.AwsS3BucketResourceType,
+					Attrs: &resource.Attributes{},
 				},
 			},
 			resourcesFromState: []*resource.Resource{
