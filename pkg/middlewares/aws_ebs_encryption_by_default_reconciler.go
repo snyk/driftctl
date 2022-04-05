@@ -32,7 +32,6 @@ func (m AwsEbsEncryptionByDefaultReconciler) Execute(remoteResources, resourcesF
 			continue
 		}
 		defaultEbsEncryption = res
-		break
 	}
 
 	// We can encounter this case when we don't have permission to get this setting from AWS.
