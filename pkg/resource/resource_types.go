@@ -21,9 +21,13 @@ var supportedTypes = map[string]ResourceTypeMeta{
 		// VPC are used by aws_internet_gateway to determine if internet gateway is the default one in middleware
 		"aws_internet_gateway",
 	}},
-	"aws_dynamodb_table":            {},
-	"aws_ebs_snapshot":              {},
-	"aws_ebs_volume":                {},
+	"aws_dynamodb_table": {},
+	"aws_ebs_snapshot":   {},
+	"aws_ebs_volume":     {},
+	"aws_alb": {children: []ResourceType{
+		"aws_lb",
+	}},
+	"aws_lb":                        {},
 	"aws_ebs_encryption_by_default": {},
 	"aws_ecr_repository":            {},
 	"aws_eip": {children: []ResourceType{

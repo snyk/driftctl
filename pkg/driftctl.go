@@ -124,6 +124,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		middlewares.NewAwsConsoleApiGatewayGatewayResponse(),
 		middlewares.NewAwsApiGatewayDomainNamesReconciler(),
 		middlewares.NewAwsEbsEncryptionByDefaultReconciler(d.resourceFactory),
+		middlewares.NewAwsALBTransformer(d.resourceFactory),
 
 		middlewares.NewGoogleIAMBindingTransformer(d.resourceFactory),
 		middlewares.NewGoogleIAMPolicyTransformer(d.resourceFactory),
