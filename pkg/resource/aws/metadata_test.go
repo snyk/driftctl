@@ -56,6 +56,7 @@ func TestAWS_Metadata_Flags(t *testing.T) {
 		AwsDefaultSubnetResourceType:                   {resource.FlagDeepMode},
 		AwsDefaultVpcResourceType:                      {resource.FlagDeepMode},
 		AwsDynamodbTableResourceType:                   {resource.FlagDeepMode},
+		AwsEbsEncryptionByDefaultResourceType:          {resource.FlagDeepMode},
 		AwsEbsSnapshotResourceType:                     {resource.FlagDeepMode},
 		AwsEbsVolumeResourceType:                       {resource.FlagDeepMode},
 		AwsEcrRepositoryResourceType:                   {resource.FlagDeepMode},
