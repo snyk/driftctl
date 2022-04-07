@@ -62,6 +62,7 @@ func TestAWS_Metadata_Flags(t *testing.T) {
 		AwsEcrRepositoryResourceType:                   {resource.FlagDeepMode},
 		AwsEipResourceType:                             {resource.FlagDeepMode},
 		AwsEipAssociationResourceType:                  {resource.FlagDeepMode},
+		AwsElastiCacheClusterResourceType:              {},
 		AwsIamAccessKeyResourceType:                    {resource.FlagDeepMode},
 		AwsIamPolicyResourceType:                       {resource.FlagDeepMode},
 		AwsIamPolicyAttachmentResourceType:             {resource.FlagDeepMode},

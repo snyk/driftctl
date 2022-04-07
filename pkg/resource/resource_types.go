@@ -164,6 +164,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_launch_template":                   {},
 	"aws_launch_configuration":              {},
 	"aws_elb":                               {},
+	"aws_elasticache_cluster":               {},
 
 	"github_branch_protection": {},
 	"github_membership":        {},
