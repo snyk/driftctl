@@ -106,6 +106,8 @@ func TestAWS_Metadata_Flags(t *testing.T) {
 		AwsNetworkACLRuleResourceType:                  {resource.FlagDeepMode},
 		AwsLaunchTemplateResourceType:                  {resource.FlagDeepMode},
 		AwsLaunchConfigurationResourceType:             {},
+		AwsLoadBalancerResourceType:                    {},
+		AwsApplicationLoadBalancerResourceType:         {},
 	}
 
 	schemaRepository := testresource.InitFakeSchemaRepository(tf.AWS, "3.19.0")

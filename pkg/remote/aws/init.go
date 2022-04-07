@@ -38,6 +38,7 @@ func Init(version string, alerter *alerter.Alerter,
 
 	s3Repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session), repositoryCache)
 	ec2repository := repository.NewEC2Repository(provider.session, repositoryCache)
+	elbv2Repository := repository.NewELBV2Repository(provider.session, repositoryCache)
 	route53repository := repository.NewRoute53Repository(provider.session, repositoryCache)
 	lambdaRepository := repository.NewLambdaRepository(provider.session, repositoryCache)
 	rdsRepository := repository.NewRDSRepository(provider.session, repositoryCache)
@@ -229,6 +230,8 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewAppAutoscalingScheduledActionEnumerator(appAutoScalingRepository, factory))
 
 	remoteLibrary.AddEnumerator(NewLaunchConfigurationEnumerator(autoscalingRepository, factory))
+
+	remoteLibrary.AddEnumerator(NewLoadBalancerEnumerator(elbv2Repository, factory))
 
 	err = resourceSchemaRepository.Init(terraform.AWS, provider.Version(), provider.Schema())
 	if err != nil {
