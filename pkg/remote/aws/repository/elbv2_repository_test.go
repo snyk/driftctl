@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_ELBv2Repository_ListAllLoadBalancers(t *testing.T) {
+func Test_ELBV2Repository_ListAllLoadBalancers(t *testing.T) {
 	dummyError := errors.New("dummy error")
 
 	tests := []struct {
