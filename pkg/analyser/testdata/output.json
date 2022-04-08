@@ -76,5 +76,6 @@
 	},
 	"provider_name": "AWS",
 	"provider_version": "2.18.5",
-	"scan_duration": 241
+	"scan_duration": 241,
+	"date": "2022-04-08T10:35:00Z"
 }

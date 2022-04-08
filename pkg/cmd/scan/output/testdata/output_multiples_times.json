@@ -19,5 +19,6 @@
 	"coverage": 0,
 	"alerts": null,
 	"provider_name": "",
-	"provider_version": ""
+	"provider_version": "",
+	"date": "0001-01-01T00:00:00Z"
 }

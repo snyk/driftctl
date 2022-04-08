@@ -1272,6 +1272,7 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 	goldenFile := "./testdata/output.json"
 	analysis := Analysis{
 		Duration: 241 * time.Second,
+		Date:     time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC),
 	}
 	analysis.SetIaCSourceCount(1)
 	analysis.AddManaged(
@@ -1421,6 +1422,7 @@ func TestAnalysis_UnmarshalJSON(t *testing.T) {
 		},
 		ProviderName:    "AWS",
 		ProviderVersion: "2.18.5",
+		Date:            time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC),
 	}
 
 	got := Analysis{}
