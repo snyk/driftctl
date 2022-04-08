@@ -116,28 +116,33 @@ func TestAwsS3BucketPublicAccessBlockReconciler(t *testing.T) {
 						"block_public_acls": false,
 					},
 				},
-			},
-			resourcesFromState: []*resource.Resource{
 				{
-					Id:   "should_be_skipped_because_default",
-					Type: aws.AwsS3BucketPublicAccessBlockResourceType,
-					Attrs: &resource.Attributes{
-						"block_public_acls":       false,
-						"block_public_policy":     false,
-						"ignore_public_acls":      false,
-						"restrict_public_buckets": false,
-					},
-				},
-				{
-					Id:   "should_be_skipped_because_nil_values",
+					Id:   "should_not_be_skipped_because_exist_in_iac",
 					Type: aws.AwsS3BucketPublicAccessBlockResourceType,
 					Attrs: &resource.Attributes{
 						"block_public_acls": false,
 					},
 				},
 			},
-			expected: []*resource.Resource{},
-			wantErr:  nil,
+			resourcesFromState: []*resource.Resource{
+				{
+					Id:   "should_not_be_skipped_because_exist_in_iac",
+					Type: aws.AwsS3BucketPublicAccessBlockResourceType,
+					Attrs: &resource.Attributes{
+						"block_public_acls": false,
+					},
+				},
+			},
+			expected: []*resource.Resource{
+				{
+					Id:   "should_not_be_skipped_because_exist_in_iac",
+					Type: aws.AwsS3BucketPublicAccessBlockResourceType,
+					Attrs: &resource.Attributes{
+						"block_public_acls": false,
+					},
+				},
+			},
+			wantErr: nil,
 		},
 	}
 
