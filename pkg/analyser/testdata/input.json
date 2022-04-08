@@ -70,5 +70,6 @@
     ]
   },
   "provider_name": "AWS",
-  "provider_version": "2.18.5"
+  "provider_version": "2.18.5",
+  "date": "2022-04-08T10:35:00Z"
 }

@@ -23,6 +23,7 @@ func fakeAnalysis(opts analyser.AnalyzerOptions) *analyser.Analysis {
 		opts = analyser.AnalyzerOptions{Deep: true}
 	}
 	a := analyser.NewAnalysis(opts)
+	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	a.SetIaCSourceCount(3)
 	a.Duration = 12 * time.Second
 	a.AddUnmanaged(
@@ -118,6 +119,7 @@ func fakeAnalysis(opts analyser.AnalyzerOptions) *analyser.Analysis {
 
 func fakeAnalysisWithAlerts() *analyser.Analysis {
 	a := fakeAnalysis(analyser.AnalyzerOptions{})
+	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
 			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("dummy error"), "aws_vpc", "aws_vpc"), alerts.EnumerationPhase),
@@ -131,6 +133,7 @@ func fakeAnalysisWithAlerts() *analyser.Analysis {
 
 func fakeAnalysisNoDrift() *analyser.Analysis {
 	a := analyser.Analysis{}
+	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	for i := 0; i < 5; i++ {
 		a.AddManaged(&resource.Resource{
 			Id:   "managed-id-" + fmt.Sprintf("%d", i),
@@ -144,6 +147,7 @@ func fakeAnalysisNoDrift() *analyser.Analysis {
 
 func fakeAnalysisWithJsonFields() *analyser.Analysis {
 	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
+	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	a.AddManaged(
 		&resource.Resource{
 			Id:   "diff-id-1",
@@ -205,6 +209,7 @@ func fakeAnalysisWithJsonFields() *analyser.Analysis {
 
 func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
+	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	a.AddDeleted(
 		&resource.Resource{
 			Id:    "dfjkgnbsgj",
@@ -238,6 +243,7 @@ func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 
 func fakeAnalysisWithStringerResources() *analyser.Analysis {
 	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
+	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	schema := &resource.Schema{HumanReadableAttributesFunc: func(res *resource.Resource) map[string]string {
 		return map[string]string{
 			"Name": (*res.Attrs)["name"].(string),
@@ -307,6 +313,7 @@ func fakeAnalysisWithStringerResources() *analyser.Analysis {
 
 func fakeAnalysisWithComputedFields() *analyser.Analysis {
 	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
+	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	a.AddManaged(
 		&resource.Resource{
 			Id:   "diff-id-1",
@@ -389,6 +396,7 @@ func fakeAnalysisWithComputedFields() *analyser.Analysis {
 
 func fakeAnalysisWithAWSEnumerationError() *analyser.Analysis {
 	a := analyser.Analysis{}
+	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
 			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("dummy error"), "aws_vpc", "aws_vpc"), alerts.EnumerationPhase),
@@ -403,6 +411,7 @@ func fakeAnalysisWithAWSEnumerationError() *analyser.Analysis {
 
 func fakeAnalysisWithGithubEnumerationError() *analyser.Analysis {
 	a := analyser.Analysis{}
+	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
 			alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("dummy error"), "github_team", "github_team"), alerts.EnumerationPhase),
@@ -416,6 +425,7 @@ func fakeAnalysisWithGithubEnumerationError() *analyser.Analysis {
 
 func fakeAnalysisForJSONPlan() *analyser.Analysis {
 	a := analyser.Analysis{}
+	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	a.AddUnmanaged(
 		&resource.Resource{
 			Id:   "unmanaged-id-1",
@@ -455,6 +465,7 @@ func fakeAnalysisForJSONPlan() *analyser.Analysis {
 
 func fakeAnalysisWithoutDeep() *analyser.Analysis {
 	a := analyser.Analysis{}
+	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	a.AddUnmanaged(
 		&resource.Resource{
 			Id:   "unmanaged-id-1",
@@ -471,6 +482,7 @@ func fakeAnalysisWithoutDeep() *analyser.Analysis {
 
 func fakeAnalysisWithOnlyManagedFlag() *analyser.Analysis {
 	a := analyser.Analysis{}
+	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	a.SetOptions(analyser.AnalyzerOptions{
 		OnlyManaged: true,
 		Deep:        true,
@@ -522,6 +534,7 @@ func fakeAnalysisWithOnlyManagedFlag() *analyser.Analysis {
 
 func fakeAnalysisWithOnlyUnmanagedFlag() *analyser.Analysis {
 	a := analyser.Analysis{}
+	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	a.SetOptions(analyser.AnalyzerOptions{
 		OnlyUnmanaged: true,
 	})
