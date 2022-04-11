@@ -24,10 +24,7 @@ func NewELBRepository(session *session.Session, c cache.Cache) *elbRepository {
 }
 
 func (r *elbRepository) ListAllLoadBalancers() ([]*elb.LoadBalancerDescription, error) {
-	cacheKey := "elbListAllLoadBalancers"
-	v := r.cache.GetAndLock(cacheKey)
-	defer r.cache.Unlock(cacheKey)
-	if v != nil {
+	if v := r.cache.Get("elbListAllLoadBalancers"); v != nil {
 		return v.([]*elb.LoadBalancerDescription), nil
 	}
 
@@ -41,6 +38,6 @@ func (r *elbRepository) ListAllLoadBalancers() ([]*elb.LoadBalancerDescription, 
 		return nil, err
 	}
 
-	r.cache.Put(cacheKey, results)
+	r.cache.Put("elbListAllLoadBalancers", results)
 	return results, nil
 }

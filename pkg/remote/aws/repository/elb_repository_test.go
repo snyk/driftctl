@@ -37,8 +37,7 @@ func Test_ELBRepository_ListAllLoadBalancers(t *testing.T) {
 		{
 			name: "List load balancers with multiple pages",
 			mocks: func(client *awstest.MockFakeELB, store *cache.MockCache) {
-				store.On("GetAndLock", "elbListAllLoadBalancers").Return(nil).Once()
-				store.On("Unlock", "elbListAllLoadBalancers").Return().Once()
+				store.On("Get", "elbListAllLoadBalancers").Return(nil).Once()
 
 				client.On("DescribeLoadBalancersPages",
 					&elb.DescribeLoadBalancersInput{},
@@ -66,8 +65,7 @@ func Test_ELBRepository_ListAllLoadBalancers(t *testing.T) {
 		{
 			name: "List load balancers with multiple pages (cache hit)",
 			mocks: func(client *awstest.MockFakeELB, store *cache.MockCache) {
-				store.On("GetAndLock", "elbListAllLoadBalancers").Return(results).Once()
-				store.On("Unlock", "elbListAllLoadBalancers").Return().Once()
+				store.On("Get", "elbListAllLoadBalancers").Return(results).Once()
 			},
 			want: []*elb.LoadBalancerDescription{
 				{
@@ -81,8 +79,7 @@ func Test_ELBRepository_ListAllLoadBalancers(t *testing.T) {
 		{
 			name: "Error listing load balancers",
 			mocks: func(client *awstest.MockFakeELB, store *cache.MockCache) {
-				store.On("GetAndLock", "elbListAllLoadBalancers").Return(nil).Once()
-				store.On("Unlock", "elbListAllLoadBalancers").Return().Once()
+				store.On("Get", "elbListAllLoadBalancers").Return(nil).Once()
 
 				client.On("DescribeLoadBalancersPages",
 					&elb.DescribeLoadBalancersInput{},

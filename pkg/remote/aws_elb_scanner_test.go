@@ -22,7 +22,9 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestLoadBalancer(t *testing.T) {
+func TestELB_LoadBalancer(t *testing.T) {
+	dummyError := errors.New("dummy error")
+
 	tests := []struct {
 		test           string
 		mocks          func(*repository.MockELBRepository, *mocks.AlerterInterface)
@@ -64,6 +66,16 @@ func TestLoadBalancer(t *testing.T) {
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
 				assert.Len(t, got, 0)
 			},
+		},
+		{
+			test: "cannot list load balancers (dummy error)",
+			mocks: func(repository *repository.MockELBRepository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllLoadBalancers").Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+			wantErr: remoteerr.NewResourceScanningError(dummyError, resourceaws.AwsClassicLoadBalancerResourceType, ""),
 		},
 	}
 

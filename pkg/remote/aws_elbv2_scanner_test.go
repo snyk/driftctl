@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestLoadBalancer(t *testing.T) {
+func TestELBV2_LoadBalancer(t *testing.T) {
 	dummyError := errors.New("dummy error")
 
 	tests := []struct {
