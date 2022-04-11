@@ -40,7 +40,7 @@ func Test_ELBV2Repository_ListAllLoadBalancers(t *testing.T) {
 					},
 				}
 
-				store.On("Get", "elbListAllLoadBalancers").Return(nil).Once()
+				store.On("Get", "elbv2ListAllLoadBalancers").Return(nil).Once()
 
 				client.On("DescribeLoadBalancersPages",
 					&elbv2.DescribeLoadBalancersInput{},
@@ -54,7 +54,7 @@ func Test_ELBV2Repository_ListAllLoadBalancers(t *testing.T) {
 						return true
 					})).Return(nil).Once()
 
-				store.On("Put", "elbListAllLoadBalancers", results.LoadBalancers).Return(false).Once()
+				store.On("Put", "elbv2ListAllLoadBalancers", results.LoadBalancers).Return(false).Once()
 			},
 			want: []*elbv2.LoadBalancer{
 				{
@@ -79,7 +79,7 @@ func Test_ELBV2Repository_ListAllLoadBalancers(t *testing.T) {
 					},
 				}
 
-				store.On("Get", "elbListAllLoadBalancers").Return(output.LoadBalancers).Once()
+				store.On("Get", "elbv2ListAllLoadBalancers").Return(output.LoadBalancers).Once()
 			},
 			want: []*elbv2.LoadBalancer{
 				{
@@ -91,7 +91,7 @@ func Test_ELBV2Repository_ListAllLoadBalancers(t *testing.T) {
 		{
 			name: "error listing load balancers",
 			mocks: func(client *awstest.MockFakeELBV2, store *cache.MockCache) {
-				store.On("Get", "elbListAllLoadBalancers").Return(nil).Once()
+				store.On("Get", "elbv2ListAllLoadBalancers").Return(nil).Once()
 
 				client.On("DescribeLoadBalancersPages",
 					&elbv2.DescribeLoadBalancersInput{},
