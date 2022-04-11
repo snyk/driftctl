@@ -95,6 +95,7 @@ func TestAWS_Metadata_Flags(t *testing.T) {
 		AwsS3BucketMetricResourceType:                  {resource.FlagDeepMode},
 		AwsS3BucketNotificationResourceType:            {resource.FlagDeepMode},
 		AwsS3BucketPolicyResourceType:                  {resource.FlagDeepMode},
+		AwsS3BucketPublicAccessBlockResourceType:       {},
 		AwsSecurityGroupResourceType:                   {resource.FlagDeepMode},
 		AwsSnsTopicResourceType:                        {resource.FlagDeepMode},
 		AwsSnsTopicPolicyResourceType:                  {resource.FlagDeepMode},

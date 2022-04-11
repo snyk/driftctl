@@ -132,6 +132,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 
 		middlewares.NewAzurermRouteExpander(d.resourceFactory),
 		middlewares.NewAzurermSubnetExpander(d.resourceFactory),
+		middlewares.NewAwsS3BucketPublicAccessBlockReconciler(),
 	)
 
 	if !d.opts.StrictMode {
