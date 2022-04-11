@@ -24,7 +24,7 @@ func NewELBV2Repository(session *session.Session, c cache.Cache) *elbv2Repositor
 }
 
 func (r *elbv2Repository) ListAllLoadBalancers() ([]*elbv2.LoadBalancer, error) {
-	if v := r.cache.Get("elbListAllLoadBalancers"); v != nil {
+	if v := r.cache.Get("elbv2ListAllLoadBalancers"); v != nil {
 		return v.([]*elbv2.LoadBalancer), nil
 	}
 
@@ -37,6 +37,6 @@ func (r *elbv2Repository) ListAllLoadBalancers() ([]*elbv2.LoadBalancer, error) 
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Put("elbListAllLoadBalancers", results)
+	r.cache.Put("elbv2ListAllLoadBalancers", results)
 	return results, err
 }

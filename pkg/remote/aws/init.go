@@ -54,6 +54,7 @@ func Init(version string, alerter *alerter.Alerter,
 	appAutoScalingRepository := repository.NewAppAutoScalingRepository(provider.session, repositoryCache)
 	apigatewayv2Repository := repository.NewApiGatewayV2Repository(provider.session, repositoryCache)
 	autoscalingRepository := repository.NewAutoScalingRepository(provider.session, repositoryCache)
+	elbRepository := repository.NewELBRepository(provider.session, repositoryCache)
 
 	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.AWS, provider)
@@ -233,6 +234,8 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewLaunchConfigurationEnumerator(autoscalingRepository, factory))
 
 	remoteLibrary.AddEnumerator(NewLoadBalancerEnumerator(elbv2Repository, factory))
+
+	remoteLibrary.AddEnumerator(NewClassicLoadBalancerEnumerator(elbRepository, factory))
 
 	err = resourceSchemaRepository.Init(terraform.AWS, provider.Version(), provider.Schema())
 	if err != nil {

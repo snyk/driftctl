@@ -196,6 +196,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "Launch configuration", dirName: "aws_launch_configuration", wantErr: false},
 		{name: "EBS encryption by default", dirName: "aws_ebs_encryption_by_default", wantErr: false},
 		{name: "LoadBalancer", dirName: "aws_lb", wantErr: false},
+		{name: "Classic load balancer", dirName: "aws_elb", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
