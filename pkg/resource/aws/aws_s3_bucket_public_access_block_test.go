@@ -22,7 +22,7 @@ func TestAcc_Aws_S3Bucket_PublicAccessBlock(t *testing.T) {
 						t.Fatal(err)
 					}
 					result.AssertInfrastructureIsInSync()
-					result.AssertManagedCount(4)
+					result.AssertManagedCount(2)
 				},
 			},
 		},
