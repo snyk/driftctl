@@ -115,3 +115,131 @@ func TestELBV2_LoadBalancer(t *testing.T) {
 		})
 	}
 }
+
+func TestELBV2_LoadBalancerListener(t *testing.T) {
+	dummyError := errors.New("dummy error")
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockELBV2Repository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "no load balancer listener",
+			mocks: func(repository *repository.MockELBV2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllLoadBalancers").Return([]*elbv2.LoadBalancer{
+					{
+						LoadBalancerArn: awssdk.String("test-lb"),
+					},
+				}, nil)
+				repository.On("ListLoadBalancerListeners", "test-lb").Return([]*elbv2.Listener{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "should list load balancer listener",
+			mocks: func(repository *repository.MockELBV2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllLoadBalancers").Return([]*elbv2.LoadBalancer{
+					{
+						LoadBalancerArn: awssdk.String("test-lb"),
+					},
+				}, nil)
+
+				repository.On("ListLoadBalancerListeners", "test-lb").Return([]*elbv2.Listener{
+					{
+						ListenerArn: awssdk.String("test-lb-listener-1"),
+					},
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+				assert.Equal(t, "test-lb-listener-1", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsLoadBalancerListenerResourceType, got[0].ResourceType())
+			},
+		},
+		{
+			test: "cannot list load balancer listeners (403)",
+			mocks: func(repository *repository.MockELBV2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllLoadBalancers").Return([]*elbv2.LoadBalancer{
+					{
+						LoadBalancerArn: awssdk.String("test-lb"),
+					},
+				}, nil)
+
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListLoadBalancerListeners", "test-lb").Return(nil, awsError)
+
+				alerter.On("SendAlert", resourceaws.AwsLoadBalancerListenerResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingError(awsError, resourceaws.AwsLoadBalancerListenerResourceType), alerts.EnumerationPhase)).Return()
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "cannot list load balancers (403)",
+			mocks: func(repository *repository.MockELBV2Repository, alerter *mocks.AlerterInterface) {
+				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
+				repository.On("ListAllLoadBalancers").Return(nil, awsError)
+
+				alerter.On("SendAlert", resourceaws.AwsLoadBalancerListenerResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLoadBalancerListenerResourceType, resourceaws.AwsLoadBalancerResourceType), alerts.EnumerationPhase)).Return()
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+		},
+		{
+			test: "cannot list load balancer listeners (dummy error)",
+			mocks: func(repository *repository.MockELBV2Repository, alerter *mocks.AlerterInterface) {
+				repository.On("ListAllLoadBalancers").Return([]*elbv2.LoadBalancer{
+					{
+						LoadBalancerArn: awssdk.String("test-lb"),
+					},
+				}, nil)
+
+				repository.On("ListLoadBalancerListeners", "test-lb").Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+			wantErr: remoteerr.NewResourceScanningError(dummyError, resourceaws.AwsLoadBalancerListenerResourceType, ""),
+		},
+	}
+
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockELBV2Repository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.ELBV2Repository = fakeRepo
+
+			remoteLibrary.AddEnumerator(aws.NewLoadBalancerListenerEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, c.wantErr, err)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+		})
+	}
+}

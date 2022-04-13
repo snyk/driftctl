@@ -235,6 +235,7 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewLaunchConfigurationEnumerator(autoscalingRepository, factory))
 
 	remoteLibrary.AddEnumerator(NewLoadBalancerEnumerator(elbv2Repository, factory))
+	remoteLibrary.AddEnumerator(NewLoadBalancerListenerEnumerator(elbv2Repository, factory))
 
 	remoteLibrary.AddEnumerator(NewClassicLoadBalancerEnumerator(elbRepository, factory))
 
