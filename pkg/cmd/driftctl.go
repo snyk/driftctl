@@ -58,6 +58,7 @@ func NewDriftctlCmd(build build.BuildInterface) *DriftctlCmd {
 	cmd.AddCommand(NewVersionCmd())
 
 	cmd.AddCommand(NewCompletionCmd())
+	cmd.AddCommand(NewListCmd())
 
 	cmd.SetUsageTemplate(usageTemplate)
 

@@ -60,7 +60,7 @@ loop:
 
 func (s *Scanner) scan() ([]*resource.Resource, error) {
 	for _, enumerator := range s.remoteLibrary.Enumerators() {
-		if s.filter.IsTypeIgnored(enumerator.SupportedType()) {
+		if s.filter != nil && s.filter.IsTypeIgnored(enumerator.SupportedType()) {
 			logrus.WithFields(logrus.Fields{
 				"type": enumerator.SupportedType(),
 			}).Debug("Ignored enumeration of resources since it is ignored in filter")
