@@ -1,2 +1,6 @@
 *
 !aws_api_gateway_base_path_mapping
+
+# We include drifts from aws_apigatewayv2_api_mapping as well to avoid regression regarding this bug:
+# https://github.com/snyk/driftctl/issues/1442
+!aws_apigatewayv2_api_mapping
