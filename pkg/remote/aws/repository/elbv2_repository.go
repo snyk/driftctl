@@ -9,7 +9,7 @@ import (
 
 type ELBV2Repository interface {
 	ListAllLoadBalancers() ([]*elbv2.LoadBalancer, error)
-	ListLoadBalancerListeners(string) ([]*elbv2.Listener, error)
+	ListAllLoadBalancerListeners(string) ([]*elbv2.Listener, error)
 }
 
 type elbv2Repository struct {
@@ -44,8 +44,8 @@ func (r *elbv2Repository) ListAllLoadBalancers() ([]*elbv2.LoadBalancer, error) 
 	return results, err
 }
 
-func (r *elbv2Repository) ListLoadBalancerListeners(loadBalancerArn string) ([]*elbv2.Listener, error) {
-	if v := r.cache.Get("elbv2ListLoadBalancerListeners"); v != nil {
+func (r *elbv2Repository) ListAllLoadBalancerListeners(loadBalancerArn string) ([]*elbv2.Listener, error) {
+	if v := r.cache.Get("elbv2ListAllLoadBalancerListeners"); v != nil {
 		return v.([]*elbv2.Listener), nil
 	}
 
@@ -60,6 +60,6 @@ func (r *elbv2Repository) ListLoadBalancerListeners(loadBalancerArn string) ([]*
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Put("elbv2ListLoadBalancerListeners", results)
+	r.cache.Put("elbv2ListAllLoadBalancerListeners", results)
 	return results, err
 }

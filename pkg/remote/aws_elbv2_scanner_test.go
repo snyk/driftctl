@@ -133,7 +133,7 @@ func TestELBV2_LoadBalancerListener(t *testing.T) {
 						LoadBalancerArn: awssdk.String("test-lb"),
 					},
 				}, nil)
-				repository.On("ListLoadBalancerListeners", "test-lb").Return([]*elbv2.Listener{}, nil)
+				repository.On("ListAllLoadBalancerListeners", "test-lb").Return([]*elbv2.Listener{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
 				assert.Len(t, got, 0)
@@ -148,7 +148,7 @@ func TestELBV2_LoadBalancerListener(t *testing.T) {
 					},
 				}, nil)
 
-				repository.On("ListLoadBalancerListeners", "test-lb").Return([]*elbv2.Listener{
+				repository.On("ListAllLoadBalancerListeners", "test-lb").Return([]*elbv2.Listener{
 					{
 						ListenerArn: awssdk.String("test-lb-listener-1"),
 					},
@@ -170,7 +170,7 @@ func TestELBV2_LoadBalancerListener(t *testing.T) {
 				}, nil)
 
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
-				repository.On("ListLoadBalancerListeners", "test-lb").Return(nil, awsError)
+				repository.On("ListAllLoadBalancerListeners", "test-lb").Return(nil, awsError)
 
 				alerter.On("SendAlert", resourceaws.AwsLoadBalancerListenerResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingError(awsError, resourceaws.AwsLoadBalancerListenerResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -199,7 +199,7 @@ func TestELBV2_LoadBalancerListener(t *testing.T) {
 					},
 				}, nil)
 
-				repository.On("ListLoadBalancerListeners", "test-lb").Return(nil, dummyError)
+				repository.On("ListAllLoadBalancerListeners", "test-lb").Return(nil, dummyError)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
 				assert.Len(t, got, 0)

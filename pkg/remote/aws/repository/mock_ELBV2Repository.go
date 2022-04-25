@@ -36,7 +36,7 @@ func (_m *MockELBV2Repository) ListAllLoadBalancers() ([]*elbv2.LoadBalancer, er
 }
 
 // ListLoadBalancerListeners provides a mock function with given fields: _a0
-func (_m *MockELBV2Repository) ListLoadBalancerListeners(_a0 string) ([]*elbv2.Listener, error) {
+func (_m *MockELBV2Repository) ListAllLoadBalancerListeners(_a0 string) ([]*elbv2.Listener, error) {
 	ret := _m.Called(_a0)
 
 	var r0 []*elbv2.Listener

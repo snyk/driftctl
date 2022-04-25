@@ -155,7 +155,7 @@ func Test_ELBV2Repository_ListAllLoadBalancerListeners(t *testing.T) {
 					},
 				}
 
-				store.On("Get", "elbv2ListLoadBalancerListeners").Return(nil).Once()
+				store.On("Get", "elbv2ListAllLoadBalancerListeners").Return(nil).Once()
 
 				client.On("DescribeListenersPages",
 					&elbv2.DescribeListenersInput{LoadBalancerArn: aws.String("test-lb")},
@@ -169,7 +169,7 @@ func Test_ELBV2Repository_ListAllLoadBalancerListeners(t *testing.T) {
 						return true
 					})).Return(nil).Once()
 
-				store.On("Put", "elbv2ListLoadBalancerListeners", results.Listeners).Return(false).Once()
+				store.On("Put", "elbv2ListAllLoadBalancerListeners", results.Listeners).Return(false).Once()
 			},
 			want: []*elbv2.Listener{
 				{
@@ -194,7 +194,7 @@ func Test_ELBV2Repository_ListAllLoadBalancerListeners(t *testing.T) {
 					},
 				}
 
-				store.On("Get", "elbv2ListLoadBalancerListeners").Return(output.Listeners).Once()
+				store.On("Get", "elbv2ListAllLoadBalancerListeners").Return(output.Listeners).Once()
 			},
 			want: []*elbv2.Listener{
 				{
@@ -206,7 +206,7 @@ func Test_ELBV2Repository_ListAllLoadBalancerListeners(t *testing.T) {
 		{
 			name: "error listing load balancer listeners",
 			mocks: func(client *awstest.MockFakeELBV2, store *cache.MockCache) {
-				store.On("Get", "elbv2ListLoadBalancerListeners").Return(nil).Once()
+				store.On("Get", "elbv2ListAllLoadBalancerListeners").Return(nil).Once()
 
 				client.On("DescribeListenersPages",
 					&elbv2.DescribeListenersInput{LoadBalancerArn: aws.String("test-lb")},
@@ -227,7 +227,7 @@ func Test_ELBV2Repository_ListAllLoadBalancerListeners(t *testing.T) {
 				client: client,
 				cache:  store,
 			}
-			got, err := r.ListLoadBalancerListeners("test-lb")
+			got, err := r.ListAllLoadBalancerListeners("test-lb")
 			assert.Equal(t, tt.wantErr, err)
 
 			changelog, err := diff.Diff(got, tt.want)
