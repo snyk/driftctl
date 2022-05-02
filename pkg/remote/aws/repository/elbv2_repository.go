@@ -9,6 +9,7 @@ import (
 
 type ELBV2Repository interface {
 	ListAllLoadBalancers() ([]*elbv2.LoadBalancer, error)
+	ListAllLoadBalancerListeners(string) ([]*elbv2.Listener, error)
 }
 
 type elbv2Repository struct {
@@ -24,7 +25,9 @@ func NewELBV2Repository(session *session.Session, c cache.Cache) *elbv2Repositor
 }
 
 func (r *elbv2Repository) ListAllLoadBalancers() ([]*elbv2.LoadBalancer, error) {
-	if v := r.cache.Get("elbv2ListAllLoadBalancers"); v != nil {
+	cacheKey := "elbv2ListAllLoadBalancers"
+	defer r.cache.Unlock(cacheKey)
+	if v := r.cache.GetAndLock(cacheKey); v != nil {
 		return v.([]*elbv2.LoadBalancer), nil
 	}
 
@@ -37,6 +40,26 @@ func (r *elbv2Repository) ListAllLoadBalancers() ([]*elbv2.LoadBalancer, error) 
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Put("elbv2ListAllLoadBalancers", results)
+	r.cache.Put(cacheKey, results)
+	return results, err
+}
+
+func (r *elbv2Repository) ListAllLoadBalancerListeners(loadBalancerArn string) ([]*elbv2.Listener, error) {
+	if v := r.cache.Get("elbv2ListAllLoadBalancerListeners"); v != nil {
+		return v.([]*elbv2.Listener), nil
+	}
+
+	results := make([]*elbv2.Listener, 0)
+	input := &elbv2.DescribeListenersInput{
+		LoadBalancerArn: &loadBalancerArn,
+	}
+	err := r.client.DescribeListenersPages(input, func(res *elbv2.DescribeListenersOutput, lastPage bool) bool {
+		results = append(results, res.Listeners...)
+		return !lastPage
+	})
+	if err != nil {
+		return nil, err
+	}
+	r.cache.Put("elbv2ListAllLoadBalancerListeners", results)
 	return results, err
 }

@@ -27,7 +27,11 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_alb": {children: []ResourceType{
 		"aws_lb",
 	}},
-	"aws_lb":                        {},
+	"aws_lb":          {},
+	"aws_lb_listener": {},
+	"aws_alb_listener": {children: []ResourceType{
+		"aws_lb_listener",
+	}},
 	"aws_ebs_encryption_by_default": {},
 	"aws_ecr_repository":            {},
 	"aws_eip": {children: []ResourceType{
