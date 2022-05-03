@@ -14,6 +14,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/privatedns/armprivatedns v0.2.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v0.2.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v0.2.0
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.2.0
 	github.com/Azure/go-autorest/autorest v0.11.3
 	github.com/aws/aws-sdk-go v1.38.68
 	github.com/bmatcuk/doublestar/v4 v4.0.1
@@ -23,7 +24,7 @@ require (
 	github.com/getsentry/sentry-go v0.10.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-git/go-git/v5 v5.4.2
-	github.com/hashicorp/go-getter v1.5.3
+	github.com/hashicorp/go-getter v1.5.11
 	github.com/hashicorp/go-hclog v0.9.2
 	github.com/hashicorp/go-plugin v1.3.0
 	github.com/hashicorp/go-tfe v0.20.0
@@ -59,7 +60,6 @@ require (
 	cloud.google.com/go v0.92.1 // indirect
 	github.com/Azure/azure-sdk-for-go v59.0.0+incompatible // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v0.8.1 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.2.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.9.0 // indirect
 	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
