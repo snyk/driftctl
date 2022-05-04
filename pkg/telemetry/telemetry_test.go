@@ -13,6 +13,7 @@ import (
 	"github.com/snyk/driftctl/pkg/resource"
 	"github.com/snyk/driftctl/pkg/version"
 	"github.com/snyk/driftctl/test/mocks"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -45,6 +46,7 @@ func TestSendTelemetry(t *testing.T) {
 				Duration:       123,
 				ProviderName:   "aws",
 				IaCSourceCount: 2,
+				Client:         "driftctl",
 			},
 			setStoreValues: func(s memstore.Bucket, a *analyser.Analysis) {
 				s.Set("total_resources", a.Summary().TotalResources)
@@ -67,6 +69,7 @@ func TestSendTelemetry(t *testing.T) {
 				Arch:         runtime.GOARCH,
 				Duration:     124,
 				ProviderName: "aws",
+				Client:       "driftctl",
 			},
 			setStoreValues: func(s memstore.Bucket, a *analyser.Analysis) {
 				s.Set("total_resources", a.Summary().TotalResources)
@@ -90,6 +93,7 @@ func TestSendTelemetry(t *testing.T) {
 				Version: version.Current(),
 				Os:      runtime.GOOS,
 				Arch:    runtime.GOARCH,
+				Client:  "driftctl",
 			},
 			setStoreValues: func(s memstore.Bucket, a *analyser.Analysis) {},
 		},
@@ -149,4 +153,35 @@ func TestTelemetryNotSend(t *testing.T) {
 	tl.SendTelemetry(store)
 
 	assert.Zero(t, httpmock.GetTotalCallCount())
+}
+
+func TestTelemetrySetProperClient(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+	httpmock.RegisterResponder(
+		"POST",
+		"https://telemetry.driftctl.com/telemetry",
+		func(req *http.Request) (*http.Response, error) {
+			requestTelemetry := &telemetry{}
+			requestBody, err := ioutil.ReadAll(req.Body)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			err = json.Unmarshal(requestBody, requestTelemetry)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Equal(t, "snyk-cli", requestTelemetry.Client)
+
+			return httpmock.NewBytesResponse(202, []byte{}), nil
+		},
+	)
+
+	viper.Set("IS_SNYK", true)
+	store := memstore.New().Bucket(memstore.TelemetryBucket)
+	tl := NewTelemetry(mocks.MockBuild{UsageReporting: true})
+	tl.SendTelemetry(store)
+	assert.Equal(t, 1, httpmock.GetTotalCallCount())
 }

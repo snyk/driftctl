@@ -8,6 +8,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/snyk/driftctl/build"
+	"github.com/snyk/driftctl/pkg/config"
 	"github.com/snyk/driftctl/pkg/memstore"
 	"github.com/snyk/driftctl/pkg/version"
 )
@@ -21,6 +22,7 @@ type telemetry struct {
 	Duration       uint   `json:"duration"`
 	ProviderName   string `json:"provider_name"`
 	IaCSourceCount uint   `json:"iac_source_count"`
+	Client         string `json:"client"`
 }
 
 type Telemetry struct {
@@ -42,6 +44,11 @@ func (te Telemetry) SendTelemetry(store memstore.Bucket) {
 		Version: version.Current(),
 		Os:      runtime.GOOS,
 		Arch:    runtime.GOARCH,
+		Client:  "driftctl",
+	}
+
+	if config.IsSnyk() {
+		t.Client = "snyk-cli"
 	}
 
 	if val, ok := store.Get("total_resources").(int); ok {
