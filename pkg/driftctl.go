@@ -135,6 +135,7 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 		middlewares.NewAzurermRouteExpander(d.resourceFactory),
 		middlewares.NewAzurermSubnetExpander(d.resourceFactory),
 		middlewares.NewAwsS3BucketPublicAccessBlockReconciler(),
+		middlewares.NewAwsIAMPolicyAttachmentTransformer(d.resourceFactory),
 	)
 
 	if !d.opts.StrictMode {
