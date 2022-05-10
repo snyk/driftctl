@@ -34,6 +34,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	}},
 	"aws_ebs_encryption_by_default": {},
 	"aws_ecr_repository":            {},
+	"aws_ecr_repository_policy":     {},
 	"aws_eip": {children: []ResourceType{
 		"aws_eip_association",
 	}},
