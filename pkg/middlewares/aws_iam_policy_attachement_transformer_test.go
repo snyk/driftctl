@@ -202,6 +202,95 @@ func TestIamPolicyAttachmentTransformer_Execute(t *testing.T) {
 			},
 		},
 		{
+			name: "transform group_policy_attachment",
+			args: argRes{
+				RemoteResources: &[]*resource.Resource{
+					{
+						Id:   "id1",
+						Type: aws.AwsIamGroupPolicyAttachmentResourceType,
+						Attrs: &resource.Attributes{
+							"policy_arn": "policy_arn1",
+							"group":      "group1",
+						},
+					},
+				},
+				ResourcesFromState: &[]*resource.Resource{
+					{
+						Id:   "id2",
+						Type: aws.AwsIamGroupPolicyAttachmentResourceType,
+						Attrs: &resource.Attributes{
+							"policy_arn": "policy_arn2",
+							"group":      "group2",
+						},
+					},
+				},
+			},
+			expected: argRes{
+				RemoteResources: &[]*resource.Resource{
+					{
+						Id:   "id1",
+						Type: aws.AwsIamPolicyAttachmentResourceType,
+						Attrs: &resource.Attributes{
+							"id":         "id1",
+							"policy_arn": "policy_arn1",
+							"users":      []interface{}{},
+							"groups":     []interface{}{"group1"},
+							"roles":      []interface{}{},
+						},
+					},
+				},
+				ResourcesFromState: &[]*resource.Resource{
+					{
+						Id:   "id2",
+						Type: aws.AwsIamPolicyAttachmentResourceType,
+						Attrs: &resource.Attributes{
+							"id":         "id2",
+							"policy_arn": "policy_arn2",
+							"users":      []interface{}{},
+							"groups":     []interface{}{"group2"},
+							"roles":      []interface{}{},
+						},
+					},
+				},
+			},
+			mocks: func(factory *terraform.MockResourceFactory) {
+				factory.On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "id1", map[string]interface{}{
+					"id":         "id1",
+					"policy_arn": "policy_arn1",
+					"users":      []interface{}{},
+					"groups":     []interface{}{"group1"},
+					"roles":      []interface{}{},
+				}).Once().Return(&resource.Resource{
+					Id:   "id1",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"id":         "id1",
+						"policy_arn": "policy_arn1",
+						"users":      []interface{}{},
+						"groups":     []interface{}{"group1"},
+						"roles":      []interface{}{},
+					},
+				}, nil)
+				factory.On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "id2", map[string]interface{}{
+					"id":         "id2",
+					"policy_arn": "policy_arn2",
+					"users":      []interface{}{},
+					"groups":     []interface{}{"group2"},
+					"roles":      []interface{}{},
+				}).Once().Return(&resource.Resource{
+					Id:   "id2",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+					Attrs: &resource.Attributes{
+						"id":         "id2",
+						"policy_arn": "policy_arn2",
+						"users":      []interface{}{},
+						"groups":     []interface{}{"group2"},
+						"roles":      []interface{}{},
+					},
+				}, nil)
+			},
+		},
+		{
 			name: "transform nothing",
 			args: argRes{
 				RemoteResources: &[]*resource.Resource{

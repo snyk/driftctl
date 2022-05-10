@@ -1,0 +1,11 @@
+[
+ {
+  "Id": "test-group-20220509135152620300000001",
+  "Type": "aws_iam_group_policy_attachment",
+  "Attrs": {
+   "group": "test-group",
+   "id": "test-group-20220509135152620300000001",
+   "policy_arn": "arn:aws:iam::929327065333:policy/test-policy"
+  }
+ }
+]

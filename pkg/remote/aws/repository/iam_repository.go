@@ -21,6 +21,7 @@ type IAMRepository interface {
 	ListAllUserPolicies([]*iam.User) ([]string, error)
 	ListAllGroups() ([]*iam.Group, error)
 	ListAllGroupPolicies([]*iam.Group) ([]string, error)
+	ListAllGroupPolicyAttachments([]*iam.Group) ([]*AttachedGroupPolicy, error)
 }
 
 type iamRepository struct {
@@ -311,6 +312,40 @@ func (r *iamRepository) ListAllGroupPolicies(groups []*iam.Group) ([]string, err
 	return resources, nil
 }
 
+func (r *iamRepository) ListAllGroupPolicyAttachments(groups []*iam.Group) ([]*AttachedGroupPolicy, error) {
+	var resources []*AttachedGroupPolicy
+	for _, group := range groups {
+		cacheKey := fmt.Sprintf("iamListAllGroupPolicyAttachments_%s", *group.GroupId)
+		if v := r.cache.Get(cacheKey); v != nil {
+			resources = append(resources, v.([]*AttachedGroupPolicy)...)
+			continue
+		}
+
+		attachedGroupPolicies := make([]*AttachedGroupPolicy, 0)
+		input := &iam.ListAttachedGroupPoliciesInput{
+			GroupName: group.GroupName,
+		}
+		err := r.client.ListAttachedGroupPoliciesPages(input, func(res *iam.ListAttachedGroupPoliciesOutput, lastPage bool) bool {
+			for _, policy := range res.AttachedPolicies {
+				p := *policy
+				attachedGroupPolicies = append(attachedGroupPolicies, &AttachedGroupPolicy{
+					AttachedPolicy: p,
+					GroupName:      *input.GroupName,
+				})
+			}
+			return !lastPage
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		r.cache.Put(cacheKey, attachedGroupPolicies)
+		resources = append(resources, attachedGroupPolicies...)
+	}
+
+	return resources, nil
+}
+
 type AttachedUserPolicy struct {
 	iam.AttachedPolicy
 	UserName string
@@ -319,6 +354,11 @@ type AttachedUserPolicy struct {
 type AttachedRolePolicy struct {
 	iam.AttachedPolicy
 	RoleName string
+}
+
+type AttachedGroupPolicy struct {
+	iam.AttachedPolicy
+	GroupName string
 }
 
 type RolePolicy struct {

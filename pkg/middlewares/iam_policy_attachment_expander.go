@@ -80,5 +80,20 @@ func (m IamPolicyAttachmentExpander) expand(policyAttachment *resource.Resource)
 		)
 		newResources = append(newResources, newAttachment)
 	}
+
+	groups := policyAttachment.Attrs.GetSlice("groups")
+	// we create one attachment per group
+	for _, group := range groups {
+		group := group.(string)
+		newAttachment := m.resourceFactory.CreateAbstractResource(
+			resourceaws.AwsIamPolicyAttachmentResourceType,
+			fmt.Sprintf("%s-%s", group, (*policyAttachment.Attrs)["policy_arn"]),
+			map[string]interface{}{
+				"policy_arn": *policyAttachment.Attrs.GetString("policy_arn"),
+				"groups":     []interface{}{group},
+			},
+		)
+		newResources = append(newResources, newAttachment)
+	}
 	return newResources
 }
