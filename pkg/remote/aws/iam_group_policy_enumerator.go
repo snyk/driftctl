@@ -26,8 +26,7 @@ func (e *IamGroupPolicyEnumerator) SupportedType() resource.ResourceType {
 func (e *IamGroupPolicyEnumerator) Enumerate() ([]*resource.Resource, error) {
 	groups, err := e.repository.ListAllGroups()
 	if err != nil {
-		// TODO Use constant instead of string for `aws_iam_group` here when we'll add support for the group resource
-		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), "aws_iam_group")
+		return nil, remoteerror.NewResourceListingErrorWithType(err, string(e.SupportedType()), aws.AwsIamGroupResourceType)
 	}
 	groupPolicies, err := e.repository.ListAllGroupPolicies(groups)
 	if err != nil {

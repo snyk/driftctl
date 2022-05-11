@@ -1193,8 +1193,7 @@ func TestIamGroupPolicy(t *testing.T) {
 			mocks: func(repository *repository.MockIAMRepository) {
 				repository.On("ListAllGroups").Return(nil, dummyError)
 			},
-			// TODO Use constant instead of string for `aws_iam_group` here when we'll add support for the group resource
-			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsIamGroupPolicyResourceType, "aws_iam_group"),
+			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsIamGroupPolicyResourceType, resourceaws.AwsIamGroupResourceType),
 		},
 		{
 			test: "cannot list policies",
@@ -1224,6 +1223,83 @@ func TestIamGroupPolicy(t *testing.T) {
 			var repo repository.IAMRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(remoteaws.NewIamGroupPolicyEnumerator(
+				repo, factory,
+			))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, c.wantErr, err)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+		})
+	}
+}
+
+func TestIamGroup(t *testing.T) {
+	dummyError := errors.New("this is an error")
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockIAMRepository)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "multiple groups, with multiples groups",
+			mocks: func(repository *repository.MockIAMRepository) {
+				repository.On("ListAllGroups").Return([]*iam.Group{
+					{
+						GroupName: aws.String("group1"),
+					},
+					{
+						GroupName: aws.String("group2"),
+					},
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+				assert.Equal(t, resourceaws.AwsIamGroupResourceType, got[0].ResourceType())
+				assert.Equal(t, "group1", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamGroupResourceType, got[1].ResourceType())
+				assert.Equal(t, "group2", got[1].ResourceId())
+			},
+		},
+		{
+			test: "cannot list groups",
+			mocks: func(repository *repository.MockIAMRepository) {
+				repository.On("ListAllGroups").Return(nil, dummyError)
+			},
+			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsIamGroupResourceType),
+		},
+	}
+
+	providerVersion := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockIAMRepository{}
+			c.mocks(fakeRepo)
+
+			var repo repository.IAMRepository = fakeRepo
+
+			remoteLibrary.AddEnumerator(remoteaws.NewIamGroupEnumerator(
 				repo, factory,
 			))
 
