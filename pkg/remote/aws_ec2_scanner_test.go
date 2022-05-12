@@ -232,7 +232,9 @@ func TestEC2Eip(t *testing.T) {
 			test:    "no eips",
 			dirName: "aws_ec2_eip_empty",
 			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
-				repository.On("ListAllAddresses").Return([]*ec2.Address{}, nil)
+				repository.On("ListAllAddresses").Return([]*ec2.Address{
+					{}, // Test Eip without AllocationId because it can happen (seen in sentry)
+				}, nil)
 			},
 		},
 		{
