@@ -20,6 +20,9 @@ func initAwsRouteMetaData(resourceSchemaRepository resource.SchemaRepositoryInte
 		if ipv6 := res.Attributes().GetString("destination_ipv6_cidr_block"); ipv6 != nil && *ipv6 != "" {
 			attributes["destination_ipv6_cidr_block"] = *ipv6
 		}
+		if prefixes := res.Attributes().GetString("destination_prefix_list_id"); prefixes != nil && *prefixes != "" {
+			attributes["destination_prefix_list_id"] = *prefixes
+		}
 		return attributes
 	})
 	resourceSchemaRepository.SetNormalizeFunc(AwsRouteResourceType, func(res *resource.Resource) {
@@ -30,6 +33,7 @@ func initAwsRouteMetaData(resourceSchemaRepository resource.SchemaRepositoryInte
 		val.DeleteIfDefault("local_gateway_id")
 		val.DeleteIfDefault("destination_cidr_block")
 		val.DeleteIfDefault("destination_ipv6_cidr_block")
+		val.DeleteIfDefault("destination_prefix_list_id")
 		val.DeleteIfDefault("egress_only_gateway_id")
 		val.DeleteIfDefault("nat_gateway_id")
 		val.DeleteIfDefault("instance_id")
