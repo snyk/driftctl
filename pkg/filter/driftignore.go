@@ -90,7 +90,7 @@ func (r *DriftIgnore) parseIgnorePattern(line string, patterns *[]gitignore.Patt
 func (r *DriftIgnore) isAnyOfChildrenTypesNotIgnored(ty resource.ResourceType) bool {
 	childrenTypes := resource.GetMeta(ty).GetChildrenTypes()
 	for _, childrenType := range childrenTypes {
-		if !r.match(fmt.Sprintf("%s.*", childrenType)) {
+		if !r.shouldIgnoreType(childrenType) {
 			return true
 		}
 		if r.isAnyOfChildrenTypesNotIgnored(childrenType) {
@@ -105,6 +105,17 @@ func (r *DriftIgnore) IsTypeIgnored(ty resource.ResourceType) bool {
 	// if at least one of children type is not ignored.
 	if r.isAnyOfChildrenTypesNotIgnored(ty) {
 		return false
+	}
+
+	return r.shouldIgnoreType(ty)
+}
+
+func (r *DriftIgnore) shouldIgnoreType(ty resource.ResourceType) bool {
+	for _, pattern := range r.ignorePatterns {
+		// If a line start with a `!` and if the type match, we should not ignore it
+		if strings.HasPrefix(pattern, fmt.Sprintf("!%s.", ty)) {
+			return false
+		}
 	}
 
 	return r.match(fmt.Sprintf("%s.*", ty))

@@ -712,6 +712,50 @@ func TestDriftIgnore_IsTypeIgnored(t *testing.T) {
 			path:    "testdata/drift_ignore_all/.driftignore",
 			ignores: []string{"*", "!aws_s3*", "!aws_route53*"},
 		},
+		{
+			name: "do not ignore type when one inclusion rule with resource ID exist",
+			resources: []*resource.Resource{
+				// This type should not be ignored because of `!aws_iam_policy_attachment.foo*` expression
+				{
+					Type: "aws_iam_policy_attachment",
+					Id:   "foobar",
+				},
+				// This type should not be ignored because `azurerm_route` type is not ignored and is a child of `azurerm_route_table`
+				{
+					Type: "azurerm_route_table",
+					Id:   "uselessId",
+				},
+				// This type should not be ignored because of `!azurerm_route.barfoo` expression
+				{
+					Type: "azurerm_route",
+					Id:   "barfoo",
+				},
+			},
+			want: []bool{
+				false,
+				false,
+				false,
+			},
+			path:    "",
+			ignores: []string{"*", "!aws_iam_policy_attachment.foobar", "!azurerm_route.barfoo"},
+		},
+		{
+			name: "ignore type wildcard while excluding one",
+			resources: []*resource.Resource{
+				{
+					Type: "type_ignored",
+				},
+				{
+					Type: "type_not_ignored",
+				},
+			},
+			want: []bool{
+				true,
+				false,
+			},
+			path:    "",
+			ignores: []string{"type_*", "!type_not_ignored"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
