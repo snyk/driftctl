@@ -131,6 +131,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "IAM role policy attachment", dirName: "aws_iam_role_policy_attachment", wantErr: false},
 		{name: "IAM user policy attachment", dirName: "aws_iam_user_policy_attachment", wantErr: false},
 		{name: "IAM group policy", dirName: "aws_iam_group_policy", wantErr: false},
+		{name: "IAM group policy attachment", dirName: "aws_iam_group_policy_attachment", wantErr: false},
 		{name: "VPC security group rule", dirName: "aws_vpc_security_group_rule", wantErr: false},
 		{name: "route table", dirName: "aws_route_table", wantErr: false},
 		{name: "route table associations", dirName: "aws_route_assoc", wantErr: false},

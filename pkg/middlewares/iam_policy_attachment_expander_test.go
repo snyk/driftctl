@@ -345,6 +345,166 @@ func TestIamPolicyAttachmentExpander_Execute(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "Split Groups and ReId",
+			mocks: func(factory *terraform.MockResourceFactory) {
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsIamPolicyAttachmentResourceType,
+					"group1-arn",
+					map[string]interface{}{
+						"policy_arn": "arn",
+						"groups":     []interface{}{"group1"},
+					},
+				).Once().Return(&resource.Resource{
+					Id:   "group1-arn",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsIamPolicyAttachmentResourceType,
+					"group2-arn",
+					map[string]interface{}{
+						"policy_arn": "arn",
+						"groups":     []interface{}{"group2"},
+					},
+				).Once().Return(&resource.Resource{
+					Id:   "group2-arn",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsIamPolicyAttachmentResourceType,
+					"foobar-arn",
+					map[string]interface{}{
+						"policy_arn": "arn",
+						"groups":     []interface{}{"foobar"},
+					},
+				).Once().Return(&resource.Resource{
+					Id:   "foobar-arn",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsIamPolicyAttachmentResourceType,
+					"group1-thisisarn",
+					map[string]interface{}{
+						"policy_arn": "thisisarn",
+						"groups":     []interface{}{"group1"},
+					},
+				).Once().Return(&resource.Resource{
+					Id:   "group1-thisisarn",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsIamPolicyAttachmentResourceType,
+					"group2-thisisarn",
+					map[string]interface{}{
+						"policy_arn": "thisisarn",
+						"groups":     []interface{}{"group2"},
+					},
+				).Once().Return(&resource.Resource{
+					Id:   "group2-thisisarn",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsIamPolicyAttachmentResourceType,
+					"group3-thisisarn",
+					map[string]interface{}{
+						"policy_arn": "thisisarn",
+						"groups":     []interface{}{"group3"},
+					},
+				).Once().Return(&resource.Resource{
+					Id:   "group3-thisisarn",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+				})
+				factory.On(
+					"CreateAbstractResource",
+					aws.AwsIamPolicyAttachmentResourceType,
+					"group1-fromstatearn",
+					map[string]interface{}{
+						"policy_arn": "fromstatearn",
+						"groups":     []interface{}{"group1"},
+					},
+				).Once().Return(&resource.Resource{
+					Id:   "group1-fromstatearn",
+					Type: aws.AwsIamPolicyAttachmentResourceType,
+				})
+			},
+			args: struct {
+				RemoteResources    *[]*resource.Resource
+				ResourcesFromState *[]*resource.Resource
+			}{
+				RemoteResources: &[]*resource.Resource{
+					{
+						Id:   "wrongId",
+						Type: aws.AwsIamPolicyAttachmentResourceType,
+						Attrs: &resource.Attributes{
+							"policy_arn": "arn",
+							"groups":     []interface{}{"group1", "group2", "foobar"},
+						},
+					},
+					{
+						Id:   "wrongId2",
+						Type: aws.AwsIamPolicyAttachmentResourceType,
+						Attrs: &resource.Attributes{
+							"policy_arn": "thisisarn",
+							"groups":     []interface{}{"group1", "group2", "group3"},
+						},
+					},
+				},
+				ResourcesFromState: &[]*resource.Resource{
+					{
+						Id:   "wrongId",
+						Type: aws.AwsIamPolicyAttachmentResourceType,
+						Attrs: &resource.Attributes{
+							"policy_arn": "fromstatearn",
+							"groups":     []interface{}{"group1"},
+						},
+					},
+				},
+			},
+			expected: struct {
+				RemoteResources    *[]*resource.Resource
+				ResourcesFromState *[]*resource.Resource
+			}{
+				RemoteResources: &[]*resource.Resource{
+					{
+						Id:   "group1-arn",
+						Type: aws.AwsIamPolicyAttachmentResourceType,
+					},
+					{
+						Id:   "group2-arn",
+						Type: aws.AwsIamPolicyAttachmentResourceType,
+					},
+					{
+						Id:   "foobar-arn",
+						Type: aws.AwsIamPolicyAttachmentResourceType,
+					},
+					{
+						Id:   "group1-thisisarn",
+						Type: aws.AwsIamPolicyAttachmentResourceType,
+					},
+					{
+						Id:   "group2-thisisarn",
+						Type: aws.AwsIamPolicyAttachmentResourceType,
+					},
+					{
+						Id:   "group3-thisisarn",
+						Type: aws.AwsIamPolicyAttachmentResourceType,
+					},
+				},
+				ResourcesFromState: &[]*resource.Resource{
+					{
+						Id:   "group1-fromstatearn",
+						Type: aws.AwsIamPolicyAttachmentResourceType,
+					},
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
