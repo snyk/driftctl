@@ -1,7 +1,9 @@
 package aws
 
 import (
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/pkg/errors"
 	"github.com/snyk/driftctl/pkg/output"
 	"github.com/snyk/driftctl/pkg/remote/terraform"
 	tf "github.com/snyk/driftctl/pkg/terraform"
@@ -85,4 +87,17 @@ func (a *AWSTerraformProvider) Name() string {
 
 func (p *AWSTerraformProvider) Version() string {
 	return p.version
+}
+
+func (p *AWSTerraformProvider) CheckCredentialsExist() error {
+	_, err := p.session.Config.Credentials.Get()
+	if err == credentials.ErrNoValidProvidersFoundInChain {
+		return errors.New("Could not find a way to authenticate on AWS!\n" +
+			"Please refer to AWS documentation: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html\n\n" +
+			"To use a different cloud provider, use --to=\"tf+gcp\" for GCP or --to=\"tf+azure\" for Azure.")
+	}
+	if err != nil {
+		return err
+	}
+	return nil
 }
