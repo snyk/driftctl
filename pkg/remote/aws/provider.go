@@ -94,7 +94,7 @@ func (p *AWSTerraformProvider) CheckCredentialsExist() error {
 	if err == credentials.ErrNoValidProvidersFoundInChain {
 		return errors.New("Could not find a way to authenticate on AWS!\n" +
 			"Please refer to AWS documentation: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html\n\n" +
-			"To use a different cloud provider, use --to=\"tf+gcp\" for GCP or --to=\"tf+azure\" for Azure.")
+			"To use a different cloud provider, use --to=\"gcp+tf\" for GCP or --to=\"azure+tf\" for Azure.")
 	}
 	if err != nil {
 		return err
