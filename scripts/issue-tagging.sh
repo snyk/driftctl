@@ -50,9 +50,11 @@ for pr in $PRs; do
     ISSUES+=("$id")
 done
 
-# Remove duplicate IDs
-# This can happen when we release using a separate branch (e.g. patch releases)
-mapfile -t ISSUES < <(printf "%s\n" "${ISSUES[@]}" | sort -u)
+if (( ${#ISSUES[@]} > 0 )); then
+    # Remove duplicate IDs
+    # This can happen when we release using a separate branch (e.g. patch releases)
+    mapfile -t ISSUES < <(printf "%s\n" "${ISSUES[@]}" | sort -u)
+fi
 
 echo "Creating milestone $LATEST_TAG in github.com/$REPO"
 curl -X POST \
