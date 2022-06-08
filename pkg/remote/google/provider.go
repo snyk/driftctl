@@ -1,8 +1,11 @@
 package google
 
 import (
+	"context"
+	"errors"
 	"os"
 
+	asset "cloud.google.com/go/asset/apiv1"
 	"github.com/snyk/driftctl/pkg/output"
 	"github.com/snyk/driftctl/pkg/remote/google/config"
 	"github.com/snyk/driftctl/pkg/remote/terraform"
@@ -61,4 +64,14 @@ func (p *GCPTerraformProvider) GetConfig() config.GCPTerraformConfig {
 		Region:  os.Getenv("CLOUDSDK_COMPUTE_REGION"),
 		Zone:    os.Getenv("CLOUDSDK_COMPUTE_ZONE"),
 	}
+}
+
+func (p *GCPTerraformProvider) CheckCredentialsExist() error {
+	client, err := asset.NewClient(context.Background())
+	if err != nil {
+		return errors.New("Please use a Service Account to authenticate on GCP.\n" +
+			"For more information: https://cloud.google.com/docs/authentication/production")
+	}
+	_ = client.Close()
+	return nil
 }
