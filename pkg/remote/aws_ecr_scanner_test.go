@@ -125,3 +125,69 @@ func TestECRRepository(t *testing.T) {
 		})
 	}
 }
+
+func TestECRRepositoryPolicy(t *testing.T) {
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockECRRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		err            error
+	}{
+		{
+			test: "single repository policy",
+			mocks: func(client *repository.MockECRRepository, alerter *mocks.AlerterInterface) {
+				client.On("ListAllRepositories").Return([]*ecr.Repository{
+					{RepositoryName: awssdk.String("test_ecr_repo_policy")},
+				}, nil)
+				client.On("GetRepositoryPolicy", &ecr.Repository{
+					RepositoryName: awssdk.String("test_ecr_repo_policy"),
+				}).Return(&ecr.GetRepositoryPolicyOutput{
+					RegistryId:     awssdk.String("1"),
+					RepositoryName: awssdk.String("test_ecr_repo_policy"),
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+
+				assert.Equal(t, got[0].ResourceId(), "test_ecr_repo_policy")
+			},
+			err: nil,
+		},
+	}
+
+	providerVersion := "3.19.0"
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
+	resourceaws.InitResourcesMetadata(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockECRRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.ECRRepository = fakeRepo
+
+			remoteLibrary.AddEnumerator(aws.NewECRRepositoryPolicyEnumerator(repo, factory))
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, err, c.err)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
+		})
+	}
+}
