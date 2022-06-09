@@ -1,8 +1,12 @@
 package azurerm
 
 import (
+	"context"
+	"errors"
 	"os"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/snyk/driftctl/pkg/output"
 	"github.com/snyk/driftctl/pkg/remote/azurerm/common"
 	"github.com/snyk/driftctl/pkg/remote/terraform"
@@ -69,4 +73,23 @@ func (p *AzureTerraformProvider) Name() string {
 
 func (p *AzureTerraformProvider) Version() string {
 	return p.version
+}
+
+func (p *AzureTerraformProvider) CheckCredentialsExist() error {
+	cred, err := azidentity.NewDefaultAzureCredential(&azidentity.DefaultAzureCredentialOptions{})
+	if err != nil {
+		return err
+	}
+
+	_, err = cred.GetToken(context.Background(), policy.TokenRequestOptions{Scopes: []string{"https://management.azure.com//.default"}})
+	if err != nil {
+		return errors.New("Could not find any authentication method for Azure.\n" +
+			"For more information, please check the official Azure documentation: https://docs.microsoft.com/en-us/azure/developer/go/azure-sdk-authorization#use-environment-based-authentication")
+	}
+
+	if p.GetConfig().SubscriptionID == "" {
+		return errors.New("Please provide an Azure subscription ID by setting the `AZURE_SUBSCRIPTION_ID` environment variable.")
+	}
+
+	return nil
 }

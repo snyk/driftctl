@@ -27,6 +27,10 @@ func Init(
 	if err != nil {
 		return err
 	}
+	err = provider.CheckCredentialsExist()
+	if err != nil {
+		return err
+	}
 	err = provider.Init()
 	if err != nil {
 		return err
