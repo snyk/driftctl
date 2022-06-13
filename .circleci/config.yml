@@ -32,7 +32,7 @@ jobs:
     steps:
       - checkout
       - go/install:
-          version: "1.17.6"
+          version: "1.18.3"
       - go/load-cache:
           key: test_acc
       - run: make install-tools
@@ -63,7 +63,7 @@ jobs:
           path: ./
   lint:
     docker:
-      - image: golang:1.17
+      - image: golang:1.18
     steps:
       - checkout
       - run:
@@ -83,7 +83,7 @@ jobs:
     resource_class: large
     executor:
         name: go/default
-        tag: '1.17.6'
+        tag: '1.18.3'
     steps:
       - checkout
       - go/load-cache:
@@ -101,7 +101,7 @@ jobs:
   release:
     resource_class: large
     docker:
-      - image: cimg/go:1.17
+      - image: cimg/go:1.18
     steps:
       - checkout
       - gh/setup:
@@ -196,7 +196,7 @@ jobs:
                 -env "LATEST_VERSION=${CIRCLE_TAG}"
   security-oss:
       docker:
-          - image: cimg/go:1.17.2
+          - image: cimg/go:1.18
       steps:
           - checkout
           - snyk/scan:
@@ -206,7 +206,7 @@ jobs:
                 organization: snyk-iac-group-seceng
   security-code:
       docker:
-          - image: cimg/go:1.17.2
+          - image: cimg/go:1.18.3
       steps:
           - checkout
           - snyk/scan:
