@@ -96,9 +96,10 @@ func TestTerraformStateReader_Source(t *testing.T) {
 
 func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 	tests := []struct {
-		name    string
-		dirName string
-		wantErr bool
+		name            string
+		dirName         string
+		wantErr         bool
+		providerVersion string
 	}{
 		{name: "IAM user module", dirName: "module.iam_iam-user", wantErr: false},
 		{name: "Data source", dirName: "data_source", wantErr: false},
@@ -212,10 +213,13 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 			shouldUpdate := tt.dirName == *goldenfile.Update
 
 			var realProvider *aws.AWSTerraformProvider
+			if tt.providerVersion == "" {
+				tt.providerVersion = "3.19.0"
+			}
 
 			if shouldUpdate {
 				var err error
-				realProvider, err = aws.NewAWSTerraformProvider("3.19.0", progress, os.TempDir())
+				realProvider, err = aws.NewAWSTerraformProvider(tt.providerVersion, progress, os.TempDir())
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -229,7 +233,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 			library := terraform.NewProviderLibrary()
 			library.AddProvider(terraform.AWS, provider)
 
-			repo := testresource.InitFakeSchemaRepository(terraform.AWS, "3.19.0")
+			repo := testresource.InitFakeSchemaRepository(terraform.AWS, tt.providerVersion)
 			resourceaws.InitResourcesMetadata(repo)
 
 			factory := terraform.NewTerraformResourceFactory(repo)
