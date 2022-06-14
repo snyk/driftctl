@@ -24,4 +24,10 @@ resource "aws_route_table" "rr" {
   tags = {
     Name = "rr"
   }
+
+  timeouts {
+    create = "6m"
+    update = "3m"
+    delete = "6m"
+  }
 }
