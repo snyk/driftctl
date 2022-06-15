@@ -11,4 +11,8 @@ func initAwsDefaultRouteTableMetadata(resourceSchemaRepository resource.SchemaRe
 		}
 	})
 	resourceSchemaRepository.SetFlags(AwsDefaultRouteTableResourceType, resource.FlagDeepMode)
+	resourceSchemaRepository.SetNormalizeFunc(AwsDefaultRouteTableResourceType, func(res *resource.Resource) {
+		val := res.Attrs
+		val.SafeDelete([]string{"timeouts"})
+	})
 }
