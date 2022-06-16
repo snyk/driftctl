@@ -35,7 +35,6 @@ echo "Finding merged pull requests between $BASE_TAG and $LATEST_TAG..."
 PRs=$(git log --pretty=oneline "$BASE_TAG"..."$LATEST_TAG" | grep 'Merge pull request #' | grep -oE '#[0-9]+' | sed 's/#//')
 
 # Find fixed issues from $BASE_TAG to $LATEST_TAG
-EXIT_CODE=0
 ISSUES=()
 for pr in $PRs; do
     id=$($GHCLI_BIN pr view "$pr" --json body | grep -oE '(Related issues \| )(.*)?[0-9]+(.*|\r|\n)?(\|)' | sed 's/[^[:digit:]]//g' | sed -z 's/\n//g' || true)
@@ -44,7 +43,6 @@ for pr in $PRs; do
     fi
     if ! $GHCLI_BIN issue view "$id" --json title &> /dev/null; then
         echo "Invalid issue $id for pull request $pr. Skipping."
-        EXIT_CODE=1
         continue
     fi
     ISSUES+=("$id")
@@ -75,4 +73,3 @@ for issue in "${ISSUES[@]}"; do
 done
 
 echo "Done."
-exit $EXIT_CODE
