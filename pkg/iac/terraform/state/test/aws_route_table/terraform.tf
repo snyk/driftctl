@@ -4,7 +4,7 @@ provider "aws" {
 
 terraform {
   required_providers {
-    aws = "3.19.0"
+    aws = "3.62.0"
   }
 }
 
@@ -23,5 +23,11 @@ resource "aws_route_table" "rr" {
 
   tags = {
     Name = "rr"
+  }
+
+  timeouts {
+    create = "6m"
+    update = "3m"
+    delete = "6m"
   }
 }

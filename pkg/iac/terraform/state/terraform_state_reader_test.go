@@ -96,9 +96,10 @@ func TestTerraformStateReader_Source(t *testing.T) {
 
 func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 	tests := []struct {
-		name    string
-		dirName string
-		wantErr bool
+		name            string
+		dirName         string
+		wantErr         bool
+		providerVersion string
 	}{
 		{name: "IAM user module", dirName: "module.iam_iam-user", wantErr: false},
 		{name: "Data source", dirName: "data_source", wantErr: false},
@@ -133,7 +134,8 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "IAM group policy", dirName: "aws_iam_group_policy", wantErr: false},
 		{name: "IAM group policy attachment", dirName: "aws_iam_group_policy_attachment", wantErr: false},
 		{name: "VPC security group rule", dirName: "aws_vpc_security_group_rule", wantErr: false},
-		{name: "route table", dirName: "aws_route_table", wantErr: false},
+		{name: "default route table", dirName: "aws_default_route_table", wantErr: false, providerVersion: "3.62.0"},
+		{name: "route table", dirName: "aws_route_table", wantErr: false, providerVersion: "3.62.0"},
 		{name: "route table associations", dirName: "aws_route_assoc", wantErr: false},
 		{name: "route", dirName: "aws_route", wantErr: false},
 		{name: "NAT gateway", dirName: "aws_nat_gateway", wantErr: false},
@@ -212,10 +214,13 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 			shouldUpdate := tt.dirName == *goldenfile.Update
 
 			var realProvider *aws.AWSTerraformProvider
+			if tt.providerVersion == "" {
+				tt.providerVersion = "3.19.0"
+			}
 
 			if shouldUpdate {
 				var err error
-				realProvider, err = aws.NewAWSTerraformProvider("3.19.0", progress, os.TempDir())
+				realProvider, err = aws.NewAWSTerraformProvider(tt.providerVersion, progress, os.TempDir())
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -229,7 +234,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 			library := terraform.NewProviderLibrary()
 			library.AddProvider(terraform.AWS, provider)
 
-			repo := testresource.InitFakeSchemaRepository(terraform.AWS, "3.19.0")
+			repo := testresource.InitFakeSchemaRepository(terraform.AWS, tt.providerVersion)
 			resourceaws.InitResourcesMetadata(repo)
 
 			factory := terraform.NewTerraformResourceFactory(repo)
