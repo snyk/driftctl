@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/snyk/driftctl/pkg/remote/aws/repository"
 	remoteerror "github.com/snyk/driftctl/pkg/remote/error"
 	"github.com/snyk/driftctl/pkg/resource"
@@ -33,6 +34,9 @@ func (e *ECRRepositoryPolicyEnumerator) Enumerate() ([]*resource.Resource, error
 
 	for _, repo := range repos {
 		repoOutput, err := e.repository.GetRepositoryPolicy(repo)
+		if _, ok := err.(*ecr.RepositoryPolicyNotFoundException); ok {
+			continue
+		}
 		if err != nil {
 			return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 		}

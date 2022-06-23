@@ -138,6 +138,7 @@ func TestECRRepositoryPolicy(t *testing.T) {
 			mocks: func(client *repository.MockECRRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllRepositories").Return([]*ecr.Repository{
 					{RepositoryName: awssdk.String("test_ecr_repo_policy")},
+					{RepositoryName: awssdk.String("test_ecr_repo_without_policy")},
 				}, nil)
 				client.On("GetRepositoryPolicy", &ecr.Repository{
 					RepositoryName: awssdk.String("test_ecr_repo_policy"),
@@ -145,6 +146,9 @@ func TestECRRepositoryPolicy(t *testing.T) {
 					RegistryId:     awssdk.String("1"),
 					RepositoryName: awssdk.String("test_ecr_repo_policy"),
 				}, nil)
+				client.On("GetRepositoryPolicy", &ecr.Repository{
+					RepositoryName: awssdk.String("test_ecr_repo_without_policy"),
+				}).Return(nil, &ecr.RepositoryPolicyNotFoundException{})
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
 				assert.Len(t, got, 1)
