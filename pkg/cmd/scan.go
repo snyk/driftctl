@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"syscall"
@@ -15,9 +17,12 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/snyk/driftctl/build"
 	"github.com/snyk/driftctl/pkg/analyser"
+	"github.com/snyk/driftctl/pkg/iac/config"
+	"github.com/snyk/driftctl/pkg/iac/terraform/state"
 	"github.com/snyk/driftctl/pkg/memstore"
 	"github.com/snyk/driftctl/pkg/remote/common"
 	"github.com/snyk/driftctl/pkg/telemetry"
+	"github.com/snyk/driftctl/pkg/terraform/hcl"
 	"github.com/snyk/driftctl/pkg/terraform/lock"
 	"github.com/spf13/cobra"
 
@@ -146,7 +151,7 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 	fl.StringSliceP(
 		"from",
 		"f",
-		[]string{"tfstate://terraform.tfstate"},
+		[]string{},
 		"IaC sources, by default try to find local terraform.tfstate file\n"+
 			"Accepted schemes are: "+strings.Join(supplier.GetSupportedSchemes(), ",")+"\n",
 	)
@@ -259,6 +264,22 @@ func scanRun(opts *pkg.ScanOptions) error {
 		globaloutput.ChangePrinter(globaloutput.NewConsolePrinter())
 	}
 
+	if len(opts.From) == 0 {
+		supplierConfigs, err := retrieveBackendsFromHCL("")
+		if err != nil {
+			return err
+		}
+		opts.From = append(opts.From, supplierConfigs...)
+	}
+
+	if len(opts.From) == 0 {
+		opts.From = append(opts.From, config.SupplierConfig{
+			Key:     state.TerraformStateReaderSupplier,
+			Backend: backend.BackendKeyFile,
+			Path:    "terraform.tfstate",
+		})
+	}
+
 	providerLibrary := terraform.NewProviderLibrary()
 	remoteLibrary := common.NewRemoteLibrary()
 
@@ -359,4 +380,30 @@ func validateTfProviderVersionString(version string) error {
 		return errors.Errorf("Invalid version argument %s, expected a valid semver string (e.g. 2.13.4)", version)
 	}
 	return nil
+}
+
+func retrieveBackendsFromHCL(workdir string) ([]config.SupplierConfig, error) {
+	matches, err := filepath.Glob(path.Join(workdir, "*.tf"))
+	if err != nil {
+		return nil, err
+	}
+	var supplierConfigs []config.SupplierConfig
+
+	for _, match := range matches {
+		body, err := hcl.ParseTerraformFromHCL(match)
+		if err != nil {
+			logrus.
+				WithField("file", match).
+				WithField("error", err).
+				Debug("Error parsing backend block in Terraform file")
+			continue
+		}
+
+		if supplierConfig := body.Backend.SupplierConfig(); supplierConfig != nil {
+			globaloutput.Printf(color.WhiteString("Using Terraform state %s found in %s. Use the --from flag to specify another state file.\n"), supplierConfig, match)
+			supplierConfigs = append(supplierConfigs, *supplierConfig)
+		}
+	}
+
+	return supplierConfigs, nil
 }
