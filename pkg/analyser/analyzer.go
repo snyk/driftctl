@@ -2,11 +2,11 @@ package analyser
 
 import (
 	"github.com/r3labs/diff/v2"
+	"github.com/snyk/driftctl/enumeration/alerter"
+	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/pkg/filter"
-	resourceaws "github.com/snyk/driftctl/pkg/resource/aws"
 
-	"github.com/snyk/driftctl/pkg/alerter"
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
 )
 
 type UnmanagedSecurityGroupRulesAlert struct{}

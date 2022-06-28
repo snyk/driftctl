@@ -1,19 +1,9 @@
 package azurerm
 
-import "github.com/snyk/driftctl/pkg/resource"
+import "github.com/snyk/driftctl/enumeration/resource"
 
 func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	initAzureVirtualNetworkMetaData(resourceSchemaRepository)
-	initAzureRouteTableMetaData(resourceSchemaRepository)
-	initAzureRouteMetaData(resourceSchemaRepository)
-	initAzureResourceGroupMetadata(resourceSchemaRepository)
-	initAzureContainerRegistryMetadata(resourceSchemaRepository)
-	initAzureFirewallMetadata(resourceSchemaRepository)
-	initAzurePostgresqlServerMetadata(resourceSchemaRepository)
-	initAzurePublicIPMetadata(resourceSchemaRepository)
-	initAzurePostgresqlDatabaseMetadata(resourceSchemaRepository)
 	initAzureNetworkSecurityGroupMetadata(resourceSchemaRepository)
-	initAzureLoadBalancerMetadata(resourceSchemaRepository)
 	initAzurePrivateDNSZoneMetaData(resourceSchemaRepository)
 	initAzurePrivateDNSARecordMetaData(resourceSchemaRepository)
 	initAzurePrivateDNSAAAARecordMetaData(resourceSchemaRepository)
@@ -21,7 +11,6 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAzurePrivateDNSSRVRecordMetaData(resourceSchemaRepository)
 	initAzurePrivateDNSMXRecordMetaData(resourceSchemaRepository)
 	initAzurePrivateDNSTXTRecordMetaData(resourceSchemaRepository)
-	initAzureImageMetaData(resourceSchemaRepository)
 	initAzureSSHPublicKeyMetaData(resourceSchemaRepository)
 	initAzurePrivateDNSCNameRecordMetaData(resourceSchemaRepository)
 	initAzureLoadBalancerRuleMetadata(resourceSchemaRepository)

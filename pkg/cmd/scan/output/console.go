@@ -3,6 +3,7 @@ package output
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"os"
 	"reflect"
 	"sort"
@@ -12,12 +13,11 @@ import (
 	"github.com/fatih/color"
 	"github.com/mattn/go-isatty"
 	"github.com/r3labs/diff/v2"
-	"github.com/snyk/driftctl/pkg/remote/alerts"
 	"github.com/yudai/gojsondiff"
 	"github.com/yudai/gojsondiff/formatter"
 
+	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg/analyser"
-	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const ConsoleOutputType = "console"

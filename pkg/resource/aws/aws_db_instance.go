@@ -1,13 +1,12 @@
 package aws
 
 import (
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
-const AwsDbInstanceResourceType = "aws_db_instance"
-
 func initAwsDbInstanceMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsDbInstanceResourceType, func(res *resource.Resource) {
+	resourceSchemaRepository.SetNormalizeFunc(aws.AwsDbInstanceResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"delete_automated_backups"})
 		val.SafeDelete([]string{"final_snapshot_identifier"})
@@ -20,5 +19,4 @@ func initAwsDbInstanceMetaData(resourceSchemaRepository resource.SchemaRepositor
 		val.SafeDelete([]string{"apply_immediately"})
 		val.DeleteIfDefault("CharacterSetName")
 	})
-	resourceSchemaRepository.SetFlags(AwsDbInstanceResourceType, resource.FlagDeepMode)
 }

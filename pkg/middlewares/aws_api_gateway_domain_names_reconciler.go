@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 // Used to reconcile API Gateway domain names (v1 and v2) from both remote

@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 // Each region has a default vpc which has an internet gateway attached and thus the route table of this

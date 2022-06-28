@@ -4,19 +4,21 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/snyk/driftctl/enumeration/alerter"
+	resource2 "github.com/snyk/driftctl/pkg/resource"
+
 	"github.com/jmespath/go-jmespath"
 	"github.com/sirupsen/logrus"
 	"github.com/snyk/driftctl/pkg/memstore"
 	globaloutput "github.com/snyk/driftctl/pkg/output"
 
-	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/snyk/driftctl/pkg/cmd/scan/output"
 	"github.com/snyk/driftctl/pkg/filter"
 	"github.com/snyk/driftctl/pkg/iac/config"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend"
 	"github.com/snyk/driftctl/pkg/middlewares"
-	"github.com/snyk/driftctl/pkg/resource"
 )
 
 type FmtOptions struct {
@@ -45,7 +47,7 @@ type ScanOptions struct {
 
 type DriftCTL struct {
 	remoteSupplier           resource.Supplier
-	iacSupplier              resource.IaCSupplier
+	iacSupplier              resource2.IaCSupplier
 	alerter                  alerter.AlerterInterface
 	analyzer                 *analyser.Analyzer
 	resourceFactory          resource.ResourceFactory
@@ -57,7 +59,7 @@ type DriftCTL struct {
 }
 
 func NewDriftCTL(remoteSupplier resource.Supplier,
-	iacSupplier resource.IaCSupplier,
+	iacSupplier resource2.IaCSupplier,
 	alerter *alerter.Alerter,
 	analyzer *analyser.Analyzer,
 	resFactory resource.ResourceFactory,

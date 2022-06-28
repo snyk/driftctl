@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/sirupsen/logrus"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 // Since AWS returns the FQDN as the name of the remote record, we must change the Id of the

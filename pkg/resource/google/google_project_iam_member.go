@@ -1,21 +1,13 @@
 package google
 
-import "github.com/snyk/driftctl/pkg/resource"
-
-const GoogleProjectIamMemberResourceType = "google_project_iam_member"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/google"
+)
 
 func initGoogleProjectIAMMemberMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(GoogleProjectIamMemberResourceType, func(res *resource.Resource) {
+	resourceSchemaRepository.SetNormalizeFunc(google.GoogleProjectIamMemberResourceType, func(res *resource.Resource) {
 		res.Attributes().SafeDelete([]string{"force_destroy"})
 		res.Attributes().SafeDelete([]string{"etag"})
 	})
-	resourceSchemaRepository.SetResolveReadAttributesFunc(GoogleProjectIamMemberResourceType, func(res *resource.Resource) map[string]string {
-		return map[string]string{
-			"project": *res.Attrs.GetString("project"),
-			"role":    *res.Attrs.GetString("role"),
-			"member":  *res.Attrs.GetString("member"),
-		}
-	})
-	resourceSchemaRepository.SetFlags(GoogleProjectIamMemberResourceType, resource.FlagDeepMode)
-
 }

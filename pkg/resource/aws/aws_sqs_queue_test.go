@@ -6,8 +6,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	awsresources "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/pkg/analyser"
-	awsresources "github.com/snyk/driftctl/pkg/resource/aws"
 	"github.com/snyk/driftctl/test"
 
 	"github.com/r3labs/diff/v2"

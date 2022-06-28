@@ -7,24 +7,29 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/snyk/driftctl/enumeration/remote/aws"
+	"github.com/snyk/driftctl/enumeration/remote/azurerm"
+	"github.com/snyk/driftctl/enumeration/remote/github"
+	"github.com/snyk/driftctl/enumeration/remote/google"
+	"github.com/snyk/driftctl/enumeration/terraform"
+	aws2 "github.com/snyk/driftctl/pkg/resource/aws"
+	azurerm2 "github.com/snyk/driftctl/pkg/resource/azurerm"
+	github2 "github.com/snyk/driftctl/pkg/resource/github"
+	google2 "github.com/snyk/driftctl/pkg/resource/google"
+
 	"github.com/pkg/errors"
+	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
+	resourceazure "github.com/snyk/driftctl/enumeration/resource/azurerm"
+	resourcegithub "github.com/snyk/driftctl/enumeration/resource/github"
+	resourcegoogle "github.com/snyk/driftctl/enumeration/resource/google"
 	"github.com/snyk/driftctl/pkg/filter"
 	"github.com/snyk/driftctl/pkg/output"
-	"github.com/snyk/driftctl/pkg/remote/azurerm"
-	"github.com/snyk/driftctl/pkg/remote/google"
-	resourceaws "github.com/snyk/driftctl/pkg/resource/aws"
-	resourceazure "github.com/snyk/driftctl/pkg/resource/azurerm"
-	resourcegithub "github.com/snyk/driftctl/pkg/resource/github"
-	resourcegoogle "github.com/snyk/driftctl/pkg/resource/google"
 	testresource "github.com/snyk/driftctl/test/resource"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg/iac/config"
-	"github.com/snyk/driftctl/pkg/remote/aws"
-	"github.com/snyk/driftctl/pkg/remote/github"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/terraform"
 	"github.com/snyk/driftctl/test/goldenfile"
 	"github.com/snyk/driftctl/test/mocks"
 
@@ -236,6 +241,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 
 			repo := testresource.InitFakeSchemaRepository(terraform.AWS, tt.providerVersion)
 			resourceaws.InitResourcesMetadata(repo)
+			aws2.InitResourcesMetadata(repo)
 
 			factory := terraform.NewTerraformResourceFactory(repo)
 
@@ -268,7 +274,8 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 				t.Errorf("Resources() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			changelog, err := diff.Diff(convert(got), want)
+			gotc := convert(got)
+			changelog, err := diff.Diff(gotc, want)
 			if err != nil {
 				panic(err)
 			}
@@ -321,6 +328,7 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 
 			repo := testresource.InitFakeSchemaRepository(terraform.GITHUB, "4.4.0")
 			resourcegithub.InitResourcesMetadata(repo)
+			github2.InitResourcesMetadata(repo)
 			factory := terraform.NewTerraformResourceFactory(repo)
 
 			r := &TerraformStateReader{
@@ -426,6 +434,7 @@ func TestTerraformStateReader_Google_Resources(t *testing.T) {
 
 			repo := testresource.InitFakeSchemaRepository(terraform.GOOGLE, providerVersion)
 			resourcegoogle.InitResourcesMetadata(repo)
+			google2.InitResourcesMetadata(repo)
 			factory := terraform.NewTerraformResourceFactory(repo)
 
 			r := &TerraformStateReader{
@@ -520,6 +529,7 @@ func TestTerraformStateReader_Azure_Resources(t *testing.T) {
 
 			repo := testresource.InitFakeSchemaRepository(terraform.AZURE, providerVersion)
 			resourceazure.InitResourcesMetadata(repo)
+			azurerm2.InitResourcesMetadata(repo)
 			factory := terraform.NewTerraformResourceFactory(repo)
 
 			r := &TerraformStateReader{

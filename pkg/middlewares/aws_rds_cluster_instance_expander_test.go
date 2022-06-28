@@ -1,11 +1,11 @@
 package middlewares
 
 import (
+	"github.com/snyk/driftctl/enumeration/terraform"
 	"testing"
 
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
-	"github.com/snyk/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 // Each default vpc has an internet gateway attached that should not be seen as unmanaged if not managed by IaC

@@ -5,6 +5,7 @@ provider "registry.terraform.io/hashicorp/github" {
   version     = "4.4.0"
   constraints = "4.4.0"
   hashes = [
+    "h1:dgn+oL1cC8kz3ODIuT/PyHqgso00SpItPN089ZuUGt4=",
     "h1:eKArqtLcYoYUFf4dgNzVemqu2GsoEf7K0ZLEXjSoPBo=",
     "zh:0ebb07c4971ca7d60fce8614270d056328a121fd4ffbda4b29a06d4a1e90e939",
     "zh:178b333f2f285c1a59b9335320f584bd01304179c2d6a1919366945b55cfb293",

@@ -3,19 +3,20 @@ package supplier
 import (
 	"fmt"
 
+	"github.com/snyk/driftctl/enumeration/alerter"
+	"github.com/snyk/driftctl/enumeration/terraform"
+	resource2 "github.com/snyk/driftctl/pkg/resource"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/snyk/driftctl/pkg/alerter"
 	"github.com/snyk/driftctl/pkg/filter"
+	"github.com/snyk/driftctl/pkg/iac/config"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend"
 	"github.com/snyk/driftctl/pkg/output"
-	"github.com/snyk/driftctl/pkg/terraform"
-
-	"github.com/snyk/driftctl/pkg/iac/config"
 
 	"github.com/snyk/driftctl/pkg/iac/terraform/state"
 
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
 )
 
 var supportedSuppliers = []string{
@@ -37,7 +38,7 @@ func GetIACSupplier(configs []config.SupplierConfig,
 	progress output.Progress,
 	alerter *alerter.Alerter,
 	factory resource.ResourceFactory,
-	filter filter.Filter) (resource.IaCSupplier, error) {
+	filter filter.Filter) (resource2.IaCSupplier, error) {
 
 	chainSupplier := NewIacChainSupplier()
 	for _, config := range configs {
@@ -47,7 +48,7 @@ func GetIACSupplier(configs []config.SupplierConfig,
 
 		deserializer := resource.NewDeserializer(factory)
 
-		var supplier resource.IaCSupplier
+		var supplier resource2.IaCSupplier
 		var err error
 		switch config.Key {
 		case state.TerraformStateReaderSupplier:

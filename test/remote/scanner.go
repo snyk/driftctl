@@ -1,7 +1,7 @@
 package remote
 
 import (
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
 )
 
 type SortableScanner struct {

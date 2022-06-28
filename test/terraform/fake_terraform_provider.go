@@ -9,7 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform/providers"
 	"github.com/pkg/errors"
-	"github.com/snyk/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/enumeration/terraform"
 	"github.com/snyk/driftctl/test/goldenfile"
 	"github.com/snyk/driftctl/test/mocks"
 	"github.com/snyk/driftctl/test/schemas"

@@ -1,0 +1,72 @@
+[
+ {
+  "cidr_block": "172.31.0.0/16",
+  "egress": true,
+  "from_port": 80,
+  "icmp_code": null,
+  "icmp_type": null,
+  "id": "nacl-246660311",
+  "ipv6_cidr_block": "",
+  "network_acl_id": "acl-0ad6d657494d17ee2",
+  "protocol": "udp",
+  "rule_action": "allow",
+  "rule_number": 100,
+  "to_port": 80
+ },
+ {
+  "cidr_block": "",
+  "egress": false,
+  "from_port": 80,
+  "icmp_code": null,
+  "icmp_type": null,
+  "id": "nacl-2289824980",
+  "ipv6_cidr_block": "::/0",
+  "network_acl_id": "acl-0ad6d657494d17ee2",
+  "protocol": "tcp",
+  "rule_action": "allow",
+  "rule_number": 200,
+  "to_port": 80
+ },
+ {
+  "cidr_block": "172.31.0.0/16",
+  "egress": false,
+  "from_port": 80,
+  "icmp_code": null,
+  "icmp_type": null,
+  "id": "nacl-515082162",
+  "ipv6_cidr_block": "",
+  "network_acl_id": "acl-0de54ef59074b622e",
+  "protocol": "udp",
+  "rule_action": "allow",
+  "rule_number": 100,
+  "to_port": 80
+ },
+ {
+  "cidr_block": "172.31.0.0/16",
+  "egress": true,
+  "from_port": 80,
+  "icmp_code": null,
+  "icmp_type": null,
+  "id": "nacl-4268384215",
+  "ipv6_cidr_block": "",
+  "network_acl_id": "acl-0de54ef59074b622e",
+  "protocol": "udp",
+  "rule_action": "allow",
+  "rule_number": 100,
+  "to_port": 80
+ },
+ {
+  "cidr_block": "172.31.0.0/16",
+  "egress": false,
+  "from_port": 80,
+  "icmp_code": null,
+  "icmp_type": null,
+  "id": "nacl-4293207588",
+  "ipv6_cidr_block": "",
+  "network_acl_id": "acl-0ad6d657494d17ee2",
+  "protocol": "tcp",
+  "rule_action": "allow",
+  "rule_number": 100,
+  "to_port": 80
+ }
+]

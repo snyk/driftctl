@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 func TestAwsInstanceEIP_Execute(t *testing.T) {

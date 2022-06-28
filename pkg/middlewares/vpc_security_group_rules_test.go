@@ -1,13 +1,13 @@
 package middlewares
 
 import (
+	"github.com/snyk/driftctl/enumeration/terraform"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
-	"github.com/snyk/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 func TestVPCSecurityGroupRuleSanitizer(t *testing.T) {

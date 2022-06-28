@@ -1,14 +1,14 @@
 package terraform
 
 import (
+	"github.com/snyk/driftctl/enumeration/remote/aws"
+	"github.com/snyk/driftctl/enumeration/remote/azurerm"
+	"github.com/snyk/driftctl/enumeration/remote/github"
+	"github.com/snyk/driftctl/enumeration/remote/google"
+	"github.com/snyk/driftctl/enumeration/terraform"
 	"os"
 
 	"github.com/snyk/driftctl/pkg/output"
-	"github.com/snyk/driftctl/pkg/remote/aws"
-	"github.com/snyk/driftctl/pkg/remote/azurerm"
-	"github.com/snyk/driftctl/pkg/remote/github"
-	"github.com/snyk/driftctl/pkg/remote/google"
-	"github.com/snyk/driftctl/pkg/terraform"
 )
 
 func InitTestAwsProvider(providerLibrary *terraform.ProviderLibrary, version string) (*aws.AWSTerraformProvider, error) {

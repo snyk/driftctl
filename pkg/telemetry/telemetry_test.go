@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/jarcoal/httpmock"
+	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/snyk/driftctl/pkg/memstore"
-	"github.com/snyk/driftctl/pkg/resource"
 	"github.com/snyk/driftctl/pkg/version"
 	"github.com/snyk/driftctl/test/mocks"
 	"github.com/spf13/viper"

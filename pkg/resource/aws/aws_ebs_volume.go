@@ -1,18 +1,16 @@
 package aws
 
 import (
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
-const AwsEbsVolumeResourceType = "aws_ebs_volume"
-
 func initAwsEbsVolumeMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsEbsVolumeResourceType, func(res *resource.Resource) {
+	resourceSchemaRepository.SetNormalizeFunc(aws.AwsEbsVolumeResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"arn"})
 		val.SafeDelete([]string{"outpost_arn"})
 		val.SafeDelete([]string{"snapshot_id"})
 		val.DeleteIfDefault("throughput")
 	})
-	resourceSchemaRepository.SetFlags(AwsEbsVolumeResourceType, resource.FlagDeepMode)
 }

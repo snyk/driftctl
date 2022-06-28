@@ -4,13 +4,15 @@ import (
 	"context"
 	"runtime"
 
+	"github.com/snyk/driftctl/enumeration/parallel"
+	resource2 "github.com/snyk/driftctl/pkg/resource"
+
+	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg/iac"
-	"github.com/snyk/driftctl/pkg/parallel"
-	"github.com/snyk/driftctl/pkg/resource"
 )
 
 type IacChainSupplier struct {
-	suppliers []resource.IaCSupplier
+	suppliers []resource2.IaCSupplier
 	runner    *parallel.ParallelRunner
 }
 
@@ -28,7 +30,7 @@ func (r *IacChainSupplier) SourceCount() uint {
 	return count
 }
 
-func (r *IacChainSupplier) AddSupplier(supplier resource.IaCSupplier) {
+func (r *IacChainSupplier) AddSupplier(supplier resource2.IaCSupplier) {
 	r.suppliers = append(r.suppliers, supplier)
 }
 

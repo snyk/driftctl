@@ -8,8 +8,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/ecr"
 
 	"github.com/r3labs/diff/v2"
+	awsresources "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/pkg/analyser"
-	awsresources "github.com/snyk/driftctl/pkg/resource/aws"
 	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/acceptance"
 	"github.com/snyk/driftctl/test/acceptance/awsutils"

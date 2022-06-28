@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
 )
 
 var callCounters map[string]int

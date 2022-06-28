@@ -1,15 +1,13 @@
 package azurerm
 
 import (
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/azurerm"
 )
 
-const AzurePrivateDNSZoneResourceType = "azurerm_private_dns_zone"
-
 func initAzurePrivateDNSZoneMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AzurePrivateDNSZoneResourceType, func(res *resource.Resource) {
+	resourceSchemaRepository.SetNormalizeFunc(azurerm.AzurePrivateDNSZoneResourceType, func(res *resource.Resource) {
 		res.Attributes().SafeDelete([]string{"number_of_record_sets"})
 		res.Attributes().SafeDelete([]string{"timeouts"})
 	})
-	resourceSchemaRepository.SetFlags(AzurePrivateDNSZoneResourceType, resource.FlagDeepMode)
 }

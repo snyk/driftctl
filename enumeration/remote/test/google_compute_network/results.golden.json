@@ -1,0 +1,41 @@
+[
+ {
+  "auto_create_subnetworks": false,
+  "delete_default_routes_on_create": false,
+  "description": "",
+  "gateway_ipv4": "",
+  "id": "projects/driftctl-qa-1/global/networks/driftctl-unittest-3",
+  "mtu": 1460,
+  "name": "driftctl-unittest-3",
+  "project": "driftctl-qa-1",
+  "routing_mode": "REGIONAL",
+  "self_link": "https://www.googleapis.com/compute/v1/projects/driftctl-qa-1/global/networks/driftctl-unittest-3",
+  "timeouts": {}
+ },
+ {
+  "auto_create_subnetworks": true,
+  "delete_default_routes_on_create": false,
+  "description": "",
+  "gateway_ipv4": "",
+  "id": "projects/driftctl-qa-1/global/networks/driftctl-unittest-2",
+  "mtu": 1460,
+  "name": "driftctl-unittest-2",
+  "project": "driftctl-qa-1",
+  "routing_mode": "REGIONAL",
+  "self_link": "https://www.googleapis.com/compute/v1/projects/driftctl-qa-1/global/networks/driftctl-unittest-2",
+  "timeouts": {}
+ },
+ {
+  "auto_create_subnetworks": false,
+  "delete_default_routes_on_create": false,
+  "description": "",
+  "gateway_ipv4": "",
+  "id": "projects/driftctl-qa-1/global/networks/driftctl-unittest-1",
+  "mtu": 1460,
+  "name": "driftctl-unittest-1",
+  "project": "driftctl-qa-1",
+  "routing_mode": "REGIONAL",
+  "self_link": "https://www.googleapis.com/compute/v1/projects/driftctl-qa-1/global/networks/driftctl-unittest-1",
+  "timeouts": {}
+ }
+]

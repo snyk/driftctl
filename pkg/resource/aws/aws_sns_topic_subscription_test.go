@@ -1,12 +1,12 @@
 package aws_test
 
 import (
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"testing"
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/snyk/driftctl/pkg/remote/aws/repository"
-	"github.com/snyk/driftctl/pkg/remote/cache"
 	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/acceptance"
 	"github.com/snyk/driftctl/test/acceptance/awsutils"

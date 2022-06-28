@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/r3labs/diff/v2"
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/snyk/driftctl/pkg/analyser"

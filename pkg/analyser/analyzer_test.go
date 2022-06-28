@@ -6,6 +6,9 @@ import (
 	"testing"
 	"time"
 
+	alerter2 "github.com/snyk/driftctl/enumeration/alerter"
+	aws2 "github.com/snyk/driftctl/pkg/resource/aws"
+
 	"github.com/snyk/driftctl/pkg/filter"
 	"github.com/stretchr/testify/mock"
 
@@ -15,9 +18,8 @@ import (
 
 	"github.com/snyk/driftctl/test/goldenfile"
 
-	"github.com/snyk/driftctl/pkg/alerter"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 
 	"github.com/r3labs/diff/v2"
 )
@@ -32,7 +34,7 @@ func TestAnalyze(t *testing.T) {
 			res  *resource.Resource
 			path []string
 		}
-		alerts     alerter.Alerts
+		alerts     alerter2.Alerts
 		expected   Analysis
 		hasDrifted bool
 		options    *AnalyzerOptions
@@ -292,7 +294,7 @@ func TestAnalyze(t *testing.T) {
 						},
 					},
 				},
-				alerts: alerter.Alerts{
+				alerts: alerter2.Alerts{
 					"": {
 						NewComputedDiffAlert(),
 					},
@@ -379,7 +381,7 @@ func TestAnalyze(t *testing.T) {
 						},
 					},
 				},
-				alerts: alerter.Alerts{
+				alerts: alerter2.Alerts{
 					"": {
 						NewComputedDiffAlert(),
 					},
@@ -574,15 +576,15 @@ func TestAnalyze(t *testing.T) {
 					},
 				},
 			},
-			alerts: alerter.Alerts{
+			alerts: alerter2.Alerts{
 				"fakeres": {
-					&alerter.FakeAlert{Msg: "Should be ignored", IgnoreResource: true},
+					&alerter2.FakeAlert{Msg: "Should be ignored", IgnoreResource: true},
 				},
 				"other.foobaz": {
-					&alerter.FakeAlert{Msg: "Should be ignored", IgnoreResource: true},
+					&alerter2.FakeAlert{Msg: "Should be ignored", IgnoreResource: true},
 				},
 				"other.resource": {
-					&alerter.FakeAlert{Msg: "Should not be ignored"},
+					&alerter2.FakeAlert{Msg: "Should not be ignored"},
 				},
 			},
 			expected: Analysis{
@@ -702,15 +704,15 @@ func TestAnalyze(t *testing.T) {
 						},
 					},
 				},
-				alerts: alerter.Alerts{
+				alerts: alerter2.Alerts{
 					"fakeres": {
-						&alerter.FakeAlert{Msg: "Should be ignored", IgnoreResource: true},
+						&alerter2.FakeAlert{Msg: "Should be ignored", IgnoreResource: true},
 					},
 					"other.foobaz": {
-						&alerter.FakeAlert{Msg: "Should be ignored", IgnoreResource: true},
+						&alerter2.FakeAlert{Msg: "Should be ignored", IgnoreResource: true},
 					},
 					"other.resource": {
-						&alerter.FakeAlert{Msg: "Should not be ignored"},
+						&alerter2.FakeAlert{Msg: "Should not be ignored"},
 					},
 				},
 			},
@@ -738,7 +740,7 @@ func TestAnalyze(t *testing.T) {
 					},
 				},
 			},
-			alerts: alerter.Alerts{},
+			alerts: alerter2.Alerts{},
 			expected: Analysis{
 				managed: []*resource.Resource{
 					{
@@ -791,7 +793,7 @@ func TestAnalyze(t *testing.T) {
 						},
 					},
 				},
-				alerts: alerter.Alerts{
+				alerts: alerter2.Alerts{
 					"": {
 						NewComputedDiffAlert(),
 					},
@@ -850,7 +852,7 @@ func TestAnalyze(t *testing.T) {
 					TotalManaged:   1,
 					TotalUnmanaged: 1,
 				},
-				alerts: alerter.Alerts{
+				alerts: alerter2.Alerts{
 					"": {
 						newUnmanagedSecurityGroupRulesAlert(),
 					},
@@ -924,7 +926,7 @@ func TestAnalyze(t *testing.T) {
 					TotalUnmanaged: 3,
 					TotalDeleted:   3,
 				},
-				alerts: alerter.Alerts{},
+				alerts: alerter2.Alerts{},
 			},
 			hasDrifted: true,
 		},
@@ -1158,13 +1160,14 @@ func TestAnalyze(t *testing.T) {
 			}
 			testFilter.On("IsFieldIgnored", mock.Anything, mock.Anything).Return(false)
 
-			al := alerter.NewAlerter()
+			al := alerter2.NewAlerter()
 			if c.alerts != nil {
 				al.SetAlerts(c.alerts)
 			}
 
 			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 			aws.InitResourcesMetadata(repo)
+			aws2.InitResourcesMetadata(repo)
 
 			options := AnalyzerOptions{Deep: true}
 			if c.options != nil {
@@ -1327,9 +1330,9 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 			},
 		},
 	})
-	analysis.SetAlerts(alerter.Alerts{
+	analysis.SetAlerts(alerter2.Alerts{
 		"aws_iam_access_key": {
-			&alerter.FakeAlert{Msg: "This is an alert"},
+			&alerter2.FakeAlert{Msg: "This is an alert"},
 		},
 	})
 	analysis.ProviderName = "AWS"
@@ -1413,9 +1416,9 @@ func TestAnalysis_UnmarshalJSON(t *testing.T) {
 				},
 			},
 		},
-		alerts: alerter.Alerts{
+		alerts: alerter2.Alerts{
 			"aws_iam_access_key": {
-				&alerter.SerializedAlert{
+				&alerter2.SerializedAlert{
 					Msg: "This is an alert",
 				},
 			},

@@ -1,13 +1,13 @@
 package aws
 
-import "github.com/snyk/driftctl/pkg/resource"
-
-const AwsEcrRepositoryResourceType = "aws_ecr_repository"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
+)
 
 func initAwsEcrRepositoryMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsEcrRepositoryResourceType, func(res *resource.Resource) {
+	resourceSchemaRepository.SetNormalizeFunc(aws.AwsEcrRepositoryResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 	})
-	resourceSchemaRepository.SetFlags(AwsEcrRepositoryResourceType, resource.FlagDeepMode)
 }

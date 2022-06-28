@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"github.com/snyk/driftctl/enumeration/terraform"
 	"strings"
 	"testing"
 
@@ -8,10 +9,9 @@ import (
 	"github.com/r3labs/diff/v2"
 	"github.com/stretchr/testify/mock"
 
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/mocks"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
-	"github.com/snyk/driftctl/pkg/terraform"
 )
 
 func TestAwsRouteTableExpander_Execute(t *testing.T) {
