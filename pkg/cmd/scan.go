@@ -387,7 +387,7 @@ func retrieveBackendsFromHCL(workdir string) ([]config.SupplierConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	var supplierConfigs []config.SupplierConfig
+	supplierConfigs := make([]config.SupplierConfig, 0)
 
 	for _, match := range matches {
 		body, err := hcl.ParseTerraformFromHCL(match)

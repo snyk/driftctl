@@ -4,6 +4,9 @@ import (
 	"testing"
 
 	"github.com/snyk/driftctl/pkg"
+	"github.com/snyk/driftctl/pkg/iac/config"
+	"github.com/snyk/driftctl/pkg/iac/terraform/state"
+	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend"
 	"github.com/snyk/driftctl/test"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
@@ -153,6 +156,40 @@ func Test_Options(t *testing.T) {
 			_, err := test.Execute(rootCmd, tt.args...)
 			assert.NoError(t, err)
 			tt.assertOptions(t, opts)
+		})
+	}
+}
+
+func Test_RetrieveBackendsFromHCL(t *testing.T) {
+	cases := []struct {
+		name     string
+		dir      string
+		expected []config.SupplierConfig
+		wantErr  error
+	}{
+		{
+			name: "should parse s3 backend and ignore invalid file",
+			dir:  "testdata/backend/s3",
+			expected: []config.SupplierConfig{
+				{
+					Key:     state.TerraformStateReaderSupplier,
+					Backend: backend.BackendKeyS3,
+					Path:    "terraform-state-prod/network/terraform.tfstate",
+				},
+			},
+		},
+		{
+			name:     "should not find any match and return empty slice",
+			dir:      "testdata/backend",
+			expected: []config.SupplierConfig{},
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			configs, err := retrieveBackendsFromHCL(tt.dir)
+			assert.Equal(t, tt.wantErr, err)
+			assert.Equal(t, tt.expected, configs)
 		})
 	}
 }
