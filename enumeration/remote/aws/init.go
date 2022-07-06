@@ -4,7 +4,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/remote/aws/client"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	"github.com/snyk/driftctl/enumeration/resource"
@@ -40,26 +40,26 @@ func Init(version string, alerter *alerter.Alerter,
 
 	repositoryCache := cache.New(100)
 
-	s3Repository := repository2.NewS3Repository(client.NewAWSClientFactory(provider.session), repositoryCache)
-	ec2repository := repository2.NewEC2Repository(provider.session, repositoryCache)
-	elbv2Repository := repository2.NewELBV2Repository(provider.session, repositoryCache)
-	route53repository := repository2.NewRoute53Repository(provider.session, repositoryCache)
-	lambdaRepository := repository2.NewLambdaRepository(provider.session, repositoryCache)
-	rdsRepository := repository2.NewRDSRepository(provider.session, repositoryCache)
-	sqsRepository := repository2.NewSQSRepository(provider.session, repositoryCache)
-	snsRepository := repository2.NewSNSRepository(provider.session, repositoryCache)
-	cloudfrontRepository := repository2.NewCloudfrontRepository(provider.session, repositoryCache)
-	dynamoDBRepository := repository2.NewDynamoDBRepository(provider.session, repositoryCache)
-	ecrRepository := repository2.NewECRRepository(provider.session, repositoryCache)
-	kmsRepository := repository2.NewKMSRepository(provider.session, repositoryCache)
-	iamRepository := repository2.NewIAMRepository(provider.session, repositoryCache)
-	cloudformationRepository := repository2.NewCloudformationRepository(provider.session, repositoryCache)
-	apigatewayRepository := repository2.NewApiGatewayRepository(provider.session, repositoryCache)
-	appAutoScalingRepository := repository2.NewAppAutoScalingRepository(provider.session, repositoryCache)
-	apigatewayv2Repository := repository2.NewApiGatewayV2Repository(provider.session, repositoryCache)
-	autoscalingRepository := repository2.NewAutoScalingRepository(provider.session, repositoryCache)
-	elbRepository := repository2.NewELBRepository(provider.session, repositoryCache)
-	elasticacheRepository := repository2.NewElastiCacheRepository(provider.session, repositoryCache)
+	s3Repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session), repositoryCache)
+	ec2repository := repository.NewEC2Repository(provider.session, repositoryCache)
+	elbv2Repository := repository.NewELBV2Repository(provider.session, repositoryCache)
+	route53repository := repository.NewRoute53Repository(provider.session, repositoryCache)
+	lambdaRepository := repository.NewLambdaRepository(provider.session, repositoryCache)
+	rdsRepository := repository.NewRDSRepository(provider.session, repositoryCache)
+	sqsRepository := repository.NewSQSRepository(provider.session, repositoryCache)
+	snsRepository := repository.NewSNSRepository(provider.session, repositoryCache)
+	cloudfrontRepository := repository.NewCloudfrontRepository(provider.session, repositoryCache)
+	dynamoDBRepository := repository.NewDynamoDBRepository(provider.session, repositoryCache)
+	ecrRepository := repository.NewECRRepository(provider.session, repositoryCache)
+	kmsRepository := repository.NewKMSRepository(provider.session, repositoryCache)
+	iamRepository := repository.NewIAMRepository(provider.session, repositoryCache)
+	cloudformationRepository := repository.NewCloudformationRepository(provider.session, repositoryCache)
+	apigatewayRepository := repository.NewApiGatewayRepository(provider.session, repositoryCache)
+	appAutoScalingRepository := repository.NewAppAutoScalingRepository(provider.session, repositoryCache)
+	apigatewayv2Repository := repository.NewApiGatewayV2Repository(provider.session, repositoryCache)
+	autoscalingRepository := repository.NewAutoScalingRepository(provider.session, repositoryCache)
+	elbRepository := repository.NewELBRepository(provider.session, repositoryCache)
+	elasticacheRepository := repository.NewElastiCacheRepository(provider.session, repositoryCache)
 
 	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.AWS, provider)

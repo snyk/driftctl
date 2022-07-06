@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	azurerm2 "github.com/snyk/driftctl/enumeration/remote/azurerm"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
+	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -35,20 +35,20 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no private zone",
 			dirName: "azurerm_private_dns_private_zone_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
 		},
 		{
 			test:    "error listing private zones",
 			dirName: "azurerm_private_dns_private_zone_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzurePrivateDNSZoneResourceType),
@@ -56,7 +56,7 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 		{
 			test:    "multiple private zones",
 			dirName: "azurerm_private_dns_private_zone_multiple",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
 					{
 						TrackedResource: armprivatedns.TrackedResource{
@@ -103,10 +103,10 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockPrivateDNSRepository{}
+			fakeRepo := &repository.MockPrivateDNSRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.PrivateDNSRepository = fakeRepo
+			var repo repository.PrivateDNSRepository = fakeRepo
 			providerVersion := "2.71.0"
 			realProvider, err := terraformtest.InitTestAzureProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -127,7 +127,7 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 					t.Fatal(err)
 				}
 				clientOptions := &arm.ClientOptions{}
-				repo = repository2.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSZoneEnumerator(repo, factory))
@@ -157,20 +157,20 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no private a record",
 			dirName: "azurerm_private_dns_a_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
 		},
 		{
 			test:    "error listing private zone",
 			dirName: "azurerm_private_dns_a_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePrivateDNSARecordResourceType, resourceazure.AzurePrivateDNSZoneResourceType),
@@ -178,7 +178,7 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 		{
 			test:    "error listing private a records",
 			dirName: "azurerm_private_dns_a_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
 					{
 						TrackedResource: armprivatedns.TrackedResource{
@@ -196,7 +196,7 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 		{
 			test:    "multiple private a records",
 			dirName: "azurerm_private_dns_a_record_multiple",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
 					{
 						TrackedResource: armprivatedns.TrackedResource{
@@ -257,10 +257,10 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockPrivateDNSRepository{}
+			fakeRepo := &repository.MockPrivateDNSRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.PrivateDNSRepository = fakeRepo
+			var repo repository.PrivateDNSRepository = fakeRepo
 			providerVersion := "2.71.0"
 			realProvider, err := terraformtest.InitTestAzureProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -281,7 +281,7 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 					t.Fatal(err)
 				}
 				clientOptions := &arm.ClientOptions{}
-				repo = repository2.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSARecordEnumerator(repo, factory))
@@ -311,20 +311,20 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no private aaaa record",
 			dirName: "azurerm_private_dns_aaaa_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
 		},
 		{
 			test:    "error listing private zone",
 			dirName: "azurerm_private_dns_aaaa_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePrivateDNSAAAARecordResourceType, resourceazure.AzurePrivateDNSZoneResourceType),
@@ -332,7 +332,7 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 		{
 			test:    "error listing private aaaa records",
 			dirName: "azurerm_private_dns_aaaa_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
 					{
 						TrackedResource: armprivatedns.TrackedResource{
@@ -350,7 +350,7 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 		{
 			test:    "multiple private aaaaa records",
 			dirName: "azurerm_private_dns_aaaaa_record_multiple",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
 					{
 						TrackedResource: armprivatedns.TrackedResource{
@@ -412,10 +412,10 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockPrivateDNSRepository{}
+			fakeRepo := &repository.MockPrivateDNSRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.PrivateDNSRepository = fakeRepo
+			var repo repository.PrivateDNSRepository = fakeRepo
 			providerVersion := "2.71.0"
 			realProvider, err := terraformtest.InitTestAzureProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -436,7 +436,7 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 					t.Fatal(err)
 				}
 				clientOptions := &arm.ClientOptions{}
-				repo = repository2.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSAAAARecordEnumerator(repo, factory))
@@ -466,20 +466,20 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no private cname record",
 			dirName: "azurerm_private_dns_cname_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
 		},
 		{
 			test:    "error listing private zone",
 			dirName: "azurerm_private_dns_cname_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePrivateDNSCNameRecordResourceType, resourceazure.AzurePrivateDNSZoneResourceType),
@@ -487,7 +487,7 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 		{
 			test:    "error listing private cname records",
 			dirName: "azurerm_private_dns_cname_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
 					{
 						TrackedResource: armprivatedns.TrackedResource{
@@ -505,7 +505,7 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 		{
 			test:    "multiple private cname records",
 			dirName: "azurerm_private_dns_cname_record_multiple",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
 					{
 						TrackedResource: armprivatedns.TrackedResource{
@@ -555,10 +555,10 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockPrivateDNSRepository{}
+			fakeRepo := &repository.MockPrivateDNSRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.PrivateDNSRepository = fakeRepo
+			var repo repository.PrivateDNSRepository = fakeRepo
 			providerVersion := "2.71.0"
 			realProvider, err := terraformtest.InitTestAzureProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -579,7 +579,7 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 					t.Fatal(err)
 				}
 				clientOptions := &arm.ClientOptions{}
-				repo = repository2.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSCNameRecordEnumerator(repo, factory))
@@ -609,20 +609,20 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no private ptr record",
 			dirName: "azurerm_private_dns_ptr_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
 		},
 		{
 			test:    "error listing private zone",
 			dirName: "azurerm_private_dns_ptr_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePrivateDNSPTRRecordResourceType, resourceazure.AzurePrivateDNSZoneResourceType),
@@ -630,7 +630,7 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 		{
 			test:    "error listing private ptr records",
 			dirName: "azurerm_private_dns_ptr_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
 					{
 						TrackedResource: armprivatedns.TrackedResource{
@@ -648,7 +648,7 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 		{
 			test:    "multiple private ptra records",
 			dirName: "azurerm_private_dns_ptr_record_multiple",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
 					{
 						TrackedResource: armprivatedns.TrackedResource{
@@ -709,10 +709,10 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockPrivateDNSRepository{}
+			fakeRepo := &repository.MockPrivateDNSRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.PrivateDNSRepository = fakeRepo
+			var repo repository.PrivateDNSRepository = fakeRepo
 			providerVersion := "2.71.0"
 			realProvider, err := terraformtest.InitTestAzureProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -733,7 +733,7 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 					t.Fatal(err)
 				}
 				clientOptions := &arm.ClientOptions{}
-				repo = repository2.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSPTRRecordEnumerator(repo, factory))
@@ -763,20 +763,20 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no private mx record",
 			dirName: "azurerm_private_dns_mx_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
 		},
 		{
 			test:    "error listing private zone",
 			dirName: "azurerm_private_dns_mx_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePrivateDNSMXRecordResourceType, resourceazure.AzurePrivateDNSZoneResourceType),
@@ -784,7 +784,7 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 		{
 			test:    "error listing private mx records",
 			dirName: "azurerm_private_dns_mx_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
 					{
 						TrackedResource: armprivatedns.TrackedResource{
@@ -802,7 +802,7 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 		{
 			test:    "multiple private mx records",
 			dirName: "azurerm_private_dns_mx_record_multiple",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
 					{
 						TrackedResource: armprivatedns.TrackedResource{
@@ -864,10 +864,10 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockPrivateDNSRepository{}
+			fakeRepo := &repository.MockPrivateDNSRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.PrivateDNSRepository = fakeRepo
+			var repo repository.PrivateDNSRepository = fakeRepo
 			providerVersion := "2.71.0"
 			realProvider, err := terraformtest.InitTestAzureProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -888,7 +888,7 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 					t.Fatal(err)
 				}
 				clientOptions := &arm.ClientOptions{}
-				repo = repository2.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSMXRecordEnumerator(repo, factory))
@@ -918,20 +918,20 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no private srv record",
 			dirName: "azurerm_private_dns_srv_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
 		},
 		{
 			test:    "error listing private zone",
 			dirName: "azurerm_private_dns_srv_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePrivateDNSSRVRecordResourceType, resourceazure.AzurePrivateDNSZoneResourceType),
@@ -939,7 +939,7 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 		{
 			test:    "error listing private srv records",
 			dirName: "azurerm_private_dns_srv_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
 					{
 						TrackedResource: armprivatedns.TrackedResource{
@@ -957,7 +957,7 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 		{
 			test:    "multiple private srv records",
 			dirName: "azurerm_private_dns_srv_record_multiple",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
 					{
 						TrackedResource: armprivatedns.TrackedResource{
@@ -1018,10 +1018,10 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockPrivateDNSRepository{}
+			fakeRepo := &repository.MockPrivateDNSRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.PrivateDNSRepository = fakeRepo
+			var repo repository.PrivateDNSRepository = fakeRepo
 			providerVersion := "2.71.0"
 			realProvider, err := terraformtest.InitTestAzureProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -1042,7 +1042,7 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 					t.Fatal(err)
 				}
 				clientOptions := &arm.ClientOptions{}
-				repo = repository2.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSSRVRecordEnumerator(repo, factory))
@@ -1072,20 +1072,20 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no private txt record",
 			dirName: "azurerm_private_dns_txt_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
 		},
 		{
 			test:    "error listing private zone",
 			dirName: "azurerm_private_dns_txt_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePrivateDNSTXTRecordResourceType, resourceazure.AzurePrivateDNSZoneResourceType),
@@ -1093,7 +1093,7 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 		{
 			test:    "error listing private txt records",
 			dirName: "azurerm_private_dns_txt_record_empty",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
 					{
 						TrackedResource: armprivatedns.TrackedResource{
@@ -1111,7 +1111,7 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 		{
 			test:    "multiple private txt records",
 			dirName: "azurerm_private_dns_txt_record_multiple",
-			mocks: func(repository *repository2.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{
 					{
 						TrackedResource: armprivatedns.TrackedResource{
@@ -1172,10 +1172,10 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockPrivateDNSRepository{}
+			fakeRepo := &repository.MockPrivateDNSRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.PrivateDNSRepository = fakeRepo
+			var repo repository.PrivateDNSRepository = fakeRepo
 			providerVersion := "2.71.0"
 			realProvider, err := terraformtest.InitTestAzureProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -1196,7 +1196,7 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 					t.Fatal(err)
 				}
 				clientOptions := &arm.ClientOptions{}
-				repo = repository2.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
+				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSTXTRecordEnumerator(repo, factory))

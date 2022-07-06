@@ -5,7 +5,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/alerter"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
+	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	"github.com/snyk/driftctl/enumeration/resource"
@@ -45,13 +45,13 @@ func Init(
 
 	c := cache.New(100)
 
-	storageAccountRepo := repository2.NewStorageRepository(cred, clientOptions, providerConfig, c)
-	networkRepo := repository2.NewNetworkRepository(cred, clientOptions, providerConfig, c)
-	resourcesRepo := repository2.NewResourcesRepository(cred, clientOptions, providerConfig, c)
-	containerRegistryRepo := repository2.NewContainerRegistryRepository(cred, clientOptions, providerConfig, c)
-	postgresqlRepo := repository2.NewPostgresqlRepository(cred, clientOptions, providerConfig, c)
-	privateDNSRepo := repository2.NewPrivateDNSRepository(cred, clientOptions, providerConfig, c)
-	computeRepo := repository2.NewComputeRepository(cred, clientOptions, providerConfig, c)
+	storageAccountRepo := repository.NewStorageRepository(cred, clientOptions, providerConfig, c)
+	networkRepo := repository.NewNetworkRepository(cred, clientOptions, providerConfig, c)
+	resourcesRepo := repository.NewResourcesRepository(cred, clientOptions, providerConfig, c)
+	containerRegistryRepo := repository.NewContainerRegistryRepository(cred, clientOptions, providerConfig, c)
+	postgresqlRepo := repository.NewPostgresqlRepository(cred, clientOptions, providerConfig, c)
+	privateDNSRepo := repository.NewPrivateDNSRepository(cred, clientOptions, providerConfig, c)
+	computeRepo := repository.NewComputeRepository(cred, clientOptions, providerConfig, c)
 
 	providerLibrary.AddProvider(terraform.AZURE, provider)
 	deserializer := resource.NewDeserializer(factory)

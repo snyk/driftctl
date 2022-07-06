@@ -7,7 +7,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/aws"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -32,13 +32,13 @@ func TestDynamoDBTable(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockDynamoDBRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockDynamoDBRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no DynamoDB Table",
 			dirName: "aws_dynamodb_table_empty",
-			mocks: func(client *repository2.MockDynamoDBRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockDynamoDBRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTables").Return([]*string{}, nil)
 			},
 			wantErr: nil,
@@ -46,7 +46,7 @@ func TestDynamoDBTable(t *testing.T) {
 		{
 			test:    "Multiple DynamoDB Table",
 			dirName: "aws_dynamodb_table_multiple",
-			mocks: func(client *repository2.MockDynamoDBRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockDynamoDBRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTables").Return([]*string{
 					awssdk.String("GameScores"),
 					awssdk.String("example"),
@@ -57,7 +57,7 @@ func TestDynamoDBTable(t *testing.T) {
 		{
 			test:    "cannot list DynamoDB Table",
 			dirName: "aws_dynamodb_table_list",
-			mocks: func(client *repository2.MockDynamoDBRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockDynamoDBRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 400, "")
 				client.On("ListAllTables").Return(nil, awsError)
 
@@ -86,10 +86,10 @@ func TestDynamoDBTable(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockDynamoDBRepository{}
+			fakeRepo := &repository.MockDynamoDBRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.DynamoDBRepository = fakeRepo
+			var repo repository.DynamoDBRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -105,7 +105,7 @@ func TestDynamoDBTable(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewDynamoDBRepository(sess, cache.New(0))
+				repo = repository.NewDynamoDBRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewDynamoDBTableEnumerator(repo, factory))

@@ -10,7 +10,7 @@ import (
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	google2 "github.com/snyk/driftctl/enumeration/remote/google"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/google/repository"
+	"github.com/snyk/driftctl/enumeration/remote/google/repository"
 	terraform3 "github.com/snyk/driftctl/enumeration/terraform"
 
 	asset "cloud.google.com/go/asset/apiv1"
@@ -140,7 +140,7 @@ func TestGoogleStorageBucket(t *testing.T) {
 				provider.ShouldUpdate()
 			}
 
-			repo := repository2.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
+			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google2.NewGoogleStorageBucketEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resType, common2.NewGenericDetailsFetcher(resType, provider, deserializer))
@@ -166,8 +166,8 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 	cases := []struct {
 		test                  string
 		dirName               string
-		assetRepositoryMock   func(assetRepository *repository2.MockAssetRepository)
-		storageRepositoryMock func(storageRepository *repository2.MockStorageRepository)
+		assetRepositoryMock   func(assetRepository *repository.MockAssetRepository)
+		storageRepositoryMock func(storageRepository *repository.MockStorageRepository)
 		responseErr           error
 		setupAlerterMock      func(alerter *mocks.AlerterInterface)
 		wantErr               error
@@ -175,7 +175,7 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 		{
 			test:    "no storage buckets",
 			dirName: "google_storage_bucket_member_empty",
-			assetRepositoryMock: func(assetRepository *repository2.MockAssetRepository) {
+			assetRepositoryMock: func(assetRepository *repository.MockAssetRepository) {
 				assetRepository.On("SearchAllBuckets").Return([]*assetpb.ResourceSearchResult{}, nil)
 			},
 			wantErr: nil,
@@ -183,7 +183,7 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 		{
 			test:    "multiples storage buckets, no bindings",
 			dirName: "google_storage_bucket_member_empty",
-			assetRepositoryMock: func(assetRepository *repository2.MockAssetRepository) {
+			assetRepositoryMock: func(assetRepository *repository.MockAssetRepository) {
 				assetRepository.On("SearchAllBuckets").Return([]*assetpb.ResourceSearchResult{
 					{
 						AssetType:   "storage.googleapis.com/Bucket",
@@ -195,7 +195,7 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 					},
 				}, nil)
 			},
-			storageRepositoryMock: func(storageRepository *repository2.MockStorageRepository) {
+			storageRepositoryMock: func(storageRepository *repository.MockStorageRepository) {
 				storageRepository.On("ListAllBindings", "dctlgstoragebucketiambinding-1").Return(map[string][]string{}, nil)
 				storageRepository.On("ListAllBindings", "dctlgstoragebucketiambinding-2").Return(map[string][]string{}, nil)
 			},
@@ -204,7 +204,7 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 		{
 			test:    "Cannot list bindings",
 			dirName: "google_storage_bucket_member_listing_error",
-			assetRepositoryMock: func(assetRepository *repository2.MockAssetRepository) {
+			assetRepositoryMock: func(assetRepository *repository.MockAssetRepository) {
 				assetRepository.On("SearchAllBuckets").Return([]*assetpb.ResourceSearchResult{
 					{
 						AssetType:   "storage.googleapis.com/Bucket",
@@ -212,7 +212,7 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 					},
 				}, nil)
 			},
-			storageRepositoryMock: func(storageRepository *repository2.MockStorageRepository) {
+			storageRepositoryMock: func(storageRepository *repository.MockStorageRepository) {
 				storageRepository.On("ListAllBindings", "dctlgstoragebucketiambinding-1").Return(
 					map[string][]string{},
 					errors.New("googleapi: Error 403: driftctl-acc-circle@driftctl-qa-1.iam.gserviceaccount.com does not have storage.buckets.getIamPolicy access to the Google Cloud Storage bucket., forbidden"))
@@ -236,7 +236,7 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 		{
 			test:    "multiples storage buckets, multiple bindings",
 			dirName: "google_storage_bucket_member_listing_multiple",
-			assetRepositoryMock: func(assetRepository *repository2.MockAssetRepository) {
+			assetRepositoryMock: func(assetRepository *repository.MockAssetRepository) {
 				assetRepository.On("SearchAllBuckets").Return([]*assetpb.ResourceSearchResult{
 					{
 						AssetType:   "storage.googleapis.com/Bucket",
@@ -248,7 +248,7 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 					},
 				}, nil)
 			},
-			storageRepositoryMock: func(storageRepository *repository2.MockStorageRepository) {
+			storageRepositoryMock: func(storageRepository *repository.MockStorageRepository) {
 				storageRepository.On("ListAllBindings", "dctlgstoragebucketiambinding-1").Return(map[string][]string{
 					"roles/storage.admin":        {"user:elie.charra@cloudskiff.com"},
 					"roles/storage.objectViewer": {"user:william.beuil@cloudskiff.com"},
@@ -286,24 +286,24 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 				c.setupAlerterMock(alerter)
 			}
 
-			storageRepo := &repository2.MockStorageRepository{}
+			storageRepo := &repository.MockStorageRepository{}
 			if c.storageRepositoryMock != nil {
 				c.storageRepositoryMock(storageRepo)
 			}
-			var storageRepository repository2.StorageRepository = storageRepo
+			var storageRepository repository.StorageRepository = storageRepo
 			if shouldUpdate {
 				storageClient, err := storage.NewClient(context.Background())
 				if err != nil {
 					panic(err)
 				}
-				storageRepository = repository2.NewStorageRepository(storageClient, repositoryCache)
+				storageRepository = repository.NewStorageRepository(storageClient, repositoryCache)
 			}
 
-			assetRepo := &repository2.MockAssetRepository{}
+			assetRepo := &repository.MockAssetRepository{}
 			if c.assetRepositoryMock != nil {
 				c.assetRepositoryMock(assetRepo)
 			}
-			var assetRepository repository2.AssetRepository = assetRepo
+			var assetRepository repository.AssetRepository = assetRepo
 
 			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
 			if err != nil {

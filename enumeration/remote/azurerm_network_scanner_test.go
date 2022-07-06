@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	azurerm2 "github.com/snyk/driftctl/enumeration/remote/azurerm"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
+	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	error2 "github.com/snyk/driftctl/enumeration/remote/error"
@@ -34,13 +34,13 @@ func TestAzurermVirtualNetwork(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockNetworkRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no virtual network",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllVirtualNetworks").Return([]*armnetwork.VirtualNetwork{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -49,14 +49,14 @@ func TestAzurermVirtualNetwork(t *testing.T) {
 		},
 		{
 			test: "error listing virtual network",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllVirtualNetworks").Return(nil, dummyError)
 			},
 			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzureVirtualNetworkResourceType),
 		},
 		{
 			test: "multiple virtual network",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllVirtualNetworks").Return([]*armnetwork.VirtualNetwork{
 					{
 						Resource: armnetwork.Resource{
@@ -97,10 +97,10 @@ func TestAzurermVirtualNetwork(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockNetworkRepository{}
+			fakeRepo := &repository.MockNetworkRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.NetworkRepository = fakeRepo
+			var repo repository.NetworkRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermVirtualNetworkEnumerator(repo, factory))
 
@@ -127,13 +127,13 @@ func TestAzurermRouteTables(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockNetworkRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no route tables",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRouteTables").Return([]*armnetwork.RouteTable{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -142,14 +142,14 @@ func TestAzurermRouteTables(t *testing.T) {
 		},
 		{
 			test: "error listing route tables",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRouteTables").Return(nil, dummyError)
 			},
 			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzureRouteTableResourceType),
 		},
 		{
 			test: "multiple route tables",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRouteTables").Return([]*armnetwork.RouteTable{
 					{
 						Resource: armnetwork.Resource{
@@ -190,10 +190,10 @@ func TestAzurermRouteTables(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockNetworkRepository{}
+			fakeRepo := &repository.MockNetworkRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.NetworkRepository = fakeRepo
+			var repo repository.NetworkRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermRouteTableEnumerator(repo, factory))
 
@@ -220,13 +220,13 @@ func TestAzurermRoutes(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockNetworkRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no route tables",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRouteTables").Return([]*armnetwork.RouteTable{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -235,7 +235,7 @@ func TestAzurermRoutes(t *testing.T) {
 		},
 		{
 			test: "no routes",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRouteTables").Return([]*armnetwork.RouteTable{
 					{
 						Properties: &armnetwork.RouteTablePropertiesFormat{
@@ -255,14 +255,14 @@ func TestAzurermRoutes(t *testing.T) {
 		},
 		{
 			test: "error listing route tables",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRouteTables").Return(nil, dummyError)
 			},
 			wantErr: error2.NewResourceListingErrorWithType(dummyError, resourceazure.AzureRouteResourceType, resourceazure.AzureRouteTableResourceType),
 		},
 		{
 			test: "multiple routes",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRouteTables").Return([]*armnetwork.RouteTable{
 					{
 						Resource: armnetwork.Resource{
@@ -339,10 +339,10 @@ func TestAzurermRoutes(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockNetworkRepository{}
+			fakeRepo := &repository.MockNetworkRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.NetworkRepository = fakeRepo
+			var repo repository.NetworkRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermRouteEnumerator(repo, factory))
 
@@ -382,13 +382,13 @@ func TestAzurermSubnets(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockNetworkRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no subnets",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllVirtualNetworks").Return(networks, nil)
 				repository.On("ListAllSubnets", networks[0]).Return([]*armnetwork.Subnet{}, nil).Times(1)
 				repository.On("ListAllSubnets", networks[1]).Return([]*armnetwork.Subnet{}, nil).Times(1)
@@ -399,14 +399,14 @@ func TestAzurermSubnets(t *testing.T) {
 		},
 		{
 			test: "error listing virtual network",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllVirtualNetworks").Return(nil, dummyError)
 			},
 			wantErr: error2.NewResourceListingErrorWithType(dummyError, resourceazure.AzureSubnetResourceType, resourceazure.AzureVirtualNetworkResourceType),
 		},
 		{
 			test: "error listing subnets",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllVirtualNetworks").Return(networks, nil)
 				repository.On("ListAllSubnets", networks[0]).Return(nil, dummyError).Times(1)
 			},
@@ -414,7 +414,7 @@ func TestAzurermSubnets(t *testing.T) {
 		},
 		{
 			test: "multiple subnets",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllVirtualNetworks").Return(networks, nil)
 				repository.On("ListAllSubnets", networks[0]).Return([]*armnetwork.Subnet{
 					{
@@ -472,10 +472,10 @@ func TestAzurermSubnets(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockNetworkRepository{}
+			fakeRepo := &repository.MockNetworkRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.NetworkRepository = fakeRepo
+			var repo repository.NetworkRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermSubnetEnumerator(repo, factory))
 
@@ -502,13 +502,13 @@ func TestAzurermFirewalls(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockNetworkRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no firewall",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllFirewalls").Return([]*armnetwork.AzureFirewall{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -517,14 +517,14 @@ func TestAzurermFirewalls(t *testing.T) {
 		},
 		{
 			test: "error listing firewalls",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllFirewalls").Return(nil, dummyError)
 			},
 			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzureFirewallResourceType),
 		},
 		{
 			test: "multiple firewalls",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllFirewalls").Return([]*armnetwork.AzureFirewall{
 					{
 						Resource: armnetwork.Resource{
@@ -565,10 +565,10 @@ func TestAzurermFirewalls(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockNetworkRepository{}
+			fakeRepo := &repository.MockNetworkRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.NetworkRepository = fakeRepo
+			var repo repository.NetworkRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermFirewallsEnumerator(repo, factory))
 
@@ -595,13 +595,13 @@ func TestAzurermPublicIP(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockNetworkRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no public IP",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPublicIPAddresses").Return([]*armnetwork.PublicIPAddress{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -610,14 +610,14 @@ func TestAzurermPublicIP(t *testing.T) {
 		},
 		{
 			test: "error listing public IPs",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPublicIPAddresses").Return(nil, dummyError)
 			},
 			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzurePublicIPResourceType),
 		},
 		{
 			test: "multiple public IP",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPublicIPAddresses").Return([]*armnetwork.PublicIPAddress{
 					{
 						Resource: armnetwork.Resource{
@@ -658,10 +658,10 @@ func TestAzurermPublicIP(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockNetworkRepository{}
+			fakeRepo := &repository.MockNetworkRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.NetworkRepository = fakeRepo
+			var repo repository.NetworkRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPublicIPEnumerator(repo, factory))
 
@@ -689,20 +689,20 @@ func TestAzurermSecurityGroups(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockNetworkRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no security group",
 			dirName: "azurerm_network_security_group_empty",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSecurityGroups").Return([]*armnetwork.NetworkSecurityGroup{}, nil)
 			},
 		},
 		{
 			test:    "error listing security groups",
 			dirName: "azurerm_network_security_group_empty",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSecurityGroups").Return(nil, dummyError)
 			},
 			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzureNetworkSecurityGroupResourceType),
@@ -710,7 +710,7 @@ func TestAzurermSecurityGroups(t *testing.T) {
 		{
 			test:    "multiple security groups",
 			dirName: "azurerm_network_security_group_multiple",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSecurityGroups").Return([]*armnetwork.NetworkSecurityGroup{
 					{
 						Resource: armnetwork.Resource{
@@ -745,10 +745,10 @@ func TestAzurermSecurityGroups(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockNetworkRepository{}
+			fakeRepo := &repository.MockNetworkRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.NetworkRepository = fakeRepo
+			var repo repository.NetworkRepository = fakeRepo
 			providerVersion := "2.71.0"
 			realProvider, err := terraform2.InitTestAzureProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -769,7 +769,7 @@ func TestAzurermSecurityGroups(t *testing.T) {
 					t.Fatal(err)
 				}
 				clientOptions := &arm.ClientOptions{}
-				repo = repository2.NewNetworkRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
+				repo = repository.NewNetworkRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermNetworkSecurityGroupEnumerator(repo, factory))
@@ -798,13 +798,13 @@ func TestAzurermLoadBalancers(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockNetworkRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no load balancer",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllLoadBalancers").Return([]*armnetwork.LoadBalancer{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -813,14 +813,14 @@ func TestAzurermLoadBalancers(t *testing.T) {
 		},
 		{
 			test: "error listing load balancers",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllLoadBalancers").Return(nil, dummyError)
 			},
 			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzureLoadBalancerResourceType),
 		},
 		{
 			test: "multiple load balancers",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllLoadBalancers").Return([]*armnetwork.LoadBalancer{
 					{
 						Resource: armnetwork.Resource{
@@ -861,10 +861,10 @@ func TestAzurermLoadBalancers(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockNetworkRepository{}
+			fakeRepo := &repository.MockNetworkRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.NetworkRepository = fakeRepo
+			var repo repository.NetworkRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermLoadBalancerEnumerator(repo, factory))
 
@@ -892,13 +892,13 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockNetworkRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no load balancer rule",
 			dirName: "azurerm_lb_rule_empty",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				loadbalancer := &armnetwork.LoadBalancer{
 					Resource: armnetwork.Resource{
 						ID:   to.StringPtr("/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/frontendIPConfigurations/PublicIPAddress"),
@@ -914,7 +914,7 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 		{
 			test:    "error listing load balancer rules",
 			dirName: "azurerm_lb_rule_empty",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllLoadBalancers").Return(nil, dummyError)
 			},
 			wantErr: error2.NewResourceListingErrorWithType(dummyError, resourceazure.AzureLoadBalancerRuleResourceType, resourceazure.AzureLoadBalancerResourceType),
@@ -922,7 +922,7 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 		{
 			test:    "multiple load balancer rules",
 			dirName: "azurerm_lb_rule_multiple",
-			mocks: func(repository *repository2.MockNetworkRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				loadbalancer := &armnetwork.LoadBalancer{
 					Resource: armnetwork.Resource{
 						ID:   to.StringPtr("/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/frontendIPConfigurations/PublicIPAddress"),
@@ -966,10 +966,10 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockNetworkRepository{}
+			fakeRepo := &repository.MockNetworkRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.NetworkRepository = fakeRepo
+			var repo repository.NetworkRepository = fakeRepo
 			providerVersion := "2.71.0"
 			realProvider, err := terraform2.InitTestAzureProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -990,7 +990,7 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 					t.Fatal(err)
 				}
 				clientOptions := &arm.ClientOptions{}
-				repo = repository2.NewNetworkRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
+				repo = repository.NewNetworkRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermLoadBalancerRuleEnumerator(repo, factory))

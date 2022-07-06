@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	azurerm2 "github.com/snyk/driftctl/enumeration/remote/azurerm"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
+	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/terraform"
@@ -28,13 +28,13 @@ func TestAzurermPostgresqlServer(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockPostgresqlRespository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockPostgresqlRespository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no postgres server",
-			mocks: func(repository *repository2.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllServers").Return([]*armpostgresql.Server{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -43,14 +43,14 @@ func TestAzurermPostgresqlServer(t *testing.T) {
 		},
 		{
 			test: "error listing postgres servers",
-			mocks: func(repository *repository2.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllServers").Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzurePostgresqlServerResourceType),
 		},
 		{
 			test: "multiple postgres servers",
-			mocks: func(repository *repository2.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllServers").Return([]*armpostgresql.Server{
 					{
 						TrackedResource: armpostgresql.TrackedResource{
@@ -95,10 +95,10 @@ func TestAzurermPostgresqlServer(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockPostgresqlRespository{}
+			fakeRepo := &repository.MockPostgresqlRespository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.PostgresqlRespository = fakeRepo
+			var repo repository.PostgresqlRespository = fakeRepo
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPostgresqlServerEnumerator(repo, factory))
 
@@ -125,13 +125,13 @@ func TestAzurermPostgresqlDatabase(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockPostgresqlRespository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockPostgresqlRespository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no postgres database",
-			mocks: func(repository *repository2.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllServers").Return([]*armpostgresql.Server{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -140,14 +140,14 @@ func TestAzurermPostgresqlDatabase(t *testing.T) {
 		},
 		{
 			test: "error listing postgres servers",
-			mocks: func(repository *repository2.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllServers").Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePostgresqlDatabaseResourceType, resourceazure.AzurePostgresqlServerResourceType),
 		},
 		{
 			test: "error listing postgres databases",
-			mocks: func(repository *repository2.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllServers").Return([]*armpostgresql.Server{
 					{
 						TrackedResource: armpostgresql.TrackedResource{
@@ -165,7 +165,7 @@ func TestAzurermPostgresqlDatabase(t *testing.T) {
 		},
 		{
 			test: "multiple postgres databases",
-			mocks: func(repository *repository2.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockPostgresqlRespository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllServers").Return([]*armpostgresql.Server{
 					{
 						TrackedResource: armpostgresql.TrackedResource{
@@ -221,10 +221,10 @@ func TestAzurermPostgresqlDatabase(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockPostgresqlRespository{}
+			fakeRepo := &repository.MockPostgresqlRespository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.PostgresqlRespository = fakeRepo
+			var repo repository.PostgresqlRespository = fakeRepo
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPostgresqlDatabaseEnumerator(repo, factory))
 

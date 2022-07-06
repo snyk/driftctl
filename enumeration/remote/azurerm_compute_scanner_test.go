@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	azurerm2 "github.com/snyk/driftctl/enumeration/remote/azurerm"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
+	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -34,13 +34,13 @@ func TestAzurermCompute_Image(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockComputeRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockComputeRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no images",
-			mocks: func(repository *repository2.MockComputeRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockComputeRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllImages").Return([]*armcompute.Image{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -49,14 +49,14 @@ func TestAzurermCompute_Image(t *testing.T) {
 		},
 		{
 			test: "error listing images",
-			mocks: func(repository *repository2.MockComputeRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockComputeRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllImages").Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzureImageResourceType),
 		},
 		{
 			test: "multiple images including an invalid ID",
-			mocks: func(repository *repository2.MockComputeRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockComputeRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllImages").Return([]*armcompute.Image{
 					{
 						Resource: armcompute.Resource{
@@ -102,7 +102,7 @@ func TestAzurermCompute_Image(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockComputeRepository{}
+			fakeRepo := &repository.MockComputeRepository{}
 			c.mocks(fakeRepo, alerter)
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermImageEnumerator(fakeRepo, factory))
@@ -131,20 +131,20 @@ func TestAzurermCompute_SSHPublicKey(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockComputeRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockComputeRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no public key",
 			dirName: "azurerm_ssh_public_key_empty",
-			mocks: func(repository *repository2.MockComputeRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockComputeRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSSHPublicKeys").Return([]*armcompute.SSHPublicKeyResource{}, nil)
 			},
 		},
 		{
 			test:    "error listing public keys",
 			dirName: "azurerm_ssh_public_key_empty",
-			mocks: func(repository *repository2.MockComputeRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockComputeRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSSHPublicKeys").Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzureSSHPublicKeyResourceType),
@@ -152,7 +152,7 @@ func TestAzurermCompute_SSHPublicKey(t *testing.T) {
 		{
 			test:    "multiple public keys",
 			dirName: "azurerm_ssh_public_key_multiple",
-			mocks: func(repository *repository2.MockComputeRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockComputeRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSSHPublicKeys").Return([]*armcompute.SSHPublicKeyResource{
 					{
 						Resource: armcompute.Resource{
@@ -187,10 +187,10 @@ func TestAzurermCompute_SSHPublicKey(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockComputeRepository{}
+			fakeRepo := &repository.MockComputeRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ComputeRepository = fakeRepo
+			var repo repository.ComputeRepository = fakeRepo
 			providerVersion := "2.71.0"
 			realProvider, err := terraform2.InitTestAzureProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -211,7 +211,7 @@ func TestAzurermCompute_SSHPublicKey(t *testing.T) {
 					t.Fatal(err)
 				}
 				clientOptions := &arm.ClientOptions{}
-				repo = repository2.NewComputeRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
+				repo = repository.NewComputeRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermSSHPublicKeyEnumerator(repo, factory))

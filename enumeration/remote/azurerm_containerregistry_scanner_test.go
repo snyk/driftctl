@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/azurerm"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
+	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	error2 "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/terraform"
@@ -28,13 +28,13 @@ func TestAzurermContainerRegistry(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockContainerRegistryRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockContainerRegistryRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no container registry",
-			mocks: func(repository *repository2.MockContainerRegistryRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockContainerRegistryRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllContainerRegistries").Return([]*armcontainerregistry.Registry{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -43,14 +43,14 @@ func TestAzurermContainerRegistry(t *testing.T) {
 		},
 		{
 			test: "error listing container registry",
-			mocks: func(repository *repository2.MockContainerRegistryRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockContainerRegistryRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllContainerRegistries").Return(nil, dummyError)
 			},
 			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzureContainerRegistryResourceType),
 		},
 		{
 			test: "multiple container registries",
-			mocks: func(repository *repository2.MockContainerRegistryRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockContainerRegistryRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllContainerRegistries").Return([]*armcontainerregistry.Registry{
 					{
 						Resource: armcontainerregistry.Resource{
@@ -89,10 +89,10 @@ func TestAzurermContainerRegistry(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockContainerRegistryRepository{}
+			fakeRepo := &repository.MockContainerRegistryRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ContainerRegistryRepository = fakeRepo
+			var repo repository.ContainerRegistryRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermContainerRegistryEnumerator(repo, factory))
 

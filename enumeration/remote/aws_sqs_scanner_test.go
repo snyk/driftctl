@@ -6,7 +6,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -33,13 +33,13 @@ func TestSQSQueue(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockSQSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockSQSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no sqs queues",
 			dirName: "aws_sqs_queue_empty",
-			mocks: func(client *repository2.MockSQSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{}, nil)
 			},
 			wantErr: nil,
@@ -47,7 +47,7 @@ func TestSQSQueue(t *testing.T) {
 		{
 			test:    "multiple sqs queues",
 			dirName: "aws_sqs_queue_multiple",
-			mocks: func(client *repository2.MockSQSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo"),
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/foo"),
@@ -58,7 +58,7 @@ func TestSQSQueue(t *testing.T) {
 		{
 			test:    "cannot list sqs queues",
 			dirName: "aws_sqs_queue_empty",
-			mocks: func(client *repository2.MockSQSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllQueues").Return(nil, awsError)
 
@@ -87,9 +87,9 @@ func TestSQSQueue(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockSQSRepository{}
+			fakeRepo := &repository.MockSQSRepository{}
 			c.mocks(fakeRepo, alerter)
-			var repo repository2.SQSRepository = fakeRepo
+			var repo repository.SQSRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -105,7 +105,7 @@ func TestSQSQueue(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewSQSRepository(sess, cache.New(0))
+				repo = repository.NewSQSRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewSQSQueueEnumerator(repo, factory))
@@ -131,7 +131,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockSQSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockSQSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
@@ -139,7 +139,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 			// as a default SQSDefaultPolicy (e.g. policy="") will always be present in each queue
 			test:    "no sqs queue policies",
 			dirName: "aws_sqs_queue_policy_empty",
-			mocks: func(client *repository2.MockSQSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{}, nil)
 			},
 			wantErr: nil,
@@ -147,7 +147,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 		{
 			test:    "multiple sqs queue policies (default or not)",
 			dirName: "aws_sqs_queue_policy_multiple",
-			mocks: func(client *repository2.MockSQSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo"),
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/foo"),
@@ -168,7 +168,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 		{
 			test:    "multiple sqs queue policies (with nil attributes)",
 			dirName: "aws_sqs_queue_policy_multiple",
-			mocks: func(client *repository2.MockSQSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo"),
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/foo"),
@@ -185,7 +185,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 		{
 			test:    "cannot list sqs queues, thus sqs queue policies",
 			dirName: "aws_sqs_queue_policy_empty",
-			mocks: func(client *repository2.MockSQSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllQueues").Return(nil, awsError)
 
@@ -214,9 +214,9 @@ func TestSQSQueuePolicy(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockSQSRepository{}
+			fakeRepo := &repository.MockSQSRepository{}
 			c.mocks(fakeRepo, alerter)
-			var repo repository2.SQSRepository = fakeRepo
+			var repo repository.SQSRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -232,7 +232,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewSQSRepository(sess, cache.New(0))
+				repo = repository.NewSQSRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewSQSQueuePolicyEnumerator(repo, factory))

@@ -9,7 +9,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/resource"
@@ -28,13 +28,13 @@ func TestApiGatewayRestApi(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway rest apis",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRestApis").Return([]*apigateway.RestApi{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -43,7 +43,7 @@ func TestApiGatewayRestApi(t *testing.T) {
 		},
 		{
 			test: "multiple api gateway rest apis",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRestApis").Return([]*apigateway.RestApi{
 					{Id: awssdk.String("3of73v5ob4")},
 					{Id: awssdk.String("1jitcobwol")},
@@ -61,7 +61,7 @@ func TestApiGatewayRestApi(t *testing.T) {
 		},
 		{
 			test: "cannot list api gateway rest apis",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRestApis").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayRestApiResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayRestApiResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -81,10 +81,10 @@ func TestApiGatewayRestApi(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayRestApiEnumerator(repo, factory))
 
@@ -111,13 +111,13 @@ func TestApiGatewayAccount(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway account",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("GetAccount").Return(nil, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -126,7 +126,7 @@ func TestApiGatewayAccount(t *testing.T) {
 		},
 		{
 			test: "empty api gateway account",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("GetAccount").Return(&apigateway.Account{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -138,7 +138,7 @@ func TestApiGatewayAccount(t *testing.T) {
 		},
 		{
 			test: "cannot get api gateway account",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("GetAccount").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayAccountResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayAccountResourceType, resourceaws.AwsApiGatewayAccountResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -158,10 +158,10 @@ func TestApiGatewayAccount(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayAccountEnumerator(repo, factory))
 
@@ -188,13 +188,13 @@ func TestApiGatewayApiKey(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway api keys",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllApiKeys").Return([]*apigateway.ApiKey{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -203,7 +203,7 @@ func TestApiGatewayApiKey(t *testing.T) {
 		},
 		{
 			test: "multiple api gateway api keys",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllApiKeys").Return([]*apigateway.ApiKey{
 					{Id: awssdk.String("fuwnl8lrva")},
 					{Id: awssdk.String("9ge737dd45")},
@@ -221,7 +221,7 @@ func TestApiGatewayApiKey(t *testing.T) {
 		},
 		{
 			test: "cannot list api gateway api keys",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllApiKeys").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayApiKeyResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayApiKeyResourceType, resourceaws.AwsApiGatewayApiKeyResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -241,10 +241,10 @@ func TestApiGatewayApiKey(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayApiKeyEnumerator(repo, factory))
 
@@ -275,13 +275,13 @@ func TestApiGatewayAuthorizer(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway authorizers",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiAuthorizers", *apis[0].Id).Return([]*apigateway.Authorizer{}, nil).Once()
 				repo.On("ListAllRestApiAuthorizers", *apis[1].Id).Return([]*apigateway.Authorizer{}, nil).Once()
@@ -292,7 +292,7 @@ func TestApiGatewayAuthorizer(t *testing.T) {
 		},
 		{
 			test: "multiple api gateway authorizers",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiAuthorizers", *apis[0].Id).Return([]*apigateway.Authorizer{
 					{Id: awssdk.String("ypcpde")},
@@ -313,7 +313,7 @@ func TestApiGatewayAuthorizer(t *testing.T) {
 		},
 		{
 			test: "cannot list rest apis",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayAuthorizerResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayAuthorizerResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -321,7 +321,7 @@ func TestApiGatewayAuthorizer(t *testing.T) {
 		},
 		{
 			test: "cannot list api gateway resources",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiAuthorizers", *apis[0].Id).Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayAuthorizerResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayAuthorizerResourceType, resourceaws.AwsApiGatewayAuthorizerResourceType), alerts.EnumerationPhase)).Return()
@@ -342,10 +342,10 @@ func TestApiGatewayAuthorizer(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayAuthorizerEnumerator(repo, factory))
 
@@ -375,13 +375,13 @@ func TestApiGatewayStage(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway stages",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiStages", *apis[0].Id).Return([]*apigateway.Stage{}, nil)
 			},
@@ -391,7 +391,7 @@ func TestApiGatewayStage(t *testing.T) {
 		},
 		{
 			test: "multiple api gateway stages",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiStages", *apis[0].Id).Return([]*apigateway.Stage{
 					{StageName: awssdk.String("foo")},
@@ -410,7 +410,7 @@ func TestApiGatewayStage(t *testing.T) {
 		},
 		{
 			test: "cannot list rest apis",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayStageResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayStageResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -418,7 +418,7 @@ func TestApiGatewayStage(t *testing.T) {
 		},
 		{
 			test: "cannot list api gateway stages",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiStages", *apis[0].Id).Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayStageResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayStageResourceType, resourceaws.AwsApiGatewayStageResourceType), alerts.EnumerationPhase)).Return()
@@ -439,10 +439,10 @@ func TestApiGatewayStage(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayStageEnumerator(repo, factory))
 
@@ -472,13 +472,13 @@ func TestApiGatewayResource(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway resources",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return([]*apigateway.Resource{}, nil)
 			},
@@ -488,7 +488,7 @@ func TestApiGatewayResource(t *testing.T) {
 		},
 		{
 			test: "multiple api gateway resources",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return([]*apigateway.Resource{
 					{Id: awssdk.String("21zk4y"), Path: awssdk.String("/")},
@@ -507,7 +507,7 @@ func TestApiGatewayResource(t *testing.T) {
 		},
 		{
 			test: "cannot list rest apis",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayResourceResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayResourceResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -515,7 +515,7 @@ func TestApiGatewayResource(t *testing.T) {
 		},
 		{
 			test: "cannot list api gateway resources",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayResourceResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayResourceResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
@@ -536,10 +536,10 @@ func TestApiGatewayResource(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayResourceEnumerator(repo, factory))
 
@@ -566,13 +566,13 @@ func TestApiGatewayDomainName(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway domain names",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDomainNames").Return([]*apigateway.DomainName{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -581,7 +581,7 @@ func TestApiGatewayDomainName(t *testing.T) {
 		},
 		{
 			test: "single api gateway domain name",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDomainNames").Return([]*apigateway.DomainName{
 					{DomainName: awssdk.String("example-driftctl.com")},
 				}, nil)
@@ -595,7 +595,7 @@ func TestApiGatewayDomainName(t *testing.T) {
 		},
 		{
 			test: "cannot list api gateway domain names",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDomainNames").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayDomainNameResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayDomainNameResourceType, resourceaws.AwsApiGatewayDomainNameResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -615,10 +615,10 @@ func TestApiGatewayDomainName(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayDomainNameEnumerator(repo, factory))
 
@@ -645,13 +645,13 @@ func TestApiGatewayVpcLink(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway vpc links",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllVpcLinks").Return([]*apigateway.UpdateVpcLinkOutput{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -660,7 +660,7 @@ func TestApiGatewayVpcLink(t *testing.T) {
 		},
 		{
 			test: "single api gateway vpc link",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllVpcLinks").Return([]*apigateway.UpdateVpcLinkOutput{
 					{Id: awssdk.String("ipu24n")},
 				}, nil)
@@ -674,7 +674,7 @@ func TestApiGatewayVpcLink(t *testing.T) {
 		},
 		{
 			test: "cannot list api gateway vpc links",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllVpcLinks").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayVpcLinkResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayVpcLinkResourceType, resourceaws.AwsApiGatewayVpcLinkResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -694,10 +694,10 @@ func TestApiGatewayVpcLink(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayVpcLinkEnumerator(repo, factory))
 
@@ -727,13 +727,13 @@ func TestApiGatewayRequestValidator(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway request validators",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiRequestValidators", *apis[0].Id).Return([]*apigateway.UpdateRequestValidatorOutput{}, nil)
 			},
@@ -743,7 +743,7 @@ func TestApiGatewayRequestValidator(t *testing.T) {
 		},
 		{
 			test: "multiple api gateway request validators",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiRequestValidators", *apis[0].Id).Return([]*apigateway.UpdateRequestValidatorOutput{
 					{Id: awssdk.String("ywlcuf")},
@@ -762,7 +762,7 @@ func TestApiGatewayRequestValidator(t *testing.T) {
 		},
 		{
 			test: "cannot list rest apis",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayRequestValidatorResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayRequestValidatorResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -770,7 +770,7 @@ func TestApiGatewayRequestValidator(t *testing.T) {
 		},
 		{
 			test: "cannot list api gateway request validators",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiRequestValidators", *apis[0].Id).Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayRequestValidatorResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayRequestValidatorResourceType, resourceaws.AwsApiGatewayRequestValidatorResourceType), alerts.EnumerationPhase)).Return()
@@ -791,10 +791,10 @@ func TestApiGatewayRequestValidator(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayRequestValidatorEnumerator(repo, factory))
 
@@ -821,13 +821,13 @@ func TestApiGatewayRestApiPolicy(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway rest api policies",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRestApis").Return([]*apigateway.RestApi{
 					{Id: awssdk.String("3of73v5ob4")},
 					{Id: awssdk.String("9x7kq9pbyh"), Policy: awssdk.String("")},
@@ -839,7 +839,7 @@ func TestApiGatewayRestApiPolicy(t *testing.T) {
 		},
 		{
 			test: "multiple api gateway rest api policies",
-			mocks: func(repository *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRestApis").Return([]*apigateway.RestApi{
 					{Id: awssdk.String("c3n3aqga5d"), Policy: awssdk.String("{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"execute-api:Invoke\",\"Resource\":\"arn:aws:execute-api:us-east-1:111111111111:c3n3aqga5d/*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":\"123.123.123.123/32\"}}}]}")},
 					{Id: awssdk.String("9y1eus3hr7"), Policy: awssdk.String("{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"execute-api:Invoke\",\"Resource\":\"arn:aws:execute-api:us-east-1:111111111111:9y1eus3hr7/*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":\"123.123.123.123/32\"}}}]}")},
@@ -857,7 +857,7 @@ func TestApiGatewayRestApiPolicy(t *testing.T) {
 		},
 		{
 			test: "cannot list rest apis",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayRestApiPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayRestApiPolicyResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -877,10 +877,10 @@ func TestApiGatewayRestApiPolicy(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayRestApiPolicyEnumerator(repo, factory))
 
@@ -910,13 +910,13 @@ func TestApiGatewayBasePathMapping(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no domain name base path mappings",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllDomainNames").Return(domainNames, nil)
 				repo.On("ListAllDomainNameBasePathMappings", *domainNames[0].DomainName).Return([]*apigateway.BasePathMapping{}, nil)
 			},
@@ -926,7 +926,7 @@ func TestApiGatewayBasePathMapping(t *testing.T) {
 		},
 		{
 			test: "multiple domain name base path mappings",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllDomainNames").Return(domainNames, nil)
 				repo.On("ListAllDomainNameBasePathMappings", *domainNames[0].DomainName).Return([]*apigateway.BasePathMapping{
 					{BasePath: awssdk.String("foo")},
@@ -945,7 +945,7 @@ func TestApiGatewayBasePathMapping(t *testing.T) {
 		},
 		{
 			test: "cannot list domain names",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllDomainNames").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayBasePathMappingResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayBasePathMappingResourceType, resourceaws.AwsApiGatewayDomainNameResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -953,7 +953,7 @@ func TestApiGatewayBasePathMapping(t *testing.T) {
 		},
 		{
 			test: "cannot list domain name base path mappings",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllDomainNames").Return(domainNames, nil)
 				repo.On("ListAllDomainNameBasePathMappings", *domainNames[0].DomainName).Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayBasePathMappingResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayBasePathMappingResourceType, resourceaws.AwsApiGatewayBasePathMappingResourceType), alerts.EnumerationPhase)).Return()
@@ -974,10 +974,10 @@ func TestApiGatewayBasePathMapping(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayBasePathMappingEnumerator(repo, factory))
 
@@ -1007,13 +1007,13 @@ func TestApiGatewayMethod(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway methods",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return([]*apigateway.Resource{
 					{Id: awssdk.String("hl7ksq"), Path: awssdk.String("/foo")},
@@ -1025,7 +1025,7 @@ func TestApiGatewayMethod(t *testing.T) {
 		},
 		{
 			test: "multiple api gateway methods",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return([]*apigateway.Resource{
 					{Id: awssdk.String("hl7ksq"), Path: awssdk.String("/foo"), ResourceMethods: map[string]*apigateway.Method{
@@ -1050,7 +1050,7 @@ func TestApiGatewayMethod(t *testing.T) {
 		},
 		{
 			test: "cannot list rest apis",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -1058,7 +1058,7 @@ func TestApiGatewayMethod(t *testing.T) {
 		},
 		{
 			test: "cannot list api gateway resources",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
@@ -1079,10 +1079,10 @@ func TestApiGatewayMethod(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayMethodEnumerator(repo, factory))
 
@@ -1112,13 +1112,13 @@ func TestApiGatewayModel(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway models",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiModels", *apis[0].Id).Return([]*apigateway.Model{}, nil)
 			},
@@ -1128,7 +1128,7 @@ func TestApiGatewayModel(t *testing.T) {
 		},
 		{
 			test: "multiple api gateway models",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiModels", *apis[0].Id).Return([]*apigateway.Model{
 					{Id: awssdk.String("g68a4s")},
@@ -1147,7 +1147,7 @@ func TestApiGatewayModel(t *testing.T) {
 		},
 		{
 			test: "cannot list rest apis",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayModelResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayModelResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -1155,7 +1155,7 @@ func TestApiGatewayModel(t *testing.T) {
 		},
 		{
 			test: "cannot list api gateway models",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiModels", *apis[0].Id).Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayModelResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayModelResourceType, resourceaws.AwsApiGatewayModelResourceType), alerts.EnumerationPhase)).Return()
@@ -1176,10 +1176,10 @@ func TestApiGatewayModel(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayModelEnumerator(repo, factory))
 
@@ -1209,13 +1209,13 @@ func TestApiGatewayMethodResponse(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway method responses",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return([]*apigateway.Resource{
 					{Id: awssdk.String("hl7ksq"), Path: awssdk.String("/foo"), ResourceMethods: map[string]*apigateway.Method{
@@ -1229,7 +1229,7 @@ func TestApiGatewayMethodResponse(t *testing.T) {
 		},
 		{
 			test: "multiple api gateway method responses",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return([]*apigateway.Resource{
 					{Id: awssdk.String("hl7ksq"), Path: awssdk.String("/foo"), ResourceMethods: map[string]*apigateway.Method{
@@ -1256,7 +1256,7 @@ func TestApiGatewayMethodResponse(t *testing.T) {
 		},
 		{
 			test: "cannot list rest apis",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResponseResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -1264,7 +1264,7 @@ func TestApiGatewayMethodResponse(t *testing.T) {
 		},
 		{
 			test: "cannot list api gateway resources",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResponseResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
@@ -1285,10 +1285,10 @@ func TestApiGatewayMethodResponse(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayMethodResponseEnumerator(repo, factory))
 
@@ -1318,13 +1318,13 @@ func TestApiGatewayGatewayResponse(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway gateway responses",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiGatewayResponses", *apis[0].Id).Return([]*apigateway.UpdateGatewayResponseOutput{}, nil)
 			},
@@ -1334,7 +1334,7 @@ func TestApiGatewayGatewayResponse(t *testing.T) {
 		},
 		{
 			test: "multiple api gateway gateway responses",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiGatewayResponses", *apis[0].Id).Return([]*apigateway.UpdateGatewayResponseOutput{
 					{ResponseType: awssdk.String("UNAUTHORIZED")},
@@ -1353,7 +1353,7 @@ func TestApiGatewayGatewayResponse(t *testing.T) {
 		},
 		{
 			test: "cannot list rest apis",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayGatewayResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayGatewayResponseResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -1361,7 +1361,7 @@ func TestApiGatewayGatewayResponse(t *testing.T) {
 		},
 		{
 			test: "cannot list api gateway gateway responses",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiGatewayResponses", *apis[0].Id).Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayGatewayResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayGatewayResponseResourceType, resourceaws.AwsApiGatewayGatewayResponseResourceType), alerts.EnumerationPhase)).Return()
@@ -1382,10 +1382,10 @@ func TestApiGatewayGatewayResponse(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayGatewayResponseEnumerator(repo, factory))
 
@@ -1415,13 +1415,13 @@ func TestApiGatewayMethodSettings(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway method settings",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiStages", *apis[0].Id).Return([]*apigateway.Stage{
 					{StageName: awssdk.String("foo"), MethodSettings: map[string]*apigateway.MethodSetting{}},
@@ -1433,7 +1433,7 @@ func TestApiGatewayMethodSettings(t *testing.T) {
 		},
 		{
 			test: "multiple api gateway method settings",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiStages", *apis[0].Id).Return([]*apigateway.Stage{
 					{StageName: awssdk.String("foo"), MethodSettings: map[string]*apigateway.MethodSetting{
@@ -1458,7 +1458,7 @@ func TestApiGatewayMethodSettings(t *testing.T) {
 		},
 		{
 			test: "cannot list rest apis",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodSettingsResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodSettingsResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -1466,7 +1466,7 @@ func TestApiGatewayMethodSettings(t *testing.T) {
 		},
 		{
 			test: "cannot list api gateway settings",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiStages", *apis[0].Id).Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodSettingsResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodSettingsResourceType, resourceaws.AwsApiGatewayStageResourceType), alerts.EnumerationPhase)).Return()
@@ -1487,10 +1487,10 @@ func TestApiGatewayMethodSettings(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayMethodSettingsEnumerator(repo, factory))
 
@@ -1520,13 +1520,13 @@ func TestApiGatewayIntegration(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway integrations",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return([]*apigateway.Resource{
 					{Id: awssdk.String("z9ag20"), Path: awssdk.String("/foo")},
@@ -1538,7 +1538,7 @@ func TestApiGatewayIntegration(t *testing.T) {
 		},
 		{
 			test: "multiple api gateway integrations",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return([]*apigateway.Resource{
 					{Id: awssdk.String("z9ag20"), Path: awssdk.String("/foo"), ResourceMethods: map[string]*apigateway.Method{
@@ -1563,7 +1563,7 @@ func TestApiGatewayIntegration(t *testing.T) {
 		},
 		{
 			test: "cannot list rest apis",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayIntegrationResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -1571,7 +1571,7 @@ func TestApiGatewayIntegration(t *testing.T) {
 		},
 		{
 			test: "cannot list api gateway resources",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayIntegrationResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
@@ -1592,10 +1592,10 @@ func TestApiGatewayIntegration(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayIntegrationEnumerator(repo, factory))
 
@@ -1625,13 +1625,13 @@ func TestApiGatewayIntegrationResponse(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockApiGatewayRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockApiGatewayRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no api gateway integration responses",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return([]*apigateway.Resource{
 					{Id: awssdk.String("z9ag20"), Path: awssdk.String("/foo"), ResourceMethods: map[string]*apigateway.Method{
@@ -1645,7 +1645,7 @@ func TestApiGatewayIntegrationResponse(t *testing.T) {
 		},
 		{
 			test: "multiple api gateway integration responses",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return([]*apigateway.Resource{
 					{Id: awssdk.String("z9ag20"), Path: awssdk.String("/foo"), ResourceMethods: map[string]*apigateway.Method{
@@ -1672,7 +1672,7 @@ func TestApiGatewayIntegrationResponse(t *testing.T) {
 		},
 		{
 			test: "cannot list rest apis",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayIntegrationResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResponseResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
@@ -1680,7 +1680,7 @@ func TestApiGatewayIntegrationResponse(t *testing.T) {
 		},
 		{
 			test: "cannot list api gateway resources",
-			mocks: func(repo *repository2.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return(nil, dummyError)
 				alerter.On("SendAlert", resourceaws.AwsApiGatewayIntegrationResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResponseResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
@@ -1701,10 +1701,10 @@ func TestApiGatewayIntegrationResponse(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockApiGatewayRepository{}
+			fakeRepo := &repository.MockApiGatewayRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ApiGatewayRepository = fakeRepo
+			var repo repository.ApiGatewayRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewApiGatewayIntegrationResponseEnumerator(repo, factory))
 

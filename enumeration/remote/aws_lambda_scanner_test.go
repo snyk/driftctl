@@ -6,7 +6,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -36,13 +36,13 @@ func TestScanLambdaFunction(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockLambdaRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockLambdaRepository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no lambda functions",
 			dirName: "aws_lambda_function_empty",
-			mocks: func(repo *repository2.MockLambdaRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllLambdaFunctions").Return([]*lambda.FunctionConfiguration{}, nil)
 			},
 			err: nil,
@@ -50,7 +50,7 @@ func TestScanLambdaFunction(t *testing.T) {
 		{
 			test:    "with lambda functions",
 			dirName: "aws_lambda_function_multiple",
-			mocks: func(repo *repository2.MockLambdaRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllLambdaFunctions").Return([]*lambda.FunctionConfiguration{
 					{
 						FunctionName: awssdk.String("foo"),
@@ -65,7 +65,7 @@ func TestScanLambdaFunction(t *testing.T) {
 		{
 			test:    "One lambda with signing",
 			dirName: "aws_lambda_function_signed",
-			mocks: func(repo *repository2.MockLambdaRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllLambdaFunctions").Return([]*lambda.FunctionConfiguration{
 					{
 						FunctionName: awssdk.String("foo"),
@@ -77,7 +77,7 @@ func TestScanLambdaFunction(t *testing.T) {
 		{
 			test:    "cannot list lambda functions",
 			dirName: "aws_lambda_function_empty",
-			mocks: func(repo *repository2.MockLambdaRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllLambdaFunctions").Return([]*lambda.FunctionConfiguration{}, awsError)
 
@@ -106,10 +106,10 @@ func TestScanLambdaFunction(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockLambdaRepository{}
+			fakeRepo := &repository.MockLambdaRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.LambdaRepository = fakeRepo
+			var repo repository.LambdaRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -125,7 +125,7 @@ func TestScanLambdaFunction(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewLambdaRepository(session, cache.New(0))
+				repo = repository.NewLambdaRepository(session, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewLambdaFunctionEnumerator(repo, factory))
@@ -152,13 +152,13 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockLambdaRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockLambdaRepository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no EventSourceMapping",
 			dirName: "aws_lambda_source_mapping_empty",
-			mocks: func(repo *repository2.MockLambdaRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllLambdaEventSourceMappings").Return([]*lambda.EventSourceMappingConfiguration{}, nil)
 			},
 			err: nil,
@@ -166,7 +166,7 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 		{
 			test:    "with 2 sqs EventSourceMapping",
 			dirName: "aws_lambda_source_mapping_sqs_multiple",
-			mocks: func(repo *repository2.MockLambdaRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllLambdaEventSourceMappings").Return([]*lambda.EventSourceMappingConfiguration{
 					{
 						UUID: awssdk.String("13ff66f8-37eb-4ad6-a0a8-594fea72df4f"),
@@ -181,7 +181,7 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 		{
 			test:    "with dynamo EventSourceMapping",
 			dirName: "aws_lambda_source_mapping_dynamo_multiple",
-			mocks: func(repo *repository2.MockLambdaRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllLambdaEventSourceMappings").Return([]*lambda.EventSourceMappingConfiguration{
 					{
 						UUID: awssdk.String("1aa9c4a0-060b-41c1-a9ae-dc304ebcdb00"),
@@ -193,7 +193,7 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 		{
 			test:    "cannot list lambda functions",
 			dirName: "aws_lambda_function_empty",
-			mocks: func(repo *repository2.MockLambdaRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockLambdaRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllLambdaEventSourceMappings").Return([]*lambda.EventSourceMappingConfiguration{}, awsError)
 
@@ -222,10 +222,10 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockLambdaRepository{}
+			fakeRepo := &repository.MockLambdaRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.LambdaRepository = fakeRepo
+			var repo repository.LambdaRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -241,7 +241,7 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewLambdaRepository(session, cache.New(0))
+				repo = repository.NewLambdaRepository(session, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewLambdaEventSourceMappingEnumerator(repo, factory))

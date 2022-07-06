@@ -6,7 +6,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -33,20 +33,20 @@ func TestEC2EbsVolume(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no volumes",
 			dirName: "aws_ec2_ebs_volume_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllVolumes").Return([]*ec2.Volume{}, nil)
 			},
 		},
 		{
 			test:    "multiple volumes",
 			dirName: "aws_ec2_ebs_volume_multiple",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllVolumes").Return([]*ec2.Volume{
 					{VolumeId: awssdk.String("vol-081c7272a57a09db1")},
 					{VolumeId: awssdk.String("vol-01ddc91d3d9d1318b")},
@@ -56,7 +56,7 @@ func TestEC2EbsVolume(t *testing.T) {
 		{
 			test:    "cannot list volumes",
 			dirName: "aws_ec2_ebs_volume_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllVolumes").Return(nil, awsError)
 
@@ -85,10 +85,10 @@ func TestEC2EbsVolume(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -104,7 +104,7 @@ func TestEC2EbsVolume(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2EbsVolumeEnumerator(repo, factory))
@@ -130,20 +130,20 @@ func TestEC2EbsSnapshot(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no snapshots",
 			dirName: "aws_ec2_ebs_snapshot_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSnapshots").Return([]*ec2.Snapshot{}, nil)
 			},
 		},
 		{
 			test:    "multiple snapshots",
 			dirName: "aws_ec2_ebs_snapshot_multiple",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSnapshots").Return([]*ec2.Snapshot{
 					{SnapshotId: awssdk.String("snap-0c509a2a880d95a39")},
 					{SnapshotId: awssdk.String("snap-00672558cecd93a61")},
@@ -153,7 +153,7 @@ func TestEC2EbsSnapshot(t *testing.T) {
 		{
 			test:    "cannot list snapshots",
 			dirName: "aws_ec2_ebs_snapshot_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllSnapshots").Return(nil, awsError)
 
@@ -182,10 +182,10 @@ func TestEC2EbsSnapshot(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -201,7 +201,7 @@ func TestEC2EbsSnapshot(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2EbsSnapshotEnumerator(repo, factory))
@@ -227,13 +227,13 @@ func TestEC2Eip(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no eips",
 			dirName: "aws_ec2_eip_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllAddresses").Return([]*ec2.Address{
 					{}, // Test Eip without AllocationId because it can happen (seen in sentry)
 				}, nil)
@@ -242,7 +242,7 @@ func TestEC2Eip(t *testing.T) {
 		{
 			test:    "multiple eips",
 			dirName: "aws_ec2_eip_multiple",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllAddresses").Return([]*ec2.Address{
 					{AllocationId: awssdk.String("eipalloc-017d5267e4dda73f1")},
 					{AllocationId: awssdk.String("eipalloc-0cf714dc097c992cc")},
@@ -252,7 +252,7 @@ func TestEC2Eip(t *testing.T) {
 		{
 			test:    "cannot list eips",
 			dirName: "aws_ec2_eip_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllAddresses").Return(nil, awsError)
 
@@ -281,10 +281,10 @@ func TestEC2Eip(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -300,7 +300,7 @@ func TestEC2Eip(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2EipEnumerator(repo, factory))
@@ -326,20 +326,20 @@ func TestEC2Ami(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no amis",
 			dirName: "aws_ec2_ami_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllImages").Return([]*ec2.Image{}, nil)
 			},
 		},
 		{
 			test:    "multiple amis",
 			dirName: "aws_ec2_ami_multiple",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllImages").Return([]*ec2.Image{
 					{ImageId: awssdk.String("ami-03a578b46f4c3081b")},
 					{ImageId: awssdk.String("ami-025962fd8b456731f")},
@@ -349,7 +349,7 @@ func TestEC2Ami(t *testing.T) {
 		{
 			test:    "cannot list ami",
 			dirName: "aws_ec2_ami_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllImages").Return(nil, awsError)
 
@@ -378,10 +378,10 @@ func TestEC2Ami(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -397,7 +397,7 @@ func TestEC2Ami(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2AmiEnumerator(repo, factory))
@@ -423,20 +423,20 @@ func TestEC2KeyPair(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no key pairs",
 			dirName: "aws_ec2_key_pair_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllKeyPairs").Return([]*ec2.KeyPairInfo{}, nil)
 			},
 		},
 		{
 			test:    "multiple key pairs",
 			dirName: "aws_ec2_key_pair_multiple",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllKeyPairs").Return([]*ec2.KeyPairInfo{
 					{KeyName: awssdk.String("test")},
 					{KeyName: awssdk.String("bar")},
@@ -446,7 +446,7 @@ func TestEC2KeyPair(t *testing.T) {
 		{
 			test:    "cannot list key pairs",
 			dirName: "aws_ec2_key_pair_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllKeyPairs").Return(nil, awsError)
 
@@ -475,10 +475,10 @@ func TestEC2KeyPair(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -494,7 +494,7 @@ func TestEC2KeyPair(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2KeyPairEnumerator(repo, factory))
@@ -520,20 +520,20 @@ func TestEC2EipAssociation(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no eip associations",
 			dirName: "aws_ec2_eip_association_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllAddressesAssociation").Return([]*ec2.Address{}, nil)
 			},
 		},
 		{
 			test:    "single eip association",
 			dirName: "aws_ec2_eip_association_single",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllAddressesAssociation").Return([]*ec2.Address{
 					{
 						AssociationId: awssdk.String("eipassoc-0e9a7356e30f0c3d1"),
@@ -545,7 +545,7 @@ func TestEC2EipAssociation(t *testing.T) {
 		{
 			test:    "cannot list eip associations",
 			dirName: "aws_ec2_eip_association_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllAddressesAssociation").Return(nil, awsError)
 
@@ -574,10 +574,10 @@ func TestEC2EipAssociation(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -593,7 +593,7 @@ func TestEC2EipAssociation(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2EipAssociationEnumerator(repo, factory))
@@ -619,20 +619,20 @@ func TestEC2Instance(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no instances",
 			dirName: "aws_ec2_instance_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllInstances").Return([]*ec2.Instance{}, nil)
 			},
 		},
 		{
 			test:    "multiple instances",
 			dirName: "aws_ec2_instance_multiple",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllInstances").Return([]*ec2.Instance{
 					{InstanceId: awssdk.String("i-0d3650a23f4e45dc0")},
 					{InstanceId: awssdk.String("i-010376047a71419f1")},
@@ -642,7 +642,7 @@ func TestEC2Instance(t *testing.T) {
 		{
 			test:    "terminated instances",
 			dirName: "aws_ec2_instance_terminated",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllInstances").Return([]*ec2.Instance{
 					{InstanceId: awssdk.String("i-0e1543baf4f2cd990")},
 					{InstanceId: awssdk.String("i-0a3a7ed51ae2b4fa0")}, // Nil
@@ -652,7 +652,7 @@ func TestEC2Instance(t *testing.T) {
 		{
 			test:    "cannot list instances",
 			dirName: "aws_ec2_instance_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllInstances").Return(nil, awsError)
 
@@ -681,10 +681,10 @@ func TestEC2Instance(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -700,7 +700,7 @@ func TestEC2Instance(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2InstanceEnumerator(repo, factory))
@@ -726,20 +726,20 @@ func TestEC2InternetGateway(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no internet gateways",
 			dirName: "aws_ec2_internet_gateway_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllInternetGateways").Return([]*ec2.InternetGateway{}, nil)
 			},
 		},
 		{
 			test:    "multiple internet gateways",
 			dirName: "aws_ec2_internet_gateway_multiple",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllInternetGateways").Return([]*ec2.InternetGateway{
 					{InternetGatewayId: awssdk.String("igw-0184eb41aadc62d1c")},
 					{InternetGatewayId: awssdk.String("igw-047b487f5c60fca99")},
@@ -749,7 +749,7 @@ func TestEC2InternetGateway(t *testing.T) {
 		{
 			test:    "cannot list internet gateways",
 			dirName: "aws_ec2_internet_gateway_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllInternetGateways").Return(nil, awsError)
 
@@ -778,10 +778,10 @@ func TestEC2InternetGateway(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -797,7 +797,7 @@ func TestEC2InternetGateway(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2InternetGatewayEnumerator(repo, factory))
@@ -824,13 +824,13 @@ func TestVPC(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no VPC",
 			dirName: "aws_vpc_empty",
-			mocks: func(client *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllVPCs").Once().Return([]*ec2.Vpc{}, []*ec2.Vpc{}, nil)
 			},
 			wantErr: nil,
@@ -838,7 +838,7 @@ func TestVPC(t *testing.T) {
 		{
 			test:    "VPC results",
 			dirName: "aws_vpc",
-			mocks: func(client *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllVPCs").Once().Return([]*ec2.Vpc{
 					{
 						VpcId: awssdk.String("vpc-0768e1fd0029e3fc3"),
@@ -863,7 +863,7 @@ func TestVPC(t *testing.T) {
 		{
 			test:    "cannot list VPC",
 			dirName: "aws_vpc_empty",
-			mocks: func(client *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllVPCs").Once().Return(nil, nil, awsError)
 
@@ -892,10 +892,10 @@ func TestVPC(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -911,7 +911,7 @@ func TestVPC(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewVPCEnumerator(repo, factory))
@@ -938,13 +938,13 @@ func TestDefaultVPC(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no VPC",
 			dirName: "aws_vpc_empty",
-			mocks: func(client *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllVPCs").Once().Return([]*ec2.Vpc{}, []*ec2.Vpc{}, nil)
 			},
 			wantErr: nil,
@@ -952,7 +952,7 @@ func TestDefaultVPC(t *testing.T) {
 		{
 			test:    "default VPC results",
 			dirName: "aws_default_vpc",
-			mocks: func(client *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllVPCs").Once().Return([]*ec2.Vpc{
 					{
 						VpcId:     awssdk.String("vpc-0768e1fd0029e3fc3"),
@@ -974,7 +974,7 @@ func TestDefaultVPC(t *testing.T) {
 		{
 			test:    "cannot list VPC",
 			dirName: "aws_vpc_empty",
-			mocks: func(client *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllVPCs").Once().Return(nil, nil, awsError)
 
@@ -1003,10 +1003,10 @@ func TestDefaultVPC(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -1022,7 +1022,7 @@ func TestDefaultVPC(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewDefaultVPCEnumerator(repo, factory))
@@ -1048,13 +1048,13 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no route table associations (test for nil values)",
 			dirName: "aws_ec2_route_table_association_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{
 					{
 						RouteTableId: awssdk.String("assoc_with_nil"),
@@ -1076,7 +1076,7 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 		{
 			test:    "multiple route table associations (mixed subnet and gateway associations)",
 			dirName: "aws_ec2_route_table_association_multiple",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{
 					{
 						RouteTableId: awssdk.String("rtb-05aa6c5673311a17b"), // route
@@ -1140,7 +1140,7 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 		{
 			test:    "cannot list route table associations",
 			dirName: "aws_ec2_route_table_association_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllRouteTables").Return(nil, awsError)
 
@@ -1169,10 +1169,10 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -1188,7 +1188,7 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2RouteTableAssociationEnumerator(repo, factory))
@@ -1214,20 +1214,20 @@ func TestEC2Subnet(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no subnets",
 			dirName: "aws_ec2_subnet_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSubnets").Return([]*ec2.Subnet{}, []*ec2.Subnet{}, nil)
 			},
 		},
 		{
 			test:    "multiple subnets",
 			dirName: "aws_ec2_subnet_multiple",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSubnets").Return([]*ec2.Subnet{
 					{
 						SubnetId:     awssdk.String("subnet-05810d3f933925f6d"), // subnet1
@@ -1260,7 +1260,7 @@ func TestEC2Subnet(t *testing.T) {
 		{
 			test:    "cannot list subnets",
 			dirName: "aws_ec2_subnet_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllSubnets").Return(nil, nil, awsError)
 
@@ -1289,10 +1289,10 @@ func TestEC2Subnet(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -1308,7 +1308,7 @@ func TestEC2Subnet(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2SubnetEnumerator(repo, factory))
@@ -1334,20 +1334,20 @@ func TestEC2DefaultSubnet(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no default subnets",
 			dirName: "aws_ec2_default_subnet_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSubnets").Return([]*ec2.Subnet{}, []*ec2.Subnet{}, nil)
 			},
 		},
 		{
 			test:    "multiple default subnets",
 			dirName: "aws_ec2_default_subnet_multiple",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSubnets").Return([]*ec2.Subnet{
 					{
 						SubnetId:     awssdk.String("subnet-05810d3f933925f6d"), // subnet1
@@ -1380,7 +1380,7 @@ func TestEC2DefaultSubnet(t *testing.T) {
 		{
 			test:    "cannot list default subnets",
 			dirName: "aws_ec2_default_subnet_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllSubnets").Return(nil, nil, awsError)
 
@@ -1409,10 +1409,10 @@ func TestEC2DefaultSubnet(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -1428,7 +1428,7 @@ func TestEC2DefaultSubnet(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2DefaultSubnetEnumerator(repo, factory))
@@ -1454,20 +1454,20 @@ func TestEC2RouteTable(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no route tables",
 			dirName: "aws_ec2_route_table_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{}, nil)
 			},
 		},
 		{
 			test:    "multiple route tables",
 			dirName: "aws_ec2_route_table_multiple",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{
 					{RouteTableId: awssdk.String("rtb-08b7b71af15e183ce")}, // table1
 					{RouteTableId: awssdk.String("rtb-0002ac731f6fdea55")}, // table2
@@ -1487,7 +1487,7 @@ func TestEC2RouteTable(t *testing.T) {
 		{
 			test:    "cannot list route tables",
 			dirName: "aws_ec2_route_table_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllRouteTables").Return(nil, awsError)
 
@@ -1516,10 +1516,10 @@ func TestEC2RouteTable(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -1535,7 +1535,7 @@ func TestEC2RouteTable(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2RouteTableEnumerator(repo, factory))
@@ -1561,20 +1561,20 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no default route tables",
 			dirName: "aws_ec2_default_route_table_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{}, nil)
 			},
 		},
 		{
 			test:    "multiple default route tables",
 			dirName: "aws_ec2_default_route_table_single",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{
 					{RouteTableId: awssdk.String("rtb-08b7b71af15e183ce")}, // table1
 					{RouteTableId: awssdk.String("rtb-0002ac731f6fdea55")}, // table2
@@ -1594,7 +1594,7 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 		{
 			test:    "cannot list default route tables",
 			dirName: "aws_ec2_default_route_table_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllRouteTables").Return(nil, awsError)
 
@@ -1623,10 +1623,10 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -1642,7 +1642,7 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2DefaultRouteTableEnumerator(repo, factory))
@@ -1669,13 +1669,13 @@ func TestVpcSecurityGroup(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no security groups",
 			dirName: "aws_vpc_security_group_empty",
-			mocks: func(client *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{}, []*ec2.SecurityGroup{}, nil)
 			},
 			wantErr: nil,
@@ -1683,7 +1683,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 		{
 			test:    "with security groups",
 			dirName: "aws_vpc_security_group_multiple",
-			mocks: func(client *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{
 					{
 						GroupId:   awssdk.String("sg-0254c038e32f25530"),
@@ -1701,7 +1701,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 		{
 			test:    "cannot list security groups",
 			dirName: "aws_vpc_security_group_empty",
-			mocks: func(client *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllSecurityGroups").Return(nil, nil, awsError)
 
@@ -1730,10 +1730,10 @@ func TestVpcSecurityGroup(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -1749,7 +1749,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewVPCSecurityGroupEnumerator(repo, factory))
@@ -1776,13 +1776,13 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no security groups",
 			dirName: "aws_vpc_default_security_group_empty",
-			mocks: func(client *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{}, []*ec2.SecurityGroup{}, nil)
 			},
 			wantErr: nil,
@@ -1790,7 +1790,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 		{
 			test:    "with security groups",
 			dirName: "aws_vpc_default_security_group_multiple",
-			mocks: func(client *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{
 					{
 						GroupId:   awssdk.String("sg-0254c038e32f25530"),
@@ -1808,7 +1808,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 		{
 			test:    "cannot list security groups",
 			dirName: "aws_vpc_default_security_group_empty",
-			mocks: func(client *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllSecurityGroups").Return(nil, nil, awsError)
 
@@ -1837,10 +1837,10 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -1856,7 +1856,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewVPCDefaultSecurityGroupEnumerator(repo, factory))
@@ -1882,20 +1882,20 @@ func TestEC2NatGateway(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no nat gateways",
 			dirName: "aws_ec2_nat_gateway_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllNatGateways").Return([]*ec2.NatGateway{}, nil)
 			},
 		},
 		{
 			test:    "single nat gateway",
 			dirName: "aws_ec2_nat_gateway_single",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllNatGateways").Return([]*ec2.NatGateway{
 					{NatGatewayId: awssdk.String("nat-0a5408508b19ef490")},
 				}, nil)
@@ -1904,7 +1904,7 @@ func TestEC2NatGateway(t *testing.T) {
 		{
 			test:    "cannot list nat gateways",
 			dirName: "aws_ec2_nat_gateway_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllNatGateways").Return(nil, awsError)
 
@@ -1933,10 +1933,10 @@ func TestEC2NatGateway(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -1952,7 +1952,7 @@ func TestEC2NatGateway(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2NatGatewayEnumerator(repo, factory))
@@ -1978,20 +1978,20 @@ func TestEC2NetworkACL(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no network ACL",
 			dirName: "aws_ec2_network_acl_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllNetworkACLs").Return([]*ec2.NetworkAcl{}, nil)
 			},
 		},
 		{
 			test:    "network acl",
 			dirName: "aws_ec2_network_acl",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllNetworkACLs").Return([]*ec2.NetworkAcl{
 					{
 						NetworkAclId: awssdk.String("acl-043880b4682d2366b"),
@@ -2011,7 +2011,7 @@ func TestEC2NetworkACL(t *testing.T) {
 		{
 			test:    "cannot list network acl",
 			dirName: "aws_ec2_network_acl_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllNetworkACLs").Return(nil, awsError)
 
@@ -2051,10 +2051,10 @@ func TestEC2NetworkACL(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -2070,7 +2070,7 @@ func TestEC2NetworkACL(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2NetworkACLEnumerator(repo, factory))
@@ -2096,20 +2096,20 @@ func TestEC2NetworkACLRule(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no network ACL",
 			dirName: "aws_ec2_network_acl_rule_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllNetworkACLs").Return([]*ec2.NetworkAcl{}, nil)
 			},
 		},
 		{
 			test:    "network acl rules",
 			dirName: "aws_ec2_network_acl_rule",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllNetworkACLs").Return([]*ec2.NetworkAcl{
 					{
 						NetworkAclId: awssdk.String("acl-0ad6d657494d17ee2"), // test
@@ -2164,7 +2164,7 @@ func TestEC2NetworkACLRule(t *testing.T) {
 		{
 			test:    "cannot list network acl",
 			dirName: "aws_ec2_network_acl_rule_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllNetworkACLs").Return(nil, awsError)
 
@@ -2201,10 +2201,10 @@ func TestEC2NetworkACLRule(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := version
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -2245,13 +2245,13 @@ func TestEC2DefaultNetworkACL(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no network ACL",
 			dirName: "aws_ec2_default_network_acl_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllNetworkACLs").Return([]*ec2.NetworkAcl{}, nil)
 			},
 		},
@@ -2278,7 +2278,7 @@ func TestEC2DefaultNetworkACL(t *testing.T) {
 		{
 			test:    "cannot list default network acl",
 			dirName: "aws_ec2_default_network_acl_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllNetworkACLs").Return(nil, awsError)
 
@@ -2318,10 +2318,10 @@ func TestEC2DefaultNetworkACL(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -2337,7 +2337,7 @@ func TestEC2DefaultNetworkACL(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2DefaultNetworkACLEnumerator(repo, factory))
@@ -2363,7 +2363,7 @@ func TestEC2Route(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
@@ -2371,14 +2371,14 @@ func TestEC2Route(t *testing.T) {
 			// as a default route will always be present in each route table
 			test:    "no routes",
 			dirName: "aws_ec2_route_empty",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{}, nil)
 			},
 		},
 		{
 			test:    "multiple routes (mixed default_route_table and route_table)",
 			dirName: "aws_ec2_route_multiple",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRouteTables").Return([]*ec2.RouteTable{
 					{
 						RouteTableId: awssdk.String("rtb-096bdfb69309c54c3"), // table1
@@ -2458,7 +2458,7 @@ func TestEC2Route(t *testing.T) {
 		{
 			test:    "cannot list routes",
 			dirName: "aws_ec2_route_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllRouteTables").Return(nil, awsError)
 
@@ -2487,10 +2487,10 @@ func TestEC2Route(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -2506,7 +2506,7 @@ func TestEC2Route(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2RouteEnumerator(repo, factory))
@@ -2533,13 +2533,13 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no security group rules",
 			dirName: "aws_vpc_security_group_rule_empty",
-			mocks: func(client *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{
 					{
 						GroupId:             awssdk.String("sg-0254c038e32f25530"),
@@ -2553,7 +2553,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 		{
 			test:    "with security group rules",
 			dirName: "aws_vpc_security_group_rule_multiple",
-			mocks: func(client *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSecurityGroups").Once().Return([]*ec2.SecurityGroup{
 					{
 						GroupId: awssdk.String("sg-0254c038e32f25530"),
@@ -2649,7 +2649,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 		{
 			test:    "cannot list security group rules",
 			dirName: "aws_vpc_security_group_rule_empty",
-			mocks: func(client *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllSecurityGroups").Once().Return(nil, nil, awsError)
 
@@ -2678,10 +2678,10 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -2697,7 +2697,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewVPCSecurityGroupRuleEnumerator(repo, factory))
@@ -2723,20 +2723,20 @@ func TestEC2LaunchTemplate(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no launch template",
 			dirName: "aws_launch_template",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("DescribeLaunchTemplates").Return([]*ec2.LaunchTemplate{}, nil)
 			},
 		},
 		{
 			test:    "multiple launch templates",
 			dirName: "aws_launch_template_multiple",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				launchTemplates := []*ec2.LaunchTemplate{
 					{LaunchTemplateId: awssdk.String("lt-0ed993d09ce6afc67"), LatestVersionNumber: awssdk.Int64(1)},
 					{LaunchTemplateId: awssdk.String("lt-00b2d18c6cee7fe23"), LatestVersionNumber: awssdk.Int64(1)},
@@ -2748,7 +2748,7 @@ func TestEC2LaunchTemplate(t *testing.T) {
 		{
 			test:    "cannot list launch templates",
 			dirName: "aws_launch_template",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("DescribeLaunchTemplates").Return(nil, awsError)
 
@@ -2777,10 +2777,10 @@ func TestEC2LaunchTemplate(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -2796,7 +2796,7 @@ func TestEC2LaunchTemplate(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewLaunchTemplateEnumerator(repo, factory))
@@ -2823,20 +2823,20 @@ func TestEC2EbsEncryptionByDefault(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockEC2Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockEC2Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no encryption by default resource",
 			dirName: "aws_ebs_encryption_by_default_list",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				repository.On("IsEbsEncryptionEnabledByDefault").Return(false, nil)
 			},
 		},
 		{
 			test:    "cannot list encryption by default resources",
 			dirName: "aws_ebs_encryption_by_default_error",
-			mocks: func(repository *repository2.MockEC2Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockEC2Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("IsEbsEncryptionEnabledByDefault").Return(false, awsError)
 
@@ -2865,10 +2865,10 @@ func TestEC2EbsEncryptionByDefault(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockEC2Repository{}
+			fakeRepo := &repository.MockEC2Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.EC2Repository = fakeRepo
+			var repo repository.EC2Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -2884,7 +2884,7 @@ func TestEC2EbsEncryptionByDefault(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewEC2Repository(sess, cache.New(0))
+				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2EbsEncryptionByDefaultEnumerator(repo, factory))

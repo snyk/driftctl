@@ -6,7 +6,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -33,20 +33,20 @@ func TestRDSDBInstance(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockRDSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockRDSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no db instances",
 			dirName: "aws_rds_db_instance_empty",
-			mocks: func(repository *repository2.MockRDSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBInstances").Return([]*rds.DBInstance{}, nil)
 			},
 		},
 		{
 			test:    "single db instance",
 			dirName: "aws_rds_db_instance_single",
-			mocks: func(repository *repository2.MockRDSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBInstances").Return([]*rds.DBInstance{
 					{DBInstanceIdentifier: awssdk.String("terraform-20201015115018309600000001")},
 				}, nil)
@@ -55,7 +55,7 @@ func TestRDSDBInstance(t *testing.T) {
 		{
 			test:    "multiple mixed db instances",
 			dirName: "aws_rds_db_instance_multiple",
-			mocks: func(repository *repository2.MockRDSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBInstances").Return([]*rds.DBInstance{
 					{DBInstanceIdentifier: awssdk.String("terraform-20201015115018309600000001")},
 					{DBInstanceIdentifier: awssdk.String("database-1")},
@@ -65,7 +65,7 @@ func TestRDSDBInstance(t *testing.T) {
 		{
 			test:    "cannot list db instances",
 			dirName: "aws_rds_db_instance_list",
-			mocks: func(repository *repository2.MockRDSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllDBInstances").Return(nil, awsError)
 
@@ -94,10 +94,10 @@ func TestRDSDBInstance(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockRDSRepository{}
+			fakeRepo := &repository.MockRDSRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.RDSRepository = fakeRepo
+			var repo repository.RDSRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -113,7 +113,7 @@ func TestRDSDBInstance(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewRDSRepository(sess, cache.New(0))
+				repo = repository.NewRDSRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewRDSDBInstanceEnumerator(repo, factory))
@@ -139,20 +139,20 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockRDSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockRDSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no db subnet groups",
 			dirName: "aws_rds_db_subnet_group_empty",
-			mocks: func(repository *repository2.MockRDSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBSubnetGroups").Return([]*rds.DBSubnetGroup{}, nil)
 			},
 		},
 		{
 			test:    "multiple db subnet groups",
 			dirName: "aws_rds_db_subnet_group_multiple",
-			mocks: func(repository *repository2.MockRDSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBSubnetGroups").Return([]*rds.DBSubnetGroup{
 					{DBSubnetGroupName: awssdk.String("foo")},
 					{DBSubnetGroupName: awssdk.String("bar")},
@@ -162,7 +162,7 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 		{
 			test:    "cannot list db subnet groups",
 			dirName: "aws_rds_db_subnet_group_list",
-			mocks: func(repository *repository2.MockRDSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllDBSubnetGroups").Return(nil, awsError)
 
@@ -191,10 +191,10 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockRDSRepository{}
+			fakeRepo := &repository.MockRDSRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.RDSRepository = fakeRepo
+			var repo repository.RDSRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -210,7 +210,7 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewRDSRepository(sess, cache.New(0))
+				repo = repository.NewRDSRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewRDSDBSubnetGroupEnumerator(repo, factory))
@@ -236,20 +236,20 @@ func TestRDSCluster(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockRDSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockRDSRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no cluster",
 			dirName: "aws_rds_cluster_empty",
-			mocks: func(repository *repository2.MockRDSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBClusters").Return([]*rds.DBCluster{}, nil)
 			},
 		},
 		{
 			test:    "should return one result",
 			dirName: "aws_rds_clusters_results",
-			mocks: func(repository *repository2.MockRDSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBClusters").Return([]*rds.DBCluster{
 					{
 						DBClusterIdentifier: awssdk.String("aurora-cluster-demo"),
@@ -264,7 +264,7 @@ func TestRDSCluster(t *testing.T) {
 		{
 			test:    "cannot list clusters",
 			dirName: "aws_rds_cluster_denied",
-			mocks: func(repository *repository2.MockRDSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 400, "")
 				repository.On("ListAllDBClusters").Return(nil, awsError).Once()
 
@@ -293,10 +293,10 @@ func TestRDSCluster(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockRDSRepository{}
+			fakeRepo := &repository.MockRDSRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.RDSRepository = fakeRepo
+			var repo repository.RDSRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -312,7 +312,7 @@ func TestRDSCluster(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewRDSRepository(sess, cache.New(0))
+				repo = repository.NewRDSRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewRDSClusterEnumerator(repo, factory))

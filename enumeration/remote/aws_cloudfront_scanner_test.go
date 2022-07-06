@@ -6,7 +6,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/aws"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -33,20 +33,20 @@ func TestCloudfrontDistribution(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockCloudfrontRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockCloudfrontRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no cloudfront distributions",
 			dirName: "aws_cloudfront_distribution_empty",
-			mocks: func(repository *repository2.MockCloudfrontRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockCloudfrontRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDistributions").Return([]*cloudfront.DistributionSummary{}, nil)
 			},
 		},
 		{
 			test:    "single cloudfront distribution",
 			dirName: "aws_cloudfront_distribution_single",
-			mocks: func(repository *repository2.MockCloudfrontRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockCloudfrontRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDistributions").Return([]*cloudfront.DistributionSummary{
 					{Id: awssdk.String("E1M9CNS0XSHI19")},
 				}, nil)
@@ -55,7 +55,7 @@ func TestCloudfrontDistribution(t *testing.T) {
 		{
 			test:    "cannot list cloudfront distributions",
 			dirName: "aws_cloudfront_distribution_list",
-			mocks: func(repository *repository2.MockCloudfrontRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockCloudfrontRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 400, "")
 				repository.On("ListAllDistributions").Return(nil, awsError)
 
@@ -84,10 +84,10 @@ func TestCloudfrontDistribution(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockCloudfrontRepository{}
+			fakeRepo := &repository.MockCloudfrontRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.CloudfrontRepository = fakeRepo
+			var repo repository.CloudfrontRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -103,7 +103,7 @@ func TestCloudfrontDistribution(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewCloudfrontRepository(sess, cache.New(0))
+				repo = repository.NewCloudfrontRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewCloudfrontDistributionEnumerator(repo, factory))

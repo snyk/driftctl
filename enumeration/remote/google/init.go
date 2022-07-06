@@ -8,7 +8,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/google/repository"
+	"github.com/snyk/driftctl/enumeration/remote/google/repository"
 	"github.com/snyk/driftctl/enumeration/terraform"
 
 	asset "cloud.google.com/go/asset/apiv1"
@@ -59,9 +59,9 @@ func Init(version string, alerter *alerter.Alerter,
 		return err
 	}
 
-	assetRepository := repository2.NewAssetRepository(assetClient, provider.GetConfig(), repositoryCache)
-	storageRepository := repository2.NewStorageRepository(storageClient, repositoryCache)
-	iamRepository := repository2.NewCloudResourceManagerRepository(crmService, provider.GetConfig(), repositoryCache)
+	assetRepository := repository.NewAssetRepository(assetClient, provider.GetConfig(), repositoryCache)
+	storageRepository := repository.NewStorageRepository(storageClient, repositoryCache)
+	iamRepository := repository.NewCloudResourceManagerRepository(crmService, provider.GetConfig(), repositoryCache)
 
 	providerLibrary.AddProvider(terraform.GOOGLE, provider)
 	deserializer := resource.NewDeserializer(factory)

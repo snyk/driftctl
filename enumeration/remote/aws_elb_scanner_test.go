@@ -7,7 +7,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/aws"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/terraform"
@@ -29,13 +29,13 @@ func TestELB_LoadBalancer(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockELBRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockELBRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no load balancer",
-			mocks: func(repository *repository2.MockELBRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockELBRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllLoadBalancers").Return([]*elb.LoadBalancerDescription{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -44,7 +44,7 @@ func TestELB_LoadBalancer(t *testing.T) {
 		},
 		{
 			test: "should list load balancers",
-			mocks: func(repository *repository2.MockELBRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockELBRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllLoadBalancers").Return([]*elb.LoadBalancerDescription{
 					{
 						LoadBalancerName: awssdk.String("acc-test-lb-tf"),
@@ -59,7 +59,7 @@ func TestELB_LoadBalancer(t *testing.T) {
 		},
 		{
 			test: "cannot list load balancers",
-			mocks: func(repository *repository2.MockELBRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockELBRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllLoadBalancers").Return(nil, awsError)
 
@@ -71,7 +71,7 @@ func TestELB_LoadBalancer(t *testing.T) {
 		},
 		{
 			test: "cannot list load balancers (dummy error)",
-			mocks: func(repository *repository2.MockELBRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockELBRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllLoadBalancers").Return(nil, dummyError)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -93,10 +93,10 @@ func TestELB_LoadBalancer(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockELBRepository{}
+			fakeRepo := &repository.MockELBRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ELBRepository = fakeRepo
+			var repo repository.ELBRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws.NewClassicLoadBalancerEnumerator(repo, factory))
 

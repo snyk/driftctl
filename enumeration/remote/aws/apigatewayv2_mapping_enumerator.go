@@ -1,19 +1,19 @@
 package aws
 
 import (
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	remoteerror "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 type ApiGatewayV2MappingEnumerator struct {
-	repository   repository2.ApiGatewayV2Repository
-	repositoryV1 repository2.ApiGatewayRepository
+	repository   repository.ApiGatewayV2Repository
+	repositoryV1 repository.ApiGatewayRepository
 	factory      resource.ResourceFactory
 }
 
-func NewApiGatewayV2MappingEnumerator(repo repository2.ApiGatewayV2Repository, repov1 repository2.ApiGatewayRepository, factory resource.ResourceFactory) *ApiGatewayV2MappingEnumerator {
+func NewApiGatewayV2MappingEnumerator(repo repository.ApiGatewayV2Repository, repov1 repository.ApiGatewayRepository, factory resource.ResourceFactory) *ApiGatewayV2MappingEnumerator {
 	return &ApiGatewayV2MappingEnumerator{
 		repository:   repo,
 		repositoryV1: repov1,

@@ -7,7 +7,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/client"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -38,12 +38,12 @@ func TestS3Bucket(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockS3Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test: "multiple bucket", dirName: "aws_s3_bucket_multiple",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -79,7 +79,7 @@ func TestS3Bucket(t *testing.T) {
 		},
 		{
 			test: "cannot list bucket", dirName: "aws_s3_bucket_list",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllBuckets").Return(nil, awsError)
 
@@ -108,9 +108,9 @@ func TestS3Bucket(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockS3Repository{}
+			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo, alerter)
-			var repo repository2.S3Repository = fakeRepo
+			var repo repository.S3Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -126,7 +126,7 @@ func TestS3Bucket(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
+				repo = repository.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewS3BucketEnumerator(repo, factory, tf.TerraformProviderConfig{
@@ -156,12 +156,12 @@ func TestS3BucketInventory(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockS3Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test: "multiple bucket with multiple inventories", dirName: "aws_s3_bucket_inventories_multiple",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -209,7 +209,7 @@ func TestS3BucketInventory(t *testing.T) {
 		},
 		{
 			test: "cannot list bucket", dirName: "aws_s3_bucket_inventories_list_bucket",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllBuckets").Return(nil, awsError)
 
@@ -219,7 +219,7 @@ func TestS3BucketInventory(t *testing.T) {
 		},
 		{
 			test: "cannot list bucket inventories", dirName: "aws_s3_bucket_inventories_list_inventories",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return(
 					[]*s3.Bucket{
 						{Name: awssdk.String("bucket-martin-test-drift")},
@@ -268,9 +268,9 @@ func TestS3BucketInventory(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockS3Repository{}
+			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo, alerter)
-			var repo repository2.S3Repository = fakeRepo
+			var repo repository.S3Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -286,7 +286,7 @@ func TestS3BucketInventory(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
+				repo = repository.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewS3BucketInventoryEnumerator(repo, factory, tf.TerraformProviderConfig{
@@ -316,13 +316,13 @@ func TestS3BucketNotification(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockS3Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "single bucket without notifications",
 			dirName: "aws_s3_bucket_notifications_no_notif",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -349,7 +349,7 @@ func TestS3BucketNotification(t *testing.T) {
 		},
 		{
 			test: "multiple bucket with notifications", dirName: "aws_s3_bucket_notifications_multiple",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -403,7 +403,7 @@ func TestS3BucketNotification(t *testing.T) {
 		},
 		{
 			test: "Cannot get bucket notification", dirName: "aws_s3_bucket_notifications_list_bucket",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -425,7 +425,7 @@ func TestS3BucketNotification(t *testing.T) {
 		},
 		{
 			test: "Cannot list bucket", dirName: "aws_s3_bucket_notifications_list_bucket",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllBuckets").Return(nil, awsError)
 
@@ -454,9 +454,9 @@ func TestS3BucketNotification(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockS3Repository{}
+			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo, alerter)
-			var repo repository2.S3Repository = fakeRepo
+			var repo repository.S3Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -472,7 +472,7 @@ func TestS3BucketNotification(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
+				repo = repository.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewS3BucketNotificationEnumerator(repo, factory, tf.TerraformProviderConfig{
@@ -502,12 +502,12 @@ func TestS3BucketMetrics(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockS3Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test: "multiple bucket with multiple metrics", dirName: "aws_s3_bucket_metrics_multiple",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -555,7 +555,7 @@ func TestS3BucketMetrics(t *testing.T) {
 		},
 		{
 			test: "cannot list bucket", dirName: "aws_s3_bucket_metrics_list_bucket",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllBuckets").Return(nil, awsError)
 
@@ -565,7 +565,7 @@ func TestS3BucketMetrics(t *testing.T) {
 		},
 		{
 			test: "cannot list metrics", dirName: "aws_s3_bucket_metrics_list_metrics",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return(
 					[]*s3.Bucket{
 						{Name: awssdk.String("bucket-martin-test-drift")},
@@ -615,9 +615,9 @@ func TestS3BucketMetrics(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockS3Repository{}
+			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo, alerter)
-			var repo repository2.S3Repository = fakeRepo
+			var repo repository.S3Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -633,7 +633,7 @@ func TestS3BucketMetrics(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
+				repo = repository.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewS3BucketMetricsEnumerator(repo, factory, tf.TerraformProviderConfig{
@@ -663,13 +663,13 @@ func TestS3BucketPolicy(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockS3Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "single bucket without policy",
 			dirName: "aws_s3_bucket_policy_no_policy",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -696,7 +696,7 @@ func TestS3BucketPolicy(t *testing.T) {
 		},
 		{
 			test: "multiple bucket with policies", dirName: "aws_s3_bucket_policies_multiple",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -744,7 +744,7 @@ func TestS3BucketPolicy(t *testing.T) {
 		},
 		{
 			test: "cannot list bucket", dirName: "aws_s3_bucket_policies_list_bucket",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllBuckets").Return(nil, awsError)
 
@@ -773,9 +773,9 @@ func TestS3BucketPolicy(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockS3Repository{}
+			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo, alerter)
-			var repo repository2.S3Repository = fakeRepo
+			var repo repository.S3Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -791,7 +791,7 @@ func TestS3BucketPolicy(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
+				repo = repository.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewS3BucketPolicyEnumerator(repo, factory, tf.TerraformProviderConfig{
@@ -821,13 +821,13 @@ func TestS3BucketPublicAccessBlock(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockS3Repository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockS3Repository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "multiple bucket, one with access block",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return([]*s3.Bucket{
 					{Name: awssdk.String("bucket-with-public-access-block")},
 					{Name: awssdk.String("bucket-without-public-access-block")},
@@ -861,14 +861,14 @@ func TestS3BucketPublicAccessBlock(t *testing.T) {
 		},
 		{
 			test: "cannot list bucket",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsS3BucketPublicAccessBlockResourceType, resourceaws.AwsS3BucketResourceType),
 		},
 		{
 			test: "cannot list public access block",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return([]*s3.Bucket{{Name: awssdk.String("foobar")}}, nil)
 				repository.On("GetBucketLocation", "foobar").Return("us-east-1", nil)
 				repository.On("GetBucketPublicAccessBlock", "foobar", "us-east-1").Return(nil, dummyError)
@@ -892,10 +892,10 @@ func TestS3BucketPublicAccessBlock(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockS3Repository{}
+			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.S3Repository = fakeRepo
+			var repo repository.S3Repository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewS3BucketPublicAccessBlockEnumerator(
 				repo, factory,
@@ -926,13 +926,13 @@ func TestS3BucketAnalytic(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockS3Repository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "multiple bucket with multiple analytics",
 			dirName: "aws_s3_bucket_analytics_multiple",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On(
 					"ListAllBuckets",
 				).Return([]*s3.Bucket{
@@ -980,7 +980,7 @@ func TestS3BucketAnalytic(t *testing.T) {
 		},
 		{
 			test: "cannot list bucket", dirName: "aws_s3_bucket_analytics_list_bucket",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllBuckets").Return(nil, awsError)
 
@@ -990,7 +990,7 @@ func TestS3BucketAnalytic(t *testing.T) {
 		},
 		{
 			test: "cannot list Analytics", dirName: "aws_s3_bucket_analytics_list_analytics",
-			mocks: func(repository *repository2.MockS3Repository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockS3Repository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllBuckets").Return(
 					[]*s3.Bucket{
 						{Name: awssdk.String("bucket-martin-test-drift")},
@@ -1040,9 +1040,9 @@ func TestS3BucketAnalytic(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockS3Repository{}
+			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo, alerter)
-			var repo repository2.S3Repository = fakeRepo
+			var repo repository.S3Repository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -1058,7 +1058,7 @@ func TestS3BucketAnalytic(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
+				repo = repository.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewS3BucketAnalyticEnumerator(repo, factory, tf.TerraformProviderConfig{

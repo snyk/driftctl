@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerror "github.com/snyk/driftctl/enumeration/remote/error"
@@ -31,13 +31,13 @@ func TestAppAutoScalingTarget(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockAppAutoScalingRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockAppAutoScalingRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "should return one target",
 			dirName: "aws_appautoscaling_target_single",
-			mocks: func(client *repository2.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
 				client.On("ServiceNamespaceValues").Return(applicationautoscaling.ServiceNamespace_Values()).Once()
 
 				client.On("DescribeScalableTargets", "dynamodb").Return([]*applicationautoscaling.ScalableTarget{
@@ -58,7 +58,7 @@ func TestAppAutoScalingTarget(t *testing.T) {
 		{
 			test:    "should return remote error",
 			dirName: "aws_appautoscaling_target_single",
-			mocks: func(client *repository2.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
 				client.On("ServiceNamespaceValues").Return(applicationautoscaling.ServiceNamespace_Values()).Once()
 
 				client.On("DescribeScalableTargets", mock.AnythingOfType("string")).Return(nil, errors.New("remote error")).Once()
@@ -86,10 +86,10 @@ func TestAppAutoScalingTarget(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockAppAutoScalingRepository{}
+			fakeRepo := &repository.MockAppAutoScalingRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.AppAutoScalingRepository = fakeRepo
+			var repo repository.AppAutoScalingRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -105,7 +105,7 @@ func TestAppAutoScalingTarget(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewAppAutoScalingRepository(sess, cache.New(0))
+				repo = repository.NewAppAutoScalingRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewAppAutoscalingTargetEnumerator(repo, factory))
@@ -136,13 +136,13 @@ func TestAppAutoScalingPolicy(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockAppAutoScalingRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockAppAutoScalingRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "should return one policy",
 			dirName: "aws_appautoscaling_policy_single",
-			mocks: func(client *repository2.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
 				client.On("ServiceNamespaceValues").Return(applicationautoscaling.ServiceNamespace_Values()).Once()
 
 				client.On("DescribeScalingPolicies", "dynamodb").Return([]*applicationautoscaling.ScalingPolicy{
@@ -161,7 +161,7 @@ func TestAppAutoScalingPolicy(t *testing.T) {
 		{
 			test:    "should return remote error",
 			dirName: "aws_appautoscaling_policy_single",
-			mocks: func(client *repository2.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
 				client.On("ServiceNamespaceValues").Return(applicationautoscaling.ServiceNamespace_Values()).Once()
 
 				client.On("DescribeScalingPolicies", mock.AnythingOfType("string")).Return(nil, errors.New("remote error")).Once()
@@ -189,10 +189,10 @@ func TestAppAutoScalingPolicy(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockAppAutoScalingRepository{}
+			fakeRepo := &repository.MockAppAutoScalingRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.AppAutoScalingRepository = fakeRepo
+			var repo repository.AppAutoScalingRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -208,7 +208,7 @@ func TestAppAutoScalingPolicy(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewAppAutoScalingRepository(sess, cache.New(0))
+				repo = repository.NewAppAutoScalingRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewAppAutoscalingPolicyEnumerator(repo, factory))
@@ -240,13 +240,13 @@ func TestAppAutoScalingScheduledAction(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockAppAutoScalingRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockAppAutoScalingRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "should return one scheduled action",
-			mocks: func(client *repository2.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
 				matchServiceNamespaceFunc := func(ns string) bool {
 					for _, n := range applicationautoscaling.ServiceNamespace_Values() {
 						if n == ns {
@@ -278,7 +278,7 @@ func TestAppAutoScalingScheduledAction(t *testing.T) {
 		},
 		{
 			test: "should return remote error",
-			mocks: func(client *repository2.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockAppAutoScalingRepository, alerter *mocks.AlerterInterface) {
 				client.On("ServiceNamespaceValues").Return(applicationautoscaling.ServiceNamespace_Values()).Once()
 
 				client.On("DescribeScheduledActions", mock.AnythingOfType("string")).Return(nil, dummyError).Once()
@@ -302,10 +302,10 @@ func TestAppAutoScalingScheduledAction(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockAppAutoScalingRepository{}
+			fakeRepo := &repository.MockAppAutoScalingRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.AppAutoScalingRepository = fakeRepo
+			var repo repository.AppAutoScalingRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewAppAutoscalingScheduledActionEnumerator(repo, factory))
 

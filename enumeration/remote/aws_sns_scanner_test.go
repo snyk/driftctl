@@ -6,7 +6,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -36,13 +36,13 @@ func TestScanSNSTopic(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockSNSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockSNSRepository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no SNS Topic",
 			dirName: "aws_sns_topic_empty",
-			mocks: func(client *repository2.MockSNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTopics").Return([]*sns.Topic{}, nil)
 			},
 			err: nil,
@@ -50,7 +50,7 @@ func TestScanSNSTopic(t *testing.T) {
 		{
 			test:    "Multiple SNSTopic",
 			dirName: "aws_sns_topic_multiple",
-			mocks: func(client *repository2.MockSNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTopics").Return([]*sns.Topic{
 					{TopicArn: awssdk.String("arn:aws:sns:eu-west-3:526954929923:user-updates-topic")},
 					{TopicArn: awssdk.String("arn:aws:sns:eu-west-3:526954929923:user-updates-topic2")},
@@ -62,7 +62,7 @@ func TestScanSNSTopic(t *testing.T) {
 		{
 			test:    "cannot list SNSTopic",
 			dirName: "aws_sns_topic_empty",
-			mocks: func(client *repository2.MockSNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllTopics").Return(nil, awsError)
 
@@ -91,10 +91,10 @@ func TestScanSNSTopic(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockSNSRepository{}
+			fakeRepo := &repository.MockSNSRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.SNSRepository = fakeRepo
+			var repo repository.SNSRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -110,7 +110,7 @@ func TestScanSNSTopic(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewSNSRepository(sess, cache.New(0))
+				repo = repository.NewSNSRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewSNSTopicEnumerator(repo, factory))
@@ -137,13 +137,13 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockSNSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockSNSRepository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no SNS Topic policy",
 			dirName: "aws_sns_topic_policy_empty",
-			mocks: func(client *repository2.MockSNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTopics").Return([]*sns.Topic{}, nil)
 			},
 			err: nil,
@@ -151,7 +151,7 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 		{
 			test:    "Multiple SNSTopicPolicy",
 			dirName: "aws_sns_topic_policy_multiple",
-			mocks: func(client *repository2.MockSNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTopics").Return([]*sns.Topic{
 					{TopicArn: awssdk.String("arn:aws:sns:us-east-1:526954929923:my-topic-with-policy")},
 					{TopicArn: awssdk.String("arn:aws:sns:us-east-1:526954929923:my-topic-with-policy2")},
@@ -162,7 +162,7 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 		{
 			test:    "cannot list SNSTopic",
 			dirName: "aws_sns_topic_policy_topic_list",
-			mocks: func(client *repository2.MockSNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllTopics").Return(nil, awsError)
 
@@ -191,10 +191,10 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockSNSRepository{}
+			fakeRepo := &repository.MockSNSRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.SNSRepository = fakeRepo
+			var repo repository.SNSRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -210,7 +210,7 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewSNSRepository(sess, cache.New(0))
+				repo = repository.NewSNSRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewSNSTopicPolicyEnumerator(repo, factory))
@@ -237,13 +237,13 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockSNSRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockSNSRepository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no SNS Topic Subscription",
 			dirName: "aws_sns_topic_subscription_empty",
-			mocks: func(client *repository2.MockSNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSubscriptions").Return([]*sns.Subscription{}, nil)
 			},
 			err: nil,
@@ -251,7 +251,7 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 		{
 			test:    "Multiple SNSTopic Subscription",
 			dirName: "aws_sns_topic_subscription_multiple",
-			mocks: func(client *repository2.MockSNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSubscriptions").Return([]*sns.Subscription{
 					{SubscriptionArn: awssdk.String("arn:aws:sns:us-east-1:526954929923:user-updates-topic2:c0f794c5-a009-4db4-9147-4c55959787fa")},
 					{SubscriptionArn: awssdk.String("arn:aws:sns:us-east-1:526954929923:user-updates-topic:b6e66147-2b31-4486-8d4b-2a2272264c8e")},
@@ -262,7 +262,7 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 		{
 			test:    "Multiple SNSTopic Subscription with one pending and one incorrect",
 			dirName: "aws_sns_topic_subscription_multiple",
-			mocks: func(client *repository2.MockSNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSubscriptions").Return([]*sns.Subscription{
 					{SubscriptionArn: awssdk.String("PendingConfirmation"), Endpoint: awssdk.String("TEST")},
 					{SubscriptionArn: awssdk.String("Incorrect"), Endpoint: awssdk.String("INCORRECT")},
@@ -279,7 +279,7 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 		{
 			test:    "cannot list SNSTopic subscription",
 			dirName: "aws_sns_topic_subscription_list",
-			mocks: func(client *repository2.MockSNSRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllSubscriptions").Return(nil, awsError)
 
@@ -308,10 +308,10 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockSNSRepository{}
+			fakeRepo := &repository.MockSNSRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.SNSRepository = fakeRepo
+			var repo repository.SNSRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -327,7 +327,7 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewSNSRepository(sess, cache.New(0))
+				repo = repository.NewSNSRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewSNSTopicSubscriptionEnumerator(repo, factory, alerter))

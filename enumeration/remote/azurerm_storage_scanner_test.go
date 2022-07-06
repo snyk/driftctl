@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	azurerm2 "github.com/snyk/driftctl/enumeration/remote/azurerm"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
+	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	error2 "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/terraform"
@@ -27,13 +27,13 @@ func TestAzurermStorageAccount(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockStorageRespository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockStorageRespository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no storage accounts",
-			mocks: func(repository *repository2.MockStorageRespository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockStorageRespository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllStorageAccount").Return([]*armstorage.StorageAccount{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -42,14 +42,14 @@ func TestAzurermStorageAccount(t *testing.T) {
 		},
 		{
 			test: "error listing storage accounts",
-			mocks: func(repository *repository2.MockStorageRespository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockStorageRespository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllStorageAccount").Return(nil, dummyError)
 			},
 			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzureStorageAccountResourceType),
 		},
 		{
 			test: "multiple storage accounts",
-			mocks: func(repository *repository2.MockStorageRespository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockStorageRespository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllStorageAccount").Return([]*armstorage.StorageAccount{
 					{
 						TrackedResource: armstorage.TrackedResource{
@@ -92,10 +92,10 @@ func TestAzurermStorageAccount(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockStorageRespository{}
+			fakeRepo := &repository.MockStorageRespository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.StorageRespository = fakeRepo
+			var repo repository.StorageRespository = fakeRepo
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermStorageAccountEnumerator(repo, factory))
 
@@ -122,13 +122,13 @@ func TestAzurermStorageContainer(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockStorageRespository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockStorageRespository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no storage accounts",
-			mocks: func(repository *repository2.MockStorageRespository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockStorageRespository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllStorageAccount").Return([]*armstorage.StorageAccount{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -137,7 +137,7 @@ func TestAzurermStorageContainer(t *testing.T) {
 		},
 		{
 			test: "no storage containers",
-			mocks: func(repository *repository2.MockStorageRespository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockStorageRespository, alerter *mocks.AlerterInterface) {
 				account1 := &armstorage.StorageAccount{
 					TrackedResource: armstorage.TrackedResource{
 						Resource: armstorage.Resource{
@@ -165,14 +165,14 @@ func TestAzurermStorageContainer(t *testing.T) {
 		},
 		{
 			test: "error listing storage accounts",
-			mocks: func(repository *repository2.MockStorageRespository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockStorageRespository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllStorageAccount").Return(nil, dummyError)
 			},
 			wantErr: error2.NewResourceListingErrorWithType(dummyError, resourceazure.AzureStorageContainerResourceType, resourceazure.AzureStorageAccountResourceType),
 		},
 		{
 			test: "error listing storage container",
-			mocks: func(repository *repository2.MockStorageRespository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockStorageRespository, alerter *mocks.AlerterInterface) {
 				account := &armstorage.StorageAccount{
 					TrackedResource: armstorage.TrackedResource{
 						Resource: armstorage.Resource{
@@ -187,7 +187,7 @@ func TestAzurermStorageContainer(t *testing.T) {
 		},
 		{
 			test: "multiple storage containers",
-			mocks: func(repository *repository2.MockStorageRespository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockStorageRespository, alerter *mocks.AlerterInterface) {
 				account1 := &armstorage.StorageAccount{
 					TrackedResource: armstorage.TrackedResource{
 						Resource: armstorage.Resource{
@@ -237,10 +237,10 @@ func TestAzurermStorageContainer(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockStorageRespository{}
+			fakeRepo := &repository.MockStorageRespository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.StorageRespository = fakeRepo
+			var repo repository.StorageRespository = fakeRepo
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermStorageContainerEnumerator(repo, factory))
 

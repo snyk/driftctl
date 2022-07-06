@@ -6,7 +6,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/aws"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/terraform"
@@ -27,13 +27,13 @@ import (
 func TestAutoscaling_LaunchConfiguration(t *testing.T) {
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockAutoScalingRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockAutoScalingRepository, *mocks.AlerterInterface)
 		assertExpected func(*testing.T, []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no launch configuration",
-			mocks: func(repository *repository2.MockAutoScalingRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockAutoScalingRepository, alerter *mocks.AlerterInterface) {
 				repository.On("DescribeLaunchConfigurations").Return([]*autoscaling.LaunchConfiguration{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -42,7 +42,7 @@ func TestAutoscaling_LaunchConfiguration(t *testing.T) {
 		},
 		{
 			test: "multiple launch configurations",
-			mocks: func(repository *repository2.MockAutoScalingRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockAutoScalingRepository, alerter *mocks.AlerterInterface) {
 				repository.On("DescribeLaunchConfigurations").Return([]*autoscaling.LaunchConfiguration{
 					{LaunchConfigurationName: awssdk.String("web_config_1")},
 					{LaunchConfigurationName: awssdk.String("web_config_2")},
@@ -60,7 +60,7 @@ func TestAutoscaling_LaunchConfiguration(t *testing.T) {
 		},
 		{
 			test: "cannot list launch configurations",
-			mocks: func(repository *repository2.MockAutoScalingRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockAutoScalingRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("DescribeLaunchConfigurations").Return(nil, awsError)
 
@@ -85,10 +85,10 @@ func TestAutoscaling_LaunchConfiguration(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockAutoScalingRepository{}
+			fakeRepo := &repository.MockAutoScalingRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.AutoScalingRepository = fakeRepo
+			var repo repository.AutoScalingRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws.NewLaunchConfigurationEnumerator(repo, factory))
 

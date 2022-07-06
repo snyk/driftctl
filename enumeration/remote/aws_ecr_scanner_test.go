@@ -6,7 +6,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -33,13 +33,13 @@ func TestECRRepository(t *testing.T) {
 	tests := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockECRRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockECRRepository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no repository",
 			dirName: "aws_ecr_repository_empty",
-			mocks: func(client *repository2.MockECRRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockECRRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllRepositories").Return([]*ecr.Repository{}, nil)
 			},
 			err: nil,
@@ -47,7 +47,7 @@ func TestECRRepository(t *testing.T) {
 		{
 			test:    "multiple repositories",
 			dirName: "aws_ecr_repository_multiple",
-			mocks: func(client *repository2.MockECRRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockECRRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllRepositories").Return([]*ecr.Repository{
 					{RepositoryName: awssdk.String("test_ecr")},
 					{RepositoryName: awssdk.String("bar")},
@@ -58,7 +58,7 @@ func TestECRRepository(t *testing.T) {
 		{
 			test:    "cannot list repository",
 			dirName: "aws_ecr_repository_empty",
-			mocks: func(client *repository2.MockECRRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockECRRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllRepositories").Return(nil, awsError)
 
@@ -87,10 +87,10 @@ func TestECRRepository(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockECRRepository{}
+			fakeRepo := &repository.MockECRRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ECRRepository = fakeRepo
+			var repo repository.ECRRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -106,7 +106,7 @@ func TestECRRepository(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewECRRepository(sess, cache.New(0))
+				repo = repository.NewECRRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewECRRepositoryEnumerator(repo, factory))
@@ -131,13 +131,13 @@ func TestECRRepository(t *testing.T) {
 func TestECRRepositoryPolicy(t *testing.T) {
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockECRRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockECRRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		err            error
 	}{
 		{
 			test: "single repository policy",
-			mocks: func(client *repository2.MockECRRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *repository.MockECRRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllRepositories").Return([]*ecr.Repository{
 					{RepositoryName: awssdk.String("test_ecr_repo_policy")},
 					{RepositoryName: awssdk.String("test_ecr_repo_without_policy")},
@@ -173,10 +173,10 @@ func TestECRRepositoryPolicy(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockECRRepository{}
+			fakeRepo := &repository.MockECRRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ECRRepository = fakeRepo
+			var repo repository.ECRRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewECRRepositoryPolicyEnumerator(repo, factory))
 

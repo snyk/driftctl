@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/azurerm"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
+	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	error2 "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/terraform"
@@ -28,13 +28,13 @@ func TestAzurermResourceGroups(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockResourcesRepository, *mocks.AlerterInterface)
+		mocks          func(*repository.MockResourcesRepository, *mocks.AlerterInterface)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "no resource group",
-			mocks: func(repository *repository2.MockResourcesRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockResourcesRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllResourceGroups").Return([]*armresources.ResourceGroup{}, nil)
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
@@ -43,14 +43,14 @@ func TestAzurermResourceGroups(t *testing.T) {
 		},
 		{
 			test: "error listing resource groups",
-			mocks: func(repository *repository2.MockResourcesRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockResourcesRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllResourceGroups").Return(nil, dummyError)
 			},
 			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzureResourceGroupResourceType),
 		},
 		{
 			test: "multiple resource groups",
-			mocks: func(repository *repository2.MockResourcesRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repository *repository.MockResourcesRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllResourceGroups").Return([]*armresources.ResourceGroup{
 					{
 						ID:   to.StringPtr("group1"),
@@ -87,10 +87,10 @@ func TestAzurermResourceGroups(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockResourcesRepository{}
+			fakeRepo := &repository.MockResourcesRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.ResourcesRepository = fakeRepo
+			var repo repository.ResourcesRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermResourceGroupEnumerator(repo, factory))
 

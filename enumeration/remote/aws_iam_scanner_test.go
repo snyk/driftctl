@@ -6,7 +6,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/aws/repository"
+	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	common2 "github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -34,13 +34,13 @@ func TestIamUser(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockIAMRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no iam user",
 			dirName: "aws_iam_user_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllUsers").Return([]*iam.User{}, nil)
 			},
 			wantErr: nil,
@@ -48,7 +48,7 @@ func TestIamUser(t *testing.T) {
 		{
 			test:    "iam multiples users",
 			dirName: "aws_iam_user_multiple",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllUsers").Return([]*iam.User{
 					{
 						UserName: aws.String("test-driftctl-0"),
@@ -66,7 +66,7 @@ func TestIamUser(t *testing.T) {
 		{
 			test:    "cannot list iam user",
 			dirName: "aws_iam_user_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllUsers").Return(nil, awsError)
 
@@ -94,10 +94,10 @@ func TestIamUser(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockIAMRepository{}
+			fakeRepo := &repository.MockIAMRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.IAMRepository = fakeRepo
+			var repo repository.IAMRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -113,7 +113,7 @@ func TestIamUser(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewIAMRepository(sess, cache.New(0))
+				repo = repository.NewIAMRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamUserEnumerator(repo, factory))
@@ -140,13 +140,13 @@ func TestIamUserPolicy(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockIAMRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no iam user policy",
 			dirName: "aws_iam_user_policy_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				users := []*iam.User{
 					{
 						UserName: aws.String("loadbalancer"),
@@ -160,7 +160,7 @@ func TestIamUserPolicy(t *testing.T) {
 		{
 			test:    "iam multiples users multiple policies",
 			dirName: "aws_iam_user_policy_multiple",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				users := []*iam.User{
 					{
 						UserName: aws.String("loadbalancer"),
@@ -193,7 +193,7 @@ func TestIamUserPolicy(t *testing.T) {
 		{
 			test:    "cannot list user",
 			dirName: "aws_iam_user_policy_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllUsers").Return(nil, awsError)
 
@@ -204,7 +204,7 @@ func TestIamUserPolicy(t *testing.T) {
 		{
 			test:    "cannot list user policy",
 			dirName: "aws_iam_user_policy_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllUsers").Once().Return([]*iam.User{}, nil)
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllUserPolicies", mock.Anything).Return(nil, awsError)
@@ -233,10 +233,10 @@ func TestIamUserPolicy(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockIAMRepository{}
+			fakeRepo := &repository.MockIAMRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.IAMRepository = fakeRepo
+			var repo repository.IAMRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -252,7 +252,7 @@ func TestIamUserPolicy(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewIAMRepository(sess, cache.New(0))
+				repo = repository.NewIAMRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamUserPolicyEnumerator(repo, factory))
@@ -279,13 +279,13 @@ func TestIamPolicy(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockIAMRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no iam custom policies",
 			dirName: "aws_iam_policy_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllPolicies").Once().Return([]*iam.Policy{}, nil)
 			},
 			wantErr: nil,
@@ -293,7 +293,7 @@ func TestIamPolicy(t *testing.T) {
 		{
 			test:    "iam multiples custom policies",
 			dirName: "aws_iam_policy_multiple",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllPolicies").Once().Return([]*iam.Policy{
 					{
 						Arn: aws.String("arn:aws:iam::929327065333:policy/policy-0"),
@@ -311,7 +311,7 @@ func TestIamPolicy(t *testing.T) {
 		{
 			test:    "cannot list iam custom policies",
 			dirName: "aws_iam_policy_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllPolicies").Once().Return(nil, awsError)
 
@@ -340,10 +340,10 @@ func TestIamPolicy(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockIAMRepository{}
+			fakeRepo := &repository.MockIAMRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.IAMRepository = fakeRepo
+			var repo repository.IAMRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -359,7 +359,7 @@ func TestIamPolicy(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewIAMRepository(sess, cache.New(0))
+				repo = repository.NewIAMRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamPolicyEnumerator(repo, factory))
@@ -386,13 +386,13 @@ func TestIamRole(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockIAMRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no iam roles",
 			dirName: "aws_iam_role_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRoles").Return([]*iam.Role{}, nil)
 			},
 			wantErr: nil,
@@ -400,7 +400,7 @@ func TestIamRole(t *testing.T) {
 		{
 			test:    "iam multiples roles",
 			dirName: "aws_iam_role_multiple",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRoles").Return([]*iam.Role{
 					{
 						RoleName: aws.String("test_role_0"),
@@ -421,7 +421,7 @@ func TestIamRole(t *testing.T) {
 		{
 			test:    "iam roles ignore services roles",
 			dirName: "aws_iam_role_ignore_services_roles",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRoles").Return([]*iam.Role{
 					{
 						RoleName: aws.String("AWSServiceRoleForOrganizations"),
@@ -460,10 +460,10 @@ func TestIamRole(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockIAMRepository{}
+			fakeRepo := &repository.MockIAMRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.IAMRepository = fakeRepo
+			var repo repository.IAMRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -479,7 +479,7 @@ func TestIamRole(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewIAMRepository(sess, cache.New(0))
+				repo = repository.NewIAMRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamRoleEnumerator(repo, factory))
@@ -506,27 +506,27 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockIAMRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no iam role policy",
 			dirName: "aws_aws_iam_role_policy_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				roles := []*iam.Role{
 					{
 						RoleName: aws.String("test-role"),
 					},
 				}
 				repo.On("ListAllRoles").Return(roles, nil)
-				repo.On("ListAllRolePolicyAttachments", roles).Return([]*repository2.AttachedRolePolicy{}, nil)
+				repo.On("ListAllRolePolicyAttachments", roles).Return([]*repository.AttachedRolePolicy{}, nil)
 			},
 			err: nil,
 		},
 		{
 			test:    "iam multiples roles multiple policies",
 			dirName: "aws_iam_role_policy_attachment_multiple",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				roles := []*iam.Role{
 					{
 						RoleName: aws.String("test-role"),
@@ -536,7 +536,7 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 					},
 				}
 				repo.On("ListAllRoles").Return(roles, nil)
-				repo.On("ListAllRolePolicyAttachments", roles).Return([]*repository2.AttachedRolePolicy{
+				repo.On("ListAllRolePolicyAttachments", roles).Return([]*repository.AttachedRolePolicy{
 					{
 						AttachedPolicy: iam.AttachedPolicy{
 							PolicyArn:  aws.String("arn:aws:iam::929327065333:policy/test-policy"),
@@ -586,7 +586,7 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 		{
 			test:    "iam multiples roles for ignored roles",
 			dirName: "aws_iam_role_policy_attachment_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				roles := []*iam.Role{
 					{
 						RoleName: aws.String("AWSServiceRoleForSupport"),
@@ -604,7 +604,7 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 		{
 			test:    "Cannot list roles",
 			dirName: "aws_iam_role_policy_attachment_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllRoles").Once().Return(nil, awsError)
 
@@ -614,7 +614,7 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 		{
 			test:    "Cannot list roles policy attachment",
 			dirName: "aws_iam_role_policy_attachment_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRoles").Once().Return([]*iam.Role{{RoleName: aws.String("test")}}, nil)
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllRolePolicyAttachments", mock.Anything).Return(nil, awsError)
@@ -643,10 +643,10 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockIAMRepository{}
+			fakeRepo := &repository.MockIAMRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.IAMRepository = fakeRepo
+			var repo repository.IAMRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -662,7 +662,7 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewIAMRepository(sess, cache.New(0))
+				repo = repository.NewIAMRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamRolePolicyAttachmentEnumerator(repo, factory))
@@ -689,13 +689,13 @@ func TestIamAccessKey(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockIAMRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no iam access_key",
 			dirName: "aws_iam_access_key_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				users := []*iam.User{
 					{
 						UserName: aws.String("test-driftctl"),
@@ -709,7 +709,7 @@ func TestIamAccessKey(t *testing.T) {
 		{
 			test:    "iam multiples keys for multiples users",
 			dirName: "aws_iam_access_key_multiple",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				users := []*iam.User{
 					{
 						UserName: aws.String("test-driftctl"),
@@ -740,7 +740,7 @@ func TestIamAccessKey(t *testing.T) {
 		{
 			test:    "Cannot list iam user",
 			dirName: "aws_iam_access_key_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllUsers").Once().Return(nil, awsError)
 
@@ -751,7 +751,7 @@ func TestIamAccessKey(t *testing.T) {
 		{
 			test:    "Cannot list iam access_key",
 			dirName: "aws_iam_access_key_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllUsers").Once().Return([]*iam.User{}, nil)
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllAccessKeys", mock.Anything).Return(nil, awsError)
@@ -781,10 +781,10 @@ func TestIamAccessKey(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockIAMRepository{}
+			fakeRepo := &repository.MockIAMRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.IAMRepository = fakeRepo
+			var repo repository.IAMRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -800,7 +800,7 @@ func TestIamAccessKey(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewIAMRepository(sess, cache.New(0))
+				repo = repository.NewIAMRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamAccessKeyEnumerator(repo, factory))
@@ -827,27 +827,27 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockIAMRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no iam user policy",
 			dirName: "aws_iam_user_policy_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				users := []*iam.User{
 					{
 						UserName: aws.String("loadbalancer"),
 					},
 				}
 				repo.On("ListAllUsers").Return(users, nil)
-				repo.On("ListAllUserPolicyAttachments", users).Return([]*repository2.AttachedUserPolicy{}, nil)
+				repo.On("ListAllUserPolicyAttachments", users).Return([]*repository.AttachedUserPolicy{}, nil)
 			},
 			wantErr: nil,
 		},
 		{
 			test:    "iam multiples users multiple policies",
 			dirName: "aws_iam_user_policy_attachment_multiple",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				users := []*iam.User{
 					{
 						UserName: aws.String("loadbalancer"),
@@ -860,7 +860,7 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 					},
 				}
 				repo.On("ListAllUsers").Return(users, nil)
-				repo.On("ListAllUserPolicyAttachments", users).Return([]*repository2.AttachedUserPolicy{
+				repo.On("ListAllUserPolicyAttachments", users).Return([]*repository.AttachedUserPolicy{
 					{
 						AttachedPolicy: iam.AttachedPolicy{
 							PolicyArn:  aws.String("arn:aws:iam::726421854799:policy/test"),
@@ -953,7 +953,7 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 		{
 			test:    "cannot list user",
 			dirName: "aws_iam_user_policy_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllUsers").Return(nil, awsError)
 
@@ -964,7 +964,7 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 		{
 			test:    "cannot list user policies attachment",
 			dirName: "aws_iam_user_policy_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllUsers").Once().Return([]*iam.User{}, nil)
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllUserPolicyAttachments", mock.Anything).Return(nil, awsError)
@@ -994,10 +994,10 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockIAMRepository{}
+			fakeRepo := &repository.MockIAMRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.IAMRepository = fakeRepo
+			var repo repository.IAMRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -1013,7 +1013,7 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewIAMRepository(sess, cache.New(0))
+				repo = repository.NewIAMRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamUserPolicyAttachmentEnumerator(repo, factory))
@@ -1040,27 +1040,27 @@ func TestIamRolePolicy(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(*repository2.MockIAMRepository, *mocks.AlerterInterface)
+		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
 		wantErr error
 	}{
 		{
 			test:    "no iam role policy",
 			dirName: "aws_iam_role_policy_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				roles := []*iam.Role{
 					{
 						RoleName: aws.String("test_role"),
 					},
 				}
 				repo.On("ListAllRoles").Return(roles, nil)
-				repo.On("ListAllRolePolicies", roles).Return([]repository2.RolePolicy{}, nil)
+				repo.On("ListAllRolePolicies", roles).Return([]repository.RolePolicy{}, nil)
 			},
 			wantErr: nil,
 		},
 		{
 			test:    "multiples roles with inline policies",
 			dirName: "aws_iam_role_policy_multiple",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				roles := []*iam.Role{
 					{
 						RoleName: aws.String("test_role_0"),
@@ -1070,7 +1070,7 @@ func TestIamRolePolicy(t *testing.T) {
 					},
 				}
 				repo.On("ListAllRoles").Return(roles, nil)
-				repo.On("ListAllRolePolicies", roles).Return([]repository2.RolePolicy{
+				repo.On("ListAllRolePolicies", roles).Return([]repository.RolePolicy{
 					{Policy: "policy-role0-0", RoleName: "test_role_0"},
 					{Policy: "policy-role0-1", RoleName: "test_role_0"},
 					{Policy: "policy-role0-2", RoleName: "test_role_0"},
@@ -1084,7 +1084,7 @@ func TestIamRolePolicy(t *testing.T) {
 		{
 			test:    "Cannot list roles",
 			dirName: "aws_iam_role_policy_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllRoles").Once().Return(nil, awsError)
 
@@ -1095,7 +1095,7 @@ func TestIamRolePolicy(t *testing.T) {
 		{
 			test:    "cannot list role policy",
 			dirName: "aws_iam_role_policy_empty",
-			mocks: func(repo *repository2.MockIAMRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRoles").Once().Return([]*iam.Role{}, nil)
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllRolePolicies", mock.Anything).Return(nil, awsError)
@@ -1125,10 +1125,10 @@ func TestIamRolePolicy(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockIAMRepository{}
+			fakeRepo := &repository.MockIAMRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			var repo repository2.IAMRepository = fakeRepo
+			var repo repository.IAMRepository = fakeRepo
 			providerVersion := "3.19.0"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
@@ -1144,7 +1144,7 @@ func TestIamRolePolicy(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = repository2.NewIAMRepository(sess, cache.New(0))
+				repo = repository.NewIAMRepository(sess, cache.New(0))
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamRolePolicyEnumerator(repo, factory))
@@ -1171,13 +1171,13 @@ func TestIamGroupPolicy(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockIAMRepository)
+		mocks          func(*repository.MockIAMRepository)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "multiple groups, with multiples policies",
-			mocks: func(repository *repository2.MockIAMRepository) {
+			mocks: func(repository *repository.MockIAMRepository) {
 				repository.On("ListAllGroups").Return(nil, nil)
 				repository.On("ListAllGroupPolicies", []*iam.Group(nil)).
 					Return([]string{"group1:policy1", "group2:policy2"}, nil)
@@ -1192,14 +1192,14 @@ func TestIamGroupPolicy(t *testing.T) {
 		},
 		{
 			test: "cannot list groups",
-			mocks: func(repository *repository2.MockIAMRepository) {
+			mocks: func(repository *repository.MockIAMRepository) {
 				repository.On("ListAllGroups").Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsIamGroupPolicyResourceType, resourceaws.AwsIamGroupResourceType),
 		},
 		{
 			test: "cannot list policies",
-			mocks: func(repository *repository2.MockIAMRepository) {
+			mocks: func(repository *repository.MockIAMRepository) {
 				repository.On("ListAllGroups").Return(nil, nil)
 				repository.On("ListAllGroupPolicies", []*iam.Group(nil)).Return(nil, dummyError)
 			},
@@ -1219,10 +1219,10 @@ func TestIamGroupPolicy(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockIAMRepository{}
+			fakeRepo := &repository.MockIAMRepository{}
 			c.mocks(fakeRepo)
 
-			var repo repository2.IAMRepository = fakeRepo
+			var repo repository.IAMRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewIamGroupPolicyEnumerator(
 				repo, factory,
@@ -1251,13 +1251,13 @@ func TestIamGroup(t *testing.T) {
 
 	tests := []struct {
 		test           string
-		mocks          func(*repository2.MockIAMRepository)
+		mocks          func(*repository.MockIAMRepository)
 		assertExpected func(t *testing.T, got []*resource.Resource)
 		wantErr        error
 	}{
 		{
 			test: "multiple groups, with multiples groups",
-			mocks: func(repository *repository2.MockIAMRepository) {
+			mocks: func(repository *repository.MockIAMRepository) {
 				repository.On("ListAllGroups").Return([]*iam.Group{
 					{
 						GroupName: aws.String("group1"),
@@ -1277,7 +1277,7 @@ func TestIamGroup(t *testing.T) {
 		},
 		{
 			test: "cannot list groups",
-			mocks: func(repository *repository2.MockIAMRepository) {
+			mocks: func(repository *repository.MockIAMRepository) {
 				repository.On("ListAllGroups").Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsIamGroupResourceType),
@@ -1296,10 +1296,10 @@ func TestIamGroup(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			fakeRepo := &repository2.MockIAMRepository{}
+			fakeRepo := &repository.MockIAMRepository{}
 			c.mocks(fakeRepo)
 
-			var repo repository2.IAMRepository = fakeRepo
+			var repo repository.IAMRepository = fakeRepo
 
 			remoteLibrary.AddEnumerator(aws2.NewIamGroupEnumerator(
 				repo, factory,

@@ -3,19 +3,19 @@ package google
 import (
 	"fmt"
 	remoteerror "github.com/snyk/driftctl/enumeration/remote/error"
-	repository2 "github.com/snyk/driftctl/enumeration/remote/google/repository"
+	"github.com/snyk/driftctl/enumeration/remote/google/repository"
 
 	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/enumeration/resource/google"
 )
 
 type GoogleStorageBucketIamMemberEnumerator struct {
-	repository        repository2.AssetRepository
-	storageRepository repository2.StorageRepository
+	repository        repository.AssetRepository
+	storageRepository repository.StorageRepository
 	factory           resource.ResourceFactory
 }
 
-func NewGoogleStorageBucketIamMemberEnumerator(repo repository2.AssetRepository, storageRepo repository2.StorageRepository, factory resource.ResourceFactory) *GoogleStorageBucketIamMemberEnumerator {
+func NewGoogleStorageBucketIamMemberEnumerator(repo repository.AssetRepository, storageRepo repository.StorageRepository, factory resource.ResourceFactory) *GoogleStorageBucketIamMemberEnumerator {
 	return &GoogleStorageBucketIamMemberEnumerator{
 		repository:        repo,
 		storageRepository: storageRepo,
