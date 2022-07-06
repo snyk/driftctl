@@ -8,7 +8,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
-	google2 "github.com/snyk/driftctl/enumeration/remote/google"
+	"github.com/snyk/driftctl/enumeration/remote/google"
 	"github.com/snyk/driftctl/enumeration/remote/google/repository"
 	"github.com/snyk/driftctl/enumeration/terraform"
 
@@ -109,7 +109,7 @@ func TestGoogleBigqueryDataset(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleBigqueryDatasetEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleBigqueryDatasetEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -212,7 +212,7 @@ func TestGoogleBigqueryTable(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleBigqueryTableEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleBigqueryTableEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

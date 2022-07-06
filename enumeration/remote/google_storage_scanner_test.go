@@ -9,7 +9,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
-	google2 "github.com/snyk/driftctl/enumeration/remote/google"
+	"github.com/snyk/driftctl/enumeration/remote/google"
 	"github.com/snyk/driftctl/enumeration/remote/google/repository"
 	"github.com/snyk/driftctl/enumeration/terraform"
 
@@ -142,7 +142,7 @@ func TestGoogleStorageBucket(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleStorageBucketEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleStorageBucketEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -312,7 +312,7 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 			provider := terraform2.NewFakeTerraformProvider(realProvider)
 			provider.WithResponse(c.dirName)
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleStorageBucketIamMemberEnumerator(assetRepository, storageRepository, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleStorageBucketIamMemberEnumerator(assetRepository, storageRepository, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

@@ -8,7 +8,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
-	google2 "github.com/snyk/driftctl/enumeration/remote/google"
+	"github.com/snyk/driftctl/enumeration/remote/google"
 	"github.com/snyk/driftctl/enumeration/remote/google/repository"
 	"github.com/snyk/driftctl/enumeration/terraform"
 
@@ -133,7 +133,7 @@ func TestGoogleComputeFirewall(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleComputeFirewallEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeFirewallEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -256,7 +256,7 @@ func TestGoogleComputeRouter(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleComputeRouterEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeRouterEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -360,7 +360,7 @@ func TestGoogleComputeInstance(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleComputeInstanceEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeInstanceEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -484,7 +484,7 @@ func TestGoogleComputeNetwork(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleComputeNetworkEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeNetworkEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -606,7 +606,7 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleComputeInstanceGroupEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeInstanceGroupEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(googleresource.GoogleComputeInstanceGroupResourceType, common.NewGenericDetailsFetcher(googleresource.GoogleComputeInstanceGroupResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -727,7 +727,7 @@ func TestGoogleComputeAddress(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleComputeAddressEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeAddressEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -853,7 +853,7 @@ func TestGoogleComputeGlobalAddress(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleComputeGlobalAddressEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeGlobalAddressEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -977,7 +977,7 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleComputeSubnetworkEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeSubnetworkEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -1086,7 +1086,7 @@ func TestGoogleComputeDisk(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleComputeDiskEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeDiskEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1196,7 +1196,7 @@ func TestGoogleComputeImage(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleComputeImageEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeImageEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1306,7 +1306,7 @@ func TestGoogleComputeHealthCheck(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleComputeHealthCheckEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeHealthCheckEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1416,7 +1416,7 @@ func TestGoogleComputeNodeGroup(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleComputeNodeGroupEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeNodeGroupEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1525,7 +1525,7 @@ func TestGoogleComputeForwardingRule(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleComputeForwardingRuleEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeForwardingRuleEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1635,7 +1635,7 @@ func TestGoogleComputeInstanceGroupManager(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleComputeInstanceGroupManagerEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeInstanceGroupManagerEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1744,7 +1744,7 @@ func TestGoogleComputeGlobalForwardingRule(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleComputeGlobalForwardingRuleEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeGlobalForwardingRuleEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

@@ -8,7 +8,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
-	google2 "github.com/snyk/driftctl/enumeration/remote/google"
+	"github.com/snyk/driftctl/enumeration/remote/google"
 	"github.com/snyk/driftctl/enumeration/remote/google/repository"
 	"github.com/snyk/driftctl/enumeration/terraform"
 
@@ -146,7 +146,7 @@ func TestGoogleBigtableInstance(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleBigTableInstanceEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleBigTableInstanceEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -272,7 +272,7 @@ func TestGoogleBigtableTable(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google2.NewGoogleBigtableTableEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleBigtableTableEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
