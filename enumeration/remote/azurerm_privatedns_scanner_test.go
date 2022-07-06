@@ -9,7 +9,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
-	terraform2 "github.com/snyk/driftctl/enumeration/terraform"
+	"github.com/snyk/driftctl/enumeration/terraform"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
@@ -90,7 +90,7 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform2.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -98,7 +98,7 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform2.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -244,7 +244,7 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform2.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -252,7 +252,7 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform2.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -399,7 +399,7 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform2.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -407,7 +407,7 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform2.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -542,7 +542,7 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform2.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -550,7 +550,7 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform2.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -696,7 +696,7 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform2.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -704,7 +704,7 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform2.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -851,7 +851,7 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform2.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -859,7 +859,7 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform2.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1005,7 +1005,7 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform2.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -1013,7 +1013,7 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform2.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1159,7 +1159,7 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform2.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -1167,7 +1167,7 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform2.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks

@@ -10,7 +10,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/azurerm/common"
 	"github.com/snyk/driftctl/enumeration/remote/terraform"
-	terraform2 "github.com/snyk/driftctl/enumeration/terraform"
+	tf "github.com/snyk/driftctl/enumeration/terraform"
 )
 
 type AzureTerraformProvider struct {
@@ -26,10 +26,10 @@ func NewAzureTerraformProvider(version string, progress enumeration.ProgressCoun
 	// Just pass your version and name
 	p := &AzureTerraformProvider{
 		version: version,
-		name:    terraform2.AZURE,
+		name:    tf.AZURE,
 	}
 	// Use TerraformProviderInstaller to retrieve the provider if needed
-	installer, err := terraform2.NewProviderInstaller(terraform2.ProviderConfig{
+	installer, err := tf.NewProviderInstaller(tf.ProviderConfig{
 		Key:       p.name,
 		Version:   version,
 		ConfigDir: configDir,

@@ -17,7 +17,7 @@ import (
 	"github.com/sirupsen/logrus"
 	progress2 "github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/parallel"
-	terraform2 "github.com/snyk/driftctl/enumeration/terraform"
+	tf "github.com/snyk/driftctl/enumeration/terraform"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 )
@@ -36,7 +36,7 @@ type TerraformProviderConfig struct {
 
 type TerraformProvider struct {
 	lock              sync.Mutex
-	providerInstaller *terraform2.ProviderInstaller
+	providerInstaller *tf.ProviderInstaller
 	grpcProviders     map[string]*plugin.GRPCProvider
 	schemas           map[string]providers.Schema
 	Config            TerraformProviderConfig
@@ -44,7 +44,7 @@ type TerraformProvider struct {
 	progress          progress2.ProgressCounter
 }
 
-func NewTerraformProvider(installer *terraform2.ProviderInstaller, config TerraformProviderConfig, progress progress2.ProgressCounter) (*TerraformProvider, error) {
+func NewTerraformProvider(installer *tf.ProviderInstaller, config TerraformProviderConfig, progress progress2.ProgressCounter) (*TerraformProvider, error) {
 	p := TerraformProvider{
 		providerInstaller: installer,
 		runner:            parallel.NewParallelRunner(context.TODO(), 10),
@@ -97,7 +97,7 @@ func (p *TerraformProvider) configure(alias string) error {
 		logrus.WithFields(logrus.Fields{
 			"alias": alias,
 		}).Debug("Starting gRPC client")
-		GRPCProvider, err := terraform2.NewGRPCProvider(discovery.PluginMeta{
+		GRPCProvider, err := tf.NewGRPCProvider(discovery.PluginMeta{
 			Path: providerPath,
 		})
 
@@ -142,7 +142,7 @@ func (p *TerraformProvider) configure(alias string) error {
 	return nil
 }
 
-func (p *TerraformProvider) ReadResource(args terraform2.ReadResourceArgs) (*cty.Value, error) {
+func (p *TerraformProvider) ReadResource(args tf.ReadResourceArgs) (*cty.Value, error) {
 
 	logrus.WithFields(logrus.Fields{
 		"id":    args.ID,

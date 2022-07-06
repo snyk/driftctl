@@ -8,7 +8,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/google/config"
 	"github.com/snyk/driftctl/enumeration/remote/terraform"
-	terraform2 "github.com/snyk/driftctl/enumeration/terraform"
+	tf "github.com/snyk/driftctl/enumeration/terraform"
 
 	asset "cloud.google.com/go/asset/apiv1"
 )
@@ -25,9 +25,9 @@ func NewGCPTerraformProvider(version string, progress enumeration.ProgressCounte
 	}
 	p := &GCPTerraformProvider{
 		version: version,
-		name:    terraform2.GOOGLE,
+		name:    tf.GOOGLE,
 	}
-	installer, err := terraform2.NewProviderInstaller(terraform2.ProviderConfig{
+	installer, err := tf.NewProviderInstaller(tf.ProviderConfig{
 		Key:       p.name,
 		Version:   version,
 		ConfigDir: configDir,

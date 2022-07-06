@@ -1,7 +1,7 @@
 package pkg_test
 
 import (
-	terraform2 "github.com/snyk/driftctl/enumeration/terraform"
+	"github.com/snyk/driftctl/enumeration/terraform"
 	resource2 "github.com/snyk/driftctl/pkg/resource"
 
 	"reflect"
@@ -79,10 +79,10 @@ func runTest(t *testing.T, cases TestCases) {
 			remoteSupplier := &resource.MockSupplier{}
 			remoteSupplier.On("Resources").Return(c.remoteResources, nil)
 
-			var resourceFactory resource.ResourceFactory = terraform2.NewTerraformResourceFactory(repo)
+			var resourceFactory resource.ResourceFactory = terraform.NewTerraformResourceFactory(repo)
 
 			if c.mocks != nil {
-				resourceFactory = &terraform2.MockResourceFactory{}
+				resourceFactory = &terraform.MockResourceFactory{}
 				c.mocks(resourceFactory, repo)
 			}
 
@@ -366,7 +366,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		{
 			name: "we should ignore default AWS IAM role when strict mode is disabled",
 			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
-				factory.(*terraform2.MockResourceFactory).On(
+				factory.(*terraform.MockResourceFactory).On(
 					"CreateAbstractResource",
 					aws.AwsIamPolicyAttachmentResourceType,
 					"role-test-1-policy-test-1",
@@ -464,7 +464,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		{
 			name: "we should not ignore default AWS IAM role when strict mode is enabled",
 			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
-				factory.(*terraform2.MockResourceFactory).On(
+				factory.(*terraform.MockResourceFactory).On(
 					"CreateAbstractResource",
 					aws.AwsIamPolicyAttachmentResourceType,
 					"role-test-1-policy-test-1",
@@ -562,7 +562,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		{
 			name: "we should not ignore default AWS IAM role when strict mode is enabled and a filter is specified",
 			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
-				factory.(*terraform2.MockResourceFactory).On(
+				factory.(*terraform.MockResourceFactory).On(
 					"CreateAbstractResource",
 					aws.AwsIamPolicyAttachmentResourceType,
 					"role-test-1-policy-test-1",
@@ -793,7 +793,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				},
 			},
 			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
-				factory.(*terraform2.MockResourceFactory).On(
+				factory.(*terraform.MockResourceFactory).On(
 					"CreateAbstractResource",
 					aws.AwsS3BucketPolicyResourceType,
 					"foo",
@@ -890,7 +890,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 					Sch: getSchema(repo, "aws_ebs_volume"),
 				}
-				factory.(*terraform2.MockResourceFactory).On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return matchByAttributes(input, map[string]interface{}{
 						"id":                   "vol-018c5ae89895aca4c",
 						"availability_zone":    "us-east-1",
@@ -909,7 +909,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 					Sch: getSchema(repo, "aws_ebs_volume"),
 				}
-				factory.(*terraform2.MockResourceFactory).On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return matchByAttributes(input, map[string]interface{}{
 						"id":                   "vol-02862d9b39045a3a4",
 						"availability_zone":    "us-east-1",
@@ -995,7 +995,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				},
 			},
 			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
-				factory.(*terraform2.MockResourceFactory).On("CreateAbstractResource", "aws_route", "r-table1080289494", mock.MatchedBy(func(input map[string]interface{}) bool {
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_route", "r-table1080289494", mock.MatchedBy(func(input map[string]interface{}) bool {
 					return matchByAttributes(input, map[string]interface{}{
 						"destination_cidr_block": "0.0.0.0/0",
 						"gateway_id":             "igw-07b7844a8fd17a638",
@@ -1014,7 +1014,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"state":                  "active",
 					},
 				}, nil)
-				factory.(*terraform2.MockResourceFactory).On("CreateAbstractResource", "aws_route", "r-table2750132062", mock.MatchedBy(func(input map[string]interface{}) bool {
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_route", "r-table2750132062", mock.MatchedBy(func(input map[string]interface{}) bool {
 					return matchByAttributes(input, map[string]interface{}{
 						"destination_ipv6_cidr_block": "::/0",
 						"gateway_id":                  "igw-07b7844a8fd17a638",
@@ -1073,7 +1073,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				},
 			},
 			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
-				factory.(*terraform2.MockResourceFactory).On("CreateAbstractResource", "aws_sns_topic_policy", "foo", map[string]interface{}{
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_sns_topic_policy", "foo", map[string]interface{}{
 					"id":     "foo",
 					"arn":    "arn",
 					"policy": "{\"policy\":\"bar\"}",
@@ -1135,7 +1135,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				},
 			},
 			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
-				factory.(*terraform2.MockResourceFactory).On("CreateAbstractResource", "aws_sqs_queue_policy", "foo", map[string]interface{}{
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_sqs_queue_policy", "foo", map[string]interface{}{
 					"id":        "foo",
 					"queue_url": "foo",
 					"policy":    "{\"policy\":\"bar\"}",
@@ -1364,7 +1364,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"prefix_list_ids":  []interface{}{},
 					},
 				}
-				factory.(*terraform2.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule1.Id,
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule1.Id,
 					mock.MatchedBy(func(input map[string]interface{}) bool {
 						return matchByAttributes(input, map[string]interface{}{
 							"id":                "sgrule-1707973622",
@@ -1396,7 +1396,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"prefix_list_ids": []interface{}{},
 					},
 				}
-				factory.(*terraform2.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule2.Id,
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule2.Id,
 					mock.MatchedBy(func(input map[string]interface{}) bool {
 						return matchByAttributes(input, map[string]interface{}{
 							"id":                "sgrule-2821752134",
@@ -1428,7 +1428,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"prefix_list_ids":  []interface{}{},
 					},
 				}
-				factory.(*terraform2.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule3.Id,
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule3.Id,
 					mock.MatchedBy(func(input map[string]interface{}) bool {
 						return matchByAttributes(input, map[string]interface{}{
 							"id":                "sgrule-2165103420",
@@ -1460,7 +1460,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"prefix_list_ids":  []interface{}{},
 					},
 				}
-				factory.(*terraform2.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule4.Id,
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule4.Id,
 					mock.MatchedBy(func(input map[string]interface{}) bool {
 						return matchByAttributes(input, map[string]interface{}{
 							"id":                "sgrule-2582518759",
@@ -1556,7 +1556,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 				},
 			},
 			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
-				factory.(*terraform2.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "iduser1", map[string]interface{}{
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "iduser1", map[string]interface{}{
 					"id":         "iduser1",
 					"policy_arn": "policy_arn1",
 					"users":      []interface{}{"user1"},
@@ -1573,7 +1573,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"roles":      []interface{}{},
 					},
 				}, nil)
-				factory.(*terraform2.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "user1-policy_arn1", map[string]interface{}{
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "user1-policy_arn1", map[string]interface{}{
 					"policy_arn": "policy_arn1",
 					"users":      []interface{}{"user1"},
 				}).Twice().Return(&resource.Resource{
@@ -1584,7 +1584,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"users":      []interface{}{"user1"},
 					},
 				}, nil)
-				factory.(*terraform2.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "idrole1", map[string]interface{}{
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "idrole1", map[string]interface{}{
 					"id":         "idrole1",
 					"policy_arn": "policy_arn1",
 					"users":      []interface{}{},
@@ -1601,7 +1601,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"roles":      []interface{}{"role1"},
 					},
 				}, nil)
-				factory.(*terraform2.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "role1-policy_arn1", map[string]interface{}{
+				factory.(*terraform.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "role1-policy_arn1", map[string]interface{}{
 					"policy_arn": "policy_arn1",
 					"roles":      []interface{}{"role1"},
 				}).Twice().Return(&resource.Resource{

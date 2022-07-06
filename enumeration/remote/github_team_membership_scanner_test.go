@@ -9,8 +9,8 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
-	github2 "github.com/snyk/driftctl/enumeration/remote/github"
-	terraform2 "github.com/snyk/driftctl/enumeration/terraform"
+	"github.com/snyk/driftctl/enumeration/remote/github"
+	"github.com/snyk/driftctl/enumeration/terraform"
 
 	githubres "github.com/snyk/driftctl/enumeration/resource/github"
 	"github.com/snyk/driftctl/mocks"
@@ -30,13 +30,13 @@ func TestScanGithubTeamMembership(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(*github2.MockGithubRepository, *mocks.AlerterInterface)
+		mocks   func(*github.MockGithubRepository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no github team memberships",
 			dirName: "github_team_membership_empty",
-			mocks: func(client *github2.MockGithubRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListTeamMemberships").Return([]string{}, nil)
 			},
 			err: nil,
@@ -44,7 +44,7 @@ func TestScanGithubTeamMembership(t *testing.T) {
 		{
 			test:    "multiple github team memberships",
 			dirName: "github_team_membership_multiple",
-			mocks: func(client *github2.MockGithubRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListTeamMemberships").Return([]string{
 					"4570529:driftctl-acceptance-tester",
 					"4570529:wbeuil",
@@ -55,7 +55,7 @@ func TestScanGithubTeamMembership(t *testing.T) {
 		{
 			test:    "cannot list team membership",
 			dirName: "github_team_membership_empty",
-			mocks: func(client *github2.MockGithubRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListTeamMemberships").Return(nil, errors.New("Your token has not been granted the required scopes to execute this query."))
 
 				alerter.On("SendAlert", githubres.GithubTeamMembershipResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Your token has not been granted the required scopes to execute this query."), githubres.GithubTeamMembershipResourceType, githubres.GithubTeamMembershipResourceType), alerts.EnumerationPhase)).Return()
@@ -66,7 +66,7 @@ func TestScanGithubTeamMembership(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("github", "4.4.0")
 	githubres.InitResourcesMetadata(schemaRepository)
-	factory := terraform2.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -75,15 +75,15 @@ func TestScanGithubTeamMembership(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 
-			providerLibrary := terraform2.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			mockedRepo := github2.MockGithubRepository{}
+			mockedRepo := github.MockGithubRepository{}
 			c.mocks(&mockedRepo, alerter)
 
-			var repo github2.GithubRepository = &mockedRepo
+			var repo github.GithubRepository = &mockedRepo
 
 			realProvider, err := tftest.InitTestGithubProvider(providerLibrary, "4.4.0")
 			if err != nil {
@@ -98,10 +98,10 @@ func TestScanGithubTeamMembership(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = github2.NewGithubRepository(realProvider.GetConfig(), cache.New(0))
+				repo = github.NewGithubRepository(realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(github2.NewGithubTeamMembershipEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(github.NewGithubTeamMembershipEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(githubres.GithubTeamMembershipResourceType, common.NewGenericDetailsFetcher(githubres.GithubTeamMembershipResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}

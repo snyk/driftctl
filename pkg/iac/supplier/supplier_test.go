@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/snyk/driftctl/enumeration/alerter"
-	terraform2 "github.com/snyk/driftctl/enumeration/terraform"
+	"github.com/snyk/driftctl/enumeration/terraform"
 
 	"github.com/snyk/driftctl/pkg/filter"
 	"github.com/snyk/driftctl/pkg/iac/config"
@@ -91,12 +91,12 @@ func TestGetIACSupplier(t *testing.T) {
 			progress.On("Start").Return().Times(1)
 
 			repo := resource.InitFakeSchemaRepository("aws", "3.19.0")
-			factory := terraform2.NewTerraformResourceFactory(repo)
+			factory := terraform.NewTerraformResourceFactory(repo)
 			alerter := alerter.NewAlerter()
 
 			testFilter := &filter.MockFilter{}
 
-			_, err := GetIACSupplier(tt.args.config, terraform2.NewProviderLibrary(), tt.args.options, progress, alerter, factory, testFilter)
+			_, err := GetIACSupplier(tt.args.config, terraform.NewProviderLibrary(), tt.args.options, progress, alerter, factory, testFilter)
 
 			if tt.wantErr != nil && err.Error() != tt.wantErr.Error() {
 				t.Errorf("GetIACSupplier() error = %v, wantErr %v", err, tt.wantErr)

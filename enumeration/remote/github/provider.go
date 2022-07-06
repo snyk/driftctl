@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/terraform"
-	terraform2 "github.com/snyk/driftctl/enumeration/terraform"
+	tf "github.com/snyk/driftctl/enumeration/terraform"
 )
 
 type GithubTerraformProvider struct {
@@ -28,7 +28,7 @@ func NewGithubTerraformProvider(version string, progress enumeration.ProgressCou
 		version: version,
 		name:    "github",
 	}
-	installer, err := terraform2.NewProviderInstaller(terraform2.ProviderConfig{
+	installer, err := tf.NewProviderInstaller(tf.ProviderConfig{
 		Key:       p.name,
 		Version:   version,
 		ConfigDir: configDir,

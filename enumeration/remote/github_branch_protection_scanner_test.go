@@ -9,7 +9,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	github2 "github.com/snyk/driftctl/enumeration/remote/github"
-	terraform2 "github.com/snyk/driftctl/enumeration/terraform"
+	"github.com/snyk/driftctl/enumeration/terraform"
 
 	"github.com/pkg/errors"
 	githubres "github.com/snyk/driftctl/enumeration/resource/github"
@@ -70,7 +70,7 @@ func TestScanGithubBranchProtection(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("github", "4.4.0")
 	githubres.InitResourcesMetadata(schemaRepository)
-	factory := terraform2.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -79,7 +79,7 @@ func TestScanGithubBranchProtection(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 
-			providerLibrary := terraform2.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
