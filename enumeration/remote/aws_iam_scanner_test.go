@@ -10,7 +10,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
-	terraform3 "github.com/snyk/driftctl/enumeration/terraform"
+	"github.com/snyk/driftctl/enumeration/terraform"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -77,7 +77,7 @@ func TestIamUser(t *testing.T) {
 	}
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -89,7 +89,7 @@ func TestIamUser(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -216,7 +216,7 @@ func TestIamUserPolicy(t *testing.T) {
 	}
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -228,7 +228,7 @@ func TestIamUserPolicy(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -323,7 +323,7 @@ func TestIamPolicy(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -335,7 +335,7 @@ func TestIamPolicy(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -443,7 +443,7 @@ func TestIamRole(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -455,7 +455,7 @@ func TestIamRole(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -626,7 +626,7 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -638,7 +638,7 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -764,7 +764,7 @@ func TestIamAccessKey(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -776,7 +776,7 @@ func TestIamAccessKey(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -977,7 +977,7 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -989,7 +989,7 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1108,7 +1108,7 @@ func TestIamRolePolicy(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -1120,7 +1120,7 @@ func TestIamRolePolicy(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1210,7 +1210,7 @@ func TestIamGroupPolicy(t *testing.T) {
 	providerVersion := "3.19.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1287,7 +1287,7 @@ func TestIamGroup(t *testing.T) {
 	providerVersion := "3.19.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {

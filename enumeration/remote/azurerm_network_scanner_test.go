@@ -9,7 +9,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	error2 "github.com/snyk/driftctl/enumeration/remote/error"
-	terraform3 "github.com/snyk/driftctl/enumeration/terraform"
+	"github.com/snyk/driftctl/enumeration/terraform"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
@@ -87,7 +87,7 @@ func TestAzurermVirtualNetwork(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -180,7 +180,7 @@ func TestAzurermRouteTables(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -329,7 +329,7 @@ func TestAzurermRoutes(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -462,7 +462,7 @@ func TestAzurermSubnets(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -555,7 +555,7 @@ func TestAzurermFirewalls(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -648,7 +648,7 @@ func TestAzurermPublicIP(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -732,7 +732,7 @@ func TestAzurermSecurityGroups(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -740,7 +740,7 @@ func TestAzurermSecurityGroups(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -851,7 +851,7 @@ func TestAzurermLoadBalancers(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -953,7 +953,7 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -961,7 +961,7 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks

@@ -9,7 +9,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
-	terraform3 "github.com/snyk/driftctl/enumeration/terraform"
+	"github.com/snyk/driftctl/enumeration/terraform"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
@@ -93,7 +93,7 @@ func TestAzurermCompute_Image(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -174,7 +174,7 @@ func TestAzurermCompute_SSHPublicKey(t *testing.T) {
 	providerVersion := "2.71.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
 	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -182,7 +182,7 @@ func TestAzurermCompute_SSHPublicKey(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks

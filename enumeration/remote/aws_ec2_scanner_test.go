@@ -10,7 +10,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
-	terraform3 "github.com/snyk/driftctl/enumeration/terraform"
+	"github.com/snyk/driftctl/enumeration/terraform"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -68,7 +68,7 @@ func TestEC2EbsVolume(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -80,7 +80,7 @@ func TestEC2EbsVolume(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -165,7 +165,7 @@ func TestEC2EbsSnapshot(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -177,7 +177,7 @@ func TestEC2EbsSnapshot(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -264,7 +264,7 @@ func TestEC2Eip(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -276,7 +276,7 @@ func TestEC2Eip(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -361,7 +361,7 @@ func TestEC2Ami(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -373,7 +373,7 @@ func TestEC2Ami(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -458,7 +458,7 @@ func TestEC2KeyPair(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -470,7 +470,7 @@ func TestEC2KeyPair(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -557,7 +557,7 @@ func TestEC2EipAssociation(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -569,7 +569,7 @@ func TestEC2EipAssociation(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -664,7 +664,7 @@ func TestEC2Instance(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -676,7 +676,7 @@ func TestEC2Instance(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -761,7 +761,7 @@ func TestEC2InternetGateway(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -773,7 +773,7 @@ func TestEC2InternetGateway(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -875,7 +875,7 @@ func TestVPC(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -887,7 +887,7 @@ func TestVPC(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -986,7 +986,7 @@ func TestDefaultVPC(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -998,7 +998,7 @@ func TestDefaultVPC(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1152,7 +1152,7 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -1164,7 +1164,7 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1272,7 +1272,7 @@ func TestEC2Subnet(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -1284,7 +1284,7 @@ func TestEC2Subnet(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1392,7 +1392,7 @@ func TestEC2DefaultSubnet(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -1404,7 +1404,7 @@ func TestEC2DefaultSubnet(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1499,7 +1499,7 @@ func TestEC2RouteTable(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -1511,7 +1511,7 @@ func TestEC2RouteTable(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1606,7 +1606,7 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -1618,7 +1618,7 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1713,7 +1713,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -1725,7 +1725,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1820,7 +1820,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -1832,7 +1832,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1916,7 +1916,7 @@ func TestEC2NatGateway(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -1928,7 +1928,7 @@ func TestEC2NatGateway(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -2034,7 +2034,7 @@ func TestEC2NetworkACL(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -2046,7 +2046,7 @@ func TestEC2NetworkACL(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -2188,7 +2188,7 @@ func TestEC2NetworkACLRule(t *testing.T) {
 	version := "3.19.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", version)
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -2196,7 +2196,7 @@ func TestEC2NetworkACLRule(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -2301,7 +2301,7 @@ func TestEC2DefaultNetworkACL(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -2313,7 +2313,7 @@ func TestEC2DefaultNetworkACL(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -2470,7 +2470,7 @@ func TestEC2Route(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -2482,7 +2482,7 @@ func TestEC2Route(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -2661,7 +2661,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -2673,7 +2673,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -2760,7 +2760,7 @@ func TestEC2LaunchTemplate(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -2772,7 +2772,7 @@ func TestEC2LaunchTemplate(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -2848,7 +2848,7 @@ func TestEC2EbsEncryptionByDefault(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -2860,7 +2860,7 @@ func TestEC2EbsEncryptionByDefault(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks

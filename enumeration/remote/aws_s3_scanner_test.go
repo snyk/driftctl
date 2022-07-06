@@ -13,7 +13,7 @@ import (
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	tf "github.com/snyk/driftctl/enumeration/remote/terraform"
 	"github.com/snyk/driftctl/enumeration/terraform"
- 
+
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"

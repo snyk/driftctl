@@ -9,7 +9,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerror "github.com/snyk/driftctl/enumeration/remote/error"
-	terraform3 "github.com/snyk/driftctl/enumeration/terraform"
+	"github.com/snyk/driftctl/enumeration/terraform"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -69,7 +69,7 @@ func TestAppAutoScalingTarget(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -81,7 +81,7 @@ func TestAppAutoScalingTarget(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -172,7 +172,7 @@ func TestAppAutoScalingPolicy(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -184,7 +184,7 @@ func TestAppAutoScalingPolicy(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -293,7 +293,7 @@ func TestAppAutoScalingScheduledAction(t *testing.T) {
 	providerVersion := "3.19.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {

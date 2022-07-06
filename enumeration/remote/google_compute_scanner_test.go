@@ -10,7 +10,7 @@ import (
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	google2 "github.com/snyk/driftctl/enumeration/remote/google"
 	"github.com/snyk/driftctl/enumeration/remote/google/repository"
-	terraform3 "github.com/snyk/driftctl/enumeration/terraform"
+	"github.com/snyk/driftctl/enumeration/terraform"
 
 	"github.com/snyk/driftctl/enumeration/resource"
 	googleresource "github.com/snyk/driftctl/enumeration/resource/google"
@@ -93,7 +93,7 @@ func TestGoogleComputeFirewall(t *testing.T) {
 	resType := resource.ResourceType(googleresource.GoogleComputeFirewallResourceType)
 	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -101,7 +101,7 @@ func TestGoogleComputeFirewall(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -230,12 +230,12 @@ func TestGoogleComputeRouter(t *testing.T) {
 	providerVersion := "3.78.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -334,12 +334,12 @@ func TestGoogleComputeInstance(t *testing.T) {
 	providerVersion := "3.78.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -444,7 +444,7 @@ func TestGoogleComputeNetwork(t *testing.T) {
 	resType := resource.ResourceType(googleresource.GoogleComputeNetworkResourceType)
 	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -452,7 +452,7 @@ func TestGoogleComputeNetwork(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -566,7 +566,7 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 	resType := resource.ResourceType(googleresource.GoogleComputeInstanceGroupResourceType)
 	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -574,7 +574,7 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -701,12 +701,12 @@ func TestGoogleComputeAddress(t *testing.T) {
 	providerVersion := "3.78.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -827,12 +827,12 @@ func TestGoogleComputeGlobalAddress(t *testing.T) {
 	providerVersion := "3.78.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -937,7 +937,7 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 	resType := resource.ResourceType(googleresource.GoogleComputeSubnetworkResourceType)
 	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -945,7 +945,7 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1060,12 +1060,12 @@ func TestGoogleComputeDisk(t *testing.T) {
 	providerVersion := "3.78.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1170,12 +1170,12 @@ func TestGoogleComputeImage(t *testing.T) {
 	providerVersion := "3.78.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1278,14 +1278,14 @@ func TestGoogleComputeHealthCheck(t *testing.T) {
 	}
 
 	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository(terraform3.GOOGLE, providerVersion)
+	schemaRepository := testresource.InitFakeSchemaRepository(terraform.GOOGLE, providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1388,14 +1388,14 @@ func TestGoogleComputeNodeGroup(t *testing.T) {
 	}
 
 	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository(terraform3.GOOGLE, providerVersion)
+	schemaRepository := testresource.InitFakeSchemaRepository(terraform.GOOGLE, providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1497,14 +1497,14 @@ func TestGoogleComputeForwardingRule(t *testing.T) {
 	}
 
 	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository(terraform3.GOOGLE, providerVersion)
+	schemaRepository := testresource.InitFakeSchemaRepository(terraform.GOOGLE, providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1607,14 +1607,14 @@ func TestGoogleComputeInstanceGroupManager(t *testing.T) {
 	}
 
 	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository(terraform3.GOOGLE, providerVersion)
+	schemaRepository := testresource.InitFakeSchemaRepository(terraform.GOOGLE, providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1716,14 +1716,14 @@ func TestGoogleComputeGlobalForwardingRule(t *testing.T) {
 	}
 
 	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository(terraform3.GOOGLE, providerVersion)
+	schemaRepository := testresource.InitFakeSchemaRepository(terraform.GOOGLE, providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks

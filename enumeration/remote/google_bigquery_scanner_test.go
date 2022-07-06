@@ -10,7 +10,7 @@ import (
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	google2 "github.com/snyk/driftctl/enumeration/remote/google"
 	"github.com/snyk/driftctl/enumeration/remote/google/repository"
-	terraform3 "github.com/snyk/driftctl/enumeration/terraform"
+	"github.com/snyk/driftctl/enumeration/terraform"
 
 	"github.com/snyk/driftctl/enumeration/resource"
 	googleresource "github.com/snyk/driftctl/enumeration/resource/google"
@@ -83,12 +83,12 @@ func TestGoogleBigqueryDataset(t *testing.T) {
 	providerVersion := "3.78.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -186,12 +186,12 @@ func TestGoogleBigqueryTable(t *testing.T) {
 	providerVersion := "3.78.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
 	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
