@@ -53,6 +53,9 @@ func (s *GSBackend) Read(p []byte) (int, error) {
 }
 
 func (s *GSBackend) Close() error {
+	if s.storageClient == nil {
+		return nil
+	}
 	if err := s.storageClient.Close(); err != nil {
 		return err
 	}
