@@ -3,7 +3,9 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/snyk/driftctl/pkg/output"
 	"github.com/snyk/driftctl/pkg/remote/terraform"
 	tf "github.com/snyk/driftctl/pkg/terraform"
@@ -30,10 +32,10 @@ type awsConfig struct {
 	IgnoreTagsConfig map[string]string
 	Insecure         bool
 
-	SkipCredsValidation     bool
+	SkipCredsValidation     bool `cty:"skip_credentials_validation"`
 	SkipGetEC2Platforms     bool
 	SkipRegionValidation    bool
-	SkipRequestingAccountId bool
+	SkipRequestingAccountId bool `cty:"skip_requesting_account_id"`
 	SkipMetadataApiCheck    bool
 	S3ForcePathStyle        bool
 }
@@ -69,7 +71,12 @@ func NewAWSTerraformProvider(version string, progress output.Progress, configDir
 		DefaultAlias: *p.session.Config.Region,
 		GetProviderConfig: func(alias string) interface{} {
 			return awsConfig{
-				Region:     alias,
+				Region: alias,
+				// Those two parameters are used to make sure that the credentials are not validated when calling
+				// Configure(). Credentials validation is now handled directly in driftctl
+				SkipCredsValidation:     true,
+				SkipRequestingAccountId: true,
+
 				MaxRetries: 10, // TODO make this configurable
 			}
 		},
@@ -98,6 +105,15 @@ func (p *AWSTerraformProvider) CheckCredentialsExist() error {
 	}
 	if err != nil {
 		return err
+	}
+	// This call is to make sure that the credentials are valid
+	// A more complex logic exist in terraform provider, but it's probably not worth to implement it
+	// https://github.com/hashicorp/terraform-provider-aws/blob/e3959651092864925045a6044961a73137095798/aws/auth_helpers.go#L111
+	_, err = sts.New(p.session).GetCallerIdentity(&sts.GetCallerIdentityInput{})
+	if err != nil {
+		logrus.Debug(err)
+		return errors.New("Could not authenticate successfully on AWS with the provided credentials.\n" +
+			"Please refer to the AWS documentation: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html\n")
 	}
 	return nil
 }
