@@ -1,10 +1,10 @@
 package repository
 
 import (
-	"github.com/snyk/driftctl/enumeration/remote/cache"
-	"github.com/snyk/driftctl/enumeration/remote/google/config"
 	"testing"
 
+	"github.com/snyk/driftctl/enumeration/remote/cache"
+	"github.com/snyk/driftctl/enumeration/remote/google/config"
 	"github.com/snyk/driftctl/test/google"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

@@ -3,10 +3,10 @@ package repository
 import (
 	"context"
 	"fmt"
-	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"sync"
 
 	"cloud.google.com/go/storage"
+	"github.com/snyk/driftctl/enumeration/remote/cache"
 )
 
 type StorageRepository interface {

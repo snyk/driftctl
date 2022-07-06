@@ -3,10 +3,10 @@ package repository
 import (
 	"context"
 	"fmt"
-	"github.com/snyk/driftctl/enumeration/remote/cache"
-	"github.com/snyk/driftctl/enumeration/remote/google/config"
 
 	asset "cloud.google.com/go/asset/apiv1"
+	"github.com/snyk/driftctl/enumeration/remote/cache"
+	"github.com/snyk/driftctl/enumeration/remote/google/config"
 	"google.golang.org/api/iterator"
 	assetpb "google.golang.org/genproto/googleapis/cloud/asset/v1"
 )
