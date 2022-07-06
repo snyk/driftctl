@@ -8,7 +8,7 @@ import (
 	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
-	common2 "github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	terraform3 "github.com/snyk/driftctl/enumeration/terraform"
 
@@ -62,7 +62,7 @@ func TestSQSQueue(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllQueues").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsSqsQueueResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSqsQueueResourceType, resourceaws.AwsSqsQueueResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsSqsQueueResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSqsQueueResourceType, resourceaws.AwsSqsQueueResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -83,7 +83,7 @@ func TestSQSQueue(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -189,7 +189,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllQueues").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsSqsQueuePolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSqsQueuePolicyResourceType, resourceaws.AwsSqsQueueResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsSqsQueuePolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSqsQueuePolicyResourceType, resourceaws.AwsSqsQueueResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -210,7 +210,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -236,7 +236,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewSQSQueuePolicyEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSqsQueuePolicyResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsSqsQueuePolicyResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSqsQueuePolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSqsQueuePolicyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

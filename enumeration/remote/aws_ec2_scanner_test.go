@@ -8,7 +8,7 @@ import (
 	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
-	common2 "github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	terraform3 "github.com/snyk/driftctl/enumeration/terraform"
 
@@ -60,7 +60,7 @@ func TestEC2EbsVolume(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllVolumes").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsEbsVolumeResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEbsVolumeResourceType, resourceaws.AwsEbsVolumeResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsEbsVolumeResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEbsVolumeResourceType, resourceaws.AwsEbsVolumeResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -81,7 +81,7 @@ func TestEC2EbsVolume(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -108,7 +108,7 @@ func TestEC2EbsVolume(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2EbsVolumeEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsVolumeResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsEbsVolumeResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsVolumeResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEbsVolumeResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -157,7 +157,7 @@ func TestEC2EbsSnapshot(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllSnapshots").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsEbsSnapshotResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEbsSnapshotResourceType, resourceaws.AwsEbsSnapshotResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsEbsSnapshotResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEbsSnapshotResourceType, resourceaws.AwsEbsSnapshotResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -178,7 +178,7 @@ func TestEC2EbsSnapshot(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -205,7 +205,7 @@ func TestEC2EbsSnapshot(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2EbsSnapshotEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsSnapshotResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsEbsSnapshotResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsSnapshotResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEbsSnapshotResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -256,7 +256,7 @@ func TestEC2Eip(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllAddresses").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsEipResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEipResourceType, resourceaws.AwsEipResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsEipResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEipResourceType, resourceaws.AwsEipResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -277,7 +277,7 @@ func TestEC2Eip(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -304,7 +304,7 @@ func TestEC2Eip(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2EipEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEipResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsEipResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEipResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEipResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -353,7 +353,7 @@ func TestEC2Ami(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllImages").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsAmiResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsAmiResourceType, resourceaws.AwsAmiResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsAmiResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsAmiResourceType, resourceaws.AwsAmiResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -374,7 +374,7 @@ func TestEC2Ami(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -401,7 +401,7 @@ func TestEC2Ami(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2AmiEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsAmiResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsAmiResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsAmiResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsAmiResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -450,7 +450,7 @@ func TestEC2KeyPair(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllKeyPairs").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsKeyPairResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsKeyPairResourceType, resourceaws.AwsKeyPairResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsKeyPairResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsKeyPairResourceType, resourceaws.AwsKeyPairResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -471,7 +471,7 @@ func TestEC2KeyPair(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -498,7 +498,7 @@ func TestEC2KeyPair(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2KeyPairEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsKeyPairResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsKeyPairResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsKeyPairResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsKeyPairResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -549,7 +549,7 @@ func TestEC2EipAssociation(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllAddressesAssociation").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsEipAssociationResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEipAssociationResourceType, resourceaws.AwsEipAssociationResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsEipAssociationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEipAssociationResourceType, resourceaws.AwsEipAssociationResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -570,7 +570,7 @@ func TestEC2EipAssociation(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -597,7 +597,7 @@ func TestEC2EipAssociation(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2EipAssociationEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEipAssociationResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsEipAssociationResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEipAssociationResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEipAssociationResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -656,7 +656,7 @@ func TestEC2Instance(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllInstances").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsInstanceResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsInstanceResourceType, resourceaws.AwsInstanceResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsInstanceResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsInstanceResourceType, resourceaws.AwsInstanceResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -677,7 +677,7 @@ func TestEC2Instance(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -704,7 +704,7 @@ func TestEC2Instance(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2InstanceEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsInstanceResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsInstanceResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsInstanceResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsInstanceResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -753,7 +753,7 @@ func TestEC2InternetGateway(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllInternetGateways").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsInternetGatewayResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsInternetGatewayResourceType, resourceaws.AwsInternetGatewayResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsInternetGatewayResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsInternetGatewayResourceType, resourceaws.AwsInternetGatewayResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -774,7 +774,7 @@ func TestEC2InternetGateway(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -801,7 +801,7 @@ func TestEC2InternetGateway(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2InternetGatewayEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsInternetGatewayResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsInternetGatewayResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsInternetGatewayResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsInternetGatewayResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -867,7 +867,7 @@ func TestVPC(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllVPCs").Once().Return(nil, nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsVpcResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsVpcResourceType, resourceaws.AwsVpcResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsVpcResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsVpcResourceType, resourceaws.AwsVpcResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -888,7 +888,7 @@ func TestVPC(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -915,7 +915,7 @@ func TestVPC(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewVPCEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsVpcResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsVpcResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsVpcResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsVpcResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -978,7 +978,7 @@ func TestDefaultVPC(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllVPCs").Once().Return(nil, nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsDefaultVpcResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsDefaultVpcResourceType, resourceaws.AwsDefaultVpcResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsDefaultVpcResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsDefaultVpcResourceType, resourceaws.AwsDefaultVpcResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -999,7 +999,7 @@ func TestDefaultVPC(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1026,7 +1026,7 @@ func TestDefaultVPC(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewDefaultVPCEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultVpcResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsDefaultVpcResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultVpcResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultVpcResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1144,7 +1144,7 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllRouteTables").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsRouteTableAssociationResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRouteTableAssociationResourceType, resourceaws.AwsRouteTableResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsRouteTableAssociationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRouteTableAssociationResourceType, resourceaws.AwsRouteTableResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1165,7 +1165,7 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1192,7 +1192,7 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2RouteTableAssociationEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteTableAssociationResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsRouteTableAssociationResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteTableAssociationResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRouteTableAssociationResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1264,7 +1264,7 @@ func TestEC2Subnet(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllSubnets").Return(nil, nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsSubnetResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSubnetResourceType, resourceaws.AwsSubnetResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsSubnetResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSubnetResourceType, resourceaws.AwsSubnetResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1285,7 +1285,7 @@ func TestEC2Subnet(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1312,7 +1312,7 @@ func TestEC2Subnet(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2SubnetEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSubnetResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsSubnetResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSubnetResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSubnetResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1384,7 +1384,7 @@ func TestEC2DefaultSubnet(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllSubnets").Return(nil, nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsDefaultSubnetResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsDefaultSubnetResourceType, resourceaws.AwsDefaultSubnetResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsDefaultSubnetResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsDefaultSubnetResourceType, resourceaws.AwsDefaultSubnetResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1405,7 +1405,7 @@ func TestEC2DefaultSubnet(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1432,7 +1432,7 @@ func TestEC2DefaultSubnet(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2DefaultSubnetEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultSubnetResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsDefaultSubnetResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultSubnetResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultSubnetResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1491,7 +1491,7 @@ func TestEC2RouteTable(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllRouteTables").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsRouteTableResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRouteTableResourceType, resourceaws.AwsRouteTableResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsRouteTableResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRouteTableResourceType, resourceaws.AwsRouteTableResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1512,7 +1512,7 @@ func TestEC2RouteTable(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1539,7 +1539,7 @@ func TestEC2RouteTable(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2RouteTableEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteTableResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsRouteTableResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteTableResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRouteTableResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1598,7 +1598,7 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllRouteTables").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsDefaultRouteTableResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsDefaultRouteTableResourceType, resourceaws.AwsDefaultRouteTableResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsDefaultRouteTableResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsDefaultRouteTableResourceType, resourceaws.AwsDefaultRouteTableResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1619,7 +1619,7 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1646,7 +1646,7 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2DefaultRouteTableEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultRouteTableResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsDefaultRouteTableResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultRouteTableResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultRouteTableResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1705,7 +1705,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllSecurityGroups").Return(nil, nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsSecurityGroupResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSecurityGroupResourceType, resourceaws.AwsSecurityGroupResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsSecurityGroupResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSecurityGroupResourceType, resourceaws.AwsSecurityGroupResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1726,7 +1726,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1753,7 +1753,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewVPCSecurityGroupEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSecurityGroupResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsSecurityGroupResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSecurityGroupResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSecurityGroupResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1812,7 +1812,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllSecurityGroups").Return(nil, nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsDefaultSecurityGroupResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsDefaultSecurityGroupResourceType, resourceaws.AwsDefaultSecurityGroupResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsDefaultSecurityGroupResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsDefaultSecurityGroupResourceType, resourceaws.AwsDefaultSecurityGroupResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1833,7 +1833,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1860,7 +1860,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewVPCDefaultSecurityGroupEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultSecurityGroupResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsDefaultSecurityGroupResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultSecurityGroupResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultSecurityGroupResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1908,7 +1908,7 @@ func TestEC2NatGateway(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllNatGateways").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsNatGatewayResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsNatGatewayResourceType, resourceaws.AwsNatGatewayResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsNatGatewayResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsNatGatewayResourceType, resourceaws.AwsNatGatewayResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -1929,7 +1929,7 @@ func TestEC2NatGateway(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1956,7 +1956,7 @@ func TestEC2NatGateway(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2NatGatewayEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsNatGatewayResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsNatGatewayResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsNatGatewayResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsNatGatewayResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -2018,7 +2018,7 @@ func TestEC2NetworkACL(t *testing.T) {
 				alerter.On("SendAlert",
 					resourceaws.AwsNetworkACLResourceType,
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteAWSTerraform,
+						common.RemoteAWSTerraform,
 						remoteerr.NewResourceListingErrorWithType(
 							awsError,
 							resourceaws.AwsNetworkACLResourceType,
@@ -2047,7 +2047,7 @@ func TestEC2NetworkACL(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -2074,7 +2074,7 @@ func TestEC2NetworkACL(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2NetworkACLEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsNetworkACLResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsNetworkACLResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsNetworkACLResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsNetworkACLResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -2171,7 +2171,7 @@ func TestEC2NetworkACLRule(t *testing.T) {
 				alerter.On("SendAlert",
 					resourceaws.AwsNetworkACLRuleResourceType,
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteAWSTerraform,
+						common.RemoteAWSTerraform,
 						remoteerr.NewResourceListingErrorWithType(
 							awsError,
 							resourceaws.AwsNetworkACLRuleResourceType,
@@ -2197,7 +2197,7 @@ func TestEC2NetworkACLRule(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -2223,7 +2223,7 @@ func TestEC2NetworkACLRule(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2NetworkACLRuleEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsNetworkACLRuleResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsNetworkACLRuleResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsNetworkACLRuleResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsNetworkACLRuleResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -2285,7 +2285,7 @@ func TestEC2DefaultNetworkACL(t *testing.T) {
 				alerter.On("SendAlert",
 					resourceaws.AwsDefaultNetworkACLResourceType,
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteAWSTerraform,
+						common.RemoteAWSTerraform,
 						remoteerr.NewResourceListingErrorWithType(
 							awsError,
 							resourceaws.AwsDefaultNetworkACLResourceType,
@@ -2314,7 +2314,7 @@ func TestEC2DefaultNetworkACL(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -2341,7 +2341,7 @@ func TestEC2DefaultNetworkACL(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2DefaultNetworkACLEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultNetworkACLResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsDefaultNetworkACLResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultNetworkACLResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultNetworkACLResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -2462,7 +2462,7 @@ func TestEC2Route(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllRouteTables").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsRouteResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRouteResourceType, resourceaws.AwsRouteTableResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsRouteResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRouteResourceType, resourceaws.AwsRouteTableResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -2483,7 +2483,7 @@ func TestEC2Route(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -2510,7 +2510,7 @@ func TestEC2Route(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2RouteEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsRouteResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRouteResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -2653,7 +2653,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				client.On("ListAllSecurityGroups").Once().Return(nil, nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsSecurityGroupRuleResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSecurityGroupRuleResourceType, resourceaws.AwsSecurityGroupResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsSecurityGroupRuleResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSecurityGroupRuleResourceType, resourceaws.AwsSecurityGroupResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -2674,7 +2674,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -2701,7 +2701,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewVPCSecurityGroupRuleEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSecurityGroupRuleResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsSecurityGroupRuleResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSecurityGroupRuleResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSecurityGroupRuleResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -2752,7 +2752,7 @@ func TestEC2LaunchTemplate(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("DescribeLaunchTemplates").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsLaunchTemplateResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLaunchTemplateResourceType, resourceaws.AwsLaunchTemplateResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsLaunchTemplateResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLaunchTemplateResourceType, resourceaws.AwsLaunchTemplateResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -2773,7 +2773,7 @@ func TestEC2LaunchTemplate(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -2800,7 +2800,7 @@ func TestEC2LaunchTemplate(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewLaunchTemplateEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsLaunchTemplateResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsLaunchTemplateResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsLaunchTemplateResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsLaunchTemplateResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -2840,7 +2840,7 @@ func TestEC2EbsEncryptionByDefault(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("IsEbsEncryptionEnabledByDefault").Return(false, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsEbsEncryptionByDefaultResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEbsEncryptionByDefaultResourceType, resourceaws.AwsEbsEncryptionByDefaultResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsEbsEncryptionByDefaultResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEbsEncryptionByDefaultResourceType, resourceaws.AwsEbsEncryptionByDefaultResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -2861,7 +2861,7 @@ func TestEC2EbsEncryptionByDefault(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -2888,7 +2888,7 @@ func TestEC2EbsEncryptionByDefault(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewEC2EbsEncryptionByDefaultEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsEncryptionByDefaultResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsEbsEncryptionByDefaultResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsEncryptionByDefaultResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEbsEncryptionByDefaultResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

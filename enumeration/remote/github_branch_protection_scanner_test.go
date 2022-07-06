@@ -6,7 +6,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
-	common2 "github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	github2 "github.com/snyk/driftctl/enumeration/remote/github"
 	terraform2 "github.com/snyk/driftctl/enumeration/terraform"
@@ -62,7 +62,7 @@ func TestScanGithubBranchProtection(t *testing.T) {
 			mocks: func(client *github2.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListBranchProtection").Return(nil, errors.New("Your token has not been granted the required scopes to execute this query."))
 
-				alerter.On("SendAlert", githubres.GithubBranchProtectionResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteGithubTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Your token has not been granted the required scopes to execute this query."), githubres.GithubBranchProtectionResourceType, githubres.GithubBranchProtectionResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", githubres.GithubBranchProtectionResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Your token has not been granted the required scopes to execute this query."), githubres.GithubBranchProtectionResourceType, githubres.GithubBranchProtectionResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -80,7 +80,7 @@ func TestScanGithubBranchProtection(t *testing.T) {
 			scanOptions := ScannerOptions{Deep: true}
 
 			providerLibrary := terraform2.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -106,7 +106,7 @@ func TestScanGithubBranchProtection(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(github2.NewGithubBranchProtectionEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(githubres.GithubBranchProtectionResourceType, common2.NewGenericDetailsFetcher(githubres.GithubBranchProtectionResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(githubres.GithubBranchProtectionResourceType, common.NewGenericDetailsFetcher(githubres.GithubBranchProtectionResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

@@ -7,7 +7,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
-	common2 "github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	google2 "github.com/snyk/driftctl/enumeration/remote/google"
 	"github.com/snyk/driftctl/enumeration/remote/google/repository"
@@ -76,7 +76,7 @@ func TestGoogleStorageBucket(t *testing.T) {
 					"SendAlert",
 					"google_storage_bucket",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							"google_storage_bucket",
@@ -102,7 +102,7 @@ func TestGoogleStorageBucket(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -143,7 +143,7 @@ func TestGoogleStorageBucket(t *testing.T) {
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google2.NewGoogleStorageBucketEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resType, common2.NewGenericDetailsFetcher(resType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -222,7 +222,7 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 					"SendAlert",
 					"google_storage_bucket_iam_member",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							errors.New("googleapi: Error 403: driftctl-acc-circle@driftctl-qa-1.iam.gserviceaccount.com does not have storage.buckets.getIamPolicy access to the Google Cloud Storage bucket., forbidden"),
 							"google_storage_bucket_iam_member",
@@ -278,7 +278,7 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}

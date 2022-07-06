@@ -8,7 +8,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
-	common2 "github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/terraform"
 
@@ -64,7 +64,7 @@ func TestELBV2_LoadBalancer(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllLoadBalancers").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsLoadBalancerResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLoadBalancerResourceType, resourceaws.AwsLoadBalancerResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsLoadBalancerResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLoadBalancerResourceType, resourceaws.AwsLoadBalancerResourceType), alerts.EnumerationPhase)).Return()
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
 				assert.Len(t, got, 0)
@@ -90,7 +90,7 @@ func TestELBV2_LoadBalancer(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -174,7 +174,7 @@ func TestELBV2_LoadBalancerListener(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllLoadBalancerListeners", "test-lb").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsLoadBalancerListenerResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingError(awsError, resourceaws.AwsLoadBalancerListenerResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsLoadBalancerListenerResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingError(awsError, resourceaws.AwsLoadBalancerListenerResourceType), alerts.EnumerationPhase)).Return()
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
 				assert.Len(t, got, 0)
@@ -186,7 +186,7 @@ func TestELBV2_LoadBalancerListener(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repository.On("ListAllLoadBalancers").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsLoadBalancerListenerResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLoadBalancerListenerResourceType, resourceaws.AwsLoadBalancerResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsLoadBalancerListenerResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLoadBalancerListenerResourceType, resourceaws.AwsLoadBalancerResourceType), alerts.EnumerationPhase)).Return()
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
 				assert.Len(t, got, 0)
@@ -218,7 +218,7 @@ func TestELBV2_LoadBalancerListener(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}

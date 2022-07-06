@@ -7,7 +7,7 @@ import (
 	azurerm2 "github.com/snyk/driftctl/enumeration/remote/azurerm"
 	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
-	common2 "github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	terraform2 "github.com/snyk/driftctl/enumeration/terraform"
 
@@ -99,7 +99,7 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform2.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -131,7 +131,7 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSZoneEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSZoneResourceType, common2.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSZoneResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSZoneResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSZoneResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -253,7 +253,7 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform2.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -285,7 +285,7 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSARecordEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSARecordResourceType, common2.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSARecordResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSARecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSARecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -408,7 +408,7 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform2.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -440,7 +440,7 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSAAAARecordEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSAAAARecordResourceType, common2.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSAAAARecordResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSAAAARecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSAAAARecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -551,7 +551,7 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform2.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -583,7 +583,7 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSCNameRecordEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSCNameRecordResourceType, common2.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSCNameRecordResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSCNameRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSCNameRecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -705,7 +705,7 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform2.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -737,7 +737,7 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSPTRRecordEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSPTRRecordResourceType, common2.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSPTRRecordResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSPTRRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSPTRRecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -860,7 +860,7 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform2.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -892,7 +892,7 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSMXRecordEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSMXRecordResourceType, common2.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSMXRecordResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSMXRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSMXRecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1014,7 +1014,7 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform2.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1046,7 +1046,7 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSSRVRecordEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSSRVRecordResourceType, common2.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSSRVRecordResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSSRVRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSSRVRecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1168,7 +1168,7 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform2.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1200,7 +1200,7 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSTXTRecordEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSTXTRecordResourceType, common2.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSTXTRecordResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSTXTRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSTXTRecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

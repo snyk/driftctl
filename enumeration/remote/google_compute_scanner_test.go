@@ -6,7 +6,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
-	common2 "github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	google2 "github.com/snyk/driftctl/enumeration/remote/google"
 	"github.com/snyk/driftctl/enumeration/remote/google/repository"
@@ -76,7 +76,7 @@ func TestGoogleComputeFirewall(t *testing.T) {
 					"SendAlert",
 					"google_compute_firewall",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							"google_compute_firewall",
@@ -102,7 +102,7 @@ func TestGoogleComputeFirewall(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -134,7 +134,7 @@ func TestGoogleComputeFirewall(t *testing.T) {
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google2.NewGoogleComputeFirewallEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resType, common2.NewGenericDetailsFetcher(resType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -212,7 +212,7 @@ func TestGoogleComputeRouter(t *testing.T) {
 					"SendAlert",
 					googleresource.GoogleComputeRouterResourceType,
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							googleresource.GoogleComputeRouterResourceType,
@@ -236,7 +236,7 @@ func TestGoogleComputeRouter(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -319,7 +319,7 @@ func TestGoogleComputeInstance(t *testing.T) {
 					"SendAlert",
 					"google_compute_instance",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							"google_compute_instance",
@@ -340,7 +340,7 @@ func TestGoogleComputeInstance(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -427,7 +427,7 @@ func TestGoogleComputeNetwork(t *testing.T) {
 					"SendAlert",
 					"google_compute_network",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							"google_compute_network",
@@ -453,7 +453,7 @@ func TestGoogleComputeNetwork(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -485,7 +485,7 @@ func TestGoogleComputeNetwork(t *testing.T) {
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google2.NewGoogleComputeNetworkEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resType, common2.NewGenericDetailsFetcher(resType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -549,7 +549,7 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 					"SendAlert",
 					"google_compute_instance_group",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							"google_compute_instance_group",
@@ -575,7 +575,7 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -607,7 +607,7 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google2.NewGoogleComputeInstanceGroupEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(googleresource.GoogleComputeInstanceGroupResourceType, common2.NewGenericDetailsFetcher(googleresource.GoogleComputeInstanceGroupResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(googleresource.GoogleComputeInstanceGroupResourceType, common.NewGenericDetailsFetcher(googleresource.GoogleComputeInstanceGroupResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -686,7 +686,7 @@ func TestGoogleComputeAddress(t *testing.T) {
 					"SendAlert",
 					"google_compute_address",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							"google_compute_address",
@@ -707,7 +707,7 @@ func TestGoogleComputeAddress(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -812,7 +812,7 @@ func TestGoogleComputeGlobalAddress(t *testing.T) {
 					"SendAlert",
 					"google_compute_global_address",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							"google_compute_global_address",
@@ -833,7 +833,7 @@ func TestGoogleComputeGlobalAddress(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -920,7 +920,7 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 					"SendAlert",
 					"google_compute_subnetwork",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							"google_compute_subnetwork",
@@ -946,7 +946,7 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -978,7 +978,7 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google2.NewGoogleComputeSubnetworkEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resType, common2.NewGenericDetailsFetcher(resType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1045,7 +1045,7 @@ func TestGoogleComputeDisk(t *testing.T) {
 					"SendAlert",
 					"google_compute_disk",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							"google_compute_disk",
@@ -1066,7 +1066,7 @@ func TestGoogleComputeDisk(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1155,7 +1155,7 @@ func TestGoogleComputeImage(t *testing.T) {
 					"SendAlert",
 					"google_compute_image",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							"google_compute_image",
@@ -1176,7 +1176,7 @@ func TestGoogleComputeImage(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1265,7 +1265,7 @@ func TestGoogleComputeHealthCheck(t *testing.T) {
 					"SendAlert",
 					"google_compute_health_check",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							"google_compute_health_check",
@@ -1286,7 +1286,7 @@ func TestGoogleComputeHealthCheck(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1375,7 +1375,7 @@ func TestGoogleComputeNodeGroup(t *testing.T) {
 					"SendAlert",
 					"google_compute_node_group",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							"google_compute_node_group",
@@ -1396,7 +1396,7 @@ func TestGoogleComputeNodeGroup(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1484,7 +1484,7 @@ func TestGoogleComputeForwardingRule(t *testing.T) {
 					"SendAlert",
 					"google_compute_forwarding_rule",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							"google_compute_forwarding_rule",
@@ -1505,7 +1505,7 @@ func TestGoogleComputeForwardingRule(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1594,7 +1594,7 @@ func TestGoogleComputeInstanceGroupManager(t *testing.T) {
 					"SendAlert",
 					"google_compute_instance_group_manager",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							"google_compute_instance_group_manager",
@@ -1615,7 +1615,7 @@ func TestGoogleComputeInstanceGroupManager(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1703,7 +1703,7 @@ func TestGoogleComputeGlobalForwardingRule(t *testing.T) {
 					"SendAlert",
 					"google_compute_global_forwarding_rule",
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							"google_compute_global_forwarding_rule",
@@ -1724,7 +1724,7 @@ func TestGoogleComputeGlobalForwardingRule(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}

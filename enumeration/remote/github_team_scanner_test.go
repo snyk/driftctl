@@ -7,7 +7,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
-	common2 "github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	github2 "github.com/snyk/driftctl/enumeration/remote/github"
 	terraform2 "github.com/snyk/driftctl/enumeration/terraform"
@@ -59,7 +59,7 @@ func TestScanGithubTeam(t *testing.T) {
 			mocks: func(client *github2.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListTeams").Return(nil, errors.New("Your token has not been granted the required scopes to execute this query."))
 
-				alerter.On("SendAlert", githubres.GithubTeamResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteGithubTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Your token has not been granted the required scopes to execute this query."), githubres.GithubTeamResourceType, githubres.GithubTeamResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", githubres.GithubTeamResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Your token has not been granted the required scopes to execute this query."), githubres.GithubTeamResourceType, githubres.GithubTeamResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -77,7 +77,7 @@ func TestScanGithubTeam(t *testing.T) {
 			scanOptions := ScannerOptions{Deep: true}
 
 			providerLibrary := terraform2.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -103,7 +103,7 @@ func TestScanGithubTeam(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(github2.NewGithubTeamEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(githubres.GithubTeamResourceType, common2.NewGenericDetailsFetcher(githubres.GithubTeamResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(githubres.GithubTeamResourceType, common.NewGenericDetailsFetcher(githubres.GithubTeamResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

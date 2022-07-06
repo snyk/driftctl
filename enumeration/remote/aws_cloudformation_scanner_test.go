@@ -9,7 +9,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
-	common2 "github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	terraform3 "github.com/snyk/driftctl/enumeration/terraform"
 
@@ -60,7 +60,7 @@ func TestCloudformationStack(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 400, "")
 				repository.On("ListAllStacks").Return(nil, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsCloudformationStackResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsCloudformationStackResourceType, resourceaws.AwsCloudformationStackResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsCloudformationStackResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsCloudformationStackResourceType, resourceaws.AwsCloudformationStackResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
 		},
@@ -81,7 +81,7 @@ func TestCloudformationStack(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -108,7 +108,7 @@ func TestCloudformationStack(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewCloudformationStackEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsCloudformationStackResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsCloudformationStackResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsCloudformationStackResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsCloudformationStackResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

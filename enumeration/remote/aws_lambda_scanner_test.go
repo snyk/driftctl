@@ -8,7 +8,7 @@ import (
 	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
-	common2 "github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	terraform3 "github.com/snyk/driftctl/enumeration/terraform"
 
@@ -81,7 +81,7 @@ func TestScanLambdaFunction(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllLambdaFunctions").Return([]*lambda.FunctionConfiguration{}, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsLambdaFunctionResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLambdaFunctionResourceType, resourceaws.AwsLambdaFunctionResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsLambdaFunctionResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLambdaFunctionResourceType, resourceaws.AwsLambdaFunctionResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -102,7 +102,7 @@ func TestScanLambdaFunction(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -129,7 +129,7 @@ func TestScanLambdaFunction(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewLambdaFunctionEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsLambdaFunctionResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsLambdaFunctionResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsLambdaFunctionResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsLambdaFunctionResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -197,7 +197,7 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, "")
 				repo.On("ListAllLambdaEventSourceMappings").Return([]*lambda.EventSourceMappingConfiguration{}, awsError)
 
-				alerter.On("SendAlert", resourceaws.AwsLambdaEventSourceMappingResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLambdaEventSourceMappingResourceType, resourceaws.AwsLambdaEventSourceMappingResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsLambdaEventSourceMappingResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsLambdaEventSourceMappingResourceType, resourceaws.AwsLambdaEventSourceMappingResourceType), alerts.EnumerationPhase)).Return()
 			},
 			err: nil,
 		},
@@ -218,7 +218,7 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -245,7 +245,7 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewLambdaEventSourceMappingEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsLambdaEventSourceMappingResourceType, common2.NewGenericDetailsFetcher(resourceaws.AwsLambdaEventSourceMappingResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsLambdaEventSourceMappingResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsLambdaEventSourceMappingResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

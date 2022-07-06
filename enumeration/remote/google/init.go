@@ -7,7 +7,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
-	common2 "github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/remote/common"
 	"github.com/snyk/driftctl/enumeration/remote/google/repository"
 	"github.com/snyk/driftctl/enumeration/terraform"
 
@@ -20,7 +20,7 @@ import (
 
 func Init(version string, alerter *alerter.Alerter,
 	providerLibrary *terraform.ProviderLibrary,
-	remoteLibrary *common2.RemoteLibrary,
+	remoteLibrary *common.RemoteLibrary,
 	progress enumeration.ProgressCounter,
 	resourceSchemaRepository *resource.SchemaRepository,
 	factory resource.ResourceFactory,
@@ -67,31 +67,31 @@ func Init(version string, alerter *alerter.Alerter,
 	deserializer := resource.NewDeserializer(factory)
 
 	remoteLibrary.AddEnumerator(NewGoogleStorageBucketEnumerator(assetRepository, factory))
-	remoteLibrary.AddDetailsFetcher(google.GoogleStorageBucketResourceType, common2.NewGenericDetailsFetcher(google.GoogleStorageBucketResourceType, provider, deserializer))
+	remoteLibrary.AddDetailsFetcher(google.GoogleStorageBucketResourceType, common.NewGenericDetailsFetcher(google.GoogleStorageBucketResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewGoogleComputeFirewallEnumerator(assetRepository, factory))
-	remoteLibrary.AddDetailsFetcher(google.GoogleComputeFirewallResourceType, common2.NewGenericDetailsFetcher(google.GoogleComputeFirewallResourceType, provider, deserializer))
+	remoteLibrary.AddDetailsFetcher(google.GoogleComputeFirewallResourceType, common.NewGenericDetailsFetcher(google.GoogleComputeFirewallResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewGoogleComputeRouterEnumerator(assetRepository, factory))
 
 	remoteLibrary.AddEnumerator(NewGoogleComputeInstanceEnumerator(assetRepository, factory))
 
 	remoteLibrary.AddEnumerator(NewGoogleProjectIamMemberEnumerator(iamRepository, factory))
-	remoteLibrary.AddDetailsFetcher(google.GoogleProjectIamMemberResourceType, common2.NewGenericDetailsFetcher(google.GoogleProjectIamMemberResourceType, provider, deserializer))
+	remoteLibrary.AddDetailsFetcher(google.GoogleProjectIamMemberResourceType, common.NewGenericDetailsFetcher(google.GoogleProjectIamMemberResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewGoogleStorageBucketIamMemberEnumerator(assetRepository, storageRepository, factory))
-	remoteLibrary.AddDetailsFetcher(google.GoogleStorageBucketIamMemberResourceType, common2.NewGenericDetailsFetcher(google.GoogleStorageBucketIamMemberResourceType, provider, deserializer))
+	remoteLibrary.AddDetailsFetcher(google.GoogleStorageBucketIamMemberResourceType, common.NewGenericDetailsFetcher(google.GoogleStorageBucketIamMemberResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewGoogleComputeNetworkEnumerator(assetRepository, factory))
-	remoteLibrary.AddDetailsFetcher(google.GoogleComputeNetworkResourceType, common2.NewGenericDetailsFetcher(google.GoogleComputeNetworkResourceType, provider, deserializer))
+	remoteLibrary.AddDetailsFetcher(google.GoogleComputeNetworkResourceType, common.NewGenericDetailsFetcher(google.GoogleComputeNetworkResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewGoogleComputeSubnetworkEnumerator(assetRepository, factory))
-	remoteLibrary.AddDetailsFetcher(google.GoogleComputeSubnetworkResourceType, common2.NewGenericDetailsFetcher(google.GoogleComputeSubnetworkResourceType, provider, deserializer))
+	remoteLibrary.AddDetailsFetcher(google.GoogleComputeSubnetworkResourceType, common.NewGenericDetailsFetcher(google.GoogleComputeSubnetworkResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewGoogleDNSManagedZoneEnumerator(assetRepository, factory))
 
 	remoteLibrary.AddEnumerator(NewGoogleComputeInstanceGroupEnumerator(assetRepository, factory))
-	remoteLibrary.AddDetailsFetcher(google.GoogleComputeInstanceGroupResourceType, common2.NewGenericDetailsFetcher(google.GoogleComputeInstanceGroupResourceType, provider, deserializer))
+	remoteLibrary.AddDetailsFetcher(google.GoogleComputeInstanceGroupResourceType, common.NewGenericDetailsFetcher(google.GoogleComputeInstanceGroupResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewGoogleBigqueryDatasetEnumerator(assetRepository, factory))
 	remoteLibrary.AddEnumerator(NewGoogleBigqueryTableEnumerator(assetRepository, factory))

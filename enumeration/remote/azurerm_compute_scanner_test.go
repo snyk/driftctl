@@ -7,7 +7,7 @@ import (
 	azurerm2 "github.com/snyk/driftctl/enumeration/remote/azurerm"
 	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
-	common2 "github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	terraform3 "github.com/snyk/driftctl/enumeration/terraform"
 
@@ -98,7 +98,7 @@ func TestAzurermCompute_Image(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -183,7 +183,7 @@ func TestAzurermCompute_SSHPublicKey(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -215,7 +215,7 @@ func TestAzurermCompute_SSHPublicKey(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermSSHPublicKeyEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzureSSHPublicKeyResourceType, common2.NewGenericDetailsFetcher(resourceazure.AzureSSHPublicKeyResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceazure.AzureSSHPublicKeyResourceType, common.NewGenericDetailsFetcher(resourceazure.AzureSSHPublicKeyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

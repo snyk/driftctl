@@ -6,7 +6,7 @@ import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
-	common2 "github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/remote/google"
 	"github.com/snyk/driftctl/enumeration/remote/google/repository"
@@ -84,7 +84,7 @@ func TestGoogleCloudRunService(t *testing.T) {
 					"SendAlert",
 					googleresource.GoogleCloudRunServiceResourceType,
 					alerts.NewRemoteAccessDeniedAlert(
-						common2.RemoteGoogleTerraform,
+						common.RemoteGoogleTerraform,
 						remoteerr.NewResourceListingError(
 							status.Error(codes.PermissionDenied, "The caller does not have permission"),
 							googleresource.GoogleCloudRunServiceResourceType,
@@ -108,7 +108,7 @@ func TestGoogleCloudRunService(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}

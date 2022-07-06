@@ -7,7 +7,7 @@ import (
 	azurerm2 "github.com/snyk/driftctl/enumeration/remote/azurerm"
 	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
-	common2 "github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/remote/common"
 	error2 "github.com/snyk/driftctl/enumeration/remote/error"
 	terraform3 "github.com/snyk/driftctl/enumeration/terraform"
 
@@ -93,7 +93,7 @@ func TestAzurermVirtualNetwork(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -186,7 +186,7 @@ func TestAzurermRouteTables(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -335,7 +335,7 @@ func TestAzurermRoutes(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -468,7 +468,7 @@ func TestAzurermSubnets(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -561,7 +561,7 @@ func TestAzurermFirewalls(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -654,7 +654,7 @@ func TestAzurermPublicIP(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -741,7 +741,7 @@ func TestAzurermSecurityGroups(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -773,7 +773,7 @@ func TestAzurermSecurityGroups(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermNetworkSecurityGroupEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzureNetworkSecurityGroupResourceType, common2.NewGenericDetailsFetcher(resourceazure.AzureNetworkSecurityGroupResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceazure.AzureNetworkSecurityGroupResourceType, common.NewGenericDetailsFetcher(resourceazure.AzureNetworkSecurityGroupResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -857,7 +857,7 @@ func TestAzurermLoadBalancers(t *testing.T) {
 		t.Run(c.test, func(tt *testing.T) {
 
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -962,7 +962,7 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 
 			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform3.NewProviderLibrary()
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -994,7 +994,7 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm2.NewAzurermLoadBalancerRuleEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzureLoadBalancerRuleResourceType, common2.NewGenericDetailsFetcher(resourceazure.AzureLoadBalancerRuleResourceType, provider, deserializer))
+			remoteLibrary.AddDetailsFetcher(resourceazure.AzureLoadBalancerRuleResourceType, common.NewGenericDetailsFetcher(resourceazure.AzureLoadBalancerRuleResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

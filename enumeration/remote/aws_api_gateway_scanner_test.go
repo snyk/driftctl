@@ -10,7 +10,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
-	common2 "github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/resource"
 	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
@@ -63,7 +63,7 @@ func TestApiGatewayRestApi(t *testing.T) {
 			test: "cannot list api gateway rest apis",
 			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllRestApis").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayRestApiResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayRestApiResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayRestApiResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayRestApiResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayRestApiResourceType),
 		},
@@ -77,7 +77,7 @@ func TestApiGatewayRestApi(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -140,7 +140,7 @@ func TestApiGatewayAccount(t *testing.T) {
 			test: "cannot get api gateway account",
 			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("GetAccount").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayAccountResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayAccountResourceType, resourceaws.AwsApiGatewayAccountResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayAccountResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayAccountResourceType, resourceaws.AwsApiGatewayAccountResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayAccountResourceType),
 		},
@@ -154,7 +154,7 @@ func TestApiGatewayAccount(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -223,7 +223,7 @@ func TestApiGatewayApiKey(t *testing.T) {
 			test: "cannot list api gateway api keys",
 			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllApiKeys").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayApiKeyResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayApiKeyResourceType, resourceaws.AwsApiGatewayApiKeyResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayApiKeyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayApiKeyResourceType, resourceaws.AwsApiGatewayApiKeyResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayApiKeyResourceType),
 		},
@@ -237,7 +237,7 @@ func TestApiGatewayApiKey(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -315,7 +315,7 @@ func TestApiGatewayAuthorizer(t *testing.T) {
 			test: "cannot list rest apis",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayAuthorizerResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayAuthorizerResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayAuthorizerResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayAuthorizerResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayAuthorizerResourceType, resourceaws.AwsApiGatewayRestApiResourceType),
 		},
@@ -324,7 +324,7 @@ func TestApiGatewayAuthorizer(t *testing.T) {
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiAuthorizers", *apis[0].Id).Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayAuthorizerResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayAuthorizerResourceType, resourceaws.AwsApiGatewayAuthorizerResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayAuthorizerResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayAuthorizerResourceType, resourceaws.AwsApiGatewayAuthorizerResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayAuthorizerResourceType),
 		},
@@ -338,7 +338,7 @@ func TestApiGatewayAuthorizer(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -412,7 +412,7 @@ func TestApiGatewayStage(t *testing.T) {
 			test: "cannot list rest apis",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayStageResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayStageResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayStageResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayStageResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayStageResourceType, resourceaws.AwsApiGatewayRestApiResourceType),
 		},
@@ -421,7 +421,7 @@ func TestApiGatewayStage(t *testing.T) {
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiStages", *apis[0].Id).Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayStageResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayStageResourceType, resourceaws.AwsApiGatewayStageResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayStageResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayStageResourceType, resourceaws.AwsApiGatewayStageResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayStageResourceType),
 		},
@@ -435,7 +435,7 @@ func TestApiGatewayStage(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -509,7 +509,7 @@ func TestApiGatewayResource(t *testing.T) {
 			test: "cannot list rest apis",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayResourceResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayResourceResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayResourceResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayResourceResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayResourceResourceType, resourceaws.AwsApiGatewayRestApiResourceType),
 		},
@@ -518,7 +518,7 @@ func TestApiGatewayResource(t *testing.T) {
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayResourceResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayResourceResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayResourceResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayResourceResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayResourceResourceType),
 		},
@@ -532,7 +532,7 @@ func TestApiGatewayResource(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -597,7 +597,7 @@ func TestApiGatewayDomainName(t *testing.T) {
 			test: "cannot list api gateway domain names",
 			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDomainNames").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayDomainNameResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayDomainNameResourceType, resourceaws.AwsApiGatewayDomainNameResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayDomainNameResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayDomainNameResourceType, resourceaws.AwsApiGatewayDomainNameResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayDomainNameResourceType),
 		},
@@ -611,7 +611,7 @@ func TestApiGatewayDomainName(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -676,7 +676,7 @@ func TestApiGatewayVpcLink(t *testing.T) {
 			test: "cannot list api gateway vpc links",
 			mocks: func(repository *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllVpcLinks").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayVpcLinkResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayVpcLinkResourceType, resourceaws.AwsApiGatewayVpcLinkResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayVpcLinkResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayVpcLinkResourceType, resourceaws.AwsApiGatewayVpcLinkResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayVpcLinkResourceType),
 		},
@@ -690,7 +690,7 @@ func TestApiGatewayVpcLink(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -764,7 +764,7 @@ func TestApiGatewayRequestValidator(t *testing.T) {
 			test: "cannot list rest apis",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayRequestValidatorResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayRequestValidatorResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayRequestValidatorResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayRequestValidatorResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayRequestValidatorResourceType, resourceaws.AwsApiGatewayRestApiResourceType),
 		},
@@ -773,7 +773,7 @@ func TestApiGatewayRequestValidator(t *testing.T) {
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiRequestValidators", *apis[0].Id).Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayRequestValidatorResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayRequestValidatorResourceType, resourceaws.AwsApiGatewayRequestValidatorResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayRequestValidatorResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayRequestValidatorResourceType, resourceaws.AwsApiGatewayRequestValidatorResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayRequestValidatorResourceType),
 		},
@@ -787,7 +787,7 @@ func TestApiGatewayRequestValidator(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -859,7 +859,7 @@ func TestApiGatewayRestApiPolicy(t *testing.T) {
 			test: "cannot list rest apis",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayRestApiPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayRestApiPolicyResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayRestApiPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayRestApiPolicyResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayRestApiPolicyResourceType, resourceaws.AwsApiGatewayRestApiResourceType),
 		},
@@ -873,7 +873,7 @@ func TestApiGatewayRestApiPolicy(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -947,7 +947,7 @@ func TestApiGatewayBasePathMapping(t *testing.T) {
 			test: "cannot list domain names",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllDomainNames").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayBasePathMappingResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayBasePathMappingResourceType, resourceaws.AwsApiGatewayDomainNameResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayBasePathMappingResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayBasePathMappingResourceType, resourceaws.AwsApiGatewayDomainNameResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayBasePathMappingResourceType, resourceaws.AwsApiGatewayDomainNameResourceType),
 		},
@@ -956,7 +956,7 @@ func TestApiGatewayBasePathMapping(t *testing.T) {
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllDomainNames").Return(domainNames, nil)
 				repo.On("ListAllDomainNameBasePathMappings", *domainNames[0].DomainName).Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayBasePathMappingResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayBasePathMappingResourceType, resourceaws.AwsApiGatewayBasePathMappingResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayBasePathMappingResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayBasePathMappingResourceType, resourceaws.AwsApiGatewayBasePathMappingResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayBasePathMappingResourceType),
 		},
@@ -970,7 +970,7 @@ func TestApiGatewayBasePathMapping(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1052,7 +1052,7 @@ func TestApiGatewayMethod(t *testing.T) {
 			test: "cannot list rest apis",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResourceType, resourceaws.AwsApiGatewayRestApiResourceType),
 		},
@@ -1061,7 +1061,7 @@ func TestApiGatewayMethod(t *testing.T) {
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResourceType, resourceaws.AwsApiGatewayResourceResourceType),
 		},
@@ -1075,7 +1075,7 @@ func TestApiGatewayMethod(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1149,7 +1149,7 @@ func TestApiGatewayModel(t *testing.T) {
 			test: "cannot list rest apis",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayModelResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayModelResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayModelResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayModelResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayModelResourceType, resourceaws.AwsApiGatewayRestApiResourceType),
 		},
@@ -1158,7 +1158,7 @@ func TestApiGatewayModel(t *testing.T) {
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiModels", *apis[0].Id).Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayModelResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayModelResourceType, resourceaws.AwsApiGatewayModelResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayModelResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayModelResourceType, resourceaws.AwsApiGatewayModelResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayModelResourceType),
 		},
@@ -1172,7 +1172,7 @@ func TestApiGatewayModel(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1258,7 +1258,7 @@ func TestApiGatewayMethodResponse(t *testing.T) {
 			test: "cannot list rest apis",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResponseResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResponseResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResponseResourceType, resourceaws.AwsApiGatewayRestApiResourceType),
 		},
@@ -1267,7 +1267,7 @@ func TestApiGatewayMethodResponse(t *testing.T) {
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResponseResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResponseResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodResponseResourceType, resourceaws.AwsApiGatewayResourceResourceType),
 		},
@@ -1281,7 +1281,7 @@ func TestApiGatewayMethodResponse(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1355,7 +1355,7 @@ func TestApiGatewayGatewayResponse(t *testing.T) {
 			test: "cannot list rest apis",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayGatewayResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayGatewayResponseResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayGatewayResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayGatewayResponseResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayGatewayResponseResourceType, resourceaws.AwsApiGatewayRestApiResourceType),
 		},
@@ -1364,7 +1364,7 @@ func TestApiGatewayGatewayResponse(t *testing.T) {
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiGatewayResponses", *apis[0].Id).Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayGatewayResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayGatewayResponseResourceType, resourceaws.AwsApiGatewayGatewayResponseResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayGatewayResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayGatewayResponseResourceType, resourceaws.AwsApiGatewayGatewayResponseResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsApiGatewayGatewayResponseResourceType),
 		},
@@ -1378,7 +1378,7 @@ func TestApiGatewayGatewayResponse(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1460,7 +1460,7 @@ func TestApiGatewayMethodSettings(t *testing.T) {
 			test: "cannot list rest apis",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodSettingsResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodSettingsResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodSettingsResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodSettingsResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodSettingsResourceType, resourceaws.AwsApiGatewayRestApiResourceType),
 		},
@@ -1469,7 +1469,7 @@ func TestApiGatewayMethodSettings(t *testing.T) {
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiStages", *apis[0].Id).Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodSettingsResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodSettingsResourceType, resourceaws.AwsApiGatewayStageResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayMethodSettingsResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodSettingsResourceType, resourceaws.AwsApiGatewayStageResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayMethodSettingsResourceType, resourceaws.AwsApiGatewayStageResourceType),
 		},
@@ -1483,7 +1483,7 @@ func TestApiGatewayMethodSettings(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1565,7 +1565,7 @@ func TestApiGatewayIntegration(t *testing.T) {
 			test: "cannot list rest apis",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayIntegrationResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayIntegrationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResourceType, resourceaws.AwsApiGatewayRestApiResourceType),
 		},
@@ -1574,7 +1574,7 @@ func TestApiGatewayIntegration(t *testing.T) {
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayIntegrationResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayIntegrationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResourceType, resourceaws.AwsApiGatewayResourceResourceType),
 		},
@@ -1588,7 +1588,7 @@ func TestApiGatewayIntegration(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
@@ -1674,7 +1674,7 @@ func TestApiGatewayIntegrationResponse(t *testing.T) {
 			test: "cannot list rest apis",
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayIntegrationResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResponseResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayIntegrationResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResponseResourceType, resourceaws.AwsApiGatewayRestApiResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResponseResourceType, resourceaws.AwsApiGatewayRestApiResourceType),
 		},
@@ -1683,7 +1683,7 @@ func TestApiGatewayIntegrationResponse(t *testing.T) {
 			mocks: func(repo *repository.MockApiGatewayRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRestApis").Return(apis, nil)
 				repo.On("ListAllRestApiResources", *apis[0].Id).Return(nil, dummyError)
-				alerter.On("SendAlert", resourceaws.AwsApiGatewayIntegrationResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common2.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResponseResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
+				alerter.On("SendAlert", resourceaws.AwsApiGatewayIntegrationResponseResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResponseResourceType, resourceaws.AwsApiGatewayResourceResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceaws.AwsApiGatewayIntegrationResponseResourceType, resourceaws.AwsApiGatewayResourceResourceType),
 		},
@@ -1697,7 +1697,7 @@ func TestApiGatewayIntegrationResponse(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			scanOptions := ScannerOptions{}
-			remoteLibrary := common2.NewRemoteLibrary()
+			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
