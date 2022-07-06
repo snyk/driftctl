@@ -8,7 +8,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
-	github2 "github.com/snyk/driftctl/enumeration/remote/github"
+	"github.com/snyk/driftctl/enumeration/remote/github"
 	"github.com/snyk/driftctl/enumeration/terraform"
 
 	"github.com/pkg/errors"
@@ -30,13 +30,13 @@ func TestScanGithubBranchProtection(t *testing.T) {
 	cases := []struct {
 		test    string
 		dirName string
-		mocks   func(*github2.MockGithubRepository, *mocks.AlerterInterface)
+		mocks   func(*github.MockGithubRepository, *mocks.AlerterInterface)
 		err     error
 	}{
 		{
 			test:    "no branch protection",
 			dirName: "github_branch_protection_empty",
-			mocks: func(client *github2.MockGithubRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListBranchProtection").Return([]string{}, nil)
 			},
 			err: nil,
@@ -44,7 +44,7 @@ func TestScanGithubBranchProtection(t *testing.T) {
 		{
 			test:    "Multiple branch protections",
 			dirName: "github_branch_protection_multiples",
-			mocks: func(client *github2.MockGithubRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListBranchProtection").Return([]string{
 					"MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0NzI=", // "repo0:main"
 					"MDIwOkJyYW5jaFByb3RlY3Rpb25SdWxlMTk1NDg0Nzg=", // "repo0:toto"
@@ -59,7 +59,7 @@ func TestScanGithubBranchProtection(t *testing.T) {
 		{
 			test:    "cannot list branch protections",
 			dirName: "github_branch_protection_empty",
-			mocks: func(client *github2.MockGithubRepository, alerter *mocks.AlerterInterface) {
+			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListBranchProtection").Return(nil, errors.New("Your token has not been granted the required scopes to execute this query."))
 
 				alerter.On("SendAlert", githubres.GithubBranchProtectionResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Your token has not been granted the required scopes to execute this query."), githubres.GithubBranchProtectionResourceType, githubres.GithubBranchProtectionResourceType), alerts.EnumerationPhase)).Return()
@@ -84,10 +84,10 @@ func TestScanGithubBranchProtection(t *testing.T) {
 
 			// Initialize mocks
 			alerter := &mocks.AlerterInterface{}
-			mockedRepo := github2.MockGithubRepository{}
+			mockedRepo := github.MockGithubRepository{}
 			c.mocks(&mockedRepo, alerter)
 
-			var repo github2.GithubRepository = &mockedRepo
+			var repo github.GithubRepository = &mockedRepo
 
 			realProvider, err := tftest.InitTestGithubProvider(providerLibrary, "4.4.0")
 			if err != nil {
@@ -102,10 +102,10 @@ func TestScanGithubBranchProtection(t *testing.T) {
 					t.Fatal(err)
 				}
 				provider.ShouldUpdate()
-				repo = github2.NewGithubRepository(realProvider.GetConfig(), cache.New(0))
+				repo = github.NewGithubRepository(realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(github2.NewGithubBranchProtectionEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(github.NewGithubBranchProtectionEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(githubres.GithubBranchProtectionResourceType, common.NewGenericDetailsFetcher(githubres.GithubBranchProtectionResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
