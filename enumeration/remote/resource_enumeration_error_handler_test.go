@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	alerter2 "github.com/snyk/driftctl/enumeration/alerter"
+	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -24,55 +24,55 @@ func TestHandleAwsEnumerationErrors(t *testing.T) {
 	tests := []struct {
 		name       string
 		err        error
-		wantAlerts alerter2.Alerts
+		wantAlerts alerter.Alerts
 		wantErr    bool
 	}{
 		{
 			name:       "Handled error 403",
 			err:        remoteerr.NewResourceListingError(awserr.NewRequestFailure(awserr.New("", "", errors.New("")), 403, ""), resourceaws.AwsVpcResourceType),
-			wantAlerts: alerter2.Alerts{"aws_vpc": []alerter2.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awserr.NewRequestFailure(awserr.New("", "", errors.New("")), 403, ""), "aws_vpc", "aws_vpc"), alerts.EnumerationPhase)}},
+			wantAlerts: alerter.Alerts{"aws_vpc": []alerter.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awserr.NewRequestFailure(awserr.New("", "", errors.New("")), 403, ""), "aws_vpc", "aws_vpc"), alerts.EnumerationPhase)}},
 			wantErr:    false,
 		},
 		{
 			name:       "Handled error AccessDenied",
 			err:        remoteerr.NewResourceListingError(awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, ""), resourceaws.AwsDynamodbTableResourceType),
-			wantAlerts: alerter2.Alerts{"aws_dynamodb_table": []alerter2.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, ""), "aws_dynamodb_table", "aws_dynamodb_table"), alerts.EnumerationPhase)}},
+			wantAlerts: alerter.Alerts{"aws_dynamodb_table": []alerter.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 403, ""), "aws_dynamodb_table", "aws_dynamodb_table"), alerts.EnumerationPhase)}},
 			wantErr:    false,
 		},
 		{
 			name:       "Not Handled error code",
 			err:        remoteerr.NewResourceListingError(awserr.NewRequestFailure(awserr.New("", "", errors.New("")), 404, ""), resourceaws.AwsVpcResourceType),
-			wantAlerts: map[string][]alerter2.Alert{},
+			wantAlerts: map[string][]alerter.Alert{},
 			wantErr:    true,
 		},
 		{
 			name:       "Not Handled error type",
 			err:        errors.New("error"),
-			wantAlerts: map[string][]alerter2.Alert{},
+			wantAlerts: map[string][]alerter.Alert{},
 			wantErr:    true,
 		},
 		{
 			name:       "Not Handled root error type",
 			err:        remoteerr.NewResourceListingError(errors.New("error"), resourceaws.AwsVpcResourceType),
-			wantAlerts: map[string][]alerter2.Alert{},
+			wantAlerts: map[string][]alerter.Alert{},
 			wantErr:    true,
 		},
 		{
 			name:       "Handle AccessDenied error",
 			err:        remoteerr.NewResourceListingError(errors.New("an error occured: AccessDenied: 403"), resourceaws.AwsVpcResourceType),
-			wantAlerts: alerter2.Alerts{"aws_vpc": []alerter2.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("an error occured: AccessDenied: 403"), "aws_vpc", "aws_vpc"), alerts.EnumerationPhase)}},
+			wantAlerts: alerter.Alerts{"aws_vpc": []alerter.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("an error occured: AccessDenied: 403"), "aws_vpc", "aws_vpc"), alerts.EnumerationPhase)}},
 			wantErr:    false,
 		},
 		{
 			name:       "Access denied error on a single resource",
 			err:        remoteerr.NewResourceScanningError(errors.New("Error: AccessDenied: 403 ..."), resourceaws.AwsS3BucketResourceType, "my-bucket"),
-			wantAlerts: alerter2.Alerts{"aws_s3_bucket.my-bucket": []alerter2.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Error: AccessDenied: 403 ..."), "aws_s3_bucket.my-bucket", "aws_s3_bucket"), alerts.EnumerationPhase)}},
+			wantAlerts: alerter.Alerts{"aws_s3_bucket.my-bucket": []alerter.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Error: AccessDenied: 403 ..."), "aws_s3_bucket.my-bucket", "aws_s3_bucket"), alerts.EnumerationPhase)}},
 			wantErr:    false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			alertr := alerter2.NewAlerter()
+			alertr := alerter.NewAlerter()
 			gotErr := HandleResourceEnumerationError(tt.err, alertr)
 			assert.Equal(t, tt.wantErr, gotErr != nil)
 
@@ -88,31 +88,31 @@ func TestHandleGithubEnumerationErrors(t *testing.T) {
 	tests := []struct {
 		name       string
 		err        error
-		wantAlerts alerter2.Alerts
+		wantAlerts alerter.Alerts
 		wantErr    bool
 	}{
 		{
 			name:       "Handled graphql error",
 			err:        remoteerr.NewResourceListingError(errors.New("Your token has not been granted the required scopes to execute this query."), resourcegithub.GithubTeamResourceType),
-			wantAlerts: alerter2.Alerts{"github_team": []alerter2.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Your token has not been granted the required scopes to execute this query."), "github_team", "github_team"), alerts.EnumerationPhase)}},
+			wantAlerts: alerter.Alerts{"github_team": []alerter.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Your token has not been granted the required scopes to execute this query."), "github_team", "github_team"), alerts.EnumerationPhase)}},
 			wantErr:    false,
 		},
 		{
 			name:       "Not handled graphql error",
 			err:        remoteerr.NewResourceListingError(errors.New("This is a not handler graphql error"), resourcegithub.GithubTeamResourceType),
-			wantAlerts: map[string][]alerter2.Alert{},
+			wantAlerts: map[string][]alerter.Alert{},
 			wantErr:    true,
 		},
 		{
 			name:       "Not Handled error type",
 			err:        errors.New("error"),
-			wantAlerts: map[string][]alerter2.Alert{},
+			wantAlerts: map[string][]alerter.Alert{},
 			wantErr:    true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			alertr := alerter2.NewAlerter()
+			alertr := alerter.NewAlerter()
 			gotErr := HandleResourceEnumerationError(tt.err, alertr)
 			assert.Equal(t, tt.wantErr, gotErr != nil)
 
@@ -127,31 +127,31 @@ func TestHandleGoogleEnumerationErrors(t *testing.T) {
 	tests := []struct {
 		name       string
 		err        error
-		wantAlerts alerter2.Alerts
+		wantAlerts alerter.Alerts
 		wantErr    bool
 	}{
 		{
 			name:       "Handled 403 error",
 			err:        remoteerr.NewResourceListingError(status.Error(codes.PermissionDenied, "useless message"), "google_type"),
-			wantAlerts: alerter2.Alerts{"google_type": []alerter2.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteGoogleTerraform, remoteerr.NewResourceListingErrorWithType(status.Error(codes.PermissionDenied, "useless message"), "google_type", "google_type"), alerts.EnumerationPhase)}},
+			wantAlerts: alerter.Alerts{"google_type": []alerter.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteGoogleTerraform, remoteerr.NewResourceListingErrorWithType(status.Error(codes.PermissionDenied, "useless message"), "google_type", "google_type"), alerts.EnumerationPhase)}},
 			wantErr:    false,
 		},
 		{
 			name:       "Not handled non 403 error",
 			err:        status.Error(codes.Unknown, ""),
-			wantAlerts: map[string][]alerter2.Alert{},
+			wantAlerts: map[string][]alerter.Alert{},
 			wantErr:    true,
 		},
 		{
 			name:       "Not Handled error type",
 			err:        errors.New("error"),
-			wantAlerts: map[string][]alerter2.Alert{},
+			wantAlerts: map[string][]alerter.Alert{},
 			wantErr:    true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			alertr := alerter2.NewAlerter()
+			alertr := alerter.NewAlerter()
 			gotErr := HandleResourceEnumerationError(tt.err, alertr)
 			assert.Equal(t, tt.wantErr, gotErr != nil)
 
@@ -167,43 +167,43 @@ func TestHandleAwsDetailsFetchingErrors(t *testing.T) {
 	tests := []struct {
 		name       string
 		err        error
-		wantAlerts alerter2.Alerts
+		wantAlerts alerter.Alerts
 		wantErr    bool
 	}{
 		{
 			name:       "Handle AccessDeniedException error",
 			err:        remoteerr.NewResourceListingError(awserr.NewRequestFailure(awserr.New("AccessDeniedException", "test", errors.New("")), 403, ""), resourceaws.AwsVpcResourceType),
-			wantAlerts: alerter2.Alerts{"aws_vpc": []alerter2.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awserr.NewRequestFailure(awserr.New("AccessDeniedException", "test", errors.New("")), 403, ""), "aws_vpc", "aws_vpc"), alerts.DetailsFetchingPhase)}},
+			wantAlerts: alerter.Alerts{"aws_vpc": []alerter.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awserr.NewRequestFailure(awserr.New("AccessDeniedException", "test", errors.New("")), 403, ""), "aws_vpc", "aws_vpc"), alerts.DetailsFetchingPhase)}},
 			wantErr:    false,
 		},
 		{
 			name:       "Handle AccessDenied error",
 			err:        remoteerr.NewResourceListingError(awserr.NewRequestFailure(awserr.New("test", "error: AccessDenied", errors.New("")), 403, ""), resourceaws.AwsVpcResourceType),
-			wantAlerts: alerter2.Alerts{"aws_vpc": []alerter2.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awserr.NewRequestFailure(awserr.New("test", "error: AccessDenied", errors.New("")), 403, ""), "aws_vpc", "aws_vpc"), alerts.DetailsFetchingPhase)}},
+			wantAlerts: alerter.Alerts{"aws_vpc": []alerter.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awserr.NewRequestFailure(awserr.New("test", "error: AccessDenied", errors.New("")), 403, ""), "aws_vpc", "aws_vpc"), alerts.DetailsFetchingPhase)}},
 			wantErr:    false,
 		},
 		{
 			name:       "Handle AuthorizationError error",
 			err:        remoteerr.NewResourceListingError(awserr.NewRequestFailure(awserr.New("test", "error: AuthorizationError", errors.New("")), 403, ""), resourceaws.AwsVpcResourceType),
-			wantAlerts: alerter2.Alerts{"aws_vpc": []alerter2.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awserr.NewRequestFailure(awserr.New("test", "error: AuthorizationError", errors.New("")), 403, ""), "aws_vpc", "aws_vpc"), alerts.DetailsFetchingPhase)}},
+			wantAlerts: alerter.Alerts{"aws_vpc": []alerter.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awserr.NewRequestFailure(awserr.New("test", "error: AuthorizationError", errors.New("")), 403, ""), "aws_vpc", "aws_vpc"), alerts.DetailsFetchingPhase)}},
 			wantErr:    false,
 		},
 		{
 			name:       "Unhandled error",
 			err:        remoteerr.NewResourceListingError(awserr.NewRequestFailure(awserr.New("test", "error: dummy error", errors.New("")), 403, ""), resourceaws.AwsVpcResourceType),
-			wantAlerts: alerter2.Alerts{},
+			wantAlerts: alerter.Alerts{},
 			wantErr:    true,
 		},
 		{
 			name:       "Not Handled error type",
 			err:        errors.New("error"),
-			wantAlerts: map[string][]alerter2.Alert{},
+			wantAlerts: map[string][]alerter.Alert{},
 			wantErr:    true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			alertr := alerter2.NewAlerter()
+			alertr := alerter.NewAlerter()
 			gotErr := HandleResourceDetailsFetchingError(tt.err, alertr)
 			assert.Equal(t, tt.wantErr, gotErr != nil)
 
@@ -219,7 +219,7 @@ func TestHandleGoogleDetailsFetchingErrors(t *testing.T) {
 	tests := []struct {
 		name       string
 		err        error
-		wantAlerts alerter2.Alerts
+		wantAlerts alerter.Alerts
 		wantErr    bool
 	}{
 		{
@@ -229,7 +229,7 @@ func TestHandleGoogleDetailsFetchingErrors(t *testing.T) {
 				"google_type",
 				"resource_id",
 			),
-			wantAlerts: alerter2.Alerts{"google_type.resource_id": []alerter2.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteGoogleTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Error when reading or editing Storage Bucket \"driftctl-unittest-1\": googleapi: Error 403: driftctl@elie-dev.iam.gserviceaccount.com does not have storage.buckets.get access to the Google Cloud Storage bucket., forbidden"), "google_type.resource_id", "google_type"), alerts.DetailsFetchingPhase)}},
+			wantAlerts: alerter.Alerts{"google_type.resource_id": []alerter.Alert{alerts.NewRemoteAccessDeniedAlert(common.RemoteGoogleTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Error when reading or editing Storage Bucket \"driftctl-unittest-1\": googleapi: Error 403: driftctl@elie-dev.iam.gserviceaccount.com does not have storage.buckets.get access to the Google Cloud Storage bucket., forbidden"), "google_type.resource_id", "google_type"), alerts.DetailsFetchingPhase)}},
 			wantErr:    false,
 		},
 		{
@@ -238,7 +238,7 @@ func TestHandleGoogleDetailsFetchingErrors(t *testing.T) {
 				errors.New("this string does not contains g o o g l e a p i string and thus should not be matched"),
 				"google_type",
 				"resource_id",
-			), wantAlerts: alerter2.Alerts{},
+			), wantAlerts: alerter.Alerts{},
 			wantErr: true,
 		},
 		{
@@ -247,19 +247,19 @@ func TestHandleGoogleDetailsFetchingErrors(t *testing.T) {
 				errors.New("Error when reading or editing Storage Bucket \"driftctl-unittest-1\": googleapi: Error 404: not found"),
 				"google_type",
 				"resource_id",
-			), wantAlerts: alerter2.Alerts{},
+			), wantAlerts: alerter.Alerts{},
 			wantErr: true,
 		},
 		{
 			name:       "Not Handled error type",
 			err:        errors.New("error"),
-			wantAlerts: map[string][]alerter2.Alert{},
+			wantAlerts: map[string][]alerter.Alert{},
 			wantErr:    true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			alertr := alerter2.NewAlerter()
+			alertr := alerter.NewAlerter()
 			gotErr := HandleResourceDetailsFetchingError(tt.err, alertr)
 			assert.Equal(t, tt.wantErr, gotErr != nil)
 
