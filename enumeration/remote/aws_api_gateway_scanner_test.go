@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
-	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
+	"github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -86,7 +86,7 @@ func TestApiGatewayRestApi(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayRestApiEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayRestApiEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -163,7 +163,7 @@ func TestApiGatewayAccount(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayAccountEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayAccountEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -246,7 +246,7 @@ func TestApiGatewayApiKey(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayApiKeyEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayApiKeyEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -347,7 +347,7 @@ func TestApiGatewayAuthorizer(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayAuthorizerEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayAuthorizerEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -444,7 +444,7 @@ func TestApiGatewayStage(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayStageEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayStageEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -541,7 +541,7 @@ func TestApiGatewayResource(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayResourceEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayResourceEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -620,7 +620,7 @@ func TestApiGatewayDomainName(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayDomainNameEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayDomainNameEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -699,7 +699,7 @@ func TestApiGatewayVpcLink(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayVpcLinkEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayVpcLinkEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -796,7 +796,7 @@ func TestApiGatewayRequestValidator(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayRequestValidatorEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayRequestValidatorEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -882,7 +882,7 @@ func TestApiGatewayRestApiPolicy(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayRestApiPolicyEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayRestApiPolicyEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -979,7 +979,7 @@ func TestApiGatewayBasePathMapping(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayBasePathMappingEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayBasePathMappingEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1084,7 +1084,7 @@ func TestApiGatewayMethod(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayMethodEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayMethodEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1181,7 +1181,7 @@ func TestApiGatewayModel(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayModelEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayModelEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1290,7 +1290,7 @@ func TestApiGatewayMethodResponse(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayMethodResponseEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayMethodResponseEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1387,7 +1387,7 @@ func TestApiGatewayGatewayResponse(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayGatewayResponseEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayGatewayResponseEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1492,7 +1492,7 @@ func TestApiGatewayMethodSettings(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayMethodSettingsEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayMethodSettingsEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1597,7 +1597,7 @@ func TestApiGatewayIntegration(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayIntegrationEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayIntegrationEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1706,7 +1706,7 @@ func TestApiGatewayIntegrationResponse(t *testing.T) {
 
 			var repo repository.ApiGatewayRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewApiGatewayIntegrationResponseEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewApiGatewayIntegrationResponseEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

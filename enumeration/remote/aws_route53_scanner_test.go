@@ -3,7 +3,7 @@ package remote
 import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
-	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
+	"github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
@@ -111,7 +111,7 @@ func TestRoute53_HealthCheck(t *testing.T) {
 				repo = repository.NewRoute53Repository(session, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewRoute53HealthCheckEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewRoute53HealthCheckEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRoute53HealthCheckResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRoute53HealthCheckResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -246,7 +246,7 @@ func TestRoute53_Zone(t *testing.T) {
 				repo = repository.NewRoute53Repository(session, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewRoute53ZoneEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewRoute53ZoneEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRoute53ZoneResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRoute53ZoneResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -456,7 +456,7 @@ func TestRoute53_Record(t *testing.T) {
 				repo = repository.NewRoute53Repository(session, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewRoute53RecordEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewRoute53RecordEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRoute53RecordResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRoute53RecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}

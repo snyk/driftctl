@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
-	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
+	"github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
@@ -108,7 +108,7 @@ func TestKMSKey(t *testing.T) {
 				repo = repository.NewKMSRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewKMSKeyEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewKMSKeyEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsKmsKeyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsKmsKeyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -206,7 +206,7 @@ func TestKMSAlias(t *testing.T) {
 				repo = repository.NewKMSRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewKMSAliasEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewKMSAliasEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsKmsAliasResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsKmsAliasResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}

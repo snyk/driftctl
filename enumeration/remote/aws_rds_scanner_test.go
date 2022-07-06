@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
-	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
+	"github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
@@ -116,7 +116,7 @@ func TestRDSDBInstance(t *testing.T) {
 				repo = repository.NewRDSRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewRDSDBInstanceEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewRDSDBInstanceEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDbInstanceResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDbInstanceResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -213,7 +213,7 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 				repo = repository.NewRDSRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewRDSDBSubnetGroupEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewRDSDBSubnetGroupEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDbSubnetGroupResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDbSubnetGroupResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -315,7 +315,7 @@ func TestRDSCluster(t *testing.T) {
 				repo = repository.NewRDSRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewRDSClusterEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewRDSClusterEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRDSClusterResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRDSClusterResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}

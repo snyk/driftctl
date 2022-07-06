@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
-	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
+	"github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
@@ -109,7 +109,7 @@ func TestECRRepository(t *testing.T) {
 				repo = repository.NewECRRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewECRRepositoryEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewECRRepositoryEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEcrRepositoryResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEcrRepositoryResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -178,7 +178,7 @@ func TestECRRepositoryPolicy(t *testing.T) {
 
 			var repo repository.ECRRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewECRRepositoryPolicyEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewECRRepositoryPolicyEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

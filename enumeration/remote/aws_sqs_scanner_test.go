@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
-	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
+	"github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
@@ -108,8 +108,8 @@ func TestSQSQueue(t *testing.T) {
 				repo = repository.NewSQSRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewSQSQueueEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSqsQueueResourceType, aws2.NewSQSQueueDetailsFetcher(provider, deserializer))
+			remoteLibrary.AddEnumerator(aws.NewSQSQueueEnumerator(repo, factory))
+			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSqsQueueResourceType, aws.NewSQSQueueDetailsFetcher(provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -235,7 +235,7 @@ func TestSQSQueuePolicy(t *testing.T) {
 				repo = repository.NewSQSRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewSQSQueuePolicyEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewSQSQueuePolicyEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSqsQueuePolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSqsQueuePolicyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}

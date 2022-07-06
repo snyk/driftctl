@@ -6,7 +6,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
-	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
+	"github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -99,7 +99,7 @@ func TestELBV2_LoadBalancer(t *testing.T) {
 
 			var repo repository.ELBV2Repository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewLoadBalancerEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewLoadBalancerEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -227,7 +227,7 @@ func TestELBV2_LoadBalancerListener(t *testing.T) {
 
 			var repo repository.ELBV2Repository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewLoadBalancerListenerEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewLoadBalancerListenerEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

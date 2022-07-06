@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
-	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
+	"github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
@@ -107,7 +107,7 @@ func TestEC2EbsVolume(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2EbsVolumeEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2EbsVolumeEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsVolumeResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEbsVolumeResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -204,7 +204,7 @@ func TestEC2EbsSnapshot(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2EbsSnapshotEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2EbsSnapshotEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsSnapshotResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEbsSnapshotResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -303,7 +303,7 @@ func TestEC2Eip(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2EipEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2EipEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEipResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEipResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -400,7 +400,7 @@ func TestEC2Ami(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2AmiEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2AmiEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsAmiResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsAmiResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -497,7 +497,7 @@ func TestEC2KeyPair(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2KeyPairEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2KeyPairEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsKeyPairResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsKeyPairResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -596,7 +596,7 @@ func TestEC2EipAssociation(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2EipAssociationEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2EipAssociationEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEipAssociationResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEipAssociationResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -703,7 +703,7 @@ func TestEC2Instance(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2InstanceEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2InstanceEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsInstanceResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsInstanceResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -800,7 +800,7 @@ func TestEC2InternetGateway(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2InternetGatewayEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2InternetGatewayEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsInternetGatewayResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsInternetGatewayResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -914,7 +914,7 @@ func TestVPC(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewVPCEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewVPCEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsVpcResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsVpcResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -1025,7 +1025,7 @@ func TestDefaultVPC(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewDefaultVPCEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewDefaultVPCEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultVpcResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultVpcResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -1191,7 +1191,7 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2RouteTableAssociationEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2RouteTableAssociationEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteTableAssociationResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRouteTableAssociationResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -1311,7 +1311,7 @@ func TestEC2Subnet(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2SubnetEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2SubnetEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSubnetResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSubnetResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -1431,7 +1431,7 @@ func TestEC2DefaultSubnet(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2DefaultSubnetEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2DefaultSubnetEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultSubnetResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultSubnetResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -1538,7 +1538,7 @@ func TestEC2RouteTable(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2RouteTableEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2RouteTableEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteTableResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRouteTableResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -1645,7 +1645,7 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2DefaultRouteTableEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2DefaultRouteTableEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultRouteTableResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultRouteTableResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -1752,7 +1752,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewVPCSecurityGroupEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewVPCSecurityGroupEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSecurityGroupResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSecurityGroupResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -1859,7 +1859,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewVPCDefaultSecurityGroupEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewVPCDefaultSecurityGroupEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultSecurityGroupResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultSecurityGroupResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -1955,7 +1955,7 @@ func TestEC2NatGateway(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2NatGatewayEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2NatGatewayEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsNatGatewayResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsNatGatewayResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -2073,7 +2073,7 @@ func TestEC2NetworkACL(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2NetworkACLEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2NetworkACLEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsNetworkACLResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsNetworkACLResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -2222,7 +2222,7 @@ func TestEC2NetworkACLRule(t *testing.T) {
 				provider.ShouldUpdate()
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2NetworkACLRuleEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2NetworkACLRuleEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsNetworkACLRuleResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsNetworkACLRuleResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -2340,7 +2340,7 @@ func TestEC2DefaultNetworkACL(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2DefaultNetworkACLEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2DefaultNetworkACLEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDefaultNetworkACLResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDefaultNetworkACLResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -2509,7 +2509,7 @@ func TestEC2Route(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2RouteEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2RouteEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRouteResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRouteResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -2700,7 +2700,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewVPCSecurityGroupRuleEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewVPCSecurityGroupRuleEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSecurityGroupRuleResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSecurityGroupRuleResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -2799,7 +2799,7 @@ func TestEC2LaunchTemplate(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewLaunchTemplateEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewLaunchTemplateEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsLaunchTemplateResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsLaunchTemplateResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -2887,7 +2887,7 @@ func TestEC2EbsEncryptionByDefault(t *testing.T) {
 				repo = repository.NewEC2Repository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewEC2EbsEncryptionByDefaultEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewEC2EbsEncryptionByDefaultEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEbsEncryptionByDefaultResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEbsEncryptionByDefaultResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}

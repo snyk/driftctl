@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/snyk/driftctl/enumeration"
-	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
+	"github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
@@ -108,7 +108,7 @@ func TestAppAutoScalingTarget(t *testing.T) {
 				repo = repository.NewAppAutoScalingRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewAppAutoscalingTargetEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewAppAutoscalingTargetEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsAppAutoscalingTargetResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsAppAutoscalingTargetResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -211,7 +211,7 @@ func TestAppAutoScalingPolicy(t *testing.T) {
 				repo = repository.NewAppAutoScalingRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewAppAutoscalingPolicyEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewAppAutoscalingPolicyEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsAppAutoscalingPolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsAppAutoscalingPolicyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -307,7 +307,7 @@ func TestAppAutoScalingScheduledAction(t *testing.T) {
 
 			var repo repository.AppAutoScalingRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewAppAutoscalingScheduledActionEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewAppAutoscalingScheduledActionEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

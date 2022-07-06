@@ -5,15 +5,15 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
-	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
+	"github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/client"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	tf "github.com/snyk/driftctl/enumeration/remote/terraform"
-	terraform3 "github.com/snyk/driftctl/enumeration/terraform"
-
+	"github.com/snyk/driftctl/enumeration/terraform"
+ 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -91,7 +91,7 @@ func TestS3Bucket(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -103,7 +103,7 @@ func TestS3Bucket(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -129,7 +129,7 @@ func TestS3Bucket(t *testing.T) {
 				repo = repository.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewS3BucketEnumerator(repo, factory, tf.TerraformProviderConfig{
+			remoteLibrary.AddEnumerator(aws.NewS3BucketEnumerator(repo, factory, tf.TerraformProviderConfig{
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
@@ -251,7 +251,7 @@ func TestS3BucketInventory(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -263,7 +263,7 @@ func TestS3BucketInventory(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -289,7 +289,7 @@ func TestS3BucketInventory(t *testing.T) {
 				repo = repository.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewS3BucketInventoryEnumerator(repo, factory, tf.TerraformProviderConfig{
+			remoteLibrary.AddEnumerator(aws.NewS3BucketInventoryEnumerator(repo, factory, tf.TerraformProviderConfig{
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
@@ -437,7 +437,7 @@ func TestS3BucketNotification(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -449,7 +449,7 @@ func TestS3BucketNotification(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -475,7 +475,7 @@ func TestS3BucketNotification(t *testing.T) {
 				repo = repository.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewS3BucketNotificationEnumerator(repo, factory, tf.TerraformProviderConfig{
+			remoteLibrary.AddEnumerator(aws.NewS3BucketNotificationEnumerator(repo, factory, tf.TerraformProviderConfig{
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
@@ -598,7 +598,7 @@ func TestS3BucketMetrics(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -610,7 +610,7 @@ func TestS3BucketMetrics(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -636,7 +636,7 @@ func TestS3BucketMetrics(t *testing.T) {
 				repo = repository.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewS3BucketMetricsEnumerator(repo, factory, tf.TerraformProviderConfig{
+			remoteLibrary.AddEnumerator(aws.NewS3BucketMetricsEnumerator(repo, factory, tf.TerraformProviderConfig{
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
@@ -756,7 +756,7 @@ func TestS3BucketPolicy(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -768,7 +768,7 @@ func TestS3BucketPolicy(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -794,7 +794,7 @@ func TestS3BucketPolicy(t *testing.T) {
 				repo = repository.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewS3BucketPolicyEnumerator(repo, factory, tf.TerraformProviderConfig{
+			remoteLibrary.AddEnumerator(aws.NewS3BucketPolicyEnumerator(repo, factory, tf.TerraformProviderConfig{
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
@@ -883,7 +883,7 @@ func TestS3BucketPublicAccessBlock(t *testing.T) {
 	providerVersion := "3.19.0"
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -897,7 +897,7 @@ func TestS3BucketPublicAccessBlock(t *testing.T) {
 
 			var repo repository.S3Repository = fakeRepo
 
-			remoteLibrary.AddEnumerator(aws2.NewS3BucketPublicAccessBlockEnumerator(
+			remoteLibrary.AddEnumerator(aws.NewS3BucketPublicAccessBlockEnumerator(
 				repo, factory,
 				tf.TerraformProviderConfig{DefaultAlias: "us-east-1"},
 				alerter,
@@ -1023,7 +1023,7 @@ func TestS3BucketAnalytic(t *testing.T) {
 
 	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform3.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory(schemaRepository)
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -1035,7 +1035,7 @@ func TestS3BucketAnalytic(t *testing.T) {
 			}))
 
 			scanOptions := ScannerOptions{Deep: true}
-			providerLibrary := terraform3.NewProviderLibrary()
+			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1061,7 +1061,7 @@ func TestS3BucketAnalytic(t *testing.T) {
 				repo = repository.NewS3Repository(client.NewAWSClientFactory(session), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewS3BucketAnalyticEnumerator(repo, factory, tf.TerraformProviderConfig{
+			remoteLibrary.AddEnumerator(aws.NewS3BucketAnalyticEnumerator(repo, factory, tf.TerraformProviderConfig{
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))

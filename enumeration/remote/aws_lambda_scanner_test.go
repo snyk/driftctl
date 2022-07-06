@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
-	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
+	"github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
@@ -128,7 +128,7 @@ func TestScanLambdaFunction(t *testing.T) {
 				repo = repository.NewLambdaRepository(session, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewLambdaFunctionEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewLambdaFunctionEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsLambdaFunctionResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsLambdaFunctionResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -244,7 +244,7 @@ func TestScanLambdaEventSourceMapping(t *testing.T) {
 				repo = repository.NewLambdaRepository(session, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewLambdaEventSourceMappingEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewLambdaEventSourceMappingEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsLambdaEventSourceMappingResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsLambdaEventSourceMappingResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}

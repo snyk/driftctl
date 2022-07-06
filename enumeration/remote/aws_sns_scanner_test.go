@@ -5,7 +5,7 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
-	aws2 "github.com/snyk/driftctl/enumeration/remote/aws"
+	"github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
@@ -113,7 +113,7 @@ func TestScanSNSTopic(t *testing.T) {
 				repo = repository.NewSNSRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewSNSTopicEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewSNSTopicEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSnsTopicResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -213,7 +213,7 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 				repo = repository.NewSNSRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewSNSTopicPolicyEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(aws.NewSNSTopicPolicyEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicPolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSnsTopicPolicyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -270,9 +270,9 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 					{SubscriptionArn: awssdk.String("arn:aws:sns:us-east-1:526954929923:user-updates-topic:b6e66147-2b31-4486-8d4b-2a2272264c8e")},
 				}, nil)
 
-				alerter.On("SendAlert", "aws_sns_topic_subscription.PendingConfirmation", aws2.NewWrongArnTopicAlert("PendingConfirmation", awssdk.String("TEST"))).Return()
+				alerter.On("SendAlert", "aws_sns_topic_subscription.PendingConfirmation", aws.NewWrongArnTopicAlert("PendingConfirmation", awssdk.String("TEST"))).Return()
 
-				alerter.On("SendAlert", "aws_sns_topic_subscription.Incorrect", aws2.NewWrongArnTopicAlert("Incorrect", awssdk.String("INCORRECT"))).Return()
+				alerter.On("SendAlert", "aws_sns_topic_subscription.Incorrect", aws.NewWrongArnTopicAlert("Incorrect", awssdk.String("INCORRECT"))).Return()
 			},
 			err: nil,
 		},
@@ -330,7 +330,7 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 				repo = repository.NewSNSRepository(sess, cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(aws2.NewSNSTopicSubscriptionEnumerator(repo, factory, alerter))
+			remoteLibrary.AddEnumerator(aws.NewSNSTopicSubscriptionEnumerator(repo, factory, alerter))
 			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicSubscriptionResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSnsTopicSubscriptionResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
