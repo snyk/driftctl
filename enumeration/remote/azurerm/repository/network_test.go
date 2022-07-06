@@ -3,13 +3,13 @@ package repository
 import (
 	"context"
 	"fmt"
-	cache2 "github.com/snyk/driftctl/enumeration/remote/cache"
 	"reflect"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork"
 	"github.com/pkg/errors"
+	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -84,7 +84,7 @@ func Test_ListAllVirtualNetwork_MultiplesResults(t *testing.T) {
 
 	fakeClient.On("ListAll", mock.Anything).Return(mockPager)
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "ListAllVirtualNetworks").Return(nil).Times(1)
 	c.On("Unlock", "ListAllVirtualNetworks").Times(1)
 	c.On("Put", "ListAllVirtualNetworks", expected).Return(true).Times(1)
@@ -119,7 +119,7 @@ func Test_ListAllVirtualNetwork_MultiplesResults_WithCache(t *testing.T) {
 
 	fakeClient := &mockVirtualNetworkClient{}
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "ListAllVirtualNetworks").Return(expected).Times(1)
 	c.On("Unlock", "ListAllVirtualNetworks").Times(1)
 	s := &networkRepository{
@@ -155,7 +155,7 @@ func Test_ListAllVirtualNetwork_Error_OnPageResponse(t *testing.T) {
 
 	s := &networkRepository{
 		virtualNetworksClient: fakeClient,
-		cache:                 cache2.New(0),
+		cache:                 cache.New(0),
 	}
 	got, err := s.ListAllVirtualNetworks()
 
@@ -180,7 +180,7 @@ func Test_ListAllVirtualNetwork_Error(t *testing.T) {
 
 	s := &networkRepository{
 		virtualNetworksClient: fakeClient,
-		cache:                 cache2.New(0),
+		cache:                 cache.New(0),
 	}
 	got, err := s.ListAllVirtualNetworks()
 
@@ -239,7 +239,7 @@ func Test_ListAllRouteTables_MultiplesResults(t *testing.T) {
 
 	fakeClient.On("ListAll", mock.Anything).Return(mockPager)
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "ListAllRouteTables").Return(nil).Times(1)
 	c.On("Unlock", "ListAllRouteTables").Times(1)
 	c.On("Put", "ListAllRouteTables", expected).Return(true).Times(1)
@@ -274,7 +274,7 @@ func Test_ListAllRouteTables_MultiplesResults_WithCache(t *testing.T) {
 
 	fakeClient := &mockRouteTablesClient{}
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "ListAllRouteTables").Return(expected).Times(1)
 	c.On("Unlock", "ListAllRouteTables").Times(1)
 	s := &networkRepository{
@@ -310,7 +310,7 @@ func Test_ListAllRouteTables_Error_OnPageResponse(t *testing.T) {
 
 	s := &networkRepository{
 		routeTableClient: fakeClient,
-		cache:            cache2.New(0),
+		cache:            cache.New(0),
 	}
 	got, err := s.ListAllRouteTables()
 
@@ -335,7 +335,7 @@ func Test_ListAllRouteTables_Error(t *testing.T) {
 
 	s := &networkRepository{
 		routeTableClient: fakeClient,
-		cache:            cache2.New(0),
+		cache:            cache.New(0),
 	}
 	got, err := s.ListAllRouteTables()
 
@@ -423,7 +423,7 @@ func Test_ListAllSubnets_MultiplesResults(t *testing.T) {
 
 	fakeClient.On("List", "test-dev", "network1", mock.Anything).Return(mockPager)
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	cacheKey := fmt.Sprintf("ListAllSubnets_%s", *network.ID)
 	c.On("Get", cacheKey).Return(nil).Times(1)
 	c.On("Put", cacheKey, expected).Return(true).Times(1)
@@ -461,7 +461,7 @@ func Test_ListAllSubnets_MultiplesResults_WithCache(t *testing.T) {
 	}
 	fakeClient := &mockSubnetsClient{}
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("Get", "ListAllSubnets_networkID").Return(expected).Times(1)
 	s := &networkRepository{
 		subnetsClient: fakeClient,
@@ -503,7 +503,7 @@ func Test_ListAllSubnets_Error_OnPageResponse(t *testing.T) {
 
 	s := &networkRepository{
 		subnetsClient: fakeClient,
-		cache:         cache2.New(0),
+		cache:         cache.New(0),
 	}
 	got, err := s.ListAllSubnets(network)
 
@@ -535,7 +535,7 @@ func Test_ListAllSubnets_Error(t *testing.T) {
 
 	s := &networkRepository{
 		subnetsClient: fakeClient,
-		cache:         cache2.New(0),
+		cache:         cache.New(0),
 	}
 	got, err := s.ListAllSubnets(network)
 
@@ -561,7 +561,7 @@ func Test_ListAllSubnets_ErrorOnInvalidNetworkID(t *testing.T) {
 
 	s := &networkRepository{
 		subnetsClient: fakeClient,
-		cache:         cache2.New(0),
+		cache:         cache.New(0),
 	}
 	got, err := s.ListAllSubnets(network)
 
@@ -619,7 +619,7 @@ func Test_ListAllFirewalls_MultiplesResults(t *testing.T) {
 
 	fakeClient.On("ListAll", mock.Anything).Return(mockPager)
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("Get", "ListAllFirewalls").Return(nil).Times(1)
 	c.On("Put", "ListAllFirewalls", expected).Return(true).Times(1)
 	s := &networkRepository{
@@ -653,7 +653,7 @@ func Test_ListAllFirewalls_MultiplesResults_WithCache(t *testing.T) {
 
 	fakeClient := &mockFirewallsClient{}
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("Get", "ListAllFirewalls").Return(expected).Times(1)
 	s := &networkRepository{
 		firewallsClient: fakeClient,
@@ -688,7 +688,7 @@ func Test_ListAllFirewalls_Error_OnPageResponse(t *testing.T) {
 
 	s := &networkRepository{
 		firewallsClient: fakeClient,
-		cache:           cache2.New(0),
+		cache:           cache.New(0),
 	}
 	got, err := s.ListAllFirewalls()
 
@@ -713,7 +713,7 @@ func Test_ListAllFirewalls_Error(t *testing.T) {
 
 	s := &networkRepository{
 		firewallsClient: fakeClient,
-		cache:           cache2.New(0),
+		cache:           cache.New(0),
 	}
 	got, err := s.ListAllFirewalls()
 
@@ -772,7 +772,7 @@ func Test_ListAllPublicIPAddresses_MultiplesResults(t *testing.T) {
 
 	fakeClient.On("ListAll", mock.Anything).Return(mockPager)
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("Get", "ListAllPublicIPAddresses").Return(nil).Times(1)
 	c.On("Put", "ListAllPublicIPAddresses", expected).Return(true).Times(1)
 	s := &networkRepository{
@@ -806,7 +806,7 @@ func Test_ListAllPublicIPAddresses_MultiplesResults_WithCache(t *testing.T) {
 
 	fakeClient := &mockPublicIPAddressesClient{}
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("Get", "ListAllPublicIPAddresses").Return(expected).Times(1)
 	s := &networkRepository{
 		publicIPAddressesClient: fakeClient,
@@ -841,7 +841,7 @@ func Test_ListAllPublicIPAddresses_Error_OnPageResponse(t *testing.T) {
 
 	s := &networkRepository{
 		publicIPAddressesClient: fakeClient,
-		cache:                   cache2.New(0),
+		cache:                   cache.New(0),
 	}
 	got, err := s.ListAllPublicIPAddresses()
 
@@ -866,7 +866,7 @@ func Test_ListAllPublicIPAddresses_Error(t *testing.T) {
 
 	s := &networkRepository{
 		publicIPAddressesClient: fakeClient,
-		cache:                   cache2.New(0),
+		cache:                   cache.New(0),
 	}
 	got, err := s.ListAllPublicIPAddresses()
 
@@ -895,13 +895,13 @@ func Test_Network_ListAllSecurityGroups(t *testing.T) {
 
 	testcases := []struct {
 		name     string
-		mocks    func(*mockNetworkSecurityGroupsListAllPager, *cache2.MockCache)
+		mocks    func(*mockNetworkSecurityGroupsListAllPager, *cache.MockCache)
 		expected []*armnetwork.NetworkSecurityGroup
 		wantErr  string
 	}{
 		{
 			name: "should return security groups",
-			mocks: func(pager *mockNetworkSecurityGroupsListAllPager, mockCache *cache2.MockCache) {
+			mocks: func(pager *mockNetworkSecurityGroupsListAllPager, mockCache *cache.MockCache) {
 				pager.On("NextPage", context.Background()).Return(true).Times(1)
 				pager.On("NextPage", context.Background()).Return(false).Times(1)
 				pager.On("PageResponse").Return(armnetwork.NetworkSecurityGroupsListAllResponse{
@@ -920,14 +920,14 @@ func Test_Network_ListAllSecurityGroups(t *testing.T) {
 		},
 		{
 			name: "should hit cache and return security groups",
-			mocks: func(pager *mockNetworkSecurityGroupsListAllPager, mockCache *cache2.MockCache) {
+			mocks: func(pager *mockNetworkSecurityGroupsListAllPager, mockCache *cache.MockCache) {
 				mockCache.On("Get", "networkListAllSecurityGroups").Return(expectedResults).Times(1)
 			},
 			expected: expectedResults,
 		},
 		{
 			name: "should return remote error",
-			mocks: func(pager *mockNetworkSecurityGroupsListAllPager, mockCache *cache2.MockCache) {
+			mocks: func(pager *mockNetworkSecurityGroupsListAllPager, mockCache *cache.MockCache) {
 				pager.On("NextPage", context.Background()).Return(true).Times(1)
 				pager.On("NextPage", context.Background()).Return(false).Times(1)
 				pager.On("PageResponse").Return(armnetwork.NetworkSecurityGroupsListAllResponse{}).Times(1)
@@ -943,7 +943,7 @@ func Test_Network_ListAllSecurityGroups(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			fakePager := &mockNetworkSecurityGroupsListAllPager{}
 			fakeClient := &mockNetworkSecurityGroupsClient{}
-			mockCache := &cache2.MockCache{}
+			mockCache := &cache.MockCache{}
 
 			fakeClient.On("ListAll", (*armnetwork.NetworkSecurityGroupsListAllOptions)(nil)).Return(fakePager).Maybe()
 
@@ -988,13 +988,13 @@ func Test_Network_ListAllLoadBalancers(t *testing.T) {
 
 	testcases := []struct {
 		name     string
-		mocks    func(*mockLoadBalancersListAllPager, *cache2.MockCache)
+		mocks    func(*mockLoadBalancersListAllPager, *cache.MockCache)
 		expected []*armnetwork.LoadBalancer
 		wantErr  string
 	}{
 		{
 			name: "should return load balancers",
-			mocks: func(pager *mockLoadBalancersListAllPager, mockCache *cache2.MockCache) {
+			mocks: func(pager *mockLoadBalancersListAllPager, mockCache *cache.MockCache) {
 				pager.On("NextPage", context.Background()).Return(true).Times(1)
 				pager.On("NextPage", context.Background()).Return(false).Times(1)
 				pager.On("PageResponse").Return(armnetwork.LoadBalancersListAllResponse{
@@ -1014,7 +1014,7 @@ func Test_Network_ListAllLoadBalancers(t *testing.T) {
 		},
 		{
 			name: "should hit cache and return load balancers",
-			mocks: func(pager *mockLoadBalancersListAllPager, mockCache *cache2.MockCache) {
+			mocks: func(pager *mockLoadBalancersListAllPager, mockCache *cache.MockCache) {
 				mockCache.On("GetAndLock", "networkListAllLoadBalancers").Return(expectedResults).Times(1)
 				mockCache.On("Unlock", "networkListAllLoadBalancers").Return(nil).Times(1)
 			},
@@ -1022,7 +1022,7 @@ func Test_Network_ListAllLoadBalancers(t *testing.T) {
 		},
 		{
 			name: "should return remote error",
-			mocks: func(pager *mockLoadBalancersListAllPager, mockCache *cache2.MockCache) {
+			mocks: func(pager *mockLoadBalancersListAllPager, mockCache *cache.MockCache) {
 				pager.On("NextPage", context.Background()).Return(true).Times(1)
 				pager.On("NextPage", context.Background()).Return(false).Times(1)
 				pager.On("PageResponse").Return(armnetwork.LoadBalancersListAllResponse{}).Times(1)
@@ -1039,7 +1039,7 @@ func Test_Network_ListAllLoadBalancers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			fakePager := &mockLoadBalancersListAllPager{}
 			fakeClient := &mockLoadBalancersClient{}
-			mockCache := &cache2.MockCache{}
+			mockCache := &cache.MockCache{}
 
 			fakeClient.On("ListAll", (*armnetwork.LoadBalancersListAllOptions)(nil)).Return(fakePager).Maybe()
 
@@ -1085,7 +1085,7 @@ func Test_Network_ListLoadBalancerRules(t *testing.T) {
 	testcases := []struct {
 		name         string
 		loadBalancer *armnetwork.LoadBalancer
-		mocks        func(*mockLoadBalancerRulesClient, *mockLoadBalancerRulesListAllPager, *cache2.MockCache)
+		mocks        func(*mockLoadBalancerRulesClient, *mockLoadBalancerRulesListAllPager, *cache.MockCache)
 		expected     []*armnetwork.LoadBalancingRule
 		wantErr      string
 	}{
@@ -1094,7 +1094,7 @@ func Test_Network_ListLoadBalancerRules(t *testing.T) {
 			loadBalancer: &armnetwork.LoadBalancer{
 				Resource: armnetwork.Resource{ID: to.StringPtr("/subscriptions/xxx/resourceGroups/driftctl/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/frontendIPConfigurations/PublicIPAddress")},
 			},
-			mocks: func(client *mockLoadBalancerRulesClient, pager *mockLoadBalancerRulesListAllPager, mockCache *cache2.MockCache) {
+			mocks: func(client *mockLoadBalancerRulesClient, pager *mockLoadBalancerRulesListAllPager, mockCache *cache.MockCache) {
 				client.On("List", "driftctl", "PublicIPAddress", &armnetwork.LoadBalancerLoadBalancingRulesListOptions{}).Return(pager)
 
 				pager.On("NextPage", context.Background()).Return(true).Times(1)
@@ -1118,7 +1118,7 @@ func Test_Network_ListLoadBalancerRules(t *testing.T) {
 			loadBalancer: &armnetwork.LoadBalancer{
 				Resource: armnetwork.Resource{ID: to.StringPtr("lb-1")},
 			},
-			mocks: func(client *mockLoadBalancerRulesClient, pager *mockLoadBalancerRulesListAllPager, mockCache *cache2.MockCache) {
+			mocks: func(client *mockLoadBalancerRulesClient, pager *mockLoadBalancerRulesListAllPager, mockCache *cache.MockCache) {
 				mockCache.On("Get", "networkListLoadBalancerRules_lb-1").Return(expectedResults).Times(1)
 			},
 			expected: expectedResults,
@@ -1128,7 +1128,7 @@ func Test_Network_ListLoadBalancerRules(t *testing.T) {
 			loadBalancer: &armnetwork.LoadBalancer{
 				Resource: armnetwork.Resource{ID: to.StringPtr("/subscriptions/xxx/resourceGroups/driftctl/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/frontendIPConfigurations/PublicIPAddress")},
 			},
-			mocks: func(client *mockLoadBalancerRulesClient, pager *mockLoadBalancerRulesListAllPager, mockCache *cache2.MockCache) {
+			mocks: func(client *mockLoadBalancerRulesClient, pager *mockLoadBalancerRulesListAllPager, mockCache *cache.MockCache) {
 				client.On("List", "driftctl", "PublicIPAddress", &armnetwork.LoadBalancerLoadBalancingRulesListOptions{}).Return(pager)
 
 				pager.On("NextPage", context.Background()).Return(true).Times(1)
@@ -1146,7 +1146,7 @@ func Test_Network_ListLoadBalancerRules(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			fakePager := &mockLoadBalancerRulesListAllPager{}
 			fakeClient := &mockLoadBalancerRulesClient{}
-			mockCache := &cache2.MockCache{}
+			mockCache := &cache.MockCache{}
 
 			tt.mocks(fakeClient, fakePager, mockCache)
 

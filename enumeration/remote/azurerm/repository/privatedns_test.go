@@ -1,13 +1,13 @@
 package repository
 
 import (
-	cache2 "github.com/snyk/driftctl/enumeration/remote/cache"
 	"reflect"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/privatedns/armprivatedns"
 	"github.com/pkg/errors"
+	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -99,7 +99,7 @@ func Test_ListAllPrivateZones_MultiplesResults(t *testing.T) {
 
 	fakeClient.On("List", mock.Anything).Return(mockPager)
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "privateDNSListAllPrivateZones").Return(nil).Times(1)
 	c.On("Unlock", "privateDNSListAllPrivateZones").Times(1)
 	c.On("Put", "privateDNSListAllPrivateZones", expected).Return(true).Times(1)
@@ -136,7 +136,7 @@ func Test_ListAllPrivateZones_MultiplesResults_WithCache(t *testing.T) {
 
 	fakeClient := &mockPrivateZonesClient{}
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "privateDNSListAllPrivateZones").Return(expected).Times(1)
 	c.On("Unlock", "privateDNSListAllPrivateZones").Times(1)
 
@@ -173,7 +173,7 @@ func Test_ListAllPrivateZones_Error(t *testing.T) {
 
 	s := &privateDNSRepository{
 		zoneClient: fakeClient,
-		cache:      cache2.New(0),
+		cache:      cache.New(0),
 	}
 	got, err := s.ListAllPrivateZones()
 
@@ -281,7 +281,7 @@ func Test_ListAllARecords_MultiplesResults(t *testing.T) {
 
 	fakeRecordSetClient.On("List", "rgid", "zone", (*armprivatedns.RecordSetsListOptions)(nil)).Return(mockPager)
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(nil).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return().Times(1)
 	c.On("Put", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com", mock.Anything).Return(true).Times(1)
@@ -330,7 +330,7 @@ func Test_ListAllARecords_MultiplesResults_WithCache(t *testing.T) {
 
 	fakeRecordSetClient := &mockPrivateRecordSetClient{}
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(expected).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Times(1)
 	s := &privateDNSRepository{
@@ -373,7 +373,7 @@ func Test_ListAllARecords_Error(t *testing.T) {
 
 	s := &privateDNSRepository{
 		recordClient: fakeClient,
-		cache:        cache2.New(0),
+		cache:        cache.New(0),
 	}
 	got, err := s.ListAllARecords(&armprivatedns.PrivateZone{
 		TrackedResource: armprivatedns.TrackedResource{
@@ -488,7 +488,7 @@ func Test_ListAllAAAARecords_MultiplesResults(t *testing.T) {
 
 	fakeRecordSetClient.On("List", "rgid", "zone", (*armprivatedns.RecordSetsListOptions)(nil)).Return(mockPager)
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(nil).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return().Times(1)
 	c.On("Put", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com", mock.Anything).Return(true).Times(1)
@@ -537,7 +537,7 @@ func Test_ListAllAAAARecords_MultiplesResults_WithCache(t *testing.T) {
 
 	fakeRecordSetClient := &mockPrivateRecordSetClient{}
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(expected).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Times(1)
 	s := &privateDNSRepository{
@@ -580,7 +580,7 @@ func Test_ListAllAAAARecords_Error(t *testing.T) {
 
 	s := &privateDNSRepository{
 		recordClient: fakeClient,
-		cache:        cache2.New(0),
+		cache:        cache.New(0),
 	}
 	got, err := s.ListAllAAAARecords(&armprivatedns.PrivateZone{
 		TrackedResource: armprivatedns.TrackedResource{
@@ -695,7 +695,7 @@ func Test_ListAllCNAMERecords_MultiplesResults(t *testing.T) {
 
 	fakeRecordSetClient.On("List", "rgid", "zone", (*armprivatedns.RecordSetsListOptions)(nil)).Return(mockPager)
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(nil).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return().Times(1)
 	c.On("Put", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com", mock.Anything).Return(true).Times(1)
@@ -744,7 +744,7 @@ func Test_ListAllCNAMERecords_MultiplesResults_WithCache(t *testing.T) {
 
 	fakeRecordSetClient := &mockPrivateRecordSetClient{}
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(expected).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return().Times(1)
@@ -789,7 +789,7 @@ func Test_ListAllCNAMERecords_Error(t *testing.T) {
 
 	s := &privateDNSRepository{
 		recordClient: fakeClient,
-		cache:        cache2.New(0),
+		cache:        cache.New(0),
 	}
 	got, err := s.ListAllCNAMERecords(&armprivatedns.PrivateZone{
 		TrackedResource: armprivatedns.TrackedResource{
@@ -904,7 +904,7 @@ func Test_ListAllPTRRecords_MultiplesResults(t *testing.T) {
 
 	fakeRecordSetClient.On("List", "rgid", "zone", (*armprivatedns.RecordSetsListOptions)(nil)).Return(mockPager)
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(nil).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return().Times(1)
 	c.On("Put", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com", mock.Anything).Return(true).Times(1)
@@ -953,7 +953,7 @@ func Test_ListAllPTRRecords_MultiplesResults_WithCache(t *testing.T) {
 
 	fakeRecordSetClient := &mockPrivateRecordSetClient{}
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(expected).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Times(1)
 	s := &privateDNSRepository{
@@ -996,7 +996,7 @@ func Test_ListAllPTRRecords_Error(t *testing.T) {
 
 	s := &privateDNSRepository{
 		recordClient: fakeClient,
-		cache:        cache2.New(0),
+		cache:        cache.New(0),
 	}
 	got, err := s.ListAllPTRRecords(&armprivatedns.PrivateZone{
 		TrackedResource: armprivatedns.TrackedResource{
@@ -1110,7 +1110,7 @@ func Test_ListAllMXRecords_MultiplesResults(t *testing.T) {
 
 	fakeRecordSetClient.On("List", "rgid", "zone", (*armprivatedns.RecordSetsListOptions)(nil)).Return(mockPager)
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(nil).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return().Times(1)
 	c.On("Put", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com", mock.Anything).Return(true).Times(1)
@@ -1158,7 +1158,7 @@ func Test_ListAllMXRecords_MultiplesResults_WithCache(t *testing.T) {
 
 	fakeRecordSetClient := &mockPrivateRecordSetClient{}
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(expected).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Times(1)
 	s := &privateDNSRepository{
@@ -1203,7 +1203,7 @@ func Test_ListAllMXRecords_Error(t *testing.T) {
 
 	s := &privateDNSRepository{
 		recordClient: fakeClient,
-		cache:        cache2.New(0),
+		cache:        cache.New(0),
 	}
 
 	got, err := s.ListAllMXRecords(&armprivatedns.PrivateZone{
@@ -1319,7 +1319,7 @@ func Test_ListAllSRVRecords_MultiplesResults(t *testing.T) {
 
 	fakeRecordSetClient.On("List", "rgid", "zone", (*armprivatedns.RecordSetsListOptions)(nil)).Return(mockPager)
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(nil).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return().Times(1)
 	c.On("Put", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com", mock.Anything).Return(true).Times(1)
@@ -1368,7 +1368,7 @@ func Test_ListAllSRVRecords_MultiplesResults_WithCache(t *testing.T) {
 
 	fakeRecordSetClient := &mockPrivateRecordSetClient{}
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(expected).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Times(1)
 	s := &privateDNSRepository{
@@ -1411,7 +1411,7 @@ func Test_ListAllSRVRecords_Error(t *testing.T) {
 
 	s := &privateDNSRepository{
 		recordClient: fakeClient,
-		cache:        cache2.New(0),
+		cache:        cache.New(0),
 	}
 	got, err := s.ListAllSRVRecords(&armprivatedns.PrivateZone{
 		TrackedResource: armprivatedns.TrackedResource{
@@ -1526,7 +1526,7 @@ func Test_ListAllTXTRecords_MultiplesResults(t *testing.T) {
 
 	fakeRecordSetClient.On("List", "rgid", "zone", (*armprivatedns.RecordSetsListOptions)(nil)).Return(mockPager)
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(nil).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return().Times(1)
 	c.On("Put", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com", mock.Anything).Return(true).Times(1)
@@ -1575,7 +1575,7 @@ func Test_ListAllTXTRecords_MultiplesResults_WithCache(t *testing.T) {
 
 	fakeRecordSetClient := &mockPrivateRecordSetClient{}
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Return(expected).Times(1)
 	c.On("Unlock", "privateDNSlistAllRecords-/subscriptions/subid/resourceGroups/rgid/providers/Microsoft.Network/privateDnsZones/zone.com").Times(1)
 	s := &privateDNSRepository{
@@ -1618,7 +1618,7 @@ func Test_ListAllTXTRecords_Error(t *testing.T) {
 
 	s := &privateDNSRepository{
 		recordClient: fakeClient,
-		cache:        cache2.New(0),
+		cache:        cache.New(0),
 	}
 	got, err := s.ListAllTXTRecords(&armprivatedns.PrivateZone{
 		TrackedResource: armprivatedns.TrackedResource{

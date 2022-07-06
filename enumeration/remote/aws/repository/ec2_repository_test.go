@@ -1,11 +1,11 @@
 package repository
 
 import (
-	cache2 "github.com/snyk/driftctl/enumeration/remote/cache"
 	"strings"
 	"testing"
 
 	"github.com/pkg/errors"
+	"github.com/snyk/driftctl/enumeration/remote/cache"
 	awstest "github.com/snyk/driftctl/test/aws"
 	"github.com/stretchr/testify/mock"
 
@@ -52,7 +52,7 @@ func Test_ec2Repository_ListAllImages(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(1)
+			store := cache.New(1)
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
@@ -131,7 +131,7 @@ func Test_ec2Repository_ListAllSnapshots(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(1)
+			store := cache.New(1)
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
@@ -206,7 +206,7 @@ func Test_ec2Repository_ListAllVolumes(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(1)
+			store := cache.New(1)
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
@@ -266,7 +266,7 @@ func Test_ec2Repository_ListAllAddresses(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(1)
+			store := cache.New(1)
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
@@ -326,7 +326,7 @@ func Test_ec2Repository_ListAllAddressesAssociation(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(1)
+			store := cache.New(1)
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
@@ -438,7 +438,7 @@ func Test_ec2Repository_ListAllInstances(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(1)
+			store := cache.New(1)
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
@@ -497,7 +497,7 @@ func Test_ec2Repository_ListAllKeyPairs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(1)
+			store := cache.New(1)
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
@@ -581,7 +581,7 @@ func Test_ec2Repository_ListAllInternetGateways(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(1)
+			store := cache.New(1)
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
@@ -692,7 +692,7 @@ func Test_ec2Repository_ListAllSubnets(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(2)
+			store := cache.New(2)
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
@@ -786,7 +786,7 @@ func Test_ec2Repository_ListAllNatGateways(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(1)
+			store := cache.New(1)
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
@@ -978,7 +978,7 @@ func Test_ec2Repository_ListAllRouteTables(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(1)
+			store := cache.New(1)
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
@@ -1071,7 +1071,7 @@ func Test_ec2Repository_ListAllVPCs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(2)
+			store := cache.New(2)
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
@@ -1156,7 +1156,7 @@ func Test_ec2Repository_ListAllSecurityGroups(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(2)
+			store := cache.New(2)
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
@@ -1247,7 +1247,7 @@ func Test_ec2Repository_ListAllNetworkACLs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(2)
+			store := cache.New(2)
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
@@ -1325,7 +1325,7 @@ func Test_ec2Repository_DescribeLaunchTemplates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(1)
+			store := cache.New(1)
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client)
 			r := &ec2Repository{
@@ -1362,13 +1362,13 @@ func Test_ec2Repository_IsEbsEncryptionEnabledByDefault(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		mocks   func(client *awstest.MockFakeEC2, store *cache2.MockCache)
+		mocks   func(client *awstest.MockFakeEC2, store *cache.MockCache)
 		want    bool
 		wantErr error
 	}{
 		{
 			name: "test that encryption enabled by default",
-			mocks: func(client *awstest.MockFakeEC2, store *cache2.MockCache) {
+			mocks: func(client *awstest.MockFakeEC2, store *cache.MockCache) {
 				store.On("Get", "ec2IsEbsEncryptionEnabledByDefault").
 					Return(nil).
 					Once()
@@ -1387,7 +1387,7 @@ func Test_ec2Repository_IsEbsEncryptionEnabledByDefault(t *testing.T) {
 		},
 		{
 			name: "test that encryption enabled by default (cached)",
-			mocks: func(client *awstest.MockFakeEC2, store *cache2.MockCache) {
+			mocks: func(client *awstest.MockFakeEC2, store *cache.MockCache) {
 				store.On("Get", "ec2IsEbsEncryptionEnabledByDefault").
 					Return(false).
 					Once()
@@ -1396,7 +1396,7 @@ func Test_ec2Repository_IsEbsEncryptionEnabledByDefault(t *testing.T) {
 		},
 		{
 			name: "error while getting default encryption value",
-			mocks: func(client *awstest.MockFakeEC2, store *cache2.MockCache) {
+			mocks: func(client *awstest.MockFakeEC2, store *cache.MockCache) {
 				store.On("Get", "ec2IsEbsEncryptionEnabledByDefault").
 					Return(nil).
 					Once()
@@ -1410,7 +1410,7 @@ func Test_ec2Repository_IsEbsEncryptionEnabledByDefault(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := &cache2.MockCache{}
+			store := &cache.MockCache{}
 			client := &awstest.MockFakeEC2{}
 			tt.mocks(client, store)
 			r := &ec2Repository{

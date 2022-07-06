@@ -1,13 +1,13 @@
 package repository
 
 import (
-	cache2 "github.com/snyk/driftctl/enumeration/remote/cache"
 	"strings"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/r3labs/diff/v2"
+	"github.com/snyk/driftctl/enumeration/remote/cache"
 	awstest "github.com/snyk/driftctl/test/aws"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -55,7 +55,7 @@ func Test_rdsRepository_ListAllDBInstances(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(1)
+			store := cache.New(1)
 			client := &awstest.MockFakeRDS{}
 			tt.mocks(client)
 			r := &rdsRepository{
@@ -127,7 +127,7 @@ func Test_rdsRepository_ListAllDBSubnetGroups(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := cache2.New(1)
+			store := cache.New(1)
 			client := &awstest.MockFakeRDS{}
 			tt.mocks(client)
 			r := &rdsRepository{
@@ -160,13 +160,13 @@ func Test_rdsRepository_ListAllDBSubnetGroups(t *testing.T) {
 func Test_rdsRepository_ListAllDBClusters(t *testing.T) {
 	tests := []struct {
 		name    string
-		mocks   func(*awstest.MockFakeRDS, *cache2.MockCache)
+		mocks   func(*awstest.MockFakeRDS, *cache.MockCache)
 		want    []*rds.DBCluster
 		wantErr error
 	}{
 		{
 			name: "should list with 2 pages",
-			mocks: func(client *awstest.MockFakeRDS, store *cache2.MockCache) {
+			mocks: func(client *awstest.MockFakeRDS, store *cache.MockCache) {
 				clusters := []*rds.DBCluster{
 					{DBClusterIdentifier: aws.String("1")},
 					{DBClusterIdentifier: aws.String("2")},
@@ -198,7 +198,7 @@ func Test_rdsRepository_ListAllDBClusters(t *testing.T) {
 		},
 		{
 			name: "should hit cache",
-			mocks: func(client *awstest.MockFakeRDS, store *cache2.MockCache) {
+			mocks: func(client *awstest.MockFakeRDS, store *cache.MockCache) {
 				clusters := []*rds.DBCluster{
 					{DBClusterIdentifier: aws.String("1")},
 					{DBClusterIdentifier: aws.String("2")},
@@ -222,7 +222,7 @@ func Test_rdsRepository_ListAllDBClusters(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			store := &cache2.MockCache{}
+			store := &cache.MockCache{}
 			client := &awstest.MockFakeRDS{}
 			tt.mocks(client, store)
 			r := &rdsRepository{

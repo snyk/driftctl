@@ -1,13 +1,13 @@
 package repository
 
 import (
-	cache2 "github.com/snyk/driftctl/enumeration/remote/cache"
 	"reflect"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
 	"github.com/pkg/errors"
+	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -98,7 +98,7 @@ func Test_ListAllStorageAccount_MultiplesResults(t *testing.T) {
 
 	fakeClient.On("List", mock.Anything).Return(mockPager)
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "ListAllStorageAccount").Return(nil).Times(1)
 	c.On("Unlock", "ListAllStorageAccount").Times(1)
 	c.On("Put", "ListAllStorageAccount", expected).Return(true).Times(1)
@@ -135,7 +135,7 @@ func Test_ListAllStorageAccount_MultiplesResults_WithCache(t *testing.T) {
 
 	fakeClient := &mockStorageAccountClient{}
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("GetAndLock", "ListAllStorageAccount").Return(expected).Times(1)
 	c.On("Unlock", "ListAllStorageAccount").Times(1)
 	s := &storageRepository{
@@ -171,7 +171,7 @@ func Test_ListAllStorageAccount_Error(t *testing.T) {
 
 	s := &storageRepository{
 		storageAccountsClient: fakeClient,
-		cache:                 cache2.New(0),
+		cache:                 cache.New(0),
 	}
 	got, err := s.ListAllStorageAccount()
 
@@ -258,7 +258,7 @@ func Test_ListAllStorageContainer_MultiplesResults(t *testing.T) {
 
 	fakeClient.On("List", "foobar", "testeliedriftctl", (*armstorage.BlobContainersListOptions)(nil)).Return(mockPager)
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("Get", "ListAllStorageContainer_testeliedriftctl").Return(nil).Times(1)
 	c.On("Put", "ListAllStorageContainer_testeliedriftctl", expected).Return(true).Times(1)
 	s := &storageRepository{
@@ -295,7 +295,7 @@ func Test_ListAllStorageContainer_MultiplesResults_WithCache(t *testing.T) {
 
 	fakeClient := &mockBlobContainerClient{}
 
-	c := &cache2.MockCache{}
+	c := &cache.MockCache{}
 	c.On("Get", "ListAllStorageContainer_testeliedriftctl").Return(expected).Times(1)
 	s := &storageRepository{
 		blobContainerClient: fakeClient,
@@ -328,7 +328,7 @@ func Test_ListAllStorageContainer_InvalidStorageAccountResourceID(t *testing.T) 
 
 	s := &storageRepository{
 		blobContainerClient: fakeClient,
-		cache:               cache2.New(0),
+		cache:               cache.New(0),
 	}
 	got, err := s.ListAllStorageContainer(&account)
 
@@ -361,7 +361,7 @@ func Test_ListAllStorageContainer_Error(t *testing.T) {
 
 	s := &storageRepository{
 		blobContainerClient: fakeClient,
-		cache:               cache2.New(0),
+		cache:               cache.New(0),
 	}
 	got, err := s.ListAllStorageContainer(&account)
 
