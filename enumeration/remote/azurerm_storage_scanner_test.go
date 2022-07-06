@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/snyk/driftctl/enumeration"
-	azurerm2 "github.com/snyk/driftctl/enumeration/remote/azurerm"
+	"github.com/snyk/driftctl/enumeration/remote/azurerm"
 	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	error2 "github.com/snyk/driftctl/enumeration/remote/error"
@@ -97,7 +97,7 @@ func TestAzurermStorageAccount(t *testing.T) {
 
 			var repo repository.StorageRespository = fakeRepo
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermStorageAccountEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermStorageAccountEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -242,7 +242,7 @@ func TestAzurermStorageContainer(t *testing.T) {
 
 			var repo repository.StorageRespository = fakeRepo
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermStorageContainerEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermStorageContainerEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

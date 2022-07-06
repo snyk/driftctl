@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/snyk/driftctl/enumeration"
-	azurerm2 "github.com/snyk/driftctl/enumeration/remote/azurerm"
+	"github.com/snyk/driftctl/enumeration/remote/azurerm"
 	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
@@ -100,7 +100,7 @@ func TestAzurermPostgresqlServer(t *testing.T) {
 
 			var repo repository.PostgresqlRespository = fakeRepo
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPostgresqlServerEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermPostgresqlServerEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -226,7 +226,7 @@ func TestAzurermPostgresqlDatabase(t *testing.T) {
 
 			var repo repository.PostgresqlRespository = fakeRepo
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPostgresqlDatabaseEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermPostgresqlDatabaseEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)

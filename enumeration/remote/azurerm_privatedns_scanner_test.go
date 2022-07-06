@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/snyk/driftctl/enumeration"
-	azurerm2 "github.com/snyk/driftctl/enumeration/remote/azurerm"
+	"github.com/snyk/driftctl/enumeration/remote/azurerm"
 	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
@@ -130,7 +130,7 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSZoneEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSZoneEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSZoneResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSZoneResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -284,7 +284,7 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSARecordEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSARecordEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSARecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSARecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -439,7 +439,7 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSAAAARecordEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSAAAARecordEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSAAAARecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSAAAARecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -582,7 +582,7 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSCNameRecordEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSCNameRecordEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSCNameRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSCNameRecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -736,7 +736,7 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSPTRRecordEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSPTRRecordEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSPTRRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSPTRRecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -891,7 +891,7 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSMXRecordEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSMXRecordEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSMXRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSMXRecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -1045,7 +1045,7 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSSRVRecordEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSSRVRecordEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSSRVRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSSRVRecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -1199,7 +1199,7 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 				repo = repository.NewPrivateDNSRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPrivateDNSTXTRecordEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSTXTRecordEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSTXTRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSTXTRecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}

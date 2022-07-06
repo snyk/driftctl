@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/snyk/driftctl/enumeration"
-	azurerm2 "github.com/snyk/driftctl/enumeration/remote/azurerm"
+	"github.com/snyk/driftctl/enumeration/remote/azurerm"
 	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
@@ -105,7 +105,7 @@ func TestAzurermCompute_Image(t *testing.T) {
 			fakeRepo := &repository.MockComputeRepository{}
 			c.mocks(fakeRepo, alerter)
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermImageEnumerator(fakeRepo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermImageEnumerator(fakeRepo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -214,7 +214,7 @@ func TestAzurermCompute_SSHPublicKey(t *testing.T) {
 				repo = repository.NewComputeRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermSSHPublicKeyEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermSSHPublicKeyEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceazure.AzureSSHPublicKeyResourceType, common.NewGenericDetailsFetcher(resourceazure.AzureSSHPublicKeyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/snyk/driftctl/enumeration"
-	azurerm2 "github.com/snyk/driftctl/enumeration/remote/azurerm"
+	"github.com/snyk/driftctl/enumeration/remote/azurerm"
 	"github.com/snyk/driftctl/enumeration/remote/azurerm/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
@@ -102,7 +102,7 @@ func TestAzurermVirtualNetwork(t *testing.T) {
 
 			var repo repository.NetworkRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermVirtualNetworkEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermVirtualNetworkEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -195,7 +195,7 @@ func TestAzurermRouteTables(t *testing.T) {
 
 			var repo repository.NetworkRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermRouteTableEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermRouteTableEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -344,7 +344,7 @@ func TestAzurermRoutes(t *testing.T) {
 
 			var repo repository.NetworkRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermRouteEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermRouteEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -477,7 +477,7 @@ func TestAzurermSubnets(t *testing.T) {
 
 			var repo repository.NetworkRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermSubnetEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermSubnetEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -570,7 +570,7 @@ func TestAzurermFirewalls(t *testing.T) {
 
 			var repo repository.NetworkRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermFirewallsEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermFirewallsEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -663,7 +663,7 @@ func TestAzurermPublicIP(t *testing.T) {
 
 			var repo repository.NetworkRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermPublicIPEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermPublicIPEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -772,7 +772,7 @@ func TestAzurermSecurityGroups(t *testing.T) {
 				repo = repository.NewNetworkRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermNetworkSecurityGroupEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermNetworkSecurityGroupEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceazure.AzureNetworkSecurityGroupResourceType, common.NewGenericDetailsFetcher(resourceazure.AzureNetworkSecurityGroupResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
@@ -866,7 +866,7 @@ func TestAzurermLoadBalancers(t *testing.T) {
 
 			var repo repository.NetworkRepository = fakeRepo
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermLoadBalancerEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermLoadBalancerEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -993,7 +993,7 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 				repo = repository.NewNetworkRepository(cred, clientOptions, realProvider.GetConfig(), cache.New(0))
 			}
 
-			remoteLibrary.AddEnumerator(azurerm2.NewAzurermLoadBalancerRuleEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(azurerm.NewAzurermLoadBalancerRuleEnumerator(repo, factory))
 			remoteLibrary.AddDetailsFetcher(resourceazure.AzureLoadBalancerRuleResourceType, common.NewGenericDetailsFetcher(resourceazure.AzureLoadBalancerRuleResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
