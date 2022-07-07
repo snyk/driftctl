@@ -4,7 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/snyk/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/enumeration/terraform"
+
 	"github.com/snyk/driftctl/test/schemas"
 )
 

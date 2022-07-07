@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 // AwsALBTransformer is a simple middleware to turn all aws_alb resources into aws_lb ones

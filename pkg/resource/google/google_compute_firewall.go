@@ -1,18 +1,12 @@
 package google
 
-import "github.com/snyk/driftctl/pkg/resource"
-
-const GoogleComputeFirewallResourceType = "google_compute_firewall"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/google"
+)
 
 func initGoogleComputeFirewallMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetResolveReadAttributesFunc(GoogleComputeFirewallResourceType, func(res *resource.Resource) map[string]string {
-		return map[string]string{
-			"name":    *res.Attrs.GetString("name"),
-			"project": *res.Attrs.GetString("project"),
-		}
-	})
-	resourceSchemaRepository.SetNormalizeFunc(GoogleComputeFirewallResourceType, func(res *resource.Resource) {
+	resourceSchemaRepository.SetNormalizeFunc(google.GoogleComputeFirewallResourceType, func(res *resource.Resource) {
 		res.Attrs.SafeDelete([]string{"timeouts"})
 	})
-	resourceSchemaRepository.SetFlags(GoogleComputeFirewallResourceType, resource.FlagDeepMode)
 }

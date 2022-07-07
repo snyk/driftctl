@@ -16,27 +16,28 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/snyk/driftctl/build"
+	"github.com/snyk/driftctl/enumeration/alerter"
+	"github.com/snyk/driftctl/enumeration/remote"
+	"github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/terraform"
+	"github.com/snyk/driftctl/enumeration/terraform/lock"
 	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/snyk/driftctl/pkg/iac/config"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state"
 	"github.com/snyk/driftctl/pkg/memstore"
-	"github.com/snyk/driftctl/pkg/remote/common"
 	"github.com/snyk/driftctl/pkg/telemetry"
 	"github.com/snyk/driftctl/pkg/terraform/hcl"
-	"github.com/snyk/driftctl/pkg/terraform/lock"
 	"github.com/spf13/cobra"
 
+	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg"
-	"github.com/snyk/driftctl/pkg/alerter"
 	cmderrors "github.com/snyk/driftctl/pkg/cmd/errors"
 	"github.com/snyk/driftctl/pkg/cmd/scan/output"
 	"github.com/snyk/driftctl/pkg/filter"
 	"github.com/snyk/driftctl/pkg/iac/supplier"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend"
 	globaloutput "github.com/snyk/driftctl/pkg/output"
-	"github.com/snyk/driftctl/pkg/remote"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/terraform"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
 func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
@@ -295,6 +296,10 @@ func scanRun(opts *pkg.ScanOptions) error {
 		return err
 	}
 
+	err = dctlresource.InitMetadatas(opts.To, resourceSchemaRepository)
+	if err != nil {
+		return err
+	}
 	// Teardown
 	defer func() {
 		logrus.Trace("Exiting scan cmd")

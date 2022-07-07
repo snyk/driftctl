@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/google"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/google"
 )
 
 type GoogleComputeInstanceGroupManagerReconciler struct{}

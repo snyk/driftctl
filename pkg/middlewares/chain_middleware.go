@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/sirupsen/logrus"
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
 )
 
 type Chain []Middleware

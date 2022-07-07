@@ -1,20 +1,12 @@
 package aws
 
 import (
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
-const AwsLambdaFunctionResourceType = "aws_lambda_function"
-
 func initAwsLambdaFunctionMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-
-	resourceSchemaRepository.SetResolveReadAttributesFunc(AwsLambdaFunctionResourceType, func(res *resource.Resource) map[string]string {
-		return map[string]string{
-			"function_name": res.ResourceId(),
-		}
-	})
-
-	resourceSchemaRepository.SetNormalizeFunc(AwsLambdaFunctionResourceType, func(res *resource.Resource) {
+	resourceSchemaRepository.SetNormalizeFunc(aws.AwsLambdaFunctionResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 		val.SafeDelete([]string{"publish"})
@@ -27,5 +19,4 @@ func initAwsLambdaFunctionMetaData(resourceSchemaRepository resource.SchemaRepos
 		val.DeleteIfDefault("signing_profile_version_arn")
 		val.SafeDelete([]string{"source_code_size"})
 	})
-	resourceSchemaRepository.SetFlags(AwsLambdaFunctionResourceType, resource.FlagDeepMode)
 }

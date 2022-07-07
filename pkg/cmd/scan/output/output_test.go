@@ -6,16 +6,17 @@ import (
 	"testing"
 	"time"
 
+	"github.com/snyk/driftctl/enumeration/alerter"
+	"github.com/snyk/driftctl/enumeration/remote/alerts"
+	"github.com/snyk/driftctl/enumeration/remote/common"
+	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
+
 	"github.com/pkg/errors"
 	"github.com/r3labs/diff/v2"
-	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/snyk/driftctl/pkg/output"
-	"github.com/snyk/driftctl/pkg/remote/alerts"
-	"github.com/snyk/driftctl/pkg/remote/common"
-	remoteerr "github.com/snyk/driftctl/pkg/remote/error"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 func fakeAnalysis(opts analyser.AnalyzerOptions) *analyser.Analysis {

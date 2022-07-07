@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 // Each API Gateway rest API has by design all the gateway responses available to edit in the console

@@ -1,17 +1,15 @@
 package aws
 
 import (
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
-const AwsDefaultSecurityGroupResourceType = "aws_default_security_group"
-
 func initAwsDefaultSecurityGroupMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsDefaultSecurityGroupResourceType, func(res *resource.Resource) {
+	resourceSchemaRepository.SetNormalizeFunc(aws.AwsDefaultSecurityGroupResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"revoke_rules_on_delete"})
 		val.SafeDelete([]string{"ingress"})
 		val.SafeDelete([]string{"egress"})
 	})
-	resourceSchemaRepository.SetFlags(AwsDefaultSecurityGroupResourceType, resource.FlagDeepMode)
 }

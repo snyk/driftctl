@@ -3,9 +3,9 @@ package middlewares
 import (
 	"testing"
 
-	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
 )
 
 func TestAwsDefaultVPCShouldBeIgnored(t *testing.T) {

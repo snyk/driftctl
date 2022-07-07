@@ -1,21 +1,13 @@
 package aws
 
 import (
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
-const AwsDynamodbTableResourceType = "aws_dynamodb_table"
-
 func initAwsDynamodbTableMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetResolveReadAttributesFunc(AwsDynamodbTableResourceType, func(res *resource.Resource) map[string]string {
-		return map[string]string{
-			"table_name": res.ResourceId(),
-		}
-	})
-	resourceSchemaRepository.SetNormalizeFunc(AwsDynamodbTableResourceType, func(res *resource.Resource) {
+	resourceSchemaRepository.SetNormalizeFunc(aws.AwsDynamodbTableResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 	})
-	resourceSchemaRepository.SetFlags(AwsDynamodbTableResourceType, resource.FlagDeepMode)
-
 }

@@ -2,7 +2,7 @@ package resource
 
 import (
 	"github.com/hashicorp/terraform/providers"
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/test/schemas"
 )
 

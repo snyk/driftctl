@@ -1,16 +1,15 @@
 package middlewares
 
 import (
+	"github.com/snyk/driftctl/enumeration/terraform"
 	"strings"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
-	"github.com/snyk/driftctl/pkg/terraform"
-
 	"github.com/r3labs/diff/v2"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 func TestAwsBucketPolicyExpander_Execute(t *testing.T) {

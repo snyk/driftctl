@@ -3,8 +3,8 @@ package middlewares
 import (
 	"testing"
 
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 func TestDefaultVPCSecurityGroupShouldBeIgnored(t *testing.T) {

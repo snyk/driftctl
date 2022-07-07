@@ -2,10 +2,10 @@ package middlewares
 
 import (
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/enumeration/alerter"
 
-	"github.com/snyk/driftctl/pkg/alerter"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 // Explodes routes found in aws_default_route_table.route and aws_route_table.route to dedicated resources

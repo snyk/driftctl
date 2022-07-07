@@ -6,8 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/google"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/google"
 )
 
 func TestGoogleComputeInstanceGroupManagerExpander_Execute(t *testing.T) {

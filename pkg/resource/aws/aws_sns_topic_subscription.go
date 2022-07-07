@@ -1,29 +1,13 @@
 package aws
 
 import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/pkg/helpers"
-	"github.com/snyk/driftctl/pkg/resource"
 )
 
-const AwsSnsTopicSubscriptionResourceType = "aws_sns_topic_subscription"
-
 func initSnsTopicSubscriptionMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetResolveReadAttributesFunc(AwsSnsTopicSubscriptionResourceType, func(res *resource.Resource) map[string]string {
-		return map[string]string{
-			"SubscriptionId": res.ResourceId(),
-		}
-	})
-
-	resourceSchemaRepository.UpdateSchema(AwsSnsTopicSubscriptionResourceType, map[string]func(attributeSchema *resource.AttributeSchema){
-		"delivery_policy": func(attributeSchema *resource.AttributeSchema) {
-			attributeSchema.JsonString = true
-		},
-		"filter_policy": func(attributeSchema *resource.AttributeSchema) {
-			attributeSchema.JsonString = true
-		},
-	})
-
-	resourceSchemaRepository.SetNormalizeFunc(AwsSnsTopicSubscriptionResourceType, func(res *resource.Resource) {
+	resourceSchemaRepository.SetNormalizeFunc(aws.AwsSnsTopicSubscriptionResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		jsonString, err := helpers.NormalizeJsonString((*val)["delivery_policy"])
 		if err == nil {
@@ -42,5 +26,4 @@ func initSnsTopicSubscriptionMetaData(resourceSchemaRepository resource.SchemaRe
 			val.SafeDelete([]string{"confirmation_timeout_in_minutes"})
 		}
 	})
-	resourceSchemaRepository.SetFlags(AwsSnsTopicSubscriptionResourceType, resource.FlagDeepMode)
 }

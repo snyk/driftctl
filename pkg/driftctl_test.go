@@ -1,20 +1,22 @@
 package pkg_test
 
 import (
+	"github.com/snyk/driftctl/enumeration/terraform"
+	resource2 "github.com/snyk/driftctl/pkg/resource"
+
 	"reflect"
 	"testing"
 
 	"github.com/r3labs/diff/v2"
+	"github.com/snyk/driftctl/enumeration/alerter"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource/github"
 	"github.com/snyk/driftctl/pkg"
-	"github.com/snyk/driftctl/pkg/alerter"
 	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/snyk/driftctl/pkg/filter"
 	"github.com/snyk/driftctl/pkg/memstore"
 	"github.com/snyk/driftctl/pkg/output"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
-	"github.com/snyk/driftctl/pkg/resource/github"
-	"github.com/snyk/driftctl/pkg/terraform"
 	"github.com/snyk/driftctl/test"
 	testresource "github.com/snyk/driftctl/test/resource"
 	"github.com/stretchr/testify/assert"
@@ -62,7 +64,7 @@ func runTest(t *testing.T, cases TestCases) {
 				res.Sch = schema
 			}
 
-			stateSupplier := &resource.MockIaCSupplier{}
+			stateSupplier := &resource2.MockIaCSupplier{}
 			stateSupplier.On("Resources").Return(c.stateResources, nil)
 			stateSupplier.On("SourceCount").Return(uint(2))
 

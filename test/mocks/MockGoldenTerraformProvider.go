@@ -4,23 +4,23 @@ import (
 	gojson "encoding/json"
 	"errors"
 	"fmt"
+	terraform2 "github.com/snyk/driftctl/enumeration/terraform"
 	"sort"
 
 	"github.com/snyk/driftctl/test/goldenfile"
 
 	"github.com/hashicorp/terraform/providers"
-	"github.com/snyk/driftctl/pkg/terraform"
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 )
 
 type MockedGoldenTFProvider struct {
 	name         string
-	realProvider terraform.TerraformProvider
+	realProvider terraform2.TerraformProvider
 	update       bool
 }
 
-func NewMockedGoldenTFProvider(name string, realProvider terraform.TerraformProvider, update bool) *MockedGoldenTFProvider {
+func NewMockedGoldenTFProvider(name string, realProvider terraform2.TerraformProvider, update bool) *MockedGoldenTFProvider {
 	return &MockedGoldenTFProvider{name: name, realProvider: realProvider, update: update}
 }
 
@@ -33,7 +33,7 @@ func (m *MockedGoldenTFProvider) Schema() map[string]providers.Schema {
 	return m.readSchema()
 }
 
-func (m *MockedGoldenTFProvider) ReadResource(args terraform.ReadResourceArgs) (*cty.Value, error) {
+func (m *MockedGoldenTFProvider) ReadResource(args terraform2.ReadResourceArgs) (*cty.Value, error) {
 	if m.update {
 		readResource, err := m.realProvider.ReadResource(args)
 		m.writeReadResource(args, readResource, err)
@@ -60,7 +60,7 @@ func (m *MockedGoldenTFProvider) readSchema() map[string]providers.Schema {
 	return schema
 }
 
-func (m *MockedGoldenTFProvider) writeReadResource(args terraform.ReadResourceArgs, readResource *cty.Value, err error) {
+func (m *MockedGoldenTFProvider) writeReadResource(args terraform2.ReadResourceArgs, readResource *cty.Value, err error) {
 	var readRes = ReadResource{
 		Value: readResource,
 		Err:   err,
@@ -74,7 +74,7 @@ func (m *MockedGoldenTFProvider) writeReadResource(args terraform.ReadResourceAr
 	goldenfile.WriteFile(m.name, marshalled, fileName)
 }
 
-func (m *MockedGoldenTFProvider) readReadResource(args terraform.ReadResourceArgs) (*cty.Value, error) {
+func (m *MockedGoldenTFProvider) readReadResource(args terraform2.ReadResourceArgs) (*cty.Value, error) {
 	fileName := getFileName(args)
 	// TODO I'm putting this here for compatibility reason...
 	if !goldenfile.FileExists(m.name, fileName) {
@@ -146,13 +146,13 @@ func (m *ReadResource) MarshalJSON() ([]byte, error) {
 	return gojson.Marshal(unm)
 }
 
-func getFileName(args terraform.ReadResourceArgs) string {
+func getFileName(args terraform2.ReadResourceArgs) string {
 	suffix := getFileNameSuffix(args)
 	fileName := fmt.Sprintf("%s-%s%s.res.golden.json", args.Ty, args.ID, suffix)
 	return fileName
 }
 
-func getFileNameSuffix(args terraform.ReadResourceArgs) string {
+func getFileNameSuffix(args terraform2.ReadResourceArgs) string {
 	suffix := ""
 	keys := make([]string, 0, len(args.Attributes))
 	for k := range args.Attributes {

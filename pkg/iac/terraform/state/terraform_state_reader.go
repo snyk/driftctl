@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/snyk/driftctl/enumeration/alerter"
+	"github.com/snyk/driftctl/enumeration/terraform"
+
 	"github.com/hashicorp/terraform/addrs"
 	"github.com/hashicorp/terraform/states"
 	"github.com/hashicorp/terraform/states/statefile"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/snyk/driftctl/pkg/alerter"
 	"github.com/snyk/driftctl/pkg/filter"
 	"github.com/snyk/driftctl/pkg/iac"
 	"github.com/snyk/driftctl/pkg/output"
@@ -17,11 +19,10 @@ import (
 	ctyconvert "github.com/zclconf/go-cty/cty/convert"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
+	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg/iac/config"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state/enumerator"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/terraform"
 )
 
 const TerraformStateReaderSupplier = "tfstate"

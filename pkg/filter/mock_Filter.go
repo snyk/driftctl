@@ -3,7 +3,7 @@
 package filter
 
 import (
-	resource "github.com/snyk/driftctl/pkg/resource"
+	resource "github.com/snyk/driftctl/enumeration/resource"
 	mock "github.com/stretchr/testify/mock"
 )
 

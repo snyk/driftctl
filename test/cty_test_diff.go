@@ -5,13 +5,13 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/snyk/driftctl/enumeration/terraform"
+
 	"github.com/snyk/driftctl/test/goldenfile"
 
 	"github.com/zclconf/go-cty/cty/json"
 
-	"github.com/snyk/driftctl/pkg/resource"
-
-	"github.com/snyk/driftctl/pkg/terraform"
+	"github.com/snyk/driftctl/enumeration/resource"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"

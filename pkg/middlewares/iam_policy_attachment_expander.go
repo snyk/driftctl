@@ -3,8 +3,8 @@ package middlewares
 import (
 	"fmt"
 
-	"github.com/snyk/driftctl/pkg/resource"
-	resourceaws "github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource"
+	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 // Split Policy attachment when there is multiple user and groups and generate a repeatable id

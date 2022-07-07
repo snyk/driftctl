@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/r3labs/diff/v2"
-	awsresources "github.com/snyk/driftctl/pkg/resource/aws"
+	awsresources "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/test/acceptance"
 	"github.com/snyk/driftctl/test/acceptance/awsutils"
 )

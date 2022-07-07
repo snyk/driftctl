@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/google"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/google"
 )
 
 // GoogleIAMBindingTransformer Transforms Bucket IAM binding in bucket iam member to ease comparison.

@@ -1,17 +1,9 @@
 package resource
 
-// Supplier supply the list of resource.Resource, it's the main interface to retrieve remote resources
-type Supplier interface {
-	Resources() ([]*Resource, error)
-}
+import "github.com/snyk/driftctl/enumeration/resource"
 
 // IaCSupplier supply the list of resource.Resource, it's the main interface to retrieve state resources
 type IaCSupplier interface {
-	Supplier
+	resource.Supplier
 	SourceCount() uint
-}
-
-type StoppableSupplier interface {
-	Supplier
-	Stop()
 }

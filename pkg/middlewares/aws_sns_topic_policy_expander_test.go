@@ -1,19 +1,19 @@
 package middlewares
 
 import (
+	"github.com/snyk/driftctl/enumeration/terraform"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
 
-	awsresource "github.com/snyk/driftctl/pkg/resource/aws"
-	"github.com/snyk/driftctl/pkg/terraform"
+	awsresource "github.com/snyk/driftctl/enumeration/resource/aws"
 	testresource "github.com/snyk/driftctl/test/resource"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
 
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
 )
 
 func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {

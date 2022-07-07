@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 // Explodes policy found in aws_api_gateway_rest_api.policy from state resources to dedicated resources

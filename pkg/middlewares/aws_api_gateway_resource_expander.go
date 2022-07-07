@@ -3,8 +3,8 @@ package middlewares
 import (
 	"github.com/sirupsen/logrus"
 
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 // Explodes api gateway default resource found in aws_api_gateway_rest_api.root_resource_id from state resources to dedicated resources

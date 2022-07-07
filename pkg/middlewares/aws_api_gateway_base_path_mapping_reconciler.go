@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 // AwsApiGatewayBasePathMappingReconciler is used to reconcile API Gateway base path mapping (v1 and v2)

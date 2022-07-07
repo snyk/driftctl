@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg/analyser"
-	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const FormatVersion = "0.1"

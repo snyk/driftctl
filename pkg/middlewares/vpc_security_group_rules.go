@@ -3,8 +3,8 @@ package middlewares
 import (
 	"github.com/sirupsen/logrus"
 
-	"github.com/snyk/driftctl/pkg/resource"
-	resourceaws "github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/enumeration/resource"
+	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 // Split security group rule if it needs to given its attributes

@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/sirupsen/logrus"
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/google"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/google"
 )
 
 // Creating buckets add legacy role bindings, this middleware will filter them unless they are managed.

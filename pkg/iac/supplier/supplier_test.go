@@ -5,12 +5,13 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/enumeration/alerter"
+	"github.com/snyk/driftctl/enumeration/terraform"
+
 	"github.com/snyk/driftctl/pkg/filter"
 	"github.com/snyk/driftctl/pkg/iac/config"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend"
 	"github.com/snyk/driftctl/pkg/output"
-	"github.com/snyk/driftctl/pkg/terraform"
 	"github.com/snyk/driftctl/test/resource"
 )
 

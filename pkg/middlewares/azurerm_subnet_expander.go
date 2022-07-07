@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/azurerm"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/azurerm"
 )
 
 // Explodes subnet found in azurerm_virtual_network.subnet from state resources to dedicated resources

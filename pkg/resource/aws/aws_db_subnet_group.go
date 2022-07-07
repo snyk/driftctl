@@ -1,15 +1,13 @@
 package aws
 
 import (
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
-const AwsDbSubnetGroupResourceType = "aws_db_subnet_group"
-
 func initAwsDbSubnetGroupMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(AwsDbSubnetGroupResourceType, func(res *resource.Resource) {
+	resourceSchemaRepository.SetNormalizeFunc(aws.AwsDbSubnetGroupResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"name_prefix"})
 	})
-	resourceSchemaRepository.SetFlags(AwsDbSubnetGroupResourceType, resource.FlagDeepMode)
 }

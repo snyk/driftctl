@@ -7,9 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/snyk/driftctl/enumeration/alerter"
+
 	"github.com/r3labs/diff/v2"
-	"github.com/snyk/driftctl/pkg/alerter"
-	"github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/enumeration/resource"
 )
 
 type Change struct {

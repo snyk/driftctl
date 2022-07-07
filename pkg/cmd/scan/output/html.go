@@ -5,6 +5,7 @@ import (
 	"embed"
 	"encoding/base64"
 	"fmt"
+	"github.com/snyk/driftctl/enumeration/alerter"
 	"html/template"
 	"math"
 	"os"
@@ -16,9 +17,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
-	"github.com/snyk/driftctl/pkg/alerter"
+	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg/analyser"
-	"github.com/snyk/driftctl/pkg/resource"
 )
 
 const HTMLOutputType = "html"
