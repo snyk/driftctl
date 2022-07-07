@@ -17,7 +17,7 @@ import (
  * Required to use Scanner
  */
 
-func Init(version string, alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, remoteLibrary *common.RemoteLibrary, progress enumeration.ProgressCounter, factory resource.ResourceFactory, configDir string) error {
+func Init(version string, alerter alerter.AlerterInterface, providerLibrary *terraform.ProviderLibrary, remoteLibrary *common.RemoteLibrary, progress enumeration.ProgressCounter, factory resource.ResourceFactory, configDir string) error {
 
 	provider, err := NewAWSTerraformProvider(version, progress, configDir)
 	if err != nil {
