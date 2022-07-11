@@ -11,15 +11,18 @@ import (
 )
 
 type BackendBlock struct {
-	Name          string   `hcl:"name,label"`
-	Path          string   `hcl:"path,optional"`
-	WorkspaceDir  string   `hcl:"workspace_dir,optional"`
-	Bucket        string   `hcl:"bucket,optional"`
-	Key           string   `hcl:"key,optional"`
-	Region        string   `hcl:"region,optional"`
-	Prefix        string   `hcl:"prefix,optional"`
-	ContainerName string   `hcl:"container_name,optional"`
-	Remain        hcl.Body `hcl:",remain"`
+	Name               string   `hcl:"name,label"`
+	Path               string   `hcl:"path,optional"`
+	WorkspaceDir       string   `hcl:"workspace_dir,optional"`
+	Bucket             string   `hcl:"bucket,optional"`
+	Key                string   `hcl:"key,optional"`
+	Region             string   `hcl:"region,optional"`
+	Prefix             string   `hcl:"prefix,optional"`
+	ContainerName      string   `hcl:"container_name,optional"`
+	WorkspaceKeyPrefix string   `hcl:"workspace_key_prefix,optional"`
+	Remain             hcl.Body `hcl:",remain"`
+
+	workspace string
 }
 
 func (b BackendBlock) SupplierConfig() *config.SupplierConfig {
@@ -51,10 +54,14 @@ func (b BackendBlock) parseS3Backend() *config.SupplierConfig {
 	if b.Bucket == "" || b.Key == "" {
 		return nil
 	}
+	keyPrefix := b.workspace
+	if keyPrefix == "default" {
+		keyPrefix = ""
+	}
 	return &config.SupplierConfig{
 		Key:     state.TerraformStateReaderSupplier,
 		Backend: backend.BackendKeyS3,
-		Path:    path.Join(b.Bucket, b.Key),
+		Path:    path.Join(b.Bucket, b.WorkspaceKeyPrefix, keyPrefix, b.Key),
 	}
 }
 
@@ -65,7 +72,7 @@ func (b BackendBlock) parseGCSBackend() *config.SupplierConfig {
 	return &config.SupplierConfig{
 		Key:     state.TerraformStateReaderSupplier,
 		Backend: backend.BackendKeyGS,
-		Path:    fmt.Sprintf("%s.tfstate", path.Join(b.Bucket, b.Prefix)),
+		Path:    fmt.Sprintf("%s.tfstate", path.Join(b.Bucket, b.Prefix, b.workspace)),
 	}
 }
 
