@@ -52,14 +52,19 @@ func (b BackendBlock) parseS3Backend(ws string) *config.SupplierConfig {
 	if b.Bucket == "" || b.Key == "" {
 		return nil
 	}
-	keyPrefix := ws
-	if keyPrefix == DefaultStateName {
-		keyPrefix = ""
+
+	keyPrefix := b.WorkspaceKeyPrefix
+	if ws != DefaultStateName {
+		if b.WorkspaceKeyPrefix == "" {
+			b.WorkspaceKeyPrefix = "env:"
+		}
+		keyPrefix = path.Join(b.WorkspaceKeyPrefix, ws)
 	}
+
 	return &config.SupplierConfig{
 		Key:     state.TerraformStateReaderSupplier,
 		Backend: backend.BackendKeyS3,
-		Path:    path.Join(b.Bucket, b.WorkspaceKeyPrefix, keyPrefix, b.Key),
+		Path:    path.Join(b.Bucket, keyPrefix, b.Key),
 	}
 }
 

@@ -75,7 +75,7 @@ func TestBackend_SupplierConfig(t *testing.T) {
 			want: &config.SupplierConfig{
 				Key:     "tfstate",
 				Backend: "s3",
-				Path:    "terraform-state-prod/bar/network/terraform.tfstate",
+				Path:    "terraform-state-prod/env:/bar/network/terraform.tfstate",
 			},
 		},
 		{
