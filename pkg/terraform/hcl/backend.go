@@ -32,7 +32,7 @@ func (b BackendBlock) SupplierConfig(workspace string) *config.SupplierConfig {
 	case "gcs":
 		return b.parseGCSBackend(workspace)
 	case "azurerm":
-		return b.parseAzurermBackend()
+		return b.parseAzurermBackend(workspace)
 	}
 	return nil
 }
@@ -79,9 +79,12 @@ func (b BackendBlock) parseGCSBackend(ws string) *config.SupplierConfig {
 	}
 }
 
-func (b BackendBlock) parseAzurermBackend() *config.SupplierConfig {
+func (b BackendBlock) parseAzurermBackend(ws string) *config.SupplierConfig {
 	if b.ContainerName == "" || b.Key == "" {
 		return nil
+	}
+	if ws != DefaultStateName {
+		b.Key = fmt.Sprintf("%senv:%s", b.Key, ws)
 	}
 	return &config.SupplierConfig{
 		Key:     state.TerraformStateReaderSupplier,
