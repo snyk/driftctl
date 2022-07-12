@@ -1,6 +1,7 @@
 package hcl
 
 import (
+	"path"
 	"testing"
 
 	"github.com/snyk/driftctl/pkg/iac/config"
@@ -32,7 +33,7 @@ func TestHCL_getCurrentWorkspaceName(t *testing.T) {
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			workspace := getCurrentWorkspaceName(tt.dir)
+			workspace := GetCurrentWorkspaceName(tt.dir)
 			assert.Equal(t, tt.want, workspace)
 		})
 	}
@@ -40,28 +41,28 @@ func TestHCL_getCurrentWorkspaceName(t *testing.T) {
 
 func TestBackend_SupplierConfig(t *testing.T) {
 	cases := []struct {
-		name    string
-		dir     string
-		want    *config.SupplierConfig
-		wantErr string
+		name     string
+		filename string
+		want     *config.SupplierConfig
+		wantErr  string
 	}{
 		{
-			name:    "test with no backend block",
-			dir:     "testdata/no_backend_block.tf",
-			want:    nil,
-			wantErr: "testdata/no_backend_block.tf:1,11-11: Missing backend block; A backend block is required.",
+			name:     "test with no backend block",
+			filename: "testdata/no_backend_block.tf",
+			want:     nil,
+			wantErr:  "testdata/no_backend_block.tf:1,11-11: Missing backend block; A backend block is required.",
 		},
 		{
-			name: "test with local backend block",
-			dir:  "testdata/local_backend_block.tf",
+			name:     "test with local backend block",
+			filename: "testdata/local_backend_block.tf",
 			want: &config.SupplierConfig{
 				Key:  "tfstate",
 				Path: "terraform-state-prod/network/terraform.tfstate",
 			},
 		},
 		{
-			name: "test with S3 backend block",
-			dir:  "testdata/s3_backend_block.tf",
+			name:     "test with S3 backend block",
+			filename: "testdata/s3_backend_block.tf",
 			want: &config.SupplierConfig{
 				Key:     "tfstate",
 				Backend: "s3",
@@ -69,8 +70,8 @@ func TestBackend_SupplierConfig(t *testing.T) {
 			},
 		},
 		{
-			name: "test with S3 backend block with non-default workspace",
-			dir:  "testdata/s3_backend_workspace/s3_backend_block.tf",
+			name:     "test with S3 backend block with non-default workspace",
+			filename: "testdata/s3_backend_workspace/s3_backend_block.tf",
 			want: &config.SupplierConfig{
 				Key:     "tfstate",
 				Backend: "s3",
@@ -78,8 +79,8 @@ func TestBackend_SupplierConfig(t *testing.T) {
 			},
 		},
 		{
-			name: "test with GCS backend block",
-			dir:  "testdata/gcs_backend_block.tf",
+			name:     "test with GCS backend block",
+			filename: "testdata/gcs_backend_block.tf",
 			want: &config.SupplierConfig{
 				Key:     "tfstate",
 				Backend: "gs",
@@ -87,19 +88,24 @@ func TestBackend_SupplierConfig(t *testing.T) {
 			},
 		},
 		{
-			name: "test with Azure backend block",
-			dir:  "testdata/azurerm_backend_block.tf",
+			name:     "test with Azure backend block",
+			filename: "testdata/azurerm_backend_block.tf",
 			want: &config.SupplierConfig{
 				Key:     "tfstate",
 				Backend: "azurerm",
 				Path:    "states/prod.terraform.tfstate",
 			},
 		},
+		{
+			name:     "test with unknown backend",
+			filename: "testdata/unknown_backend_block.tf",
+			want:     nil,
+		},
 	}
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			hcl, err := ParseTerraformFromHCL(tt.dir)
+			hcl, err := ParseTerraformFromHCL(tt.filename)
 			if tt.wantErr == "" {
 				assert.NoError(t, err)
 			} else {
@@ -107,12 +113,13 @@ func TestBackend_SupplierConfig(t *testing.T) {
 				return
 			}
 
-			if hcl.Backend.SupplierConfig() == nil {
+			ws := GetCurrentWorkspaceName(path.Dir(tt.filename))
+			if hcl.Backend.SupplierConfig(ws) == nil {
 				assert.Nil(t, tt.want)
 				return
 			}
 
-			assert.Equal(t, *tt.want, *hcl.Backend.SupplierConfig())
+			assert.Equal(t, *tt.want, *hcl.Backend.SupplierConfig(ws))
 		})
 	}
 }

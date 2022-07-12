@@ -21,18 +21,16 @@ type BackendBlock struct {
 	ContainerName      string   `hcl:"container_name,optional"`
 	WorkspaceKeyPrefix string   `hcl:"workspace_key_prefix,optional"`
 	Remain             hcl.Body `hcl:",remain"`
-
-	workspace string
 }
 
-func (b BackendBlock) SupplierConfig() *config.SupplierConfig {
+func (b BackendBlock) SupplierConfig(workspace string) *config.SupplierConfig {
 	switch b.Name {
 	case "local":
 		return b.parseLocalBackend()
 	case "s3":
-		return b.parseS3Backend()
+		return b.parseS3Backend(workspace)
 	case "gcs":
-		return b.parseGCSBackend()
+		return b.parseGCSBackend(workspace)
 	case "azurerm":
 		return b.parseAzurermBackend()
 	}
@@ -50,12 +48,12 @@ func (b BackendBlock) parseLocalBackend() *config.SupplierConfig {
 	}
 }
 
-func (b BackendBlock) parseS3Backend() *config.SupplierConfig {
+func (b BackendBlock) parseS3Backend(ws string) *config.SupplierConfig {
 	if b.Bucket == "" || b.Key == "" {
 		return nil
 	}
-	keyPrefix := b.workspace
-	if keyPrefix == "default" {
+	keyPrefix := ws
+	if keyPrefix == DefaultStateName {
 		keyPrefix = ""
 	}
 	return &config.SupplierConfig{
@@ -65,14 +63,14 @@ func (b BackendBlock) parseS3Backend() *config.SupplierConfig {
 	}
 }
 
-func (b BackendBlock) parseGCSBackend() *config.SupplierConfig {
+func (b BackendBlock) parseGCSBackend(ws string) *config.SupplierConfig {
 	if b.Bucket == "" || b.Prefix == "" {
 		return nil
 	}
 	return &config.SupplierConfig{
 		Key:     state.TerraformStateReaderSupplier,
 		Backend: backend.BackendKeyGS,
-		Path:    fmt.Sprintf("%s.tfstate", path.Join(b.Bucket, b.Prefix, b.workspace)),
+		Path:    fmt.Sprintf("%s.tfstate", path.Join(b.Bucket, b.Prefix, ws)),
 	}
 }
 

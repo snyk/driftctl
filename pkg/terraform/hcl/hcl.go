@@ -10,6 +10,8 @@ import (
 	"github.com/hashicorp/hcl/v2/hclparse"
 )
 
+const DefaultStateName = "default"
+
 type MainBodyBlock struct {
 	Terraform TerraformBlock `hcl:"terraform,block"`
 	Remain    hcl.Body       `hcl:",remain"`
@@ -22,8 +24,6 @@ type TerraformBlock struct {
 
 func ParseTerraformFromHCL(filename string) (*TerraformBlock, error) {
 	var body MainBodyBlock
-
-	body.Terraform.Backend.workspace = getCurrentWorkspaceName(path.Dir(filename))
 
 	parser := hclparse.NewParser()
 	f, diags := parser.ParseHCLFile(filename)
@@ -39,12 +39,15 @@ func ParseTerraformFromHCL(filename string) (*TerraformBlock, error) {
 	return &body.Terraform, nil
 }
 
-func getCurrentWorkspaceName(cwd string) string {
-	env := "default" // See https://github.com/hashicorp/terraform/blob/main/internal/backend/backend.go#L33
+func GetCurrentWorkspaceName(cwd string) string {
+	name := DefaultStateName // See https://github.com/hashicorp/terraform/blob/main/internal/backend/backend.go#L33
 
 	data, err := ioutil.ReadFile(path.Join(cwd, ".terraform/environment"))
 	if err != nil {
-		return env
+		return name
 	}
-	return strings.Trim(string(data), "\n")
+	if v := strings.Trim(string(data), "\n"); v != "" {
+		name = v
+	}
+	return name
 }
