@@ -15,11 +15,6 @@ func TestHCL_getCurrentWorkspaceName(t *testing.T) {
 		want string
 	}{
 		{
-			name: "test with default workspace",
-			dir:  "testdata/default_workspace",
-			want: "default",
-		},
-		{
 			name: "test with non-default workspace",
 			dir:  "testdata/foo_workspace",
 			want: "foo",
