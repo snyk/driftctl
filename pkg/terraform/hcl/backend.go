@@ -11,27 +11,28 @@ import (
 )
 
 type BackendBlock struct {
-	Name          string   `hcl:"name,label"`
-	Path          string   `hcl:"path,optional"`
-	WorkspaceDir  string   `hcl:"workspace_dir,optional"`
-	Bucket        string   `hcl:"bucket,optional"`
-	Key           string   `hcl:"key,optional"`
-	Region        string   `hcl:"region,optional"`
-	Prefix        string   `hcl:"prefix,optional"`
-	ContainerName string   `hcl:"container_name,optional"`
-	Remain        hcl.Body `hcl:",remain"`
+	Name               string   `hcl:"name,label"`
+	Path               string   `hcl:"path,optional"`
+	WorkspaceDir       string   `hcl:"workspace_dir,optional"`
+	Bucket             string   `hcl:"bucket,optional"`
+	Key                string   `hcl:"key,optional"`
+	Region             string   `hcl:"region,optional"`
+	Prefix             string   `hcl:"prefix,optional"`
+	ContainerName      string   `hcl:"container_name,optional"`
+	WorkspaceKeyPrefix string   `hcl:"workspace_key_prefix,optional"`
+	Remain             hcl.Body `hcl:",remain"`
 }
 
-func (b BackendBlock) SupplierConfig() *config.SupplierConfig {
+func (b BackendBlock) SupplierConfig(workspace string) *config.SupplierConfig {
 	switch b.Name {
 	case "local":
 		return b.parseLocalBackend()
 	case "s3":
-		return b.parseS3Backend()
+		return b.parseS3Backend(workspace)
 	case "gcs":
-		return b.parseGCSBackend()
+		return b.parseGCSBackend(workspace)
 	case "azurerm":
-		return b.parseAzurermBackend()
+		return b.parseAzurermBackend(workspace)
 	}
 	return nil
 }
@@ -47,31 +48,43 @@ func (b BackendBlock) parseLocalBackend() *config.SupplierConfig {
 	}
 }
 
-func (b BackendBlock) parseS3Backend() *config.SupplierConfig {
+func (b BackendBlock) parseS3Backend(ws string) *config.SupplierConfig {
 	if b.Bucket == "" || b.Key == "" {
 		return nil
 	}
+
+	keyPrefix := b.WorkspaceKeyPrefix
+	if ws != DefaultStateName {
+		if b.WorkspaceKeyPrefix == "" {
+			b.WorkspaceKeyPrefix = "env:"
+		}
+		keyPrefix = path.Join(b.WorkspaceKeyPrefix, ws)
+	}
+
 	return &config.SupplierConfig{
 		Key:     state.TerraformStateReaderSupplier,
 		Backend: backend.BackendKeyS3,
-		Path:    path.Join(b.Bucket, b.Key),
+		Path:    path.Join(b.Bucket, keyPrefix, b.Key),
 	}
 }
 
-func (b BackendBlock) parseGCSBackend() *config.SupplierConfig {
+func (b BackendBlock) parseGCSBackend(ws string) *config.SupplierConfig {
 	if b.Bucket == "" || b.Prefix == "" {
 		return nil
 	}
 	return &config.SupplierConfig{
 		Key:     state.TerraformStateReaderSupplier,
 		Backend: backend.BackendKeyGS,
-		Path:    fmt.Sprintf("%s.tfstate", path.Join(b.Bucket, b.Prefix)),
+		Path:    fmt.Sprintf("%s.tfstate", path.Join(b.Bucket, b.Prefix, ws)),
 	}
 }
 
-func (b BackendBlock) parseAzurermBackend() *config.SupplierConfig {
+func (b BackendBlock) parseAzurermBackend(ws string) *config.SupplierConfig {
 	if b.ContainerName == "" || b.Key == "" {
 		return nil
+	}
+	if ws != DefaultStateName {
+		b.Key = fmt.Sprintf("%senv:%s", b.Key, ws)
 	}
 	return &config.SupplierConfig{
 		Key:     state.TerraformStateReaderSupplier,

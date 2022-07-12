@@ -404,7 +404,8 @@ func retrieveBackendsFromHCL(workdir string) ([]config.SupplierConfig, error) {
 			continue
 		}
 
-		if supplierConfig := body.Backend.SupplierConfig(); supplierConfig != nil {
+		ws := hcl.GetCurrentWorkspaceName(path.Dir(match))
+		if supplierConfig := body.Backend.SupplierConfig(ws); supplierConfig != nil {
 			globaloutput.Printf(color.WhiteString("Using Terraform state %s found in %s. Use the --from flag to specify another state file.\n"), supplierConfig, match)
 			supplierConfigs = append(supplierConfigs, *supplierConfig)
 		}
