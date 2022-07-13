@@ -18,8 +18,9 @@ type MainBodyBlock struct {
 }
 
 type TerraformBlock struct {
-	Backend BackendBlock `hcl:"backend,block"`
-	Remain  hcl.Body     `hcl:",remain"`
+	Backend *BackendBlock `hcl:"backend,block"`
+	Cloud   *CloudBlock   `hcl:"cloud,block"`
+	Remain  hcl.Body      `hcl:",remain"`
 }
 
 func ParseTerraformFromHCL(filename string) (*TerraformBlock, error) {

@@ -8,32 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHCL_getCurrentWorkspaceName(t *testing.T) {
-	cases := []struct {
-		name string
-		dir  string
-		want string
-	}{
-		{
-			name: "test with non-default workspace",
-			dir:  "testdata/foo_workspace",
-			want: "foo",
-		},
-		{
-			name: "test with non-existing directory",
-			dir:  "testdata/noenvfile",
-			want: "default",
-		},
-	}
-
-	for _, tt := range cases {
-		t.Run(tt.name, func(t *testing.T) {
-			workspace := GetCurrentWorkspaceName(tt.dir)
-			assert.Equal(t, tt.want, workspace)
-		})
-	}
-}
-
 func TestBackend_SupplierConfig(t *testing.T) {
 	cases := []struct {
 		name     string
@@ -45,7 +19,6 @@ func TestBackend_SupplierConfig(t *testing.T) {
 			name:     "test with no backend block",
 			filename: "testdata/no_backend_block.tf",
 			want:     nil,
-			wantErr:  "testdata/no_backend_block.tf:1,11-11: Missing backend block; A backend block is required.",
 		},
 		{
 			name:     "test with local backend block",
@@ -118,7 +91,7 @@ func TestBackend_SupplierConfig(t *testing.T) {
 			}
 
 			ws := GetCurrentWorkspaceName(path.Dir(tt.filename))
-			if hcl.Backend.SupplierConfig(ws) == nil {
+			if hcl.Backend == nil || hcl.Backend.SupplierConfig(ws) == nil {
 				assert.Nil(t, tt.want)
 				return
 			}
