@@ -10,8 +10,9 @@ import (
 )
 
 type CloudWorkspacesBlock struct {
-	Name string   `hcl:"name,optional"`
-	Tags []string `hcl:"tags,optional"`
+	Name   string   `hcl:"name,optional"`
+	Tags   []string `hcl:"tags,optional"`
+	Remain hcl.Body `hcl:",remain"`
 }
 
 type CloudBlock struct {
