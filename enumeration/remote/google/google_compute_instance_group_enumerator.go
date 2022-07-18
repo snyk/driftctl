@@ -1,9 +1,10 @@
 package google
 
 import (
+	"strings"
+
 	remoteerror "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/remote/google/repository"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 	"github.com/snyk/driftctl/enumeration/resource"
@@ -46,9 +47,9 @@ func (e *GoogleComputeInstanceGroupEnumerator) Enumerate() ([]*resource.Resource
 				string(e.SupportedType()),
 				trimResourceName(res.GetName()),
 				map[string]interface{}{
-					"name":     res.GetDisplayName(),
-					"project":  project,
-					"location": res.GetLocation(),
+					"name":    res.GetDisplayName(),
+					"project": project,
+					"zone":    res.GetLocation(),
 				},
 			),
 		)

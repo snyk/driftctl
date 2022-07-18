@@ -5,11 +5,6 @@ import "github.com/snyk/driftctl/enumeration/resource"
 const AwsSnsTopicResourceType = "aws_sns_topic"
 
 func initSnsTopicMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetResolveReadAttributesFunc(AwsSnsTopicResourceType, func(res *resource.Resource) map[string]string {
-		return map[string]string{
-			"topic_arn": res.ResourceId(),
-		}
-	})
 	resourceSchemaRepository.UpdateSchema(AwsSnsTopicResourceType, map[string]func(attributeSchema *resource.AttributeSchema){
 		"delivery_policy": func(attributeSchema *resource.AttributeSchema) {
 			attributeSchema.JsonString = true

@@ -37,7 +37,11 @@ func (e *GoogleComputeRouterEnumerator) Enumerate() ([]*resource.Resource, error
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
 				trimResourceName(res.GetName()),
-				map[string]interface{}{},
+				map[string]interface{}{
+					"name":    res.GetDisplayName(),
+					"region":  res.GetLocation(),
+					"project": res.GetProject(),
+				},
 			),
 		)
 	}

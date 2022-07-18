@@ -182,7 +182,7 @@ func initAwsNetworkACLRuleMetaData(resourceSchemaRepository resource.SchemaRepos
 		// This workaround is mandatory to harmonize resources ID
 		res.Id = aws.CreateNetworkACLRuleID(
 			*res.Attrs.GetString("network_acl_id"),
-			int(*res.Attrs.GetFloat64("rule_number")),
+			int64(*res.Attrs.GetInt("rule_number")),
 			*res.Attrs.GetBool("egress"),
 			*res.Attrs.GetString("protocol"),
 		)

@@ -37,7 +37,9 @@ func (e *DynamoDBTableEnumerator) Enumerate() ([]*resource.Resource, error) {
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
 				*table,
-				map[string]interface{}{},
+				map[string]interface{}{
+					"table_name": *table,
+				},
 			),
 		)
 	}

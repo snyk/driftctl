@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"strconv"
+
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	remoteerror "github.com/snyk/driftctl/enumeration/remote/error"
@@ -35,6 +37,7 @@ func (e *CloudformationStackEnumerator) Enumerate() ([]*resource.Resource, error
 	for _, stack := range stacks {
 		attrs := map[string]interface{}{}
 		if stack.Parameters != nil && len(stack.Parameters) > 0 {
+			attrs["parameters.%"] = strconv.FormatInt(int64(len(stack.Parameters)), 10)
 			attrs["parameters"] = flattenParameters(stack.Parameters)
 		}
 

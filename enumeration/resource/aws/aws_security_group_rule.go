@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform/flatmap"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/snyk/driftctl/enumeration/resource"
 )
@@ -56,40 +55,6 @@ func CreateSecurityGroupRuleIdHash(attrs *resource.Attributes) string {
 }
 
 func initAwsSecurityGroupRuleMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetResolveReadAttributesFunc(AwsSecurityGroupRuleResourceType, func(res *resource.Resource) map[string]string {
-		attrs := make(map[string]interface{})
-		if v, ok := res.Attributes().Get("type"); ok {
-			attrs["type"] = v
-		}
-		if v, ok := res.Attributes().Get("protocol"); ok {
-			attrs["protocol"] = v
-		}
-		if v := res.Attributes().GetInt("from_port"); v != nil {
-			attrs["from_port"] = *v
-		}
-		if v := res.Attributes().GetInt("to_port"); v != nil {
-			attrs["to_port"] = *v
-		}
-		if v, ok := res.Attributes().Get("security_group_id"); ok {
-			attrs["security_group_id"] = v
-		}
-		if v, ok := res.Attributes().Get("self"); ok {
-			attrs["self"] = v
-		}
-		if v, ok := res.Attributes().Get("cidr_blocks"); ok {
-			attrs["cidr_blocks"] = v
-		}
-		if v, ok := res.Attributes().Get("ipv6_cidr_blocks"); ok {
-			attrs["ipv6_cidr_blocks"] = v
-		}
-		if v, ok := res.Attributes().Get("prefix_list_ids"); ok {
-			attrs["prefix_list_ids"] = v
-		}
-		if v, ok := res.Attributes().Get("source_security_group_id"); ok {
-			attrs["source_security_group_id"] = v
-		}
-		return flatmap.Flatten(attrs)
-	})
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsSecurityGroupRuleResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)

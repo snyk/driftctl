@@ -27,8 +27,12 @@ func NewGenericDetailsFetcher(resType resource.ResourceType, provider terraform.
 
 func (f *GenericDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	attributes := map[string]string{}
-	if res.Schema().ResolveReadAttributesFunc != nil {
-		attributes = res.Schema().ResolveReadAttributesFunc(res)
+	if res.Attributes() != nil {
+		for k, v := range *res.Attributes() {
+			if str, ok := v.(string); ok {
+				attributes[k] = str
+			}
+		}
 	}
 	ctyVal, err := f.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty:         f.resType,

@@ -15,7 +15,7 @@ func initAwsNetworkACLRuleMetaData(resourceSchemaRepository resource.SchemaRepos
 	resourceSchemaRepository.SetFlags(AwsNetworkACLRuleResourceType, resource.FlagDeepMode)
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsNetworkACLRuleResourceType, func(res *resource.Resource) map[string]string {
 
-		ruleNumber := strconv.FormatInt(int64(*res.Attrs.GetFloat64("rule_number")), 10)
+		ruleNumber := strconv.FormatInt(int64(*res.Attrs.GetInt("rule_number")), 10)
 		if ruleNumber == "32767" {
 			ruleNumber = "*"
 		}
@@ -50,16 +50,9 @@ func initAwsNetworkACLRuleMetaData(resourceSchemaRepository resource.SchemaRepos
 
 		return attrs
 	})
-	resourceSchemaRepository.SetResolveReadAttributesFunc(AwsNetworkACLRuleResourceType, func(res *resource.Resource) map[string]string {
-		return map[string]string{
-			"network_acl_id": *res.Attrs.GetString("network_acl_id"),
-			"rule_number":    strconv.FormatInt(int64(*res.Attrs.GetFloat64("rule_number")), 10),
-			"egress":         strconv.FormatBool(*res.Attrs.GetBool("egress")),
-		}
-	})
 }
 
-func CreateNetworkACLRuleID(networkAclId string, ruleNumber int, egress bool, protocol string) string {
+func CreateNetworkACLRuleID(networkAclId string, ruleNumber int64, egress bool, protocol string) string {
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", networkAclId))
 	buf.WriteString(fmt.Sprintf("%d-", ruleNumber))

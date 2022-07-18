@@ -74,7 +74,7 @@ func (e *S3BucketNotificationEnumerator) Enumerate() ([]*resource.Resource, erro
 				string(e.SupportedType()),
 				*bucket.Name,
 				map[string]interface{}{
-					"region": region,
+					"alias": region,
 				},
 			),
 		)

@@ -86,7 +86,7 @@ func (e *AwsNetworkACLExpander) expandBlock(resourcesFromState *[]*resource.Reso
 			aws.AwsNetworkACLRuleResourceType,
 			aws.CreateNetworkACLRuleID(
 				networkAclId,
-				int(attrs["rule_number"].(float64)),
+				int64(attrs["rule_number"].(int)),
 				egress,
 				attrs["protocol"].(string),
 			),

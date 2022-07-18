@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+
 	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
@@ -69,7 +70,7 @@ func (e *S3BucketMetricsEnumerator) Enumerate() ([]*resource.Resource, error) {
 					string(e.SupportedType()),
 					id,
 					map[string]interface{}{
-						"region": region,
+						"alias": region,
 					},
 				),
 			)

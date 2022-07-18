@@ -5,7 +5,6 @@ import "github.com/snyk/driftctl/enumeration/resource"
 func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
 	initGoogleStorageBucketMetadata(resourceSchemaRepository)
 	initGoogleComputeFirewallMetadata(resourceSchemaRepository)
-	initGoogleComputeRouterMetadata(resourceSchemaRepository)
 	initGoogleComputeNetworkMetadata(resourceSchemaRepository)
 	initGoogleStorageBucketIamBMemberMetadata(resourceSchemaRepository)
 	initGoogleComputeInstanceGroupMetadata(resourceSchemaRepository)

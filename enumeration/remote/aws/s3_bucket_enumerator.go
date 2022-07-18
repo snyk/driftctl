@@ -59,7 +59,7 @@ func (e *S3BucketEnumerator) Enumerate() ([]*resource.Resource, error) {
 				string(e.SupportedType()),
 				*bucket.Name,
 				map[string]interface{}{
-					"region": region,
+					"alias": region,
 				},
 			),
 		)
