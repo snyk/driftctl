@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
 	"github.com/pkg/errors"
@@ -370,4 +371,38 @@ func Test_ListAllStorageContainer_Error(t *testing.T) {
 
 	assert.Nil(t, got)
 	assert.Equal(t, expectedErr, err)
+}
+
+func Test_ListAllStorageContainer_IgnoredError(t *testing.T) {
+
+	account := armstorage.StorageAccount{
+		TrackedResource: armstorage.TrackedResource{
+			Resource: armstorage.Resource{
+				ID:   to.StringPtr("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/foobar/providers/Microsoft.Storage/storageAccounts/testeliedriftctl"),
+				Name: to.StringPtr("testeliedriftctl"),
+			},
+		},
+	}
+
+	fakeClient := &mockBlobContainerClient{}
+	mockPager := &mockBlobContainerListPager{}
+	mockPager.On("NextPage", mock.Anything).Return(false).Times(1)
+	mockPager.On("Err").Return(runtime.NewResponseError(
+		errors.New("{\"error\":{\"code\":\"FeatureNotSupportedForAccount\",\"message\":\"Blob is not supported for the account.\"}}"),
+		nil),
+	).Times(1)
+
+	fakeClient.On("List", "foobar", "testeliedriftctl", (*armstorage.BlobContainersListOptions)(nil)).Return(mockPager)
+
+	s := &storageRepository{
+		blobContainerClient: fakeClient,
+		cache:               cache.New(0),
+	}
+	got, err := s.ListAllStorageContainer(&account)
+
+	fakeClient.AssertExpectations(t)
+	mockPager.AssertExpectations(t)
+
+	assert.Empty(t, got)
+	assert.Equal(t, nil, err)
 }

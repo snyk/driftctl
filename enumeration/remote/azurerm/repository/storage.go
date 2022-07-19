@@ -3,6 +3,10 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strings"
+
+	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	"github.com/sirupsen/logrus"
 	"github.com/snyk/driftctl/enumeration/remote/azurerm/common"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 
@@ -111,7 +115,9 @@ func (s *storageRepository) ListAllStorageContainer(account *armstorage.StorageA
 	for pager.NextPage(context.Background()) {
 		resp := pager.PageResponse()
 		if err := pager.Err(); err != nil {
-			return nil, err
+			if !shouldIgnoreStorageContainerError(err) {
+				return nil, err
+			}
 		}
 		for _, item := range resp.BlobContainersListResult.ListContainerItems.Value {
 			results = append(results, fmt.Sprintf("%s%s", *account.Properties.PrimaryEndpoints.Blob, *item.Name))
@@ -119,10 +125,28 @@ func (s *storageRepository) ListAllStorageContainer(account *armstorage.StorageA
 	}
 
 	if err := pager.Err(); err != nil {
-		return nil, err
+		if !shouldIgnoreStorageContainerError(err) {
+			return nil, err
+		}
 	}
 
 	s.cache.Put(cacheKey, results)
 
 	return results, nil
+}
+
+func shouldIgnoreStorageContainerError(err error) bool {
+	azureErr, ok := err.(azblob.ResponseError)
+	if !ok {
+		return false
+	}
+	unwrapped := azureErr.Unwrap().Error()
+	if strings.Contains(unwrapped, "FeatureNotSupportedForAccount") {
+		logrus.WithFields(logrus.Fields{
+			"repository": "StorageRepository",
+			"error":      err,
+		}).Debug("Ignoring ListStorageContainer error ...")
+		return true
+	}
+	return false
 }
