@@ -27,6 +27,15 @@ resource "azurerm_storage_account" "example" {
     }
 }
 
+resource "azurerm_storage_account" "noblob" {
+    name                     = "testaccdriftctlnoblob"
+    resource_group_name      = data.azurerm_resource_group.qa1.name
+    location                 = data.azurerm_resource_group.qa1.location
+    account_tier             = "Premium"
+    account_replication_type = "LRS"
+    account_kind = "FileStorage"
+}
+
 resource "azurerm_storage_container" "private" {
     name                  = "private"
     storage_account_name  = azurerm_storage_account.example.name
