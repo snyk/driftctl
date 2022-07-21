@@ -3,6 +3,7 @@ package aws
 import (
 	"bytes"
 	"fmt"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 	"strings"
 
 	"github.com/hashicorp/terraform/helper/hashcode"
@@ -11,7 +12,7 @@ import (
 
 const AwsSecurityGroupRuleResourceType = "aws_security_group_rule"
 
-func initAwsSecurityGroupRuleMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAwsSecurityGroupRuleMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(AwsSecurityGroupRuleResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.DeleteIfDefault("security_group_id")

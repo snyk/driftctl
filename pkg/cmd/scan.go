@@ -19,7 +19,6 @@ import (
 	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/remote"
 	"github.com/snyk/driftctl/enumeration/remote/common"
-	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/enumeration/terraform"
 	"github.com/snyk/driftctl/enumeration/terraform/lock"
 	"github.com/snyk/driftctl/pkg/analyser"
@@ -27,10 +26,7 @@ import (
 	"github.com/snyk/driftctl/pkg/iac/terraform/state"
 	"github.com/snyk/driftctl/pkg/memstore"
 	dctlresource "github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
-	"github.com/snyk/driftctl/pkg/resource/azurerm"
-	"github.com/snyk/driftctl/pkg/resource/github"
-	"github.com/snyk/driftctl/pkg/resource/google"
+	"github.com/snyk/driftctl/pkg/resource/schemas"
 	"github.com/snyk/driftctl/pkg/telemetry"
 	"github.com/snyk/driftctl/pkg/terraform/hcl"
 	"github.com/spf13/cobra"
@@ -291,7 +287,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 	iacProgress := globaloutput.NewProgress("Scanning states", "Scanned states", true)
 	scanProgress := globaloutput.NewProgress("Scanning resources", "Scanned resources", false)
 
-	resourceSchemaRepository := resource.NewSchemaRepository()
+	resourceSchemaRepository := schemas.NewSchemaRepository()
 
 	resFactory := dctlresource.NewDriftctlResourceFactory(resourceSchemaRepository)
 
@@ -300,17 +296,10 @@ func scanRun(opts *pkg.ScanOptions) error {
 		return err
 	}
 
-	switch opts.To {
-	case common.RemoteAWSTerraform:
-		aws.InitResourcesMetadata(resourceSchemaRepository)
-	case common.RemoteGithubTerraform:
-		github.InitResourcesMetadata(resourceSchemaRepository)
-	case common.RemoteGoogleTerraform:
-		google.InitResourcesMetadata(resourceSchemaRepository)
-	case common.RemoteAzureTerraform:
-		azurerm.InitResourcesMetadata(resourceSchemaRepository)
-	default:
-		return errors.Errorf("unsupported remote '%s'", opts.To)
+	providerName := common.RemoteParameter(opts.To).GetProviderAddress().Type
+	err = resourceSchemaRepository.Init(providerName, opts.ProviderVersion, providerLibrary.Provider(opts.To).Schema())
+	if err != nil {
+		return err
 	}
 
 	// Teardown
@@ -355,8 +344,8 @@ func scanRun(opts *pkg.ScanOptions) error {
 		return err
 	}
 
-	analysis.ProviderVersion = resourceSchemaRepository.ProviderVersion.String()
-	analysis.ProviderName = resourceSchemaRepository.ProviderName
+	analysis.ProviderVersion = opts.ProviderVersion
+	analysis.ProviderName = opts.To
 	store.Bucket(memstore.TelemetryBucket).Set("provider_name", analysis.ProviderName)
 
 	validOutput := false
@@ -377,7 +366,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 	}
 
 	globaloutput.Printf(color.WhiteString("Scan duration: %s\n", analysis.Duration.Round(time.Second)))
-	globaloutput.Printf(color.WhiteString("Provider version used to scan: %s. Use --tf-provider-version to use another version.\n"), resourceSchemaRepository.ProviderVersion.String())
+	globaloutput.Printf(color.WhiteString("Provider version used to scan: %s. Use --tf-provider-version to use another version.\n"), opts.ProviderVersion)
 
 	if !opts.DisableTelemetry {
 		tl := telemetry.NewTelemetry(&build.Build{})

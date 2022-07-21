@@ -1,7 +1,7 @@
 package google
 
 import (
-	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/pkg/resource"
 )
 
 func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {

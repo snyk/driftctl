@@ -1,10 +1,13 @@
 package azurerm
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+)
 
 const AzurePostgresqlDatabaseResourceType = "azurerm_postgresql_database"
 
-func initAzurePostgresqlDatabaseMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAzurePostgresqlDatabaseMetadata(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(AzurePostgresqlDatabaseResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)

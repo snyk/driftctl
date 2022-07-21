@@ -1,10 +1,13 @@
 package aws
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+)
 
 const AwsRDSClusterResourceType = "aws_rds_cluster"
 
-func initAwsRDSClusterMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAwsRDSClusterMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(AwsRDSClusterResourceType, func(res *resource.Resource) {
 		val := res.Attributes()
 		val.SafeDelete([]string{"timeouts"})

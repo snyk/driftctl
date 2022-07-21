@@ -1,6 +1,8 @@
 package azurerm
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/pkg/resource"
+)
 
 func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
 	initAzureContainerRegistryMetadata(resourceSchemaRepository)

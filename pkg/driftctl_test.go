@@ -14,7 +14,6 @@ import (
 	"github.com/snyk/driftctl/pkg/output"
 	dctlresource "github.com/snyk/driftctl/pkg/resource"
 	"github.com/snyk/driftctl/pkg/resource/aws"
-	"github.com/snyk/driftctl/pkg/resource/github"
 	"github.com/snyk/driftctl/test"
 	testresource "github.com/snyk/driftctl/test/resource"
 	"github.com/stretchr/testify/assert"
@@ -31,7 +30,7 @@ type TestCase struct {
 	provider        *TestProvider
 	stateResources  []*resource.Resource
 	remoteResources []*resource.Resource
-	mocks           func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface)
+	mocks           func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface)
 	assert          func(t *testing.T, result *test.ScanResult, err error)
 	assertStore     func(*testing.T, memstore.Store)
 	options         *pkg.ScanOptions
@@ -48,8 +47,6 @@ func runTest(t *testing.T, cases TestCases) {
 			}
 		}
 		repo := testresource.InitFakeSchemaRepository(c.provider.Name, c.provider.Version)
-		aws.InitResourcesMetadata(repo)
-		github.InitResourcesMetadata(repo)
 		t.Run(c.name, func(t *testing.T) {
 			testAlerter := alerter.NewAlerter()
 
@@ -363,7 +360,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should ignore default AWS IAM role when strict mode is disabled",
-			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
+			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
 				factory.(*dctlresource.MockResourceFactory).On(
 					"CreateAbstractResource",
 					aws.AwsIamPolicyAttachmentResourceType,
@@ -461,7 +458,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should not ignore default AWS IAM role when strict mode is enabled",
-			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
+			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
 				factory.(*dctlresource.MockResourceFactory).On(
 					"CreateAbstractResource",
 					aws.AwsIamPolicyAttachmentResourceType,
@@ -559,7 +556,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should not ignore default AWS IAM role when strict mode is enabled and a filter is specified",
-			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
+			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
 				factory.(*dctlresource.MockResourceFactory).On(
 					"CreateAbstractResource",
 					aws.AwsIamPolicyAttachmentResourceType,
@@ -790,7 +787,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
+			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
 				factory.(*dctlresource.MockResourceFactory).On(
 					"CreateAbstractResource",
 					aws.AwsS3BucketPolicyResourceType,
@@ -877,7 +874,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
+			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
 				foo := resource.Resource{
 					Id:   "vol-018c5ae89895aca4c",
 					Type: "aws_ebs_volume",
@@ -992,7 +989,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
+			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
 				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", "aws_route", "r-table1080289494", mock.MatchedBy(func(input map[string]interface{}) bool {
 					return matchByAttributes(input, map[string]interface{}{
 						"destination_cidr_block": "0.0.0.0/0",
@@ -1070,7 +1067,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
+			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
 				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", "aws_sns_topic_policy", "foo", map[string]interface{}{
 					"id":     "foo",
 					"arn":    "arn",
@@ -1132,7 +1129,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
+			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
 				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", "aws_sqs_queue_policy", "foo", map[string]interface{}{
 					"id":        "foo",
 					"queue_url": "foo",
@@ -1344,7 +1341,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
+			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
 				rule1 := resource.Resource{
 					Type: aws.AwsSecurityGroupRuleResourceType,
 					Id:   "sgrule-1707973622",
@@ -1553,7 +1550,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory resource.ResourceFactory, repo resource.SchemaRepositoryInterface) {
+			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
 				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "iduser1", map[string]interface{}{
 					"id":         "iduser1",
 					"policy_arn": "policy_arn1",
@@ -1784,7 +1781,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 	runTest(t, cases)
 }
 
-func getSchema(repo resource.SchemaRepositoryInterface, resourceType string) *resource.Schema {
+func getSchema(repo dctlresource.SchemaRepositoryInterface, resourceType string) *resource.Schema {
 	sch, _ := repo.GetSchema(resourceType)
 	return sch
 }

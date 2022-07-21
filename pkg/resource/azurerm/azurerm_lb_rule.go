@@ -1,10 +1,13 @@
 package azurerm
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+)
 
 const AzureLoadBalancerRuleResourceType = "azurerm_lb_rule"
 
-func initAzureLoadBalancerRuleMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAzureLoadBalancerRuleMetadata(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(AzureLoadBalancerRuleResourceType, func(res *resource.Resource) {
 		res.Attributes().SafeDelete([]string{"timeouts"})
 	})

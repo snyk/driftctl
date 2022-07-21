@@ -1,10 +1,13 @@
 package azurerm
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+)
 
 const AzureContainerRegistryResourceType = "azurerm_container_registry"
 
-func initAzureContainerRegistryMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAzureContainerRegistryMetadata(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(AzureContainerRegistryResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)

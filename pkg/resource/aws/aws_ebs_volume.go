@@ -1,10 +1,13 @@
 package aws
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+)
 
 const AwsEbsVolumeResourceType = "aws_ebs_volume"
 
-func initAwsEbsVolumeMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAwsEbsVolumeMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(AwsEbsVolumeResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"arn"})

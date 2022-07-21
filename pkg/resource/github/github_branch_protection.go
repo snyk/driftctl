@@ -2,13 +2,13 @@ package github
 
 import (
 	"encoding/base64"
-
 	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
 const GithubBranchProtectionResourceType = "github_branch_protection"
 
-func initGithubBranchProtectionMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initGithubBranchProtectionMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(GithubBranchProtectionResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"repository_id"}) // Terraform provider is always returning nil

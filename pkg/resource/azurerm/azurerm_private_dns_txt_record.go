@@ -1,10 +1,13 @@
 package azurerm
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+)
 
 const AzurePrivateDNSTXTRecordResourceType = "azurerm_private_dns_txt_record"
 
-func initAzurePrivateDNSTXTRecordMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAzurePrivateDNSTXTRecordMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(AzurePrivateDNSTXTRecordResourceType, func(res *resource.Resource) {
 		res.Attributes().SafeDelete([]string{"timeouts"})
 	})

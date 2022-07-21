@@ -2,13 +2,13 @@ package aws
 
 import (
 	"github.com/hashicorp/go-version"
-
 	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
 const AwsInstanceResourceType = "aws_instance"
 
-func initAwsInstanceMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAwsInstanceMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(AwsInstanceResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})

@@ -2,11 +2,12 @@ package google
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
 const GoogleComputeInstanceGroupResourceType = "google_compute_instance_group"
 
-func initGoogleComputeInstanceGroupMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initGoogleComputeInstanceGroupMetadata(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(GoogleComputeInstanceGroupResourceType, func(res *resource.Resource) {
 		res.Attributes().SafeDelete([]string{"timeouts"})
 	})

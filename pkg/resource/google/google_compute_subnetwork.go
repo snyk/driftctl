@@ -2,11 +2,12 @@ package google
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
 const GoogleComputeSubnetworkResourceType = "google_compute_subnetwork"
 
-func initGoogleComputeSubnetworkMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initGoogleComputeSubnetworkMetadata(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(GoogleComputeSubnetworkResourceType, func(res *resource.Resource) {
 		res.Attributes().SafeDelete([]string{"timeouts"})
 		res.Attributes().SafeDelete([]string{"self_link"})

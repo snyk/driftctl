@@ -1,24 +1,25 @@
-package github
+package github_test
 
 import (
 	"testing"
 
 	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/pkg/resource/github"
 	testresource "github.com/snyk/driftctl/test/resource"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGitHub_Metadata_Flags(t *testing.T) {
 	testcases := map[string][]resource.Flags{
-		GithubBranchProtectionResourceType: {resource.FlagDeepMode},
-		GithubMembershipResourceType:       {resource.FlagDeepMode},
-		GithubTeamMembershipResourceType:   {resource.FlagDeepMode},
-		GithubRepositoryResourceType:       {resource.FlagDeepMode},
-		GithubTeamResourceType:             {resource.FlagDeepMode},
+		github.GithubBranchProtectionResourceType: {resource.FlagDeepMode},
+		github.GithubMembershipResourceType:       {resource.FlagDeepMode},
+		github.GithubTeamMembershipResourceType:   {resource.FlagDeepMode},
+		github.GithubRepositoryResourceType:       {resource.FlagDeepMode},
+		github.GithubTeamResourceType:             {resource.FlagDeepMode},
 	}
 
 	schemaRepository := testresource.InitFakeSchemaRepository("github", "4.4.0")
-	InitResourcesMetadata(schemaRepository)
+	github.InitResourcesMetadata(schemaRepository)
 
 	for ty, flags := range testcases {
 		t.Run(ty, func(tt *testing.T) {

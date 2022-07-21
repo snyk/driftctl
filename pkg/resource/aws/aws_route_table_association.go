@@ -1,10 +1,13 @@
 package aws
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+)
 
 const AwsRouteTableAssociationResourceType = "aws_route_table_association"
 
-func initAwsRouteTableAssociationMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAwsRouteTableAssociationMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsRouteTableAssociationResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)

@@ -1,10 +1,13 @@
 package aws
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+)
 
 const AwsSnsTopicResourceType = "aws_sns_topic"
 
-func initSnsTopicMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initSnsTopicMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(AwsSnsTopicResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.DeleteIfDefault("sqs_success_feedback_sample_rate")

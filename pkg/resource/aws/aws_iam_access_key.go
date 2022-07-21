@@ -1,10 +1,13 @@
 package aws
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+)
 
 const AwsIamAccessKeyResourceType = "aws_iam_access_key"
 
-func initAwsIAMAccessKeyMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAwsIAMAccessKeyMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(AwsIamAccessKeyResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		// As we can't read secrets from aws API once access_key created we need to set

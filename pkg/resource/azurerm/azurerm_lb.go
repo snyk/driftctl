@@ -1,10 +1,13 @@
 package azurerm
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+)
 
 const AzureLoadBalancerResourceType = "azurerm_lb"
 
-func initAzureLoadBalancerMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAzureLoadBalancerMetadata(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(AzureLoadBalancerResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)

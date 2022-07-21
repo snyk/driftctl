@@ -1,10 +1,13 @@
 package azurerm
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+)
 
 const AzureRouteTableResourceType = "azurerm_route_table"
 
-func initAzureRouteTableMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAzureRouteTableMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(AzureRouteTableResourceType, func(res *resource.Resource) map[string]string {
 		attrs := make(map[string]string)
 

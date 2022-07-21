@@ -1,16 +1,18 @@
 package resource
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+)
 
 type ResourceFactory interface {
 	CreateAbstractResource(ty, id string, data map[string]interface{}) *resource.Resource
 }
 
 type DriftctlResourceFactory struct {
-	resourceSchemaRepository resource.SchemaRepositoryInterface
+	resourceSchemaRepository SchemaRepositoryInterface
 }
 
-func NewDriftctlResourceFactory(resourceSchemaRepository resource.SchemaRepositoryInterface) *DriftctlResourceFactory {
+func NewDriftctlResourceFactory(resourceSchemaRepository SchemaRepositoryInterface) *DriftctlResourceFactory {
 	return &DriftctlResourceFactory{
 		resourceSchemaRepository: resourceSchemaRepository,
 	}
@@ -28,7 +30,7 @@ func (r *DriftctlResourceFactory) CreateAbstractResource(ty, id string, data map
 		Sch:   schema,
 	}
 
-	schema, exist := r.resourceSchemaRepository.(*resource.SchemaRepository).GetSchema(ty)
+	schema, exist := r.resourceSchemaRepository.GetSchema(ty)
 	if exist && schema.NormalizeFunc != nil {
 		schema.NormalizeFunc(&res)
 	}

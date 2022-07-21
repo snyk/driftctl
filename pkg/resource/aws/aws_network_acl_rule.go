@@ -3,6 +3,7 @@ package aws
 import (
 	"bytes"
 	"fmt"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 	"strconv"
 
 	"github.com/hashicorp/terraform/helper/hashcode"
@@ -161,7 +162,7 @@ var protocolsNumbers = map[string]int{
 	"254":             254,
 }
 
-func initAwsNetworkACLRuleMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAwsNetworkACLRuleMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(AwsNetworkACLRuleResourceType, func(res *resource.Resource) {
 		res.Attrs.DeleteIfDefault("icmp_code")
 		res.Attrs.DeleteIfDefault("icmp_type")

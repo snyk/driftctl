@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+
 	alerter2 "github.com/snyk/driftctl/enumeration/alerter"
 
 	"github.com/snyk/driftctl/pkg/filter"
@@ -1264,7 +1266,7 @@ func TestAnalyze(t *testing.T) {
 	}
 }
 
-func addSchemaToRes(res *resource.Resource, repo resource.SchemaRepositoryInterface) {
+func addSchemaToRes(res *resource.Resource, repo dctlresource.SchemaRepositoryInterface) {
 	schema, _ := repo.GetSchema(res.ResourceType())
 	res.Sch = schema
 }

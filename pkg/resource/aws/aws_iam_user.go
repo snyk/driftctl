@@ -1,10 +1,13 @@
 package aws
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+)
 
 const AwsIamUserResourceType = "aws_iam_user"
 
-func initAwsIAMUserMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAwsIAMUserMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(AwsIamUserResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		permissionsBoundary, exist := val.Get("permissions_boundary")

@@ -2,15 +2,15 @@ package aws
 
 import (
 	"fmt"
-
 	"github.com/hashicorp/terraform/helper/hashcode"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 
 	"github.com/snyk/driftctl/enumeration/resource"
 )
 
 const AwsRouteResourceType = "aws_route"
 
-func initAwsRouteMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAwsRouteMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(AwsRouteResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})

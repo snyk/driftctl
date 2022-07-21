@@ -2,13 +2,13 @@ package aws
 
 import (
 	"fmt"
-
 	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
 const AwsRoute53HealthCheckResourceType = "aws_route53_health_check"
 
-func initAwsRoute53HealthCheckMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAwsRoute53HealthCheckMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsRoute53HealthCheckResourceType, func(res *resource.Resource) map[string]string {
 		val := res.Attrs
 		attrs := make(map[string]string)

@@ -1,10 +1,13 @@
 package aws
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+)
 
 const AwsIamRoleResourceType = "aws_iam_role"
 
-func initAwsIAMRoleMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAwsIAMRoleMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(AwsIamRoleResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"force_detach_policies"})

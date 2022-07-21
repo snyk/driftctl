@@ -1,44 +1,45 @@
-package azurerm
+package azurerm_test
 
 import (
 	"testing"
 
 	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/pkg/resource/azurerm"
 	testresource "github.com/snyk/driftctl/test/resource"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAzureMetadata_Flags(t *testing.T) {
 	testcases := map[string][]resource.Flags{
-		AzureContainerRegistryResourceType:     {},
-		AzureFirewallResourceType:              {},
-		AzurePostgresqlServerResourceType:      {},
-		AzurePostgresqlDatabaseResourceType:    {},
-		AzurePublicIPResourceType:              {},
-		AzureResourceGroupResourceType:         {},
-		AzureRouteResourceType:                 {},
-		AzureRouteTableResourceType:            {},
-		AzureStorageAccountResourceType:        {},
-		AzureStorageContainerResourceType:      {},
-		AzureSubnetResourceType:                {},
-		AzureVirtualNetworkResourceType:        {},
-		AzureNetworkSecurityGroupResourceType:  {resource.FlagDeepMode},
-		AzureLoadBalancerResourceType:          {},
-		AzurePrivateDNSZoneResourceType:        {resource.FlagDeepMode},
-		AzurePrivateDNSARecordResourceType:     {resource.FlagDeepMode},
-		AzurePrivateDNSAAAARecordResourceType:  {resource.FlagDeepMode},
-		AzurePrivateDNSCNameRecordResourceType: {resource.FlagDeepMode},
-		AzurePrivateDNSPTRRecordResourceType:   {resource.FlagDeepMode},
-		AzurePrivateDNSMXRecordResourceType:    {resource.FlagDeepMode},
-		AzurePrivateDNSSRVRecordResourceType:   {resource.FlagDeepMode},
-		AzurePrivateDNSTXTRecordResourceType:   {resource.FlagDeepMode},
-		AzureImageResourceType:                 {},
-		AzureSSHPublicKeyResourceType:          {resource.FlagDeepMode},
-		AzureLoadBalancerRuleResourceType:      {resource.FlagDeepMode},
+		azurerm.AzureContainerRegistryResourceType:     {},
+		azurerm.AzureFirewallResourceType:              {},
+		azurerm.AzurePostgresqlServerResourceType:      {},
+		azurerm.AzurePostgresqlDatabaseResourceType:    {},
+		azurerm.AzurePublicIPResourceType:              {},
+		azurerm.AzureResourceGroupResourceType:         {},
+		azurerm.AzureRouteResourceType:                 {},
+		azurerm.AzureRouteTableResourceType:            {},
+		azurerm.AzureStorageAccountResourceType:        {},
+		azurerm.AzureStorageContainerResourceType:      {},
+		azurerm.AzureSubnetResourceType:                {},
+		azurerm.AzureVirtualNetworkResourceType:        {},
+		azurerm.AzureNetworkSecurityGroupResourceType:  {resource.FlagDeepMode},
+		azurerm.AzureLoadBalancerResourceType:          {},
+		azurerm.AzurePrivateDNSZoneResourceType:        {resource.FlagDeepMode},
+		azurerm.AzurePrivateDNSARecordResourceType:     {resource.FlagDeepMode},
+		azurerm.AzurePrivateDNSAAAARecordResourceType:  {resource.FlagDeepMode},
+		azurerm.AzurePrivateDNSCNameRecordResourceType: {resource.FlagDeepMode},
+		azurerm.AzurePrivateDNSPTRRecordResourceType:   {resource.FlagDeepMode},
+		azurerm.AzurePrivateDNSMXRecordResourceType:    {resource.FlagDeepMode},
+		azurerm.AzurePrivateDNSSRVRecordResourceType:   {resource.FlagDeepMode},
+		azurerm.AzurePrivateDNSTXTRecordResourceType:   {resource.FlagDeepMode},
+		azurerm.AzureImageResourceType:                 {},
+		azurerm.AzureSSHPublicKeyResourceType:          {resource.FlagDeepMode},
+		azurerm.AzureLoadBalancerRuleResourceType:      {resource.FlagDeepMode},
 	}
 
 	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", "2.71.0")
-	InitResourcesMetadata(schemaRepository)
+	azurerm.InitResourcesMetadata(schemaRepository)
 
 	for ty, flags := range testcases {
 		t.Run(ty, func(tt *testing.T) {

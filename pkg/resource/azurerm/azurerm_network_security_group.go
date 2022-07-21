@@ -1,10 +1,13 @@
 package azurerm
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+)
 
 const AzureNetworkSecurityGroupResourceType = "azurerm_network_security_group"
 
-func initAzureNetworkSecurityGroupMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAzureNetworkSecurityGroupMetadata(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(AzureNetworkSecurityGroupResourceType, func(res *resource.Resource) {
 		res.Attributes().SafeDelete([]string{"timeouts"})
 	})

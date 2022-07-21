@@ -3,11 +3,12 @@ package aws
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg/helpers"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
 const AwsSnsTopicSubscriptionResourceType = "aws_sns_topic_subscription"
 
-func initSnsTopicSubscriptionMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initSnsTopicSubscriptionMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(AwsSnsTopicSubscriptionResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		jsonString, err := helpers.NormalizeJsonString((*val)["delivery_policy"])

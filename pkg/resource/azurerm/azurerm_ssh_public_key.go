@@ -1,10 +1,13 @@
 package azurerm
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+)
 
 const AzureSSHPublicKeyResourceType = "azurerm_ssh_public_key"
 
-func initAzureSSHPublicKeyMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+func initAzureSSHPublicKeyMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
 	resourceSchemaRepository.SetNormalizeFunc(AzureSSHPublicKeyResourceType, func(res *resource.Resource) {
 		res.Attributes().SafeDelete([]string{"timeouts"})
 	})
