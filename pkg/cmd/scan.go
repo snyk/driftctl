@@ -19,17 +19,22 @@ import (
 	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/remote"
 	"github.com/snyk/driftctl/enumeration/remote/common"
+	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/enumeration/terraform"
 	"github.com/snyk/driftctl/enumeration/terraform/lock"
 	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/snyk/driftctl/pkg/iac/config"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state"
 	"github.com/snyk/driftctl/pkg/memstore"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource/azurerm"
+	"github.com/snyk/driftctl/pkg/resource/github"
+	"github.com/snyk/driftctl/pkg/resource/google"
 	"github.com/snyk/driftctl/pkg/telemetry"
 	"github.com/snyk/driftctl/pkg/terraform/hcl"
 	"github.com/spf13/cobra"
 
-	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg"
 	cmderrors "github.com/snyk/driftctl/pkg/cmd/errors"
 	"github.com/snyk/driftctl/pkg/cmd/scan/output"
@@ -37,7 +42,6 @@ import (
 	"github.com/snyk/driftctl/pkg/iac/supplier"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend"
 	globaloutput "github.com/snyk/driftctl/pkg/output"
-	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
 func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
@@ -289,17 +293,26 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	resourceSchemaRepository := resource.NewSchemaRepository()
 
-	resFactory := terraform.NewTerraformResourceFactory(resourceSchemaRepository)
+	resFactory := dctlresource.NewDriftctlResourceFactory(resourceSchemaRepository)
 
-	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, remoteLibrary, scanProgress, resourceSchemaRepository, resFactory, opts.ConfigDir)
+	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, remoteLibrary, scanProgress, resFactory, opts.ConfigDir)
 	if err != nil {
 		return err
 	}
 
-	err = dctlresource.InitMetadatas(opts.To, resourceSchemaRepository)
-	if err != nil {
-		return err
+	switch opts.To {
+	case common.RemoteAWSTerraform:
+		aws.InitResourcesMetadata(resourceSchemaRepository)
+	case common.RemoteGithubTerraform:
+		github.InitResourcesMetadata(resourceSchemaRepository)
+	case common.RemoteGoogleTerraform:
+		google.InitResourcesMetadata(resourceSchemaRepository)
+	case common.RemoteAzureTerraform:
+		azurerm.InitResourcesMetadata(resourceSchemaRepository)
+	default:
+		return errors.Errorf("unsupported remote '%s'", opts.To)
 	}
+
 	// Teardown
 	defer func() {
 		logrus.Trace("Exiting scan cmd")
@@ -310,6 +323,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 	logrus.Debug("Checking for driftignore")
 	driftIgnore := filter.NewDriftIgnore(opts.DriftignorePath, opts.Driftignores...)
 
+	// TODO use enum library interface here
 	scanner := remote.NewScanner(remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep}, driftIgnore)
 
 	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, alerter, resFactory, driftIgnore)

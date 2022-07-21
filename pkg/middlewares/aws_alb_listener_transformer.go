@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // AwsALBListenerTransformer is a simple middleware to turn all aws_alb_listener resources into aws_lb_listener ones

@@ -22,7 +22,7 @@ import (
 
 	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
-	testresource "github.com/snyk/driftctl/test/resource"
+
 	terraformtest "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -87,10 +87,7 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -241,10 +238,7 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -396,10 +390,7 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -539,10 +530,7 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -693,10 +681,7 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -848,10 +833,7 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -1002,10 +984,7 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -1156,10 +1135,7 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {

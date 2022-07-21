@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/enumeration/terraform"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -9,7 +8,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 func TestAwsApiGatewayApiExpander_Execute(t *testing.T) {
@@ -17,12 +17,12 @@ func TestAwsApiGatewayApiExpander_Execute(t *testing.T) {
 		name               string
 		resourcesFromState []*resource.Resource
 		remoteResources    []*resource.Resource
-		mocks              func(*terraform.MockResourceFactory)
+		mocks              func(*dctlresource.MockResourceFactory)
 		expected           []*resource.Resource
 	}{
 		{
 			name: "create aws_api_gateway_resource from OpenAPI v3 JSON document",
-			mocks: func(factory *terraform.MockResourceFactory) {
+			mocks: func(factory *dctlresource.MockResourceFactory) {
 				factory.On(
 					"CreateAbstractResource",
 					aws.AwsApiGatewayResourceResourceType,
@@ -231,7 +231,7 @@ func TestAwsApiGatewayApiExpander_Execute(t *testing.T) {
 		},
 		{
 			name: "create aws_api_gateway_resource from OpenAPI v2 JSON document",
-			mocks: func(factory *terraform.MockResourceFactory) {
+			mocks: func(factory *dctlresource.MockResourceFactory) {
 				factory.On(
 					"CreateAbstractResource",
 					aws.AwsApiGatewayResourceResourceType,
@@ -457,7 +457,7 @@ func TestAwsApiGatewayApiExpander_Execute(t *testing.T) {
 		},
 		{
 			name: "create resources with same path but not the same rest api id",
-			mocks: func(factory *terraform.MockResourceFactory) {
+			mocks: func(factory *dctlresource.MockResourceFactory) {
 				factory.On(
 					"CreateAbstractResource",
 					aws.AwsApiGatewayResourceResourceType,
@@ -784,7 +784,7 @@ func TestAwsApiGatewayApiExpander_Execute(t *testing.T) {
 		},
 		{
 			name: "create gateway responses based on OpenAPI v2 and v3",
-			mocks: func(factory *terraform.MockResourceFactory) {
+			mocks: func(factory *dctlresource.MockResourceFactory) {
 				factory.On(
 					"CreateAbstractResource",
 					aws.AwsApiGatewayGatewayResponseResourceType,
@@ -852,7 +852,7 @@ func TestAwsApiGatewayApiExpander_Execute(t *testing.T) {
 		},
 		{
 			name: "create api gateway resources from OpenAPI v3 YAML document",
-			mocks: func(factory *terraform.MockResourceFactory) {
+			mocks: func(factory *dctlresource.MockResourceFactory) {
 				factory.On(
 					"CreateAbstractResource",
 					aws.AwsApiGatewayResourceResourceType,
@@ -974,7 +974,7 @@ func TestAwsApiGatewayApiExpander_Execute(t *testing.T) {
 		},
 		{
 			name: "create api gateway resources from OpenAPI v2 YAML document",
-			mocks: func(factory *terraform.MockResourceFactory) {
+			mocks: func(factory *dctlresource.MockResourceFactory) {
 				factory.On(
 					"CreateAbstractResource",
 					aws.AwsApiGatewayResourceResourceType,
@@ -1160,7 +1160,7 @@ func TestAwsApiGatewayApiExpander_Execute(t *testing.T) {
 					Type: aws.AwsApiGatewayV2RouteResourceType,
 				},
 			},
-			mocks: func(factory *terraform.MockResourceFactory) {
+			mocks: func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", aws.AwsApiGatewayV2RouteResourceType, "openapi-derived-route-from-remote-1", map[string]interface{}{}).
 					Once().Return(&resource.Resource{
 					Id:   "openapi-derived-route-from-remote-1",
@@ -1212,7 +1212,7 @@ func TestAwsApiGatewayApiExpander_Execute(t *testing.T) {
 					Type: aws.AwsApiGatewayV2RouteResourceType,
 				},
 			},
-			mocks: func(factory *terraform.MockResourceFactory) {
+			mocks: func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", aws.AwsApiGatewayV2RouteResourceType, "openapi-derived-route-from-remote", map[string]interface{}{}).
 					Once().Return(&resource.Resource{
 					Id:   "openapi-derived-route-from-remote",
@@ -1267,7 +1267,7 @@ func TestAwsApiGatewayApiExpander_Execute(t *testing.T) {
 					Type: aws.AwsApiGatewayV2IntegrationResourceType,
 				},
 			},
-			mocks: func(factory *terraform.MockResourceFactory) {
+			mocks: func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", aws.AwsApiGatewayV2RouteResourceType, "openapi-derived-route-from-remote", map[string]interface{}{}).
 					Once().Return(&resource.Resource{
 					Id:   "openapi-derived-route-from-remote",
@@ -1327,7 +1327,7 @@ func TestAwsApiGatewayApiExpander_Execute(t *testing.T) {
 					Type: aws.AwsApiGatewayV2IntegrationResourceType,
 				},
 			},
-			mocks: func(factory *terraform.MockResourceFactory) {
+			mocks: func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", aws.AwsApiGatewayV2RouteResourceType, "openapi-derived-route-from-remote", map[string]interface{}{}).
 					Once().Return(&resource.Resource{
 					Id:   "openapi-derived-route-from-remote",
@@ -1343,7 +1343,7 @@ func TestAwsApiGatewayApiExpander_Execute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory := &terraform.MockResourceFactory{}
+			factory := &dctlresource.MockResourceFactory{}
 			if tt.mocks != nil {
 				tt.mocks(factory)
 			}

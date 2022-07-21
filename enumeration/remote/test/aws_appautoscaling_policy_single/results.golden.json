@@ -7,10 +7,10 @@
   "resource_id": "table/GameScores",
   "scalable_dimension": "dynamodb:table:ReadCapacityUnits",
   "service_namespace": "dynamodb",
-  "step_scaling_policy_configuration": null,
+  "step_scaling_policy_configuration": [],
   "target_tracking_scaling_policy_configuration": [
    {
-    "customized_metric_specification": null,
+    "customized_metric_specification": [],
     "disable_scale_in": false,
     "predefined_metric_specification": [
      {

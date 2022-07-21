@@ -13,15 +13,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/terraform"
 )
 
-func Init(
-	version string,
-	alerter *alerter.Alerter,
-	providerLibrary *terraform.ProviderLibrary,
-	remoteLibrary *common.RemoteLibrary,
-	progress enumeration.ProgressCounter,
-	resourceSchemaRepository *resource.SchemaRepository,
-	factory resource.ResourceFactory,
-	configDir string) error {
+func Init(version string, alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, remoteLibrary *common.RemoteLibrary, progress enumeration.ProgressCounter, factory resource.ResourceFactory, configDir string) error {
 
 	provider, err := NewAzureTerraformProvider(version, progress, configDir)
 	if err != nil {
@@ -94,12 +86,6 @@ func Init(
 	remoteLibrary.AddEnumerator(NewAzurermImageEnumerator(computeRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermSSHPublicKeyEnumerator(computeRepo, factory))
 	remoteLibrary.AddDetailsFetcher(azurerm.AzureSSHPublicKeyResourceType, common.NewGenericDetailsFetcher(azurerm.AzureSSHPublicKeyResourceType, provider, deserializer))
-
-	err = resourceSchemaRepository.Init(terraform.AZURE, provider.Version(), provider.Schema())
-	if err != nil {
-		return err
-	}
-	azurerm.InitResourcesMetadata(resourceSchemaRepository)
 
 	return nil
 }

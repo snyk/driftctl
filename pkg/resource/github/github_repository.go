@@ -2,13 +2,15 @@ package github
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/github"
 )
 
+const GithubRepositoryResourceType = "github_repository"
+
 func initGithubRepositoryMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(github.GithubRepositoryResourceType, func(res *resource.Resource) {
+	resourceSchemaRepository.SetNormalizeFunc(GithubRepositoryResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"auto_init"})
 		val.SafeDelete([]string{"etag"})
 	})
+	resourceSchemaRepository.SetFlags(GithubRepositoryResourceType, resource.FlagDeepMode)
 }

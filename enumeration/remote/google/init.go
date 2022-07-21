@@ -18,13 +18,7 @@ import (
 	"google.golang.org/api/cloudresourcemanager/v1"
 )
 
-func Init(version string, alerter *alerter.Alerter,
-	providerLibrary *terraform.ProviderLibrary,
-	remoteLibrary *common.RemoteLibrary,
-	progress enumeration.ProgressCounter,
-	resourceSchemaRepository *resource.SchemaRepository,
-	factory resource.ResourceFactory,
-	configDir string) error {
+func Init(version string, alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, remoteLibrary *common.RemoteLibrary, progress enumeration.ProgressCounter, factory resource.ResourceFactory, configDir string) error {
 
 	provider, err := NewGCPTerraformProvider(version, progress, configDir)
 	if err != nil {
@@ -110,12 +104,6 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewGoogleComputeForwardingRuleEnumerator(assetRepository, factory))
 	remoteLibrary.AddEnumerator(NewGoogleComputeInstanceGroupManagerEnumerator(assetRepository, factory))
 	remoteLibrary.AddEnumerator(NewGoogleComputeGlobalForwardingRuleEnumerator(assetRepository, factory))
-
-	err = resourceSchemaRepository.Init(terraform.GOOGLE, provider.Version(), provider.Schema())
-	if err != nil {
-		return err
-	}
-	google.InitResourcesMetadata(resourceSchemaRepository)
 
 	return nil
 }

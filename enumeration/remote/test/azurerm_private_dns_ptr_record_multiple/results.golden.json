@@ -7,7 +7,7 @@
    "ptr3.thisisatestusingtf.com"
   ],
   "resource_group_name": "martin-dev",
-  "tags": null,
+  "tags": {},
   "timeouts": {},
   "ttl": 300,
   "zone_name": "thisisatestusingtf.com"
@@ -21,7 +21,7 @@
    "ptr2.thisisatestusingtf.com"
   ],
   "resource_group_name": "martin-dev",
-  "tags": null,
+  "tags": {},
   "timeouts": {},
   "ttl": 300,
   "zone_name": "thisisatestusingtf.com"

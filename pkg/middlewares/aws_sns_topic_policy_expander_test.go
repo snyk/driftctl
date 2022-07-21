@@ -1,19 +1,16 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/enumeration/terraform"
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/mock"
-
-	awsresource "github.com/snyk/driftctl/enumeration/resource/aws"
-	testresource "github.com/snyk/driftctl/test/resource"
-
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
-
 	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+	awsresource "github.com/snyk/driftctl/pkg/resource/aws"
+	testresource "github.com/snyk/driftctl/test/resource"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
@@ -21,7 +18,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 		name               string
 		resourcesFromState *[]*resource.Resource
 		expected           *[]*resource.Resource
-		mock               func(factory *terraform.MockResourceFactory)
+		mock               func(factory *dctlresource.MockResourceFactory)
 		wantErr            bool
 	}{
 		{
@@ -56,7 +53,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			mock: func(factory *terraform.MockResourceFactory) {
+			mock: func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", awsresource.AwsSnsTopicPolicyResourceType, "ID", map[string]interface{}{
 					"arn":    "arn",
 					"id":     "ID",
@@ -208,7 +205,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			mock: func(factory *terraform.MockResourceFactory) {
+			mock: func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", awsresource.AwsSnsTopicPolicyResourceType, "ID", mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "ID"
 				})).Once().Return(&resource.Resource{
@@ -227,7 +224,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			factory := &terraform.MockResourceFactory{}
+			factory := &dctlresource.MockResourceFactory{}
 			if tt.mock != nil {
 				tt.mock(factory)
 			}

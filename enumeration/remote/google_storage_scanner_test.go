@@ -23,7 +23,6 @@ import (
 	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	testgoogle "github.com/snyk/driftctl/test/google"
-	testresource "github.com/snyk/driftctl/test/resource"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -89,11 +88,8 @@ func TestGoogleStorageBucket(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
 	resType := resource.ResourceType(googleresource.GoogleStorageBucketResourceType)
-	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -119,7 +115,7 @@ func TestGoogleStorageBucket(t *testing.T) {
 				}
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -263,11 +259,8 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
 	resType := resource.ResourceType(googleresource.GoogleStorageBucketIamMemberResourceType)
-	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -305,7 +298,7 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 			}
 			var assetRepository repository.AssetRepository = assetRepo
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -325,7 +318,7 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 			}
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
-			test.TestAgainstGoldenFile(got, resType.String(), c.dirName, provider, deserializer, shouldUpdate, tt)
+			test.TestAgainstGoldenFileNoCty(got, resType.String(), c.dirName, provider, deserializer, shouldUpdate, tt)
 		})
 	}
 }

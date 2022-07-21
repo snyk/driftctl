@@ -16,7 +16,6 @@ import (
 	resourceazure "github.com/snyk/driftctl/enumeration/resource/azurerm"
 	"github.com/snyk/driftctl/mocks"
 
-	testresource "github.com/snyk/driftctl/test/resource"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -79,10 +78,7 @@ func TestAzurermStorageAccount(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -224,10 +220,7 @@ func TestAzurermStorageContainer(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {

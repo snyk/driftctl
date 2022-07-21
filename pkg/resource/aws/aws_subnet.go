@@ -1,13 +1,13 @@
 package aws
 
-import (
-	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
-)
+import "github.com/snyk/driftctl/enumeration/resource"
+
+const AwsSubnetResourceType = "aws_subnet"
 
 func initAwsSubnetMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(aws.AwsSubnetResourceType, func(res *resource.Resource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsSubnetResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 	})
+	resourceSchemaRepository.SetFlags(AwsSubnetResourceType, resource.FlagDeepMode)
 }

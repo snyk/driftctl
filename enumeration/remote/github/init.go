@@ -15,13 +15,7 @@ import (
  * Required to use Scanner
  */
 
-func Init(version string, alerter *alerter.Alerter,
-	providerLibrary *terraform.ProviderLibrary,
-	remoteLibrary *common.RemoteLibrary,
-	progress enumeration.ProgressCounter,
-	resourceSchemaRepository *resource.SchemaRepository,
-	factory resource.ResourceFactory,
-	configDir string) error {
+func Init(version string, alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, remoteLibrary *common.RemoteLibrary, progress enumeration.ProgressCounter, factory resource.ResourceFactory, configDir string) error {
 
 	provider, err := NewGithubTerraformProvider(version, progress, configDir)
 	if err != nil {
@@ -52,12 +46,6 @@ func Init(version string, alerter *alerter.Alerter,
 
 	remoteLibrary.AddEnumerator(NewGithubBranchProtectionEnumerator(repository, factory))
 	remoteLibrary.AddDetailsFetcher(github.GithubBranchProtectionResourceType, common.NewGenericDetailsFetcher(github.GithubBranchProtectionResourceType, provider, deserializer))
-
-	err = resourceSchemaRepository.Init(terraform.GITHUB, provider.Version(), provider.Schema())
-	if err != nil {
-		return err
-	}
-	github.InitResourcesMetadata(resourceSchemaRepository)
 
 	return nil
 }

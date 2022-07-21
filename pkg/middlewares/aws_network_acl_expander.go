@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // This middelware goal is to explode aws_network_acl ingress and egress block into a set of aws_network_acl_rule

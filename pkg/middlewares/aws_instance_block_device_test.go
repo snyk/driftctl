@@ -1,13 +1,13 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/enumeration/terraform"
 	"strings"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
 	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -19,7 +19,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		mocks   func(factory *terraform.MockResourceFactory)
+		mocks   func(factory *dctlresource.MockResourceFactory)
 		wantErr bool
 	}{
 		{
@@ -117,7 +117,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 					},
 				},
 			},
-			func(factory *terraform.MockResourceFactory) {
+			func(factory *dctlresource.MockResourceFactory) {
 				foo := resource.Resource{
 					Id:   "vol-02862d9b39045a3a4",
 					Type: "aws_ebs_volume",
@@ -250,7 +250,7 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 					},
 				},
 			},
-			func(factory *terraform.MockResourceFactory) {
+			func(factory *dctlresource.MockResourceFactory) {
 				foo := resource.Resource{
 					Id:   "vol-02862d9b39045a3a4",
 					Type: "aws_ebs_volume",
@@ -339,14 +339,14 @@ func TestAwsInstanceBlockDeviceResourceMapper_Execute(t *testing.T) {
 					},
 				},
 			},
-			func(factory *terraform.MockResourceFactory) {},
+			func(factory *dctlresource.MockResourceFactory) {},
 			false,
 		},
 	}
 	for _, c := range tests {
 		t.Run(c.name, func(tt *testing.T) {
 
-			factory := &terraform.MockResourceFactory{}
+			factory := &dctlresource.MockResourceFactory{}
 			if c.mocks != nil {
 				c.mocks(factory)
 			}

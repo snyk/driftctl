@@ -17,11 +17,11 @@
     "refresh_time": 3600,
     "retry_time": 300,
     "serial_number": 1,
-    "tags": null,
+    "tags": {},
     "ttl": 3600
    }
   ],
-  "tags": null,
+  "tags": {},
   "timeouts": {}
  },
  {
@@ -42,7 +42,7 @@
     "refresh_time": 3600,
     "retry_time": 300,
     "serial_number": 1,
-    "tags": null,
+    "tags": {},
     "ttl": 3600
    }
   ],
@@ -69,11 +69,11 @@
     "refresh_time": 3600,
     "retry_time": 300,
     "serial_number": 1,
-    "tags": null,
+    "tags": {},
     "ttl": 3600
    }
   ],
-  "tags": null,
+  "tags": {},
   "timeouts": {}
  }
 ]

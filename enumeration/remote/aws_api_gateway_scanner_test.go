@@ -18,7 +18,6 @@ import (
 	"github.com/snyk/driftctl/mocks"
 
 	"github.com/snyk/driftctl/test/remote"
-	testresource "github.com/snyk/driftctl/test/resource"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -69,10 +68,7 @@ func TestApiGatewayRestApi(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -146,10 +142,7 @@ func TestApiGatewayAccount(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -229,10 +222,7 @@ func TestApiGatewayApiKey(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -330,10 +320,7 @@ func TestApiGatewayAuthorizer(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -427,10 +414,7 @@ func TestApiGatewayStage(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -524,10 +508,7 @@ func TestApiGatewayResource(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -603,10 +584,7 @@ func TestApiGatewayDomainName(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -682,10 +660,7 @@ func TestApiGatewayVpcLink(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -779,10 +754,7 @@ func TestApiGatewayRequestValidator(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -865,10 +837,7 @@ func TestApiGatewayRestApiPolicy(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -962,10 +931,7 @@ func TestApiGatewayBasePathMapping(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1067,10 +1033,7 @@ func TestApiGatewayMethod(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1164,10 +1127,7 @@ func TestApiGatewayModel(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1273,10 +1233,7 @@ func TestApiGatewayMethodResponse(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1370,10 +1327,7 @@ func TestApiGatewayGatewayResponse(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1475,10 +1429,7 @@ func TestApiGatewayMethodSettings(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1580,10 +1531,7 @@ func TestApiGatewayIntegration(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1689,10 +1637,7 @@ func TestApiGatewayIntegrationResponse(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.19.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", providerVersion)
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {

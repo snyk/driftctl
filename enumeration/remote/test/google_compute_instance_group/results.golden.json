@@ -2,9 +2,9 @@
  {
   "description": "Terraform test instance group",
   "id": "projects/cloudskiff-dev-raphael/zones/us-central1-a/instanceGroups/driftctl-test-2",
-  "instances": null,
+  "instances": [],
   "name": "driftctl-test-2",
-  "named_port": null,
+  "named_port": [],
   "network": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-raphael/global/networks/test-network",
   "project": "cloudskiff-dev-raphael",
   "self_link": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-raphael/zones/us-central1-a/instanceGroups/driftctl-test-2",
@@ -15,9 +15,9 @@
  {
   "description": "Terraform test instance group",
   "id": "projects/cloudskiff-dev-raphael/zones/us-central1-a/instanceGroups/driftctl-test-1",
-  "instances": null,
+  "instances": [],
   "name": "driftctl-test-1",
-  "named_port": null,
+  "named_port": [],
   "network": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-raphael/global/networks/test-network",
   "project": "cloudskiff-dev-raphael",
   "self_link": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-raphael/zones/us-central1-a/instanceGroups/driftctl-test-1",

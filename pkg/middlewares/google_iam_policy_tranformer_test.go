@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/enumeration/terraform"
 	"strings"
 	"testing"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/r3labs/diff/v2"
 	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/enumeration/resource/google"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
 func TestGoogleProjectIAMPolicyTransformer_Execute(t *testing.T) {
@@ -16,7 +16,7 @@ func TestGoogleProjectIAMPolicyTransformer_Execute(t *testing.T) {
 		name               string
 		resourcesFromState []*resource.Resource
 		expected           []*resource.Resource
-		mock               func(factory *terraform.MockResourceFactory)
+		mock               func(factory *dctlresource.MockResourceFactory)
 	}{
 		{
 			"Test that project policy are transformed into bindings",
@@ -103,7 +103,7 @@ func TestGoogleProjectIAMPolicyTransformer_Execute(t *testing.T) {
 					},
 				},
 			},
-			func(factory *terraform.MockResourceFactory) {
+			func(factory *dctlresource.MockResourceFactory) {
 				factory.On(
 					"CreateAbstractResource", google.GoogleProjectIamMemberResourceType,
 					"project-1/roles/storage.admin/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
@@ -184,7 +184,7 @@ func TestGoogleProjectIAMPolicyTransformer_Execute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory := &terraform.MockResourceFactory{}
+			factory := &dctlresource.MockResourceFactory{}
 			if tt.mock != nil {
 				tt.mock(factory)
 			}
@@ -212,7 +212,7 @@ func TestGoogleBucketIAMPolicyTransformer_Execute(t *testing.T) {
 		name               string
 		resourcesFromState []*resource.Resource
 		expected           []*resource.Resource
-		mock               func(factory *terraform.MockResourceFactory)
+		mock               func(factory *dctlresource.MockResourceFactory)
 	}{
 		{
 			"Test that bucket policy are transformed into bindings",
@@ -299,7 +299,7 @@ func TestGoogleBucketIAMPolicyTransformer_Execute(t *testing.T) {
 					},
 				},
 			},
-			func(factory *terraform.MockResourceFactory) {
+			func(factory *dctlresource.MockResourceFactory) {
 				factory.On(
 					"CreateAbstractResource", google.GoogleStorageBucketIamMemberResourceType,
 					"b/dctlgstoragebucketiambinding-1/roles/storage.admin/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
@@ -380,7 +380,7 @@ func TestGoogleBucketIAMPolicyTransformer_Execute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory := &terraform.MockResourceFactory{}
+			factory := &dctlresource.MockResourceFactory{}
 			if tt.mock != nil {
 				tt.mock(factory)
 			}

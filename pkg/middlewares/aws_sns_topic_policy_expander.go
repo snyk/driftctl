@@ -3,9 +3,8 @@ package middlewares
 import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // Explodes policy found in aws_sns_topic from state resources to aws_sns_topic_policy resources

@@ -23,6 +23,7 @@ import (
 	"github.com/snyk/driftctl/pkg/iac/config"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state/enumerator"
+	resdriftctl "github.com/snyk/driftctl/pkg/resource"
 )
 
 const TerraformStateReaderSupplier = "tfstate"
@@ -95,7 +96,7 @@ func (r *TerraformStateReader) retrieve() (map[string][]decodedRes, error) {
 			resName := stateRes.Addr.Resource.Name
 			resType := stateRes.Addr.Resource.Type
 
-			if !resource.IsResourceTypeSupported(resType) {
+			if !resdriftctl.IsResourceTypeSupported(resType) {
 				logrus.WithFields(logrus.Fields{
 					"name": resName,
 					"type": resType,

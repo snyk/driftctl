@@ -1,18 +1,16 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/enumeration/terraform"
 	"strings"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/stretchr/testify/mock"
-
-	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
-	testresource "github.com/snyk/driftctl/test/resource"
-
 	"github.com/r3labs/diff/v2"
+	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
+	testresource "github.com/snyk/driftctl/test/resource"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
@@ -20,7 +18,7 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 		name               string
 		resourcesFromState []*resource.Resource
 		expected           []*resource.Resource
-		mocks              func(factory *terraform.MockResourceFactory)
+		mocks              func(factory *dctlresource.MockResourceFactory)
 	}{
 		{
 			"Inline policy, no aws_sqs_queue_policy attached",
@@ -52,7 +50,7 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			func(factory *terraform.MockResourceFactory) {
+			func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", "aws_sqs_queue_policy", "foo", map[string]interface{}{
 					"id":        "foo",
 					"queue_url": "foo",
@@ -107,7 +105,7 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			func(factory *terraform.MockResourceFactory) {},
+			func(factory *dctlresource.MockResourceFactory) {},
 		},
 		{
 			"Inline policy duplicate aws_sqs_queue_policy",
@@ -148,7 +146,7 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			func(factory *terraform.MockResourceFactory) {},
+			func(factory *dctlresource.MockResourceFactory) {},
 		},
 		{
 			"Inline policy and aws_sqs_queue_policy",
@@ -198,7 +196,7 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			func(factory *terraform.MockResourceFactory) {
+			func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", "aws_sqs_queue_policy", "foo", mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "foo"
 				})).Once().Return(&resource.Resource{
@@ -216,7 +214,7 @@ func TestAwsSQSQueuePolicyExpander_Execute(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			factory := &terraform.MockResourceFactory{}
+			factory := &dctlresource.MockResourceFactory{}
 			if tt.mocks != nil {
 				tt.mocks(factory)
 			}

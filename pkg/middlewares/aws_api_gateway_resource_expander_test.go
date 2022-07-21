@@ -1,26 +1,26 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/enumeration/terraform"
 	"strings"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 func TestAwsApiGatewayResourceExpander_Execute(t *testing.T) {
 	tests := []struct {
 		name               string
 		resourcesFromState []*resource.Resource
-		mocks              func(*terraform.MockResourceFactory)
+		mocks              func(*dctlresource.MockResourceFactory)
 		expected           []*resource.Resource
 	}{
 		{
 			name: "create api gateway root resource from rest api",
-			mocks: func(factory *terraform.MockResourceFactory) {
+			mocks: func(factory *dctlresource.MockResourceFactory) {
 				factory.On(
 					"CreateAbstractResource",
 					aws.AwsApiGatewayResourceResourceType,
@@ -91,7 +91,7 @@ func TestAwsApiGatewayResourceExpander_Execute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory := &terraform.MockResourceFactory{}
+			factory := &dctlresource.MockResourceFactory{}
 			if tt.mocks != nil {
 				tt.mocks(factory)
 			}

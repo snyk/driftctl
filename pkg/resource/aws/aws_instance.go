@@ -2,12 +2,14 @@ package aws
 
 import (
 	"github.com/hashicorp/go-version"
+
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
+const AwsInstanceResourceType = "aws_instance"
+
 func initAwsInstanceMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(aws.AwsInstanceResourceType, func(res *resource.Resource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsInstanceResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 
@@ -15,4 +17,15 @@ func initAwsInstanceMetaData(resourceSchemaRepository resource.SchemaRepositoryI
 			val.SafeDelete([]string{"instance_initiated_shutdown_behavior"})
 		}
 	})
+	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsInstanceResourceType, func(res *resource.Resource) map[string]string {
+		val := res.Attrs
+		attrs := make(map[string]string)
+		if tags := val.GetMap("tags"); tags != nil {
+			if name, ok := tags["Name"]; ok {
+				attrs["Name"] = name.(string)
+			}
+		}
+		return attrs
+	})
+	resourceSchemaRepository.SetFlags(AwsInstanceResourceType, resource.FlagDeepMode)
 }

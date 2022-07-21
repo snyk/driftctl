@@ -17,7 +17,7 @@ import (
 	"github.com/snyk/driftctl/mocks"
 
 	testgoogle "github.com/snyk/driftctl/test/google"
-	testresource "github.com/snyk/driftctl/test/resource"
+
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -99,10 +99,7 @@ func TestGoogleCloudRunService(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -121,7 +118,7 @@ func TestGoogleCloudRunService(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}

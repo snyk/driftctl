@@ -23,7 +23,6 @@ import (
 
 	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
-	testresource "github.com/snyk/driftctl/test/resource"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -75,9 +74,7 @@ func TestRDSDBInstance(t *testing.T) {
 		},
 	}
 
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -128,7 +125,7 @@ func TestRDSDBInstance(t *testing.T) {
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsDbInstanceResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			test.TestAgainstGoldenFileNoCty(got, resourceaws.AwsDbInstanceResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -172,9 +169,7 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 		},
 	}
 
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -274,9 +269,7 @@ func TestRDSCluster(t *testing.T) {
 		},
 	}
 
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {

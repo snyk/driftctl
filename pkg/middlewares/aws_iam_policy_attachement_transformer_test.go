@@ -1,14 +1,14 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/enumeration/terraform"
 	"strings"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 	testresource "github.com/snyk/driftctl/test/resource"
 )
 
@@ -21,7 +21,7 @@ func TestIamPolicyAttachmentTransformer_Execute(t *testing.T) {
 		name     string
 		args     argRes
 		expected argRes
-		mocks    func(factory *terraform.MockResourceFactory)
+		mocks    func(factory *dctlresource.MockResourceFactory)
 	}{
 		{
 			name: "transform user_policy_attachment",
@@ -75,7 +75,7 @@ func TestIamPolicyAttachmentTransformer_Execute(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory *terraform.MockResourceFactory) {
+			mocks: func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "id1", map[string]interface{}{
 					"id":         "id1",
 					"policy_arn": "policy_arn1",
@@ -164,7 +164,7 @@ func TestIamPolicyAttachmentTransformer_Execute(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory *terraform.MockResourceFactory) {
+			mocks: func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "id1", map[string]interface{}{
 					"id":         "id1",
 					"policy_arn": "policy_arn1",
@@ -253,7 +253,7 @@ func TestIamPolicyAttachmentTransformer_Execute(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory *terraform.MockResourceFactory) {
+			mocks: func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "id1", map[string]interface{}{
 					"id":         "id1",
 					"policy_arn": "policy_arn1",
@@ -352,7 +352,7 @@ func TestIamPolicyAttachmentTransformer_Execute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory := &terraform.MockResourceFactory{}
+			factory := &dctlresource.MockResourceFactory{}
 			if tt.mocks != nil {
 				tt.mocks(factory)
 			}

@@ -3,7 +3,7 @@ package middlewares
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // Remote NS and SAO records from remote state if not managed by IAC

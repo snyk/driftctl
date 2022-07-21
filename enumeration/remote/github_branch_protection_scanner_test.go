@@ -15,7 +15,6 @@ import (
 	githubres "github.com/snyk/driftctl/enumeration/resource/github"
 	"github.com/snyk/driftctl/mocks"
 
-	testresource "github.com/snyk/driftctl/test/resource"
 	tftest "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/mock"
 
@@ -68,9 +67,7 @@ func TestScanGithubBranchProtection(t *testing.T) {
 		},
 	}
 
-	schemaRepository := testresource.InitFakeSchemaRepository("github", "4.4.0")
-	githubres.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {

@@ -29,22 +29,16 @@ func IsSupported(remote string) bool {
 	return false
 }
 
-func Activate(remote, version string, alerter *alerter.Alerter,
-	providerLibrary *terraform.ProviderLibrary,
-	remoteLibrary *common.RemoteLibrary,
-	progress enumeration.ProgressCounter,
-	resourceSchemaRepository *resource.SchemaRepository,
-	factory resource.ResourceFactory,
-	configDir string) error {
+func Activate(remote, version string, alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, remoteLibrary *common.RemoteLibrary, progress enumeration.ProgressCounter, factory resource.ResourceFactory, configDir string) error {
 	switch remote {
 	case common.RemoteAWSTerraform:
-		return aws.Init(version, alerter, providerLibrary, remoteLibrary, progress, resourceSchemaRepository, factory, configDir)
+		return aws.Init(version, alerter, providerLibrary, remoteLibrary, progress, factory, configDir)
 	case common.RemoteGithubTerraform:
-		return github.Init(version, alerter, providerLibrary, remoteLibrary, progress, resourceSchemaRepository, factory, configDir)
+		return github.Init(version, alerter, providerLibrary, remoteLibrary, progress, factory, configDir)
 	case common.RemoteGoogleTerraform:
-		return google.Init(version, alerter, providerLibrary, remoteLibrary, progress, resourceSchemaRepository, factory, configDir)
+		return google.Init(version, alerter, providerLibrary, remoteLibrary, progress, factory, configDir)
 	case common.RemoteAzureTerraform:
-		return azurerm.Init(version, alerter, providerLibrary, remoteLibrary, progress, resourceSchemaRepository, factory, configDir)
+		return azurerm.Init(version, alerter, providerLibrary, remoteLibrary, progress, factory, configDir)
 
 	default:
 		return errors.Errorf("unsupported remote '%s'", remote)

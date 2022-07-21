@@ -1,12 +1,11 @@
 package aws
 
-import (
-	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
-)
+import "github.com/snyk/driftctl/enumeration/resource"
+
+const AwsSecurityGroupResourceType = "aws_security_group"
 
 func initAwsSecurityGroupMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(aws.AwsSecurityGroupResourceType, func(res *resource.Resource) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsSecurityGroupResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"revoke_rules_on_delete"})
 		val.SafeDelete([]string{"timeouts"})
@@ -15,4 +14,5 @@ func initAwsSecurityGroupMetaData(resourceSchemaRepository resource.SchemaReposi
 		val.SafeDelete([]string{"ingress"})
 		val.SafeDelete([]string{"egress"})
 	})
+	resourceSchemaRepository.SetFlags(AwsSecurityGroupResourceType, resource.FlagDeepMode)
 }
