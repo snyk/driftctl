@@ -137,10 +137,22 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		{
 			name: "infrastructure should be in sync",
 			stateResources: []*resource.Resource{
-				&resource.Resource{},
+				&resource.Resource{
+					Id:   "id",
+					Type: "type",
+					Attrs: &resource.Attributes{
+						"foobar": "barfoo",
+					},
+				},
 			},
 			remoteResources: []*resource.Resource{
-				&resource.Resource{},
+				&resource.Resource{
+					Id:   "id",
+					Type: "type",
+					Attrs: &resource.Attributes{
+						"foobar": "barfoo",
+					},
+				},
 			},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertInfrastructureIsInSync()
@@ -277,6 +289,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Attrs: &resource.Attributes{
 						"tags": map[string]string{
 							"tag1": "deleted",
+							"tag2": "not_deleted",
 						},
 					},
 				},
@@ -286,7 +299,9 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Id:   "fake",
 					Type: "FakeResource",
 					Attrs: &resource.Attributes{
-						"tags": map[string]string{},
+						"tags": map[string]string{
+							"tag2": "not_deleted",
+						},
 					},
 				},
 			},
@@ -364,7 +379,8 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Id:   "role-policy-test-1",
 					Type: aws.AwsIamPolicyResourceType,
 					Attrs: &resource.Attributes{
-						"arn": "policy-test-1",
+						"arn":    "policy-test-1",
+						"policy": "",
 					},
 				},
 			},
@@ -444,7 +460,8 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 					Id:   "policy-test-1",
 					Type: aws.AwsIamPolicyResourceType,
 					Attrs: &resource.Attributes{
-						"arn": "policy-test-1",
+						"arn":    "policy-test-1",
+						"policy": "",
 					},
 				},
 			},

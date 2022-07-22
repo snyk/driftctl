@@ -213,5 +213,17 @@ func (d DriftCTL) scan() (remoteResources []*resource.Resource, resourcesFromSta
 		return nil, nil, err
 	}
 
-	return remoteResources, resourcesFromState, err
+	// We do a normalization pass to resources from remote because resource in IaC supplier
+	// are already created using DriftctlFactory.CreateAbstractResource and thus are already normalized
+	var normalizedRemoteResources []*resource.Resource
+	for _, res := range remoteResources {
+		attrs := resource.Attributes{}
+		if res.Attributes() != nil {
+			attrs = *res.Attributes()
+		}
+		normalizedRes := d.resourceFactory.CreateAbstractResource(res.ResourceType(), res.ResourceId(), attrs)
+		normalizedRemoteResources = append(normalizedRemoteResources, normalizedRes)
+	}
+
+	return normalizedRemoteResources, resourcesFromState, err
 }
