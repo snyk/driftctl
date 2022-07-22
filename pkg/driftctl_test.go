@@ -30,7 +30,6 @@ type TestCase struct {
 	provider        *TestProvider
 	stateResources  []*resource.Resource
 	remoteResources []*resource.Resource
-	mocks           func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface)
 	assert          func(t *testing.T, result *test.ScanResult, err error)
 	assertStore     func(*testing.T, memstore.Store)
 	options         *pkg.ScanOptions
@@ -75,11 +74,6 @@ func runTest(t *testing.T, cases TestCases) {
 			remoteSupplier.On("Resources").Return(c.remoteResources, nil)
 
 			var resourceFactory resource.ResourceFactory = dctlresource.NewDriftctlResourceFactory(repo)
-
-			if c.mocks != nil {
-				resourceFactory = &dctlresource.MockResourceFactory{}
-				c.mocks(resourceFactory, repo)
-			}
 
 			if c.options == nil {
 				c.options = &pkg.ScanOptions{Deep: true}
@@ -360,24 +354,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should ignore default AWS IAM role when strict mode is disabled",
-			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
-				factory.(*dctlresource.MockResourceFactory).On(
-					"CreateAbstractResource",
-					aws.AwsIamPolicyAttachmentResourceType,
-					"role-test-1-policy-test-1",
-					map[string]interface{}{
-						"policy_arn": "policy-test-1",
-						"roles":      []interface{}{"role-test-1"},
-					},
-				).Once().Return(&resource.Resource{
-					Id:   "role-test-1-policy-test-1",
-					Type: aws.AwsIamPolicyAttachmentResourceType,
-					Attrs: &resource.Attributes{
-						"policy_arn": "policy-test-1",
-						"roles":      []interface{}{"role-test-1"},
-					},
-				})
-			},
 			stateResources: []*resource.Resource{
 				&resource.Resource{
 					Id:    "fake",
@@ -458,24 +434,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should not ignore default AWS IAM role when strict mode is enabled",
-			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
-				factory.(*dctlresource.MockResourceFactory).On(
-					"CreateAbstractResource",
-					aws.AwsIamPolicyAttachmentResourceType,
-					"role-test-1-policy-test-1",
-					map[string]interface{}{
-						"policy_arn": "policy-test-1",
-						"roles":      []interface{}{"role-test-1"},
-					},
-				).Once().Return(&resource.Resource{
-					Id:   "role-test-1-policy-test-1",
-					Type: aws.AwsIamPolicyAttachmentResourceType,
-					Attrs: &resource.Attributes{
-						"policy_arn": "policy-test-1",
-						"roles":      []interface{}{"role-test-1"},
-					},
-				})
-			},
 			stateResources: []*resource.Resource{
 				&resource.Resource{
 					Id:    "fake",
@@ -556,24 +514,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 		},
 		{
 			name: "we should not ignore default AWS IAM role when strict mode is enabled and a filter is specified",
-			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
-				factory.(*dctlresource.MockResourceFactory).On(
-					"CreateAbstractResource",
-					aws.AwsIamPolicyAttachmentResourceType,
-					"role-test-1-policy-test-1",
-					map[string]interface{}{
-						"policy_arn": "policy-test-1",
-						"roles":      []interface{}{"role-test-1"},
-					},
-				).Once().Return(&resource.Resource{
-					Id:   "role-test-1-policy-test-1",
-					Type: aws.AwsIamPolicyAttachmentResourceType,
-					Attrs: &resource.Attributes{
-						"policy_arn": "policy-test-1",
-						"roles":      []interface{}{"role-test-1"},
-					},
-				})
-			},
 			stateResources: []*resource.Resource{
 				&resource.Resource{
 					Id:    "fake",
@@ -787,27 +727,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
-				factory.(*dctlresource.MockResourceFactory).On(
-					"CreateAbstractResource",
-					aws.AwsS3BucketPolicyResourceType,
-					"foo",
-					map[string]interface{}{
-						"id":     "foo",
-						"bucket": "foo",
-						"policy": "{\"Id\":\"foo\"}",
-					},
-				).Once().Return(&resource.Resource{
-					Id:   "foo",
-					Type: aws.AwsS3BucketPolicyResourceType,
-					Attrs: &resource.Attributes{
-						"id":     "foo",
-						"bucket": "foo",
-						"policy": "{\"Id\":\"foo\"}",
-					},
-					Sch: getSchema(repo, aws.AwsS3BucketPolicyResourceType),
-				})
-			},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
 				result.AssertResourceHasDrift("foo", "aws_s3_bucket_policy", analyser.Change{
@@ -874,45 +793,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					},
 				},
 			},
-			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
-				foo := resource.Resource{
-					Id:   "vol-018c5ae89895aca4c",
-					Type: "aws_ebs_volume",
-					Attrs: &resource.Attributes{
-						"encrypted":            true,
-						"multi_attach_enabled": false,
-						"availability_zone":    "us-east-1",
-					},
-					Sch: getSchema(repo, "aws_ebs_volume"),
-				}
-				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
-					return matchByAttributes(input, map[string]interface{}{
-						"id":                   "vol-018c5ae89895aca4c",
-						"availability_zone":    "us-east-1",
-						"encrypted":            true,
-						"multi_attach_enabled": false,
-					})
-				})).Times(1).Return(&foo, nil)
-
-				bar := resource.Resource{
-					Id:   "vol-02862d9b39045a3a4",
-					Type: "aws_ebs_volume",
-					Attrs: &resource.Attributes{
-						"type":                 "gp2",
-						"multi_attach_enabled": false,
-						"availability_zone":    "us-east-1",
-					},
-					Sch: getSchema(repo, "aws_ebs_volume"),
-				}
-				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", "aws_ebs_volume", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
-					return matchByAttributes(input, map[string]interface{}{
-						"id":                   "vol-02862d9b39045a3a4",
-						"availability_zone":    "us-east-1",
-						"type":                 "gp2",
-						"multi_attach_enabled": false,
-					})
-				})).Times(1).Return(&bar, nil)
-			},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(2)
 				result.AssertResourceHasDrift("vol-02862d9b39045a3a4", "aws_ebs_volume", analyser.Change{
@@ -974,6 +854,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"origin":                 "CreateRoute",
 						"destination_cidr_block": "0.0.0.0/0",
 						"gateway_id":             "igw-07b7844a8fd17a638",
+						"id":                     "r-table1080289494",
 						"state":                  "active",
 					},
 				},
@@ -985,49 +866,10 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"origin":                      "CreateRoute",
 						"destination_ipv6_cidr_block": "::/0",
 						"gateway_id":                  "igw-07b7844a8fd17a638",
+						"id":                          "r-table2750132062",
 						"state":                       "active",
 					},
 				},
-			},
-			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
-				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", "aws_route", "r-table1080289494", mock.MatchedBy(func(input map[string]interface{}) bool {
-					return matchByAttributes(input, map[string]interface{}{
-						"destination_cidr_block": "0.0.0.0/0",
-						"gateway_id":             "igw-07b7844a8fd17a638",
-						"origin":                 "CreateRoute",
-						"route_table_id":         "table",
-						"state":                  "active",
-					})
-				})).Times(1).Return(&resource.Resource{
-					Id:   "r-table1080289494",
-					Type: aws.AwsRouteResourceType,
-					Attrs: &resource.Attributes{
-						"route_table_id":         "table",
-						"origin":                 "CreateRoute",
-						"destination_cidr_block": "0.0.0.0/0",
-						"gateway_id":             "igw-07b7844a8fd17a638",
-						"state":                  "active",
-					},
-				}, nil)
-				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", "aws_route", "r-table2750132062", mock.MatchedBy(func(input map[string]interface{}) bool {
-					return matchByAttributes(input, map[string]interface{}{
-						"destination_ipv6_cidr_block": "::/0",
-						"gateway_id":                  "igw-07b7844a8fd17a638",
-						"origin":                      "CreateRoute",
-						"route_table_id":              "table",
-						"state":                       "active",
-					})
-				})).Times(1).Return(&resource.Resource{
-					Id:   "r-table2750132062",
-					Type: aws.AwsRouteResourceType,
-					Attrs: &resource.Attributes{
-						"route_table_id":              "table",
-						"origin":                      "CreateRoute",
-						"destination_ipv6_cidr_block": "::/0",
-						"gateway_id":                  "igw-07b7844a8fd17a638",
-						"state":                       "active",
-					},
-				}, nil)
 			},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(2)
@@ -1066,22 +908,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"policy": "{\"policy\":\"baz\"}",
 					},
 				},
-			},
-			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
-				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", "aws_sns_topic_policy", "foo", map[string]interface{}{
-					"id":     "foo",
-					"arn":    "arn",
-					"policy": "{\"policy\":\"bar\"}",
-				}).Times(1).Return(&resource.Resource{
-					Id:   "foo",
-					Type: aws.AwsSnsTopicPolicyResourceType,
-					Attrs: &resource.Attributes{
-						"id":     "foo",
-						"arn":    "arn",
-						"policy": "{\"policy\":\"bar\"}",
-					},
-					Sch: getSchema(repo, aws.AwsSnsTopicPolicyResourceType),
-				}, nil)
 			},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
@@ -1128,22 +954,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"policy":    "{\"policy\":\"baz\"}",
 					},
 				},
-			},
-			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
-				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", "aws_sqs_queue_policy", "foo", map[string]interface{}{
-					"id":        "foo",
-					"queue_url": "foo",
-					"policy":    "{\"policy\":\"bar\"}",
-				}).Times(1).Return(&resource.Resource{
-					Id:   "foo",
-					Type: aws.AwsSqsQueuePolicyResourceType,
-					Attrs: &resource.Attributes{
-						"id":        "foo",
-						"queue_url": "foo",
-						"policy":    "{\"policy\":\"bar\"}",
-					},
-					Sch: getSchema(repo, aws.AwsSqsQueuePolicyResourceType),
-				}, nil)
 			},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
@@ -1265,8 +1075,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"from_port":         float64(0),
 						"to_port":           float64(0),
 						"cidr_blocks":       []interface{}{"0.0.0.0/0"},
-						"ipv6_cidr_blocks":  []interface{}{},
-						"prefix_list_ids":   []interface{}{},
 					},
 				},
 				&resource.Resource{
@@ -1279,9 +1087,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"protocol":          "-1",
 						"from_port":         float64(0),
 						"to_port":           float64(0),
-						"cidr_blocks":       []interface{}{},
 						"ipv6_cidr_blocks":  []interface{}{"::/0"},
-						"prefix_list_ids":   []interface{}{},
 					},
 				},
 				&resource.Resource{
@@ -1295,8 +1101,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"from_port":         float64(0),
 						"to_port":           float64(0),
 						"cidr_blocks":       []interface{}{"5.6.7.0/24"},
-						"ipv6_cidr_blocks":  []interface{}{},
-						"prefix_list_ids":   []interface{}{},
 					},
 				},
 				&resource.Resource{
@@ -1310,8 +1114,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"from_port":         float64(0),
 						"to_port":           float64(0),
 						"cidr_blocks":       []interface{}{"1.2.0.0/16"},
-						"ipv6_cidr_blocks":  []interface{}{},
-						"prefix_list_ids":   []interface{}{},
 					},
 				},
 				&resource.Resource{
@@ -1340,135 +1142,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"source_security_group_id": "sg-9e0204ff",
 					},
 				},
-			},
-			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
-				rule1 := resource.Resource{
-					Type: aws.AwsSecurityGroupRuleResourceType,
-					Id:   "sgrule-1707973622",
-					Attrs: &resource.Attributes{
-						"id":                "sgrule-1707973622",
-						"type":              "egress",
-						"security_group_id": "sg-0254c038e32f25530",
-						"protocol":          "-1",
-						"from_port":         float64(0),
-						"to_port":           float64(0),
-						"cidr_blocks": []interface{}{
-							"0.0.0.0/0",
-						},
-						"ipv6_cidr_blocks": []interface{}{},
-						"prefix_list_ids":  []interface{}{},
-					},
-				}
-				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule1.Id,
-					mock.MatchedBy(func(input map[string]interface{}) bool {
-						return matchByAttributes(input, map[string]interface{}{
-							"id":                "sgrule-1707973622",
-							"type":              "egress",
-							"security_group_id": "sg-0254c038e32f25530",
-							"protocol":          "-1",
-							"from_port":         float64(0),
-							"to_port":           float64(0),
-							"cidr_blocks":       []interface{}{"0.0.0.0/0"},
-							"ipv6_cidr_blocks":  []interface{}{},
-							"prefix_list_ids":   []interface{}{},
-						})
-					})).Times(1).Return(&rule1, nil)
-
-				rule2 := resource.Resource{
-					Type: aws.AwsSecurityGroupRuleResourceType,
-					Id:   "sgrule-2821752134",
-					Attrs: &resource.Attributes{
-						"id":                "sgrule-2821752134",
-						"type":              "egress",
-						"security_group_id": "sg-0254c038e32f25530",
-						"protocol":          "-1",
-						"from_port":         float64(0),
-						"to_port":           float64(0),
-						"cidr_blocks":       []interface{}{},
-						"ipv6_cidr_blocks": []interface{}{
-							"::/0",
-						},
-						"prefix_list_ids": []interface{}{},
-					},
-				}
-				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule2.Id,
-					mock.MatchedBy(func(input map[string]interface{}) bool {
-						return matchByAttributes(input, map[string]interface{}{
-							"id":                "sgrule-2821752134",
-							"type":              "egress",
-							"security_group_id": "sg-0254c038e32f25530",
-							"protocol":          "-1",
-							"from_port":         float64(0),
-							"to_port":           float64(0),
-							"cidr_blocks":       []interface{}{},
-							"ipv6_cidr_blocks":  []interface{}{"::/0"},
-							"prefix_list_ids":   []interface{}{},
-						})
-					})).Times(1).Return(&rule2, nil)
-
-				rule3 := resource.Resource{
-					Type: aws.AwsSecurityGroupRuleResourceType,
-					Id:   "sgrule-2165103420",
-					Attrs: &resource.Attributes{
-						"id":                "sgrule-2165103420",
-						"type":              "ingress",
-						"security_group_id": "sg-0254c038e32f25530",
-						"protocol":          "-1",
-						"from_port":         float64(0),
-						"to_port":           float64(0),
-						"cidr_blocks": []interface{}{
-							"5.6.7.0/24",
-						},
-						"ipv6_cidr_blocks": []interface{}{},
-						"prefix_list_ids":  []interface{}{},
-					},
-				}
-				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule3.Id,
-					mock.MatchedBy(func(input map[string]interface{}) bool {
-						return matchByAttributes(input, map[string]interface{}{
-							"id":                "sgrule-2165103420",
-							"type":              "ingress",
-							"security_group_id": "sg-0254c038e32f25530",
-							"protocol":          "-1",
-							"from_port":         float64(0),
-							"to_port":           float64(0),
-							"cidr_blocks":       []interface{}{"5.6.7.0/24"},
-							"ipv6_cidr_blocks":  []interface{}{},
-							"prefix_list_ids":   []interface{}{},
-						})
-					})).Times(1).Return(&rule3, nil)
-
-				rule4 := resource.Resource{
-					Type: aws.AwsSecurityGroupRuleResourceType,
-					Id:   "sgrule-2582518759",
-					Attrs: &resource.Attributes{
-						"id":                "sgrule-2582518759",
-						"type":              "ingress",
-						"security_group_id": "sg-0254c038e32f25530",
-						"protocol":          "-1",
-						"from_port":         float64(0),
-						"to_port":           float64(0),
-						"cidr_blocks": []interface{}{
-							"1.2.0.0/16",
-						},
-						"ipv6_cidr_blocks": []interface{}{},
-						"prefix_list_ids":  []interface{}{},
-					},
-				}
-				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", "aws_security_group_rule", rule4.Id,
-					mock.MatchedBy(func(input map[string]interface{}) bool {
-						return matchByAttributes(input, map[string]interface{}{
-							"id":                "sgrule-2582518759",
-							"type":              "ingress",
-							"security_group_id": "sg-0254c038e32f25530",
-							"protocol":          "-1",
-							"from_port":         float64(0),
-							"to_port":           float64(0),
-							"cidr_blocks":       []interface{}{"1.2.0.0/16"},
-							"ipv6_cidr_blocks":  []interface{}{},
-							"prefix_list_ids":   []interface{}{},
-						})
-					})).Times(1).Return(&rule4, nil)
 			},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(7)
@@ -1549,64 +1222,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 						"role":       "role1",
 					},
 				},
-			},
-			mocks: func(factory resource.ResourceFactory, repo dctlresource.SchemaRepositoryInterface) {
-				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "iduser1", map[string]interface{}{
-					"id":         "iduser1",
-					"policy_arn": "policy_arn1",
-					"users":      []interface{}{"user1"},
-					"groups":     []interface{}{},
-					"roles":      []interface{}{},
-				}).Twice().Return(&resource.Resource{
-					Id:   "id1",
-					Type: aws.AwsIamPolicyAttachmentResourceType,
-					Attrs: &resource.Attributes{
-						"id":         "iduser1",
-						"policy_arn": "policy_arn1",
-						"users":      []interface{}{"user1"},
-						"groups":     []interface{}{},
-						"roles":      []interface{}{},
-					},
-				}, nil)
-				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "user1-policy_arn1", map[string]interface{}{
-					"policy_arn": "policy_arn1",
-					"users":      []interface{}{"user1"},
-				}).Twice().Return(&resource.Resource{
-					Id:   "user1-policy_arn1",
-					Type: aws.AwsIamPolicyAttachmentResourceType,
-					Attrs: &resource.Attributes{
-						"policy_arn": "policy_arn1",
-						"users":      []interface{}{"user1"},
-					},
-				}, nil)
-				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "idrole1", map[string]interface{}{
-					"id":         "idrole1",
-					"policy_arn": "policy_arn1",
-					"users":      []interface{}{},
-					"groups":     []interface{}{},
-					"roles":      []interface{}{"role1"},
-				}).Twice().Return(&resource.Resource{
-					Id:   "idrole1",
-					Type: aws.AwsIamPolicyAttachmentResourceType,
-					Attrs: &resource.Attributes{
-						"id":         "idrole1",
-						"policy_arn": "policy_arn1",
-						"users":      []interface{}{},
-						"groups":     []interface{}{},
-						"roles":      []interface{}{"role1"},
-					},
-				}, nil)
-				factory.(*dctlresource.MockResourceFactory).On("CreateAbstractResource", aws.AwsIamPolicyAttachmentResourceType, "role1-policy_arn1", map[string]interface{}{
-					"policy_arn": "policy_arn1",
-					"roles":      []interface{}{"role1"},
-				}).Twice().Return(&resource.Resource{
-					Id:   "role1-policy_arn1",
-					Type: aws.AwsIamPolicyAttachmentResourceType,
-					Attrs: &resource.Attributes{
-						"policy_arn": "policy_arn1",
-						"roles":      []interface{}{"role1"},
-					},
-				}, nil)
 			},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(2)
