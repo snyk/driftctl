@@ -404,10 +404,18 @@ func retrieveBackendsFromHCL(workdir string) ([]config.SupplierConfig, error) {
 			continue
 		}
 
+		var cfg *config.SupplierConfig
 		ws := hcl.GetCurrentWorkspaceName(path.Dir(match))
-		if supplierConfig := body.Backend.SupplierConfig(ws); supplierConfig != nil {
-			globaloutput.Printf(color.WhiteString("Using Terraform state %s found in %s. Use the --from flag to specify another state file.\n"), supplierConfig, match)
-			supplierConfigs = append(supplierConfigs, *supplierConfig)
+
+		if body.Cloud != nil {
+			cfg = body.Cloud.SupplierConfig(ws)
+		}
+		if body.Backend != nil {
+			cfg = body.Backend.SupplierConfig(ws)
+		}
+		if cfg != nil {
+			globaloutput.Printf(color.WhiteString("Using Terraform state %s found in %s. Use the --from flag to specify another state file.\n"), cfg, match)
+			supplierConfigs = append(supplierConfigs, *cfg)
 		}
 	}
 
