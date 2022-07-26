@@ -1,0 +1,21 @@
+[
+ {
+  "Id": "b8r351",
+  "Type": "aws_apigatewayv2_vpc_link",
+  "Attrs": {
+   "arn": "arn:aws:apigateway:us-east-2::/vpclinks/b8r351",
+   "id": "b8r351",
+   "name": "foo",
+   "security_group_ids": [
+    "sg-055d40d3b933c2c4b"
+   ],
+   "subnet_ids": [
+    "subnet-06e2e690aa9cfcb4e",
+    "subnet-0b536f373c65d780a"
+   ],
+   "tags": {
+    "Usage": "example"
+   }
+  }
+ }
+]

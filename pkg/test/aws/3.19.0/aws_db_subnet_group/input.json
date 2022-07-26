@@ -1,0 +1,30 @@
+[
+ {
+  "Id": "bar",
+  "Type": "aws_db_subnet_group",
+  "Attrs": {
+   "arn": "arn:aws:rds:eu-west-3:929327065333:subgrp:bar",
+   "description": "Managed by Terraform",
+   "id": "bar",
+   "name": "bar",
+   "subnet_ids": [
+    "subnet-63c5f90a",
+    "subnet-d81e8695"
+   ]
+  }
+ },
+ {
+  "Id": "foo",
+  "Type": "aws_db_subnet_group",
+  "Attrs": {
+   "arn": "arn:aws:rds:eu-west-3:929327065333:subgrp:foo",
+   "description": "Managed by Terraform",
+   "id": "foo",
+   "name": "foo",
+   "subnet_ids": [
+    "subnet-49f9ae32",
+    "subnet-63c5f90a"
+   ]
+  }
+ }
+]

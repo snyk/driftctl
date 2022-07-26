@@ -1,0 +1,13 @@
+[
+ {
+  "Id": "nbw7vw",
+  "Type": "aws_apigatewayv2_route_response",
+  "Attrs": {
+   "api_id": "77ooqulkke",
+   "id": "nbw7vw",
+   "model_selection_expression": "",
+   "route_id": "liqc5u4",
+   "route_response_key": "$default"
+  }
+ }
+]

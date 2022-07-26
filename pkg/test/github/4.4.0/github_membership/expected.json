@@ -1,0 +1,20 @@
+[
+  {
+    "Id": "driftctl-test:eliecharra",
+    "Type": "github_membership",
+    "Attrs": {
+      "id": "driftctl-test:eliecharra",
+      "role": "admin",
+      "username": "eliecharra"
+    }
+  },
+  {
+    "Id": "driftctl-test:driftctl-acceptance-tester",
+    "Type": "github_membership",
+    "Attrs": {
+      "id": "driftctl-test:driftctl-acceptance-tester",
+      "role": "member",
+      "username": "driftctl-acceptance-tester"
+    }
+  }
+]

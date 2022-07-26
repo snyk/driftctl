@@ -1,0 +1,41 @@
+[
+  {
+    "Id": "arn:aws:iam::929327065333:policy/policy-0",
+    "Type": "aws_iam_policy",
+    "Attrs": {
+      "arn": "arn:aws:iam::929327065333:policy/policy-0",
+      "description": "",
+      "id": "arn:aws:iam::929327065333:policy/policy-0",
+      "name": "policy-0",
+      "name_prefix": null,
+      "path": "/",
+      "policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"EC2Admin\",\n            \"Effect\": \"Allow\",\n            \"Action\": \"ec2:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}\n"
+    }
+  },
+  {
+    "Id": "arn:aws:iam::929327065333:policy/policy-1",
+    "Type": "aws_iam_policy",
+    "Attrs": {
+      "arn": "arn:aws:iam::929327065333:policy/policy-1",
+      "description": "",
+      "id": "arn:aws:iam::929327065333:policy/policy-1",
+      "name": "policy-1",
+      "name_prefix": null,
+      "path": "/",
+      "policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"EC2Admin\",\n            \"Effect\": \"Allow\",\n            \"Action\": \"ec2:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}\n"
+    }
+  },
+  {
+    "Id": "arn:aws:iam::929327065333:policy/policy-2",
+    "Type": "aws_iam_policy",
+    "Attrs": {
+      "arn": "arn:aws:iam::929327065333:policy/policy-2",
+      "description": "",
+      "id": "arn:aws:iam::929327065333:policy/policy-2",
+      "name": "policy-2",
+      "name_prefix": null,
+      "path": "/",
+      "policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"EC2Admin\",\n            \"Effect\": \"Allow\",\n            \"Action\": \"ec2:*\",\n            \"Resource\": \"*\"\n        }\n    ]\n}\n"
+    }
+  }
+]

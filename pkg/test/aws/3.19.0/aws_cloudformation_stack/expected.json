@@ -1,0 +1,30 @@
+[
+ {
+  "Id": "arn:aws:cloudformation:us-east-1:047081014315:stack/bar-stack/c7a96e70-0f21-11ec-bd2a-0a2d95c2b2ab",
+  "Type": "aws_cloudformation_stack",
+  "Attrs": {
+   "capabilities": [
+    "CAPABILITY_NAMED_IAM"
+   ],
+   "disable_rollback": false,
+   "iam_role_arn": "",
+   "id": "arn:aws:cloudformation:us-east-1:047081014315:stack/bar-stack/c7a96e70-0f21-11ec-bd2a-0a2d95c2b2ab",
+   "name": "bar-stack",
+   "template_body": "Resources:\n  myUser:\n    Type: AWS::IAM::User\n    Properties:\n      UserName: \"bar_cfn\"\n"
+  }
+ },
+ {
+  "Id": "arn:aws:cloudformation:us-east-1:047081014315:stack/foo-stack/c7aa0ab0-0f21-11ec-ba25-129d8c0b3757",
+  "Type": "aws_cloudformation_stack",
+  "Attrs": {
+   "disable_rollback": false,
+   "iam_role_arn": "",
+   "id": "arn:aws:cloudformation:us-east-1:047081014315:stack/foo-stack/c7aa0ab0-0f21-11ec-ba25-129d8c0b3757",
+   "name": "foo-stack",
+   "parameters": {
+    "VPCCidr": "10.0.0.0/16"
+   },
+   "template_body": "{\"Parameters\":{\"VPCCidr\":{\"Default\":\"10.0.0.0/16\",\"Description\":\"Enter the CIDR block for the VPC. Default is 10.0.0.0/16.\",\"Type\":\"String\"}},\"Resources\":{\"myVpc\":{\"Properties\":{\"CidrBlock\":{\"Ref\":\"VPCCidr\"},\"Tags\":[{\"Key\":\"Name\",\"Value\":\"Primary_CF_VPC\"}]},\"Type\":\"AWS::EC2::VPC\"}}}"
+  }
+ }
+]

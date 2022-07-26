@@ -1,0 +1,54 @@
+[
+ {
+  "Id": "projects/cloudskiff-dev-martin/zones/us-central1-f/nodeGroups/soletenant-group",
+  "Type": "google_compute_node_group",
+  "Attrs": {
+   "autoscaling_policy": [
+    {
+     "max_nodes": 10,
+     "min_nodes": 1,
+     "mode": "ONLY_SCALE_OUT"
+    }
+   ],
+   "creation_timestamp": "2021-12-01T08:49:24.545-08:00",
+   "description": "example google_compute_node_group for Terraform Google Provider",
+   "id": "projects/cloudskiff-dev-martin/zones/us-central1-f/nodeGroups/soletenant-group",
+   "initial_size": 1,
+   "maintenance_policy": "RESTART_IN_PLACE",
+   "maintenance_window": [
+    {
+     "start_time": "08:00"
+    }
+   ],
+   "name": "soletenant-group",
+   "node_template": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-martin/regions/us-central1/nodeTemplates/soletenant-tmpl",
+   "project": "cloudskiff-dev-martin",
+   "self_link": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-martin/zones/us-central1-f/nodeGroups/soletenant-group",
+   "size": 1,
+   "zone": "us-central1-f"
+  }
+ },
+ {
+  "Id": "projects/cloudskiff-dev-martin/zones/us-central1-f/nodeGroups/simple-group",
+  "Type": "google_compute_node_group",
+  "Attrs": {
+   "autoscaling_policy": [
+    {
+     "max_nodes": 0,
+     "min_nodes": 0,
+     "mode": "OFF"
+    }
+   ],
+   "creation_timestamp": "2021-12-01T08:49:24.740-08:00",
+   "description": "example google_compute_node_group for Terraform Google Provider",
+   "id": "projects/cloudskiff-dev-martin/zones/us-central1-f/nodeGroups/simple-group",
+   "maintenance_policy": "DEFAULT",
+   "name": "simple-group",
+   "node_template": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-martin/regions/us-central1/nodeTemplates/soletenant-tmpl",
+   "project": "cloudskiff-dev-martin",
+   "self_link": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-martin/zones/us-central1-f/nodeGroups/simple-group",
+   "size": 1,
+   "zone": "us-central1-f"
+  }
+ }
+]

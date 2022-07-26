@@ -1,0 +1,27 @@
+[
+ {
+  "Id": "example-stage",
+  "Type": "aws_apigatewayv2_stage",
+  "Attrs": {
+   "api_id": "hn5fxpwfae",
+   "arn": "arn:aws:apigateway:us-east-1::/apis/hn5fxpwfae/stages/example-stage",
+   "auto_deploy": false,
+   "client_certificate_id": "",
+   "default_route_settings": [
+    {
+     "data_trace_enabled": false,
+     "detailed_metrics_enabled": false,
+     "logging_level": "",
+     "throttling_burst_limit": 0,
+     "throttling_rate_limit": 0
+    }
+   ],
+   "deployment_id": "",
+   "description": "",
+   "execution_arn": "arn:aws:execute-api:us-east-1:929327065333:hn5fxpwfae/example-stage",
+   "id": "example-stage",
+   "invoke_url": "https://hn5fxpwfae.execute-api.us-east-1.amazonaws.com/example-stage",
+   "name": "example-stage"
+  }
+ }
+]

@@ -1,0 +1,24 @@
+[
+ {
+  "Id": "fmezvlh",
+  "Type": "aws_apigatewayv2_integration",
+  "Attrs": {
+   "api_id": "yw28nwdf34",
+   "connection_id": "",
+   "connection_type": "INTERNET",
+   "content_handling_strategy": "",
+   "credentials_arn": "",
+   "description": "",
+   "id": "fmezvlh",
+   "integration_method": "",
+   "integration_response_selection_expression": "${integration.response.statuscode}",
+   "integration_subtype": "",
+   "integration_type": "MOCK",
+   "integration_uri": "",
+   "passthrough_behavior": "WHEN_NO_MATCH",
+   "payload_format_version": "1.0",
+   "template_selection_expression": "",
+   "timeout_milliseconds": 29000
+  }
+ }
+]

@@ -1,0 +1,50 @@
+[
+ {
+  "Id": "vryjzimtj1-foo-foo/GET",
+  "Type": "aws_api_gateway_method_settings",
+  "Attrs": {
+   "id": "vryjzimtj1-foo-foo/GET",
+   "method_path": "foo/GET",
+   "rest_api_id": "vryjzimtj1",
+   "settings": [
+    {
+     "cache_data_encrypted": false,
+     "cache_ttl_in_seconds": 300,
+     "caching_enabled": false,
+     "data_trace_enabled": false,
+     "logging_level": "INFO",
+     "metrics_enabled": true,
+     "require_authorization_for_cache_control": true,
+     "throttling_burst_limit": -1,
+     "throttling_rate_limit": -1,
+     "unauthorized_cache_control_header_strategy": "SUCCEED_WITH_RESPONSE_HEADER"
+    }
+   ],
+   "stage_name": "foo"
+  }
+ },
+ {
+  "Id": "vryjzimtj1-foo-*/*",
+  "Type": "aws_api_gateway_method_settings",
+  "Attrs": {
+   "id": "vryjzimtj1-foo-*/*",
+   "method_path": "*/*",
+   "rest_api_id": "vryjzimtj1",
+   "settings": [
+    {
+     "cache_data_encrypted": false,
+     "cache_ttl_in_seconds": 300,
+     "caching_enabled": false,
+     "data_trace_enabled": false,
+     "logging_level": "ERROR",
+     "metrics_enabled": true,
+     "require_authorization_for_cache_control": true,
+     "throttling_burst_limit": -1,
+     "throttling_rate_limit": -1,
+     "unauthorized_cache_control_header_strategy": "SUCCEED_WITH_RESPONSE_HEADER"
+    }
+   ],
+   "stage_name": "foo"
+  }
+ }
+]

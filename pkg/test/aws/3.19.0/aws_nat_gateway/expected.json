@@ -1,0 +1,17 @@
+[
+ {
+  "Id": "nat-0a5408508b19ef490",
+  "Type": "aws_nat_gateway",
+  "Attrs": {
+   "allocation_id": "eipalloc-0f3e9fff457bb770b",
+   "id": "nat-0a5408508b19ef490",
+   "network_interface_id": "eni-0a5125861e3328c7d",
+   "private_ip": "172.31.84.248",
+   "public_ip": "54.87.245.115",
+   "subnet_id": "subnet-44fe0c65",
+   "tags": {
+    "Name": "nat1"
+   }
+  }
+ }
+]

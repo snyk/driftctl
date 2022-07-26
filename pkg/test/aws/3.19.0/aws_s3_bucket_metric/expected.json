@@ -1,0 +1,20 @@
+[
+  {
+    "Id": "bucket-martin-test-drift2:Metrics2_Bucket2",
+    "Type": "aws_s3_bucket_metric",
+    "Attrs": {
+      "bucket": "bucket-martin-test-drift2",
+      "id": "bucket-martin-test-drift2:Metrics2_Bucket2",
+      "name": "Metrics2_Bucket2"
+    }
+  },
+  {
+    "Id": "bucket-martin-test-drift2:Metrics_Bucket2",
+    "Type": "aws_s3_bucket_metric",
+    "Attrs": {
+      "bucket": "bucket-martin-test-drift2",
+      "id": "bucket-martin-test-drift2:Metrics_Bucket2",
+      "name": "Metrics_Bucket2"
+    }
+  }
+]

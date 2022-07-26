@@ -1,0 +1,46 @@
+[
+  {
+    "Id": "https://sqs.eu-west-3.amazonaws.com/047081014315/foo",
+    "Type": "aws_sqs_queue",
+    "Attrs": {
+      "arn": "arn:aws:sqs:eu-west-3:047081014315:foo",
+      "content_based_deduplication": false,
+      "delay_seconds": 0,
+      "fifo_queue": false,
+      "id": "https://sqs.eu-west-3.amazonaws.com/047081014315/foo",
+      "kms_data_key_reuse_period_seconds": 300,
+      "kms_master_key_id": "",
+      "max_message_size": 262144,
+      "message_retention_seconds": 345600,
+      "name": "foo",
+      "name_prefix": null,
+      "policy": "",
+      "receive_wait_time_seconds": 0,
+      "redrive_policy": "",
+      "tags": {},
+      "visibility_timeout_seconds": 30
+    }
+  },
+  {
+    "Id": "https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo",
+    "Type": "aws_sqs_queue",
+    "Attrs": {
+      "arn": "arn:aws:sqs:eu-west-3:047081014315:bar.fifo",
+      "content_based_deduplication": true,
+      "delay_seconds": 0,
+      "fifo_queue": true,
+      "id": "https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo",
+      "kms_data_key_reuse_period_seconds": 300,
+      "kms_master_key_id": "",
+      "max_message_size": 262144,
+      "message_retention_seconds": 345600,
+      "name": "bar.fifo",
+      "name_prefix": null,
+      "policy": "",
+      "receive_wait_time_seconds": 0,
+      "redrive_policy": "",
+      "tags": {},
+      "visibility_timeout_seconds": 30
+    }
+  }
+]

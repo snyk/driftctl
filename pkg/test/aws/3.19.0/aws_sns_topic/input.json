@@ -1,0 +1,83 @@
+[
+  {
+    "Id": "arn:aws:sns:eu-west-3:526954929923:user-updates-topic2",
+    "Type": "aws_sns_topic",
+    "Attrs": {
+      "application_failure_feedback_role_arn": "",
+      "application_success_feedback_role_arn": "",
+      "application_success_feedback_sample_rate": null,
+      "arn": "arn:aws:sns:eu-west-3:526954929923:user-updates-topic2",
+      "delivery_policy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false,\"defaultThrottlePolicy\":{\"maxReceivesPerSecond\":1}}}",
+      "display_name": "",
+      "http_failure_feedback_role_arn": "",
+      "http_success_feedback_role_arn": "",
+      "http_success_feedback_sample_rate": null,
+      "id": "arn:aws:sns:eu-west-3:526954929923:user-updates-topic2",
+      "kms_master_key_id": "",
+      "lambda_failure_feedback_role_arn": "",
+      "lambda_success_feedback_role_arn": "",
+      "lambda_success_feedback_sample_rate": null,
+      "name": "user-updates-topic2",
+      "name_prefix": null,
+      "policy": "{\"Version\":\"2008-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"__default_statement_ID\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"SNS:GetTopicAttributes\",\"SNS:SetTopicAttributes\",\"SNS:AddPermission\",\"SNS:RemovePermission\",\"SNS:DeleteTopic\",\"SNS:Subscribe\",\"SNS:ListSubscriptionsByTopic\",\"SNS:Publish\",\"SNS:Receive\"],\"Resource\":\"arn:aws:sns:eu-west-3:526954929923:user-updates-topic2\",\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":\"526954929923\"}}}]}",
+      "sqs_failure_feedback_role_arn": "",
+      "sqs_success_feedback_role_arn": "",
+      "sqs_success_feedback_sample_rate": null,
+      "tags": {}
+    }
+  },
+  {
+    "Id": "arn:aws:sns:eu-west-3:526954929923:user-updates-topic3",
+    "Type": "aws_sns_topic",
+    "Attrs": {
+      "application_failure_feedback_role_arn": "",
+      "application_success_feedback_role_arn": "",
+      "application_success_feedback_sample_rate": null,
+      "arn": "arn:aws:sns:eu-west-3:526954929923:user-updates-topic3",
+      "delivery_policy": "",
+      "display_name": "",
+      "http_failure_feedback_role_arn": "",
+      "http_success_feedback_role_arn": "",
+      "http_success_feedback_sample_rate": null,
+      "id": "arn:aws:sns:eu-west-3:526954929923:user-updates-topic3",
+      "kms_master_key_id": "",
+      "lambda_failure_feedback_role_arn": "",
+      "lambda_success_feedback_role_arn": "",
+      "lambda_success_feedback_sample_rate": null,
+      "name": "user-updates-topic3",
+      "name_prefix": null,
+      "policy": "{\"Version\":\"2008-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"__default_statement_ID\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"SNS:GetTopicAttributes\",\"SNS:SetTopicAttributes\",\"SNS:AddPermission\",\"SNS:RemovePermission\",\"SNS:DeleteTopic\",\"SNS:Subscribe\",\"SNS:ListSubscriptionsByTopic\",\"SNS:Publish\",\"SNS:Receive\"],\"Resource\":\"arn:aws:sns:eu-west-3:526954929923:user-updates-topic3\",\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":\"526954929923\"}}}]}",
+      "sqs_failure_feedback_role_arn": "",
+      "sqs_success_feedback_role_arn": "",
+      "sqs_success_feedback_sample_rate": null,
+      "tags": {}
+    }
+  },
+  {
+    "Id": "arn:aws:sns:eu-west-3:526954929923:user-updates-topic",
+    "Type": "aws_sns_topic",
+    "Attrs": {
+      "application_failure_feedback_role_arn": "",
+      "application_success_feedback_role_arn": "",
+      "application_success_feedback_sample_rate": null,
+      "arn": "arn:aws:sns:eu-west-3:526954929923:user-updates-topic",
+      "delivery_policy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false,\"defaultThrottlePolicy\":{\"maxReceivesPerSecond\":1}}}",
+      "display_name": "",
+      "http_failure_feedback_role_arn": "",
+      "http_success_feedback_role_arn": "",
+      "http_success_feedback_sample_rate": null,
+      "id": "arn:aws:sns:eu-west-3:526954929923:user-updates-topic",
+      "kms_master_key_id": "",
+      "lambda_failure_feedback_role_arn": "",
+      "lambda_success_feedback_role_arn": "",
+      "lambda_success_feedback_sample_rate": null,
+      "name": "user-updates-topic",
+      "name_prefix": null,
+      "policy": "{\"Version\":\"2008-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"__default_statement_ID\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"SNS:GetTopicAttributes\",\"SNS:SetTopicAttributes\",\"SNS:AddPermission\",\"SNS:RemovePermission\",\"SNS:DeleteTopic\",\"SNS:Subscribe\",\"SNS:ListSubscriptionsByTopic\",\"SNS:Publish\",\"SNS:Receive\"],\"Resource\":\"arn:aws:sns:eu-west-3:526954929923:user-updates-topic\",\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":\"526954929923\"}}}]}",
+      "sqs_failure_feedback_role_arn": "",
+      "sqs_success_feedback_role_arn": "",
+      "sqs_success_feedback_sample_rate": null,
+      "tags": {}
+    }
+  }
+]

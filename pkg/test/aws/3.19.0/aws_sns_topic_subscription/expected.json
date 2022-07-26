@@ -1,0 +1,30 @@
+[
+  {
+    "Id": "arn:aws:sns:us-east-1:526954929923:user-updates-topic2:c0f794c5-a009-4db4-9147-4c55959787fa",
+    "Type": "aws_sns_topic_subscription",
+    "Attrs": {
+      "arn": "arn:aws:sns:us-east-1:526954929923:user-updates-topic2:c0f794c5-a009-4db4-9147-4c55959787fa",
+      "delivery_policy": "",
+      "endpoint": "arn:aws:sqs:us-east-1:526954929923:user-updates-queue",
+      "filter_policy": "",
+      "id": "arn:aws:sns:us-east-1:526954929923:user-updates-topic2:c0f794c5-a009-4db4-9147-4c55959787fa",
+      "protocol": "sqs",
+      "raw_message_delivery": false,
+      "topic_arn": "arn:aws:sns:us-east-1:526954929923:user-updates-topic2"
+    }
+  },
+  {
+    "Id": "arn:aws:sns:us-east-1:526954929923:user-updates-topic:b6e66147-2b31-4486-8d4b-2a2272264c8e",
+    "Type": "aws_sns_topic_subscription",
+    "Attrs": {
+      "arn": "arn:aws:sns:us-east-1:526954929923:user-updates-topic:b6e66147-2b31-4486-8d4b-2a2272264c8e",
+      "delivery_policy": "",
+      "endpoint": "arn:aws:sqs:us-east-1:526954929923:user-updates-queue",
+      "filter_policy": "",
+      "id": "arn:aws:sns:us-east-1:526954929923:user-updates-topic:b6e66147-2b31-4486-8d4b-2a2272264c8e",
+      "protocol": "sqs",
+      "raw_message_delivery": false,
+      "topic_arn": "arn:aws:sns:us-east-1:526954929923:user-updates-topic"
+    }
+  }
+]

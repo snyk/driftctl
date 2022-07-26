@@ -1,0 +1,15 @@
+[
+ {
+  "Id": "ipu24n",
+  "Type": "aws_api_gateway_vpc_link",
+  "Attrs": {
+   "arn": "arn:aws:apigateway:us-east-1::/vpclinks/ipu24n",
+   "description": "Description",
+   "id": "ipu24n",
+   "name": "foo",
+   "target_arns": [
+    "arn:aws:elasticloadbalancing:us-east-1:047081014315:loadbalancer/net/example/ffbc3a2463857d4e"
+   ]
+  }
+ }
+]

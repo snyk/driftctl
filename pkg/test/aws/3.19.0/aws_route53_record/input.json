@@ -1,0 +1,146 @@
+[
+  {
+    "Id": "Z06486383UC8WYSBZTWFM_test1.foo-2.com_A",
+    "Type": "aws_route53_record",
+    "Attrs": {
+      "alias": null,
+      "allow_overwrite": null,
+      "failover_routing_policy": null,
+      "fqdn": "test1.foo-2.com",
+      "geolocation_routing_policy": null,
+      "health_check_id": "",
+      "id": "Z06486383UC8WYSBZTWFM_test1.foo-2.com_A",
+      "latency_routing_policy": null,
+      "multivalue_answer_routing_policy": null,
+      "name": "test1.foo-2.com",
+      "records": [
+        "192.0.1.3"
+      ],
+      "set_identifier": "",
+      "ttl": 300,
+      "type": "A",
+      "weighted_routing_policy": null,
+      "zone_id": "Z06486383UC8WYSBZTWFM"
+    }
+  },
+  {
+    "Id": "Z06486383UC8WYSBZTWFM_test0.foo-2.com_TXT",
+    "Type": "aws_route53_record",
+    "Attrs": {
+      "alias": null,
+      "allow_overwrite": null,
+      "failover_routing_policy": null,
+      "fqdn": "test0.foo-2.com",
+      "geolocation_routing_policy": null,
+      "health_check_id": "",
+      "id": "Z06486383UC8WYSBZTWFM_test0_TXT",
+      "latency_routing_policy": null,
+      "multivalue_answer_routing_policy": null,
+      "name": "test0",
+      "records": [
+        "test0"
+      ],
+      "set_identifier": "",
+      "ttl": 300,
+      "type": "TXT",
+      "weighted_routing_policy": null,
+      "zone_id": "Z06486383UC8WYSBZTWFM"
+    }
+  },
+  {
+    "Id": "Z06486383UC8WYSBZTWFM__test2.foo-2.com_A",
+    "Type": "aws_route53_record",
+    "Attrs": {
+      "alias": null,
+      "allow_overwrite": null,
+      "failover_routing_policy": null,
+      "fqdn": "_test2.foo-2.com",
+      "geolocation_routing_policy": null,
+      "health_check_id": "",
+      "id": "Z06486383UC8WYSBZTWFM__test2.foo-2.com_A",
+      "latency_routing_policy": null,
+      "multivalue_answer_routing_policy": null,
+      "name": "_test2.foo-2.com",
+      "records": [
+        "192.0.1.4"
+      ],
+      "set_identifier": "",
+      "ttl": 300,
+      "type": "A",
+      "weighted_routing_policy": null,
+      "zone_id": "Z06486383UC8WYSBZTWFM"
+    }
+  },
+  {
+    "Id": "Z06486383UC8WYSBZTWFM_test0.foo-2.com_A",
+    "Type": "aws_route53_record",
+    "Attrs": {
+      "alias": null,
+      "allow_overwrite": null,
+      "failover_routing_policy": null,
+      "fqdn": "test0.foo-2.com",
+      "geolocation_routing_policy": null,
+      "health_check_id": "",
+      "id": "Z06486383UC8WYSBZTWFM_test0.foo-2.com_A",
+      "latency_routing_policy": null,
+      "multivalue_answer_routing_policy": null,
+      "name": "test0",
+      "records": [
+        "192.0.1.2"
+      ],
+      "set_identifier": "",
+      "ttl": 300,
+      "type": "A",
+      "weighted_routing_policy": null,
+      "zone_id": "Z06486383UC8WYSBZTWFM"
+    }
+  },
+  {
+    "Id": "Z06486383UC8WYSBZTWFM_test1.foo-2.com_TXT",
+    "Type": "aws_route53_record",
+    "Attrs": {
+      "alias": null,
+      "allow_overwrite": null,
+      "failover_routing_policy": null,
+      "fqdn": "test1.foo-2.com",
+      "geolocation_routing_policy": null,
+      "health_check_id": "",
+      "id": "Z06486383UC8WYSBZTWFM_test1.foo-2.com_TXT",
+      "latency_routing_policy": null,
+      "multivalue_answer_routing_policy": null,
+      "name": "test1.foo-2.com",
+      "records": [
+        "test1.foo-2.com"
+      ],
+      "set_identifier": "",
+      "ttl": 300,
+      "type": "TXT",
+      "weighted_routing_policy": null,
+      "zone_id": "Z06486383UC8WYSBZTWFM"
+    }
+  },
+  {
+    "Id": "Z06486383UC8WYSBZTWFM__test2.foo-2.com_TXT",
+    "Type": "aws_route53_record",
+    "Attrs": {
+      "alias": null,
+      "allow_overwrite": null,
+      "failover_routing_policy": null,
+      "fqdn": "_test2.foo-2.com",
+      "geolocation_routing_policy": null,
+      "health_check_id": "",
+      "id": "Z06486383UC8WYSBZTWFM__test2.foo-2.com_TXT",
+      "latency_routing_policy": null,
+      "multivalue_answer_routing_policy": null,
+      "name": "_test2.foo-2.com",
+      "records": [
+        "_test2.foo-2.com"
+      ],
+      "set_identifier": "",
+      "ttl": 300,
+      "type": "TXT",
+      "weighted_routing_policy": null,
+      "zone_id": "Z06486383UC8WYSBZTWFM"
+    }
+  }
+]

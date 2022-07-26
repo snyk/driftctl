@@ -1,0 +1,36 @@
+[
+  {
+    "Id": "projects/cloudskiff-dev-raphael/zones/us-central1-a/instanceGroups/driftctl-test-2",
+    "Type": "google_compute_instance_group",
+    "Attrs": {
+      "description": "Terraform test instance group",
+      "id": "projects/cloudskiff-dev-raphael/zones/us-central1-a/instanceGroups/driftctl-test-2",
+      "instances": [],
+      "name": "driftctl-test-2",
+      "named_port": [],
+      "network": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-raphael/global/networks/test-network",
+      "project": "cloudskiff-dev-raphael",
+      "self_link": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-raphael/zones/us-central1-a/instanceGroups/driftctl-test-2",
+      "size": 0,
+      "timeouts": {},
+      "zone": "us-central1-a"
+    }
+  },
+  {
+    "Id": "projects/cloudskiff-dev-raphael/zones/us-central1-a/instanceGroups/driftctl-test-1",
+    "Type": "google_compute_instance_group",
+    "Attrs": {
+      "description": "Terraform test instance group",
+      "id": "projects/cloudskiff-dev-raphael/zones/us-central1-a/instanceGroups/driftctl-test-1",
+      "instances": [],
+      "name": "driftctl-test-1",
+      "named_port": [],
+      "network": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-raphael/global/networks/test-network",
+      "project": "cloudskiff-dev-raphael",
+      "self_link": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-raphael/zones/us-central1-a/instanceGroups/driftctl-test-1",
+      "size": 0,
+      "timeouts": {},
+      "zone": "us-central1-a"
+    }
+  }
+]

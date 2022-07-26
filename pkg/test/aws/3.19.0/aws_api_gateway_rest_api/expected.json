@@ -1,0 +1,49 @@
+[
+  {
+    "Id": "3of73v5ob4",
+    "Type": "aws_api_gateway_rest_api",
+    "Attrs": {
+      "api_key_source": "HEADER",
+      "arn": "arn:aws:apigateway:us-east-1::/restapis/3of73v5ob4",
+      "body": "{\"info\":{\"title\":\"example\",\"version\":\"1.0\"},\"openapi\":\"3.0.1\",\"paths\":{\"/path1\":{\"get\":{\"x-amazon-apigateway-integration\":{\"httpMethod\":\"GET\",\"payloadFormatVersion\":\"1.0\",\"type\":\"HTTP_PROXY\",\"uri\":\"https://ip-ranges.amazonaws.com/ip-ranges.json\"}}}}}",
+      "created_date": "2021-09-14T13:08:52Z",
+      "description": "This is bar API",
+      "endpoint_configuration": [
+        {
+          "types": [
+            "EDGE"
+          ]
+        }
+      ],
+      "execution_arn": "arn:aws:execute-api:us-east-1:047081014315:3of73v5ob4",
+      "id": "3of73v5ob4",
+      "minimum_compression_size": -1,
+      "name": "bar",
+      "policy": "",
+      "root_resource_id": "pe75h6tq6i"
+    }
+  },
+  {
+    "Id": "1jitcobwol",
+    "Type": "aws_api_gateway_rest_api",
+    "Attrs": {
+      "api_key_source": "HEADER",
+      "arn": "arn:aws:apigateway:us-east-1::/restapis/1jitcobwol",
+      "created_date": "2021-09-14T13:07:37Z",
+      "description": "This is foo API",
+      "endpoint_configuration": [
+        {
+          "types": [
+            "EDGE"
+          ]
+        }
+      ],
+      "execution_arn": "arn:aws:execute-api:us-east-1:047081014315:1jitcobwol",
+      "id": "1jitcobwol",
+      "minimum_compression_size": -1,
+      "name": "foo",
+      "policy": "",
+      "root_resource_id": "2ltv32p058"
+    }
+  }
+]

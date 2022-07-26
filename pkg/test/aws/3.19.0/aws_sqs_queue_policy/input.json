@@ -1,0 +1,29 @@
+[
+  {
+    "Id": "https://sqs.eu-west-3.amazonaws.com/047081014315/foo",
+    "Type": "aws_sqs_queue_policy",
+    "Attrs": {
+      "id": "https://sqs.eu-west-3.amazonaws.com/047081014315/foo",
+      "policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Policy1611769532425\",\"Statement\":[{\"Sid\":\"Stmt1611769527792\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:SendMessage\",\"Resource\":\"arn:aws:sqs:eu-west-3:047081014315:foo\"}]}",
+      "queue_url": "https://sqs.eu-west-3.amazonaws.com/047081014315/foo"
+    }
+  },
+  {
+    "Id": "https://sqs.eu-west-3.amazonaws.com/047081014315/baz",
+    "Type": "aws_sqs_queue_policy",
+    "Attrs": {
+      "id": "https://sqs.eu-west-3.amazonaws.com/047081014315/baz",
+      "policy": "{\"Version\":\"2012-10-17\",\"Id\":\"MYSQSPOLICY\",\"Statement\":[{\"Sid\":\"Stmt1611769527792\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:SendMessage\",\"Resource\":\"arn:aws:sqs:eu-west-3:047081014315:baz\"}]}",
+      "queue_url": "https://sqs.eu-west-3.amazonaws.com/047081014315/baz"
+    }
+  },
+  {
+    "Id": "https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo",
+    "Type": "aws_sqs_queue_policy",
+    "Attrs": {
+      "id": "https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo",
+      "policy": "",
+      "queue_url": "https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo"
+    }
+  }
+]

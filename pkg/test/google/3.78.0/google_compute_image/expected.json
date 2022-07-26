@@ -1,0 +1,28 @@
+[
+ {
+  "Id": "projects/cloudskiff-dev-elie/global/images/example-image",
+  "Type": "google_compute_image",
+  "Attrs": {
+   "archive_size_bytes": 539099200,
+   "creation_timestamp": "2021-10-27T07:18:35.424-07:00",
+   "description": "",
+   "disk_size_gb": 3,
+   "family": "",
+   "id": "projects/cloudskiff-dev-elie/global/images/example-image",
+   "label_fingerprint": "42WmSpB8rSM=",
+   "name": "example-image",
+   "project": "cloudskiff-dev-elie",
+   "raw_disk": [
+    {
+     "container_type": "TAR",
+     "sha1": "",
+     "source": "https://storage.googleapis.com/bosh-gce-raw-stemcells/bosh-stemcell-97.98-google-kvm-ubuntu-xenial-go_agent-raw-1557960142.tar.gz"
+    }
+   ],
+   "self_link": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-elie/global/images/example-image",
+   "source_disk": "",
+   "source_image": "",
+   "source_snapshot": ""
+  }
+ }
+]

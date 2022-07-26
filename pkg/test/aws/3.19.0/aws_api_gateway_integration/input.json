@@ -1,0 +1,22 @@
+[
+ {
+  "Id": "agi-u7jce3lokk-z9ag20-GET",
+  "Type": "aws_api_gateway_integration",
+  "Attrs": {
+   "cache_namespace": "z9ag20",
+   "connection_id": "",
+   "connection_type": "INTERNET",
+   "content_handling": "",
+   "credentials": "",
+   "http_method": "GET",
+   "id": "agi-u7jce3lokk-z9ag20-GET",
+   "integration_http_method": "",
+   "passthrough_behavior": "WHEN_NO_MATCH",
+   "resource_id": "z9ag20",
+   "rest_api_id": "u7jce3lokk",
+   "timeout_milliseconds": 29000,
+   "type": "MOCK",
+   "uri": ""
+  }
+ }
+]

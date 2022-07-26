@@ -1,0 +1,18 @@
+[
+ {
+  "Id": "aggr-vryjzimtj1-UNAUTHORIZED",
+  "Type": "aws_api_gateway_gateway_response",
+  "Attrs": {
+   "id": "aggr-vryjzimtj1-UNAUTHORIZED",
+   "response_parameters": {
+    "gatewayresponse.header.Authorization": "'Basic'"
+   },
+   "response_templates": {
+    "application/json": "{\"message\":$context.error.messageString}"
+   },
+   "response_type": "UNAUTHORIZED",
+   "rest_api_id": "vryjzimtj1",
+   "status_code": "401"
+  }
+ }
+]

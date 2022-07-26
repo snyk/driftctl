@@ -1,0 +1,24 @@
+[
+ {
+  "Id": "projects/cloudskiff-dev-elie/managedZones/example-zone",
+  "Type": "google_dns_managed_zone",
+  "Attrs": {
+   "description": "Example DNS zone",
+   "dns_name": "example-9d3bea2b.com.",
+   "force_destroy": false,
+   "id": "projects/cloudskiff-dev-elie/managedZones/example-zone",
+   "labels": {
+    "foo": "bar"
+   },
+   "name": "example-zone",
+   "name_servers": [
+    "ns-cloud-d1.googledomains.com.",
+    "ns-cloud-d2.googledomains.com.",
+    "ns-cloud-d3.googledomains.com.",
+    "ns-cloud-d4.googledomains.com."
+   ],
+   "project": "cloudskiff-dev-elie",
+   "visibility": "public"
+  }
+ }
+]

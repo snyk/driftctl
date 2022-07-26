@@ -297,7 +297,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 	}
 
 	providerName := common.RemoteParameter(opts.To).GetProviderAddress().Type
-	err = resourceSchemaRepository.Init(providerName, opts.ProviderVersion, providerLibrary.Provider(opts.To).Schema())
+	err = resourceSchemaRepository.Init(providerName, opts.ProviderVersion, providerLibrary.Provider(providerName).Schema())
 	if err != nil {
 		return err
 	}

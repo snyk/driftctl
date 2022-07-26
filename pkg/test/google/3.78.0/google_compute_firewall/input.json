@@ -1,0 +1,128 @@
+[
+  {
+    "Id": "projects/cloudskiff-dev-elie/global/firewalls/test-firewall-1",
+    "Type": "google_compute_firewall",
+    "Attrs": {
+      "allow": [
+        {
+          "ports": [
+            "80",
+            "8080",
+            "1000-2000"
+          ],
+          "protocol": "tcp"
+        },
+        {
+          "ports": [],
+          "protocol": "icmp"
+        }
+      ],
+      "creation_timestamp": "2021-09-14T05:21:08.730-07:00",
+      "deny": [],
+      "description": "",
+      "destination_ranges": [],
+      "direction": "INGRESS",
+      "disabled": false,
+      "enable_logging": null,
+      "id": "projects/cloudskiff-dev-elie/global/firewalls/test-firewall-1",
+      "log_config": [],
+      "name": "test-firewall-1",
+      "network": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-elie/global/networks/test-network",
+      "priority": 1000,
+      "project": "cloudskiff-dev-elie",
+      "self_link": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-elie/global/firewalls/test-firewall-1",
+      "source_ranges": [],
+      "source_service_accounts": [],
+      "source_tags": [
+        "web"
+      ],
+      "target_service_accounts": [],
+      "target_tags": [],
+      "timeouts": {}
+    }
+  },
+  {
+    "Id": "projects/cloudskiff-dev-elie/global/firewalls/test-firewall-0",
+    "Type": "google_compute_firewall",
+    "Attrs": {
+      "allow": [
+        {
+          "ports": [
+            "80",
+            "8080",
+            "1000-2000"
+          ],
+          "protocol": "tcp"
+        },
+        {
+          "ports": [],
+          "protocol": "icmp"
+        }
+      ],
+      "creation_timestamp": "2021-09-14T05:21:08.744-07:00",
+      "deny": [],
+      "description": "",
+      "destination_ranges": [],
+      "direction": "INGRESS",
+      "disabled": false,
+      "enable_logging": null,
+      "id": "projects/cloudskiff-dev-elie/global/firewalls/test-firewall-0",
+      "log_config": [],
+      "name": "test-firewall-0",
+      "network": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-elie/global/networks/test-network",
+      "priority": 1000,
+      "project": "cloudskiff-dev-elie",
+      "self_link": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-elie/global/firewalls/test-firewall-0",
+      "source_ranges": [],
+      "source_service_accounts": [],
+      "source_tags": [
+        "web"
+      ],
+      "target_service_accounts": [],
+      "target_tags": [],
+      "timeouts": {}
+    }
+  },
+  {
+    "Id": "projects/cloudskiff-dev-elie/global/firewalls/test-firewall-2",
+    "Type": "google_compute_firewall",
+    "Attrs": {
+      "allow": [
+        {
+          "ports": [
+            "80",
+            "8080",
+            "1000-2000"
+          ],
+          "protocol": "tcp"
+        },
+        {
+          "ports": [],
+          "protocol": "icmp"
+        }
+      ],
+      "creation_timestamp": "2021-09-14T05:21:08.624-07:00",
+      "deny": [],
+      "description": "",
+      "destination_ranges": [],
+      "direction": "INGRESS",
+      "disabled": false,
+      "enable_logging": null,
+      "id": "projects/cloudskiff-dev-elie/global/firewalls/test-firewall-2",
+      "log_config": [],
+      "name": "test-firewall-2",
+      "network": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-elie/global/networks/test-network",
+      "priority": 1000,
+      "project": "cloudskiff-dev-elie",
+      "self_link": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-elie/global/firewalls/test-firewall-2",
+      "source_ranges": [],
+      "source_service_accounts": [],
+      "source_tags": [
+        "web"
+      ],
+      "target_service_accounts": [],
+      "target_tags": [],
+      "timeouts": {}
+    }
+  }
+]

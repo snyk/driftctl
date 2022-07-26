@@ -1,0 +1,38 @@
+[
+  {
+    "Id": "alias/baz20210225124429210500000001",
+    "Type": "aws_kms_alias",
+    "Attrs": {
+      "arn": "arn:aws:kms:eu-west-3:047081014315:alias/baz20210225124429210500000001",
+      "id": "alias/baz20210225124429210500000001",
+      "name": null,
+      "name_prefix": null,
+      "target_key_arn": "arn:aws:kms:eu-west-3:047081014315:key/341b2d76-feab-4911-b5de-fbdd92b21aa7",
+      "target_key_id": "341b2d76-feab-4911-b5de-fbdd92b21aa7"
+    }
+  },
+  {
+    "Id": "alias/foo",
+    "Type": "aws_kms_alias",
+    "Attrs": {
+      "arn": "arn:aws:kms:eu-west-3:047081014315:alias/foo",
+      "id": "alias/foo",
+      "name": null,
+      "name_prefix": null,
+      "target_key_arn": "arn:aws:kms:eu-west-3:047081014315:key/341b2d76-feab-4911-b5de-fbdd92b21aa7",
+      "target_key_id": "341b2d76-feab-4911-b5de-fbdd92b21aa7"
+    }
+  },
+  {
+    "Id": "alias/bar",
+    "Type": "aws_kms_alias",
+    "Attrs": {
+      "arn": "arn:aws:kms:eu-west-3:047081014315:alias/bar",
+      "id": "alias/bar",
+      "name": null,
+      "name_prefix": null,
+      "target_key_arn": "arn:aws:kms:eu-west-3:047081014315:key/341b2d76-feab-4911-b5de-fbdd92b21aa7",
+      "target_key_id": "341b2d76-feab-4911-b5de-fbdd92b21aa7"
+    }
+  }
+]

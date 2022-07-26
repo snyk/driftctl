@@ -1,0 +1,24 @@
+[
+  {
+    "Id": "4570529:wbeuil",
+    "Type": "github_team_membership",
+    "Attrs": {
+      "etag": "W/\"36ab7d78ee013792fecf7cc3ebc0fb7e1b8365d3f87791ff589381e58c2c7f34\"",
+      "id": "4570529:wbeuil",
+      "role": "maintainer",
+      "team_id": "4570529",
+      "username": "wbeuil"
+    }
+  },
+  {
+    "Id": "4570529:driftctl-acceptance-tester",
+    "Type": "github_team_membership",
+    "Attrs": {
+      "etag": "W/\"60083b8bf2ced30fbf573dd02317c6e2f659ff7ffe97167d1331b692a39d0d1a\"",
+      "id": "4570529:driftctl-acceptance-tester",
+      "role": "maintainer",
+      "team_id": "4570529",
+      "username": "driftctl-acceptance-tester"
+    }
+  }
+]

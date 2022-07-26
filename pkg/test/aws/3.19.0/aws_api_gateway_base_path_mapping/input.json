@@ -1,0 +1,24 @@
+[
+ {
+  "Id": "example-driftctl.com/foo",
+  "Type": "aws_api_gateway_base_path_mapping",
+  "Attrs": {
+   "api_id": "zetudukz30",
+   "base_path": "foo",
+   "domain_name": "example-driftctl.com",
+   "id": "example-driftctl.com/foo",
+   "stage_name": "foo"
+  }
+ },
+ {
+  "Id": "example-driftctl.com/",
+  "Type": "aws_api_gateway_base_path_mapping",
+  "Attrs": {
+   "api_id": "zetudukz30",
+   "base_path": "",
+   "domain_name": "example-driftctl.com",
+   "id": "example-driftctl.com/",
+   "stage_name": "foo"
+  }
+ }
+]

@@ -1,0 +1,12 @@
+[
+ {
+  "Id": "dcab",
+  "Type": "aws_apigatewayv2_deployment",
+  "Attrs": {
+   "api_id": "abcd",
+   "auto_deployed": false,
+   "description": "Example deployment",
+   "id": "dcab"
+  }
+ }
+]

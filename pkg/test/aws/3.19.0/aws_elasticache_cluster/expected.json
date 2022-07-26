@@ -1,0 +1,33 @@
+[
+ {
+  "Id": "cluster-example",
+  "Type": "aws_elasticache_cluster",
+  "Attrs": {
+   "arn": "arn:aws:elasticache:us-east-2:047081014315:cluster:cluster-example",
+   "availability_zone": "us-east-2b",
+   "az_mode": "single-az",
+   "cache_nodes": [
+    {
+     "address": "cluster-example.jkdpui.0001.use2.cache.amazonaws.com",
+     "availability_zone": "us-east-2b",
+     "id": "0001",
+     "port": 11211
+    }
+   ],
+   "cluster_address": "cluster-example.jkdpui.cfg.use2.cache.amazonaws.com",
+   "cluster_id": "cluster-example",
+   "configuration_endpoint": "cluster-example.jkdpui.cfg.use2.cache.amazonaws.com:11211",
+   "engine": "memcached",
+   "engine_version": "1.6.6",
+   "id": "cluster-example",
+   "maintenance_window": "fri:02:30-fri:03:30",
+   "node_type": "cache.t2.micro",
+   "num_cache_nodes": 1,
+   "parameter_group_name": "default.memcached1.6",
+   "port": 11211,
+   "snapshot_retention_limit": 0,
+   "snapshot_window": "",
+   "subnet_group_name": "default"
+  }
+ }
+]

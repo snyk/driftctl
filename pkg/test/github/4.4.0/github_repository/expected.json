@@ -1,0 +1,80 @@
+[
+  {
+    "Id": "driftctl-demos",
+    "Type": "github_repository",
+    "Attrs": {
+      "allow_merge_commit": true,
+      "allow_rebase_merge": true,
+      "allow_squash_merge": true,
+      "archived": false,
+      "default_branch": "main",
+      "delete_branch_on_merge": false,
+      "description": "material for driftctl demos",
+      "full_name": "cloudskiff/driftctl-demos",
+      "git_clone_url": "git://github.com/cloudskiff/driftctl-demos.git",
+      "has_downloads": false,
+      "has_issues": false,
+      "has_projects": false,
+      "has_wiki": false,
+      "homepage_url": "https://driftctl.com",
+      "html_url": "https://github.com/cloudskiff/driftctl-demos",
+      "http_clone_url": "https://github.com/cloudskiff/driftctl-demos.git",
+      "id": "driftctl-demos",
+      "is_template": false,
+      "name": "driftctl-demos",
+      "node_id": "MDEwOlJlcG9zaXRvcnkzMzQxMTI2MjQ=",
+      "private": false,
+      "repo_id": 334112624,
+      "ssh_clone_url": "git@github.com:cloudskiff/driftctl-demos.git",
+      "svn_url": "https://github.com/cloudskiff/driftctl-demos",
+      "topics": [
+        "aws",
+        "drift",
+        "iac",
+        "infrastructure-drift",
+        "terraform"
+      ],
+      "visibility": "public",
+      "vulnerability_alerts": false
+    }
+  },
+  {
+    "Id": "driftctl",
+    "Type": "github_repository",
+    "Attrs": {
+      "allow_merge_commit": true,
+      "allow_rebase_merge": false,
+      "allow_squash_merge": false,
+      "archived": false,
+      "default_branch": "main",
+      "delete_branch_on_merge": true,
+      "description": "Detect, track and alert on infrastructure drift",
+      "full_name": "cloudskiff/driftctl",
+      "git_clone_url": "git://github.com/cloudskiff/driftctl.git",
+      "has_downloads": true,
+      "has_issues": true,
+      "has_projects": true,
+      "has_wiki": false,
+      "homepage_url": "https://driftctl.com",
+      "html_url": "https://github.com/cloudskiff/driftctl",
+      "http_clone_url": "https://github.com/cloudskiff/driftctl.git",
+      "id": "driftctl",
+      "is_template": false,
+      "name": "driftctl",
+      "node_id": "MDEwOlJlcG9zaXRvcnkyOTc2MjI5NDU=",
+      "private": false,
+      "repo_id": 297622945,
+      "ssh_clone_url": "git@github.com:cloudskiff/driftctl.git",
+      "svn_url": "https://github.com/cloudskiff/driftctl",
+      "topics": [
+        "aws",
+        "drift",
+        "iac",
+        "infrastructure-drift",
+        "terraform"
+      ],
+      "visibility": "public",
+      "vulnerability_alerts": false
+    }
+  }
+]

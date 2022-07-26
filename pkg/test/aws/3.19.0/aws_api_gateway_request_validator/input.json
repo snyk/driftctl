@@ -1,0 +1,24 @@
+[
+ {
+  "Id": "tak8bq",
+  "Type": "aws_api_gateway_request_validator",
+  "Attrs": {
+   "id": "tak8bq",
+   "name": "bar",
+   "rest_api_id": "zetudukz30",
+   "validate_request_body": true,
+   "validate_request_parameters": true
+  }
+ },
+ {
+  "Id": "ywlcuf",
+  "Type": "aws_api_gateway_request_validator",
+  "Attrs": {
+   "id": "ywlcuf",
+   "name": "foo",
+   "rest_api_id": "vryjzimtj1",
+   "validate_request_body": true,
+   "validate_request_parameters": true
+  }
+ }
+]

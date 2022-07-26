@@ -1,5 +1,7 @@
 package resource
 
+import "sort"
+
 type ResourceType string
 
 var supportedTypes = map[string]ResourceTypeMeta{
@@ -254,6 +256,17 @@ var supportedTypes = map[string]ResourceTypeMeta{
 func IsResourceTypeSupported(ty string) bool {
 	_, exist := supportedTypes[ty]
 	return exist
+}
+
+func GetSupportedTypes() []string {
+	types := make([]string, 0, len(supportedTypes))
+	for k, _ := range supportedTypes {
+		types = append(types, k)
+	}
+
+	sort.Strings(types)
+
+	return types
 }
 
 func (ty ResourceType) String() string {

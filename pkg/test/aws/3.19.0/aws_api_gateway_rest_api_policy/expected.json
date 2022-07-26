@@ -1,0 +1,20 @@
+[
+ {
+  "Id": "c3n3aqga5d",
+  "Type": "aws_api_gateway_rest_api_policy",
+  "Attrs": {
+   "id": "c3n3aqga5d",
+   "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"execute-api:Invoke\",\"Resource\":\"arn:aws:execute-api:us-east-1:047081014315:c3n3aqga5d/*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":\"123.123.123.123/32\"}}}]}",
+   "rest_api_id": "c3n3aqga5d"
+  }
+ },
+ {
+  "Id": "uwk4xvbm04",
+  "Type": "aws_api_gateway_rest_api_policy",
+  "Attrs": {
+   "id": "uwk4xvbm04",
+   "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"execute-api:Invoke\",\"Resource\":\"arn:aws:execute-api:us-east-1:047081014315:uwk4xvbm04/*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":\"12.12.12.12/32\"}}}]}",
+   "rest_api_id": "uwk4xvbm04"
+  }
+ }
+]

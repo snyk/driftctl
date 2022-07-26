@@ -1,0 +1,64 @@
+[
+  {
+    "Id": "bucket-martin-test-drift2:Analytics2_Bucket2",
+    "Type": "aws_s3_bucket",
+    "Attrs": {
+      "bucket": "bucket-martin-test-drift2",
+      "filter": [],
+      "id": "bucket-martin-test-drift2:Analytics2_Bucket2",
+      "name": "Analytics2_Bucket2",
+      "storage_class_analysis": [
+        {
+          "data_export": [
+            {
+              "destination": [
+                {
+                  "s3_bucket_destination": [
+                    {
+                      "bucket_account_id": "",
+                      "bucket_arn": "arn:aws:s3:::bucket-martin-test-drift2",
+                      "format": "CSV",
+                      "prefix": ""
+                    }
+                  ]
+                }
+              ],
+              "output_schema_version": "V_1"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "Id": "bucket-martin-test-drift2:Analytics_Bucket2",
+    "Type": "aws_s3_bucket",
+    "Attrs": {
+      "bucket": "bucket-martin-test-drift2",
+      "filter": [],
+      "id": "bucket-martin-test-drift2:Analytics_Bucket2",
+      "name": "Analytics_Bucket2",
+      "storage_class_analysis": [
+        {
+          "data_export": [
+            {
+              "destination": [
+                {
+                  "s3_bucket_destination": [
+                    {
+                      "bucket_account_id": "",
+                      "bucket_arn": "arn:aws:s3:::bucket-martin-test-drift2",
+                      "format": "CSV",
+                      "prefix": ""
+                    }
+                  ]
+                }
+              ],
+              "output_schema_version": "V_1"
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

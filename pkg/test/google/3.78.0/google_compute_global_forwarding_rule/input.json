@@ -1,0 +1,19 @@
+[
+ {
+  "Id": "projects/driftctl-qa-1/global/forwardingRules/global-rule",
+  "Type": "google_compute_global_forwarding_rule",
+  "Attrs": {
+   "description": "",
+   "id": "projects/driftctl-qa-1/global/forwardingRules/global-rule",
+   "ip_address": "34.120.169.13",
+   "ip_protocol": "TCP",
+   "ip_version": "",
+   "load_balancing_scheme": "EXTERNAL",
+   "name": "global-rule",
+   "port_range": "80",
+   "project": "driftctl-qa-1",
+   "self_link": "https://www.googleapis.com/compute/v1/projects/driftctl-qa-1/global/forwardingRules/global-rule",
+   "target": "projects/driftctl-qa-1/global/targetHttpProxies/target-proxy"
+  }
+ }
+]

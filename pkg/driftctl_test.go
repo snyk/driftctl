@@ -1,7 +1,11 @@
 package pkg_test
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"path"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/r3labs/diff/v2"
@@ -1411,6 +1415,181 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 	}
 
 	runTest(t, cases)
+}
+
+type normalizationTestCase struct {
+	Resource        string
+	ProviderName    string
+	ProviderVersion string
+}
+
+func TestDriftctlRun_TestResourcesNormalization(t *testing.T) {
+
+	readResourceFile := func(ty, path string) ([]*resource.Resource, error) {
+		results := []*resource.Resource{}
+		file, err := ioutil.ReadFile(path)
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(file, &results)
+		if err != nil {
+			return nil, err
+		}
+		for _, res := range results {
+			res.Type = ty
+		}
+		return results, nil
+	}
+
+	defaultProviderVersions := map[string]string{
+		"aws":     "3.19.0",
+		"github":  "4.4.0",
+		"google":  "3.78.0",
+		"azurerm": "2.71.0",
+	}
+
+	cases := []normalizationTestCase{}
+	for _, res := range dctlresource.GetSupportedTypes() {
+
+		providerName := strings.SplitN(res, "_", 2)[0]
+		providerVersion, exist := defaultProviderVersions[providerName]
+		if !exist {
+			t.Fatal("Provider not supported for normalisation test of " + res)
+		}
+
+		cases = append(cases, normalizationTestCase{
+			Resource:        res,
+			ProviderVersion: providerVersion,
+			ProviderName:    providerName,
+		})
+	}
+
+	for _, c := range cases {
+		t.Run(c.Resource, func(t *testing.T) {
+
+			folder := path.Join(c.ProviderName, c.ProviderVersion, c.Resource)
+
+			// _ = os.MkdirAll(path.Join("test", folder), os.ModePerm)
+			// wd, _ := os.Getwd()
+			// globPath := path.Join(wd, fmt.Sprintf("../enumeration/remote/test/%s*", c.Resource))
+			// matches, err := filepath.Glob(globPath)
+			// if err != nil {
+			// 	t.Fatal(err)
+			// }
+			// if len(matches) > 0 {
+			// 	fileToCopy, err := ioutil.ReadFile(path.Join(matches[0], "results.golden.json"))
+			// 	if err != nil {
+			// 		t.Fatal(err)
+			// 	}
+			//
+			// 	tmpInputRes := []*resource.Resource{}
+			// 	var tmpAttributtes []resource.Attributes
+			// 	err = json.Unmarshal(fileToCopy, &tmpAttributtes)
+			// 	if err != nil {
+			// 		t.Fatal(err)
+			// 	}
+			// 	for _, attrs := range tmpAttributtes {
+			// 		attrs := attrs
+			// 		res := &resource.Resource{
+			// 			Type:  c.Resource,
+			// 			Id:    attrs["id"].(string),
+			// 			Attrs: &attrs,
+			// 		}
+			// 		tmpInputRes = append(tmpInputRes, res)
+			// 	}
+			// 	resourcesToCopy, err := json.MarshalIndent(tmpInputRes, "", "  ")
+			// 	if err != nil {
+			// 		t.Fatal(err)
+			// 	}
+			// 	err = ioutil.WriteFile(path.Join("test", folder, "input.json"), resourcesToCopy, os.ModePerm)
+			// 	if err != nil {
+			// 		t.Fatal(err)
+			// 	}
+			// }
+
+			// wd, _ := os.Getwd()
+			// globPath := path.Join(wd, fmt.Sprintf("iac/terraform/state/test/%s*", c.Resource))
+			// matches, err := filepath.Glob(globPath)
+			// if err != nil {
+			// 	t.Fatal(err)
+			// }
+			// if len(matches) > 0 {
+			// 	fileToCopy, err := ioutil.ReadFile(path.Join(matches[0], "results.golden.json"))
+			// 	if err != nil {
+			// 		t.Fatal(err)
+			// 	}
+			// 	err = ioutil.WriteFile(path.Join("test", folder, "expected.json"), fileToCopy, os.ModePerm)
+			// 	if err != nil {
+			// 		t.Fatal(err)
+			// 	}
+			// }
+
+			inputFilePath := path.Join("test", folder, "input.json")
+			inputResources, err := readResourceFile(c.Resource, inputFilePath)
+			if err != nil {
+				t.Skip(err)
+			}
+
+			expectedFilePath := path.Join("test", folder, "expected.json")
+			expectedResources, err := readResourceFile(c.Resource, expectedFilePath)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			options := &pkg.ScanOptions{
+				Deep: true,
+			}
+
+			repo := testresource.InitFakeSchemaRepository(c.ProviderName, c.ProviderVersion)
+			resourceFactory := dctlresource.NewDriftctlResourceFactory(repo)
+			testAlerter := alerter.NewAlerter()
+			store := memstore.New()
+
+			scanProgress := &output.MockProgress{}
+			scanProgress.On("Start").Return().Once()
+			scanProgress.On("Stop").Return().Once()
+			iacProgress := &output.MockProgress{}
+			iacProgress.On("Start").Return().Once()
+			iacProgress.On("Stop").Return().Once()
+
+			testFilter := &filter.MockFilter{}
+			testFilter.On("IsResourceIgnored", mock.MatchedBy(func(res *resource.Resource) bool {
+				return res.ResourceType() == c.Resource
+			})).Return(false)
+			testFilter.On("IsResourceIgnored", mock.MatchedBy(func(res *resource.Resource) bool {
+				return res.ResourceType() != c.Resource
+			})).Return(true)
+			testFilter.On("IsFieldIgnored", mock.Anything, mock.Anything).Return(false)
+			analyzer := analyser.NewAnalyzer(testAlerter, analyser.AnalyzerOptions{Deep: options.Deep}, testFilter)
+
+			stateSupplier := &dctlresource.MockIaCSupplier{}
+			stateSupplier.On("Resources").Return(expectedResources, nil)
+			stateSupplier.On("SourceCount").Return(uint(1))
+			remoteSupplier := &resource.MockSupplier{}
+			remoteSupplier.On("Resources").Return(inputResources, nil)
+
+			driftctl := pkg.NewDriftCTL(
+				remoteSupplier,
+				stateSupplier,
+				testAlerter,
+				analyzer,
+				resourceFactory,
+				options,
+				scanProgress,
+				iacProgress,
+				repo,
+				store,
+			)
+
+			analysis, err := driftctl.Run()
+			if err != nil {
+				t.Fatal(err)
+			}
+			results := test.NewScanResult(t, analysis)
+			results.AssertInfrastructureIsInSync()
+		})
+	}
+
 }
 
 func getSchema(repo dctlresource.SchemaRepositoryInterface, resourceType string) *resource.Schema {

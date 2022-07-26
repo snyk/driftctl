@@ -1,0 +1,55 @@
+[
+  {
+    "Id": "8ee21d91-c000-428c-8032-235aac55da36",
+    "Type": "aws_kms_key",
+    "Attrs": {
+      "arn": "arn:aws:kms:eu-west-3:047081014315:key/8ee21d91-c000-428c-8032-235aac55da36",
+      "customer_master_key_spec": "RSA_2048",
+      "deletion_window_in_days": null,
+      "description": "Bar",
+      "enable_key_rotation": false,
+      "id": "8ee21d91-c000-428c-8032-235aac55da36",
+      "is_enabled": true,
+      "key_id": "8ee21d91-c000-428c-8032-235aac55da36",
+      "key_usage": "SIGN_VERIFY",
+      "policy": "{\"Id\":\"key-consolepolicy-3\",\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::047081014315:root\"},\"Resource\":\"*\",\"Sid\":\"Enable IAM User Permissions\"},{\"Action\":[\"kms:DescribeKey\",\"kms:GetPublicKey\",\"kms:Sign\",\"kms:Verify\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::047081014315:user/admin\"},\"Resource\":\"*\",\"Sid\":\"Allow use of the key\"},{\"Action\":[\"kms:CreateGrant\",\"kms:ListGrants\",\"kms:RevokeGrant\"],\"Condition\":{\"Bool\":{\"kms:GrantIsForAWSResource\":\"true\"}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::047081014315:user/admin\"},\"Resource\":\"*\",\"Sid\":\"Allow attachment of persistent resources\"}],\"Version\":\"2012-10-17\"}",
+      "tags": {}
+    }
+  },
+  {
+    "Id": "5d765f32-bfdc-4610-b6ab-f82db5d0601b",
+    "Type": "aws_kms_key",
+    "Attrs": {
+      "arn": "arn:aws:kms:eu-west-3:047081014315:key/5d765f32-bfdc-4610-b6ab-f82db5d0601b",
+      "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+      "deletion_window_in_days": null,
+      "description": "Baz",
+      "enable_key_rotation": false,
+      "id": "5d765f32-bfdc-4610-b6ab-f82db5d0601b",
+      "is_enabled": false,
+      "key_id": "5d765f32-bfdc-4610-b6ab-f82db5d0601b",
+      "key_usage": "ENCRYPT_DECRYPT",
+      "policy": "{\"Id\":\"key-default-1\",\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::047081014315:root\"},\"Resource\":\"*\",\"Sid\":\"Enable IAM User Permissions\"}],\"Version\":\"2012-10-17\"}",
+      "tags": {
+        "Foo": "true"
+      }
+    }
+  },
+  {
+    "Id": "89d2c023-ea53-40a5-b20a-d84905c622d7",
+    "Type": "aws_kms_key",
+    "Attrs": {
+      "arn": "arn:aws:kms:eu-west-3:047081014315:key/89d2c023-ea53-40a5-b20a-d84905c622d7",
+      "customer_master_key_spec": "RSA_4096",
+      "deletion_window_in_days": null,
+      "description": "Foo",
+      "enable_key_rotation": false,
+      "id": "89d2c023-ea53-40a5-b20a-d84905c622d7",
+      "is_enabled": true,
+      "key_id": "89d2c023-ea53-40a5-b20a-d84905c622d7",
+      "key_usage": "ENCRYPT_DECRYPT",
+      "policy": "{\"Id\":\"key-default-1\",\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::047081014315:root\"},\"Resource\":\"*\",\"Sid\":\"Enable IAM User Permissions\"}],\"Version\":\"2012-10-17\"}",
+      "tags": {}
+    }
+  }
+]

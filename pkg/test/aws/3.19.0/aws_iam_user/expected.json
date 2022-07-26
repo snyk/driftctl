@@ -1,0 +1,44 @@
+[
+  {
+    "Id": "test-driftctl-2",
+    "Type": "aws_iam_user",
+    "Attrs": {
+      "arn": "arn:aws:iam::929327065333:user/test/test-driftctl-2",
+      "id": "test-driftctl-2",
+      "name": "test-driftctl-2",
+      "path": "/test/",
+      "tags": {
+        "foo": "bar"
+      },
+      "unique_id": "AIDA5QYBVVD23ZWIILRUW"
+    }
+  },
+  {
+    "Id": "test-driftctl-0",
+    "Type": "aws_iam_user",
+    "Attrs": {
+      "arn": "arn:aws:iam::929327065333:user/test/test-driftctl-0",
+      "id": "test-driftctl-0",
+      "name": "test-driftctl-0",
+      "path": "/test/",
+      "tags": {
+        "foo": "bar"
+      },
+      "unique_id": "AIDA5QYBVVD2ZWIW56NWS"
+    }
+  },
+  {
+    "Id": "test-driftctl-1",
+    "Type": "aws_iam_user",
+    "Attrs": {
+      "arn": "arn:aws:iam::929327065333:user/test/test-driftctl-1",
+      "id": "test-driftctl-1",
+      "name": "test-driftctl-1",
+      "path": "/test/",
+      "tags": {
+        "foo": "bar"
+      },
+      "unique_id": "AIDA5QYBVVD2UMP6CZEGZ"
+    }
+  }
+]

@@ -1,0 +1,35 @@
+[
+ {
+  "Id": "projects/cloudskiff-dev-raphael/global/healthChecks/https-health-check",
+  "Type": "google_compute_health_check",
+  "Attrs": {
+   "check_interval_sec": 3,
+   "creation_timestamp": "2021-10-26T06:05:03.005-07:00",
+   "description": "Health check via https",
+   "healthy_threshold": 4,
+   "https_health_check": [
+    {
+     "host": "crvx.fr",
+     "port": 0,
+     "port_name": "health-check-port",
+     "port_specification": "USE_NAMED_PORT",
+     "proxy_header": "NONE",
+     "request_path": "/",
+     "response": "I AM HEALTHY"
+    }
+   ],
+   "id": "projects/cloudskiff-dev-raphael/global/healthChecks/https-health-check",
+   "log_config": [
+    {
+     "enable": false
+    }
+   ],
+   "name": "https-health-check",
+   "project": "cloudskiff-dev-raphael",
+   "self_link": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-raphael/global/healthChecks/https-health-check",
+   "timeout_sec": 1,
+   "type": "HTTPS",
+   "unhealthy_threshold": 5
+  }
+ }
+]
