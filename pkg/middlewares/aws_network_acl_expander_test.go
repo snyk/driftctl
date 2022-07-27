@@ -7,8 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
 	"github.com/snyk/driftctl/enumeration/resource"
+	"github.com/snyk/driftctl/enumeration/resource/aws"
 	dctlresource "github.com/snyk/driftctl/pkg/resource"
-	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 func TestAwsNetworkACLExpander_Execute(t *testing.T) {
@@ -87,7 +87,7 @@ func TestAwsNetworkACLExpander_Execute(t *testing.T) {
 						"icmp_type":       0,
 						"ipv6_cidr_block": "",
 						"protocol":        "17",
-						"rule_number":     100,
+						"rule_number":     int64(100),
 						"to_port":         80,
 					},
 				).Once().Return(&resource.Resource{
@@ -114,7 +114,7 @@ func TestAwsNetworkACLExpander_Execute(t *testing.T) {
 						"icmp_type":       0,
 						"ipv6_cidr_block": "",
 						"protocol":        "6",
-						"rule_number":     101,
+						"rule_number":     int64(101),
 						"to_port":         80,
 					},
 				).Once().Return(&resource.Resource{
@@ -141,7 +141,7 @@ func TestAwsNetworkACLExpander_Execute(t *testing.T) {
 						"icmp_type":       0,
 						"ipv6_cidr_block": "",
 						"protocol":        "6",
-						"rule_number":     103,
+						"rule_number":     int64(103),
 						"to_port":         80,
 					},
 				).Once().Return(&resource.Resource{
@@ -168,7 +168,7 @@ func TestAwsNetworkACLExpander_Execute(t *testing.T) {
 						"icmp_type":       0,
 						"ipv6_cidr_block": "",
 						"protocol":        "17",
-						"rule_number":     100,
+						"rule_number":     int64(100),
 						"to_port":         80,
 					},
 				).Once().Return(&resource.Resource{
@@ -190,7 +190,7 @@ func TestAwsNetworkACLExpander_Execute(t *testing.T) {
 								"icmp_type":       0,
 								"ipv6_cidr_block": "",
 								"protocol":        "17",
-								"rule_no":         100,
+								"rule_no":         100.0,
 								"to_port":         80,
 							},
 						},
@@ -203,7 +203,7 @@ func TestAwsNetworkACLExpander_Execute(t *testing.T) {
 								"icmp_type":       0,
 								"ipv6_cidr_block": "",
 								"protocol":        "6",
-								"rule_no":         101,
+								"rule_no":         101.0,
 								"to_port":         80,
 							},
 							// This one exist in state, test that we do not duplicate it
@@ -216,7 +216,7 @@ func TestAwsNetworkACLExpander_Execute(t *testing.T) {
 								"icmp_type":       0,
 								"ipv6_cidr_block": "",
 								"protocol":        "6",
-								"rule_no":         103,
+								"rule_no":         103.0,
 								"to_port":         80,
 							},
 						},
@@ -235,7 +235,7 @@ func TestAwsNetworkACLExpander_Execute(t *testing.T) {
 								"icmp_type":       0,
 								"ipv6_cidr_block": "",
 								"protocol":        "17",
-								"rule_no":         100,
+								"rule_no":         100.0,
 								"to_port":         80,
 							},
 						},

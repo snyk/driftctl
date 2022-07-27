@@ -3,12 +3,11 @@ package aws
 import (
 	"bytes"
 	"fmt"
-	dctlresource "github.com/snyk/driftctl/pkg/resource"
 	"strconv"
 
 	"github.com/hashicorp/terraform/helper/hashcode"
-
 	"github.com/snyk/driftctl/enumeration/resource"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
 const AwsNetworkACLRuleResourceType = "aws_network_acl_rule"
@@ -178,6 +177,14 @@ func initAwsNetworkACLRuleMetaData(resourceSchemaRepository dctlresource.SchemaR
 			_ = res.Attrs.SafeSet([]string{"protocol"}, strconv.Itoa(number))
 		}
 
+		// For some reason, when deserialising the state, this field is deserialized as a float
+		// We need to make this homogeneous between remote and IaC so we cast this to an int64
+		// The real type returned by AWS SDK is int64
+		ruleNumber := (*res.Attrs)["rule_number"]
+		if v, isFloat := ruleNumber.(float64); isFloat {
+			_ = res.Attrs.SafeSet([]string{"rule_number"}, int64(v))
+		}
+
 		// ID can be different even if the resource is the same.
 		// protocol is taken into account while creating the ID, if you set protocol="tcp" you'll end with
 		// a resource with a different ID than if you set protocol="6" which is the same
@@ -188,7 +195,7 @@ func initAwsNetworkACLRuleMetaData(resourceSchemaRepository dctlresource.SchemaR
 		// This workaround is mandatory to harmonize resources ID
 		res.Id = CreateNetworkACLRuleID(
 			*res.Attrs.GetString("network_acl_id"),
-			int64(*res.Attrs.GetInt("rule_number")),
+			(*res.Attrs)["rule_number"].(int64),
 			*res.Attrs.GetBool("egress"),
 			*res.Attrs.GetString("protocol"),
 		)
@@ -200,7 +207,7 @@ func initAwsNetworkACLRuleMetaData(resourceSchemaRepository dctlresource.SchemaR
 	resourceSchemaRepository.SetFlags(AwsNetworkACLRuleResourceType, resource.FlagDeepMode)
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsNetworkACLRuleResourceType, func(res *resource.Resource) map[string]string {
 
-		ruleNumber := strconv.FormatInt(int64(*res.Attrs.GetInt("rule_number")), 10)
+		ruleNumber := strconv.FormatInt((*res.Attrs)["rule_number"].(int64), 10)
 		if ruleNumber == "32767" {
 			ruleNumber = "*"
 		}

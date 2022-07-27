@@ -1,6 +1,8 @@
 package common
 
 import (
+	"strconv"
+
 	"github.com/sirupsen/logrus"
 	remoteerror "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/resource"
@@ -29,6 +31,12 @@ func (f *GenericDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.R
 	attributes := map[string]string{}
 	if res.Attributes() != nil {
 		for k, v := range *res.Attributes() {
+			if b, ok := v.(bool); ok {
+				attributes[k] = strconv.FormatBool(b)
+			}
+			if i64, ok := v.(int64); ok {
+				attributes[k] = strconv.FormatInt(i64, 10)
+			}
 			if str, ok := v.(string); ok {
 				attributes[k] = str
 			}

@@ -62,9 +62,10 @@ func (m AwsDefaultNetworkACLRule) Execute(remoteResources, resourcesFromState *[
 func (m *AwsDefaultNetworkACLRule) isDefaultACLRule(res *resource.Resource) bool {
 
 	isIPv4 := res.Attrs.GetString("cidr_block") != nil
+	ruleNumber, ruleNumberOk := (*res.Attrs)["rule_number"].(int64)
 
 	if isIPv4 {
-		if number := res.Attrs.GetFloat64("rule_number"); number != nil && int(*number) != 32767 {
+		if ruleNumberOk && ruleNumber != 32767 {
 			return false
 		}
 		if cidr := res.Attrs.GetString("cidr_block"); cidr != nil && *cidr != "0.0.0.0/0" {
@@ -73,7 +74,7 @@ func (m *AwsDefaultNetworkACLRule) isDefaultACLRule(res *resource.Resource) bool
 	}
 
 	if !isIPv4 {
-		if number := res.Attrs.GetFloat64("rule_number"); number != nil && int(*number) != 32768 {
+		if ruleNumberOk && ruleNumber != 32768 {
 			return false
 		}
 		if cidr := res.Attrs.GetString("ipv6_cidr_block"); cidr != nil && *cidr != "::/0" {
