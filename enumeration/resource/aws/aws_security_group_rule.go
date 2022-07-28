@@ -13,11 +13,11 @@ const AwsSecurityGroupRuleResourceType = "aws_security_group_rule"
 func CreateSecurityGroupRuleIdHash(attrs *resource.Attributes) string {
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", *attrs.GetString("security_group_id")))
-	if attrs.GetInt("from_port") != nil && *attrs.GetInt("from_port") > 0 {
-		buf.WriteString(fmt.Sprintf("%d-", *attrs.GetInt("from_port")))
+	if (*attrs)["from_port"] != nil && (*attrs)["from_port"].(int) > 0 {
+		buf.WriteString(fmt.Sprintf("%d-", (*attrs)["from_port"].(int)))
 	}
-	if attrs.GetInt("to_port") != nil && *attrs.GetInt("to_port") > 0 {
-		buf.WriteString(fmt.Sprintf("%d-", *attrs.GetInt("to_port")))
+	if (*attrs)["to_port"] != nil && (*attrs)["to_port"].(int) > 0 {
+		buf.WriteString(fmt.Sprintf("%d-", (*attrs)["to_port"].(int)))
 	}
 	buf.WriteString(fmt.Sprintf("%s-", *attrs.GetString("protocol")))
 	buf.WriteString(fmt.Sprintf("%s-", *attrs.GetString("type")))
