@@ -260,7 +260,7 @@ func IsResourceTypeSupported(ty string) bool {
 
 func GetSupportedTypes() []string {
 	types := make([]string, 0, len(supportedTypes))
-	for k, _ := range supportedTypes {
+	for k := range supportedTypes {
 		types = append(types, k)
 	}
 

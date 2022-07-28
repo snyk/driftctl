@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"path"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -109,15 +108,6 @@ func runTest(t *testing.T, cases TestCases) {
 			scanProgress.AssertExpectations(t)
 		})
 	}
-}
-
-func matchByAttributes(input, attrs map[string]interface{}) bool {
-	for k, v := range attrs {
-		if value, ok := input[k]; !ok || !reflect.DeepEqual(value, v) {
-			return false
-		}
-	}
-	return true
 }
 
 func TestDriftctlRun_BasicBehavior(t *testing.T) {
@@ -1590,9 +1580,4 @@ func TestDriftctlRun_TestResourcesNormalization(t *testing.T) {
 		})
 	}
 
-}
-
-func getSchema(repo dctlresource.SchemaRepositoryInterface, resourceType string) *resource.Schema {
-	sch, _ := repo.GetSchema(resourceType)
-	return sch
 }
