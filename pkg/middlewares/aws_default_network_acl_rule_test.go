@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 func TestAwsDefaultNetworkACLRule_Execute(t *testing.T) {
@@ -27,7 +27,7 @@ func TestAwsDefaultNetworkACLRule_Execute(t *testing.T) {
 					Id:   "default-acl-rule",
 					Type: aws.AwsNetworkACLRuleResourceType,
 					Attrs: &resource.Attributes{
-						"rule_number": float64(32767),
+						"rule_number": int64(32767),
 						"rule_action": "deny",
 						"cidr_block":  "0.0.0.0/0",
 						"protocol":    "-1",
@@ -37,14 +37,14 @@ func TestAwsDefaultNetworkACLRule_Execute(t *testing.T) {
 					Id:   "non-default-acl",
 					Type: aws.AwsNetworkACLRuleResourceType,
 					Attrs: &resource.Attributes{
-						"rule_number": float64(100),
+						"rule_number": int64(100),
 					},
 				},
 				{
 					Id:   "non-default-acl-2",
 					Type: aws.AwsNetworkACLRuleResourceType,
 					Attrs: &resource.Attributes{
-						"rule_number": float64(32767),
+						"rule_number": int64(32767),
 						"rule_action": "allow",
 					},
 				},
@@ -52,7 +52,7 @@ func TestAwsDefaultNetworkACLRule_Execute(t *testing.T) {
 					Id:   "non-default-acl-3",
 					Type: aws.AwsNetworkACLRuleResourceType,
 					Attrs: &resource.Attributes{
-						"rule_number": float64(32767),
+						"rule_number": int64(32767),
 						"rule_action": "deny",
 						"cidr_block":  "1.2.3.0/0",
 					},
@@ -61,7 +61,7 @@ func TestAwsDefaultNetworkACLRule_Execute(t *testing.T) {
 					Id:   "non-default-acl-4",
 					Type: aws.AwsNetworkACLRuleResourceType,
 					Attrs: &resource.Attributes{
-						"rule_number": float64(32767),
+						"rule_number": int64(32767),
 						"rule_action": "deny",
 						"cidr_block":  "0.0.0.0/0",
 						"protocol":    "6",
@@ -82,7 +82,7 @@ func TestAwsDefaultNetworkACLRule_Execute(t *testing.T) {
 					Id:   "default-acl-rule",
 					Type: aws.AwsNetworkACLRuleResourceType,
 					Attrs: &resource.Attributes{
-						"rule_number": float64(32767),
+						"rule_number": int64(32767),
 						"rule_action": "deny",
 						"cidr_block":  "0.0.0.0/0",
 						"protocol":    "-1",
@@ -92,14 +92,14 @@ func TestAwsDefaultNetworkACLRule_Execute(t *testing.T) {
 					Id:   "non-default-acl",
 					Type: aws.AwsNetworkACLRuleResourceType,
 					Attrs: &resource.Attributes{
-						"rule_number": float64(100),
+						"rule_number": int64(100),
 					},
 				},
 				{
 					Id:   "non-default-acl-2",
 					Type: aws.AwsNetworkACLRuleResourceType,
 					Attrs: &resource.Attributes{
-						"rule_number": float64(32767),
+						"rule_number": int64(32767),
 						"rule_action": "allow",
 					},
 				},
@@ -107,7 +107,7 @@ func TestAwsDefaultNetworkACLRule_Execute(t *testing.T) {
 					Id:   "non-default-acl-3",
 					Type: aws.AwsNetworkACLRuleResourceType,
 					Attrs: &resource.Attributes{
-						"rule_number": float64(32767),
+						"rule_number": int64(32767),
 						"rule_action": "deny",
 						"cidr_block":  "1.2.3.0/0",
 					},
@@ -116,7 +116,7 @@ func TestAwsDefaultNetworkACLRule_Execute(t *testing.T) {
 					Id:   "non-default-acl-4",
 					Type: aws.AwsNetworkACLRuleResourceType,
 					Attrs: &resource.Attributes{
-						"rule_number": float64(32767),
+						"rule_number": int64(32767),
 						"rule_action": "deny",
 						"cidr_block":  "0.0.0.0/0",
 						"protocol":    "6",
@@ -135,7 +135,7 @@ func TestAwsDefaultNetworkACLRule_Execute(t *testing.T) {
 					Type: aws.AwsNetworkACLRuleResourceType,
 					Attrs: &resource.Attributes{
 						"network_acl_id": "my-network",
-						"rule_number":    float64(32767),
+						"rule_number":    int64(32767),
 						"rule_action":    "deny",
 						"cidr_block":     "0.0.0.0/0",
 						"protocol":       "-1",
@@ -146,7 +146,7 @@ func TestAwsDefaultNetworkACLRule_Execute(t *testing.T) {
 					Type: aws.AwsNetworkACLRuleResourceType,
 					Attrs: &resource.Attributes{
 						"network_acl_id":  "my-network",
-						"rule_number":     float64(32768),
+						"rule_number":     int64(32768),
 						"rule_action":     "deny",
 						"ipv6_cidr_block": "::/0",
 						"protocol":        "-1",
@@ -156,7 +156,7 @@ func TestAwsDefaultNetworkACLRule_Execute(t *testing.T) {
 					Id:   "non-default-acl",
 					Type: aws.AwsNetworkACLRuleResourceType,
 					Attrs: &resource.Attributes{
-						"rule_number": float64(32767),
+						"rule_number": int64(32767),
 						"rule_action": "deny",
 						"cidr_block":  "0.0.0.0/0",
 						"protocol":    "6",
@@ -172,7 +172,7 @@ func TestAwsDefaultNetworkACLRule_Execute(t *testing.T) {
 					Id:   "non-default-acl",
 					Type: aws.AwsNetworkACLRuleResourceType,
 					Attrs: &resource.Attributes{
-						"rule_number": float64(32767),
+						"rule_number": int64(32767),
 						"rule_action": "deny",
 						"cidr_block":  "0.0.0.0/0",
 						"protocol":    "6",

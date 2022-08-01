@@ -1,0 +1,111 @@
+[
+ {
+  "Id": "arn:aws:elasticloadbalancing:us-east-1:533948124879:listener/app/test-lb-tf/168f3e312968e275/21a7de7e81a06bda",
+  "Type": "aws_lb_listener",
+  "Attrs": {
+   "arn": "arn:aws:elasticloadbalancing:us-east-1:533948124879:listener/app/test-lb-tf/168f3e312968e275/21a7de7e81a06bda",
+   "default_action": [
+    {
+     "order": 1,
+     "target_group_arn": "arn:aws:elasticloadbalancing:us-east-1:533948124879:targetgroup/tf-example-lb-tg/9e43d546683d8b35",
+     "type": "forward"
+    }
+   ],
+   "id": "arn:aws:elasticloadbalancing:us-east-1:533948124879:listener/app/test-lb-tf/168f3e312968e275/21a7de7e81a06bda",
+   "load_balancer_arn": "arn:aws:elasticloadbalancing:us-east-1:533948124879:loadbalancer/app/test-lb-tf/168f3e312968e275",
+   "port": 80,
+   "protocol": "HTTP",
+   "ssl_policy": ""
+  }
+ },
+ {
+  "Id": "sg-0d8b60865ca657bb3",
+  "Type": "aws_security_group",
+  "Attrs": {
+   "arn": "arn:aws:ec2:us-east-1:533948124879:security-group/sg-0d8b60865ca657bb3",
+   "description": "Allow TLS inbound traffic",
+   "id": "sg-0d8b60865ca657bb3",
+   "name": "allow_tls_lb",
+   "name_prefix": "",
+   "owner_id": "533948124879",
+   "vpc_id": "vpc-069eb1208f4f62f3c"
+  }
+ },
+ {
+  "Id": "subnet-09b8c4d89ed5f3aeb",
+  "Type": "aws_subnet",
+  "Attrs": {
+   "arn": "arn:aws:ec2:us-east-1:533948124879:subnet/subnet-09b8c4d89ed5f3aeb",
+   "assign_ipv6_address_on_creation": false,
+   "availability_zone": "us-east-1a",
+   "availability_zone_id": "use1-az4",
+   "cidr_block": "10.100.0.0/24",
+   "id": "subnet-09b8c4d89ed5f3aeb",
+   "ipv6_cidr_block": "",
+   "ipv6_cidr_block_association_id": "",
+   "map_public_ip_on_launch": false,
+   "outpost_arn": "",
+   "owner_id": "533948124879",
+   "vpc_id": "vpc-069eb1208f4f62f3c"
+  }
+ },
+ {
+  "Id": "igw-00e1a78d127606c92",
+  "Type": "aws_internet_gateway",
+  "Attrs": {
+   "arn": "arn:aws:ec2:us-east-1:533948124879:internet-gateway/igw-00e1a78d127606c92",
+   "id": "igw-00e1a78d127606c92",
+   "owner_id": "533948124879",
+   "vpc_id": "vpc-069eb1208f4f62f3c"
+  }
+ },
+ {
+  "Id": "arn:aws:elasticloadbalancing:us-east-1:533948124879:loadbalancer/app/test-lb-tf/168f3e312968e275",
+  "Type": "aws_lb",
+  "Attrs": {
+   "access_logs": [
+    {
+     "bucket": "",
+     "enabled": false,
+     "prefix": ""
+    }
+   ],
+   "arn": "arn:aws:elasticloadbalancing:us-east-1:533948124879:loadbalancer/app/test-lb-tf/168f3e312968e275",
+   "arn_suffix": "app/test-lb-tf/168f3e312968e275",
+   "customer_owned_ipv4_pool": "",
+   "dns_name": "test-lb-tf-2047934243.us-east-1.elb.amazonaws.com",
+   "drop_invalid_header_fields": false,
+   "enable_deletion_protection": false,
+   "enable_http2": true,
+   "id": "arn:aws:elasticloadbalancing:us-east-1:533948124879:loadbalancer/app/test-lb-tf/168f3e312968e275",
+   "idle_timeout": 60,
+   "internal": false,
+   "ip_address_type": "ipv4",
+   "load_balancer_type": "application",
+   "name": "test-lb-tf",
+   "security_groups": [
+    "sg-0d8b60865ca657bb3"
+   ],
+   "subnet_mapping": [
+    {
+     "allocation_id": "",
+     "outpost_id": "",
+     "private_ipv4_address": "",
+     "subnet_id": "subnet-00499e85b962e382f"
+    },
+    {
+     "allocation_id": "",
+     "outpost_id": "",
+     "private_ipv4_address": "",
+     "subnet_id": "subnet-09b8c4d89ed5f3aeb"
+    }
+   ],
+   "subnets": [
+    "subnet-00499e85b962e382f",
+    "subnet-09b8c4d89ed5f3aeb"
+   ],
+   "vpc_id": "vpc-069eb1208f4f62f3c",
+   "zone_id": "Z35SXDOTRQ7X7K"
+  }
+ }
+]

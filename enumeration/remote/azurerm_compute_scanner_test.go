@@ -22,7 +22,6 @@ import (
 
 	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
-	testresource "github.com/snyk/driftctl/test/resource"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -90,10 +89,7 @@ func TestAzurermCompute_Image(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -171,10 +167,7 @@ func TestAzurermCompute_SSHPublicKey(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {

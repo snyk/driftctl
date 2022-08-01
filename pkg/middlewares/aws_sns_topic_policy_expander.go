@@ -3,18 +3,18 @@ package middlewares
 import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // Explodes policy found in aws_sns_topic from state resources to aws_sns_topic_policy resources
 type AwsSNSTopicPolicyExpander struct {
 	resourceFactory          resource.ResourceFactory
-	resourceSchemaRepository resource.SchemaRepositoryInterface
+	resourceSchemaRepository dctlresource.SchemaRepositoryInterface
 }
 
-func NewAwsSNSTopicPolicyExpander(resourceFactory resource.ResourceFactory, resourceSchemaRepository resource.SchemaRepositoryInterface) AwsSNSTopicPolicyExpander {
+func NewAwsSNSTopicPolicyExpander(resourceFactory resource.ResourceFactory, resourceSchemaRepository dctlresource.SchemaRepositoryInterface) AwsSNSTopicPolicyExpander {
 	return AwsSNSTopicPolicyExpander{
 		resourceFactory,
 		resourceSchemaRepository,

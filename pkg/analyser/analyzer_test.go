@@ -6,8 +6,9 @@ import (
 	"testing"
 	"time"
 
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+
 	alerter2 "github.com/snyk/driftctl/enumeration/alerter"
-	aws2 "github.com/snyk/driftctl/pkg/resource/aws"
 
 	"github.com/snyk/driftctl/pkg/filter"
 	"github.com/stretchr/testify/mock"
@@ -19,7 +20,7 @@ import (
 	"github.com/snyk/driftctl/test/goldenfile"
 
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 
 	"github.com/r3labs/diff/v2"
 )
@@ -1167,7 +1168,6 @@ func TestAnalyze(t *testing.T) {
 
 			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
 			aws.InitResourcesMetadata(repo)
-			aws2.InitResourcesMetadata(repo)
 
 			options := AnalyzerOptions{Deep: true}
 			if c.options != nil {
@@ -1266,7 +1266,7 @@ func TestAnalyze(t *testing.T) {
 	}
 }
 
-func addSchemaToRes(res *resource.Resource, repo resource.SchemaRepositoryInterface) {
+func addSchemaToRes(res *resource.Resource, repo dctlresource.SchemaRepositoryInterface) {
 	schema, _ := repo.GetSchema(res.ResourceType())
 	res.Sch = schema
 }

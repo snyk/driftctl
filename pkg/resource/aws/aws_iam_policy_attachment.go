@@ -2,12 +2,15 @@ package aws
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
-func initAwsIAMPolicyAttachmentMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(aws.AwsIamPolicyAttachmentResourceType, func(res *resource.Resource) {
+const AwsIamPolicyAttachmentResourceType = "aws_iam_policy_attachment"
+
+func initAwsIAMPolicyAttachmentMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsIamPolicyAttachmentResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"name"})
 	})
+	resourceSchemaRepository.SetFlags(AwsIamPolicyAttachmentResourceType, resource.FlagDeepMode)
 }

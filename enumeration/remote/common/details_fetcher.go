@@ -1,6 +1,9 @@
 package common
 
 import (
+	"strconv"
+
+	"github.com/hashicorp/terraform/flatmap"
 	"github.com/sirupsen/logrus"
 	remoteerror "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/resource"
@@ -27,8 +30,27 @@ func NewGenericDetailsFetcher(resType resource.ResourceType, provider terraform.
 
 func (f *GenericDetailsFetcher) ReadDetails(res *resource.Resource) (*resource.Resource, error) {
 	attributes := map[string]string{}
-	if res.Schema().ResolveReadAttributesFunc != nil {
-		attributes = res.Schema().ResolveReadAttributesFunc(res)
+	if res.Attributes() != nil {
+		for k, v := range *res.Attributes() {
+			if b, ok := v.(bool); ok {
+				attributes[k] = strconv.FormatBool(b)
+			}
+			if i, ok := v.(int); ok {
+				attributes[k] = strconv.Itoa(i)
+			}
+			if i64, ok := v.(int64); ok {
+				attributes[k] = strconv.FormatInt(i64, 10)
+			}
+			if str, ok := v.(string); ok {
+				attributes[k] = str
+			}
+			if sliceOfInterface, ok := v.([]interface{}); ok {
+				m := flatmap.Flatten(map[string]interface{}{k: sliceOfInterface})
+				for k2, v2 := range m {
+					attributes[k2] = v2
+				}
+			}
+		}
 	}
 	ctyVal, err := f.reader.ReadResource(terraform.ReadResourceArgs{
 		Ty:         f.resType,

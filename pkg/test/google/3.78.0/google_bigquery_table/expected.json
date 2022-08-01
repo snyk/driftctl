@@ -1,0 +1,26 @@
+[
+ {
+  "Id": "projects/cloudskiff-dev-elie/datasets/example_dataset/tables/bar",
+  "Type": "google_bigquery_table",
+  "Attrs": {
+   "creation_time": 1634649708532,
+   "dataset_id": "example_dataset",
+   "deletion_protection": true,
+   "description": "",
+   "etag": "yP1tU5di6p1hWKNo8DDNYg==",
+   "expiration_time": 0,
+   "friendly_name": "",
+   "id": "projects/cloudskiff-dev-elie/datasets/example_dataset/tables/bar",
+   "last_modified_time": 1634649708609,
+   "location": "EU",
+   "num_bytes": 0,
+   "num_long_term_bytes": 0,
+   "num_rows": 0,
+   "project": "cloudskiff-dev-elie",
+   "schema": "[{\"description\":\"foobar\",\"mode\":\"NULLABLE\",\"name\":\"bar\",\"type\":\"STRING\"}]",
+   "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/cloudskiff-dev-elie/datasets/example_dataset/tables/bar",
+   "table_id": "bar",
+   "type": "TABLE"
+  }
+ }
+]

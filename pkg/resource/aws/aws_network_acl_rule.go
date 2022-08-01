@@ -1,11 +1,16 @@
 package aws
 
 import (
+	"bytes"
+	"fmt"
 	"strconv"
 
+	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
+
+const AwsNetworkACLRuleResourceType = "aws_network_acl_rule"
 
 var protocolsNumbers = map[string]int{
 	// defined at https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
@@ -156,8 +161,8 @@ var protocolsNumbers = map[string]int{
 	"254":             254,
 }
 
-func initAwsNetworkACLRuleMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(aws.AwsNetworkACLRuleResourceType, func(res *resource.Resource) {
+func initAwsNetworkACLRuleMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsNetworkACLRuleResourceType, func(res *resource.Resource) {
 		res.Attrs.DeleteIfDefault("icmp_code")
 		res.Attrs.DeleteIfDefault("icmp_type")
 
@@ -172,6 +177,14 @@ func initAwsNetworkACLRuleMetaData(resourceSchemaRepository resource.SchemaRepos
 			_ = res.Attrs.SafeSet([]string{"protocol"}, strconv.Itoa(number))
 		}
 
+		// For some reason, when deserialising the state, this field is deserialized as a float
+		// We need to make this homogeneous between remote and IaC so we cast this to an int64
+		// The real type returned by AWS SDK is int64
+		ruleNumber := (*res.Attrs)["rule_number"]
+		if v, isFloat := ruleNumber.(float64); isFloat {
+			_ = res.Attrs.SafeSet([]string{"rule_number"}, int64(v))
+		}
+
 		// ID can be different even if the resource is the same.
 		// protocol is taken into account while creating the ID, if you set protocol="tcp" you'll end with
 		// a resource with a different ID than if you set protocol="6" which is the same
@@ -180,9 +193,9 @@ func initAwsNetworkACLRuleMetaData(resourceSchemaRepository resource.SchemaRepos
 		// While reading remote we always got protocol as a number.
 		// We cannot predict how the user decided to write the protocol on IaC side.
 		// This workaround is mandatory to harmonize resources ID
-		res.Id = aws.CreateNetworkACLRuleID(
+		res.Id = CreateNetworkACLRuleID(
 			*res.Attrs.GetString("network_acl_id"),
-			int(*res.Attrs.GetFloat64("rule_number")),
+			(*res.Attrs)["rule_number"].(int64),
 			*res.Attrs.GetBool("egress"),
 			*res.Attrs.GetString("protocol"),
 		)
@@ -191,4 +204,51 @@ func initAwsNetworkACLRuleMetaData(resourceSchemaRepository resource.SchemaRepos
 		res.Attrs.DeleteIfDefault("cidr_block")
 		res.Attrs.DeleteIfDefault("ipv6_cidr_block")
 	})
+	resourceSchemaRepository.SetFlags(AwsNetworkACLRuleResourceType, resource.FlagDeepMode)
+	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsNetworkACLRuleResourceType, func(res *resource.Resource) map[string]string {
+
+		ruleNumber := strconv.FormatInt((*res.Attrs)["rule_number"].(int64), 10)
+		if ruleNumber == "32767" {
+			ruleNumber = "*"
+		}
+
+		attrs := map[string]string{
+			"Network":     *res.Attrs.GetString("network_acl_id"),
+			"Egress":      strconv.FormatBool(*res.Attrs.GetBool("egress")),
+			"Rule number": ruleNumber,
+		}
+
+		if proto := res.Attrs.GetString("protocol"); proto != nil {
+			if *proto == "-1" {
+				*proto = "All"
+			}
+			attrs["Protocol"] = *proto
+		}
+
+		if res.Attrs.GetFloat64("from_port") != nil && res.Attrs.GetFloat64("to_port") != nil {
+			attrs["Port range"] = fmt.Sprintf("%d - %d",
+				int64(*res.Attrs.GetFloat64("from_port")),
+				int64(*res.Attrs.GetFloat64("to_port")),
+			)
+		}
+
+		if cidr := res.Attrs.GetString("cidr_block"); cidr != nil && *cidr != "" {
+			attrs["CIDR"] = *cidr
+		}
+
+		if cidr := res.Attrs.GetString("ipv6_cidr_block"); cidr != nil && *cidr != "" {
+			attrs["CIDR"] = *cidr
+		}
+
+		return attrs
+	})
+}
+
+func CreateNetworkACLRuleID(networkAclId string, ruleNumber int64, egress bool, protocol string) string {
+	var buf bytes.Buffer
+	buf.WriteString(fmt.Sprintf("%s-", networkAclId))
+	buf.WriteString(fmt.Sprintf("%d-", ruleNumber))
+	buf.WriteString(fmt.Sprintf("%t-", egress))
+	buf.WriteString(fmt.Sprintf("%s-", protocol))
+	return fmt.Sprintf("nacl-%d", hashcode.String(buf.String()))
 }

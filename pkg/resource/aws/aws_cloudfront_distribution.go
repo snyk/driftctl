@@ -2,11 +2,13 @@ package aws
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
-func initAwsCloudfrontDistributionMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(aws.AwsCloudfrontDistributionResourceType, func(res *resource.Resource) {
+const AwsCloudfrontDistributionResourceType = "aws_cloudfront_distribution"
+
+func initAwsCloudfrontDistributionMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsCloudfrontDistributionResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"etag"})
 		val.SafeDelete([]string{"last_modified_time"})
@@ -14,4 +16,6 @@ func initAwsCloudfrontDistributionMetaData(resourceSchemaRepository resource.Sch
 		val.SafeDelete([]string{"status"})
 		val.SafeDelete([]string{"wait_for_deployment"})
 	})
+	resourceSchemaRepository.SetFlags(AwsCloudfrontDistributionResourceType, resource.FlagDeepMode)
+
 }

@@ -1,0 +1,10 @@
+[
+  {
+    "Id": "ebs_encryption_default",
+    "Type": "aws_ebs_encryption_by_default",
+    "Attrs": {
+      "enabled": false,
+      "id": "ebs_encryption_default"
+    }
+  }
+]

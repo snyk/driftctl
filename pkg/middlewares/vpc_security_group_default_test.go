@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 func TestDefaultVPCSecurityGroupShouldBeIgnored(t *testing.T) {

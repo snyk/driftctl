@@ -4,7 +4,7 @@ import (
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/sirupsen/logrus"
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // AwsS3BucketPublicAccessBlockReconciler middleware ignores every s3 bucket public block that is set to the default values (every option set to false)

@@ -37,9 +37,9 @@ func (e *EC2NetworkACLRuleEnumerator) Enumerate() ([]*resource.Resource, error) 
 			attrs := map[string]interface{}{
 				"egress":         *entry.Egress,
 				"network_acl_id": *res.NetworkAclId,
-				"rule_action":    *entry.RuleAction,          // Used in default middleware
-				"rule_number":    float64(*entry.RuleNumber), // Used in default middleware
-				"protocol":       *entry.Protocol,            // Used in default middleware
+				"rule_action":    *entry.RuleAction, // Used in default middleware
+				"rule_number":    *entry.RuleNumber, // Used in default middleware
+				"protocol":       *entry.Protocol,   // Used in default middleware
 			}
 
 			if entry.CidrBlock != nil {
@@ -56,7 +56,7 @@ func (e *EC2NetworkACLRuleEnumerator) Enumerate() ([]*resource.Resource, error) 
 					string(e.SupportedType()),
 					aws.CreateNetworkACLRuleID(
 						*res.NetworkAclId,
-						int(float64(*entry.RuleNumber)),
+						*entry.RuleNumber,
 						*entry.Egress,
 						*entry.Protocol,
 					),

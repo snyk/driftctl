@@ -1,0 +1,24 @@
+[
+  {
+    "Id": "4570529:wbeuil",
+    "Type": "github_team",
+    "Attrs": {
+      "id": "4570529:wbeuil",
+      "role": "maintainer",
+      "team_id": "4570529",
+      "create_default_maintainer": false,
+      "username": "wbeuil"
+    }
+  },
+  {
+    "Id": "4570529:driftctl-acceptance-tester",
+    "Type": "github_team",
+    "Attrs": {
+      "id": "4570529:driftctl-acceptance-tester",
+      "role": "maintainer",
+      "team_id": "4570529",
+      "create_default_maintainer": false,
+      "username": "driftctl-acceptance-tester"
+    }
+  }
+]

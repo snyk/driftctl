@@ -1,0 +1,47 @@
+[
+ {
+  "Id": "70994c67-b616-4caa-89bc-557153b65845",
+  "Type": "aws_route53_health_check",
+  "Attrs": {
+   "child_health_threshold": 0,
+   "disabled": false,
+   "enable_sni": false,
+   "failure_threshold": 5,
+   "fqdn": "moadib.net",
+   "id": "70994c67-b616-4caa-89bc-557153b65845",
+   "insufficient_data_health_status": "",
+   "invert_healthcheck": false,
+   "ip_address": "",
+   "measure_latency": false,
+   "port": 80,
+   "request_interval": 30,
+   "resource_path": "/",
+   "search_string": "",
+   "tags": {
+    "Name": "tf-test-health-check"
+   },
+   "type": "HTTP"
+  }
+ },
+ {
+  "Id": "45b0a22b-c9db-4271-96b3-23ac49debbf3",
+  "Type": "aws_route53_health_check",
+  "Attrs": {
+   "child_health_threshold": 0,
+   "disabled": false,
+   "enable_sni": true,
+   "failure_threshold": 5,
+   "fqdn": "moadib.net",
+   "id": "45b0a22b-c9db-4271-96b3-23ac49debbf3",
+   "insufficient_data_health_status": "",
+   "invert_healthcheck": false,
+   "ip_address": "",
+   "measure_latency": false,
+   "port": 443,
+   "request_interval": 30,
+   "resource_path": "/",
+   "search_string": "MoAdiB",
+   "type": "HTTPS_STR_MATCH"
+  }
+ }
+]

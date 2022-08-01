@@ -1,0 +1,27 @@
+[
+ {
+  "Id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com",
+  "Type": "azurerm_private_dns_zone",
+  "Attrs": {
+   "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com",
+   "max_number_of_record_sets": 25000,
+   "max_number_of_virtual_network_links": 1000,
+   "max_number_of_virtual_network_links_with_registration": 100,
+   "name": "thisisatestusingtf.com",
+   "resource_group_name": "martin-dev",
+   "soa_record": [
+    {
+     "email": "azureprivatedns-host.microsoft.com",
+     "expire_time": 2419200,
+     "fqdn": "thisisatestusingtf.com.",
+     "host_name": "azureprivatedns.net",
+     "minimum_ttl": 10,
+     "refresh_time": 3600,
+     "retry_time": 300,
+     "serial_number": 1,
+     "ttl": 3600
+    }
+   ]
+  }
+ }
+]

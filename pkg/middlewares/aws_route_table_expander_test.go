@@ -1,17 +1,16 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/enumeration/terraform"
 	"strings"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/r3labs/diff/v2"
-	"github.com/stretchr/testify/mock"
-
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/mocks"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestAwsRouteTableExpander_Execute(t *testing.T) {
@@ -19,7 +18,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 		name     string
 		input    []*resource.Resource
 		expected []*resource.Resource
-		mock     func(factory *terraform.MockResourceFactory)
+		mock     func(factory *dctlresource.MockResourceFactory)
 	}{
 		{
 			name: "test with nil route attributes",
@@ -139,7 +138,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			mock: func(factory *terraform.MockResourceFactory) {
+			mock: func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "r-table_from_state1080289494"
 				})).Times(1).Return(&resource.Resource{
@@ -248,7 +247,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			mock: func(factory *terraform.MockResourceFactory) {
+			mock: func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "r-default_route_table_from_state1080289494"
 				})).Times(1).Return(&resource.Resource{
@@ -356,7 +355,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			func(factory *terraform.MockResourceFactory) {
+			func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "r-default_route_table_from_state1080289494"
 				})).Times(1).Return(&resource.Resource{
@@ -449,7 +448,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			func(factory *terraform.MockResourceFactory) {
+			func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", "aws_route", mock.Anything, mock.MatchedBy(func(input map[string]interface{}) bool {
 					return input["id"] == "r-table_from_state2750132062"
 				})).Times(1).Return(&resource.Resource{
@@ -472,7 +471,7 @@ func TestAwsRouteTableExpander_Execute(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockedAlerter := &mocks.AlerterInterface{}
 
-			factory := &terraform.MockResourceFactory{}
+			factory := &dctlresource.MockResourceFactory{}
 			if tt.mock != nil {
 				tt.mock(factory)
 			}

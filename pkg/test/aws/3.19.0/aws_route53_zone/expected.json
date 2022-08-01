@@ -1,0 +1,19 @@
+[
+ {
+  "Id": "Z09368953G729AFEX5048",
+  "Type": "aws_route53_zone",
+  "Attrs": {
+   "comment": "Managed by Terraform",
+   "delegation_set_id": "",
+   "id": "Z09368953G729AFEX5048",
+   "name": "elie.ski",
+   "name_servers": [
+    "ns-1504.awsdns-60.org",
+    "ns-180.awsdns-22.com",
+    "ns-1890.awsdns-44.co.uk",
+    "ns-759.awsdns-30.net"
+   ],
+   "zone_id": "Z09368953G729AFEX5048"
+  }
+ }
+]

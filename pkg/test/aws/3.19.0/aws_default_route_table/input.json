@@ -1,0 +1,13 @@
+[
+ {
+  "Id": "rtb-03fda555c6c35a1e5",
+  "Type": "aws_default_route_table",
+  "Attrs": {
+   "arn": "arn:aws:ec2:us-east-1:282061376516:route-table/rtb-03fda555c6c35a1e5",
+   "default_route_table_id": "rtb-03fda555c6c35a1e5",
+   "id": "rtb-03fda555c6c35a1e5",
+   "owner_id": "282061376516",
+   "vpc_id": "vpc-092fed41ffac6df72"
+  }
+ }
+]

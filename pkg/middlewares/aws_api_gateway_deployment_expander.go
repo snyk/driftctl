@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // Create a aws_api_gateway_stage resource from a aws_api_gateway_deployment resource and ignore the latter resource

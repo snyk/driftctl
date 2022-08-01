@@ -4,7 +4,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/snyk/driftctl/enumeration/resource"
-	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
+	resourceaws "github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // Split security group rule if it needs to given its attributes

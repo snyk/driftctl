@@ -9,7 +9,7 @@
    }
   ],
   "resource_group_name": "martin-dev",
-  "tags": null,
+  "tags": {},
   "timeouts": {},
   "ttl": 300,
   "zone_name": "thisisatestusingtf.com"
@@ -27,7 +27,7 @@
    }
   ],
   "resource_group_name": "martin-dev",
-  "tags": null,
+  "tags": {},
   "timeouts": {},
   "ttl": 300,
   "zone_name": "thisisatestusingtf.com"

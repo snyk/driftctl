@@ -1,0 +1,18 @@
+[
+ {
+  "Id": "rtb-0a946227959883445",
+  "Type": "aws_route_table",
+  "Attrs": {
+   "arn": "arn:aws:ec2:us-east-1:282061376516:route-table/rtb-0a946227959883445",
+   "id": "rtb-0a946227959883445",
+   "owner_id": "282061376516",
+   "tags": {
+    "Name": "rr"
+   },
+   "tags_all": {
+    "Name": "rr"
+   },
+   "vpc_id": "vpc-0b76cbfa2bd868650"
+  }
+ }
+]

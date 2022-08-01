@@ -1,0 +1,13 @@
+[
+ {
+  "Id": "f02opk",
+  "Type": "aws_apigatewayv2_api_mapping",
+  "Attrs": {
+   "api_id": "wbachnbphj",
+   "api_mapping_key": "",
+   "domain_name": "driftctl.example.com",
+   "id": "f02opk",
+   "stage": "example-stage"
+  }
+ }
+]

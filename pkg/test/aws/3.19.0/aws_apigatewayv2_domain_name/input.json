@@ -1,0 +1,21 @@
+[
+ {
+  "Id": "driftctl.example.com",
+  "Type": "aws_apigatewayv2_domain_name",
+  "Attrs": {
+   "api_mapping_selection_expression": "$request.basepath",
+   "arn": "arn:aws:apigateway:us-east-2::/domainnames/driftctl.example.com",
+   "domain_name": "driftctl.example.com",
+   "domain_name_configuration": [
+    {
+     "certificate_arn": "arn:aws:acm:us-east-2:047081014315:certificate/c49d9c11-1308-4594-bd78-7853466ae7bc",
+     "endpoint_type": "REGIONAL",
+     "hosted_zone_id": "ZOJJZC49E0EPZ",
+     "security_policy": "TLS_1_2",
+     "target_domain_name": "d-db4yiff8oa.execute-api.us-east-2.amazonaws.com"
+    }
+   ],
+   "id": "driftctl.example.com"
+  }
+ }
+]

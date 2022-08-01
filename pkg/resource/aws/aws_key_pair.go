@@ -2,13 +2,16 @@ package aws
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
-func initAwsKeyPairMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(aws.AwsKeyPairResourceType, func(res *resource.Resource) {
+const AwsKeyPairResourceType = "aws_key_pair"
+
+func initAwsKeyPairMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsKeyPairResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"key_name_prefix"})
 		val.SafeDelete([]string{"public_key"})
 	})
+	resourceSchemaRepository.SetFlags(AwsKeyPairResourceType, resource.FlagDeepMode)
 }

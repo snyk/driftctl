@@ -1,7 +1,11 @@
 package aws
 
 import (
+	"fmt"
+	"strconv"
+
 	"github.com/aws/aws-sdk-go/service/cloudformation"
+	"github.com/hashicorp/terraform/flatmap"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	remoteerror "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/resource"
@@ -35,7 +39,10 @@ func (e *CloudformationStackEnumerator) Enumerate() ([]*resource.Resource, error
 	for _, stack := range stacks {
 		attrs := map[string]interface{}{}
 		if stack.Parameters != nil && len(stack.Parameters) > 0 {
-			attrs["parameters"] = flattenParameters(stack.Parameters)
+			attrs["parameters.%"] = strconv.FormatInt(int64(len(stack.Parameters)), 10)
+			for k, v := range flattenParameters(stack.Parameters) {
+				attrs[fmt.Sprintf("parameters.%s", k)] = v
+			}
 		}
 
 		results = append(
@@ -51,10 +58,10 @@ func (e *CloudformationStackEnumerator) Enumerate() ([]*resource.Resource, error
 	return results, err
 }
 
-func flattenParameters(parameters []*cloudformation.Parameter) interface{} {
+func flattenParameters(parameters []*cloudformation.Parameter) flatmap.Map {
 	params := make(map[string]interface{}, len(parameters))
 	for _, p := range parameters {
 		params[*p.ParameterKey] = *p.ParameterValue
 	}
-	return params
+	return flatmap.Flatten(params)
 }

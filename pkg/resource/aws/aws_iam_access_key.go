@@ -2,12 +2,13 @@ package aws
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
-func initAwsIAMAccessKeyMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
+const AwsIamAccessKeyResourceType = "aws_iam_access_key"
 
-	resourceSchemaRepository.SetNormalizeFunc(aws.AwsIamAccessKeyResourceType, func(res *resource.Resource) {
+func initAwsIAMAccessKeyMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsIamAccessKeyResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		// As we can't read secrets from aws API once access_key created we need to set
 		// fields retrieved from state to nil to avoid drift
@@ -19,4 +20,13 @@ func initAwsIAMAccessKeyMetaData(resourceSchemaRepository resource.SchemaReposit
 		val.SafeDelete([]string{"key_fingerprint"})
 		val.SafeDelete([]string{"pgp_key"})
 	})
+	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsIamAccessKeyResourceType, func(res *resource.Resource) map[string]string {
+		val := res.Attrs
+		attrs := make(map[string]string)
+		if user := val.GetString("user"); user != nil && *user != "" {
+			attrs["User"] = *user
+		}
+		return attrs
+	})
+	resourceSchemaRepository.SetFlags(AwsIamAccessKeyResourceType, resource.FlagDeepMode)
 }

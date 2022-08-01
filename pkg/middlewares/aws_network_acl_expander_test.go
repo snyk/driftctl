@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/enumeration/terraform"
 	"strings"
 	"testing"
 
@@ -9,12 +8,13 @@ import (
 	"github.com/r3labs/diff/v2"
 	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
 func TestAwsNetworkACLExpander_Execute(t *testing.T) {
 	tests := []struct {
 		name                                  string
-		mock                                  func(factory *terraform.MockResourceFactory)
+		mock                                  func(factory *dctlresource.MockResourceFactory)
 		remoteResources                       []*resource.Resource
 		resourcesFromState                    []*resource.Resource
 		expectedFromState, expectedFromRemote []*resource.Resource
@@ -67,7 +67,7 @@ func TestAwsNetworkACLExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			mock: func(factory *terraform.MockResourceFactory) {
+			mock: func(factory *dctlresource.MockResourceFactory) {
 				factory.On(
 					"CreateAbstractResource",
 					aws.AwsNetworkACLRuleResourceType,
@@ -87,7 +87,7 @@ func TestAwsNetworkACLExpander_Execute(t *testing.T) {
 						"icmp_type":       0,
 						"ipv6_cidr_block": "",
 						"protocol":        "17",
-						"rule_number":     100.0,
+						"rule_number":     int64(100),
 						"to_port":         80,
 					},
 				).Once().Return(&resource.Resource{
@@ -114,7 +114,7 @@ func TestAwsNetworkACLExpander_Execute(t *testing.T) {
 						"icmp_type":       0,
 						"ipv6_cidr_block": "",
 						"protocol":        "6",
-						"rule_number":     101.0,
+						"rule_number":     int64(101),
 						"to_port":         80,
 					},
 				).Once().Return(&resource.Resource{
@@ -141,7 +141,7 @@ func TestAwsNetworkACLExpander_Execute(t *testing.T) {
 						"icmp_type":       0,
 						"ipv6_cidr_block": "",
 						"protocol":        "6",
-						"rule_number":     103.0,
+						"rule_number":     int64(103),
 						"to_port":         80,
 					},
 				).Once().Return(&resource.Resource{
@@ -168,7 +168,7 @@ func TestAwsNetworkACLExpander_Execute(t *testing.T) {
 						"icmp_type":       0,
 						"ipv6_cidr_block": "",
 						"protocol":        "17",
-						"rule_number":     100.0,
+						"rule_number":     int64(100),
 						"to_port":         80,
 					},
 				).Once().Return(&resource.Resource{
@@ -288,7 +288,7 @@ func TestAwsNetworkACLExpander_Execute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory := &terraform.MockResourceFactory{}
+			factory := &dctlresource.MockResourceFactory{}
 			if tt.mock != nil {
 				tt.mock(factory)
 			}

@@ -1,47 +1,35 @@
 [
  {
-  "condition": null,
-  "etag": null,
   "id": "/roles/storage.admin/user:martin.guibert@cloudskiff.com",
   "member": "user:martin.guibert@cloudskiff.com",
   "project": "",
   "role": "roles/storage.admin"
  },
  {
-  "condition": null,
-  "etag": null,
   "id": "/roles/viewer/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
   "member": "serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
   "project": "",
   "role": "roles/viewer"
  },
  {
-  "condition": null,
-  "etag": null,
   "id": "/roles/cloudasset.viewer/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
   "member": "serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
   "project": "",
   "role": "roles/cloudasset.viewer"
  },
  {
-  "condition": null,
-  "etag": null,
   "id": "/roles/iam.securityReviewer/serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
   "member": "serviceAccount:driftctl@cloudskiff-dev-martin.iam.gserviceaccount.com",
   "project": "",
   "role": "roles/iam.securityReviewer"
  },
  {
-  "condition": null,
-  "etag": null,
   "id": "/roles/editor/serviceAccount:drifctl-admin@cloudskiff-dev-martin.iam.gserviceaccount.com",
   "member": "serviceAccount:drifctl-admin@cloudskiff-dev-martin.iam.gserviceaccount.com",
   "project": "",
   "role": "roles/editor"
  },
  {
-  "condition": null,
-  "etag": null,
   "id": "/roles/editor/user:martin.guibert@cloudskiff.com",
   "member": "user:martin.guibert@cloudskiff.com",
   "project": "",

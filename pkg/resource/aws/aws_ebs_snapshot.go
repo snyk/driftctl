@@ -2,12 +2,15 @@ package aws
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
-func initAwsEbsSnapshotMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(aws.AwsEbsSnapshotResourceType, func(res *resource.Resource) {
+const AwsEbsSnapshotResourceType = "aws_ebs_snapshot"
+
+func initAwsEbsSnapshotMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsEbsSnapshotResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 	})
+	resourceSchemaRepository.SetFlags(AwsEbsSnapshotResourceType, resource.FlagDeepMode)
 }

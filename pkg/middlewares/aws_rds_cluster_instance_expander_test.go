@@ -1,11 +1,11 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/enumeration/terraform"
 	"testing"
 
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +16,7 @@ func TestAwsRDSClusterInstanceExpander_Execute(t *testing.T) {
 		stateResources          []*resource.Resource
 		expectedRemoteResources []*resource.Resource
 		expectedStateResources  []*resource.Resource
-		mock                    func(factory *terraform.MockResourceFactory)
+		mock                    func(factory *dctlresource.MockResourceFactory)
 	}{
 		{
 			name: "should not map any rds cluster instance into db instances",
@@ -129,7 +129,7 @@ func TestAwsRDSClusterInstanceExpander_Execute(t *testing.T) {
 					},
 				},
 			},
-			mock: func(factory *terraform.MockResourceFactory) {
+			mock: func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", aws.AwsDbInstanceResourceType, "aurora-cluster-demo-0", map[string]interface{}{"field": "test"}).
 					Return(&resource.Resource{
 						Id:    "aurora-cluster-demo-0",
@@ -217,7 +217,7 @@ func TestAwsRDSClusterInstanceExpander_Execute(t *testing.T) {
 					Attrs: &resource.Attributes{},
 				},
 			},
-			mock: func(factory *terraform.MockResourceFactory) {
+			mock: func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", aws.AwsDbInstanceResourceType, "aurora-cluster-demo-0", map[string]interface{}{}).
 					Return(&resource.Resource{
 						Id:    "aurora-cluster-demo-0",
@@ -230,7 +230,7 @@ func TestAwsRDSClusterInstanceExpander_Execute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory := &terraform.MockResourceFactory{}
+			factory := &dctlresource.MockResourceFactory{}
 			if tt.mock != nil {
 				tt.mock(factory)
 			}

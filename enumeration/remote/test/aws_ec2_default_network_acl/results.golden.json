@@ -38,7 +38,7 @@
     "subnet-ad17e3cb",
     "subnet-afa656f0"
   ],
-  "tags": null,
+  "tags": {},
   "vpc_id": "vpc-41d1d13b"
  }
 ]

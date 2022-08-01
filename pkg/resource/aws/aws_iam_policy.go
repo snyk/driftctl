@@ -2,12 +2,14 @@ package aws
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/pkg/helpers"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
-func initAwsIAMPolicyMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(aws.AwsIamPolicyResourceType, func(res *resource.Resource) {
+const AwsIamPolicyResourceType = "aws_iam_policy"
+
+func initAwsIAMPolicyMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsIamPolicyResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		jsonString, err := helpers.NormalizeJsonString((*val)["policy"])
 		if err == nil {
@@ -16,4 +18,10 @@ func initAwsIAMPolicyMetaData(resourceSchemaRepository resource.SchemaRepository
 
 		val.SafeDelete([]string{"name_prefix"})
 	})
+	resourceSchemaRepository.UpdateSchema(AwsIamPolicyResourceType, map[string]func(attributeSchema *resource.AttributeSchema){
+		"policy": func(attributeSchema *resource.AttributeSchema) {
+			attributeSchema.JsonString = true
+		},
+	})
+	resourceSchemaRepository.SetFlags(AwsIamPolicyResourceType, resource.FlagDeepMode)
 }

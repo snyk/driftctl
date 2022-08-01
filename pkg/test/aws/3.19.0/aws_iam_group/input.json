@@ -1,0 +1,13 @@
+[
+ {
+  "Id": "developers",
+  "Type": "aws_iam_group",
+  "Attrs": {
+   "arn": "arn:aws:iam::533948124879:group/users/developers",
+   "id": "developers",
+   "name": "developers",
+   "path": "/users/",
+   "unique_id": "AGPAXYUOJZ3HYXMHVQXQK"
+  }
+ }
+]

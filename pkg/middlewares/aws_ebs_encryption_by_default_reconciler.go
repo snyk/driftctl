@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // AwsEbsEncryptionByDefaultReconciler is a middleware that either creates an 'aws_ebs_encryption_by_default' resource

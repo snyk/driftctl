@@ -1,0 +1,3 @@
+package google
+
+const GoogleStorageBucketIamPolicyResourceType = "google_storage_bucket_iam_policy"

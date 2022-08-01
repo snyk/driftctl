@@ -29,7 +29,7 @@
    }
   ],
   "owner_id": "929327065333",
-  "subnet_ids": null,
+  "subnet_ids": [],
   "tags": {
    "Name": "test"
   },
@@ -65,7 +65,7 @@
    }
   ],
   "owner_id": "929327065333",
-  "subnet_ids": null,
+  "subnet_ids": [],
   "tags": {
    "Name": "test2"
   },

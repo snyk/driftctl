@@ -1,0 +1,26 @@
+[
+ {
+  "Id": "r-rtb-0232602f0f07748fc243279527",
+  "Type": "aws_route",
+  "Attrs": {
+   "destination_cidr_block": "1.1.1.1/32",
+   "gateway_id": "igw-0125fbf19e83d008b",
+   "id": "r-rtb-0232602f0f07748fc243279527",
+   "origin": "CreateRoute",
+   "route_table_id": "rtb-0232602f0f07748fc",
+   "state": "active"
+  }
+ },
+ {
+  "Id": "r-rtb-0232602f0f07748fc2750132062",
+  "Type": "aws_route",
+  "Attrs": {
+   "destination_ipv6_cidr_block": "::/0",
+   "gateway_id": "igw-0125fbf19e83d008b",
+   "id": "r-rtb-0232602f0f07748fc2750132062",
+   "origin": "CreateRoute",
+   "route_table_id": "rtb-0232602f0f07748fc",
+   "state": "active"
+  }
+ }
+]

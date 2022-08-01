@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/snyk/driftctl/enumeration/resource"
-	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
+	resourceaws "github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // Split Policy attachment when there is multiple user and groups and generate a repeatable id

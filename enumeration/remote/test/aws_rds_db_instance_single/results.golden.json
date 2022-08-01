@@ -52,7 +52,7 @@
     "replicate_source_db": "",
     "resource_id": "db-C22NACLA2B45VA3WLVG6TKEAJE",
     "s3_import": null,
-    "security_group_names": null,
+    "security_group_names": [],
     "skip_final_snapshot": null,
     "snapshot_identifier": null,
     "status": "available",

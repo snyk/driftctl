@@ -38,7 +38,9 @@ func (e *GoogleStorageBucketEnumerator) Enumerate() ([]*resource.Resource, error
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
 				res.DisplayName,
-				map[string]interface{}{},
+				map[string]interface{}{
+					"name": res.DisplayName,
+				},
 			),
 		)
 	}

@@ -1,0 +1,110 @@
+[
+ {
+  "Id": "subnet-03258f7d55e1df8ed",
+  "Type": "aws_default_subnet",
+  "Attrs": {
+   "arn": "arn:aws:ec2:us-east-1:526954929923:subnet/subnet-03258f7d55e1df8ed",
+   "assign_ipv6_address_on_creation": false,
+   "availability_zone": "us-east-1a",
+   "availability_zone_id": "use1-az1",
+   "cidr_block": "172.31.0.0/20",
+   "id": "subnet-03258f7d55e1df8ed",
+   "ipv6_cidr_block": "",
+   "ipv6_cidr_block_association_id": "",
+   "map_public_ip_on_launch": true,
+   "outpost_arn": "",
+   "owner_id": "526954929923",
+   "vpc_id": "vpc-075959b9534907185"
+  }
+ },
+ {
+  "Id": "subnet-03a8928df96cbc112",
+  "Type": "aws_default_subnet",
+  "Attrs": {
+   "arn": "arn:aws:ec2:us-east-1:526954929923:subnet/subnet-03a8928df96cbc112",
+   "assign_ipv6_address_on_creation": false,
+   "availability_zone": "us-east-1b",
+   "availability_zone_id": "use1-az2",
+   "cidr_block": "172.31.80.0/20",
+   "id": "subnet-03a8928df96cbc112",
+   "ipv6_cidr_block": "",
+   "ipv6_cidr_block_association_id": "",
+   "map_public_ip_on_launch": true,
+   "outpost_arn": "",
+   "owner_id": "526954929923",
+   "vpc_id": "vpc-075959b9534907185"
+  }
+ },
+ {
+  "Id": "subnet-00242cc446a0e7583",
+  "Type": "aws_default_subnet",
+  "Attrs": {
+   "arn": "arn:aws:ec2:us-east-1:526954929923:subnet/subnet-00242cc446a0e7583",
+   "assign_ipv6_address_on_creation": false,
+   "availability_zone": "us-east-1c",
+   "availability_zone_id": "use1-az4",
+   "cidr_block": "172.31.16.0/20",
+   "id": "subnet-00242cc446a0e7583",
+   "ipv6_cidr_block": "",
+   "ipv6_cidr_block_association_id": "",
+   "map_public_ip_on_launch": true,
+   "outpost_arn": "",
+   "owner_id": "526954929923",
+   "vpc_id": "vpc-075959b9534907185"
+  }
+ },
+ {
+  "Id": "subnet-03c1a726f076cec6b",
+  "Type": "aws_subnet",
+  "Attrs": {
+   "arn": "arn:aws:ec2:us-east-1:526954929923:subnet/subnet-03c1a726f076cec6b",
+   "assign_ipv6_address_on_creation": false,
+   "availability_zone": "us-east-1c",
+   "availability_zone_id": "use1-az4",
+   "cidr_block": "10.0.0.0/24",
+   "id": "subnet-03c1a726f076cec6b",
+   "ipv6_cidr_block": "",
+   "ipv6_cidr_block_association_id": "",
+   "map_public_ip_on_launch": false,
+   "outpost_arn": "",
+   "owner_id": "526954929923",
+   "vpc_id": "vpc-0ad2f4ae7212c2bff"
+  }
+ },
+ {
+  "Id": "subnet-02fb51b19c891f0e9",
+  "Type": "aws_subnet",
+  "Attrs": {
+   "arn": "arn:aws:ec2:us-east-1:526954929923:subnet/subnet-02fb51b19c891f0e9",
+   "assign_ipv6_address_on_creation": false,
+   "availability_zone": "us-east-1d",
+   "availability_zone_id": "use1-az6",
+   "cidr_block": "10.0.1.0/24",
+   "id": "subnet-02fb51b19c891f0e9",
+   "ipv6_cidr_block": "",
+   "ipv6_cidr_block_association_id": "",
+   "map_public_ip_on_launch": false,
+   "outpost_arn": "",
+   "owner_id": "526954929923",
+   "vpc_id": "vpc-0ad2f4ae7212c2bff"
+  }
+ },
+ {
+  "Id": "subnet-09631aa1f17d607c4",
+  "Type": "aws_subnet",
+  "Attrs": {
+   "arn": "arn:aws:ec2:us-east-1:526954929923:subnet/subnet-09631aa1f17d607c4",
+   "assign_ipv6_address_on_creation": false,
+   "availability_zone": "us-east-1a",
+   "availability_zone_id": "use1-az1",
+   "cidr_block": "10.0.2.0/24",
+   "id": "subnet-09631aa1f17d607c4",
+   "ipv6_cidr_block": "",
+   "ipv6_cidr_block_association_id": "",
+   "map_public_ip_on_launch": false,
+   "outpost_arn": "",
+   "owner_id": "526954929923",
+   "vpc_id": "vpc-0ad2f4ae7212c2bff"
+  }
+ }
+]

@@ -1,0 +1,48 @@
+[
+  {
+    "Id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/loadBalancingRules/LBRule2",
+    "Type": "azurerm_lb",
+    "Attrs": {
+      "backend_address_pool_id": "",
+      "backend_port": 80,
+      "disable_outbound_snat": false,
+      "enable_floating_ip": false,
+      "enable_tcp_reset": false,
+      "frontend_ip_configuration_id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/frontendIPConfigurations/PublicIPAddress",
+      "frontend_ip_configuration_name": "PublicIPAddress",
+      "frontend_port": 80,
+      "id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/loadBalancingRules/LBRule2",
+      "idle_timeout_in_minutes": 4,
+      "load_distribution": "Default",
+      "loadbalancer_id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer",
+      "name": "LBRule2",
+      "probe_id": "",
+      "protocol": "Tcp",
+      "resource_group_name": "raphael-dev",
+      "timeouts": {}
+    }
+  },
+  {
+    "Id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/loadBalancingRules/LBRule",
+    "Type": "azurerm_lb",
+    "Attrs": {
+      "backend_address_pool_id": "",
+      "backend_port": 3389,
+      "disable_outbound_snat": false,
+      "enable_floating_ip": false,
+      "enable_tcp_reset": false,
+      "frontend_ip_configuration_id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/frontendIPConfigurations/PublicIPAddress",
+      "frontend_ip_configuration_name": "PublicIPAddress",
+      "frontend_port": 3389,
+      "id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/loadBalancingRules/LBRule",
+      "idle_timeout_in_minutes": 4,
+      "load_distribution": "Default",
+      "loadbalancer_id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer",
+      "name": "LBRule",
+      "probe_id": "",
+      "protocol": "Tcp",
+      "resource_group_name": "raphael-dev",
+      "timeouts": {}
+    }
+  }
+]

@@ -2,11 +2,13 @@ package aws
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
-func initAwsRDSClusterMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(aws.AwsRDSClusterResourceType, func(res *resource.Resource) {
+const AwsRDSClusterResourceType = "aws_rds_cluster"
+
+func initAwsRDSClusterMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsRDSClusterResourceType, func(res *resource.Resource) {
 		val := res.Attributes()
 		val.SafeDelete([]string{"timeouts"})
 		val.SafeDelete([]string{"master_password"})
@@ -17,4 +19,5 @@ func initAwsRDSClusterMetaData(resourceSchemaRepository resource.SchemaRepositor
 		val.SafeDelete([]string{"final_snapshot_identifier"})
 		val.SafeDelete([]string{"source_region"})
 	})
+	resourceSchemaRepository.SetFlags(AwsRDSClusterResourceType, resource.FlagDeepMode)
 }

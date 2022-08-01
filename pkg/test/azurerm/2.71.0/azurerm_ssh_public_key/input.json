@@ -1,0 +1,28 @@
+[
+  {
+    "Id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/TESTRESGROUP/providers/Microsoft.Compute/sshPublicKeys/example-key2",
+    "Type": "azurerm_ssh_public_key",
+    "Attrs": {
+      "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/TESTRESGROUP/providers/Microsoft.Compute/sshPublicKeys/example-key2",
+      "location": "westeurope",
+      "name": "example-key2",
+      "public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCjeC5sO1EdEfZOrdVCpuOgXcXsKZg9zgfJbHgQgX1R2Nd8mNQrUjpsB4XLHNZ3T6UYrsSh7oxYC3UFu6peO4LmA2WTe2wCWVFn9WW/Lo99WcA/G/fGj6s5HK5CHFVPXnNxM47QJMNm5BWOM55+EWP839SHLH9Fk63H575x7jxZvBvaV0uL84XuVpiEBKhnpQfT4cJGoGLOGgjM+TpHyosbKldu5q2UTF9nOGpmLuku41oihqiPPSJnJRv3TDKFi4mIl9Iz5HJINWvLl1kdCfyjPcHcH5GO0tuA9rP5AbsmG5EAGOKtuFipYA4MyY9SYriZ2V1vpgefUS9lilg9hIPEj/8ZPTxf62XeyC1dQ3cOz6yPWR2sODyVECVf6mrmhZPTjVX+DorByX2uBzLDzF9jGMFMJRhxi0yVpXsqBrP+ps9G+s7oNUDp771d1Bix+gm5EyebEbdiQuf0/8wDlhY5jYAFJW1xkPKXcjJdM1FuVVS1B8zhvRVEJZUngruVfh/7jJUOWNS44F7rVz5a4r/vs84ObFIMeYdFn+uxgUqOlNMAvXLvJ2GzlPXInXW90Uv+JJ5msny/5ygGfHr2D6xOf6P7r7oSalXwjd9BcRS6/4GQAY6LVfPwrpnrpyJBiK/FhEbR+ctfDo81eKhmp0EyxvSJGW46/26/kqHvchf+rQ== ?\n",
+      "resource_group_name": "TESTRESGROUP",
+      "tags": {},
+      "timeouts": {}
+    }
+  },
+  {
+    "Id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/TESTRESGROUP/providers/Microsoft.Compute/sshPublicKeys/example-key",
+    "Type": "azurerm_ssh_public_key",
+    "Attrs": {
+      "id": "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/TESTRESGROUP/providers/Microsoft.Compute/sshPublicKeys/example-key",
+      "location": "westeurope",
+      "name": "example-key",
+      "public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCjeC5sO1EdEfZOrdVCpuOgXcXsKZg9zgfJbHgQgX1R2Nd8mNQrUjpsB4XLHNZ3T6UYrsSh7oxYC3UFu6peO4LmA2WTe2wCWVFn9WW/Lo99WcA/G/fGj6s5HK5CHFVPXnNxM47QJMNm5BWOM55+EWP839SHLH9Fk63H575x7jxZvBvaV0uL84XuVpiEBKhnpQfT4cJGoGLOGgjM+TpHyosbKldu5q2UTF9nOGpmLuku41oihqiPPSJnJRv3TDKFi4mIl9Iz5HJINWvLl1kdCfyjPcHcH5GO0tuA9rP5AbsmG5EAGOKtuFipYA4MyY9SYriZ2V1vpgefUS9lilg9hIPEj/8ZPTxf62XeyC1dQ3cOz6yPWR2sODyVECVf6mrmhZPTjVX+DorByX2uBzLDzF9jGMFMJRhxi0yVpXsqBrP+ps9G+s7oNUDp771d1Bix+gm5EyebEbdiQuf0/8wDlhY5jYAFJW1xkPKXcjJdM1FuVVS1B8zhvRVEJZUngruVfh/7jJUOWNS44F7rVz5a4r/vs84ObFIMeYdFn+uxgUqOlNMAvXLvJ2GzlPXInXW90Uv+JJ5msny/5ygGfHr2D6xOf6P7r7oSalXwjd9BcRS6/4GQAY6LVfPwrpnrpyJBiK/FhEbR+ctfDo81eKhmp0EyxvSJGW46/26/kqHvchf+rQ== ?\n",
+      "resource_group_name": "TESTRESGROUP",
+      "tags": {},
+      "timeouts": {}
+    }
+  }
+]

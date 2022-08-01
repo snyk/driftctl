@@ -1,18 +1,17 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/enumeration/terraform"
 	"testing"
 
-	"github.com/stretchr/testify/mock"
-
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestVPCSecurityGroupRuleSanitizer(t *testing.T) {
 
-	factory := &terraform.MockResourceFactory{}
+	factory := &dctlresource.MockResourceFactory{}
 	factory.On("CreateAbstractResource", aws.AwsSecurityGroupRuleResourceType, "sgrule-1175318309", mock.Anything).Times(1).Return(
 		&resource.Resource{
 			Id:    "sgrule-1175318309",

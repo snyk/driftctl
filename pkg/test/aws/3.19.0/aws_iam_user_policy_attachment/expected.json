@@ -1,0 +1,110 @@
+[
+  {
+    "Id": "test3-loadbalancer2",
+    "Type": "aws_iam_user_policy_attachment",
+    "Attrs": {
+      "id": "test3-loadbalancer2",
+      "policy_arn": "arn:aws:iam::726421854799:policy/test3",
+      "user": "loadbalancer2"
+    }
+  },
+  {
+    "Id": "test4-loadbalancer2",
+    "Type": "aws_iam_user_policy_attachment",
+    "Attrs": {
+      "id": "test4-loadbalancer2",
+      "policy_arn": "arn:aws:iam::726421854799:policy/test4",
+      "user": "loadbalancer2"
+    }
+  },
+  {
+    "Id": "test-loadbalancer",
+    "Type": "aws_iam_user_policy_attachment",
+    "Attrs": {
+      "id": "test-loadbalancer",
+      "policy_arn": "arn:aws:iam::726421854799:policy/test",
+      "user": "loadbalancer"
+    }
+  },
+  {
+    "Id": "test3-loadbalancer",
+    "Type": "aws_iam_user_policy_attachment",
+    "Attrs": {
+      "id": "test3-loadbalancer",
+      "policy_arn": "arn:aws:iam::726421854799:policy/test3",
+      "user": "loadbalancer"
+    }
+  },
+  {
+    "Id": "test-loadbalancer3",
+    "Type": "aws_iam_user_policy_attachment",
+    "Attrs": {
+      "id": "test-loadbalancer3",
+      "policy_arn": "arn:aws:iam::726421854799:policy/test",
+      "user": "loadbalancer3"
+    }
+  },
+  {
+    "Id": "test-loadbalancer2",
+    "Type": "aws_iam_user_policy_attachment",
+    "Attrs": {
+      "id": "test-loadbalancer2",
+      "policy_arn": "arn:aws:iam::726421854799:policy/test",
+      "user": "loadbalancer2"
+    }
+  },
+  {
+    "Id": "test4-loadbalancer",
+    "Type": "aws_iam_user_policy_attachment",
+    "Attrs": {
+      "id": "test4-loadbalancer",
+      "policy_arn": "arn:aws:iam::726421854799:policy/test4",
+      "user": "loadbalancer"
+    }
+  },
+  {
+    "Id": "test2-loadbalancer2",
+    "Type": "aws_iam_user_policy_attachment",
+    "Attrs": {
+      "id": "test2-loadbalancer2",
+      "policy_arn": "arn:aws:iam::726421854799:policy/test2",
+      "user": "loadbalancer2"
+    }
+  },
+  {
+    "Id": "test2-loadbalancer",
+    "Type": "aws_iam_user_policy_attachment",
+    "Attrs": {
+      "id": "test2-loadbalancer",
+      "policy_arn": "arn:aws:iam::726421854799:policy/test2",
+      "user": "loadbalancer"
+    }
+  },
+  {
+    "Id": "test4-loadbalancer3",
+    "Type": "aws_iam_user_policy_attachment",
+    "Attrs": {
+      "id": "test4-loadbalancer3",
+      "policy_arn": "arn:aws:iam::726421854799:policy/test4",
+      "user": "loadbalancer3"
+    }
+  },
+  {
+    "Id": "test3-loadbalancer3",
+    "Type": "aws_iam_user_policy_attachment",
+    "Attrs": {
+      "id": "test3-loadbalancer3",
+      "policy_arn": "arn:aws:iam::726421854799:policy/test3",
+      "user": "loadbalancer3"
+    }
+  },
+  {
+    "Id": "test2-loadbalancer3",
+    "Type": "aws_iam_user_policy_attachment",
+    "Attrs": {
+      "id": "test2-loadbalancer3",
+      "policy_arn": "arn:aws:iam::726421854799:policy/test2",
+      "user": "loadbalancer3"
+    }
+  }
+]

@@ -1,0 +1,3 @@
+package google
+
+const GoogleStorageBucketIamBindingResourceType = "google_storage_bucket_iam_binding"

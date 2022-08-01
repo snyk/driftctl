@@ -1,0 +1,54 @@
+[
+ {
+  "Id": "arn:aws:elasticloadbalancing:us-east-1:533948124879:loadbalancer/app/test-lb-tf/35be57d467ff22b9",
+  "Type": "aws_alb",
+  "Attrs": {
+   "access_logs": [
+    {
+     "bucket": "",
+     "enabled": false,
+     "prefix": ""
+    }
+   ],
+   "arn": "arn:aws:elasticloadbalancing:us-east-1:533948124879:loadbalancer/app/test-lb-tf/35be57d467ff22b9",
+   "arn_suffix": "app/test-lb-tf/35be57d467ff22b9",
+   "customer_owned_ipv4_pool": "",
+   "dns_name": "test-lb-tf-278241463.us-east-1.elb.amazonaws.com",
+   "drop_invalid_header_fields": false,
+   "enable_deletion_protection": false,
+   "enable_http2": true,
+   "id": "arn:aws:elasticloadbalancing:us-east-1:533948124879:loadbalancer/app/test-lb-tf/35be57d467ff22b9",
+   "idle_timeout": 60,
+   "internal": false,
+   "ip_address_type": "ipv4",
+   "load_balancer_type": "application",
+   "name": "test-lb-tf",
+   "security_groups": [
+    "sg-06fecfaa711e65b6c"
+   ],
+   "subnet_mapping": [
+    {
+     "allocation_id": "",
+     "outpost_id": "",
+     "private_ipv4_address": "",
+     "subnet_id": "subnet-003713513d37c0905"
+    },
+    {
+     "allocation_id": "",
+     "outpost_id": "",
+     "private_ipv4_address": "",
+     "subnet_id": "subnet-063162f23053ebfdd"
+    }
+   ],
+   "subnets": [
+    "subnet-003713513d37c0905",
+    "subnet-063162f23053ebfdd"
+   ],
+   "tags": {
+    "Environment": "dev"
+   },
+   "vpc_id": "vpc-0ae1f138a09749ef1",
+   "zone_id": "Z35SXDOTRQ7X7K"
+  }
+ }
+]

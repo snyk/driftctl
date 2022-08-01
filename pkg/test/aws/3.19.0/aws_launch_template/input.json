@@ -1,0 +1,153 @@
+[
+  {
+    "Id": "lt-00b2d18c6cee7fe23",
+    "Type": "aws_launch_template",
+    "Attrs": {
+      "arn": "arn:aws:ec2:us-east-1:533948124879:launch-template/lt-00b2d18c6cee7fe23",
+      "block_device_mappings": [],
+      "capacity_reservation_specification": [],
+      "cpu_options": [],
+      "credit_specification": [],
+      "default_version": 1,
+      "description": "",
+      "disable_api_termination": false,
+      "ebs_optimized": "",
+      "elastic_gpu_specifications": [],
+      "elastic_inference_accelerator": [],
+      "hibernation_options": [],
+      "iam_instance_profile": [],
+      "id": "lt-00b2d18c6cee7fe23",
+      "image_id": "ami-000b3a073fc20e415",
+      "instance_initiated_shutdown_behavior": "",
+      "instance_market_options": [],
+      "instance_type": "t3.micro",
+      "kernel_id": "",
+      "key_name": "",
+      "latest_version": 1,
+      "license_specification": [],
+      "metadata_options": [],
+      "monitoring": [],
+      "name": "test-template-2",
+      "name_prefix": null,
+      "network_interfaces": [],
+      "placement": [],
+      "ram_disk_id": "",
+      "security_group_names": [],
+      "tag_specifications": [],
+      "tags": {},
+      "update_default_version": null,
+      "user_data": "",
+      "vpc_security_group_ids": []
+    }
+  },
+  {
+    "Id": "lt-0ed993d09ce6afc67",
+    "Type": "aws_launch_template",
+    "Attrs": {
+      "arn": "arn:aws:ec2:us-east-1:533948124879:launch-template/lt-0ed993d09ce6afc67",
+      "block_device_mappings": [
+        {
+          "device_name": "/dev/sda1",
+          "ebs": [
+            {
+              "delete_on_termination": "",
+              "encrypted": "",
+              "iops": 0,
+              "kms_key_id": "",
+              "snapshot_id": "",
+              "volume_size": 20,
+              "volume_type": ""
+            }
+          ],
+          "no_device": "",
+          "virtual_name": ""
+        }
+      ],
+      "capacity_reservation_specification": [
+        {
+          "capacity_reservation_preference": "open",
+          "capacity_reservation_target": []
+        }
+      ],
+      "cpu_options": [
+        {
+          "core_count": 4,
+          "threads_per_core": 2
+        }
+      ],
+      "credit_specification": null,
+      "default_version": 1,
+      "description": "",
+      "disable_api_termination": true,
+      "ebs_optimized": "true",
+      "elastic_gpu_specifications": [],
+      "elastic_inference_accelerator": [],
+      "hibernation_options": [],
+      "iam_instance_profile": [],
+      "id": "lt-0ed993d09ce6afc67",
+      "image_id": "ami-000b3a073fc20e415",
+      "instance_initiated_shutdown_behavior": "terminate",
+      "instance_market_options": [],
+      "instance_type": "",
+      "kernel_id": "",
+      "key_name": "",
+      "latest_version": 1,
+      "license_specification": [],
+      "metadata_options": [
+        {
+          "http_endpoint": "enabled",
+          "http_put_response_hop_limit": 1,
+          "http_tokens": "required"
+        }
+      ],
+      "monitoring": [
+        {
+          "enabled": true
+        }
+      ],
+      "name": "test-template",
+      "name_prefix": null,
+      "network_interfaces": [
+        {
+          "associate_public_ip_address": "true",
+          "delete_on_termination": "",
+          "description": "",
+          "device_index": 0,
+          "ipv4_address_count": 0,
+          "ipv4_addresses": [],
+          "ipv6_address_count": 0,
+          "ipv6_addresses": [],
+          "network_interface_id": "",
+          "private_ip_address": "",
+          "security_groups": [],
+          "subnet_id": ""
+        }
+      ],
+      "placement": [
+        {
+          "affinity": "",
+          "availability_zone": "us-west-2a",
+          "group_name": "",
+          "host_id": "",
+          "partition_number": 0,
+          "spread_domain": "",
+          "tenancy": ""
+        }
+      ],
+      "ram_disk_id": "",
+      "security_group_names": [],
+      "tag_specifications": [
+        {
+          "resource_type": "instance",
+          "tags": {
+            "Name": "test"
+          }
+        }
+      ],
+      "tags": {},
+      "update_default_version": null,
+      "user_data": "",
+      "vpc_security_group_ids": []
+    }
+  }
+]

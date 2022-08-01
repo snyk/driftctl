@@ -1,0 +1,53 @@
+[
+  {
+    "Id": "driftctl-unittest-3",
+    "Type": "google_storage_bucket",
+    "Attrs": {
+      "bucket_policy_only": true,
+      "default_event_based_hold": false,
+      "id": "driftctl-unittest-3",
+      "location": "EU",
+      "name": "driftctl-unittest-3",
+      "project": "elie-dev",
+      "requester_pays": false,
+      "self_link": "https://www.googleapis.com/storage/v1/b/driftctl-unittest-3",
+      "storage_class": "STANDARD",
+      "uniform_bucket_level_access": true,
+      "url": "gs://driftctl-unittest-3"
+    }
+  },
+  {
+    "Id": "driftctl-unittest-2",
+    "Type": "google_storage_bucket",
+    "Attrs": {
+      "bucket_policy_only": true,
+      "default_event_based_hold": false,
+      "id": "driftctl-unittest-2",
+      "location": "EU",
+      "name": "driftctl-unittest-2",
+      "project": "elie-dev",
+      "requester_pays": false,
+      "self_link": "https://www.googleapis.com/storage/v1/b/driftctl-unittest-2",
+      "storage_class": "STANDARD",
+      "uniform_bucket_level_access": true,
+      "url": "gs://driftctl-unittest-2"
+    }
+  },
+  {
+    "Id": "driftctl-unittest-1",
+    "Type": "google_storage_bucket",
+    "Attrs": {
+      "bucket_policy_only": true,
+      "default_event_based_hold": false,
+      "id": "driftctl-unittest-1",
+      "location": "EU",
+      "name": "driftctl-unittest-1",
+      "project": "elie-dev",
+      "requester_pays": false,
+      "self_link": "https://www.googleapis.com/storage/v1/b/driftctl-unittest-1",
+      "storage_class": "STANDARD",
+      "uniform_bucket_level_access": true,
+      "url": "gs://driftctl-unittest-1"
+    }
+  }
+]

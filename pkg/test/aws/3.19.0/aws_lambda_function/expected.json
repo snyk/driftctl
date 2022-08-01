@@ -1,0 +1,54 @@
+[
+  {
+    "Id": "bar",
+    "Type": "aws_lambda_function",
+    "Attrs": {
+      "arn": "arn:aws:lambda:eu-west-3:047081014315:function:bar",
+      "description": "",
+      "function_name": "bar",
+      "handler": "lambda.handler",
+      "id": "bar",
+      "invoke_arn": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:047081014315:function:bar/invocations",
+      "kms_key_arn": "",
+      "memory_size": 128,
+      "qualified_arn": "arn:aws:lambda:eu-west-3:047081014315:function:bar:$LATEST",
+      "reserved_concurrent_executions": -1,
+      "role": "arn:aws:iam::047081014315:role/iam_for_lambda",
+      "runtime": "nodejs12.x",
+      "source_code_hash": "PoaAEeOCmEFZojnrhEJvNzs+jg7/w1lL9GiFYvlM6aw=",
+      "timeout": 3,
+      "tracing_config": [
+        {
+          "mode": "PassThrough"
+        }
+      ],
+      "version": "$LATEST"
+    }
+  },
+  {
+    "Id": "foo",
+    "Type": "aws_lambda_function",
+    "Attrs": {
+      "arn": "arn:aws:lambda:eu-west-3:047081014315:function:foo",
+      "description": "",
+      "function_name": "foo",
+      "handler": "lambda.handler",
+      "id": "foo",
+      "invoke_arn": "arn:aws:apigateway:eu-west-3:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-3:047081014315:function:foo/invocations",
+      "kms_key_arn": "",
+      "memory_size": 128,
+      "qualified_arn": "arn:aws:lambda:eu-west-3:047081014315:function:foo:$LATEST",
+      "reserved_concurrent_executions": -1,
+      "role": "arn:aws:iam::047081014315:role/iam_for_lambda",
+      "runtime": "nodejs12.x",
+      "source_code_hash": "PoaAEeOCmEFZojnrhEJvNzs+jg7/w1lL9GiFYvlM6aw=",
+      "timeout": 3,
+      "tracing_config": [
+        {
+          "mode": "PassThrough"
+        }
+      ],
+      "version": "$LATEST"
+    }
+  }
+]

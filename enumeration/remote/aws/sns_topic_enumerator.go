@@ -37,7 +37,9 @@ func (e *SNSTopicEnumerator) Enumerate() ([]*resource.Resource, error) {
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
 				*topic.TopicArn,
-				map[string]interface{}{},
+				map[string]interface{}{
+					"topic_arn": *topic.TopicArn,
+				},
 			),
 		)
 	}

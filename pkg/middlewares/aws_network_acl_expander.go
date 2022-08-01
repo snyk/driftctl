@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // This middelware goal is to explode aws_network_acl ingress and egress block into a set of aws_network_acl_rule
@@ -72,7 +72,7 @@ func (e *AwsNetworkACLExpander) expandBlock(resourcesFromState *[]*resource.Reso
 	for _, rule := range ruleBlock {
 		attrs := rule.(map[string]interface{})
 
-		attrs["rule_number"] = attrs["rule_no"]
+		attrs["rule_number"] = int64(attrs["rule_no"].(float64))
 		delete(attrs, "rule_no")
 
 		attrs["egress"] = egress
@@ -86,7 +86,7 @@ func (e *AwsNetworkACLExpander) expandBlock(resourcesFromState *[]*resource.Reso
 			aws.AwsNetworkACLRuleResourceType,
 			aws.CreateNetworkACLRuleID(
 				networkAclId,
-				int(attrs["rule_number"].(float64)),
+				attrs["rule_number"].(int64),
 				egress,
 				attrs["protocol"].(string),
 			),

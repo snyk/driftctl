@@ -1,0 +1,32 @@
+[
+ {
+  "Id": "ypcpde",
+  "Type": "aws_api_gateway_authorizer",
+  "Attrs": {
+   "authorizer_credentials": "arn:aws:iam::047081014315:role/api_gateway_auth_invocation",
+   "authorizer_result_ttl_in_seconds": 300,
+   "authorizer_uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:047081014315:function:api_gateway_authorizer/invocations",
+   "id": "ypcpde",
+   "identity_source": "method.request.header.Authorization",
+   "identity_validation_expression": "",
+   "name": "bar",
+   "rest_api_id": "1jitcobwol",
+   "type": "TOKEN"
+  }
+ },
+ {
+  "Id": "bwhebj",
+  "Type": "aws_api_gateway_authorizer",
+  "Attrs": {
+   "authorizer_credentials": "arn:aws:iam::047081014315:role/api_gateway_auth_invocation",
+   "authorizer_result_ttl_in_seconds": 300,
+   "authorizer_uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:047081014315:function:api_gateway_authorizer/invocations",
+   "id": "bwhebj",
+   "identity_source": "method.request.header.Authorization",
+   "identity_validation_expression": "",
+   "name": "foo",
+   "rest_api_id": "1jitcobwol",
+   "type": "TOKEN"
+  }
+ }
+]

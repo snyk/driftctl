@@ -1,0 +1,12 @@
+[
+ {
+  "Id": "projects/cloudskiff-dev-elie/instances/tf-instance/tables/tf-table",
+  "Type": "google_bigtable_table",
+  "Attrs": {
+   "id": "projects/cloudskiff-dev-elie/instances/tf-instance/tables/tf-table",
+   "instance_name": "tf-instance",
+   "name": "tf-table",
+   "project": "cloudskiff-dev-elie"
+  }
+ }
+]

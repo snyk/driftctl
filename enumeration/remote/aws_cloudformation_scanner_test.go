@@ -23,7 +23,6 @@ import (
 
 	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
-	testresource "github.com/snyk/driftctl/test/resource"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -66,9 +65,7 @@ func TestCloudformationStack(t *testing.T) {
 		},
 	}
 
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {

@@ -1,0 +1,52 @@
+[
+  {
+    "Id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/SRV/othertestptr",
+    "Type": "azurerm_private_dns_srv_record",
+    "Attrs": {
+      "fqdn": "othertestptr.thisisatestusingtf.com.",
+      "id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/SRV/othertestptr",
+      "name": "othertestptr",
+      "record": [
+        {
+          "port": 8080,
+          "priority": 10,
+          "target": "srv2.thisisatestusingtf.com",
+          "weight": 10
+        },
+        {
+          "port": 8080,
+          "priority": 1,
+          "target": "srv1.thisisatestusingtf.com",
+          "weight": 5
+        }
+      ],
+      "resource_group_name": "martin-dev",
+      "tags": {},
+      "timeouts": {},
+      "ttl": 300,
+      "zone_name": "thisisatestusingtf.com"
+    }
+  },
+  {
+    "Id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/SRV/testptr",
+    "Type": "azurerm_private_dns_srv_record",
+    "Attrs": {
+      "fqdn": "testptr.thisisatestusingtf.com.",
+      "id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/SRV/testptr",
+      "name": "testptr",
+      "record": [
+        {
+          "port": 8080,
+          "priority": 20,
+          "target": "srv3.thisisatestusingtf.com",
+          "weight": 15
+        }
+      ],
+      "resource_group_name": "martin-dev",
+      "tags": {},
+      "timeouts": {},
+      "ttl": 300,
+      "zone_name": "thisisatestusingtf.com"
+    }
+  }
+]

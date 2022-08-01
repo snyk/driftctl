@@ -1,9 +1,36 @@
 package aws
 
-import "github.com/snyk/driftctl/enumeration/resource"
+import (
+	"github.com/snyk/driftctl/pkg/resource"
+)
 
 func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInterface) {
 	initAwsAmiMetaData(resourceSchemaRepository)
+	initAwsApiGatewayV2MappingMetaData(resourceSchemaRepository)
+	initAwsApiGatewayV2ModelMetaData(resourceSchemaRepository)
+	initAwsAppAutoscalingPolicyMetaData(resourceSchemaRepository)
+	initAwsDefaultRouteTableMetadata(resourceSchemaRepository)
+	initAwsDefaultVpcMetaData(resourceSchemaRepository)
+	initAwsEbsEncryptionByDefaultMetaData(resourceSchemaRepository)
+	initAwsEipAssociationMetaData(resourceSchemaRepository)
+	initAwsIAMRolePolicyMetaData(resourceSchemaRepository)
+	initAwsIamRolePolicyAttachmentMetaData(resourceSchemaRepository)
+	initAwsIAMUserPolicyMetaData(resourceSchemaRepository)
+	initAwsIamUserPolicyAttachmentMetaData(resourceSchemaRepository)
+	initAwsInternetGatewayMetaData(resourceSchemaRepository)
+	initAwsLaunchTemplateMetaData(resourceSchemaRepository)
+	initAwsLoadBalancerMetaData(resourceSchemaRepository)
+	initNatGatewayMetaData(resourceSchemaRepository)
+	initAwsNetworkACLMetaData(resourceSchemaRepository)
+	initAwsRoute53HealthCheckMetaData(resourceSchemaRepository)
+	initAwsRouteTableMetaData(resourceSchemaRepository)
+	initAwsRouteTableAssociationMetaData(resourceSchemaRepository)
+	initAwsS3BucketAnalyticsConfigurationMetaData(resourceSchemaRepository)
+	initAwsS3BucketInventoryMetadata(resourceSchemaRepository)
+	initAwsS3BucketMetricMetadata(resourceSchemaRepository)
+	initAwsS3BucketNotificationMetadata(resourceSchemaRepository)
+	initSqsQueueMetaData(resourceSchemaRepository)
+	initAwsVpcMetaData(resourceSchemaRepository)
 	initAwsCloudfrontDistributionMetaData(resourceSchemaRepository)
 	initAwsDbInstanceMetaData(resourceSchemaRepository)
 	initAwsDbSubnetGroupMetaData(resourceSchemaRepository)

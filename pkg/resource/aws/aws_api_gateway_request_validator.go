@@ -1,0 +1,3 @@
+package aws
+
+const AwsApiGatewayRequestValidatorResourceType = "aws_api_gateway_request_validator"

@@ -1,0 +1,29 @@
+[
+ {
+  "Id": "projects/cloudskiff-dev-william/regions/us-east1/forwardingRules/website-forwarding-rule",
+  "Type": "google_compute_forwarding_rule",
+  "Attrs": {
+   "all_ports": false,
+   "allow_global_access": false,
+   "backend_service": "",
+   "creation_timestamp": "2022-03-16T08:39:19.861-07:00",
+   "description": "",
+   "id": "projects/cloudskiff-dev-william/regions/us-east1/forwardingRules/website-forwarding-rule",
+   "ip_address": "35.231.108.206",
+   "ip_protocol": "TCP",
+   "is_mirroring_collector": false,
+   "load_balancing_scheme": "EXTERNAL",
+   "name": "website-forwarding-rule",
+   "network": "",
+   "network_tier": "PREMIUM",
+   "port_range": "80",
+   "project": "cloudskiff-dev-william",
+   "region": "us-east1",
+   "self_link": "https://www.googleapis.com/compute/v1/projects/cloudskiff-dev-william/regions/us-east1/forwardingRules/website-forwarding-rule",
+   "service_label": "",
+   "service_name": "",
+   "subnetwork": "",
+   "target": "projects/cloudskiff-dev-william/regions/us-east1/targetPools/website-target-pool"
+  }
+ }
+]

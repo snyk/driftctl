@@ -8,7 +8,7 @@ import (
 	"github.com/r3labs/diff/v2"
 
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 func TestAwsDefaultSQSQueuePolicy_Execute(t *testing.T) {

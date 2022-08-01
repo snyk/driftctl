@@ -22,7 +22,6 @@ import (
 
 	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
-	testresource "github.com/snyk/driftctl/test/resource"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -84,10 +83,7 @@ func TestAzurermVirtualNetwork(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -177,10 +173,7 @@ func TestAzurermRouteTables(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -326,10 +319,7 @@ func TestAzurermRoutes(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -459,10 +449,7 @@ func TestAzurermSubnets(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -552,10 +539,7 @@ func TestAzurermFirewalls(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -645,10 +629,7 @@ func TestAzurermPublicIP(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -729,10 +710,7 @@ func TestAzurermSecurityGroups(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
@@ -848,10 +826,7 @@ func TestAzurermLoadBalancers(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -950,10 +925,7 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 		},
 	}
 
-	providerVersion := "2.71.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("azurerm", providerVersion)
-	resourceazure.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {

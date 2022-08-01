@@ -3,6 +3,8 @@ package remote
 import (
 	"testing"
 
+	resource2 "github.com/snyk/driftctl/pkg/resource"
+
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
@@ -19,7 +21,6 @@ import (
 	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	testgoogle "github.com/snyk/driftctl/test/google"
-	testresource "github.com/snyk/driftctl/test/resource"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -89,11 +90,8 @@ func TestGoogleComputeFirewall(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
 	resType := resource.ResourceType(googleresource.GoogleComputeFirewallResourceType)
-	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -115,7 +113,7 @@ func TestGoogleComputeFirewall(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -227,10 +225,7 @@ func TestGoogleComputeRouter(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -249,7 +244,7 @@ func TestGoogleComputeRouter(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -331,10 +326,7 @@ func TestGoogleComputeInstance(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -353,7 +345,7 @@ func TestGoogleComputeInstance(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -440,11 +432,8 @@ func TestGoogleComputeNetwork(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
 	resType := resource.ResourceType(googleresource.GoogleComputeNetworkResourceType)
-	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -466,7 +455,7 @@ func TestGoogleComputeNetwork(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -562,11 +551,8 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
-	resType := resource.ResourceType(googleresource.GoogleComputeInstanceGroupResourceType)
-	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	resType := resource2.ResourceType(googleresource.GoogleComputeInstanceGroupResourceType)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -588,7 +574,7 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -698,10 +684,7 @@ func TestGoogleComputeAddress(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -720,7 +703,7 @@ func TestGoogleComputeAddress(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -824,10 +807,7 @@ func TestGoogleComputeGlobalAddress(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -846,7 +826,7 @@ func TestGoogleComputeGlobalAddress(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -933,11 +913,8 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
 	resType := resource.ResourceType(googleresource.GoogleComputeSubnetworkResourceType)
-	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
@@ -959,7 +936,7 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -1057,10 +1034,7 @@ func TestGoogleComputeDisk(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1079,7 +1053,7 @@ func TestGoogleComputeDisk(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -1167,10 +1141,7 @@ func TestGoogleComputeImage(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository("google", providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1189,7 +1160,7 @@ func TestGoogleComputeImage(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -1277,10 +1248,7 @@ func TestGoogleComputeHealthCheck(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository(terraform.GOOGLE, providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1299,7 +1267,7 @@ func TestGoogleComputeHealthCheck(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -1387,10 +1355,7 @@ func TestGoogleComputeNodeGroup(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository(terraform.GOOGLE, providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1409,7 +1374,7 @@ func TestGoogleComputeNodeGroup(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -1496,10 +1461,7 @@ func TestGoogleComputeForwardingRule(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository(terraform.GOOGLE, providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1518,7 +1480,7 @@ func TestGoogleComputeForwardingRule(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -1606,10 +1568,7 @@ func TestGoogleComputeInstanceGroupManager(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository(terraform.GOOGLE, providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1628,7 +1587,7 @@ func TestGoogleComputeInstanceGroupManager(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
@@ -1715,10 +1674,7 @@ func TestGoogleComputeGlobalForwardingRule(t *testing.T) {
 		},
 	}
 
-	providerVersion := "3.78.0"
-	schemaRepository := testresource.InitFakeSchemaRepository(terraform.GOOGLE, providerVersion)
-	googleresource.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1737,7 +1693,7 @@ func TestGoogleComputeGlobalForwardingRule(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, providerVersion)
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}

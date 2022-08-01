@@ -4,21 +4,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/snyk/driftctl/enumeration/alerter"
-	resource2 "github.com/snyk/driftctl/pkg/resource"
-
 	"github.com/jmespath/go-jmespath"
 	"github.com/sirupsen/logrus"
-	"github.com/snyk/driftctl/pkg/memstore"
-	globaloutput "github.com/snyk/driftctl/pkg/output"
-
+	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/snyk/driftctl/pkg/cmd/scan/output"
 	"github.com/snyk/driftctl/pkg/filter"
 	"github.com/snyk/driftctl/pkg/iac/config"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend"
+	"github.com/snyk/driftctl/pkg/memstore"
 	"github.com/snyk/driftctl/pkg/middlewares"
+	globaloutput "github.com/snyk/driftctl/pkg/output"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
 type FmtOptions struct {
@@ -47,26 +45,26 @@ type ScanOptions struct {
 
 type DriftCTL struct {
 	remoteSupplier           resource.Supplier
-	iacSupplier              resource2.IaCSupplier
+	iacSupplier              dctlresource.IaCSupplier
 	alerter                  alerter.AlerterInterface
 	analyzer                 *analyser.Analyzer
 	resourceFactory          resource.ResourceFactory
 	scanProgress             globaloutput.Progress
 	iacProgress              globaloutput.Progress
-	resourceSchemaRepository resource.SchemaRepositoryInterface
+	resourceSchemaRepository dctlresource.SchemaRepositoryInterface
 	opts                     *ScanOptions
 	store                    memstore.Store
 }
 
 func NewDriftCTL(remoteSupplier resource.Supplier,
-	iacSupplier resource2.IaCSupplier,
+	iacSupplier dctlresource.IaCSupplier,
 	alerter *alerter.Alerter,
 	analyzer *analyser.Analyzer,
 	resFactory resource.ResourceFactory,
 	opts *ScanOptions,
 	scanProgress globaloutput.Progress,
 	iacProgress globaloutput.Progress,
-	resourceSchemaRepository resource.SchemaRepositoryInterface,
+	resourceSchemaRepository dctlresource.SchemaRepositoryInterface,
 	store memstore.Store) *DriftCTL {
 	return &DriftCTL{
 		remoteSupplier,
@@ -215,5 +213,17 @@ func (d DriftCTL) scan() (remoteResources []*resource.Resource, resourcesFromSta
 		return nil, nil, err
 	}
 
-	return remoteResources, resourcesFromState, err
+	// We do a normalization pass to resources from remote because resource in IaC supplier
+	// are already created using DriftctlFactory.CreateAbstractResource and thus are already normalized
+	var normalizedRemoteResources []*resource.Resource
+	for _, res := range remoteResources {
+		attrs := resource.Attributes{}
+		if res.Attributes() != nil {
+			attrs = *res.Attributes()
+		}
+		normalizedRes := d.resourceFactory.CreateAbstractResource(res.ResourceType(), res.ResourceId(), attrs)
+		normalizedRemoteResources = append(normalizedRemoteResources, normalizedRes)
+	}
+
+	return normalizedRemoteResources, resourcesFromState, err
 }

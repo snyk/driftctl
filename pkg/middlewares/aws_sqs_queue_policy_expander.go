@@ -2,18 +2,18 @@ package middlewares
 
 import (
 	"github.com/sirupsen/logrus"
-
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // Explodes policy found in aws_sqs_queue.policy from state resources to dedicated resources
 type AwsSQSQueuePolicyExpander struct {
 	resourceFactory          resource.ResourceFactory
-	resourceSchemaRepository resource.SchemaRepositoryInterface
+	resourceSchemaRepository dctlresource.SchemaRepositoryInterface
 }
 
-func NewAwsSQSQueuePolicyExpander(resourceFactory resource.ResourceFactory, resourceSchemaRepository resource.SchemaRepositoryInterface) AwsSQSQueuePolicyExpander {
+func NewAwsSQSQueuePolicyExpander(resourceFactory resource.ResourceFactory, resourceSchemaRepository dctlresource.SchemaRepositoryInterface) AwsSQSQueuePolicyExpander {
 	return AwsSQSQueuePolicyExpander{
 		resourceFactory,
 		resourceSchemaRepository,

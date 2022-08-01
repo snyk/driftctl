@@ -1,0 +1,80 @@
+[
+  {
+    "Id": "E1M9CNS0XSHI19",
+    "Type": "aws_cloudfront_distribution",
+    "Attrs": {
+      "arn": "arn:aws:cloudfront::047081014315:distribution/E1M9CNS0XSHI19",
+      "caller_reference": "terraform-20210216101734792900000001",
+      "default_cache_behavior": [
+        {
+          "allowed_methods": [
+            "GET",
+            "HEAD"
+          ],
+          "cached_methods": [
+            "GET",
+            "HEAD"
+          ],
+          "compress": false,
+          "default_ttl": 86400,
+          "field_level_encryption_id": "",
+          "forwarded_values": [
+            {
+              "cookies": [
+                {
+                  "forward": "none"
+                }
+              ],
+              "query_string": false
+            }
+          ],
+          "max_ttl": 31536000,
+          "min_ttl": 0,
+          "smooth_streaming": false,
+          "target_origin_id": "S3-foo-cloudfront",
+          "viewer_protocol_policy": "allow-all"
+        }
+      ],
+      "default_root_object": "",
+      "domain_name": "d1g0dw0i1wvlgd.cloudfront.net",
+      "enabled": false,
+      "hosted_zone_id": "Z2FDTNDATAQYW2",
+      "http_version": "http2",
+      "id": "E1M9CNS0XSHI19",
+      "in_progress_validation_batches": 0,
+      "is_ipv6_enabled": false,
+      "origin": [
+        {
+          "domain_name": "foo-cloudfront.s3.eu-west-3.amazonaws.com",
+          "origin_id": "S3-foo-cloudfront",
+          "origin_path": ""
+        }
+      ],
+      "price_class": "PriceClass_All",
+      "restrictions": [
+        {
+          "geo_restriction": [
+            {
+              "restriction_type": "none"
+            }
+          ]
+        }
+      ],
+      "trusted_signers": [
+        {
+          "enabled": false
+        }
+      ],
+      "viewer_certificate": [
+        {
+          "acm_certificate_arn": "",
+          "cloudfront_default_certificate": true,
+          "iam_certificate_id": "",
+          "minimum_protocol_version": "TLSv1",
+          "ssl_support_method": ""
+        }
+      ],
+      "web_acl_id": ""
+    }
+  }
+]

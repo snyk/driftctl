@@ -5,7 +5,7 @@
   "name": "test",
   "record": "test.com",
   "resource_group_name": "martin-dev",
-  "tags": null,
+  "tags": {},
   "timeouts": {},
   "ttl": 300,
   "zone_name": "thisisatestusingtf.com"
@@ -16,7 +16,7 @@
   "name": "othertest",
   "record": "othertest.com",
   "resource_group_name": "martin-dev",
-  "tags": null,
+  "tags": {},
   "timeouts": {},
   "ttl": 300,
   "zone_name": "thisisatestusingtf.com"

@@ -8,7 +8,7 @@
    "fd5d:70bc:930e:d008::7335"
   ],
   "resource_group_name": "martin-dev",
-  "tags": null,
+  "tags": {},
   "timeouts": {},
   "ttl": 300,
   "zone_name": "thisisatestusingtf.com"
@@ -22,7 +22,7 @@
    "fd5d:70bc:930e:d008::7335"
   ],
   "resource_group_name": "martin-dev",
-  "tags": null,
+  "tags": {},
   "timeouts": {},
   "ttl": 300,
   "zone_name": "thisisatestusingtf.com"

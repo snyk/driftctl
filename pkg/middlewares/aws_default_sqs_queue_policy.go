@@ -3,7 +3,7 @@ package middlewares
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // SQS queues from AWS have a weird behaviour when we fetch them.

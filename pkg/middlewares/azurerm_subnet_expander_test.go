@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"github.com/snyk/driftctl/enumeration/terraform"
 	"strings"
 	"testing"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/r3labs/diff/v2"
 	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/enumeration/resource/azurerm"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
 func TestAzurermSubnetExpander_Execute(t *testing.T) {
@@ -16,7 +16,7 @@ func TestAzurermSubnetExpander_Execute(t *testing.T) {
 		name     string
 		input    []*resource.Resource
 		expected []*resource.Resource
-		mock     func(factory *terraform.MockResourceFactory)
+		mock     func(factory *dctlresource.MockResourceFactory)
 	}{
 		{
 			name: "test with nil subnet attribute",
@@ -132,7 +132,7 @@ func TestAzurermSubnetExpander_Execute(t *testing.T) {
 					Attrs: &resource.Attributes{},
 				},
 			},
-			mock: func(factory *terraform.MockResourceFactory) {
+			mock: func(factory *dctlresource.MockResourceFactory) {
 				factory.On("CreateAbstractResource", azurerm.AzureSubnetResourceType, "subnet1", map[string]interface{}{}).Times(1).Return(&resource.Resource{
 					Id:    "subnet1",
 					Type:  azurerm.AzureSubnetResourceType,
@@ -148,7 +148,7 @@ func TestAzurermSubnetExpander_Execute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			factory := &terraform.MockResourceFactory{}
+			factory := &dctlresource.MockResourceFactory{}
 			if tt.mock != nil {
 				tt.mock(factory)
 			}

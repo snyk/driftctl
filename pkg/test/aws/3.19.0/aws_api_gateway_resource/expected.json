@@ -1,0 +1,24 @@
+[
+ {
+  "Id": "21zk4y",
+  "Type": "aws_api_gateway_resource",
+  "Attrs": {
+   "id": "21zk4y",
+   "parent_id": "pe75h6tq6i",
+   "path": "/bar",
+   "path_part": "bar",
+   "rest_api_id": "3of73v5ob4"
+  }
+ },
+ {
+  "Id": "wijcbm",
+  "Type": "aws_api_gateway_resource",
+  "Attrs": {
+   "id": "wijcbm",
+   "parent_id": "2ltv32p058",
+   "path": "/foo",
+   "path_part": "foo",
+   "rest_api_id": "1jitcobwol"
+  }
+ }
+]

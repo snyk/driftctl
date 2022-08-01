@@ -1,0 +1,84 @@
+[
+  {
+    "Id": "aurora-cluster-demo",
+    "Type": "aws_rds_cluster",
+    "Attrs": {
+      "arn": "arn:aws:rds:us-east-1:533948124879:cluster:aurora-cluster-demo",
+      "availability_zones": [
+        "us-east-1a",
+        "us-east-1b",
+        "us-east-1d"
+      ],
+      "backtrack_window": 0,
+      "backup_retention_period": 5,
+      "cluster_identifier": "aurora-cluster-demo",
+      "cluster_resource_id": "cluster-TISYDSSX4J5R6ZGUTV6LLJW73E",
+      "copy_tags_to_snapshot": false,
+      "database_name": "mydb",
+      "db_cluster_parameter_group_name": "default.aurora-postgresql11",
+      "db_subnet_group_name": "default",
+      "deletion_protection": false,
+      "enable_http_endpoint": false,
+      "endpoint": "aurora-cluster-demo.cluster-cd539r6quiux.us-east-1.rds.amazonaws.com",
+      "engine": "aurora-postgresql",
+      "engine_mode": "provisioned",
+      "engine_version": "11.9",
+      "global_cluster_identifier": "",
+      "hosted_zone_id": "Z2R2ITUGPM61AM",
+      "iam_database_authentication_enabled": false,
+      "id": "aurora-cluster-demo",
+      "kms_key_id": "",
+      "master_username": "foo",
+      "port": 5432,
+      "preferred_backup_window": "07:00-09:00",
+      "preferred_maintenance_window": "fri:03:03-fri:03:33",
+      "reader_endpoint": "aurora-cluster-demo.cluster-ro-cd539r6quiux.us-east-1.rds.amazonaws.com",
+      "replication_source_identifier": "",
+      "storage_encrypted": false,
+      "vpc_security_group_ids": [
+        "sg-49e38646"
+      ]
+    }
+  },
+  {
+    "Id": "aurora-cluster-demo-2",
+    "Type": "aws_rds_cluster",
+    "Attrs": {
+      "arn": "arn:aws:rds:us-east-1:533948124879:cluster:aurora-cluster-demo",
+      "availability_zones": [
+        "us-east-1a",
+        "us-east-1b",
+        "us-east-1d"
+      ],
+      "backtrack_window": 0,
+      "backup_retention_period": 5,
+      "cluster_identifier": "aurora-cluster-demo-2",
+      "cluster_resource_id": "cluster-TISYDSSX4J5R6ZGUTV6LLJW73E",
+      "copy_tags_to_snapshot": false,
+      "database_name": "",
+      "db_cluster_parameter_group_name": "default.aurora-postgresql11",
+      "db_subnet_group_name": "default",
+      "deletion_protection": false,
+      "enable_http_endpoint": false,
+      "endpoint": "aurora-cluster-demo.cluster-cd539r6quiux.us-east-1.rds.amazonaws.com",
+      "engine": "aurora-postgresql",
+      "engine_mode": "provisioned",
+      "engine_version": "11.9",
+      "global_cluster_identifier": "",
+      "hosted_zone_id": "Z2R2ITUGPM61AM",
+      "iam_database_authentication_enabled": false,
+      "id": "aurora-cluster-demo-2",
+      "kms_key_id": "",
+      "master_username": "foo",
+      "port": 5432,
+      "preferred_backup_window": "07:00-09:00",
+      "preferred_maintenance_window": "fri:03:03-fri:03:33",
+      "reader_endpoint": "aurora-cluster-demo.cluster-ro-cd539r6quiux.us-east-1.rds.amazonaws.com",
+      "replication_source_identifier": "",
+      "storage_encrypted": false,
+      "vpc_security_group_ids": [
+        "sg-49e38646"
+      ]
+    }
+  }
+]

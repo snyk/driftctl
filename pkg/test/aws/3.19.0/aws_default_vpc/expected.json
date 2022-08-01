@@ -1,0 +1,26 @@
+[
+  {
+    "Id": "vpc-a8c5d4c1",
+    "Type": "aws_default_vpc",
+    "Attrs": {
+      "arn": "arn:aws:ec2:eu-west-3:929327065333:vpc/vpc-a8c5d4c1",
+      "assign_generated_ipv6_cidr_block": false,
+      "cidr_block": "172.31.0.0/16",
+      "default_network_acl_id": "acl-3d435954",
+      "default_route_table_id": "rtb-b0ba5bd8",
+      "default_security_group_id": "sg-a74815c8",
+      "dhcp_options_id": "dopt-9becf2f2",
+      "enable_dns_hostnames": true,
+      "enable_dns_support": true,
+      "id": "vpc-a8c5d4c1",
+      "instance_tenancy": "default",
+      "ipv6_association_id": "",
+      "ipv6_cidr_block": "",
+      "main_route_table_id": "rtb-b0ba5bd8",
+      "owner_id": "929327065333",
+      "tags": {
+        "Name": "Default VPC"
+      }
+    }
+  }
+]

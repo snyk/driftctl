@@ -2,13 +2,16 @@ package aws
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
-func initAwsKmsAliasMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(aws.AwsKmsAliasResourceType, func(res *resource.Resource) {
+const AwsKmsAliasResourceType = "aws_kms_alias"
+
+func initAwsKmsAliasMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsKmsAliasResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"name"})
 		val.SafeDelete([]string{"name_prefix"})
 	})
+	resourceSchemaRepository.SetFlags(AwsKmsAliasResourceType, resource.FlagDeepMode)
 }

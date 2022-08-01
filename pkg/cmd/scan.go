@@ -25,11 +25,12 @@ import (
 	"github.com/snyk/driftctl/pkg/iac/config"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state"
 	"github.com/snyk/driftctl/pkg/memstore"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
+	"github.com/snyk/driftctl/pkg/resource/schemas"
 	"github.com/snyk/driftctl/pkg/telemetry"
 	"github.com/snyk/driftctl/pkg/terraform/hcl"
 	"github.com/spf13/cobra"
 
-	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg"
 	cmderrors "github.com/snyk/driftctl/pkg/cmd/errors"
 	"github.com/snyk/driftctl/pkg/cmd/scan/output"
@@ -37,7 +38,6 @@ import (
 	"github.com/snyk/driftctl/pkg/iac/supplier"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend"
 	globaloutput "github.com/snyk/driftctl/pkg/output"
-	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
 func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
@@ -287,19 +287,21 @@ func scanRun(opts *pkg.ScanOptions) error {
 	iacProgress := globaloutput.NewProgress("Scanning states", "Scanned states", true)
 	scanProgress := globaloutput.NewProgress("Scanning resources", "Scanned resources", false)
 
-	resourceSchemaRepository := resource.NewSchemaRepository()
+	resourceSchemaRepository := schemas.NewSchemaRepository()
 
-	resFactory := terraform.NewTerraformResourceFactory(resourceSchemaRepository)
+	resFactory := dctlresource.NewDriftctlResourceFactory(resourceSchemaRepository)
 
-	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, remoteLibrary, scanProgress, resourceSchemaRepository, resFactory, opts.ConfigDir)
+	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, remoteLibrary, scanProgress, resFactory, opts.ConfigDir)
 	if err != nil {
 		return err
 	}
 
-	err = dctlresource.InitMetadatas(opts.To, resourceSchemaRepository)
+	providerName := common.RemoteParameter(opts.To).GetProviderAddress().Type
+	err = resourceSchemaRepository.Init(providerName, opts.ProviderVersion, providerLibrary.Provider(providerName).Schema())
 	if err != nil {
 		return err
 	}
+
 	// Teardown
 	defer func() {
 		logrus.Trace("Exiting scan cmd")
@@ -310,6 +312,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 	logrus.Debug("Checking for driftignore")
 	driftIgnore := filter.NewDriftIgnore(opts.DriftignorePath, opts.Driftignores...)
 
+	// TODO use enum library interface here
 	scanner := remote.NewScanner(remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep}, driftIgnore)
 
 	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, alerter, resFactory, driftIgnore)
@@ -341,8 +344,8 @@ func scanRun(opts *pkg.ScanOptions) error {
 		return err
 	}
 
-	analysis.ProviderVersion = resourceSchemaRepository.ProviderVersion.String()
-	analysis.ProviderName = resourceSchemaRepository.ProviderName
+	analysis.ProviderVersion = opts.ProviderVersion
+	analysis.ProviderName = opts.To
 	store.Bucket(memstore.TelemetryBucket).Set("provider_name", analysis.ProviderName)
 
 	validOutput := false
@@ -363,7 +366,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 	}
 
 	globaloutput.Printf(color.WhiteString("Scan duration: %s\n", analysis.Duration.Round(time.Second)))
-	globaloutput.Printf(color.WhiteString("Provider version used to scan: %s. Use --tf-provider-version to use another version.\n"), resourceSchemaRepository.ProviderVersion.String())
+	globaloutput.Printf(color.WhiteString("Provider version used to scan: %s. Use --tf-provider-version to use another version.\n"), opts.ProviderVersion)
 
 	if !opts.DisableTelemetry {
 		tl := telemetry.NewTelemetry(&build.Build{})

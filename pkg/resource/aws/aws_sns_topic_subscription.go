@@ -2,12 +2,14 @@ package aws
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/pkg/helpers"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
-func initSnsTopicSubscriptionMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(aws.AwsSnsTopicSubscriptionResourceType, func(res *resource.Resource) {
+const AwsSnsTopicSubscriptionResourceType = "aws_sns_topic_subscription"
+
+func initSnsTopicSubscriptionMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsSnsTopicSubscriptionResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		jsonString, err := helpers.NormalizeJsonString((*val)["delivery_policy"])
 		if err == nil {
@@ -26,4 +28,14 @@ func initSnsTopicSubscriptionMetaData(resourceSchemaRepository resource.SchemaRe
 			val.SafeDelete([]string{"confirmation_timeout_in_minutes"})
 		}
 	})
+	resourceSchemaRepository.UpdateSchema(AwsSnsTopicSubscriptionResourceType, map[string]func(attributeSchema *resource.AttributeSchema){
+		"delivery_policy": func(attributeSchema *resource.AttributeSchema) {
+			attributeSchema.JsonString = true
+		},
+		"filter_policy": func(attributeSchema *resource.AttributeSchema) {
+			attributeSchema.JsonString = true
+		},
+	})
+
+	resourceSchemaRepository.SetFlags(AwsSnsTopicSubscriptionResourceType, resource.FlagDeepMode)
 }

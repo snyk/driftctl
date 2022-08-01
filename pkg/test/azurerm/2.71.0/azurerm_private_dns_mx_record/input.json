@@ -1,0 +1,46 @@
+[
+  {
+    "Id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/MX/testmx",
+    "Type": "azurerm_private_dns_mx_record",
+    "Attrs": {
+      "fqdn": "testmx.thisisatestusingtf.com.",
+      "id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/MX/testmx",
+      "name": "testmx",
+      "record": [
+        {
+          "exchange": "bkpmx.thisisatestusingtf.com",
+          "preference": 30
+        }
+      ],
+      "resource_group_name": "martin-dev",
+      "tags": {},
+      "timeouts": {},
+      "ttl": 300,
+      "zone_name": "thisisatestusingtf.com"
+    }
+  },
+  {
+    "Id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/MX/othertestmx",
+    "Type": "azurerm_private_dns_mx_record",
+    "Attrs": {
+      "fqdn": "othertestmx.thisisatestusingtf.com.",
+      "id": "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/MX/othertestmx",
+      "name": "othertestmx",
+      "record": [
+        {
+          "exchange": "backupmx.thisisatestusingtf.com",
+          "preference": 20
+        },
+        {
+          "exchange": "mx.thisisatestusingtf.com",
+          "preference": 10
+        }
+      ],
+      "resource_group_name": "martin-dev",
+      "tags": {},
+      "timeouts": {},
+      "ttl": 300,
+      "zone_name": "thisisatestusingtf.com"
+    }
+  }
+]

@@ -4,7 +4,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	"github.com/snyk/driftctl/pkg/resource/aws"
 )
 
 // Remove root_block_device from aws_instance resources and create dedicated aws_ebs_volume resources

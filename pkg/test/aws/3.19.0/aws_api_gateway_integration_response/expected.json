@@ -1,0 +1,18 @@
+[
+ {
+  "Id": "agir-u7jce3lokk-z9ag20-GET-200",
+  "Type": "aws_api_gateway_integration_response",
+  "Attrs": {
+   "content_handling": "",
+   "http_method": "GET",
+   "id": "agir-u7jce3lokk-z9ag20-GET-200",
+   "resource_id": "z9ag20",
+   "response_templates": {
+    "application/xml": "#set($inputRoot = $input.path('$'))\n\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e\n\u003cmessage\u003e\n    $inputRoot.body\n\u003c/message\u003e\n"
+   },
+   "rest_api_id": "u7jce3lokk",
+   "selection_pattern": "",
+   "status_code": "200"
+  }
+ }
+]

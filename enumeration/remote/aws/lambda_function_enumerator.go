@@ -37,7 +37,9 @@ func (e *LambdaFunctionEnumerator) Enumerate() ([]*resource.Resource, error) {
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
 				*function.FunctionName,
-				map[string]interface{}{},
+				map[string]interface{}{
+					"function_name": *function.FunctionName,
+				},
 			),
 		)
 	}

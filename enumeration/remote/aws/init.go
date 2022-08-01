@@ -17,13 +17,7 @@ import (
  * Required to use Scanner
  */
 
-func Init(version string, alerter *alerter.Alerter,
-	providerLibrary *terraform.ProviderLibrary,
-	remoteLibrary *common.RemoteLibrary,
-	progress enumeration.ProgressCounter,
-	resourceSchemaRepository *resource.SchemaRepository,
-	factory resource.ResourceFactory,
-	configDir string) error {
+func Init(version string, alerter *alerter.Alerter, providerLibrary *terraform.ProviderLibrary, remoteLibrary *common.RemoteLibrary, progress enumeration.ProgressCounter, factory resource.ResourceFactory, configDir string) error {
 
 	provider, err := NewAWSTerraformProvider(version, progress, configDir)
 	if err != nil {
@@ -247,12 +241,6 @@ func Init(version string, alerter *alerter.Alerter,
 	remoteLibrary.AddEnumerator(NewClassicLoadBalancerEnumerator(elbRepository, factory))
 
 	remoteLibrary.AddEnumerator(NewElastiCacheClusterEnumerator(elasticacheRepository, factory))
-
-	err = resourceSchemaRepository.Init(terraform.AWS, provider.Version(), provider.Schema())
-	if err != nil {
-		return err
-	}
-	aws.InitResourcesMetadata(resourceSchemaRepository)
 
 	return nil
 }

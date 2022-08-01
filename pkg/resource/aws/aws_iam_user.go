@@ -2,11 +2,13 @@ package aws
 
 import (
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
 
-func initAwsIAMUserMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	resourceSchemaRepository.SetNormalizeFunc(aws.AwsIamUserResourceType, func(res *resource.Resource) {
+const AwsIamUserResourceType = "aws_iam_user"
+
+func initAwsIAMUserMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsIamUserResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		permissionsBoundary, exist := val.Get("permissions_boundary")
 		if exist && permissionsBoundary == "" {
@@ -14,4 +16,5 @@ func initAwsIAMUserMetaData(resourceSchemaRepository resource.SchemaRepositoryIn
 		}
 		val.SafeDelete([]string{"force_destroy"})
 	})
+	resourceSchemaRepository.SetFlags(AwsIamUserResourceType, resource.FlagDeepMode)
 }

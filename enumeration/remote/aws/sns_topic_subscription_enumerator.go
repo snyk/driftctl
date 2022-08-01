@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+
 	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	remoteerror "github.com/snyk/driftctl/enumeration/remote/error"
@@ -75,7 +76,9 @@ func (e *SNSTopicSubscriptionEnumerator) Enumerate() ([]*resource.Resource, erro
 			e.factory.CreateAbstractResource(
 				string(e.SupportedType()),
 				*subscription.SubscriptionArn,
-				map[string]interface{}{},
+				map[string]interface{}{
+					"SubscriptionId": *subscription.SubscriptionArn,
+				},
 			),
 		)
 	}

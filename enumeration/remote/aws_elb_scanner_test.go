@@ -19,7 +19,6 @@ import (
 	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/mocks"
 
-	testresource "github.com/snyk/driftctl/test/resource"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -81,9 +80,7 @@ func TestELB_LoadBalancer(t *testing.T) {
 		},
 	}
 
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
-	resourceaws.InitResourcesMetadata(schemaRepository)
-	factory := terraform.NewTerraformResourceFactory(schemaRepository)
+	factory := terraform.NewTerraformResourceFactory()
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {

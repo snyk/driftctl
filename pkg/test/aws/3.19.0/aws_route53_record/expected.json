@@ -1,0 +1,86 @@
+[
+  {
+    "Id": "Z06486383UC8WYSBZTWFM_test1.foo-2.com_A",
+    "Type": "aws_route53_record",
+    "Attrs": {
+      "fqdn": "test1.foo-2.com",
+      "id": "Z06486383UC8WYSBZTWFM_test1.foo-2.com_A",
+      "records": [
+        "192.0.1.3"
+      ],
+      "ttl": 300,
+      "type": "A",
+      "zone_id": "Z06486383UC8WYSBZTWFM"
+    }
+  },
+  {
+    "Id": "Z06486383UC8WYSBZTWFM_test0.foo-2.com_TXT",
+    "Type": "aws_route53_record",
+    "Attrs": {
+      "fqdn": "test0.foo-2.com",
+      "id": "Z06486383UC8WYSBZTWFM_test0_TXT",
+      "records": [
+        "test0"
+      ],
+      "ttl": 300,
+      "type": "TXT",
+      "zone_id": "Z06486383UC8WYSBZTWFM"
+    }
+  },
+  {
+    "Id": "Z06486383UC8WYSBZTWFM__test2.foo-2.com_A",
+    "Type": "aws_route53_record",
+    "Attrs": {
+      "fqdn": "_test2.foo-2.com",
+      "id": "Z06486383UC8WYSBZTWFM__test2.foo-2.com_A",
+      "records": [
+        "192.0.1.4"
+      ],
+      "ttl": 300,
+      "type": "A",
+      "zone_id": "Z06486383UC8WYSBZTWFM"
+    }
+  },
+  {
+    "Id": "Z06486383UC8WYSBZTWFM_test0_A",
+    "Type": "aws_route53_record",
+    "Attrs": {
+      "fqdn": "test0.foo-2.com",
+      "id": "Z06486383UC8WYSBZTWFM_test0_A",
+      "records": [
+        "192.0.1.2"
+      ],
+      "ttl": 300,
+      "type": "A",
+      "zone_id": "Z06486383UC8WYSBZTWFM"
+    }
+  },
+  {
+    "Id": "Z06486383UC8WYSBZTWFM_test1.foo-2.com_TXT",
+    "Type": "aws_route53_record",
+    "Attrs": {
+      "fqdn": "test1.foo-2.com",
+      "id": "Z06486383UC8WYSBZTWFM_test1.foo-2.com_TXT",
+      "records": [
+        "test1.foo-2.com"
+      ],
+      "ttl": 300,
+      "type": "TXT",
+      "zone_id": "Z06486383UC8WYSBZTWFM"
+    }
+  },
+  {
+    "Id": "Z06486383UC8WYSBZTWFM__test2.foo-2.com_TXT",
+    "Type": "aws_route53_record",
+    "Attrs": {
+      "fqdn": "_test2.foo-2.com",
+      "id": "Z06486383UC8WYSBZTWFM__test2.foo-2.com_TXT",
+      "records": [
+        "_test2.foo-2.com"
+      ],
+      "ttl": 300,
+      "type": "TXT",
+      "zone_id": "Z06486383UC8WYSBZTWFM"
+    }
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "Id": "AKIA5QYBVVD223VWU32A",
+    "Type": "aws_iam_access_key",
+    "Attrs": {
+      "encrypted_secret": null,
+      "id": "AKIA5QYBVVD223VWU32A",
+      "key_fingerprint": null,
+      "pgp_key": null,
+      "secret": null,
+      "ses_smtp_password_v4": null,
+      "status": "Active",
+      "user": "test-driftctl"
+    }
+  },
+  {
+    "Id": "AKIA5QYBVVD2QYI36UZP",
+    "Type": "aws_iam_access_key",
+    "Attrs": {
+      "encrypted_secret": null,
+      "id": "AKIA5QYBVVD2QYI36UZP",
+      "key_fingerprint": null,
+      "pgp_key": null,
+      "secret": null,
+      "ses_smtp_password_v4": null,
+      "status": "Active",
+      "user": "test-driftctl"
+    }
+  },
+  {
+    "Id": "AKIA5QYBVVD26EJME25D",
+    "Type": "aws_iam_access_key",
+    "Attrs": {
+      "encrypted_secret": null,
+      "id": "AKIA5QYBVVD26EJME25D",
+      "key_fingerprint": null,
+      "pgp_key": null,
+      "secret": null,
+      "ses_smtp_password_v4": null,
+      "status": "Active",
+      "user": "test-driftctl2"
+    }
+  },
+  {
+    "Id": "AKIA5QYBVVD2SWDFVVMG",
+    "Type": "aws_iam_access_key",
+    "Attrs": {
+      "encrypted_secret": null,
+      "id": "AKIA5QYBVVD2SWDFVVMG",
+      "key_fingerprint": null,
+      "pgp_key": null,
+      "secret": null,
+      "ses_smtp_password_v4": null,
+      "status": "Active",
+      "user": "test-driftctl2"
+    }
+  }
+]
