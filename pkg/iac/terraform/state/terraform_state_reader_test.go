@@ -59,11 +59,13 @@ func TestTerraformStateReader_Source(t *testing.T) {
 	progress.On("Inc").Return().Times(1)
 	progress.On("Stop").Return().Times(1)
 
-	provider := mocks.NewMockedGoldenTFProvider("source", nil, false)
+	version := "3.19.0"
+
+	provider := mocks.NewMockedGoldenTFProvider("source", terraform.AWS, version, nil, false)
 	library := terraform.NewProviderLibrary()
 	library.AddProvider(terraform.AWS, provider)
 
-	repo := testresource.InitFakeSchemaRepository(terraform.AWS, "3.19.0")
+	repo := testresource.InitFakeSchemaRepository(terraform.AWS, version)
 	resourceaws.InitResourcesMetadata(repo)
 
 	factory := terraform.NewTerraformResourceFactory(repo)
@@ -235,7 +237,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 				}
 			}
 
-			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, realProvider, shouldUpdate)
+			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, terraform.AWS, tt.providerVersion, realProvider, shouldUpdate)
 			library := terraform.NewProviderLibrary()
 			library.AddProvider(terraform.AWS, provider)
 
@@ -322,11 +324,13 @@ func TestTerraformStateReader_Github_Resources(t *testing.T) {
 				}
 			}
 
-			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, realProvider, shouldUpdate)
+			version := "4.4.0"
+
+			provider := mocks.NewMockedGoldenTFProvider(tt.dirName, terraform.GITHUB, version, realProvider, shouldUpdate)
 			library := terraform.NewProviderLibrary()
 			library.AddProvider(terraform.GITHUB, provider)
 
-			repo := testresource.InitFakeSchemaRepository(terraform.GITHUB, "4.4.0")
+			repo := testresource.InitFakeSchemaRepository(terraform.GITHUB, version)
 			resourcegithub.InitResourcesMetadata(repo)
 			github2.InitResourcesMetadata(repo)
 			factory := terraform.NewTerraformResourceFactory(repo)
@@ -629,7 +633,7 @@ func TestTerraformStateReader_WithIgnoredResource(t *testing.T) {
 	progress.On("Inc").Return().Times(1)
 	progress.On("Stop").Return().Times(1)
 
-	provider := mocks.NewMockedGoldenTFProvider("ignored_resources", nil, false)
+	provider := mocks.NewMockedGoldenTFProvider("ignored_resources", terraform.AWS, "3.19.0", nil, false)
 	library := terraform.NewProviderLibrary()
 	library.AddProvider(terraform.AWS, provider)
 

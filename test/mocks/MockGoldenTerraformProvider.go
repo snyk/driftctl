@@ -4,8 +4,9 @@ import (
 	gojson "encoding/json"
 	"errors"
 	"fmt"
-	terraform2 "github.com/snyk/driftctl/enumeration/terraform"
 	"sort"
+
+	terraform2 "github.com/snyk/driftctl/enumeration/terraform"
 
 	"github.com/snyk/driftctl/test/goldenfile"
 
@@ -15,13 +16,20 @@ import (
 )
 
 type MockedGoldenTFProvider struct {
-	name         string
-	realProvider terraform2.TerraformProvider
-	update       bool
+	name            string
+	providerName    string
+	providerVersion string
+	realProvider    terraform2.TerraformProvider
+	update          bool
 }
 
-func NewMockedGoldenTFProvider(name string, realProvider terraform2.TerraformProvider, update bool) *MockedGoldenTFProvider {
-	return &MockedGoldenTFProvider{name: name, realProvider: realProvider, update: update}
+func NewMockedGoldenTFProvider(name, providerName, providerVersion string, realProvider terraform2.TerraformProvider, update bool) *MockedGoldenTFProvider {
+	return &MockedGoldenTFProvider{
+		name:            name,
+		providerName:    providerName,
+		providerVersion: providerVersion,
+		realProvider:    realProvider,
+		update:          update}
 }
 
 func (m *MockedGoldenTFProvider) Schema() map[string]providers.Schema {
@@ -48,11 +56,19 @@ func (m *MockedGoldenTFProvider) writeSchema(schema map[string]providers.Schema)
 	if err != nil {
 		panic(err)
 	}
-	goldenfile.WriteFile(m.name, marshal, "schema.golden.json")
+	schemaPath := m.getSchemaPath()
+	goldenfile.WriteRootFile(schemaPath, marshal, "schema.json")
+}
+
+func (m *MockedGoldenTFProvider) getSchemaPath() string {
+	schemaPath := fmt.Sprintf("schemas/%s/%s", m.providerName, m.providerVersion)
+	return schemaPath
 }
 
 func (m *MockedGoldenTFProvider) readSchema() map[string]providers.Schema {
-	content := goldenfile.ReadFile(m.name, "schema.golden.json")
+	schemaPath := m.getSchemaPath()
+
+	content := goldenfile.ReadRootFile(schemaPath, "schema.json")
 	var schema map[string]providers.Schema
 	if err := gojson.Unmarshal(content, &schema); err != nil {
 		panic(err)
