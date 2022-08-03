@@ -8,7 +8,6 @@ import (
 
 	"github.com/snyk/driftctl/enumeration"
 
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/parallel"
@@ -179,7 +178,7 @@ func (e *CloudEnumerator) Refresh(input *enumeration.RefreshInput) (*enumeration
 }
 
 func (e *CloudEnumerator) GetSchema() (*enumeration.GetSchemasOutput, error) {
-	return nil, errors.New("GetSchema is not implemented")
+	panic("GetSchema is not implemented..")
 }
 
 func (e *CloudEnumerator) retrieveRunnerResults(runner *parallel.ParallelRunner) ([]*resource.Resource, error) {
@@ -225,8 +224,6 @@ type sliceAlerter struct {
 }
 
 func (d *sliceAlerter) Alerts() alerter.Alerts {
-	d.lock.Lock()
-	defer d.lock.Unlock()
 	return d.alerts
 }
 
