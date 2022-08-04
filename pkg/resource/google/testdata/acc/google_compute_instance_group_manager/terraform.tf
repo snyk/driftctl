@@ -45,7 +45,7 @@ resource "google_compute_instance_template" "appserver" {
 
     // boot disk
     disk {
-        source_image      = "debian-cloud/debian-9"
+        source_image      = "debian-cloud/debian-11"
         auto_delete       = true
         boot              = true
     }
