@@ -101,12 +101,13 @@ func (p *AWSTerraformProvider) Version() string {
 	return p.version
 }
 
+var AWSCredentialsNotFoundError = errors.New("Could not find a way to authenticate on AWS!\n" +
+	"Please refer to AWS documentation: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html")
+
 func (p *AWSTerraformProvider) CheckCredentialsExist() error {
 	_, err := p.session.Config.Credentials.Get()
 	if err == credentials.ErrNoValidProvidersFoundInChain {
-		return errors.New("Could not find a way to authenticate on AWS!\n" +
-			"Please refer to AWS documentation: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html\n\n" +
-			"To use a different cloud provider, use --to=\"gcp+tf\" for GCP or --to=\"azure+tf\" for Azure.")
+		return AWSCredentialsNotFoundError
 	}
 	if err != nil {
 		return err

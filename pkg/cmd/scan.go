@@ -18,6 +18,7 @@ import (
 	"github.com/snyk/driftctl/build"
 	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/remote"
+	"github.com/snyk/driftctl/enumeration/remote/aws"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	"github.com/snyk/driftctl/enumeration/terraform"
 	"github.com/snyk/driftctl/enumeration/terraform/lock"
@@ -293,6 +294,12 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	err := remote.Activate(opts.To, opts.ProviderVersion, alerter, providerLibrary, remoteLibrary, scanProgress, resFactory, opts.ConfigDir)
 	if err != nil {
+		if err == aws.AWSCredentialsNotFoundError {
+			// special case command-line advice, because AWS is the default cloud
+			// provider, and users may be confused by a cloud-specific error out of
+			// the box
+			return fmt.Errorf("%s\n\n%s", err, "To use a different cloud provider, use --to=\"gcp+tf\" for GCP or --to=\"azure+tf\" for Azure.")
+		}
 		return err
 	}
 
