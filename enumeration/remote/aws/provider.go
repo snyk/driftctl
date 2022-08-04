@@ -63,9 +63,14 @@ func NewAWSTerraformProvider(version string, progress enumeration.ProgressCounte
 	if err != nil {
 		return nil, err
 	}
-	p.session = session.Must(session.NewSessionWithOptions(session.Options{
+
+	p.session, err = session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
-	}))
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	tfProvider, err := terraform.NewTerraformProvider(installer, terraform.TerraformProviderConfig{
 		Name:         p.name,
 		DefaultAlias: *p.session.Config.Region,
