@@ -26,7 +26,6 @@
   "Id": "vpc-0a5666c0cfc366714",
   "Type": "aws_vpc",
   "Attrs": {
-   "arn": "arn:aws:ec2:us-east-1:929327065333:vpc/vpc-0a5666c0cfc366714",
    "assign_generated_ipv6_cidr_block": false,
    "cidr_block": "10.0.0.0/16",
    "default_network_acl_id": "acl-081a06acb9d092caf",

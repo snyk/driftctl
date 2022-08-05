@@ -12,6 +12,7 @@ func initAwsInstanceMetaData(resourceSchemaRepository dctlresource.SchemaReposit
 	resourceSchemaRepository.SetNormalizeFunc(AwsInstanceResourceType, func(res *resource.Resource) {
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
+		val.SafeDelete([]string{"arn"})
 
 		if v, _ := version.NewVersion("3.38.0"); res.Schema().ProviderVersion.LessThan(v) {
 			val.SafeDelete([]string{"instance_initiated_shutdown_behavior"})

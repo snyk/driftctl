@@ -3,7 +3,6 @@
   "Id": "lt-0ed993d09ce6afc67",
   "Type": "aws_launch_template",
   "Attrs": {
-   "arn": "arn:aws:ec2:us-east-1:533948124879:launch-template/lt-0ed993d09ce6afc67",
    "block_device_mappings": [
     {
      "device_name": "/dev/sda1",

@@ -4,7 +4,6 @@
   "Type": "aws_instance",
   "Attrs": {
    "ami": "ami-0f8e5edde3a79f541",
-   "arn": "arn:aws:ec2:eu-west-3:929327065333:instance/i-002c7d44410fee60e",
    "associate_public_ip_address": true,
    "availability_zone": "eu-west-3a",
    "cpu_core_count": 1,

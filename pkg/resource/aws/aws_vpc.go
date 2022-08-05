@@ -8,5 +8,8 @@ import (
 const AwsVpcResourceType = "aws_vpc"
 
 func initAwsVpcMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsVpcResourceType, func(res *resource.Resource) {
+		res.Attributes().SafeDelete([]string{"arn"})
+	})
 	resourceSchemaRepository.SetFlags(AwsVpcResourceType, resource.FlagDeepMode)
 }

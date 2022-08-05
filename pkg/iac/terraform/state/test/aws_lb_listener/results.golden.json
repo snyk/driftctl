@@ -53,7 +53,6 @@
   "Id": "igw-00e1a78d127606c92",
   "Type": "aws_internet_gateway",
   "Attrs": {
-   "arn": "arn:aws:ec2:us-east-1:533948124879:internet-gateway/igw-00e1a78d127606c92",
    "id": "igw-00e1a78d127606c92",
    "owner_id": "533948124879",
    "vpc_id": "vpc-069eb1208f4f62f3c"
