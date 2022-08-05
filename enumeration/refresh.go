@@ -2,6 +2,7 @@ package enumeration
 
 import (
 	"github.com/hashicorp/terraform/terraform"
+	"github.com/snyk/driftctl/enumeration/diagnostic"
 	"github.com/snyk/driftctl/enumeration/resource"
 )
 
@@ -12,7 +13,7 @@ type RefreshInput struct {
 
 type RefreshOutput struct {
 	Resources   map[string][]*resource.Resource
-	Diagnostics Diagnostics
+	Diagnostics diagnostic.Diagnostics
 }
 
 type GetSchemasOutput struct {

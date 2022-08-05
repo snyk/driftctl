@@ -33,6 +33,10 @@ func (p *wrongArnTopicAlert) ShouldIgnoreResource() bool {
 	return false
 }
 
+func (p *wrongArnTopicAlert) Resource() *resource.Resource {
+	return nil
+}
+
 type SNSTopicSubscriptionEnumerator struct {
 	repository repository.SNSRepository
 	factory    resource.ResourceFactory

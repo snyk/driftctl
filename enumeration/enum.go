@@ -3,6 +3,7 @@ package enumeration
 import (
 	"time"
 
+	"github.com/snyk/driftctl/enumeration/diagnostic"
 	"github.com/snyk/driftctl/enumeration/resource"
 )
 
@@ -24,7 +25,7 @@ type EnumerateOutput struct {
 	// If the diagnostic is associated with a resource type, the ResourceType()
 	// call will indicate which type. If associated with a resource, the Resource()
 	// call will indicate which resource.
-	Diagnostics Diagnostics
+	Diagnostics diagnostic.Diagnostics
 }
 
 type Enumerator interface {

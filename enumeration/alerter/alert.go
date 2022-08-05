@@ -1,12 +1,17 @@
 package alerter
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"github.com/snyk/driftctl/enumeration/resource"
+)
 
 type Alerts map[string][]Alert
 
 type Alert interface {
 	Message() string
 	ShouldIgnoreResource() bool
+	Resource() *resource.Resource
 }
 
 type FakeAlert struct {
@@ -20,6 +25,10 @@ func (f *FakeAlert) Message() string {
 
 func (f *FakeAlert) ShouldIgnoreResource() bool {
 	return f.IgnoreResource
+}
+
+func (f *FakeAlert) Resource() *resource.Resource {
+	return nil
 }
 
 type SerializableAlert struct {
@@ -36,6 +45,10 @@ func (u *SerializedAlert) Message() string {
 
 func (u *SerializedAlert) ShouldIgnoreResource() bool {
 	return false
+}
+
+func (s *SerializedAlert) Resource() *resource.Resource {
+	return nil
 }
 
 func (s *SerializableAlert) UnmarshalJSON(bytes []byte) error {

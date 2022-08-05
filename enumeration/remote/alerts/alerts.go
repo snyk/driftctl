@@ -2,10 +2,12 @@ package alerts
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerror "github.com/snyk/driftctl/enumeration/remote/error"
+	"github.com/snyk/driftctl/enumeration/resource"
 
 	"github.com/sirupsen/logrus"
 )
@@ -21,6 +23,7 @@ type RemoteAccessDeniedAlert struct {
 	message       string
 	provider      string
 	scanningPhase ScanningPhase
+	resource      *resource.Resource
 }
 
 func NewRemoteAccessDeniedAlert(provider string, scanErr *remoteerror.ResourceScanningError, scanningPhase ScanningPhase) *RemoteAccessDeniedAlert {
@@ -47,7 +50,17 @@ func NewRemoteAccessDeniedAlert(provider string, scanErr *remoteerror.ResourceSc
 			scanErr.RootCause().Error(),
 		)
 	}
-	return &RemoteAccessDeniedAlert{message, provider, scanningPhase}
+
+	var relatedResource *resource.Resource
+	resourceFQDNSSplit := strings.SplitN(scanErr.Resource(), ".", 2)
+	if len(resourceFQDNSSplit) == 2 {
+		relatedResource = &resource.Resource{
+			Id:   resourceFQDNSSplit[1],
+			Type: resourceFQDNSSplit[0],
+		}
+	}
+
+	return &RemoteAccessDeniedAlert{message, provider, scanningPhase, relatedResource}
 }
 
 func (e *RemoteAccessDeniedAlert) Message() string {
@@ -56,6 +69,10 @@ func (e *RemoteAccessDeniedAlert) Message() string {
 
 func (e *RemoteAccessDeniedAlert) ShouldIgnoreResource() bool {
 	return true
+}
+
+func (e *RemoteAccessDeniedAlert) Resource() *resource.Resource {
+	return e.resource
 }
 
 func (e *RemoteAccessDeniedAlert) GetProviderMessage() string {

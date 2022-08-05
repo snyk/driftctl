@@ -23,6 +23,10 @@ func (u *UnmanagedSecurityGroupRulesAlert) ShouldIgnoreResource() bool {
 	return false
 }
 
+func (u *UnmanagedSecurityGroupRulesAlert) Resource() *resource.Resource {
+	return nil
+}
+
 type ComputedDiffAlert struct{}
 
 func NewComputedDiffAlert() *ComputedDiffAlert {
@@ -35,6 +39,10 @@ func (c *ComputedDiffAlert) Message() string {
 
 func (c *ComputedDiffAlert) ShouldIgnoreResource() bool {
 	return false
+}
+
+func (c *ComputedDiffAlert) Resource() *resource.Resource {
+	return nil
 }
 
 type AnalyzerOptions struct {
