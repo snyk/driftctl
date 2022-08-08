@@ -8,5 +8,8 @@ import (
 const AwsInternetGatewayResourceType = "aws_internet_gateway"
 
 func initAwsInternetGatewayMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryInterface) {
+	resourceSchemaRepository.SetNormalizeFunc(AwsInternetGatewayResourceType, func(res *resource.Resource) {
+		res.Attributes().SafeDelete([]string{"arn"})
+	})
 	resourceSchemaRepository.SetFlags(AwsInternetGatewayResourceType, resource.FlagDeepMode)
 }
