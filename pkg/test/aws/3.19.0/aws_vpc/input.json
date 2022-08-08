@@ -3,6 +3,7 @@
     "Id": "vpc-02c50896b59598761",
     "Type": "aws_vpc",
     "Attrs": {
+      "arn": "arn:aws:ec2:eu-west-3:929327065333:vpc/vpc-02c50896b59598761",
       "assign_generated_ipv6_cidr_block": false,
       "cidr_block": "10.0.0.0/16",
       "default_network_acl_id": "acl-0acd66b145f6f2102",
@@ -26,6 +27,7 @@
     "Id": "vpc-0768e1fd0029e3fc3",
     "Type": "aws_vpc",
     "Attrs": {
+      "arn": "arn:aws:ec2:eu-west-3:929327065333:vpc/vpc-0768e1fd0029e3fc3",
       "assign_generated_ipv6_cidr_block": false,
       "cidr_block": "10.1.0.0/16",
       "default_network_acl_id": "acl-0d17964d633baf4b3",
@@ -49,6 +51,7 @@
     "Id": "vpc-020b072316a95b97f",
     "Type": "aws_vpc",
     "Attrs": {
+      "arn": "arn:aws:ec2:eu-west-3:929327065333:vpc/vpc-020b072316a95b97f",
       "assign_generated_ipv6_cidr_block": false,
       "cidr_block": "10.2.0.0/16",
       "default_network_acl_id": "acl-0ff5d175a1aa8f51a",
