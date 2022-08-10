@@ -47,6 +47,22 @@ func (r *SchemaRepository) fetchNestedBlocks(root string, metadata map[string]re
 }
 
 func (r *SchemaRepository) Init(providerName, providerVersion string, schema map[string]providers.Schema) error {
+
+	if providerVersion == "" {
+		switch providerName {
+		case "aws":
+			providerVersion = "3.19.0"
+		case "github":
+			providerVersion = "4.4.0"
+		case "google":
+			providerVersion = "3.78.0"
+		case "azurerm":
+			providerVersion = "2.71.0"
+		default:
+			return errors.Errorf("unsupported remote '%s'", providerName)
+		}
+	}
+
 	v, err := version.NewVersion(providerVersion)
 	if err != nil {
 		return err
