@@ -188,14 +188,18 @@ func (a *Attributes) GetBool(path string) *bool {
 }
 
 func (a *Attributes) GetInt(path string) *int {
-	// This is a nonsense, if we want to retrieve an int this is gonna fail
-	// We were doing that because all numbers fields from cty are float64 but sometimes we want to retrieve an int
-	// TODO Change this to be compatible with both int and float64 underlying type
-	val := a.GetFloat64(path)
+	val, exist := (*a)[path]
+	if !exist {
+		return nil
+	}
+	if v, isInt := val.(int); isInt {
+		return &v
+	}
+	floatVal := a.GetFloat64(path)
 	if val == nil {
 		return nil
 	}
-	v := int(*val)
+	v := int(*floatVal)
 	return &v
 }
 
