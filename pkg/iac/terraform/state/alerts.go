@@ -1,6 +1,10 @@
 package state
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/snyk/driftctl/enumeration/resource"
+)
 
 type StateReadingAlert struct {
 	key string
@@ -17,4 +21,8 @@ func (s *StateReadingAlert) Message() string {
 
 func (s *StateReadingAlert) ShouldIgnoreResource() bool {
 	return false
+}
+
+func (s *StateReadingAlert) Resource() *resource.Resource {
+	return nil
 }

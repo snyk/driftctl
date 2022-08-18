@@ -2,10 +2,12 @@ package alerts
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerror "github.com/snyk/driftctl/enumeration/remote/error"
+	"github.com/snyk/driftctl/enumeration/resource"
 
 	"github.com/sirupsen/logrus"
 )
@@ -21,6 +23,7 @@ type RemoteAccessDeniedAlert struct {
 	message       string
 	provider      string
 	scanningPhase ScanningPhase
+	resource      *resource.Resource
 }
 
 func NewRemoteAccessDeniedAlert(provider string, scanErr *remoteerror.ResourceScanningError, scanningPhase ScanningPhase) *RemoteAccessDeniedAlert {
@@ -28,26 +31,36 @@ func NewRemoteAccessDeniedAlert(provider string, scanErr *remoteerror.ResourceSc
 	switch scanningPhase {
 	case EnumerationPhase:
 		message = fmt.Sprintf(
-			"Ignoring %s from drift calculation: Listing %s is forbidden: %s",
+			"An error occured listing %s: listing %s is forbidden: %s",
 			scanErr.Resource(),
 			scanErr.ListedTypeError(),
 			scanErr.RootCause().Error(),
 		)
 	case DetailsFetchingPhase:
 		message = fmt.Sprintf(
-			"Ignoring %s from drift calculation: Reading details of %s is forbidden: %s",
+			"An error occured listing %s: reading details of %s is forbidden: %s",
 			scanErr.Resource(),
 			scanErr.ListedTypeError(),
 			scanErr.RootCause().Error(),
 		)
 	default:
 		message = fmt.Sprintf(
-			"Ignoring %s from drift calculation: %s",
+			"An error occured listing %s: %s",
 			scanErr.Resource(),
 			scanErr.RootCause().Error(),
 		)
 	}
-	return &RemoteAccessDeniedAlert{message, provider, scanningPhase}
+
+	var relatedResource *resource.Resource
+	resourceFQDNSSplit := strings.SplitN(scanErr.Resource(), ".", 2)
+	if len(resourceFQDNSSplit) == 2 {
+		relatedResource = &resource.Resource{
+			Id:   resourceFQDNSSplit[1],
+			Type: resourceFQDNSSplit[0],
+		}
+	}
+
+	return &RemoteAccessDeniedAlert{message, provider, scanningPhase, relatedResource}
 }
 
 func (e *RemoteAccessDeniedAlert) Message() string {
@@ -56,6 +69,10 @@ func (e *RemoteAccessDeniedAlert) Message() string {
 
 func (e *RemoteAccessDeniedAlert) ShouldIgnoreResource() bool {
 	return true
+}
+
+func (e *RemoteAccessDeniedAlert) Resource() *resource.Resource {
+	return e.resource
 }
 
 func (e *RemoteAccessDeniedAlert) GetProviderMessage() string {

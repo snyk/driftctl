@@ -6,10 +6,10 @@ import (
 	"os"
 	"sync"
 
-	"github.com/snyk/driftctl/enumeration"
-
 	"github.com/sirupsen/logrus"
+	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/alerter"
+	"github.com/snyk/driftctl/enumeration/diagnostic"
 	"github.com/snyk/driftctl/enumeration/parallel"
 	"github.com/snyk/driftctl/enumeration/remote"
 	"github.com/snyk/driftctl/enumeration/remote/common"
@@ -25,6 +25,11 @@ type CloudEnumerator struct {
 	enumeratorRunner     *parallel.ParallelRunner
 	detailsFetcherRunner *parallel.ParallelRunner
 	to                   string
+}
+
+type ListOutput struct {
+	Resources   []*resource.Resource
+	Diagnostics diagnostic.Diagnostics
 }
 
 type cloudEnumeratorBuilder struct {
@@ -58,7 +63,7 @@ func (b *cloudEnumeratorBuilder) Build() (*CloudEnumerator, error) {
 		detailsFetcherRunner: parallel.NewParallelRunner(context.TODO(), 10),
 		providerLibrary:      terraform.NewProviderLibrary(),
 		remoteLibrary:        common.NewRemoteLibrary(),
-		alerter:              &sliceAlerter{},
+		alerter:              newSliceAlerter(),
 		progress:             &dummyCounter{},
 	}
 
@@ -92,6 +97,9 @@ func (e *CloudEnumerator) init(to, providerVersion, configDirectory string) erro
 }
 
 func (e *CloudEnumerator) Enumerate(input *enumeration.EnumerateInput) (*enumeration.EnumerateOutput, error) {
+
+	e.alerter.alerts = alerter.Alerts{}
+
 	types := map[string]struct{}{}
 	for _, resourceType := range input.ResourceTypes {
 		types[resourceType] = struct{}{}
@@ -135,14 +143,19 @@ func (e *CloudEnumerator) Enumerate(input *enumeration.EnumerateInput) (*enumera
 
 	mapRes := mapByType(results)
 
+	diagnostics := diagnostic.FromAlerts(e.alerter.Alerts())
+
 	return &enumeration.EnumerateOutput{
 		Resources:   mapRes,
 		Timings:     nil,
-		Diagnostics: nil,
+		Diagnostics: diagnostics,
 	}, nil
 }
 
 func (e *CloudEnumerator) Refresh(input *enumeration.RefreshInput) (*enumeration.RefreshOutput, error) {
+
+	e.alerter.alerts = alerter.Alerts{}
+
 	for _, resByType := range input.Resources {
 		for _, res := range resByType {
 			res := res
@@ -170,10 +183,11 @@ func (e *CloudEnumerator) Refresh(input *enumeration.RefreshInput) (*enumeration
 	}
 
 	mapRes := mapByType(results)
+	diagnostics := diagnostic.FromAlerts(e.alerter.Alerts())
 
 	return &enumeration.RefreshOutput{
 		Resources:   mapRes,
-		Diagnostics: nil,
+		Diagnostics: diagnostics,
 	}, nil
 }
 
@@ -203,24 +217,39 @@ loop:
 	return results, runner.Err()
 }
 
-func (e *CloudEnumerator) List(typ string) ([]*resource.Resource, error) {
+func (e *CloudEnumerator) List(typ string) (*ListOutput, error) {
+
+	diagnostics := diagnostic.Diagnostics{}
+
 	enumInput := &enumeration.EnumerateInput{ResourceTypes: []string{typ}}
 	enumerate, err := e.Enumerate(enumInput)
 	if err != nil {
 		return nil, err
 	}
+	diagnostics = append(diagnostics, enumerate.Diagnostics...)
 
 	refreshInput := &enumeration.RefreshInput{Resources: enumerate.Resources}
 	refresh, err := e.Refresh(refreshInput)
 	if err != nil {
 		return nil, err
 	}
-	return refresh.Resources[typ], nil
+	diagnostics = append(diagnostics, refresh.Diagnostics...)
+
+	return &ListOutput{
+		Resources:   refresh.Resources[typ],
+		Diagnostics: diagnostics,
+	}, nil
 }
 
 type sliceAlerter struct {
 	lock   sync.Mutex
 	alerts alerter.Alerts
+}
+
+func newSliceAlerter() *sliceAlerter {
+	return &sliceAlerter{
+		alerts: alerter.Alerts{},
+	}
 }
 
 func (d *sliceAlerter) Alerts() alerter.Alerts {

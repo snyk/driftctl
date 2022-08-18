@@ -20,10 +20,10 @@
 	"alerts": {
 		"": [
 			{
-				"message": "Ignoring github_team from drift calculation: Listing github_team is forbidden: dummy error"
+				"message": "An error occured listing github_team: listing github_team is forbidden: dummy error"
 			},
 			{
-				"message": "Ignoring github_team_membership from drift calculation: Listing github_team is forbidden: dummy error"
+				"message": "An error occured listing github_team_membership: listing github_team is forbidden: dummy error"
 			}
 		]
 	},
