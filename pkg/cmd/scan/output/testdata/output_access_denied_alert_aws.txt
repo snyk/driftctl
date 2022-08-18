@@ -1,9 +1,9 @@
 Found 0 resource(s)
  - 0% coverage
 Congrats! Your infrastructure is fully in sync.
-Ignoring aws_vpc from drift calculation: Listing aws_vpc is forbidden: dummy error
-Ignoring aws_sqs from drift calculation: Listing aws_sqs is forbidden: dummy error
-Ignoring aws_sns from drift calculation: Listing aws_sns is forbidden: dummy error
+An error occured listing aws_vpc: listing aws_vpc is forbidden: dummy error
+An error occured listing aws_sqs: listing aws_sqs is forbidden: dummy error
+An error occured listing aws_sns: listing aws_sns is forbidden: dummy error
 
 It seems that we got access denied exceptions while listing resources.
 The latest minimal read-only IAM policy for driftctl is always available here, please update yours: https://docs.driftctl.com/aws/policy
