@@ -5,10 +5,11 @@ import (
 )
 
 const (
-	AWS    string = "aws"
-	GITHUB string = "github"
-	GOOGLE string = "google"
-	AZURE  string = "azurerm"
+	AWS        string = "aws"
+	GITHUB     string = "github"
+	GOOGLE     string = "google"
+	GOOGLEBETA string = "google-beta"
+	AZURE      string = "azurerm"
 )
 
 type ProviderLibrary struct {

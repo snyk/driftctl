@@ -17,6 +17,7 @@ var supportedRemotes = []string{
 	common.RemoteAWSTerraform,
 	common.RemoteGithubTerraform,
 	common.RemoteGoogleTerraform,
+	common.RemoteGoogleBetaTerraform,
 	common.RemoteAzureTerraform,
 }
 
@@ -37,6 +38,8 @@ func Activate(remote, version string, alerter alerter.AlerterInterface, provider
 		return github.Init(version, alerter, providerLibrary, remoteLibrary, progress, factory, configDir)
 	case common.RemoteGoogleTerraform:
 		return google.Init(version, alerter, providerLibrary, remoteLibrary, progress, factory, configDir)
+	case common.RemoteGoogleBetaTerraform:
+		return google.InitBeta(version, alerter, providerLibrary, remoteLibrary, progress, factory, configDir)
 	case common.RemoteAzureTerraform:
 		return azurerm.Init(version, alerter, providerLibrary, remoteLibrary, progress, factory, configDir)
 

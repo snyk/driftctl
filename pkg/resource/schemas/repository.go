@@ -56,6 +56,8 @@ func (r *SchemaRepository) Init(providerName, providerVersion string, schema map
 			providerVersion = "4.4.0"
 		case "google":
 			providerVersion = "3.78.0"
+		case "google-beta":
+			providerVersion = "4.32.0"
 		case "azurerm":
 			providerVersion = "2.71.0"
 		default:
@@ -89,6 +91,7 @@ func (r *SchemaRepository) Init(providerName, providerVersion string, schema map
 	case "github":
 		github.InitResourcesMetadata(r)
 	case "google":
+	case "google-beta":
 		google.InitResourcesMetadata(r)
 	case "azurerm":
 		azurerm.InitResourcesMetadata(r)

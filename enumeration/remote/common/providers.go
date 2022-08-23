@@ -8,17 +8,19 @@ import (
 type RemoteParameter string
 
 const (
-	RemoteAWSTerraform    = "aws+tf"
-	RemoteGithubTerraform = "github+tf"
-	RemoteGoogleTerraform = "gcp+tf"
-	RemoteAzureTerraform  = "azure+tf"
+	RemoteAWSTerraform        = "aws+tf"
+	RemoteGithubTerraform     = "github+tf"
+	RemoteGoogleTerraform     = "gcp+tf"
+	RemoteGoogleBetaTerraform = "gcp-beta+tf"
+	RemoteAzureTerraform      = "azure+tf"
 )
 
 var remoteParameterMapping = map[RemoteParameter]string{
-	RemoteAWSTerraform:    tf.AWS,
-	RemoteGithubTerraform: tf.GITHUB,
-	RemoteGoogleTerraform: tf.GOOGLE,
-	RemoteAzureTerraform:  tf.AZURE,
+	RemoteAWSTerraform:        tf.AWS,
+	RemoteGithubTerraform:     tf.GITHUB,
+	RemoteGoogleTerraform:     tf.GOOGLE,
+	RemoteGoogleBetaTerraform: tf.GOOGLEBETA,
+	RemoteAzureTerraform:      tf.AZURE,
 }
 
 func (p RemoteParameter) GetProviderAddress() *lock.ProviderAddress {

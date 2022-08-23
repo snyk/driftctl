@@ -19,13 +19,25 @@ import (
 )
 
 func Init(version string, alerter alerter.AlerterInterface, providerLibrary *terraform.ProviderLibrary, remoteLibrary *common.RemoteLibrary, progress enumeration.ProgressCounter, factory resource.ResourceFactory, configDir string) error {
-
 	provider, err := NewGCPTerraformProvider(version, progress, configDir)
 	if err != nil {
 		return err
 	}
 
-	err = provider.CheckCredentialsExist()
+	return initInternal(provider, version, alerter, providerLibrary, remoteLibrary, progress, factory, configDir)
+}
+
+func InitBeta(version string, alerter alerter.AlerterInterface, providerLibrary *terraform.ProviderLibrary, remoteLibrary *common.RemoteLibrary, progress enumeration.ProgressCounter, factory resource.ResourceFactory, configDir string) error {
+	provider, err := NewGCPBetaTerraformProvider(version, progress, configDir)
+	if err != nil {
+		return err
+	}
+
+	return initInternal(provider, version, alerter, providerLibrary, remoteLibrary, progress, factory, configDir)
+}
+
+func initInternal(provider *GCPTerraformProvider, version string, alerter alerter.AlerterInterface, providerLibrary *terraform.ProviderLibrary, remoteLibrary *common.RemoteLibrary, progress enumeration.ProgressCounter, factory resource.ResourceFactory, configDir string) error {
+	err := provider.CheckCredentialsExist()
 	if err != nil {
 		return err
 	}
@@ -57,7 +69,7 @@ func Init(version string, alerter alerter.AlerterInterface, providerLibrary *ter
 	storageRepository := repository.NewStorageRepository(storageClient, repositoryCache)
 	iamRepository := repository.NewCloudResourceManagerRepository(crmService, provider.GetConfig(), repositoryCache)
 
-	providerLibrary.AddProvider(terraform.GOOGLE, provider)
+	providerLibrary.AddProvider(provider.name, provider)
 	deserializer := resource.NewDeserializer(factory)
 
 	remoteLibrary.AddEnumerator(NewGoogleStorageBucketEnumerator(assetRepository, factory))

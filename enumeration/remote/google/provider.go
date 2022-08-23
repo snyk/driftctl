@@ -23,9 +23,22 @@ func NewGCPTerraformProvider(version string, progress enumeration.ProgressCounte
 	if version == "" {
 		version = "3.78.0"
 	}
+
+	return newGCPTerraformProviderInternal(version, tf.GOOGLE, progress, configDir)
+}
+
+func NewGCPBetaTerraformProvider(version string, progress enumeration.ProgressCounter, configDir string) (*GCPTerraformProvider, error) {
+	if version == "" {
+		version = "4.32.0"
+	}
+
+	return newGCPTerraformProviderInternal(version, tf.GOOGLEBETA, progress, configDir)
+}
+
+func newGCPTerraformProviderInternal(version string, name string, progress enumeration.ProgressCounter, configDir string) (*GCPTerraformProvider, error) {
 	p := &GCPTerraformProvider{
 		version: version,
-		name:    tf.GOOGLE,
+		name:    name,
 	}
 	installer, err := tf.NewProviderInstaller(tf.ProviderConfig{
 		Key:       p.name,
