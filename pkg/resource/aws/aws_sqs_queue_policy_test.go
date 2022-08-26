@@ -4,11 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/sirupsen/logrus"
 	"github.com/snyk/driftctl/test"
-	"github.com/snyk/driftctl/test/acceptance/awsutils"
-
 	"github.com/snyk/driftctl/test/acceptance"
 )
 
@@ -22,22 +18,7 @@ func TestAcc_Aws_SQSQueuePolicy(t *testing.T) {
 				Env: map[string]string{
 					"AWS_REGION": "us-east-1",
 				},
-				PreExec: func() {
-					err := acceptance.RetryFor(60*time.Second, func(doneCh chan struct{}) error {
-						return sqs.New(awsutils.Session()).ListQueuesPages(&sqs.ListQueuesInput{},
-							func(resp *sqs.ListQueuesOutput, lastPage bool) bool {
-								logrus.Debugf("Retrieved %d SQS queues", len(resp.QueueUrls))
-								if len(resp.QueueUrls) >= 3 {
-									doneCh <- struct{}{}
-								}
-								return !lastPage
-							},
-						)
-					})
-					if err != nil {
-						t.Fatal("Timeout while fetching SQS queues")
-					}
-				},
+				ShouldRetry: acceptance.LinearBackoff(10 * time.Minute),
 				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
