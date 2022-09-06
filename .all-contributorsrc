@@ -277,6 +277,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "Doridian",
+      "name": "Mark Dietzer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/631409?v=4",
+      "profile": "https://doridian.net/",
+      "contributions": [
+        "bug"
+      ]
     }
   ]
 }
