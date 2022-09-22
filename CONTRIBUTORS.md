@@ -39,6 +39,7 @@ Thank you to all the people who have already contributed to driftctl.
   <tr>
     <td align="center"><a href="https://github.com/almog27"><img src="https://avatars.githubusercontent.com/u/1466549?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Almog Ben David</b></sub></a><br /><a href="https://github.com/snyk/driftctl/commits?author=almog27" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/chdorner-snyk"><img src="https://avatars.githubusercontent.com/u/106981178?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Christof</b></sub></a><br /><a href="https://github.com/snyk/driftctl/commits?author=chdorner-snyk" title="Code">💻</a></td>
+    <td align="center"><a href="https://doridian.net/"><img src="https://avatars.githubusercontent.com/u/631409?v=4?s=80" width="80px;" alt=""/><br /><sub><b>Mark Dietzer</b></sub></a><br /><a href="https://github.com/snyk/driftctl/issues?q=author%3ADoridian" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 

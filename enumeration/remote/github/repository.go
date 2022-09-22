@@ -116,7 +116,7 @@ type listRepoForOwnerQuery struct {
 				EndCursor   githubv4.String
 				HasNextPage bool
 			}
-		} `graphql:"repositories(first: 100, after: $cursor)"`
+		} `graphql:"repositories(first: 100, after: $cursor, ownerAffiliations: OWNER)"`
 	}
 }
 

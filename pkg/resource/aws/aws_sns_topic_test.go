@@ -1,13 +1,10 @@
 package aws_test
 
 import (
-	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
-	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/snyk/driftctl/test"
 
 	"github.com/aws/aws-sdk-go/service/sns"
@@ -31,23 +28,7 @@ func TestAcc_Aws_SNSTopic(t *testing.T) {
 				Env: map[string]string{
 					"AWS_REGION": "us-east-1",
 				},
-				PreExec: func() {
-					err := acceptance.RetryFor(60*time.Second, func(doneCh chan struct{}) error {
-						client := repository.NewSNSRepository(awsutils.Session(), cache.New(0))
-						topics, err := client.ListAllTopics()
-						if err != nil {
-							logrus.Warnf("Cannot list topics: %+v", err)
-							return err
-						}
-						if len(topics) == 3 {
-							doneCh <- struct{}{}
-						}
-						return nil
-					})
-					if err != nil {
-						t.Fatal("Timeout while fetching SNS TOPIC")
-					}
-				},
+				ShouldRetry: acceptance.LinearBackoff(10 * time.Minute),
 				Check: func(result *test.ScanResult, stdout string, err error) {
 					if err != nil {
 						t.Fatal(err)
