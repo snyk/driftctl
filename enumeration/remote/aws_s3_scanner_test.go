@@ -3,6 +3,7 @@ package remote
 import (
 	"testing"
 
+	"github.com/aws/aws-sdk-go/service/s3control"
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/aws"
@@ -1063,6 +1064,85 @@ func TestS3BucketAnalytic(t *testing.T) {
 			test.TestAgainstGoldenFile(got, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
+		})
+	}
+}
+
+func TestS3AccountPublicAccessBlock(t *testing.T) {
+	dummyError := errors.New("this is an error")
+
+	tests := []struct {
+		test           string
+		mocks          func(*repository.MockS3ControlRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
+	}{
+		{
+			test: "existing access block",
+			mocks: func(repository *repository.MockS3ControlRepository, alerter *mocks.AlerterInterface) {
+				repository.On("GetAccountID").Return("123456")
+				repository.On("DescribeAccountPublicAccessBlock").Return(&s3control.PublicAccessBlockConfiguration{
+					BlockPublicAcls:       awssdk.Bool(false),
+					BlockPublicPolicy:     awssdk.Bool(true),
+					IgnorePublicAcls:      awssdk.Bool(false),
+					RestrictPublicBuckets: awssdk.Bool(true),
+				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+				assert.Equal(t, got[0].ResourceId(), "123456")
+				assert.Equal(t, got[0].ResourceType(), resourceaws.AwsS3AccountPublicAccessBlock)
+				assert.Equal(t, got[0].Attributes(), &resource.Attributes{
+					"block_public_acls":       false,
+					"block_public_policy":     true,
+					"ignore_public_acls":      false,
+					"restrict_public_buckets": true,
+				})
+			},
+		},
+		{
+			test: "cannot list access block",
+			mocks: func(repository *repository.MockS3ControlRepository, alerter *mocks.AlerterInterface) {
+				repository.On("DescribeAccountPublicAccessBlock").Return(nil, dummyError)
+			},
+			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsS3AccountPublicAccessBlock),
+		},
+	}
+
+	factory := terraform.NewTerraformResourceFactory()
+
+	for _, c := range tests {
+		t.Run(c.test, func(tt *testing.T) {
+			scanOptions := ScannerOptions{}
+			remoteLibrary := common.NewRemoteLibrary()
+
+			// Initialize mocks
+			alerter := &mocks.AlerterInterface{}
+			fakeRepo := &repository.MockS3ControlRepository{}
+			c.mocks(fakeRepo, alerter)
+
+			var repo repository.S3ControlRepository = fakeRepo
+
+			remoteLibrary.AddEnumerator(aws.NewS3AccountPublicAccessBlockEnumerator(
+				repo, factory,
+				tf.TerraformProviderConfig{DefaultAlias: "us-east-1"},
+				alerter,
+			))
+
+			testFilter := &enumeration.MockFilter{}
+			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
+
+			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			got, err := s.Resources()
+			assert.Equal(tt, c.wantErr, err)
+			if err != nil {
+				return
+			}
+
+			c.assertExpected(tt, got)
+			alerter.AssertExpectations(tt)
+			fakeRepo.AssertExpectations(tt)
+			testFilter.AssertExpectations(tt)
 		})
 	}
 }

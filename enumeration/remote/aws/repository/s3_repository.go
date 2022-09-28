@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+
 	"github.com/snyk/driftctl/enumeration/remote/aws/client"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 

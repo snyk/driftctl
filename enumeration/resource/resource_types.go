@@ -99,11 +99,11 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_s3_bucket_metric":                  {},
 	"aws_s3_bucket_notification":            {},
 	"aws_s3_bucket_policy":                  {},
-	"aws_s3_bucket_public_access_block":     {},
-	"aws_security_group": {children: []ResourceType{
+	"aws_s3_bucket_public_access_block":     {}, "aws_security_group": {children: []ResourceType{
 		"aws_security_group_rule",
 	}},
-	"aws_security_group_rule": {},
+	"aws_s3_account_public_access_block": {},
+	"aws_security_group_rule":            {},
 	"aws_sns_topic": {children: []ResourceType{
 		"aws_sns_topic_policy",
 	}},

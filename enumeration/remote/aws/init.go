@@ -3,7 +3,7 @@ package aws
 import (
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/alerter"
-	"github.com/snyk/driftctl/enumeration/remote/aws/client"
+	client "github.com/snyk/driftctl/enumeration/remote/aws/client"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
@@ -35,6 +35,7 @@ func Init(version string, alerter alerter.AlerterInterface, providerLibrary *ter
 	repositoryCache := cache.New(100)
 
 	s3Repository := repository.NewS3Repository(client.NewAWSClientFactory(provider.session), repositoryCache)
+	s3ControlRepository := repository.NewS3ControlRepository(client.NewAWSClientFactory(provider.session), provider.accountId, repositoryCache)
 	ec2repository := repository.NewEC2Repository(provider.session, repositoryCache)
 	elbv2Repository := repository.NewELBV2Repository(provider.session, repositoryCache)
 	route53repository := repository.NewRoute53Repository(provider.session, repositoryCache)
@@ -71,6 +72,7 @@ func Init(version string, alerter alerter.AlerterInterface, providerLibrary *ter
 	remoteLibrary.AddEnumerator(NewS3BucketAnalyticEnumerator(s3Repository, factory, provider.Config, alerter))
 	remoteLibrary.AddDetailsFetcher(aws.AwsS3BucketAnalyticsConfigurationResourceType, common.NewGenericDetailsFetcher(aws.AwsS3BucketAnalyticsConfigurationResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewS3BucketPublicAccessBlockEnumerator(s3Repository, factory, provider.Config, alerter))
+	remoteLibrary.AddEnumerator(NewS3AccountPublicAccessBlockEnumerator(s3ControlRepository, factory, provider.Config, alerter))
 
 	remoteLibrary.AddEnumerator(NewEC2EbsVolumeEnumerator(ec2repository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsEbsVolumeResourceType, common.NewGenericDetailsFetcher(aws.AwsEbsVolumeResourceType, provider, deserializer))

@@ -1,0 +1,14 @@
+[
+ {
+  "Id": "526954929923",
+  "Type": "aws_s3_account_public_access_block",
+  "Attrs": {
+   "account_id": "526954929923",
+   "block_public_acls": true,
+   "block_public_policy": true,
+   "id": "526954929923",
+   "ignore_public_acls": false,
+   "restrict_public_buckets": false
+  }
+ }
+]

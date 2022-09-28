@@ -114,6 +114,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "Route 53 record - empty records", dirName: "aws_route53_record_null_records", wantErr: false},
 		{name: "s3 full", dirName: "aws_s3_full", wantErr: false},
 		{name: "s3 bucket public access block", dirName: "aws_s3_bucket_public_access_block", wantErr: false},
+		{name: "s3 account public access block", dirName: "aws_s3_account_public_access_block", wantErr: false},
 		{name: "RDS DB instance", dirName: "aws_db_instance", wantErr: false},
 		{name: "RDS DB Subnet group", dirName: "aws_db_subnet_group", wantErr: false},
 		{name: "Lambda function", dirName: "aws_lambda_function", wantErr: false},
