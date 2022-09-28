@@ -3,7 +3,6 @@ package output
 import (
 	"bytes"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -160,12 +159,12 @@ func TestConsole_Write(t *testing.T) {
 
 			expectedFilePath := path.Join("./testdata", tt.goldenfile)
 			if *goldenfile.Update == tt.goldenfile {
-				if err := ioutil.WriteFile(expectedFilePath, out, 0600); err != nil {
+				if err := os.WriteFile(expectedFilePath, out, 0600); err != nil {
 					t.Fatal(err)
 				}
 			}
 
-			expected, err := ioutil.ReadFile(expectedFilePath)
+			expected, err := os.ReadFile(expectedFilePath)
 			if err != nil {
 				t.Fatal(err)
 			}

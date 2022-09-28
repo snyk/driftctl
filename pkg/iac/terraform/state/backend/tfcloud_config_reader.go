@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -29,7 +28,7 @@ func NewTFCloudConfigReader(reader io.ReadCloser) *tfCloudConfigReader {
 }
 
 func (r *tfCloudConfigReader) GetToken(host string) (string, error) {
-	b, err := ioutil.ReadAll(r.reader)
+	b, err := io.ReadAll(r.reader)
 	if err != nil {
 		return "", errors.New("unable to read file")
 	}

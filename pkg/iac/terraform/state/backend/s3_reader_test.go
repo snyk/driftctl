@@ -2,7 +2,7 @@ package backend
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"reflect"
 	"testing"
@@ -125,6 +125,6 @@ func TestS3Backend_Read(t *testing.T) {
 		t.Error(err)
 	}
 	reader.S3Client = fakeS3
-	_, err = ioutil.ReadAll(reader)
+	_, err = io.ReadAll(reader)
 	assert.Nil(err)
 }

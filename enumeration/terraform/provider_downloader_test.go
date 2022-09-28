@@ -2,11 +2,12 @@ package terraform
 
 import (
 	"fmt"
-	terraformError "github.com/snyk/driftctl/enumeration/terraform/error"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"path"
 	"testing"
+
+	terraformError "github.com/snyk/driftctl/enumeration/terraform/error"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/stretchr/testify/assert"
@@ -59,7 +60,7 @@ func TestProviderDownloader_Download(t *testing.T) {
 			testFile: aws.String("invalid.zip"),
 			assert: func(assert *assert.Assertions, tmpDir string, err error) {
 				assert.NotNil(err)
-				infos, err := ioutil.ReadDir(tmpDir)
+				infos, err := os.ReadDir(tmpDir)
 				assert.Nil(err)
 				assert.Len(infos, 0)
 			},
@@ -69,7 +70,7 @@ func TestProviderDownloader_Download(t *testing.T) {
 			testFile: aws.String("terraform-provider-aws_3.5.0_linux_amd64.zip"),
 			assert: func(assert *assert.Assertions, tmpDir string, err error) {
 				assert.Nil(err)
-				file, err := ioutil.ReadFile(path.Join(tmpDir, "terraform-provider-aws_v3.5.0_x5"))
+				file, err := os.ReadFile(path.Join(tmpDir, "terraform-provider-aws_v3.5.0_x5"))
 				assert.Nil(err)
 				assert.Equal([]byte{0x74, 0x65, 0x73, 0x74, 0xa}, file)
 			},
@@ -92,7 +93,7 @@ func TestProviderDownloader_Download(t *testing.T) {
 				httpmock.RegisterResponder("GET", url, c.responder)
 			} else {
 				if c.testFile != nil {
-					body, err := ioutil.ReadFile("./testdata/" + *c.testFile)
+					body, err := os.ReadFile("./testdata/" + *c.testFile)
 					if err != nil {
 						tt.Error(err)
 					}

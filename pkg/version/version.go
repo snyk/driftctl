@@ -2,7 +2,7 @@ package version
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"runtime"
 
@@ -50,7 +50,7 @@ func CheckLatest() string {
 		return ""
 	}
 
-	bodyBytes, err := ioutil.ReadAll(res.Body)
+	bodyBytes, err := io.ReadAll(res.Body)
 	if err != nil {
 		logrus.Debug("Unable to read response")
 		logrus.Debug(err)
