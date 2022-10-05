@@ -12,13 +12,13 @@ type MockS3ControlRepository struct {
 	mock.Mock
 }
 
-// DescribeAccountPublicAccessBlock provides a mock function with given fields:
-func (_m *MockS3ControlRepository) DescribeAccountPublicAccessBlock() (*s3control.PublicAccessBlockConfiguration, error) {
-	ret := _m.Called()
+// DescribeAccountPublicAccessBlock provides a mock function with given fields: accountID
+func (_m *MockS3ControlRepository) DescribeAccountPublicAccessBlock(accountID string) (*s3control.PublicAccessBlockConfiguration, error) {
+	ret := _m.Called(accountID)
 
 	var r0 *s3control.PublicAccessBlockConfiguration
-	if rf, ok := ret.Get(0).(func() *s3control.PublicAccessBlockConfiguration); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(string) *s3control.PublicAccessBlockConfiguration); ok {
+		r0 = rf(accountID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*s3control.PublicAccessBlockConfiguration)
@@ -26,27 +26,13 @@ func (_m *MockS3ControlRepository) DescribeAccountPublicAccessBlock() (*s3contro
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(accountID)
 	} else {
 		r1 = ret.Error(1)
 	}
 
 	return r0, r1
-}
-
-// GetAccountID provides a mock function with given fields:
-func (_m *MockS3ControlRepository) GetAccountID() string {
-	ret := _m.Called()
-
-	var r0 string
-	if rf, ok := ret.Get(0).(func() string); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Get(0).(string)
-	}
-
-	return r0
 }
 
 type mockConstructorTestingTNewMockS3ControlRepository interface {

@@ -1071,6 +1071,7 @@ func TestS3BucketAnalytic(t *testing.T) {
 func TestS3AccountPublicAccessBlock(t *testing.T) {
 	dummyError := errors.New("this is an error")
 
+	accountID := "123456"
 	tests := []struct {
 		test           string
 		mocks          func(*repository.MockS3ControlRepository, *mocks.AlerterInterface)
@@ -1080,8 +1081,7 @@ func TestS3AccountPublicAccessBlock(t *testing.T) {
 		{
 			test: "existing access block",
 			mocks: func(repository *repository.MockS3ControlRepository, alerter *mocks.AlerterInterface) {
-				repository.On("GetAccountID").Return("123456")
-				repository.On("DescribeAccountPublicAccessBlock").Return(&s3control.PublicAccessBlockConfiguration{
+				repository.On("DescribeAccountPublicAccessBlock", accountID).Return(&s3control.PublicAccessBlockConfiguration{
 					BlockPublicAcls:       awssdk.Bool(false),
 					BlockPublicPolicy:     awssdk.Bool(true),
 					IgnorePublicAcls:      awssdk.Bool(false),
@@ -1090,7 +1090,7 @@ func TestS3AccountPublicAccessBlock(t *testing.T) {
 			},
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
 				assert.Len(t, got, 1)
-				assert.Equal(t, got[0].ResourceId(), "123456")
+				assert.Equal(t, got[0].ResourceId(), accountID)
 				assert.Equal(t, got[0].ResourceType(), resourceaws.AwsS3AccountPublicAccessBlock)
 				assert.Equal(t, got[0].Attributes(), &resource.Attributes{
 					"block_public_acls":       false,
@@ -1103,7 +1103,7 @@ func TestS3AccountPublicAccessBlock(t *testing.T) {
 		{
 			test: "cannot list access block",
 			mocks: func(repository *repository.MockS3ControlRepository, alerter *mocks.AlerterInterface) {
-				repository.On("DescribeAccountPublicAccessBlock").Return(nil, dummyError)
+				repository.On("DescribeAccountPublicAccessBlock", accountID).Return(nil, dummyError)
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceaws.AwsS3AccountPublicAccessBlock),
 		},
@@ -1125,7 +1125,7 @@ func TestS3AccountPublicAccessBlock(t *testing.T) {
 
 			remoteLibrary.AddEnumerator(aws.NewS3AccountPublicAccessBlockEnumerator(
 				repo, factory,
-				tf.TerraformProviderConfig{DefaultAlias: "us-east-1"},
+				accountID,
 				alerter,
 			))
 

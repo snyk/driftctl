@@ -5,24 +5,23 @@ import (
 	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/remote/aws/repository"
 	remoteerror "github.com/snyk/driftctl/enumeration/remote/error"
-	tf "github.com/snyk/driftctl/enumeration/remote/terraform"
 	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/enumeration/resource/aws"
 )
 
 type S3AccountPublicAccessBlockEnumerator struct {
-	repository     repository.S3ControlRepository
-	factory        resource.ResourceFactory
-	providerConfig tf.TerraformProviderConfig
-	alerter        alerter.AlerterInterface
+	repository repository.S3ControlRepository
+	factory    resource.ResourceFactory
+	accountID  string
+	alerter    alerter.AlerterInterface
 }
 
-func NewS3AccountPublicAccessBlockEnumerator(repo repository.S3ControlRepository, factory resource.ResourceFactory, providerConfig tf.TerraformProviderConfig, alerter alerter.AlerterInterface) *S3AccountPublicAccessBlockEnumerator {
+func NewS3AccountPublicAccessBlockEnumerator(repo repository.S3ControlRepository, factory resource.ResourceFactory, accountId string, alerter alerter.AlerterInterface) *S3AccountPublicAccessBlockEnumerator {
 	return &S3AccountPublicAccessBlockEnumerator{
-		repository:     repo,
-		factory:        factory,
-		providerConfig: providerConfig,
-		alerter:        alerter,
+		repository: repo,
+		factory:    factory,
+		accountID:  accountId,
+		alerter:    alerter,
 	}
 }
 
@@ -31,7 +30,7 @@ func (e *S3AccountPublicAccessBlockEnumerator) SupportedType() resource.Resource
 }
 
 func (e *S3AccountPublicAccessBlockEnumerator) Enumerate() ([]*resource.Resource, error) {
-	accountPublicAccessBlock, err := e.repository.DescribeAccountPublicAccessBlock()
+	accountPublicAccessBlock, err := e.repository.DescribeAccountPublicAccessBlock(e.accountID)
 	if err != nil {
 		return nil, remoteerror.NewResourceListingError(err, string(e.SupportedType()))
 	}
@@ -42,7 +41,7 @@ func (e *S3AccountPublicAccessBlockEnumerator) Enumerate() ([]*resource.Resource
 		results,
 		e.factory.CreateAbstractResource(
 			string(e.SupportedType()),
-			e.repository.GetAccountID(),
+			e.accountID,
 			map[string]interface{}{
 				"block_public_acls":       awssdk.BoolValue(accountPublicAccessBlock.BlockPublicAcls),
 				"block_public_policy":     awssdk.BoolValue(accountPublicAccessBlock.BlockPublicPolicy),

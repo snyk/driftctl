@@ -17,6 +17,7 @@ import (
 )
 
 func Test_s3ControlRepository_DescribeAccountPublicAccessBlock(t *testing.T) {
+	accountID := "123456"
 
 	tests := []struct {
 		name    string
@@ -65,14 +66,14 @@ func Test_s3ControlRepository_DescribeAccountPublicAccessBlock(t *testing.T) {
 			tt.mocks(mockedClient)
 			factory := client.MockAwsClientFactoryInterface{}
 			factory.On("GetS3ControlClient", (*aws.Config)(nil)).Return(mockedClient).Once()
-			r := NewS3ControlRepository(&factory, "", store)
-			got, err := r.DescribeAccountPublicAccessBlock()
+			r := NewS3ControlRepository(&factory, store)
+			got, err := r.DescribeAccountPublicAccessBlock(accountID)
 			factory.AssertExpectations(t)
 			assert.Equal(t, tt.wantErr, err)
 
 			if err == nil {
 				// Check that results were cached
-				cachedData, err := r.DescribeAccountPublicAccessBlock()
+				cachedData, err := r.DescribeAccountPublicAccessBlock(accountID)
 				assert.NoError(t, err)
 				assert.Equal(t, got, cachedData)
 				assert.IsType(t, &s3control.PublicAccessBlockConfiguration{}, store.Get("S3DescribeAccountPublicAccessBlock"))
