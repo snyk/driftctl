@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sts"
@@ -42,9 +43,10 @@ type awsConfig struct {
 
 type AWSTerraformProvider struct {
 	*terraform.TerraformProvider
-	session *session.Session
-	name    string
-	version string
+	session   *session.Session
+	name      string
+	version   string
+	accountId string
 }
 
 func NewAWSTerraformProvider(version string, progress enumeration.ProgressCounter, configDir string) (*AWSTerraformProvider, error) {
@@ -115,11 +117,13 @@ func (p *AWSTerraformProvider) CheckCredentialsExist() error {
 	// This call is to make sure that the credentials are valid
 	// A more complex logic exist in terraform provider, but it's probably not worth to implement it
 	// https://github.com/hashicorp/terraform-provider-aws/blob/e3959651092864925045a6044961a73137095798/aws/auth_helpers.go#L111
-	_, err = sts.New(p.session).GetCallerIdentity(&sts.GetCallerIdentityInput{})
+	identity, err := sts.New(p.session).GetCallerIdentity(&sts.GetCallerIdentityInput{})
 	if err != nil {
 		logrus.Debug(err)
 		return errors.New("Could not authenticate successfully on AWS with the provided credentials.\n" +
 			"Please refer to the AWS documentation: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html\n")
 	}
+
+	p.accountId = aws.StringValue(identity.Account)
 	return nil
 }

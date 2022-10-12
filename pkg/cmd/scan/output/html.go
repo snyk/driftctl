@@ -25,6 +25,7 @@ const HTMLOutputType = "html"
 const HTMLOutputExample = "html://PATH/TO/FILE.html"
 
 // assets holds our static web content.
+//
 //go:embed assets/*
 var assets embed.FS
 

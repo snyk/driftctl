@@ -2,7 +2,7 @@ package telemetry
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"runtime"
 	"testing"
@@ -114,7 +114,7 @@ func TestSendTelemetry(t *testing.T) {
 					func(req *http.Request) (*http.Response, error) {
 
 						requestTelemetry := &telemetry{}
-						requestBody, err := ioutil.ReadAll(req.Body)
+						requestBody, err := io.ReadAll(req.Body)
 						if err != nil {
 							t.Fatal(err)
 						}
@@ -163,7 +163,7 @@ func TestTelemetrySetProperClient(t *testing.T) {
 		"https://telemetry.driftctl.com/telemetry",
 		func(req *http.Request) (*http.Response, error) {
 			requestTelemetry := &telemetry{}
-			requestBody, err := ioutil.ReadAll(req.Body)
+			requestBody, err := io.ReadAll(req.Body)
 			if err != nil {
 				t.Fatal(err)
 			}
