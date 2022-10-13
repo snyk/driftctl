@@ -37,6 +37,10 @@ func (e *S3AccountPublicAccessBlockEnumerator) Enumerate() ([]*resource.Resource
 
 	results := make([]*resource.Resource, 0, 1)
 
+	if accountPublicAccessBlock == nil {
+		return results, nil
+	}
+
 	results = append(
 		results,
 		e.factory.CreateAbstractResource(

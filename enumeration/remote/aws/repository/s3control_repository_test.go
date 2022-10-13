@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/r3labs/diff/v2"
 	awstest "github.com/snyk/driftctl/test/aws"
 	"github.com/stretchr/testify/assert"
@@ -23,10 +22,10 @@ func Test_s3ControlRepository_DescribeAccountPublicAccessBlock(t *testing.T) {
 		name    string
 		mocks   func(client *awstest.MockFakeS3Control)
 		want    *s3control.PublicAccessBlockConfiguration
-		wantErr error
+		wantErr bool
 	}{
 		{
-			name: "describe account public accessblock",
+			name: "describe account public access block",
 			mocks: func(client *awstest.MockFakeS3Control) {
 				client.On("GetPublicAccessBlock", mock.Anything).Return(
 					&s3control.GetPublicAccessBlockOutput{
@@ -48,15 +47,29 @@ func Test_s3ControlRepository_DescribeAccountPublicAccessBlock(t *testing.T) {
 			},
 		},
 		{
-			name: "Error detting account public accessblock",
+			name: "Error getting account public access block",
 			mocks: func(client *awstest.MockFakeS3Control) {
+				fakeRequestFailure := &awstest.MockFakeRequestFailure{}
+				fakeRequestFailure.On("Code").Return("FakeErrorCode")
 				client.On("GetPublicAccessBlock", mock.Anything).Return(
 					nil,
-					awserr.NewRequestFailure(nil, 403, ""),
+					fakeRequestFailure,
 				).Once()
 			},
 			want:    nil,
-			wantErr: awserr.NewRequestFailure(nil, 403, ""),
+			wantErr: true,
+		},
+		{
+			name: "Error no account public access block",
+			mocks: func(client *awstest.MockFakeS3Control) {
+				fakeRequestFailure := &awstest.MockFakeRequestFailure{}
+				fakeRequestFailure.On("Code").Return("NoSuchPublicAccessBlockConfiguration")
+				client.On("GetPublicAccessBlock", mock.Anything).Return(
+					nil,
+					fakeRequestFailure,
+				).Once()
+			},
+			want: nil,
 		},
 	}
 	for _, tt := range tests {
@@ -69,9 +82,9 @@ func Test_s3ControlRepository_DescribeAccountPublicAccessBlock(t *testing.T) {
 			r := NewS3ControlRepository(&factory, store)
 			got, err := r.DescribeAccountPublicAccessBlock(accountID)
 			factory.AssertExpectations(t)
-			assert.Equal(t, tt.wantErr, err)
+			assert.Equal(t, tt.wantErr, err != nil)
 
-			if err == nil {
+			if err == nil && got != nil {
 				// Check that results were cached
 				cachedData, err := r.DescribeAccountPublicAccessBlock(accountID)
 				assert.NoError(t, err)
