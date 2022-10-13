@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/s3control"
 	"github.com/snyk/driftctl/enumeration/remote/aws/client"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
@@ -33,6 +34,10 @@ func (s *s3ControlRepository) DescribeAccountPublicAccessBlock(accountID string)
 	})
 
 	if err != nil {
+		if s.shouldSuppressError(err) {
+			return nil, nil
+		}
+
 		return nil, err
 	}
 
@@ -40,4 +45,14 @@ func (s *s3ControlRepository) DescribeAccountPublicAccessBlock(accountID string)
 
 	s.cache.Put(cacheKey, result)
 	return result, nil
+}
+
+func (s *s3ControlRepository) shouldSuppressError(err error) bool {
+	if requestFailure, ok := err.(awserr.RequestFailure); ok {
+		if requestFailure.Code() == "NoSuchPublicAccessBlockConfiguration" {
+			// do not throw the error up if there is no access block config
+			return true
+		}
+	}
+	return false
 }
