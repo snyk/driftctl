@@ -49,6 +49,7 @@ func Init(version string, alerter alerter.AlerterInterface, providerLibrary *ter
 	kmsRepository := repository.NewKMSRepository(provider.session, repositoryCache)
 	iamRepository := repository.NewIAMRepository(provider.session, repositoryCache)
 	cloudformationRepository := repository.NewCloudformationRepository(provider.session, repositoryCache)
+	cloudtrailRepository := repository.NewCloudtrailRepository(provider.session, repositoryCache)
 	apigatewayRepository := repository.NewApiGatewayRepository(provider.session, repositoryCache)
 	appAutoScalingRepository := repository.NewAppAutoScalingRepository(provider.session, repositoryCache)
 	apigatewayv2Repository := repository.NewApiGatewayV2Repository(provider.session, repositoryCache)
@@ -194,6 +195,9 @@ func Init(version string, alerter alerter.AlerterInterface, providerLibrary *ter
 
 	remoteLibrary.AddEnumerator(NewCloudformationStackEnumerator(cloudformationRepository, factory))
 	remoteLibrary.AddDetailsFetcher(aws.AwsCloudformationStackResourceType, common.NewGenericDetailsFetcher(aws.AwsCloudformationStackResourceType, provider, deserializer))
+
+	remoteLibrary.AddEnumerator(NewCloudtrailEnumerator(cloudtrailRepository, factory))
+	remoteLibrary.AddDetailsFetcher(aws.AwsCloudtrailResourceType, common.NewGenericDetailsFetcher(aws.AwsCloudtrailResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewApiGatewayRestApiEnumerator(apigatewayRepository, factory))
 	remoteLibrary.AddEnumerator(NewApiGatewayAccountEnumerator(apigatewayRepository, factory))
