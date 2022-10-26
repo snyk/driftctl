@@ -210,6 +210,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 		{name: "ElastiCache Cluster", dirName: "aws_elasticache_cluster", wantErr: false},
 		{name: "IAM Group", dirName: "aws_iam_group", wantErr: false},
 		{name: "ECR Repository Policy", dirName: "aws_ecr_repository_policy", wantErr: false},
+		{name: "cloudtrail", dirName: "aws_cloudtrail", wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
