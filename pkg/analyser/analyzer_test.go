@@ -2,7 +2,7 @@ package analyser
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
@@ -1343,11 +1343,11 @@ func TestAnalysis_MarshalJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 	if *goldenfile.Update == "TestAnalysis_MarshalJSON" {
-		if err := ioutil.WriteFile(goldenFile, got, 0600); err != nil {
+		if err := os.WriteFile(goldenFile, got, 0600); err != nil {
 			t.Fatal(err)
 		}
 	}
-	expected, err := ioutil.ReadFile(goldenFile)
+	expected, err := os.ReadFile(goldenFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1429,7 +1429,7 @@ func TestAnalysis_UnmarshalJSON(t *testing.T) {
 	}
 
 	got := Analysis{}
-	input, err := ioutil.ReadFile("./testdata/input.json")
+	input, err := os.ReadFile("./testdata/input.json")
 	if err != nil {
 		t.Fatal(err)
 	}

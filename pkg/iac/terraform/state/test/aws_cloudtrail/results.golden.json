@@ -1,0 +1,23 @@
+[
+ {
+  "Id": "testtrailtrail",
+  "Type": "aws_cloudtrail",
+  "Attrs": {
+   "arn": "arn:aws:cloudtrail:eu-west-2:526954929923:trail/testtrailtrail",
+   "cloud_watch_logs_group_arn": "",
+   "cloud_watch_logs_role_arn": "",
+   "enable_log_file_validation": false,
+   "enable_logging": true,
+   "home_region": "eu-west-2",
+   "id": "testtrailtrail",
+   "include_global_service_events": true,
+   "is_multi_region_trail": false,
+   "is_organization_trail": false,
+   "kms_key_id": "",
+   "name": "testtrailtrail",
+   "s3_bucket_name": "testtrailbuckettestestest",
+   "s3_key_prefix": "",
+   "sns_topic_name": ""
+  }
+ }
+]

@@ -69,4 +69,5 @@ func InitResourcesMetadata(resourceSchemaRepository resource.SchemaRepositoryInt
 	initAwsRDSClusterMetaData(resourceSchemaRepository)
 	initAwsCloudformationStackMetaData(resourceSchemaRepository)
 	initAwsAppAutoscalingTargetMetaData(resourceSchemaRepository)
+	initAwsCloudtrailMetaData(resourceSchemaRepository)
 }

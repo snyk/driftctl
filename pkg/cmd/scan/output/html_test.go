@@ -1,7 +1,7 @@
 package output
 
 import (
-	"io/ioutil"
+	"os"
 	"path"
 	"testing"
 	"time"
@@ -236,7 +236,7 @@ func TestHTML_Write(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tempDir := t.TempDir()
-			tempFile, err := ioutil.TempFile(tempDir, "result")
+			tempFile, err := os.CreateTemp(tempDir, "result")
 
 			if err != nil {
 				t.Fatal(err)
@@ -250,19 +250,19 @@ func TestHTML_Write(t *testing.T) {
 				assert.NoError(t, err)
 			}
 
-			got, err := ioutil.ReadFile(tempFile.Name())
+			got, err := os.ReadFile(tempFile.Name())
 			if err != nil {
 				t.Fatal(err)
 			}
 
 			expectedFilePath := path.Join("./testdata/", tt.goldenfile)
 			if *goldenfile.Update == tt.goldenfile {
-				if err := ioutil.WriteFile(expectedFilePath, got, 0600); err != nil {
+				if err := os.WriteFile(expectedFilePath, got, 0600); err != nil {
 					t.Fatal(err)
 				}
 			}
 
-			expected, err := ioutil.ReadFile(expectedFilePath)
+			expected, err := os.ReadFile(expectedFilePath)
 			if err != nil {
 				t.Fatal(err)
 			}

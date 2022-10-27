@@ -103,7 +103,8 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_security_group": {children: []ResourceType{
 		"aws_security_group_rule",
 	}},
-	"aws_security_group_rule": {},
+	"aws_s3_account_public_access_block": {},
+	"aws_security_group_rule":            {},
 	"aws_sns_topic": {children: []ResourceType{
 		"aws_sns_topic_policy",
 	}},
@@ -174,6 +175,7 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"aws_launch_configuration":              {},
 	"aws_elb":                               {},
 	"aws_elasticache_cluster":               {},
+	"aws_cloudtrail":                        {},
 
 	"github_branch_protection": {},
 	"github_membership":        {},

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -37,7 +36,7 @@ func ReadRootFile(p string, name string) []byte {
 		return []byte("[]")
 	}
 
-	content, err := ioutil.ReadFile(fmt.Sprintf("%s%c%s", p, os.PathSeparator, sanitizeName(name)))
+	content, err := os.ReadFile(fmt.Sprintf("%s%c%s", p, os.PathSeparator, sanitizeName(name)))
 	if err != nil {
 		panic(err)
 	}
@@ -65,7 +64,7 @@ func WriteRootFile(p string, content []byte, name string) {
 		logrus.Error(err)
 	}
 
-	if err := ioutil.WriteFile(fmt.Sprintf("%s%c%s", p, os.PathSeparator, sanitizeName(name)), output, os.ModePerm); err != nil {
+	if err := os.WriteFile(fmt.Sprintf("%s%c%s", p, os.PathSeparator, sanitizeName(name)), output, os.ModePerm); err != nil {
 		panic(err)
 	}
 }
@@ -78,7 +77,7 @@ func ReadFile(p string, name string) []byte {
 		return []byte("[]")
 	}
 
-	content, err := ioutil.ReadFile(fmt.Sprintf("%s%c%s", p, os.PathSeparator, sanitizeName(name)))
+	content, err := os.ReadFile(fmt.Sprintf("%s%c%s", p, os.PathSeparator, sanitizeName(name)))
 	if err != nil {
 		panic(err)
 	}
@@ -106,7 +105,7 @@ func WriteFile(p string, content []byte, name string) {
 		logrus.Error(err)
 	}
 
-	if err := ioutil.WriteFile(fmt.Sprintf("%s%c%s", p, os.PathSeparator, sanitizeName(name)), output, os.ModePerm); err != nil {
+	if err := os.WriteFile(fmt.Sprintf("%s%c%s", p, os.PathSeparator, sanitizeName(name)), output, os.ModePerm); err != nil {
 		panic(err)
 	}
 }

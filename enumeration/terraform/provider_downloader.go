@@ -2,7 +2,6 @@ package terraform
 
 import (
 	"context"
-	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -53,7 +52,7 @@ func (p *ProviderDownloader) Download(url, path string) error {
 	if resp.StatusCode != http.StatusOK {
 		return errors.Errorf("unsuccessful request to %s: %s", url, resp.Status)
 	}
-	f, err := ioutil.TempFile("", "terraform-provider")
+	f, err := os.CreateTemp("", "terraform-provider")
 	if err != nil {
 		return errors.Errorf("failed to open temporary file to download from %s", url)
 	}

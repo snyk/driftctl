@@ -2,7 +2,7 @@ package pkg_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"path"
 	"strings"
 	"testing"
@@ -1417,7 +1417,7 @@ func TestDriftctlRun_TestResourcesNormalization(t *testing.T) {
 
 	readResourceFile := func(ty, path string) ([]*resource.Resource, error) {
 		results := []*resource.Resource{}
-		file, err := ioutil.ReadFile(path)
+		file, err := os.ReadFile(path)
 		if err != nil {
 			return nil, err
 		}

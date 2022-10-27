@@ -3,7 +3,6 @@ package schemas
 import (
 	"embed"
 	gojson "encoding/json"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -23,7 +22,7 @@ func WriteTestSchema(schema map[string]providers.Schema, provider, version strin
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(fileName, content, os.ModePerm)
+	err = os.WriteFile(fileName, content, os.ModePerm)
 	if err != nil {
 		return err
 	}

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -102,7 +101,7 @@ func (c *AccTestCase) initTerraformExecutor() error {
 
 func (c *AccTestCase) createResultFile(t *testing.T) error {
 	tmpDir := t.TempDir()
-	file, err := ioutil.TempFile(tmpDir, "result")
+	file, err := os.CreateTemp(tmpDir, "result")
 	if err != nil {
 		return err
 	}
@@ -135,7 +134,7 @@ func (c *AccTestCase) getResultFilePath() string {
 
 func (c *AccTestCase) getResult(t *testing.T) *test.ScanResult {
 	analysis := &analyser.Analysis{}
-	result, err := ioutil.ReadFile(c.getResultFilePath())
+	result, err := os.ReadFile(c.getResultFilePath())
 	if err != nil {
 		return nil
 	}

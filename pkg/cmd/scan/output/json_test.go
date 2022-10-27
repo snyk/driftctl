@@ -3,7 +3,6 @@ package output
 import (
 	"bytes"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -60,7 +59,7 @@ func TestJSON_Write(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tempDir := t.TempDir()
-			tempFile, err := ioutil.TempFile(tempDir, "result")
+			tempFile, err := os.CreateTemp(tempDir, "result")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -68,17 +67,17 @@ func TestJSON_Write(t *testing.T) {
 			if err := c.Write(tt.args.analysis); (err != nil) != tt.wantErr {
 				t.Errorf("Write() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			result, err := ioutil.ReadFile(tempFile.Name())
+			result, err := os.ReadFile(tempFile.Name())
 			if err != nil {
 				t.Fatal(err)
 			}
 			expectedFilePath := path.Join("./testdata/", tt.goldenfile)
 			if *goldenfile.Update == tt.goldenfile {
-				if err := ioutil.WriteFile(expectedFilePath, result, 0600); err != nil {
+				if err := os.WriteFile(expectedFilePath, result, 0600); err != nil {
 					t.Fatal(err)
 				}
 			}
-			expected, err := ioutil.ReadFile(expectedFilePath)
+			expected, err := os.ReadFile(expectedFilePath)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -145,11 +144,11 @@ func TestJSON_Write_stdout(t *testing.T) {
 
 			expectedFilePath := path.Join("./testdata/", tt.goldenfile)
 			if *goldenfile.Update == tt.goldenfile {
-				if err := ioutil.WriteFile(expectedFilePath, result, 0600); err != nil {
+				if err := os.WriteFile(expectedFilePath, result, 0600); err != nil {
 					t.Fatal(err)
 				}
 			}
-			expected, err := ioutil.ReadFile(expectedFilePath)
+			expected, err := os.ReadFile(expectedFilePath)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -162,7 +161,7 @@ func TestJSON_WriteMultiplesTimesInSameFile(t *testing.T) {
 	emptyAnalysis := &analyser.Analysis{}
 	longerAnalysis := fakeAnalysis(analyser.AnalyzerOptions{})
 	tempDir := t.TempDir()
-	tempFile, err := ioutil.TempFile(tempDir, "result")
+	tempFile, err := os.CreateTemp(tempDir, "result")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -176,18 +175,18 @@ func TestJSON_WriteMultiplesTimesInSameFile(t *testing.T) {
 		t.Errorf("Second write error = %v", err)
 	}
 
-	result, err := ioutil.ReadFile(tempFile.Name())
+	result, err := os.ReadFile(tempFile.Name())
 	if err != nil {
 		t.Fatal(err)
 	}
 	goldenFileName := "output_multiples_times.json"
 	expectedFilePath := path.Join("./testdata/", goldenFileName)
 	if *goldenfile.Update == goldenFileName {
-		if err := ioutil.WriteFile(expectedFilePath, result, 0600); err != nil {
+		if err := os.WriteFile(expectedFilePath, result, 0600); err != nil {
 			t.Fatal(err)
 		}
 	}
-	expected, err := ioutil.ReadFile(expectedFilePath)
+	expected, err := os.ReadFile(expectedFilePath)
 	if err != nil {
 		t.Fatal(err)
 	}
