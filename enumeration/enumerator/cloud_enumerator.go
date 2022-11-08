@@ -100,13 +100,18 @@ func (e *CloudEnumerator) Enumerate(input *enumeration.EnumerateInput) (*enumera
 
 	e.alerter.alerts = alerter.Alerts{}
 
+	enumerators := e.remoteLibrary.Enumerators()
+
 	types := map[string]struct{}{}
 	for _, resourceType := range input.ResourceTypes {
+		if !resource.IsResourceTypeSupported(resourceType) {
+			e.alerter.SendAlert(resourceType, alerter.NewUnsupportedResourcetypeAlert(resourceType))
+		}
 		types[resourceType] = struct{}{}
 	}
 	filter := typeFilter{types: types}
 
-	for _, enumerator := range e.remoteLibrary.Enumerators() {
+	for _, enumerator := range enumerators {
 		if filter.IsTypeIgnored(enumerator.SupportedType()) {
 			logrus.WithFields(logrus.Fields{
 				"type": enumerator.SupportedType(),
