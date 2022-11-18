@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
@@ -45,7 +47,8 @@ func (r *elbv2Repository) ListAllLoadBalancers() ([]*elbv2.LoadBalancer, error) 
 }
 
 func (r *elbv2Repository) ListAllLoadBalancerListeners(loadBalancerArn string) ([]*elbv2.Listener, error) {
-	if v := r.cache.Get("elbv2ListAllLoadBalancerListeners"); v != nil {
+	cacheKey := fmt.Sprintf("elbv2ListAllLoadBalancerListeners_%s", loadBalancerArn)
+	if v := r.cache.Get(cacheKey); v != nil {
 		return v.([]*elbv2.Listener), nil
 	}
 
@@ -60,6 +63,6 @@ func (r *elbv2Repository) ListAllLoadBalancerListeners(loadBalancerArn string) (
 	if err != nil {
 		return nil, err
 	}
-	r.cache.Put("elbv2ListAllLoadBalancerListeners", results)
+	r.cache.Put(cacheKey, results)
 	return results, err
 }
