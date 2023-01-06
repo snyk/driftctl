@@ -200,7 +200,7 @@ jobs:
       steps:
           - checkout
           - snyk/scan:
-                severity-threshold: medium
+                severity-threshold: high
                 monitor-on-build: true
                 project: ${CIRCLE_PROJECT_REPONAME}
                 organization: snyk-iac-group-seceng
@@ -211,7 +211,7 @@ jobs:
           - checkout
           - snyk/scan:
                 command: code test
-                severity-threshold: medium
+                severity-threshold: high
                 monitor-on-build: false
                 project: ${CIRCLE_PROJECT_REPONAME}
                 organization: snyk-iac-group-seceng
