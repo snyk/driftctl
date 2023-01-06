@@ -134,7 +134,7 @@ jobs:
       # This key is bound to user snyk on AUR
       - add_ssh_keys:
             fingerprints:
-                - "ba:05:09:d6:a6:2a:45:34:89:c4:5e:22:23:22:e8:9f"
+                - "75:59:a3:1d:81:9a:0f:44:98:4c:78:33:db:e5:51:6a"
       - run:
           name: Bump package version
           command: |
