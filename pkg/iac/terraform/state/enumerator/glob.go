@@ -15,6 +15,11 @@ func GlobS3(path string) (prefix string, pattern string) {
 	return
 }
 
+func GlobGS(path string) (prefix string, pattern string) {
+	prefix, pattern = splitDirPattern(path)
+	return
+}
+
 func HasMeta(path string) bool {
 	magicChars := `?*[]`
 	return strings.ContainsAny(path, magicChars)
