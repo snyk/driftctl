@@ -41,7 +41,7 @@ func (s *GSEnumerator) Origin() string {
 func (s *GSEnumerator) Enumerate() ([]string, error) {
 	bucketPath := strings.Split(s.config.Path, "/")
 	if len(bucketPath) < 2 {
-		return nil, errors.Errorf("Unable to parse GS path: %s. Must be BUCKET_NAME/PREFIX", s.config.Path)
+		return nil, fmt.Errorf("unable to parse GS path: %s. Must be BUCKET_NAME/PREFIX", s.config.Path)
 	}
 
 	bucketName := bucketPath[0]
