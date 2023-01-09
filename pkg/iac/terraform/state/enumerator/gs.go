@@ -16,7 +16,6 @@ import (
 type GSEnumerator struct {
 	config config.SupplierConfig
 	client storage.Client
-	ctx    context.Context
 }
 
 func NewGSEnumerator(config config.SupplierConfig) *GSEnumerator {
@@ -30,7 +29,6 @@ func NewGSEnumerator(config config.SupplierConfig) *GSEnumerator {
 	return &GSEnumerator{
 		config,
 		*client,
-		ctx,
 	}
 }
 
@@ -56,7 +54,7 @@ func (s *GSEnumerator) Enumerate() ([]string, error) {
 
 	bucket := s.client.Bucket(bucketName)
 
-	it := bucket.Objects(s.ctx, &storage.Query{})
+	it := bucket.Objects(context.Background(), &storage.Query{})
 	for {
 		attrs, err := it.Next()
 		if err == iterator.Done {
@@ -68,7 +66,6 @@ func (s *GSEnumerator) Enumerate() ([]string, error) {
 		if attrs.Size == 0 {
 			continue
 		}
-
 		if attrs.Size > 0 {
 			if match, _ := doublestar.Match(fullPattern, attrs.Name); match {
 				files = append(files, strings.Join([]string{bucketPath[0], attrs.Name}, "/"))
