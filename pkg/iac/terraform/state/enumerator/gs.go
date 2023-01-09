@@ -15,7 +15,7 @@ import (
 
 type GSEnumerator struct {
 	config config.SupplierConfig
-	client storage.Client
+	client *storage.Client
 }
 
 func NewGSEnumerator(config config.SupplierConfig) *GSEnumerator {
@@ -28,7 +28,7 @@ func NewGSEnumerator(config config.SupplierConfig) *GSEnumerator {
 
 	return &GSEnumerator{
 		config,
-		*client,
+		client,
 	}
 }
 
