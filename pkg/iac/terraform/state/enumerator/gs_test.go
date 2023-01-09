@@ -23,7 +23,10 @@ func TestGSEnumerator_NewGSEnumerator(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewGSEnumerator(tt.config)
+			got, err := NewGSEnumerator(tt.config)
+			if err != nil {
+				t.Error(err)
+			}
 			assert.NotNil(t, got)
 			assert.NotNil(t, got.client)
 			assert.NotNil(t, got.config)
@@ -47,7 +50,10 @@ func TestGSEnumerator_NewGSEnumerator_HasCorrectConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewGSEnumerator(tt.config)
+			got, err := NewGSEnumerator(tt.config)
+			if err != nil {
+				t.Error(err)
+			}
 			assert.NotNil(t, got)
 			assert.Equal(t, tt.config.Key, got.config.Key)
 			assert.Equal(t, tt.config.Backend, got.config.Backend)

@@ -18,18 +18,18 @@ type GSEnumerator struct {
 	client storage.Client
 }
 
-func NewGSEnumerator(config config.SupplierConfig) *GSEnumerator {
+func NewGSEnumerator(config config.SupplierConfig) (*GSEnumerator, error) {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 	if err != nil {
-		errors.Errorf("storage.NewClient: %v", err)
+		return nil, errors.Errorf("storage.NewClient: %v", err)
 	}
 	defer client.Close()
 
 	return &GSEnumerator{
 		config,
 		*client,
-	}
+	}, nil
 }
 
 func (s *GSEnumerator) Origin() string {
