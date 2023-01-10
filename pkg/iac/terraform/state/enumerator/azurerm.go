@@ -58,11 +58,9 @@ func (s *AzureRMEnumerator) Origin() string {
 }
 
 func (s *AzureRMEnumerator) Enumerate() ([]string, error) {
-
 	// prefix should contain everything that does not have a glob pattern should be the glob matcher string
 	prefix, pattern := SplitPath(s.objectPath)
-	fullPattern := strings.Join([]string{prefix, pattern}, "/")
-	fullPattern = strings.Trim(fullPattern, "/")
+	fullPattern := JoinAndTrimPath(prefix, pattern)
 
 	pager := s.containerClient.ListBlobsFlat(&azblob.ContainerListBlobFlatSegmentOptions{
 		Prefix: &prefix,

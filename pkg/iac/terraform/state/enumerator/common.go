@@ -10,6 +10,11 @@ func SplitPath(path string) (prefix string, pattern string) {
 	return
 }
 
+// Creates a path that includes both the prefix and the glob pattern (if any is present)
+func JoinAndTrimPath(prefix string, pattern string) string {
+	return path.Join(prefix, pattern)
+}
+
 // Extracts and returns the below segments:
 // - prefix : path part that should not contains glob patterns, that is used in S3 query to filter result
 // - pattern : should contains the glob pattern to be used by doublestar matching library
@@ -29,11 +34,6 @@ func extractPathSegments(p string) (prefix string, pattern string) {
 
 	}
 	return strings.Trim(prefix, sep), strings.Trim(pattern, sep)
-}
-
-// creates a path that includes both the prefix and the glob pattern (if any is present)
-func JoinAndTrimPath(prefix string, pattern string) string {
-	return path.Join(prefix, pattern)
 }
 
 // HasMeta reports whether path contains any of the magic characters
