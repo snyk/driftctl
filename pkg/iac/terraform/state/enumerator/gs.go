@@ -3,6 +3,7 @@ package enumerator
 import (
 	"context"
 	"fmt"
+	"path"
 	"strings"
 
 	"cloud.google.com/go/storage"
@@ -45,9 +46,10 @@ func (s *GSEnumerator) Enumerate() ([]string, error) {
 	bucketName := bucketPath[0]
 	// prefix should contains everything that does not have a glob pattern
 	// Pattern should be the glob matcher string
-	prefix, pattern := SplitPath(strings.Join(bucketPath[1:], "/"))
+	prefix, pattern := extractPrefixAndPattern(strings.Join(bucketPath[1:], "/"))
 
-	fullPattern := JoinAndTrimPath(prefix, pattern)
+	// We combine the prefix and pattern to match file names against.
+	fullPattern := path.Join(prefix, pattern)
 
 	files := make([]string, 0)
 

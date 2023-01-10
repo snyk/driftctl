@@ -1,27 +1,16 @@
 package enumerator
 
 import (
-	"path"
 	"strings"
 )
 
-func SplitPath(path string) (prefix string, pattern string) {
-	prefix, pattern = extractPathSegments(path)
-	return
-}
-
-// Creates a path that includes both the prefix and the glob pattern (if any is present)
-func JoinAndTrimPath(prefix string, pattern string) string {
-	return path.Join(prefix, pattern)
-}
-
-// Extracts and returns the below segments:
+// Returns the below segments:
 // - prefix : path part that should not contains glob patterns, that is used in S3 query to filter result
 // - pattern : should contains the glob pattern to be used by doublestar matching library
-func extractPathSegments(p string) (prefix string, pattern string) {
+func extractPrefixAndPattern(path string) (prefix string, pattern string) {
 	sep := "/"
 
-	splitPath := strings.Split(p, sep)
+	splitPath := strings.Split(path, sep)
 	prefixEnded := false
 	for _, s := range splitPath {
 		if HasMeta(s) || prefixEnded {
