@@ -10,12 +10,7 @@ import (
 	"github.com/bmatcuk/doublestar/v4"
 )
 
-func GlobS3(path string) (prefix string, pattern string) {
-	prefix, pattern = splitDirPattern(path)
-	return
-}
-
-func GlobGS(path string) (prefix string, pattern string) {
+func SplitS3AndGSPath(path string) (prefix string, pattern string) {
 	prefix, pattern = splitDirPattern(path)
 	return
 }

@@ -46,7 +46,7 @@ func (s *S3Enumerator) Enumerate() ([]string, error) {
 	bucket := bucketPath[0]
 	// prefix should contains everything that does not have a glob pattern
 	// Pattern should be the glob matcher string
-	prefix, pattern := GlobS3(strings.Join(bucketPath[1:], "/"))
+	prefix, pattern := SplitS3AndGSPath(strings.Join(bucketPath[1:], "/"))
 
 	fullPattern := strings.Join([]string{prefix, pattern}, "/")
 	fullPattern = strings.Trim(fullPattern, "/")
