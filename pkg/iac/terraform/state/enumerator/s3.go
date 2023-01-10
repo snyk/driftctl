@@ -48,8 +48,7 @@ func (s *S3Enumerator) Enumerate() ([]string, error) {
 	// Pattern should be the glob matcher string
 	prefix, pattern := SplitPath(strings.Join(bucketPath[1:], "/"))
 
-	fullPattern := strings.Join([]string{prefix, pattern}, "/")
-	fullPattern = strings.Trim(fullPattern, "/")
+	fullPattern := JoinAndTrimPath(prefix, pattern)
 
 	files := make([]string, 0)
 	input := &s3.ListObjectsV2Input{
