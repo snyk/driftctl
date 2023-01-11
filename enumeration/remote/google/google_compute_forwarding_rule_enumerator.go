@@ -12,7 +12,7 @@ type GoogleComputeForwardingRuleEnumerator struct {
 	factory    resource.ResourceFactory
 }
 
-func NewGoogleComputeForwardingRuleEnumerator(repo repository.AssetRepository, factory resource.ResourceFactory) *GoogleComputeForwardingRuleEnumerator {
+func NewGoogleComputeForwardingEnumerator(repo repository.AssetRepository, factory resource.ResourceFactory) *GoogleComputeForwardingRuleEnumerator {
 	return &GoogleComputeForwardingRuleEnumerator{
 		repository: repo,
 		factory:    factory,

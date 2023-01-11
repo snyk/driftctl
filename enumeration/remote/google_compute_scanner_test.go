@@ -1487,7 +1487,7 @@ func TestGoogleComputeForwardingRule(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google.NewGoogleComputeForwardingRuleEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeForwardingEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
@@ -1535,11 +1535,11 @@ func TestGoogleComputeSslCertificate(t *testing.T) {
 			},
 			response: []*assetpb.Asset{
 				{
-					AssetType: "compute.googleapis.com/ForwardingRule",
+					AssetType: "compute.googleapis.com/SslCertificate",
 					Name:      "//compute.googleapis.com/projects/playground-bruno/regions/us-east1/sslCertificates/foo",
 				},
 				{
-					AssetType: "compute.googleapis.com/ForwardingRule",
+					AssetType: "compute.googleapis.com/SslCertificate",
 					Name:      "//compute.googleapis.com/projects/playground-bruno/regions/us-east1/sslCertificates/bar",
 				},
 			},
@@ -1593,7 +1593,7 @@ func TestGoogleComputeSslCertificate(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google.NewGoogleComputeForwardingRuleEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeForwardingEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
