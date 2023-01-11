@@ -37,7 +37,7 @@ const (
 	computeForwardingRuleAssetType       = "compute.googleapis.com/ForwardingRule"
 	instanceGroupManagerAssetType        = "compute.googleapis.com/InstanceGroupManager"
 	computeGlobalForwardingRuleAssetType = "compute.googleapis.com/GlobalForwardingRule"
-	computeSslCertificateRuleAssetType = "compute.googleapis.com/SslCertificate"
+	computeSslCertificateAssetType = "compute.googleapis.com/SslCertificate"
 )
 
 type AssetRepository interface {
@@ -96,7 +96,7 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 			computeForwardingRuleAssetType,
 			instanceGroupManagerAssetType,
 			computeGlobalForwardingRuleAssetType,
-			computeSslCertificateRuleAssetType,
+			computeSslCertificateAssetType,
 		},
 	}
 	var results []*assetpb.Asset
@@ -285,5 +285,5 @@ func (s assetRepository) SearchAllGlobalForwardingRules() ([]*assetpb.Asset, err
 }
 
 func (s assetRepository) SearchAllSslCertificateRules() ([]*assetpb.Asset, error) {
-	return s.listAllResources(computeSslCertificateRuleAssetType)
+	return s.listAllResources(computeSslCertificateAssetType)
 }
