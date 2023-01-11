@@ -284,6 +284,6 @@ func (s assetRepository) SearchAllGlobalForwardingRules() ([]*assetpb.Asset, err
 	return s.listAllResources(computeGlobalForwardingRuleAssetType)
 }
 
-func (s assetRepository) SearchAllSslCertificateRules() ([]*assetpb.Asset, error) {
+func (s assetRepository) SearchAllSslCertificates() ([]*assetpb.Asset, error) {
 	return s.listAllResources(computeSslCertificateAssetType)
 }

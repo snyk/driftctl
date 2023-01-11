@@ -20,7 +20,7 @@ func NewGoogleComputeSslCertificateEnumerator(repo repository.AssetRepository, f
 }
 
 func (e *GoogleComputeSslCertificateEnumerator) SupportedType() resource.ResourceType {
-	return google.GoogleComputeSslCertificateRuleResourceType
+	return google.GoogleComputeSslCertificateResourceType
 }
 
 func (e *GoogleComputeSslCertificateEnumerator) Enumerate() ([]*resource.Resource, error) {
