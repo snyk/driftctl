@@ -37,7 +37,7 @@ const (
 	computeForwardingRuleAssetType       = "compute.googleapis.com/ForwardingRule"
 	instanceGroupManagerAssetType        = "compute.googleapis.com/InstanceGroupManager"
 	computeGlobalForwardingRuleAssetType = "compute.googleapis.com/GlobalForwardingRule"
-	computeSslCertificateAssetType = "compute.googleapis.com/SslCertificate"
+	computeSslCertificateAssetType       = "compute.googleapis.com/SslCertificate"
 )
 
 type AssetRepository interface {
