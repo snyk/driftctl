@@ -3,6 +3,7 @@ package enumerator
 import (
 	"context"
 	"fmt"
+	"path"
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
@@ -58,11 +59,12 @@ func (s *AzureRMEnumerator) Origin() string {
 }
 
 func (s *AzureRMEnumerator) Enumerate() ([]string, error) {
+	// prefix should contains everything that does not have a glob pattern
+	// Pattern should be the glob matcher string
+	prefix, pattern := extractPrefixAndPattern(s.objectPath)
 
-	// prefix should contain everything that does not have a glob pattern should be the glob matcher string
-	prefix, pattern := GlobS3(s.objectPath)
-	fullPattern := strings.Join([]string{prefix, pattern}, "/")
-	fullPattern = strings.Trim(fullPattern, "/")
+	// We combine the prefix and pattern to match file names against.
+	fullPattern := path.Join(prefix, pattern)
 
 	pager := s.containerClient.ListBlobsFlat(&azblob.ContainerListBlobFlatSegmentOptions{
 		Prefix: &prefix,
