@@ -1,7 +1,7 @@
 [
  {
   "Id": "projects/playground-bruno/locations/global/keyRings/keyring-example/cryptoKeys/crypto-key-example",
-  "Type": "google_compute_forwarding_rule",
+  "Type": "google_kms_crypto_key",
   "Attrs": {
     "destroy_scheduled_duration": "86400s",
     "id": "projects/playground-bruno/locations/global/keyRings/keyring-example/cryptoKeys/crypto-key-example",
