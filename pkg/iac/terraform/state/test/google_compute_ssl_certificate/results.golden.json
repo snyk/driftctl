@@ -1,6 +1,6 @@
 [
  {
-  "Id": "projects/driftctl/regions/global/sslCertificates/my-certificate-6cb457f7",
+  "Id": "projects/driftctl/global/sslCertificates/my-certificate-6cb457f7",
   "Type": "google_compute_ssl_certificate",
   "Attrs": {
     "certificate": "-----BEGIN CERTIFICATE-----\nMIIDjjCCAnYCCQCtS+GNvuG/2zANBgkqhkiG9w0BAQsFADCBiDELMAkGA1UEBhMC\nTkwxFjAUBgNVBAgMDU5vcnRoLUhvbGxhbmQxEjAQBgNVBAcMCUFtc3RlcmRhbTER\nMA8GA1UECgwIRHJpZnRDVEwxFDASBgNVBAMMC2V4YW1wbGUuY29tMSQwIgYJKoZI\nhvcNAQkBFhVkcmlmdGN0bEBkcmlmdGN0bC5jb20wHhcNMjMwMTExMTU1MDAyWhcN\nMjQwMTExMTU1MDAyWjCBiDELMAkGA1UEBhMCTkwxFjAUBgNVBAgMDU5vcnRoLUhv\nbGxhbmQxEjAQBgNVBAcMCUFtc3RlcmRhbTERMA8GA1UECgwIRHJpZnRDVEwxFDAS\nBgNVBAMMC2V4YW1wbGUuY29tMSQwIgYJKoZIhvcNAQkBFhVkcmlmdGN0bEBkcmlm\ndGN0bC5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDGJiRMDAzL\nbsUnOKc8+spzWSfm2N1Lox/uTL8NkqzNNKCr5FVlJVKZcOLusmAzPs0UWJqG5Dmb\nsddOofKyfanZ12v/ADnwUH++uJ5e/0cgmK30jnvINqMrLzs2awt5XwD2PW2ZbAih\n292slOuXJt/KV+VZtP3UoUfp2Gl9qJbFpI/p2qem8udNyp6Q6XSKL4yWO4jPubN/\noJLGRqtaXwPW2wgAWtWfGbTA5o4xbMKu86r1DPB9e2QgduBPLnYJTjZtEC6HkEOk\n/c1Ht9IE40xCu+TAC5FNyOQv6hrSDyJUfUUnPix5Sgyet0Me+u1kMQ3F1qbw/bWA\n4mHgIk/waZdbAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAENAaZXP5ECfGEw/rnRM\n5zfEudp+Y6H/ldGiaOr2E3t8qKOvDCbvV20dz1qvAbns3ol/dVByYRgQwc6GxWdz\nwhCDNUAj/22erTriAQbHfgPAa7Oi9LwBCmUmXqqA/KYOeWNXz9VrsUzCKlSIL7kX\noGuS1CmwNOSvE6AWpixS4epGUy4D721tIV90URhQGKvJmM3/KJe6ktiYxJ08mPLJ\n+8MkXUtZBAUhJUFYL+ZXBbh7lhg6yMDqkkDmraYumotMYwseuUz25PX9oglPyGB7\nmDwRDxz1VYpQ+TUtEwibv0FR6NXLOwZLorZVuZAxlzPJQNCHLAPQALd18CEVX6lq\nrmo=\n-----END CERTIFICATE-----\n",
