@@ -45,20 +45,20 @@ func TestGoogleKmsCryptoKey(t *testing.T) {
 			test: "multiple kms crypto keys",
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
 				assert.Len(t, got, 2)
-				assert.Equal(t, "projects/playground-bruno/locations/global/keyRings/keyring-example/cryptoKeys/foo", got[0].ResourceId())
+				assert.Equal(t, "projects/driftctl/locations/global/keyRings/keyring-example/cryptoKeys/foo", got[0].ResourceId())
 				assert.Equal(t, "google_kms_crypto_key", got[0].ResourceType())
 
-				assert.Equal(t, "projects/playground-bruno/locations/global/keyRings/keyring-example/cryptoKeys/bar", got[1].ResourceId())
+				assert.Equal(t, "projects/driftctl/locations/global/keyRings/keyring-example/cryptoKeys/bar", got[1].ResourceId())
 				assert.Equal(t, "google_kms_crypto_key", got[1].ResourceType())
 			},
 			response: []*assetpb.Asset{
 				{
 					AssetType: "cloudkms.googleapis.com/CryptoKey",
-					Name:      "//compute.googleapis.com/projects/playground-bruno/locations/global/keyRings/keyring-example/cryptoKeys/foo",
+					Name:      "//compute.googleapis.com/projects/driftctl/locations/global/keyRings/keyring-example/cryptoKeys/foo",
 				},
 				{
 					AssetType: "cloudkms.googleapis.com/CryptoKey",
-					Name:      "//compute.googleapis.com/projects/playground-bruno/locations/global/keyRings/keyring-example/cryptoKeys/bar",
+					Name:      "//compute.googleapis.com/projects/driftctl/locations/global/keyRings/keyring-example/cryptoKeys/bar",
 				},
 			},
 		},
