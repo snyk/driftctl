@@ -37,6 +37,7 @@ const (
 	computeForwardingRuleAssetType       = "compute.googleapis.com/ForwardingRule"
 	instanceGroupManagerAssetType        = "compute.googleapis.com/InstanceGroupManager"
 	computeGlobalForwardingRuleAssetType = "compute.googleapis.com/GlobalForwardingRule"
+	computeKmsCryptoKeyAssetType         = "cloudkms.googleapis.com/CryptoKey"
 )
 
 type AssetRepository interface {
@@ -64,6 +65,7 @@ type AssetRepository interface {
 	SearchAllForwardingRules() ([]*assetpb.Asset, error)
 	SearchAllInstanceGroupManagers() ([]*assetpb.Asset, error)
 	SearchAllGlobalForwardingRules() ([]*assetpb.Asset, error)
+	SearchAllKmsCryptoKeys() ([]*assetpb.Asset, error)
 }
 
 type assetRepository struct {
@@ -92,6 +94,7 @@ func (s assetRepository) listAllResources(ty string) ([]*assetpb.Asset, error) {
 			computeGlobalAddressAssetType,
 			nodeGroupAssetType,
 			computeForwardingRuleAssetType,
+			computeKmsCryptoKeyAssetType,
 			instanceGroupManagerAssetType,
 			computeGlobalForwardingRuleAssetType,
 		},
@@ -279,4 +282,8 @@ func (s assetRepository) SearchAllInstanceGroupManagers() ([]*assetpb.Asset, err
 
 func (s assetRepository) SearchAllGlobalForwardingRules() ([]*assetpb.Asset, error) {
 	return s.listAllResources(computeGlobalForwardingRuleAssetType)
+}
+
+func (s assetRepository) SearchAllKmsCryptoKeys() ([]*assetpb.Asset, error) {
+	return s.listAllResources(computeKmsCryptoKeyAssetType)
 }

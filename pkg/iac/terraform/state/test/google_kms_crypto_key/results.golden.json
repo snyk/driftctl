@@ -1,0 +1,24 @@
+[
+ {
+  "Id": "projects/playground-bruno/locations/global/keyRings/keyring-example/cryptoKeys/crypto-key-example",
+  "Type": "google_compute_forwarding_rule",
+  "Attrs": {
+    "destroy_scheduled_duration": "86400s",
+    "id": "projects/playground-bruno/locations/global/keyRings/keyring-example/cryptoKeys/crypto-key-example",
+    "import_only": false,
+    "key_ring": "projects/playground-bruno/locations/global/keyRings/keyring-example",
+    "labels": null,
+    "name": "crypto-key-example",
+    "purpose": "ENCRYPT_DECRYPT",
+    "rotation_period": "100000s",
+    "skip_initial_version_creation": false,
+    "timeouts": null,
+    "version_template": [
+      {
+        "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+        "protection_level": "SOFTWARE"
+      }
+    ]
+  }
+ }
+]
