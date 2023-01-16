@@ -101,7 +101,7 @@ func Init(version string, alerter alerter.AlerterInterface, providerLibrary *ter
 	remoteLibrary.AddEnumerator(NewGoogleComputeHealthCheckEnumerator(assetRepository, factory))
 	remoteLibrary.AddEnumerator(NewGoogleCloudRunServiceEnumerator(assetRepository, factory))
 	remoteLibrary.AddEnumerator(NewGoogleComputeNodeGroupEnumerator(assetRepository, factory))
-	remoteLibrary.AddEnumerator(NewGoogleComputeForwardingEnumerator(assetRepository, factory))
+	remoteLibrary.AddEnumerator(NewGoogleComputeForwardingRuleEnumerator(assetRepository, factory))
 	remoteLibrary.AddEnumerator(NewGoogleComputeInstanceGroupManagerEnumerator(assetRepository, factory))
 	remoteLibrary.AddEnumerator(NewGoogleComputeGlobalForwardingRuleEnumerator(assetRepository, factory))
 	remoteLibrary.AddEnumerator(NewGoogleComputeSslCertificateEnumerator(assetRepository, factory))

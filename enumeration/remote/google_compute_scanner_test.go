@@ -1487,7 +1487,7 @@ func TestGoogleComputeForwardingRule(t *testing.T) {
 
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
-			remoteLibrary.AddEnumerator(google.NewGoogleComputeForwardingEnumerator(repo, factory))
+			remoteLibrary.AddEnumerator(google.NewGoogleComputeForwardingRuleEnumerator(repo, factory))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
