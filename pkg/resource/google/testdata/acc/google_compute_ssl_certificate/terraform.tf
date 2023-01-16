@@ -25,7 +25,7 @@ resource "google_compute_ssl_certificate" "default" {
 }
 
 provider "google" {
-  project = "playground-bruno"
+  project = "driftctl"
 }
 
 resource "random_id" "certificate" {
