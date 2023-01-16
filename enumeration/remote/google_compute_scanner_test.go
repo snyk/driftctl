@@ -1527,7 +1527,7 @@ func TestGoogleComputeSslCertificate(t *testing.T) {
 			test: "multiple compute ssl certificates",
 			assertExpected: func(t *testing.T, got []*resource.Resource) {
 				assert.Len(t, got, 2)
-				assert.Equal(t, "projects/playground-bruno/regions/us-east1/sslCertificates/foo", got[0].ResourceId())
+				assert.Equal(t, "projects/driftctl/regions/us-east1/sslCertificates/foo", got[0].ResourceId())
 				assert.Equal(t, "google_compute_ssl_certificate", got[0].ResourceType())
 
 				assert.Equal(t, "projects/driftctl/regions/us-east1/sslCertificates/bar", got[1].ResourceId())
@@ -1536,11 +1536,11 @@ func TestGoogleComputeSslCertificate(t *testing.T) {
 			response: []*assetpb.Asset{
 				{
 					AssetType: "compute.googleapis.com/SslCertificate",
-					Name:      "//compute.googleapis.com/projects/playground-bruno/regions/us-east1/sslCertificates/foo",
+					Name:      "//compute.googleapis.com/projects/driftctl/regions/us-east1/sslCertificates/foo",
 				},
 				{
 					AssetType: "compute.googleapis.com/SslCertificate",
-					Name:      "//compute.googleapis.com/projects/playground-bruno/regions/us-east1/sslCertificates/bar",
+					Name:      "//compute.googleapis.com/projects/driftctl/regions/us-east1/sslCertificates/bar",
 				},
 			},
 		},
