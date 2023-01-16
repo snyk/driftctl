@@ -1586,7 +1586,7 @@ func TestGoogleComputeSslCertificate(t *testing.T) {
 				tt.Fatal(err)
 			}
 
-			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "4.48.0")
+			realProvider, err := terraform2.InitTestGoogleProvider(providerLibrary, "3.78.0")
 			if err != nil {
 				tt.Fatal(err)
 			}
