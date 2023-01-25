@@ -51,8 +51,6 @@ Spot discrepancies as they happen: driftctl is a free and open-source CLI that w
 
 ## Links
 
-**[Get Started](https://driftctl.com/product/quick-tutorial/)**
-
 **[Documentation](https://docs.driftctl.com)**
 
 **[Installation](https://docs.driftctl.com/installation)**
@@ -66,12 +64,6 @@ To learn more about compiling driftctl and contributing, please refer to the [co
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification and is brought to you by these [awesome contributors](CONTRIBUTORS.md).
 
 Build with ❤️️ from 🇫🇷 🇬🇧 🇯🇵 🇬🇷 🇸🇪 🇺🇸 🇷🇪 🇨🇦 🇮🇱 🇩🇪
-
-## Helping you get started
-
-We have 30 min slots for 1:1 [tech discussions and overviews](https://calendly.com/stephanejourdan/30min) twice a day to help you get started and collect users feedback.
-
-Feel free to book a slot.
 
 ## Security notice
 
