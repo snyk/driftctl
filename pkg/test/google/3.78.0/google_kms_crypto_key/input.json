@@ -3,9 +3,7 @@
     "Id": "projects/driftctl/locations/global/keyRings/keyring-example/cryptoKeys/crypto-key-example",
     "Type": "google_kms_crypto_key",
     "Attrs": {
-      "destroy_scheduled_duration": "86400s",
       "id": "projects/driftctl/locations/global/keyRings/keyring-example/cryptoKeys/crypto-key-example",
-      "import_only": false,
       "key_ring": "projects/driftctl/locations/global/keyRings/keyring-example",
       "name": "crypto-key-example",
       "purpose": "ENCRYPT_DECRYPT",
