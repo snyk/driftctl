@@ -1,0 +1,21 @@
+[
+  {
+    "Id": "projects/driftctl/locations/global/keyRings/keyring-example/cryptoKeys/crypto-key-example",
+    "Type": "google_kms_crypto_key",
+    "Attrs": {
+      "id": "projects/driftctl/locations/global/keyRings/keyring-example/cryptoKeys/crypto-key-example",
+      "key_ring": "projects/driftctl/locations/global/keyRings/keyring-example",
+      "name": "crypto-key-example",
+      "purpose": "ENCRYPT_DECRYPT",
+      "rotation_period": "100000s",
+      "self_link": "https://www.googleapis.com/compute/v1/projects/driftctl/locations/global/keyRings/keyring-example/cryptoKeys/crypto-key-example",
+      "skip_initial_version_creation": false,
+      "version_template": [
+        {
+          "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+          "protection_level": "SOFTWARE"
+        }
+      ]
+    }
+  }
+]
