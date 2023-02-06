@@ -104,6 +104,7 @@ func Init(version string, alerter alerter.AlerterInterface, providerLibrary *ter
 	remoteLibrary.AddEnumerator(NewGoogleComputeForwardingRuleEnumerator(assetRepository, factory))
 	remoteLibrary.AddEnumerator(NewGoogleComputeInstanceGroupManagerEnumerator(assetRepository, factory))
 	remoteLibrary.AddEnumerator(NewGoogleComputeGlobalForwardingRuleEnumerator(assetRepository, factory))
+	remoteLibrary.AddEnumerator(NewGoogleComputeSslCertificateEnumerator(assetRepository, factory))
 
 	return nil
 }
