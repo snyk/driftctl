@@ -43,6 +43,7 @@ Thank you to all the people who have already contributed to driftctl.
       <td align="center" valign="top" width="12.5%"><a href="https://doridian.net/"><img src="https://avatars.githubusercontent.com/u/631409?v=4?s=80" width="80px;" alt="Mark Dietzer"/><br /><sub><b>Mark Dietzer</b></sub></a><br /><a href="https://github.com/snyk/driftctl/issues?q=author%3ADoridian" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="12.5%"><a href="https://github.com/martin-vanta"><img src="https://avatars.githubusercontent.com/u/118209773?v=4?s=80" width="80px;" alt="Martin"/><br /><sub><b>Martin</b></sub></a><br /><a href="https://github.com/snyk/driftctl/issues?q=author%3Amartin-vanta" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="12.5%"><a href="https://bschaatsbergen.com"><img src="https://avatars.githubusercontent.com/u/58337159?v=4?s=80" width="80px;" alt="Bruno Schaatsbergen"/><br /><sub><b>Bruno Schaatsbergen</b></sub></a><br /><a href="https://github.com/snyk/driftctl/commits?author=bschaatsbergen" title="Code">💻</a> <a href="https://github.com/snyk/driftctl/commits?author=bschaatsbergen" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="12.5%"><a href="https://github.com/n2N8Z"><img src="https://avatars.githubusercontent.com/u/20487808?v=4?s=80" width="80px;" alt="n2N8Z"/><br /><sub><b>n2N8Z</b></sub></a><br /><a href="https://github.com/snyk/driftctl/issues?q=author%3An2N8Z" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
