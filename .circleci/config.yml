@@ -203,7 +203,7 @@ jobs:
                 severity-threshold: high
                 monitor-on-build: true
                 project: ${CIRCLE_PROJECT_REPONAME}
-                organization: snyk-iac-group-seceng
+                organization: cloud-cloud
   security-code:
       docker:
           - image: cimg/go:1.18.3
@@ -214,7 +214,7 @@ jobs:
                 severity-threshold: high
                 monitor-on-build: false
                 project: ${CIRCLE_PROJECT_REPONAME}
-                organization: snyk-iac-group-seceng
+                organization: cloud-cloud
 workflows:
   nightly:
     jobs:
