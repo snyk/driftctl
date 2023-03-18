@@ -86,7 +86,7 @@ func (r *apigatewayRepository) ListAllRestApis() ([]*apigateway.RestApi, error) 
 		},
 	)
 
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "TooManyRequestsException") {
 		err = retryOnFailure(func() error {
 			logrus.Debug("Making a call to get rest APIs not found in cache")
 			err = r.client.GetRestApisPages(&input,
@@ -100,7 +100,6 @@ func (r *apigatewayRepository) ListAllRestApis() ([]*apigateway.RestApi, error) 
 	}
 
 	if err != nil {
-		logrus.Error("error in list all apis")
 		return nil, err
 	}
 
@@ -115,7 +114,7 @@ func (r *apigatewayRepository) GetAccount() (*apigateway.Account, error) {
 
 	account, err := r.client.GetAccount(&apigateway.GetAccountInput{})
 
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "TooManyRequestsException") {
 		err = retryOnFailure(func() error {
 			logrus.Debug("Making a call to get rest APIs not found in cache")
 			input := apigateway.GetAccountInput{}
@@ -147,7 +146,7 @@ func (r *apigatewayRepository) ListAllApiKeys() ([]*apigateway.ApiKey, error) {
 		},
 	)
 
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "TooManyRequestsException") {
 		err = retryOnFailure(func() error {
 			logrus.Debug("Making a call to get rest APIs not found in cache")
 			err = r.client.GetApiKeysPages(&input,
@@ -181,7 +180,7 @@ func (r *apigatewayRepository) ListAllRestApiAuthorizers(apiId string) ([]*apiga
 	}
 	resources, err := r.client.GetAuthorizers(input)
 
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "TooManyRequestsException") {
 		err = retryOnFailure(func() error {
 			logrus.Debug("Making a call to API for specific authorizers not found in cache: ", apiId)
 			resources, err = r.client.GetAuthorizers(input)
@@ -190,7 +189,6 @@ func (r *apigatewayRepository) ListAllRestApiAuthorizers(apiId string) ([]*apiga
 	}
 
 	if err != nil {
-		logrus.Error("error in api authorizer")
 		return nil, err
 	}
 
@@ -213,7 +211,7 @@ func (r *apigatewayRepository) ListAllRestApiStages(apiId string) ([]*apigateway
 	}
 	resources, err := r.client.GetStages(input)
 
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "TooManyRequestsException") {
 		err = retryOnFailure(func() error {
 			logrus.Debug("Making a call to API for specific stage not found in cache: ", apiId)
 			resources, err = r.client.GetStages(input)
@@ -250,7 +248,7 @@ func (r *apigatewayRepository) ListAllRestApiResources(apiId string) ([]*apigate
 		return !lastPage
 	})
 
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "TooManyRequestsException") {
 		err = retryOnFailure(func() error {
 			logrus.Debug("Making a call to get rest APIs not found in cache")
 			err = r.client.GetResourcesPages(input, func(res *apigateway.GetResourcesOutput, lastPage bool) bool {
@@ -262,7 +260,6 @@ func (r *apigatewayRepository) ListAllRestApiResources(apiId string) ([]*apigate
 	}
 
 	if err != nil {
-		logrus.Error("error in api resource")
 		return nil, err
 	}
 
@@ -287,7 +284,7 @@ func (r *apigatewayRepository) ListAllDomainNames() ([]*apigateway.DomainName, e
 		},
 	)
 
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "TooManyRequestsException") {
 		err = retryOnFailure(func() error {
 			logrus.Debug("Making a call to get rest APIs not found in cache")
 			err = r.client.GetDomainNamesPages(&input,
@@ -322,7 +319,7 @@ func (r *apigatewayRepository) ListAllVpcLinks() ([]*apigateway.UpdateVpcLinkOut
 		},
 	)
 
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "TooManyRequestsException") {
 		err = retryOnFailure(func() error {
 			logrus.Debug("Making a call to get rest APIs not found in cache")
 			err = r.client.GetVpcLinksPages(&input,
@@ -354,7 +351,7 @@ func (r *apigatewayRepository) ListAllRestApiRequestValidators(apiId string) ([]
 	}
 	resources, err := r.client.GetRequestValidators(input)
 
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "TooManyRequestsException") {
 		err = retryOnFailure(func() error {
 			logrus.Debug("Making a call to get rest APIs not found in cache")
 			resources, err = r.client.GetRequestValidators(input)
@@ -385,7 +382,7 @@ func (r *apigatewayRepository) ListAllDomainNameBasePathMappings(domainName stri
 		return !lastPage
 	})
 
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "TooManyRequestsException") {
 		err = retryOnFailure(func() error {
 			logrus.Debug("Making a call to get rest APIs not found in cache")
 			err = r.client.GetBasePathMappingsPages(input, func(res *apigateway.GetBasePathMappingsOutput, lastPage bool) bool {
@@ -419,7 +416,7 @@ func (r *apigatewayRepository) ListAllRestApiModels(apiId string) ([]*apigateway
 		return !lastPage
 	})
 
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "TooManyRequestsException") {
 		err = retryOnFailure(func() error {
 			logrus.Debug("Making a call to get rest APIs not found in cache")
 			err = r.client.GetModelsPages(input, func(res *apigateway.GetModelsOutput, lastPage bool) bool {
@@ -448,7 +445,7 @@ func (r *apigatewayRepository) ListAllRestApiGatewayResponses(apiId string) ([]*
 	}
 	resources, err := r.client.GetGatewayResponses(input)
 
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "TooManyRequestsException") {
 		err = retryOnFailure(func() error {
 			logrus.Debug("Making a call to get rest APIs not found in cache")
 			resources, err = r.client.GetGatewayResponses(input)
