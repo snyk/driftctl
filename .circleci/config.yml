@@ -201,7 +201,7 @@ jobs:
           - checkout
           - snyk/scan:
                 severity-threshold: high
-                monitor-on-build: true
+                monitor-on-build: false
                 project: ${CIRCLE_PROJECT_REPONAME}
                 organization: cloud-cloud
   security-code:
