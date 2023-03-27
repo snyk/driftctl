@@ -39,6 +39,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.9.1
 	github.com/r3labs/diff/v2 v2.6.0
+	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.15
 	github.com/shurcooL/githubv4 v0.0.0-20201206200315-234843c633fa
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.0.0

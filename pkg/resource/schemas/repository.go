@@ -13,6 +13,7 @@ import (
 	"github.com/snyk/driftctl/pkg/resource/azurerm"
 	"github.com/snyk/driftctl/pkg/resource/github"
 	"github.com/snyk/driftctl/pkg/resource/google"
+	"github.com/snyk/driftctl/pkg/resource/scaleway"
 )
 
 type SchemaRepository struct {
@@ -58,6 +59,8 @@ func (r *SchemaRepository) Init(providerName, providerVersion string, schema map
 			providerVersion = "3.78.0"
 		case "azurerm":
 			providerVersion = "2.71.0"
+		case "scaleway":
+			providerVersion = "2.14.1"
 		default:
 			return errors.Errorf("unsupported remote '%s'", providerName)
 		}
@@ -92,6 +95,8 @@ func (r *SchemaRepository) Init(providerName, providerVersion string, schema map
 		google.InitResourcesMetadata(r)
 	case "azurerm":
 		azurerm.InitResourcesMetadata(r)
+	case "scaleway":
+		scaleway.InitResourcesMetadata(r)
 	default:
 		return errors.Errorf("unsupported remote '%s'", providerName)
 	}

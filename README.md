@@ -21,7 +21,7 @@
 
 <p align="center">
   Measures infrastructure as code coverage, and tracks infrastructure drift.<br>
-  <strong>IaC:</strong> Terraform. <strong>Cloud providers:</strong> AWS, GitHub, Azure, GCP.<br>
+  <strong>IaC:</strong> Terraform. <strong>Cloud providers:</strong> AWS, GitHub, Azure, GCP, Scaleway (alpha).<br>
   :warning: <strong>This tool is still in beta state and will evolve in the future with potential breaking changes</strong> :warning:
 </p>
 
