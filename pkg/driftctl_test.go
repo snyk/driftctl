@@ -1432,10 +1432,10 @@ func TestDriftctlRun_TestResourcesNormalization(t *testing.T) {
 	}
 
 	defaultProviderVersions := map[string]string{
-		"aws":     "3.19.0",
-		"github":  "4.4.0",
-		"google":  "3.78.0",
-		"azurerm": "2.71.0",
+		"aws":      "3.19.0",
+		"github":   "4.4.0",
+		"google":   "3.78.0",
+		"azurerm":  "2.71.0",
 		"scaleway": "2.14.1",
 	}
 
