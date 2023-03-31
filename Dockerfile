@@ -9,7 +9,7 @@ RUN go mod download
 COPY . .
 RUN SINGLE_TARGET=true make release
 
-FROM alpine:3.16
+FROM alpine:3.17
 
 ARG OS="linux"
 ARG ARCH="amd64"

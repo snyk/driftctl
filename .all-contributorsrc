@@ -305,6 +305,15 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "n2N8Z",
+      "name": "n2N8Z",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20487808?v=4",
+      "profile": "https://github.com/n2N8Z",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "commitConvention": "angular"
