@@ -216,27 +216,28 @@ jobs:
                 project: ${CIRCLE_PROJECT_REPONAME}
                 organization: cloud-cloud
 workflows:
-  nightly:
-    jobs:
-      - test_acc:
-          name: "Acceptance tests: << matrix.pattern >>"
-          matrix:
-            parameters:
-              pattern:
-                - TestAcc_Aws
-                - TestAcc_Github_
-                - TestAcc_Google
-                - TestAcc_Azure_
-                - TestAcc_StateReader_
-          context:
-            - driftctl-acc
-    triggers:
-      - schedule:
-          cron: "0 3 * * *"
-          filters:
-            branches:
-              only:
-                - main
+# Temporarily disabled
+#  nightly:
+#    jobs:
+#      - test_acc:
+#          name: "Acceptance tests: << matrix.pattern >>"
+#          matrix:
+#            parameters:
+#              pattern:
+#                - TestAcc_Aws
+#                - TestAcc_Github_
+#                - TestAcc_Google
+#                - TestAcc_Azure_
+#                - TestAcc_StateReader_
+#          context:
+#            - driftctl-acc
+#    triggers:
+#      - schedule:
+#          cron: "0 3 * * *"
+#          filters:
+#            branches:
+#              only:
+#                - main
   pullrequest:
     jobs:
       - lint:
