@@ -30,13 +30,15 @@ func NewFakeStorageServer(routes map[string]http.HandlerFunc) (*storage.Client, 
 
 func newStorageClient(fakeServer *FakeStorageServer) (*storage.Client, *httptest.Server, error) {
 	ts := httptest.NewServer(fakeServer)
-	listenUrl, _ := url.Parse(ts.URL)
+	listenUrl, err := url.Parse(ts.URL)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	_ = os.Setenv("STORAGE_EMULATOR_HOST", listenUrl.Host)
 	defer os.Setenv("STORAGE_EMULATOR_HOST", "")
 
-	// Create a client.
-	ctx := context.Background()
-	client, err := storage.NewClient(ctx)
+	client, err := storage.NewClient(context.Background())
 	if err != nil {
 		return nil, nil, err
 	}

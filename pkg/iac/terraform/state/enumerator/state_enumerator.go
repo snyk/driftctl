@@ -18,6 +18,8 @@ func GetEnumerator(config config.SupplierConfig, opts *backend.Options) (StateEn
 		return NewFileEnumerator(config), nil
 	case backend.BackendKeyS3:
 		return NewS3Enumerator(config), nil
+	case backend.BackendKeyGS:
+		return NewGSEnumerator(config)
 	case backend.BackendKeyAzureRM:
 		return NewAzureRMEnumerator(config, opts.AzureRMBackendOptions)
 	}

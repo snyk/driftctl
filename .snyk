@@ -69,10 +69,6 @@ ignore:
     - '*':
         reason: This license is addressed by including acknowledgments in each release
         created: 2021-12-09T16:40:21.832Z
-  'snyk:lic:golang:github.com:hashicorp:yamux:MPL-2.0':
-    - '*':
-        reason: This license is addressed by including acknowledgments in each release
-        created: 2021-12-09T16:40:21.832Z
   'snyk:lic:golang:github.com:r3labs:diff:v2:MPL-2.0':
     - '*':
         reason: This license is addressed by including acknowledgments in each release
@@ -81,13 +77,6 @@ ignore:
     - '*':
         reason: This license is addressed by including acknowledgments in each release
         created: 2021-12-09T16:40:21.832Z
-  SNYK-GOLANG-GOLANGORGXCRYPTOSSH-2331920:
-    - github.com/hashicorp/terraform/terraform@0.14.0 > *:
-        reason: We do not use this part of terraform code
-        created: 2022-01-11T09:46:06.556Z
-    - github.com/hashicorp/terraform/plugin@0.14.0 > *:
-        reason: We do not use this part of terraform plugin
-        created: 2022-01-11T09:46:06.556Z
   'snyk:lic:golang:github.com:hashicorp:terraform-exec:MPL-2.0':
     - '*':
         reason: This license is addressed by including acknowledgments in each release

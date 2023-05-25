@@ -286,6 +286,35 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "martin-vanta",
+      "name": "Martin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/118209773?v=4",
+      "profile": "https://github.com/martin-vanta",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "bschaatsbergen",
+      "name": "Bruno Schaatsbergen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/58337159?v=4",
+      "profile": "https://bschaatsbergen.com",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "n2N8Z",
+      "name": "n2N8Z",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20487808?v=4",
+      "profile": "https://github.com/n2N8Z",
+      "contributions": [
+        "bug"
+      ]
     }
-  ]
+  ],
+  "commitConvention": "angular"
 }

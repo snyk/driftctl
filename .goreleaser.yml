@@ -12,7 +12,7 @@ before:
 signs:
     - signature: "${artifact}.gpg"
       artifacts: checksum
-      args: [ "--batch", "-u", "security@cloudskiff.com", "--output", "${signature}", "--detach-sign", "${artifact}" ]
+      args: [ "--batch", "-u", "team-cloud-config+security@snyk.io", "--output", "${signature}", "--detach-sign", "${artifact}" ]
 builds:
     - id: "driftctl"
       binary: driftctl
