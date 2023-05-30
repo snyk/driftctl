@@ -15,7 +15,6 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/snyk/driftctl/build"
 	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/remote"
 	"github.com/snyk/driftctl/enumeration/remote/aws"
@@ -25,10 +24,8 @@ import (
 	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/snyk/driftctl/pkg/iac/config"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state"
-	"github.com/snyk/driftctl/pkg/memstore"
 	dctlresource "github.com/snyk/driftctl/pkg/resource"
 	"github.com/snyk/driftctl/pkg/resource/schemas"
-	"github.com/snyk/driftctl/pkg/telemetry"
 	"github.com/snyk/driftctl/pkg/terraform/hcl"
 	"github.com/spf13/cobra"
 
@@ -111,7 +108,6 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 			}
 
 			opts.Quiet, _ = cmd.Flags().GetBool("quiet")
-			opts.DisableTelemetry, _ = cmd.Flags().GetBool("disable-telemetry")
 
 			opts.ConfigDir, _ = cmd.Flags().GetString("config-dir")
 
@@ -253,8 +249,6 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 }
 
 func scanRun(opts *pkg.ScanOptions) error {
-	store := memstore.New()
-
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
@@ -337,7 +331,6 @@ func scanRun(opts *pkg.ScanOptions) error {
 		scanProgress,
 		iacProgress,
 		resourceSchemaRepository,
-		store,
 	)
 
 	go func() {
@@ -353,7 +346,6 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	analysis.ProviderVersion = opts.ProviderVersion
 	analysis.ProviderName = opts.To
-	store.Bucket(memstore.TelemetryBucket).Set("provider_name", analysis.ProviderName)
 
 	validOutput := false
 	for _, o := range opts.Output {
@@ -374,11 +366,6 @@ func scanRun(opts *pkg.ScanOptions) error {
 
 	globaloutput.Printf(color.WhiteString("Scan duration: %s\n", analysis.Duration.Round(time.Second)))
 	globaloutput.Printf(color.WhiteString("Provider version used to scan: %s. Use --tf-provider-version to use another version.\n"), opts.ProviderVersion)
-
-	if !opts.DisableTelemetry {
-		tl := telemetry.NewTelemetry(&build.Build{})
-		tl.SendTelemetry(store.Bucket(memstore.TelemetryBucket))
-	}
 
 	if !analysis.IsSync() {
 		return cmderrors.InfrastructureNotInSync{}

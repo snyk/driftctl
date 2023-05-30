@@ -13,7 +13,6 @@ import (
 	"github.com/snyk/driftctl/pkg/filter"
 	"github.com/snyk/driftctl/pkg/iac/config"
 	"github.com/snyk/driftctl/pkg/iac/terraform/state/backend"
-	"github.com/snyk/driftctl/pkg/memstore"
 	"github.com/snyk/driftctl/pkg/middlewares"
 	globaloutput "github.com/snyk/driftctl/pkg/output"
 	dctlresource "github.com/snyk/driftctl/pkg/resource"
@@ -24,23 +23,22 @@ type FmtOptions struct {
 }
 
 type ScanOptions struct {
-	Coverage         bool
-	Detect           bool
-	From             []config.SupplierConfig
-	To               string
-	Output           []output.OutputConfig
-	Filter           *jmespath.JMESPath
-	Quiet            bool
-	BackendOptions   *backend.Options
-	StrictMode       bool
-	DisableTelemetry bool
-	ProviderVersion  string
-	ConfigDir        string
-	DriftignorePath  string
-	Driftignores     []string
-	Deep             bool
-	OnlyManaged      bool
-	OnlyUnmanaged    bool
+	Coverage        bool
+	Detect          bool
+	From            []config.SupplierConfig
+	To              string
+	Output          []output.OutputConfig
+	Filter          *jmespath.JMESPath
+	Quiet           bool
+	BackendOptions  *backend.Options
+	StrictMode      bool
+	ProviderVersion string
+	ConfigDir       string
+	DriftignorePath string
+	Driftignores    []string
+	Deep            bool
+	OnlyManaged     bool
+	OnlyUnmanaged   bool
 }
 
 type DriftCTL struct {
@@ -53,7 +51,6 @@ type DriftCTL struct {
 	iacProgress              globaloutput.Progress
 	resourceSchemaRepository dctlresource.SchemaRepositoryInterface
 	opts                     *ScanOptions
-	store                    memstore.Store
 }
 
 func NewDriftCTL(remoteSupplier resource.Supplier,
@@ -65,7 +62,7 @@ func NewDriftCTL(remoteSupplier resource.Supplier,
 	scanProgress globaloutput.Progress,
 	iacProgress globaloutput.Progress,
 	resourceSchemaRepository dctlresource.SchemaRepositoryInterface,
-	store memstore.Store) *DriftCTL {
+) *DriftCTL {
 	return &DriftCTL{
 		remoteSupplier,
 		iacSupplier,
@@ -76,7 +73,6 @@ func NewDriftCTL(remoteSupplier resource.Supplier,
 		iacProgress,
 		resourceSchemaRepository,
 		opts,
-		store,
 	}
 }
 
@@ -172,11 +168,6 @@ func (d DriftCTL) Run() (*analyser.Analysis, error) {
 	analysis.SetIaCSourceCount(d.iacSupplier.SourceCount())
 	analysis.Duration = time.Since(start)
 	analysis.Date = time.Now()
-
-	d.store.Bucket(memstore.TelemetryBucket).Set("total_resources", analysis.Summary().TotalResources)
-	d.store.Bucket(memstore.TelemetryBucket).Set("total_managed", analysis.Summary().TotalManaged)
-	d.store.Bucket(memstore.TelemetryBucket).Set("duration", uint(analysis.Duration.Seconds()+0.5))
-	d.store.Bucket(memstore.TelemetryBucket).Set("iac_source_count", d.iacSupplier.SourceCount())
 
 	return &analysis, nil
 }

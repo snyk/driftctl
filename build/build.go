@@ -4,7 +4,6 @@ var env = "dev"
 
 // This flag could be switched to false while building to create a binary without third party network calls
 // That mean that following services will be disabled:
-// - telemetry
 // - version check
 var enableUsageReporting = "true"
 
