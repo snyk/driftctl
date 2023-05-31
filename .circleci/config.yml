@@ -11,7 +11,6 @@ only_maintainers: &only_maintainers
       ignore: /pull\/[0-9]+/
 orbs:
   go: circleci/go@1.7.0
-  codecov: codecov/codecov@3.1.0
   snyk: snyk/snyk@1.1.2
   gh: circleci/github-cli@1.1.0
 jobs:
@@ -45,9 +44,6 @@ jobs:
           name: Run acceptance tests
           command: make acc
           no_output_timeout: 30m
-      - codecov/upload:
-          flags: << parameters.pattern >>
-          file: cover-acc.out
       - run:
           name: Discord notification
           when: on_fail
@@ -100,8 +96,6 @@ jobs:
           command: make test
       - go/save-cache:
           key: test-docker
-      - codecov/upload:
-          flags: unit
       - store_test_results:
           path: ./
   release:
