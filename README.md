@@ -9,9 +9,6 @@
   <img src="https://img.shields.io/github/v/release/snyk/driftctl">
   <img src="https://img.shields.io/github/go-mod/go-version/snyk/driftctl">
   <img src="https://img.shields.io/github/downloads/snyk/driftctl/total.svg"/>
-  <a href="https://codecov.io/gh/snyk/driftctl">
-    <img src="https://codecov.io/gh/snyk/driftctl/branch/main/graph/badge.svg?token=8C5R02G5S7"/>
-  </a>
   <img src="https://img.shields.io/docker/pulls/snyk/driftctl"/>
   <img src="https://img.shields.io/docker/image-size/snyk/driftctl"/>
   <a href="https://discord.gg/NMCBxtD7Nd">
