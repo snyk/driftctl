@@ -9,7 +9,7 @@ import (
 
 func TestAcc_Aws_S3Bucket_BucketInUsEast1(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion: "0.15.5",
+		TerraformVersion: "1.4.6",
 		Paths:            []string{"./testdata/acc/aws_s3_bucket"},
 		Args:             []string{"scan", "--deep"},
 		Checks: []acceptance.AccCheck{
@@ -21,7 +21,7 @@ func TestAcc_Aws_S3Bucket_BucketInUsEast1(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					result.AssertManagedCount(5)
+					result.AssertManagedCount(1)
 					result.AssertDriftCountTotal(0)
 				},
 			},
