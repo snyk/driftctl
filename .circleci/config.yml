@@ -67,6 +67,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Ensure go mod is tidy
+          command: |
+            go mod tidy
+            git diff --exit-code go.mod go.sum
+      - run:
           name: Enforce Go Formatted Code
           command: |
             go fmt ./...
@@ -79,6 +84,7 @@ jobs:
             fi
       - run: make install-tools
       - run: make lint
+
   test:
     resource_class: large
     executor:
