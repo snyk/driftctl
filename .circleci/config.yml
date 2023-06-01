@@ -13,11 +13,56 @@ orbs:
   go: circleci/go@1.7.0
   snyk: snyk/snyk@1.1.2
   gh: circleci/github-cli@1.1.0
+  slack: circleci/slack@4.12.5
 parameters:
   ACC_TESTS:
     type: string
     description: manually run acceptance tests
     default: '0'
+commands:
+  notify_slack_on_failure:
+    steps:
+      - slack/notify:
+          channel: team-cloud-context-alerts
+          event: fail
+          custom: |
+              {
+                "blocks": [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": ":warning: Driftctl acceptance tests failed :warning:",
+                            "emoji": true
+                        }
+                    },
+                    {
+                        "type": "divider"
+                    },
+                    {
+                        "type": "section",
+                        "fields": [
+                            {
+                                "type": "mrkdwn",
+                                "text": "*Suite*: ${ACC_PATTERN}"
+                            },
+                            {
+                                "type": "mrkdwn",
+                                "text": "*Branch*: ${CIRCLE_BRANCH}"
+                            }
+                        ],
+                        "accessory": {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "emoji": true,
+                                "text": "View Job"
+                            },
+                            "value": "${CIRCLE_BUILD_URL}"
+                        }
+                    }
+                ]
+              }
 jobs:
   test_acc:
     parameters:
@@ -49,14 +94,7 @@ jobs:
           name: Run acceptance tests
           command: make acc
           no_output_timeout: 30m
-      - run:
-          name: Discord notification
-          when: on_fail
-          command: |
-            curl -X POST \
-              -H "Content-Type: application/json" \
-              -d "{\"content\": \"❌ Acceptance tests failed\nSuite: ${ACC_PATTERN}\n<${CIRCLE_BUILD_URL}>\" }"\
-              ${DISCORD_WEBHOOK}
+      - notify_slack_on_failure
       - go/save-cache:
           key: test_acc
           path: /home/circleci/.go_workspace/pkg/mod
@@ -237,6 +275,7 @@ workflows:
                 # - TestAcc_Github_
           context:
             - driftctl-acc
+            - snyk-bot-slack
     triggers:
       - schedule:
           cron: "0 3 * * *"
@@ -262,6 +301,7 @@ workflows:
                 # - TestAcc_Github_
           context:
             - driftctl-acc
+            - snyk-bot-slack
   pullrequest:
     jobs:
       - lint:
