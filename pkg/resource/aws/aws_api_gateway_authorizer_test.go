@@ -9,7 +9,7 @@ import (
 
 func TestAcc_Aws_ApiGatewayAuthorizer(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
-		TerraformVersion: "0.15.5",
+		TerraformVersion: "1.4.6",
 		Paths:            []string{"./testdata/acc/aws_api_gateway_authorizer"},
 		Args:             []string{"scan"},
 		Checks: []acceptance.AccCheck{
