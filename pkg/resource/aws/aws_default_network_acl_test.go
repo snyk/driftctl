@@ -7,7 +7,7 @@ package aws_test
 
 // func TestAcc_Aws_DefaultNetworkAcl(t *testing.T) {
 // 	acceptance.Run(t, acceptance.AccTestCase{
-// 		TerraformVersion: "0.15.5",
+// 		TerraformVersion: "1.4.6",
 // 		Paths:            []string{"./testdata/acc/aws_default_network_acl"},
 // 		Args:             []string{"scan", "--deep"},
 // 		Checks: []acceptance.AccCheck{
