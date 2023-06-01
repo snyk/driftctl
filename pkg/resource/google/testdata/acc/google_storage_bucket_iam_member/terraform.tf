@@ -23,13 +23,13 @@ resource "google_storage_bucket" "driftctl-unittest" {
 resource "google_storage_bucket_iam_member" "elie1" {
   bucket = google_storage_bucket.driftctl-unittest.name
   role   = "roles/storage.admin"
-  member = "user:team-cloud-context@snyk.io"
+  member = "group:cloud-context-team@snyk.io"
 }
 
 resource "google_storage_bucket_iam_member" "will1" {
   bucket = google_storage_bucket.driftctl-unittest.name
   role   = "roles/storage.objectViewer"
-  member = "user:team-cloud-context@snyk.io"
+  member = "group:cloud-context-team@snyk.io"
 }
 
 resource "google_storage_bucket" "driftctl-unittest2" {
@@ -40,11 +40,11 @@ resource "google_storage_bucket" "driftctl-unittest2" {
 resource "google_storage_bucket_iam_member" "eli2" {
   bucket = google_storage_bucket.driftctl-unittest2.name
   role   = "roles/storage.objectViewer"
-  member = "user:team-cloud-context@snyk.io"
+  member = "group:cloud-context-team@snyk.io"
 }
 
 resource "google_storage_bucket_iam_member" "will2" {
   bucket = google_storage_bucket.driftctl-unittest2.name
   role   = "roles/storage.admin"
-  member = "user:team-cloud-context@snyk.io"
+  member = "group:cloud-context-team@snyk.io"
 }

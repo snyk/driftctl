@@ -11,10 +11,10 @@ terraform {
 
 resource "google_project_iam_member" "elie1" {
   role   = "roles/editor"
-  member = "user:cloud-context-team@snyk.io"
+  member = "group:cloud-context-team@snyk.io"
 }
 
 resource "google_project_iam_member" "will1" {
   role   = "roles/viewer"
-  member = "user:cloud-context-team@snyk.io"
+  member = "group:cloud-context-team@snyk.io"
 }
