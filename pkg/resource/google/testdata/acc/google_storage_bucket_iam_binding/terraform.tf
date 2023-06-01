@@ -24,7 +24,7 @@ resource "google_storage_bucket_iam_binding" "binding_admin_1" {
   bucket = google_storage_bucket.driftctl-unittest.name
   role   = "roles/storage.admin"
   members = [
-    "user:team-cloud-context@snyk.io",
+    "group:cloud-context-team@snyk.io",
   ]
 }
 
@@ -32,7 +32,7 @@ resource "google_storage_bucket_iam_binding" "binding_viewer_1" {
   bucket = google_storage_bucket.driftctl-unittest.name
   role   = "roles/storage.objectViewer"
   members = [
-    "user:team-cloud-context@snyk.io",
+    "group:cloud-context-team@snyk.io",
   ]
 }
 
@@ -45,6 +45,6 @@ resource "google_storage_bucket_iam_binding" "binding_admin_2" {
   bucket = google_storage_bucket.driftctl-unittest2.name
   role   = "roles/storage.admin"
   members = [
-    "user:team-cloud-context@snyk.io",
+    "group:cloud-context-team@snyk.io",
   ]
 }
