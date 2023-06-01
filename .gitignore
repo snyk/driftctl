@@ -21,8 +21,9 @@
 ### coverage folder inside pkg ###
 !pkg/coverage
 
-### vscode settings ###
+### ide settings ###
 .vscode
+.idea
 
 ### terraform provider/tfstate ###
 .terraform
