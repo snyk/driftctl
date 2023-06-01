@@ -13,10 +13,6 @@ func TestAcc_Aws_Eip(t *testing.T) {
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_eip"},
 		Args:             []string{"scan", "--deep"},
-		RetryDestroy: acceptance.RetryConfig{
-			Attempts: 3,
-			Delay:    5 * time.Second,
-		},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

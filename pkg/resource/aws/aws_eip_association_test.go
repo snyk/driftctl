@@ -2,7 +2,6 @@ package aws_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/acceptance"
@@ -13,10 +12,6 @@ func TestAcc_Aws_EipAssociation(t *testing.T) {
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_eip_association"},
 		Args:             []string{"scan", "--deep"},
-		RetryDestroy: acceptance.RetryConfig{
-			Attempts: 3,
-			Delay:    5 * time.Second,
-		},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
