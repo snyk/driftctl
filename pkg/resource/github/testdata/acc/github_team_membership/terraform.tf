@@ -5,27 +5,47 @@ terraform {
   }
 }
 
-data "github_user" "wbeuil" {
-  username = "wbeuil"
+resource "github_team" "test" {
+  name        = "acceptance-testing"
+  description = "Acceptance tests team"
 }
 
-data "github_user" "driftctl" {
-  username = "driftctl-acceptance-tester"
+data "github_user" "karniwl" {
+  username = "karniwl"
 }
 
-resource "github_team" "foo" {
-  name        = "foo"
-  description = "Foo team"
+data "github_user" "chdorner-snyk" {
+  username = "chdorner-snyk"
 }
 
-resource "github_team_membership" "foo" {
-  team_id  = github_team.foo.id
-  username = data.github_user.wbeuil.login
+data "github_user" "agatakrajewska" {
+  username = "agatakrajewska"
+}
+
+data "github_user" "craigfurman" {
+  username = "craigfurman"
+}
+
+resource "github_team_membership" "karniwl" {
+  team_id  = github_team.test.id
+  username = data.github_user.karniwl.login
   role     = "maintainer"
 }
 
-resource "github_team_membership" "bar" {
-  team_id  = github_team.foo.id
-  username = data.github_user.driftctl.login
+resource "github_team_membership" "chdorner-snyk" {
+  team_id  = github_team.test.id
+  username = data.github_user.chdorner-snyk.login
+  role     = "maintainer"
+}
+
+resource "github_team_membership" "agatakrajewska" {
+  team_id  = github_team.test.id
+  username = data.github_user.agatakrajewska.login
+  role     = "maintainer"
+}
+
+resource "github_team_membership" "craigfurman" {
+  team_id  = github_team.test.id
+  username = data.github_user.craigfurman.login
   role     = "maintainer"
 }
