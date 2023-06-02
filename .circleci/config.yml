@@ -229,10 +229,12 @@ workflows:
             parameters:
               pattern:
                 - TestAcc_Aws
-                - TestAcc_Github_
                 - TestAcc_Google
                 - TestAcc_Azure_
                 - TestAcc_StateReader_
+
+                # Disable this rather than create a new test org
+                # - TestAcc_Github_
           context:
             - driftctl-acc
     triggers:
@@ -252,10 +254,12 @@ workflows:
             parameters:
               pattern:
                 - TestAcc_Aws
-                - TestAcc_Github_
                 - TestAcc_Google
                 - TestAcc_Azure_
                 - TestAcc_StateReader_
+
+                # Disable this rather than create a new test org
+                # - TestAcc_Github_
           context:
             - driftctl-acc
   pullrequest:
