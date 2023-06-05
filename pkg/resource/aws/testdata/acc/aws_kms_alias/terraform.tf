@@ -10,7 +10,6 @@ terraform {
 
 resource "aws_kms_key" "key" {
   deletion_window_in_days = 7
-  is_enabled              = false
 }
 
 resource "aws_kms_alias" "foo" {
@@ -19,6 +18,6 @@ resource "aws_kms_alias" "foo" {
 }
 
 resource "aws_kms_alias" "baz" {
-  name_prefix          = "alias/baz"
+  name_prefix   = "alias/baz"
   target_key_id = aws_kms_key.key.key_id
 }
