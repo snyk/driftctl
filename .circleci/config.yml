@@ -164,40 +164,6 @@ jobs:
           root: ~/project
           paths:
             - bin/driftctl_SHA256SUMS
-  publish-aur:
-    environment:
-        AUR_GIT: ssh://aur@aur.archlinux.org/driftctl-bin.git
-    docker:
-      - image: cimg/base:2020.01
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/project
-      # Add ssh private key to allow access to AUR repository
-      # This key is bound to user snyk on AUR
-      - add_ssh_keys:
-            fingerprints:
-                - "75:59:a3:1d:81:9a:0f:44:98:4c:78:33:db:e5:51:6a"
-      - run:
-          name: Bump package version
-          command: |
-            mkdir -p ~/.ssh
-            echo 'aur.archlinux.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEuBKrPzbawxA/k2g6NcyV5jmqwJ2s+zpgZGZ7tpLIcN' >> ~/.ssh/known_hosts
-            # Ensure ssh is properly configured
-            ssh aur@aur.archlinux.org list-repos
-            git clone "${AUR_GIT}" driftctl-bin
-            cd driftctl-bin
-            git config user.name "snyk"
-            git config user.email elie.charra@snyk.io
-            cp ~/project/bin/driftctl_SHA256SUMS .
-            ./bump.sh "${CIRCLE_TAG}"
-            echo "--- PKGBUILD ---"
-            cat PKGBUILD
-            echo "--- .SRCINFO ---"
-            cat .SRCINFO
-            git add PKGBUILD .SRCINFO
-            git commit -m "Updated to version ${CIRCLE_TAG}"
-            git push
   release-docs:
     docker:
         - image: cimg/base:2020.01
@@ -366,14 +332,6 @@ workflows:
           requires:
               - lint
               - test
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
-      - publish-aur:
-          requires:
-            - release
           filters:
             tags:
               only: /^v.*/
