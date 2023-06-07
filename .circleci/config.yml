@@ -58,7 +58,7 @@ commands:
                                 "emoji": true,
                                 "text": "View Job"
                             },
-                            "value": "${CIRCLE_BUILD_URL}"
+                            "url": "${CIRCLE_BUILD_URL}"
                         }
                     }
                 ]
