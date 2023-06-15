@@ -8,6 +8,7 @@ import (
 	"google.golang.org/api/option"
 	assetpb "google.golang.org/genproto/googleapis/cloud/asset/v1"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type FakeAssetServer struct {
@@ -51,7 +52,7 @@ func newAssetClient(fakeServer *FakeAssetServer) (*asset.Client, error) {
 	client, err := asset.NewClient(ctx,
 		option.WithEndpoint(fakeServerAddr),
 		option.WithoutAuthentication(),
-		option.WithGRPCDialOption(grpc.WithInsecure()),
+		option.WithGRPCDialOption(grpc.WithTransportCredentials(insecure.NewCredentials())),
 	)
 	if err != nil {
 		return nil, err

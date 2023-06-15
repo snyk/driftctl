@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 locals {
-    timestamp = formatdate("YYYYMMDDhhmmss", timestamp())
+  timestamp = formatdate("YYYYMMDDhhmmss", timestamp())
 }
 
 resource "aws_sqs_queue" "queue1" {
@@ -23,10 +23,10 @@ resource "aws_sqs_queue" "queue2" {
 }
 
 resource "aws_dynamodb_table" "dynamo-event-source-mapping-test" {
-  name = "event-source-mapping-test-${local.timestamp}"
-  hash_key = "TestTableHashKey"
-  billing_mode = "PAY_PER_REQUEST"
-  stream_enabled = true
+  name             = "event-source-mapping-test-${local.timestamp}"
+  hash_key         = "TestTableHashKey"
+  billing_mode     = "PAY_PER_REQUEST"
+  stream_enabled   = true
   stream_view_type = "NEW_AND_OLD_IMAGES"
 
   attribute {
@@ -88,11 +88,11 @@ resource "aws_iam_policy_attachment" "policy_attachment" {
 }
 
 resource "aws_lambda_function" "test_lambda" {
-  filename         = "function.zip"
-  function_name    = "event-source-mapping-test-lambda-${local.timestamp}"
-  role             = aws_iam_role.iam_for_lambda.arn
-  handler          = "exports.test"
-  runtime       = "nodejs12.x"
+  filename      = "function.zip"
+  function_name = "event-source-mapping-test-lambda-${local.timestamp}"
+  role          = aws_iam_role.iam_for_lambda.arn
+  handler       = "exports.test"
+  runtime       = "nodejs14.x"
 
   environment {
     variables = {

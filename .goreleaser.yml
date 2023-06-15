@@ -30,10 +30,8 @@ builds:
           - 386
       ldflags: "-s -w -X github.com/snyk/driftctl/build.env={{ .Env.ENV }} -X github.com/snyk/driftctl/pkg/version.version={{ .Tag }}"
 archives:
-    - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
+    - name_template: '{{ .ProjectName }}_{{ .Os }}_{{- if eq .Arch "armv6" }}arm{{- else }}{{ .Arch }}{{ end }}'
       format: binary
-      replacements:
-          armv6: arm
 checksum:
     name_template: '{{ .ProjectName }}_SHA256SUMS'
     algorithm: sha256

@@ -48,7 +48,6 @@ Even with everyone making their best effort to be responsive, it can be time-con
 The following checks run when a PR is opened:
 
 * Tests: tests include unit tests and acceptance tests, and all tests must pass before a PR can be merged.
-* Test Coverage Report: We use Codecov to check both overall test coverage, and patch coverage. We are still deciding on the right targets for our code coverage check. A failure in Codecov does not necessarily mean that your PR will not be approved or merged.
 
 ## Development Environment
 

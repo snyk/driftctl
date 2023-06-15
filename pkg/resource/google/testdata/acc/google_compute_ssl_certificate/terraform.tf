@@ -1,19 +1,20 @@
 provider "google" {}
 
 terraform {
-    required_version = "~> 0.15.0"
-    required_providers {
-        google = {
-            version = "3.78.0"
-        }
+  required_version = "~> 0.15.0"
+  required_providers {
+    google = {
+      version = "3.78.0"
     }
+  }
 }
 
 resource "random_string" "postfix" {
-    length  = 6
-    upper   = false
-    special = false
+  length  = 6
+  upper   = false
+  special = false
 }
+
 resource "google_compute_ssl_certificate" "default" {
   name        = random_id.certificate.hex
   private_key = file("host.key")
@@ -22,10 +23,6 @@ resource "google_compute_ssl_certificate" "default" {
   lifecycle {
     create_before_destroy = true
   }
-}
-
-provider "google" {
-  project = "driftctl"
 }
 
 resource "random_id" "certificate" {
