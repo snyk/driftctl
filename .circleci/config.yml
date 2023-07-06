@@ -23,7 +23,7 @@ commands:
   notify_slack_on_failure:
     steps:
       - slack/notify:
-          channel: group-infrastructure-as-code-alerts
+          channel: group-infrastructure-as-code-alerts-nonprod
           event: fail
           custom: |
               {
