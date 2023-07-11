@@ -10,6 +10,7 @@ only_maintainers: &only_maintainers
       # Forked pull requests have CIRCLE_BRANCH set to pull/XXX
       ignore: /pull\/[0-9]+/
 orbs:
+  prodsec: snyk/prodsec-orb@1.0
   go: circleci/go@1.7.0
   snyk: snyk/snyk@1.1.2
   gh: circleci/github-cli@1.1.0
@@ -270,6 +271,11 @@ workflows:
             - snyk-bot-slack
   pullrequest:
     jobs:
+      - prodsec/secrets-scan:
+          name: Scan repository for secrets
+          context:
+            - snyk-bot-slack
+          channel: group-infrastructure-as-code-alerts
       - lint:
           <<: *only_branches
       - test:
