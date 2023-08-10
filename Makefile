@@ -38,7 +38,7 @@ coverage: test
 
 .PHONY: acc
 acc:
-	DRIFTCTL_ACC=true $(GOTEST) --format testname --junitfile unit-tests-acc.xml -- -coverprofile=cover-acc.out -test.timeout 5h -coverpkg=./pkg/... -run=$(ACC_PATTERN) ./pkg/...
+	DRIFTCTL_ACC=true $(GOTEST) --format standard-verbose --junitfile unit-tests-acc.xml -- -coverprofile=cover-acc.out -test.timeout 5h -coverpkg=./pkg/... -run=$(ACC_PATTERN) ./pkg/...
 
 .PHONY: mocks
 mocks:
@@ -62,7 +62,7 @@ lint:
 
 .PHONY: install-tools
 install-tools:
-	$(GOINSTALL) gotest.tools/gotestsum@v1.6.3
+	$(GOINSTALL) gotest.tools/gotestsum@v1.10.0
 	$(GOINSTALL) github.com/vektra/mockery/v2@latest
 
 

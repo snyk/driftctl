@@ -13,10 +13,6 @@ func TestAcc_Aws_Route(t *testing.T) {
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_route"},
 		Args:             []string{"scan", "--deep"},
-		RetryDestroy: acceptance.RetryConfig{
-			Attempts: 3,
-			Delay:    5 * time.Second,
-		},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
@@ -41,10 +37,6 @@ func TestAcc_Aws_Route_With_PrefixListId(t *testing.T) {
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_route_with_prefix_list_id"},
 		Args:             []string{"scan", "--deep"},
-		RetryDestroy: acceptance.RetryConfig{
-			Attempts: 3,
-			Delay:    5 * time.Second,
-		},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

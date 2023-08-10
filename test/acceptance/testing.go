@@ -42,11 +42,6 @@ type AccCheck struct {
 	Check       func(result *test.ScanResult, stdout string, err error)
 }
 
-type RetryConfig struct {
-	Attempts uint8
-	Delay    time.Duration
-}
-
 type AccTestCase struct {
 	DoNotRunTerraform          bool
 	TerraformVersion           string
@@ -60,10 +55,10 @@ type AccTestCase struct {
 	originalEnv                []string
 	tf                         map[string]*tfexec.Terraform
 	ShouldRefreshBeforeDestroy bool
-	RetryDestroy               RetryConfig
 }
 
 func (c *AccTestCase) initTerraformExecutor() error {
+	logrus.Debug("Initializing terraform...")
 	installPath := path.Join(os.TempDir(), "terraform-bin", c.TerraformVersion)
 	binPath := path.Join(installPath, "terraform")
 	execPathFinderOptions := make([]tfinstall.ExecPathFinder, 0)
@@ -214,17 +209,8 @@ func (c *AccTestCase) terraformApply() error {
 }
 
 func (c *AccTestCase) terraformDestroy() error {
-	if c.RetryDestroy.Attempts == 0 {
-		return c.doDestroy()
-	}
-	r := retrier.New(retrier.ConstantBackoff(int(c.RetryDestroy.Attempts), c.RetryDestroy.Delay), nil)
-
-	return r.Run(c.doDestroy)
-
-}
-
-func (c *AccTestCase) doDestroy() error {
 	if c.ShouldRefreshBeforeDestroy {
+		logrus.Debug("Running terraform refresh...")
 		if err := c.terraformRefresh(); err != nil {
 			return err
 		}
@@ -346,23 +332,28 @@ func Run(t *testing.T, c AccTestCase) {
 	checkpoint := os.Getenv("CHECKPOINT_DISABLE")
 	os.Setenv("CHECKPOINT_DISABLE", "true")
 
+	// Retry after 2s, 4s, 8s, 16s, 32s, 64s, 2m, 2m, 2m, 2m
+	// Try tweaking the backoff interval limit and/or the retry count limit in
+	// response to flaky tests.
+	limitedExponentialBackoff := retrier.New(retrier.LimitedExponentialBackoff(10, time.Second*2, time.Minute*2), nil)
+
 	if !c.DoNotRunTerraform {
 		// Execute terraform init if .terraform folder is not found in test folder
-		err := c.terraformInit()
+		err := limitedExponentialBackoff.Run(c.terraformInit)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		defer func() {
 			c.restoreEnv()
-			err := c.terraformDestroy()
+			err := limitedExponentialBackoff.Run(c.terraformDestroy)
 			os.Setenv("CHECKPOINT_DISABLE", checkpoint)
 			if err != nil {
 				t.Fatal(err)
 			}
 		}()
 
-		err = c.terraformApply()
+		err = limitedExponentialBackoff.Run(c.terraformApply)
 		if err != nil {
 			t.Fatal(err)
 		}

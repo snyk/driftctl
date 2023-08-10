@@ -1,3 +1,9 @@
+## This project is now in maintenance mode. We cannot promise to review contributions. Please feel free to fork the project to apply any changes you might want to make.
+
+
+
+
+
 <p align="center">
   <img width="200" src="https://docs.driftctl.com/img/driftctl_dark.svg" alt="driftctl">
 </p>
@@ -9,9 +15,6 @@
   <img src="https://img.shields.io/github/v/release/snyk/driftctl">
   <img src="https://img.shields.io/github/go-mod/go-version/snyk/driftctl">
   <img src="https://img.shields.io/github/downloads/snyk/driftctl/total.svg"/>
-  <a href="https://codecov.io/gh/snyk/driftctl">
-    <img src="https://codecov.io/gh/snyk/driftctl/branch/main/graph/badge.svg?token=8C5R02G5S7"/>
-  </a>
   <img src="https://img.shields.io/docker/pulls/snyk/driftctl"/>
   <img src="https://img.shields.io/docker/image-size/snyk/driftctl"/>
   <a href="https://discord.gg/NMCBxtD7Nd">

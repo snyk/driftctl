@@ -1,56 +1,14 @@
-# Contributing to driftctl
+## This project is now in maintenance mode. We cannot promise to review contributions. Please feel free to fork the project to apply any changes you might want to make.
 
-This document provides guidance on driftctl contribution recommended practices.
-It covers what we're looking for in order to help set some expectations and help you get the most out of participation in this project.
 
-To record a bug report, enhancement proposal, or give any other product feedback, please open a GitHub issue using the most appropriate issue template. Please do fill in all of the information the issue templates request, because we've seen from experience that this will maximize the chance that we'll be able to act on your feedback.
 
-## Contributing Fixes
 
-For new contributors we've labeled a few issues with Good First Issue as a nod to issues which will help get you familiar with driftctl development, while also providing an onramp to the codebase itself.
 
-Read the documentation, and don't be afraid to [ask questions](https://discord.gg/NMCBxtD7Nd).
 
-## Proposing a Change
 
-In order to be respectful of the time of community contributors, we aim to discuss potential changes in GitHub issues prior to implementation. That will allow us to give design feedback up front and set expectations about the scope of the change, and, for larger changes, how best to approach the work such that the driftctl team can review it and merge it along with other concurrent work.
 
-If the bug you wish to fix or enhancement you wish to implement isn't already covered by a GitHub issue that contains feedback from the driftctl team, please do start a discussion (either in a new GitHub issue or an existing one, as appropriate) before you invest significant development time. If you mention your intent to implement the change described in your issue, the driftctl team can, as best as possible, prioritize including implementation-related feedback in the subsequent discussion.
 
-Most changes will involve updates to the test suite, and changes to driftctl's documentation. The driftctl team can advise on different testing strategies for specific scenarios, and may ask you to revise the specific phrasing of your proposed documentation prose to match better with the standard "voice" of driftctl's documentation.
 
-### Maintainers
-
-Maintainers are key contributors to our Open Source project.
-They contribute their time and expertise and we ask that the community take extra special care to be mindful of this when interacting with them.
-There is no expectation on response time for our maintainers; they may be indisposed for prolonged periods of time. Please be patient.
-
-### Pull Request Lifecycle
-
-1. You are welcome to submit a draft pull request for commentary or review before it is fully completed. It's also a good idea to include specific questions or items you'd like feedback on.
-2. Once you believe your pull request is ready to be merged you can create your pull request.
-3. When time permits driftctl's team members will look over your contribution and either merge, or provide comments letting you know if there is anything left to do. It may take some time for us to respond. We may also have questions that we need answered about the code, either because something doesn't make sense to us or because we want to understand your thought process. **We kindly ask that you do not target specific team members**.
-4. If we have requested changes, you can either make those changes or, if you disagree with the suggested changes, we can have a conversation about our reasoning and agree on a path forward. This may be a multi-step process. Our view is that pull requests are a chance to collaborate, and we welcome conversations about how to do things better. It is the contributor's responsibility to address any changes requested. While reviewers are happy to give guidance, **it is unsustainable for us to perform the coding work necessary to get a PR into a mergeable state**.
-5. Once all outstanding comments and checklist items have been addressed, your contribution will be merged!
-6. In some cases, we might decide that a PR should be closed without merging. We'll make sure to provide clear reasoning when this happens. Following the recommended process above is one of the ways to ensure you don't spend time on a PR we can't or won't merge.
-
-### Getting Your Pull Requests Merged Faster
-1. **Well-documented**: Try to explain in the pull request comments what your change does, why you have made the change, and provide instructions for how to produce the new behavior introduced in the pull request. If you can, provide screen captures or terminal output to show what the changes look like. This helps the reviewers understand and test the change.
-2. **Small**: Try to only make one change per pull request. If you found two bugs and want to fix them both, that's awesome, but it's still best to submit the fixes as separate pull requests. This makes it much easier for reviewers to keep in their heads all of the implications of individual code changes, and that means the PR takes less effort and energy to merge. In general, the smaller the pull request, the sooner reviewers will be able to make time to review it.
-3. **Passing Tests**: Based on how much time we have, we may not review pull requests which aren't passing our tests (look below for advice on how to run unit tests). If you need help figuring out why tests are failing, please feel free to ask, but while we're happy to give guidance it is generally your responsibility to make sure that tests are passing. If your pull request changes an interface or invalidates an assumption that causes a bunch of tests to fail, then you need to fix those tests before we can merge your PR.
-
-If we request changes, try to make those changes in a timely manner. Otherwise, PRs can go stale and be a lot more work for all of us to merge in the future.
-
-Even with everyone making their best effort to be responsive, it can be time-consuming to get a PR merged. It can be frustrating to deal with the back-and-forth as we make sure that we understand the changes fully. Please bear with us, and please know that we appreciate the time and energy you put into the project.
-
-### PR Checks
-
-The following checks run when a PR is opened:
-
-* Tests: tests include unit tests and acceptance tests, and all tests must pass before a PR can be merged.
-* Test Coverage Report: We use Codecov to check both overall test coverage, and patch coverage. We are still deciding on the right targets for our code coverage check. A failure in Codecov does not necessarily mean that your PR will not be approved or merged.
-
-## Development Environment
 
 ### Build
 
