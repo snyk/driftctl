@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: driftctl
+  annotations:
+    github.com/project-slug: snyk/driftctl
+    github.com/team-slug: snyk/cloud-dev-ex
+spec:
+  type: external-tooling
+  lifecycle: "-"
+  owner: cloud-dev-ex
