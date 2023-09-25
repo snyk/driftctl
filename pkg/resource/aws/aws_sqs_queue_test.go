@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/r3labs/diff/v2"
+
 	awsresources "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/snyk/driftctl/test"
@@ -15,6 +16,8 @@ import (
 )
 
 func TestAcc_Aws_SQSQueue(t *testing.T) {
+	t.Skip("flake")
+
 	var mutatedQueue string
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",

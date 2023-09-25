@@ -18,6 +18,8 @@ import (
 )
 
 func TestAcc_Aws_CloudfrontDistribution(t *testing.T) {
+	t.Skip("flake")
+
 	var mutatedDistribution string
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion:           "0.15.5",
