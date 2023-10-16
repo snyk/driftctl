@@ -28,18 +28,17 @@ import (
 	"github.com/snyk/driftctl/enumeration/resource"
 	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestS3Bucket(t *testing.T) {
-
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockS3Repository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test: "multiple bucket", dirName: "aws_s3_bucket_multiple",
@@ -76,6 +75,12 @@ func TestS3Bucket(t *testing.T) {
 					nil,
 				)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+
+				assert.Equal(t, "bucket-martin-test-drift2", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsS3BucketResourceType, got[0].ResourceType())
+			},
 		},
 		{
 			test: "cannot list bucket", dirName: "aws_s3_bucket_list",
@@ -85,12 +90,14 @@ func TestS3Bucket(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsS3BucketResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketResourceType, resourceaws.AwsS3BucketResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -100,7 +107,6 @@ func TestS3Bucket(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -131,18 +137,18 @@ func TestS3Bucket(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsS3BucketResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsS3BucketResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -150,12 +156,12 @@ func TestS3Bucket(t *testing.T) {
 }
 
 func TestS3BucketInventory(t *testing.T) {
-
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockS3Repository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test: "multiple bucket with multiple inventories", dirName: "aws_s3_bucket_inventories_multiple",
@@ -204,6 +210,15 @@ func TestS3BucketInventory(t *testing.T) {
 					nil,
 				)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "bucket-martin-test-drift2:Inventory_Bucket2", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsS3BucketInventoryResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "bucket-martin-test-drift2:Inventory2_Bucket2", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsS3BucketInventoryResourceType, got[1].ResourceType())
+			},
 		},
 		{
 			test: "cannot list bucket", dirName: "aws_s3_bucket_inventories_list_bucket",
@@ -212,6 +227,9 @@ func TestS3BucketInventory(t *testing.T) {
 				repository.On("ListAllBuckets").Return(nil, awsError)
 
 				alerter.On("SendAlert", resourceaws.AwsS3BucketInventoryResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketInventoryResourceType, resourceaws.AwsS3BucketResourceType), alerts.EnumerationPhase)).Return()
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -243,12 +261,14 @@ func TestS3BucketInventory(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsS3BucketInventoryResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketInventoryResourceType, resourceaws.AwsS3BucketInventoryResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -258,7 +278,6 @@ func TestS3BucketInventory(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -289,18 +308,18 @@ func TestS3BucketInventory(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketInventoryResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsS3BucketInventoryResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsS3BucketInventoryResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -308,12 +327,12 @@ func TestS3BucketInventory(t *testing.T) {
 }
 
 func TestS3BucketNotification(t *testing.T) {
-
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockS3Repository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "single bucket without notifications",
@@ -341,6 +360,9 @@ func TestS3BucketNotification(t *testing.T) {
 					nil,
 					nil,
 				)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 		},
 		{
@@ -396,6 +418,12 @@ func TestS3BucketNotification(t *testing.T) {
 					nil,
 				)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+
+				assert.Equal(t, "bucket-martin-test-drift2", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsS3BucketNotificationResourceType, got[0].ResourceType())
+			},
 		},
 		{
 			test: "Cannot get bucket notification", dirName: "aws_s3_bucket_notifications_list_bucket",
@@ -417,6 +445,9 @@ func TestS3BucketNotification(t *testing.T) {
 
 				alerter.On("SendAlert", "aws_s3_bucket_notification.dritftctl-test-notifications-error", alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, "aws_s3_bucket_notification.dritftctl-test-notifications-error", resourceaws.AwsS3BucketNotificationResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 		{
@@ -427,12 +458,14 @@ func TestS3BucketNotification(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsS3BucketNotificationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketNotificationResourceType, resourceaws.AwsS3BucketResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -442,7 +475,6 @@ func TestS3BucketNotification(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -473,18 +505,18 @@ func TestS3BucketNotification(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketNotificationResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsS3BucketNotificationResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsS3BucketNotificationResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -492,12 +524,12 @@ func TestS3BucketNotification(t *testing.T) {
 }
 
 func TestS3BucketMetrics(t *testing.T) {
-
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockS3Repository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test: "multiple bucket with multiple metrics", dirName: "aws_s3_bucket_metrics_multiple",
@@ -546,6 +578,15 @@ func TestS3BucketMetrics(t *testing.T) {
 					nil,
 				)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "bucket-martin-test-drift2:Metrics_Bucket2", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsS3BucketMetricResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "bucket-martin-test-drift2:Metrics2_Bucket2", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsS3BucketMetricResourceType, got[1].ResourceType())
+			},
 		},
 		{
 			test: "cannot list bucket", dirName: "aws_s3_bucket_metrics_list_bucket",
@@ -554,6 +595,9 @@ func TestS3BucketMetrics(t *testing.T) {
 				repository.On("ListAllBuckets").Return(nil, awsError)
 
 				alerter.On("SendAlert", resourceaws.AwsS3BucketMetricResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketMetricResourceType, resourceaws.AwsS3BucketResourceType), alerts.EnumerationPhase)).Return()
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -586,12 +630,14 @@ func TestS3BucketMetrics(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsS3BucketMetricResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketMetricResourceType, resourceaws.AwsS3BucketMetricResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -601,7 +647,6 @@ func TestS3BucketMetrics(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -632,18 +677,18 @@ func TestS3BucketMetrics(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketMetricResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsS3BucketMetricResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsS3BucketMetricResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -651,12 +696,12 @@ func TestS3BucketMetrics(t *testing.T) {
 }
 
 func TestS3BucketPolicy(t *testing.T) {
-
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockS3Repository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "single bucket without policy",
@@ -684,6 +729,9 @@ func TestS3BucketPolicy(t *testing.T) {
 					nil,
 					nil,
 				)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 		},
 		{
@@ -733,6 +781,12 @@ func TestS3BucketPolicy(t *testing.T) {
 				)
 
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+
+				assert.Equal(t, "bucket-martin-test-drift2", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsS3BucketPolicyResourceType, got[0].ResourceType())
+			},
 		},
 		{
 			test: "cannot list bucket", dirName: "aws_s3_bucket_policies_list_bucket",
@@ -742,12 +796,14 @@ func TestS3BucketPolicy(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsS3BucketPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketPolicyResourceType, resourceaws.AwsS3BucketResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -757,7 +813,6 @@ func TestS3BucketPolicy(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -788,18 +843,18 @@ func TestS3BucketPolicy(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketPolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsS3BucketPolicyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsS3BucketPolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -874,7 +929,6 @@ func TestS3BucketPublicAccessBlock(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -893,7 +947,7 @@ func TestS3BucketPublicAccessBlock(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -909,12 +963,12 @@ func TestS3BucketPublicAccessBlock(t *testing.T) {
 }
 
 func TestS3BucketAnalytic(t *testing.T) {
-
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockS3Repository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockS3Repository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "multiple bucket with multiple analytics",
@@ -964,6 +1018,15 @@ func TestS3BucketAnalytic(t *testing.T) {
 					nil,
 				)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "bucket-martin-test-drift2:Analytics_Bucket2", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "bucket-martin-test-drift2:Analytics2_Bucket2", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, got[1].ResourceType())
+			},
 		},
 		{
 			test: "cannot list bucket", dirName: "aws_s3_bucket_analytics_list_bucket",
@@ -972,6 +1035,9 @@ func TestS3BucketAnalytic(t *testing.T) {
 				repository.On("ListAllBuckets").Return(nil, awsError)
 
 				alerter.On("SendAlert", resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, resourceaws.AwsS3BucketResourceType), alerts.EnumerationPhase)).Return()
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -1004,12 +1070,14 @@ func TestS3BucketAnalytic(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1019,7 +1087,6 @@ func TestS3BucketAnalytic(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -1050,18 +1117,18 @@ func TestS3BucketAnalytic(t *testing.T) {
 				Name:         "test",
 				DefaultAlias: "eu-west-3",
 			}, alerter))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsS3BucketAnalyticsConfigurationResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -1113,7 +1180,6 @@ func TestS3AccountPublicAccessBlock(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1132,7 +1198,7 @@ func TestS3AccountPublicAccessBlock(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {

@@ -12,5 +12,4 @@ func initAwsCloudformationStackMetaData(resourceSchemaRepository dctlresource.Sc
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 	})
-	resourceSchemaRepository.SetFlags(AwsCloudformationStackResourceType, resource.FlagDeepMode)
 }

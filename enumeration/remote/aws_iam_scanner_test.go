@@ -21,7 +21,6 @@ import (
 	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/mocks"
 
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
@@ -31,16 +30,20 @@ import (
 func TestIamUser(t *testing.T) {
 
 	cases := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockIAMRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no iam user",
 			dirName: "aws_iam_user_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllUsers").Return([]*iam.User{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -60,6 +63,18 @@ func TestIamUser(t *testing.T) {
 					},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, "test-driftctl-0", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamUserResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "test-driftctl-1", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamUserResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "test-driftctl-2", got[2].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamUserResourceType, got[2].ResourceType())
+			},
 			wantErr: nil,
 		},
 		{
@@ -71,12 +86,14 @@ func TestIamUser(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsIamUserResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamUserResourceType, resourceaws.AwsIamUserResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -86,7 +103,6 @@ func TestIamUser(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -115,18 +131,18 @@ func TestIamUser(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamUserEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamUserResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamUserResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsIamUserResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -136,10 +152,11 @@ func TestIamUser(t *testing.T) {
 func TestIamUserPolicy(t *testing.T) {
 
 	cases := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockIAMRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no iam user policy",
@@ -152,6 +169,9 @@ func TestIamUserPolicy(t *testing.T) {
 				}
 				repo.On("ListAllUsers").Return(users, nil)
 				repo.On("ListAllUserPolicies", users).Return([]string{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -186,6 +206,15 @@ func TestIamUserPolicy(t *testing.T) {
 					*aws.String("loadbalancer3:test34"),
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 12)
+
+				assert.Equal(t, "loadbalancer:test", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamUserPolicyResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "loadbalancer3:test34", got[11].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamUserPolicyResourceType, got[11].ResourceType())
+			},
 			wantErr: nil,
 		},
 		{
@@ -196,6 +225,9 @@ func TestIamUserPolicy(t *testing.T) {
 				repo.On("ListAllUsers").Return(nil, awsError)
 
 				alerter.On("SendAlert", resourceaws.AwsIamUserPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamUserPolicyResourceType, resourceaws.AwsIamUserResourceType), alerts.EnumerationPhase)).Return()
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -209,12 +241,14 @@ func TestIamUserPolicy(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsIamUserPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamUserPolicyResourceType, resourceaws.AwsIamUserPolicyResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -224,7 +258,6 @@ func TestIamUserPolicy(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -253,18 +286,18 @@ func TestIamUserPolicy(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamUserPolicyEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamUserPolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamUserPolicyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsIamUserPolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -274,16 +307,20 @@ func TestIamUserPolicy(t *testing.T) {
 func TestIamPolicy(t *testing.T) {
 
 	cases := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockIAMRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no iam custom policies",
 			dirName: "aws_iam_policy_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllPolicies").Once().Return([]*iam.Policy{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -303,6 +340,18 @@ func TestIamPolicy(t *testing.T) {
 					},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, "arn:aws:iam::929327065333:policy/policy-0", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamPolicyResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "arn:aws:iam::929327065333:policy/policy-1", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamPolicyResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "arn:aws:iam::929327065333:policy/policy-2", got[2].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamPolicyResourceType, got[2].ResourceType())
+			},
 			wantErr: nil,
 		},
 		{
@@ -314,12 +363,14 @@ func TestIamPolicy(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsIamPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamPolicyResourceType, resourceaws.AwsIamPolicyResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -329,7 +380,6 @@ func TestIamPolicy(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -358,18 +408,18 @@ func TestIamPolicy(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamPolicyEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamPolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamPolicyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsIamPolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -379,16 +429,20 @@ func TestIamPolicy(t *testing.T) {
 func TestIamRole(t *testing.T) {
 
 	cases := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockIAMRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no iam roles",
 			dirName: "aws_iam_role_empty",
 			mocks: func(repo *repository.MockIAMRepository, alerter *mocks.AlerterInterface) {
 				repo.On("ListAllRoles").Return([]*iam.Role{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -411,6 +465,18 @@ func TestIamRole(t *testing.T) {
 					},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, "test_role_0", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamRoleResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "test_role_1", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamRoleResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "test_role_2", got[2].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamRoleResourceType, got[2].ResourceType())
+			},
 			wantErr: nil,
 		},
 		{
@@ -432,12 +498,14 @@ func TestIamRole(t *testing.T) {
 					},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -447,7 +515,6 @@ func TestIamRole(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -476,18 +543,18 @@ func TestIamRole(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamRoleEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamRoleResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamRoleResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsIamRoleResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -497,10 +564,11 @@ func TestIamRole(t *testing.T) {
 func TestIamRolePolicyAttachment(t *testing.T) {
 
 	cases := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
-		err     error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockIAMRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		err            error
 	}{
 		{
 			test:    "no iam role policy",
@@ -513,6 +581,9 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 				}
 				repo.On("ListAllRoles").Return(roles, nil)
 				repo.On("ListAllRolePolicyAttachments", roles).Return([]*repository.AttachedRolePolicy{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			err: nil,
 		},
@@ -574,6 +645,15 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 					},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 6)
+
+				assert.Equal(t, "test-policy-test-role", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamRolePolicyAttachmentResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "test-policy3-test-role2", got[5].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamRolePolicyAttachmentResourceType, got[5].ResourceType())
+			},
 			err: nil,
 		},
 		{
@@ -593,6 +673,9 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 				}
 				repo.On("ListAllRoles").Return(roles, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 		{
 			test:    "Cannot list roles",
@@ -602,6 +685,9 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 				repo.On("ListAllRoles").Once().Return(nil, awsError)
 
 				alerter.On("SendAlert", resourceaws.AwsIamRolePolicyAttachmentResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamRolePolicyAttachmentResourceType, resourceaws.AwsIamRoleResourceType), alerts.EnumerationPhase)).Return()
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 		},
 		{
@@ -614,11 +700,13 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsIamRolePolicyAttachmentResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamRolePolicyAttachmentResourceType, resourceaws.AwsIamRolePolicyAttachmentResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -628,7 +716,6 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -657,18 +744,18 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamRolePolicyAttachmentEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamRolePolicyAttachmentResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamRolePolicyAttachmentResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsIamRolePolicyAttachmentResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -678,10 +765,11 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 func TestIamAccessKey(t *testing.T) {
 
 	cases := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockIAMRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no iam access_key",
@@ -694,6 +782,9 @@ func TestIamAccessKey(t *testing.T) {
 				}
 				repo.On("ListAllUsers").Return(users, nil)
 				repo.On("ListAllAccessKeys", users).Return([]*iam.AccessKeyMetadata{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -726,6 +817,15 @@ func TestIamAccessKey(t *testing.T) {
 					},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 4)
+
+				assert.Equal(t, "AKIA5QYBVVD223VWU32A", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamAccessKeyResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "AKIA5QYBVVD2SWDFVVMG", got[3].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamAccessKeyResourceType, got[3].ResourceType())
+			},
 			wantErr: nil,
 		},
 		{
@@ -736,6 +836,9 @@ func TestIamAccessKey(t *testing.T) {
 				repo.On("ListAllUsers").Once().Return(nil, awsError)
 
 				alerter.On("SendAlert", resourceaws.AwsIamAccessKeyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamAccessKeyResourceType, resourceaws.AwsIamUserResourceType), alerts.EnumerationPhase)).Return()
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -749,12 +852,14 @@ func TestIamAccessKey(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsIamAccessKeyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamAccessKeyResourceType, resourceaws.AwsIamAccessKeyResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -764,7 +869,6 @@ func TestIamAccessKey(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -793,18 +897,18 @@ func TestIamAccessKey(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamAccessKeyEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamAccessKeyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamAccessKeyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsIamAccessKeyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -814,10 +918,11 @@ func TestIamAccessKey(t *testing.T) {
 func TestIamUserPolicyAttachment(t *testing.T) {
 
 	cases := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockIAMRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no iam user policy",
@@ -830,6 +935,9 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 				}
 				repo.On("ListAllUsers").Return(users, nil)
 				repo.On("ListAllUserPolicyAttachments", users).Return([]*repository.AttachedUserPolicy{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -937,6 +1045,15 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 				}, nil)
 
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 12)
+
+				assert.Equal(t, "test-loadbalancer", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamUserPolicyAttachmentResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "test4-loadbalancer3", got[11].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamUserPolicyAttachmentResourceType, got[11].ResourceType())
+			},
 			wantErr: nil,
 		},
 		{
@@ -947,6 +1064,9 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 				repo.On("ListAllUsers").Return(nil, awsError)
 
 				alerter.On("SendAlert", resourceaws.AwsIamUserPolicyAttachmentResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamUserPolicyAttachmentResourceType, resourceaws.AwsIamUserResourceType), alerts.EnumerationPhase)).Return()
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -960,12 +1080,14 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsIamUserPolicyAttachmentResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamUserPolicyAttachmentResourceType, resourceaws.AwsIamUserPolicyAttachmentResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -975,7 +1097,6 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -1004,18 +1125,18 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamUserPolicyAttachmentEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamUserPolicyAttachmentResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamUserPolicyAttachmentResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsIamUserPolicyAttachmentResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -1025,10 +1146,11 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 func TestIamRolePolicy(t *testing.T) {
 
 	cases := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockIAMRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockIAMRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no iam role policy",
@@ -1041,6 +1163,9 @@ func TestIamRolePolicy(t *testing.T) {
 				}
 				repo.On("ListAllRoles").Return(roles, nil)
 				repo.On("ListAllRolePolicies", roles).Return([]repository.RolePolicy{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -1066,6 +1191,15 @@ func TestIamRolePolicy(t *testing.T) {
 					{Policy: "policy-role1-2", RoleName: "test_role_1"},
 				}, nil).Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 6)
+
+				assert.Equal(t, "test_role_0:policy-role0-0", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamRolePolicyResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "test_role_1:policy-role1-2", got[5].ResourceId())
+				assert.Equal(t, resourceaws.AwsIamRolePolicyResourceType, got[5].ResourceType())
+			},
 			wantErr: nil,
 		},
 		{
@@ -1076,6 +1210,9 @@ func TestIamRolePolicy(t *testing.T) {
 				repo.On("ListAllRoles").Once().Return(nil, awsError)
 
 				alerter.On("SendAlert", resourceaws.AwsIamRolePolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamRolePolicyResourceType, resourceaws.AwsIamRoleResourceType), alerts.EnumerationPhase)).Return()
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -1089,12 +1226,14 @@ func TestIamRolePolicy(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsIamRolePolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsIamRolePolicyResourceType, resourceaws.AwsIamRolePolicyResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -1104,7 +1243,6 @@ func TestIamRolePolicy(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -1133,18 +1271,18 @@ func TestIamRolePolicy(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws2.NewIamRolePolicyEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsIamRolePolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsIamRolePolicyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsIamRolePolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -1196,7 +1334,6 @@ func TestIamGroupPolicy(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1213,7 +1350,7 @@ func TestIamGroupPolicy(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -1270,7 +1407,6 @@ func TestIamGroup(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -1287,7 +1423,7 @@ func TestIamGroup(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {

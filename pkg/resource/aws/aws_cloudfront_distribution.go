@@ -16,6 +16,4 @@ func initAwsCloudfrontDistributionMetaData(resourceSchemaRepository dctlresource
 		val.SafeDelete([]string{"status"})
 		val.SafeDelete([]string{"wait_for_deployment"})
 	})
-	resourceSchemaRepository.SetFlags(AwsCloudfrontDistributionResourceType, resource.FlagDeepMode)
-
 }

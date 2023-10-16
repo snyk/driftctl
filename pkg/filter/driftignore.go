@@ -125,11 +125,6 @@ func (r *DriftIgnore) IsResourceIgnored(res *resource.Resource) bool {
 	return r.match(fmt.Sprintf("%s.%s", res.ResourceType(), res.ResourceId()))
 }
 
-func (r *DriftIgnore) IsFieldIgnored(res *resource.Resource, path []string) bool {
-	full := fmt.Sprintf("%s.%s.%s", res.ResourceType(), res.ResourceId(), strings.Join(path, "."))
-	return r.match(full)
-}
-
 func (r *DriftIgnore) match(strRes string) bool {
 	return r.matcher.Match([]string{strings.ReplaceAll(strRes, "/", separator)}, false)
 }

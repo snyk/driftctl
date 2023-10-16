@@ -15,7 +15,6 @@ func TestAcc_Google_ComputeNetwork(t *testing.T) {
 		Args: []string{
 			"scan",
 			"--to", "gcp+tf",
-			"--deep",
 		},
 		Checks: []acceptance.AccCheck{
 			{
@@ -27,7 +26,6 @@ func TestAcc_Google_ComputeNetwork(t *testing.T) {
 					}
 					result.AssertInfrastructureIsInSync()
 					result.AssertManagedCount(3)
-					result.AssertDriftCountTotal(0)
 				},
 			},
 		},

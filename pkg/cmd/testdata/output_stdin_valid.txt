@@ -13,5 +13,3 @@ aws_iam_access_key.AKIAXYUOJZ3HUSPPQQ4L
 # Missing resources
 aws_iam_user.testuser1
 aws_iam_role.testrole1
-# Changed resources
-aws_s3_bucket.test-20210416154114486700000001

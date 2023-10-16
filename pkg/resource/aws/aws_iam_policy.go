@@ -23,5 +23,4 @@ func initAwsIAMPolicyMetaData(resourceSchemaRepository dctlresource.SchemaReposi
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetFlags(AwsIamPolicyResourceType, resource.FlagDeepMode)
 }

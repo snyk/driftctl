@@ -423,8 +423,6 @@ input[type="search"], select {
                 
                 <option value="aws_deleted_resource">aws_deleted_resource</option>
                 
-                <option value="aws_diff_resource">aws_diff_resource</option>
-                
             </select>
             <label for="iac-source-select" class="visuallyhidden">Select an IaC source:</label>
             <select id="iac-source-select" name="iac-source-select">
@@ -447,12 +445,6 @@ input[type="search"], select {
                 
                 <button type="button" role="tab" aria-selected="true" aria-controls="unmanaged-tab" id="unmanaged">
                     Unmanaged Resources (<span data-count="resource-unmanaged">5</span>)
-                </button>
-                
-                
-                <button type="button" role="tab" aria-selected="false" aria-controls="changed-tab" id="changed"
-                        tabindex="-1">
-                    Changed Resources (<span data-count="resource-changed">3</span>)
                 </button>
                 
                 
@@ -507,96 +499,6 @@ input[type="search"], select {
                         
                         </tbody>
                     </table>
-                    <div class="empty-panel is-hidden">
-                        <p>No results matched your filters</p>
-                    </div>
-                </div>
-                
-                
-                <div class="is-hidden" tabindex="0" role="tabpanel" id="changed-tab" aria-labelledby="changed">
-                    <div role="table">
-                        <div role="rowgroup">
-                            <div role="row" class="table-header">
-                                <span role="columnheader">Resource ID</span>
-                                <span role="columnheader">IaC source</span>
-                            </div>
-                        </div>
-                        <div role="rowgroup" class="table-body">
-                            
-                            <div role="row" data-kind="resource-changed" class="resource-item">
-                                <div class="row">
-                                    <span role="cell">
-                                        <span data-type="resource-id">diff-id-2</span>
-                                        <span>(aws_diff_resource)</span>
-                                        <span style="display:none;" data-type="resource-type">aws_diff_resource</span>
-                                    </span>
-                                    
-                                </div>
-                                <pre class="code-box">
-                                    <code class="code-box-line">&emsp;~ updated.field: <span class="code-box-line-delete">"foobar"</span> => <span class="code-box-line-create">"barfoo"</span><br></code>
-                                </pre>
-                            </div>
-                            
-                            <div role="row" data-kind="resource-changed" class="resource-item">
-                                <div class="row">
-                                    <span role="cell">
-                                        <span data-type="resource-id">diff-id-1</span>
-                                        (<span>module.aws_diff_resource.name</span>)
-                                        <span style="display:none;" data-type="resource-type">aws_diff_resource</span>
-                                    </span>
-                                    <span role="cell" data-type="resource-source">tfstate://state.tfstate</span>
-                                </div>
-                                <pre class="code-box">
-                                    <code class="code-box-line">&emsp;~ updated.field: <span class="code-box-line-delete">"foobar"</span> => <span class="code-box-line-create">"barfoo"</span><br>&emsp;+ new.field: <span class="code-box-line-create">"newValue"</span><br>&emsp;- a: <span class="code-box-line-delete">"oldValue"</span><br></code>
-                                </pre>
-                            </div>
-                            
-                            <div role="row" data-kind="resource-changed" class="resource-item">
-                                <div class="row">
-                                    <span role="cell">
-                                        <span data-type="resource-id">diff-id-2</span>
-                                        (<span>module.aws_diff_resource.diff-id-2</span>)
-                                        <span style="display:none;" data-type="resource-type">aws_diff_resource</span>
-                                    </span>
-                                    <span role="cell" data-type="resource-source">tfstate://state.tfstate</span>
-                                </div>
-                                <pre class="code-box">
-                                    <code class="code-box-line">&emsp;- path.to.fields.[0]: <span class="code-box-line-delete">"value"</span><br>&emsp;~ path.to.fields.[1]: <span class="code-box-line-delete">12</span> => <span class="code-box-line-create">"12"</span><br>&emsp;- group_ids: <span class="code-box-line-delete">["a071314398026"]</span><br>&emsp;~ policy:<br>&emsp; {
-   "Statement": [
-     {
-       "Action": [
-<span class="code-box-line-delete">-        "s3:GetObjectVersion"</span>
-<span class="code-box-line-create">+        "*"</span>
-       ],
-<span class="code-box-line-delete">-      "Effect": "Allow",</span>
-<span class="code-box-line-create">+      "Effect": "Deny",</span>
-       "Principal": "*",
-<span class="code-box-line-delete">-      "Resource": "arn:aws:s3:::tmxxrn.foobar.driftctl-test.com/*",</span>
-<span class="code-box-line-create">+      "Resource": "arn:aws:s3:::tmxxrn.foobar.driftctl-test.com/b/*",</span>
-<span class="code-box-line-delete">-      "Sid": "PublicRead"</span>
-<span class="code-box-line-create">+      "Sid": "PublicReadWrite"</span>
-     }
-<span class="code-box-line-create">+    {</span>
-<span class="code-box-line-create">+      "Action": [</span>
-<span class="code-box-line-create">+        "*"</span>
-<span class="code-box-line-create">+      ],</span>
-<span class="code-box-line-create">+      "Effect": "Deny",</span>
-<span class="code-box-line-create">+      "Principal": "*",</span>
-<span class="code-box-line-create">+      "Resource": "arn:aws:s3:::tmxxrn.foobar.driftctl-test.com/b/*",</span>
-<span class="code-box-line-create">+      "Sid": "PublicReadWrite"</span>
-<span class="code-box-line-create">+    }</span>
-   ],
-<span class="code-box-line-delete">-  "Version": "2012-10-17"</span>
-<span class="code-box-line-create">+  "Version": "2021-10-17"</span>
-<span class="code-box-line-create">+  "Test": [</span>
-<span class="code-box-line-create">+  ]</span>
- }
-<br>&emsp;+ Tags.[0].Name: <span class="code-box-line-create">"test"</span><br>&emsp;~ InstanceInitiatedShutdownBehavior: <span class="code-box-line-delete">""</span> => <span class="code-box-line-create">null</span><br></code>
-                                </pre>
-                            </div>
-                            
-                        </div>
-                    </div>
                     <div class="empty-panel is-hidden">
                         <p>No results matched your filters</p>
                     </div>
@@ -741,7 +643,6 @@ input[type="search"], select {
     function refreshCounters() {
         const map = {
             "[data-kind='resource-unmanaged']": "[data-count='resource-unmanaged']",
-            "[data-kind='resource-changed']": "[data-count='resource-changed']",
             "[data-kind='resource-deleted']": "[data-count='resource-deleted']",
             "[data-kind='resource-alerts']": "[data-count='resource-alerts']",
         };

@@ -14,5 +14,4 @@ func initGoogleComputeNetworkMetadata(resourceSchemaRepository dctlresource.Sche
 		res.Attributes().SafeDelete([]string{"gateway_ipv4"})
 		res.Attributes().SafeDelete([]string{"delete_default_routes_on_create"})
 	})
-	resourceSchemaRepository.SetFlags(GoogleComputeNetworkResourceType, resource.FlagDeepMode)
 }

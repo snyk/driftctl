@@ -79,8 +79,6 @@ func TestAzurermContainerRegistry(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-
-			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -95,7 +93,7 @@ func TestAzurermContainerRegistry(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {

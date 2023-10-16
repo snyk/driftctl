@@ -412,76 +412,7 @@ input[type="search"], select {
     </section>
     <main>
         
-        <form role="search">
-            <label for="search" class="visuallyhidden">Search resources by id:</label>
-            <input type="search" id="search" name="search" placeholder="Search resources by id...">
-            <label for="resource-type-select" class="visuallyhidden">Select a resource type:</label>
-            <select id="resource-type-select" name="resource-type-select">
-                <option value="">Select a resource type</option>
-                
-                <option value="aws_resource">aws_resource</option>
-                
-            </select>
-            <label for="iac-source-select" class="visuallyhidden">Select an IaC source:</label>
-            <select id="iac-source-select" name="iac-source-select">
-                <option value="">Select an IaC source</option>
-                
-                <option value="tfstate://state.tfstate">tfstate://state.tfstate</option>
-                
-            </select>
-            <input type="reset" value="Reset Filters">
-        </form>
-
-        <div class="tabs-wrapper">
-            <div role="tablist" aria-label="List of tabs">
-                
-                
-                <button type="button" role="tab" aria-selected="false" aria-controls="changed-tab" id="changed"
-                        tabindex="-1">
-                    Changed Resources (<span data-count="resource-changed">1</span>)
-                </button>
-                
-                
-                
-            </div>
-            <div class="panels">
-                
-                
-                <div class="is-hidden" tabindex="0" role="tabpanel" id="changed-tab" aria-labelledby="changed">
-                    <div role="table">
-                        <div role="rowgroup">
-                            <div role="row" class="table-header">
-                                <span role="columnheader">Resource ID</span>
-                                <span role="columnheader">IaC source</span>
-                            </div>
-                        </div>
-                        <div role="rowgroup" class="table-body">
-                            
-                            <div role="row" data-kind="resource-changed" class="resource-item">
-                                <div class="row">
-                                    <span role="cell">
-                                        <span data-type="resource-id">resource-id-1</span>
-                                        (<span>module.aws_resource.name</span>)
-                                        <span style="display:none;" data-type="resource-type">aws_resource</span>
-                                    </span>
-                                    <span role="cell" data-type="resource-source">tfstate://state.tfstate</span>
-                                </div>
-                                <pre class="code-box">
-                                    <code class="code-box-line">&emsp;- path.to.fields.[0]: <span class="code-box-line-delete">"value"</span><br></code>
-                                </pre>
-                            </div>
-                            
-                        </div>
-                    </div>
-                    <div class="empty-panel is-hidden">
-                        <p>No results matched your filters</p>
-                    </div>
-                </div>
-                
-                
-                
-            </div>
-        </div>
+        <h1 class="congrats">Congrats! Your infrastructure is in sync</h1>
         
     </main>
 </div>
@@ -520,7 +451,6 @@ input[type="search"], select {
     function refreshCounters() {
         const map = {
             "[data-kind='resource-unmanaged']": "[data-count='resource-unmanaged']",
-            "[data-kind='resource-changed']": "[data-count='resource-changed']",
             "[data-kind='resource-deleted']": "[data-count='resource-deleted']",
             "[data-kind='resource-alerts']": "[data-count='resource-alerts']",
         };

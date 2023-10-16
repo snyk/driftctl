@@ -18,12 +18,8 @@ Found resources not covered by IaC:
     - test_user
   aws_iam_user_policy:
     - driftctl:driftctlrole
-Found changed resources:
-  - test-20210416154114486700000001 (aws_s3_bucket):
-      ~ BucketPrefix: "test-" => <nil>
-      + Tags.tag2: <nil> => "value"
-      ~ Tags.test: "test" => "test1"
 Found 14 resource(s)
  - 7% coverage
  - 1 resource(s) managed by Terraform
  - 11 resource(s) not managed by Terraform
+ - 2 resource(s) found in a Terraform state but missing on the cloud provider

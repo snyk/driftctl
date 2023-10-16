@@ -12,5 +12,4 @@ func initAwsEipMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryIn
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 	})
-	resourceSchemaRepository.SetFlags(AwsEipResourceType, resource.FlagDeepMode)
 }

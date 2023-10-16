@@ -58,7 +58,7 @@ func runFmt(opts *pkg.FmtOptions, reader io.Reader) error {
 		analysisText = append(analysisText, scanner.Bytes()...)
 	}
 
-	analysis := analyser.NewAnalysis(analyser.AnalyzerOptions{})
+	analysis := analyser.NewAnalysis()
 	err := json.Unmarshal(analysisText, analysis)
 	if err != nil {
 		return err

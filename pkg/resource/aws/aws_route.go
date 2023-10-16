@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+
 	"github.com/hashicorp/terraform/helper/hashcode"
 	dctlresource "github.com/snyk/driftctl/pkg/resource"
 
@@ -47,7 +48,6 @@ func initAwsRouteMetaData(resourceSchemaRepository dctlresource.SchemaRepository
 		}
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(AwsRouteResourceType, resource.FlagDeepMode)
 }
 
 func CalculateRouteID(tableId, CidrBlock, Ipv6CidrBlock, PrefixListId *string) string {

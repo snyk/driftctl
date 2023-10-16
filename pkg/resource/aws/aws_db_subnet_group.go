@@ -12,5 +12,4 @@ func initAwsDbSubnetGroupMetaData(resourceSchemaRepository dctlresource.SchemaRe
 		val := res.Attrs
 		val.SafeDelete([]string{"name_prefix"})
 	})
-	resourceSchemaRepository.SetFlags(AwsDbSubnetGroupResourceType, resource.FlagDeepMode)
 }

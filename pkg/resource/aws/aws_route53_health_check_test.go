@@ -6,9 +6,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/route53"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/r3labs/diff/v2"
-	awsresources "github.com/snyk/driftctl/enumeration/resource/aws"
-	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/acceptance"
 	"github.com/snyk/driftctl/test/acceptance/awsutils"
@@ -19,7 +16,7 @@ func TestAcc_Aws_Route53HealthCheck(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_route53_health_check"},
-		Args:             []string{"scan", "--deep"},
+		Args:             []string{"scan"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
@@ -54,37 +51,8 @@ func TestAcc_Aws_Route53HealthCheck(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					result.AssertDriftCountTotal(2)
 					result.AssertDeletedCount(0)
 					result.AssertManagedCount(2)
-
-					result.AssertResourceHasDrift(
-						mutatedHealthCheckID,
-						awsresources.AwsRoute53HealthCheckResourceType,
-						analyser.Change{
-							Change: diff.Change{
-								Type: diff.UPDATE,
-								Path: []string{"disabled"},
-								From: false,
-								To:   true,
-							},
-							Computed: false,
-						},
-					)
-
-					result.AssertResourceHasDrift(
-						mutatedHealthCheckID,
-						awsresources.AwsRoute53HealthCheckResourceType,
-						analyser.Change{
-							Change: diff.Change{
-								Type: diff.UPDATE,
-								Path: []string{"resource_path"},
-								From: "/",
-								To:   "/bad",
-							},
-							Computed: false,
-						},
-					)
 				},
 			},
 		},

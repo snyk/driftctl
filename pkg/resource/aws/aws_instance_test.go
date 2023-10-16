@@ -3,13 +3,10 @@ package aws_test
 import (
 	"testing"
 
-	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/snyk/driftctl/test"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/r3labs/diff/v2"
-	awsresources "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/test/acceptance"
 	"github.com/snyk/driftctl/test/acceptance/awsutils"
 )
@@ -18,10 +15,7 @@ func TestAcc_Aws_Instance(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_instance_default"},
-		Args: []string{
-			"scan",
-			"--deep",
-		},
+		Args:             []string{"scan"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
@@ -44,10 +38,7 @@ func TestAcc_Aws_Instance_WithBlockDevices(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_instance"},
-		Args: []string{
-			"scan",
-			"--deep",
-		},
+		Args:             []string{"scan"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
@@ -57,7 +48,6 @@ func TestAcc_Aws_Instance_WithBlockDevices(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					result.AssertDriftCountTotal(0)
 				},
 			},
 			{
@@ -107,18 +97,6 @@ func TestAcc_Aws_Instance_WithBlockDevices(t *testing.T) {
 						t.Fatal(err)
 					}
 					result.Equal(0, result.Summary().TotalDeleted)
-					result.AssertResourceHasDrift(
-						mutatedInstanceId,
-						awsresources.AwsInstanceResourceType,
-						analyser.Change{
-							Change: diff.Change{
-								Type: diff.CREATE,
-								Path: []string{"tags", "Env"},
-								From: nil,
-								To:   "Production",
-							},
-						},
-					)
 				},
 			},
 		},

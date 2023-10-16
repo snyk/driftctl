@@ -13,17 +13,8 @@ Found resources not covered by IaC:
   aws_unmanaged_resource:
     - unmanaged-id-1
     - unmanaged-id-2
-Found changed resources:
-  - diff-id-2 (aws_diff_resource):
-      ~ updated.field: "foobar" => "barfoo"
-  From tfstate://state.tfstate
-    - diff-id-1 (module.aws_diff_resource.name):
-        ~ updated.field: "foobar" => "barfoo"
-        + new.field: <nil> => "newValue"
-        - a: "oldValue" => <nil>
 Found 10 resource(s)
  - 20% coverage
  - 2 resource(s) managed by Terraform
-     - 2/2 resource(s) out of sync with Terraform state
  - 4 resource(s) not managed by Terraform
  - 4 resource(s) found in a Terraform state but missing on the cloud provider

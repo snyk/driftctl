@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+
 	"github.com/snyk/driftctl/enumeration/resource"
 	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
@@ -39,5 +40,4 @@ func initAwsRoute53HealthCheckMetaData(resourceSchemaRepository dctlresource.Sch
 		}
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(AwsRoute53HealthCheckResourceType, resource.FlagDeepMode)
 }

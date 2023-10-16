@@ -11,11 +11,11 @@ import (
 
 func TestGitHub_Metadata_Flags(t *testing.T) {
 	testcases := map[string][]resource.Flags{
-		github.GithubBranchProtectionResourceType: {resource.FlagDeepMode},
-		github.GithubMembershipResourceType:       {resource.FlagDeepMode},
-		github.GithubTeamMembershipResourceType:   {resource.FlagDeepMode},
-		github.GithubRepositoryResourceType:       {resource.FlagDeepMode},
-		github.GithubTeamResourceType:             {resource.FlagDeepMode},
+		github.GithubBranchProtectionResourceType: {},
+		github.GithubMembershipResourceType:       {},
+		github.GithubTeamMembershipResourceType:   {},
+		github.GithubRepositoryResourceType:       {},
+		github.GithubTeamResourceType:             {},
 	}
 
 	schemaRepository := testresource.InitFakeSchemaRepository("github", "4.4.0")

@@ -12,7 +12,7 @@ func TestAcc_Aws_SNSTopicPolicy(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_sns_topic_policy"},
-		Args:             []string{"scan", "--deep"},
+		Args:             []string{"scan"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

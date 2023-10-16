@@ -1,6 +1,8 @@
 package remote
 
 import (
+	"testing"
+
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/aws"
@@ -9,7 +11,6 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/terraform"
-	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -24,7 +25,6 @@ import (
 	"github.com/snyk/driftctl/enumeration/resource"
 	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	"github.com/stretchr/testify/assert"
 )
@@ -32,16 +32,20 @@ import (
 func TestRoute53_HealthCheck(t *testing.T) {
 
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockRoute53Repository, *mocks.AlerterInterface)
-		err     error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockRoute53Repository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		err            error
 	}{
 		{
 			test:    "no health check",
 			dirName: "aws_route53_health_check_empty",
 			mocks: func(client *repository.MockRoute53Repository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllHealthChecks").Return([]*route53.HealthCheck{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			err: nil,
 		},
@@ -54,6 +58,15 @@ func TestRoute53_HealthCheck(t *testing.T) {
 					{Id: awssdk.String("84fc318a-2e0d-41d6-b638-280e2f0f4e26")},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "7001a9df-ded4-4802-9909-668eb80b972b", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsRoute53HealthCheckResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "84fc318a-2e0d-41d6-b638-280e2f0f4e26", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsRoute53HealthCheckResourceType, got[1].ResourceType())
+			},
 			err: nil,
 		},
 		{
@@ -65,12 +78,14 @@ func TestRoute53_HealthCheck(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsRoute53HealthCheckResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRoute53HealthCheckResourceType, resourceaws.AwsRoute53HealthCheckResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			err: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -80,7 +95,6 @@ func TestRoute53_HealthCheck(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -109,18 +123,18 @@ func TestRoute53_HealthCheck(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewRoute53HealthCheckEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRoute53HealthCheckResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRoute53HealthCheckResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsRoute53HealthCheckResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -130,10 +144,11 @@ func TestRoute53_HealthCheck(t *testing.T) {
 func TestRoute53_Zone(t *testing.T) {
 
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockRoute53Repository, *mocks.AlerterInterface)
-		err     error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockRoute53Repository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		err            error
 	}{
 		{
 			test:    "no zones",
@@ -143,6 +158,9 @@ func TestRoute53_Zone(t *testing.T) {
 					[]*route53.HostedZone{},
 					nil,
 				)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			err: nil,
 		},
@@ -159,6 +177,12 @@ func TestRoute53_Zone(t *testing.T) {
 					},
 					nil,
 				)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+
+				assert.Equal(t, "Z08068311RGDXPHF8KE62", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsRoute53ZoneResourceType, got[0].ResourceType())
 			},
 			err: nil,
 		},
@@ -184,6 +208,18 @@ func TestRoute53_Zone(t *testing.T) {
 					nil,
 				)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, "Z01809283VH9BBALZHO7B", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsRoute53ZoneResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "Z01804312AV8PHE3C43AD", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsRoute53ZoneResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "Z01874941AR1TCGV5K65C", got[2].ResourceId())
+				assert.Equal(t, resourceaws.AwsRoute53ZoneResourceType, got[2].ResourceType())
+			},
 			err: nil,
 		},
 		{
@@ -198,12 +234,14 @@ func TestRoute53_Zone(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsRoute53ZoneResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRoute53ZoneResourceType, resourceaws.AwsRoute53ZoneResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			err: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -213,7 +251,6 @@ func TestRoute53_Zone(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -242,18 +279,18 @@ func TestRoute53_Zone(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewRoute53ZoneEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRoute53ZoneResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRoute53ZoneResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsRoute53ZoneResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -263,10 +300,11 @@ func TestRoute53_Zone(t *testing.T) {
 func TestRoute53_Record(t *testing.T) {
 
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockRoute53Repository, *mocks.AlerterInterface)
-		err     error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockRoute53Repository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		err            error
 	}{
 		{
 			test:    "no records",
@@ -282,6 +320,9 @@ func TestRoute53_Record(t *testing.T) {
 					nil,
 				)
 				client.On("ListRecordsForZone", "Z1035360GLIB82T1EH2G").Return([]*route53.ResourceRecordSet{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			err: nil,
 		},
@@ -331,6 +372,15 @@ func TestRoute53_Record(t *testing.T) {
 					},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 6)
+
+				assert.Equal(t, "Z1035360GLIB82T1EH2G_foo-0.com_NS", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsRoute53RecordResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "Z10347383HV75H96J919W_test2_A", got[5].ResourceId())
+				assert.Equal(t, resourceaws.AwsRoute53RecordResourceType, got[5].ResourceType())
+			},
 			err: nil,
 		},
 		{
@@ -373,6 +423,15 @@ func TestRoute53_Record(t *testing.T) {
 					},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 6)
+
+				assert.Equal(t, "Z06486383UC8WYSBZTWFM_test0_TXT", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsRoute53RecordResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "Z06486383UC8WYSBZTWFM__test2.foo-2.com_A", got[5].ResourceId())
+				assert.Equal(t, resourceaws.AwsRoute53RecordResourceType, got[5].ResourceType())
+			},
 			err: nil,
 		},
 		{
@@ -385,6 +444,9 @@ func TestRoute53_Record(t *testing.T) {
 					awsError)
 
 				alerter.On("SendAlert", resourceaws.AwsRoute53RecordResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRoute53RecordResourceType, resourceaws.AwsRoute53ZoneResourceType), alerts.EnumerationPhase)).Return()
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			err: nil,
 		},
@@ -406,12 +468,14 @@ func TestRoute53_Record(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsRoute53RecordResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRoute53RecordResourceType, resourceaws.AwsRoute53RecordResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			err: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -421,7 +485,6 @@ func TestRoute53_Record(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -450,18 +513,18 @@ func TestRoute53_Record(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewRoute53RecordEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRoute53RecordResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRoute53RecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsRoute53RecordResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})

@@ -20,5 +20,4 @@ func initAwsRoute53ZoneMetaData(resourceSchemaRepository dctlresource.SchemaRepo
 		}
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(AwsRoute53ZoneResourceType, resource.FlagDeepMode)
 }

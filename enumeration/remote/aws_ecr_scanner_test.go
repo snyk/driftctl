@@ -21,7 +21,6 @@ import (
 	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/mocks"
 
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
@@ -30,16 +29,20 @@ import (
 
 func TestECRRepository(t *testing.T) {
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockECRRepository, *mocks.AlerterInterface)
-		err     error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockECRRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		err            error
 	}{
 		{
 			test:    "no repository",
 			dirName: "aws_ecr_repository_empty",
 			mocks: func(client *repository.MockECRRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllRepositories").Return([]*ecr.Repository{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			err: nil,
 		},
@@ -52,6 +55,15 @@ func TestECRRepository(t *testing.T) {
 					{RepositoryName: awssdk.String("bar")},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "test_ecr", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsEcrRepositoryResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "bar", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsEcrRepositoryResourceType, got[1].ResourceType())
+			},
 			err: nil,
 		},
 		{
@@ -63,12 +75,14 @@ func TestECRRepository(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsEcrRepositoryResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsEcrRepositoryResourceType, resourceaws.AwsEcrRepositoryResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			err: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -78,7 +92,6 @@ func TestECRRepository(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -107,18 +120,18 @@ func TestECRRepository(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewECRRepositoryEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsEcrRepositoryResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsEcrRepositoryResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.err)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsEcrRepositoryResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -162,7 +175,6 @@ func TestECRRepositoryPolicy(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -177,7 +189,7 @@ func TestECRRepositoryPolicy(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.err)
 			if err != nil {

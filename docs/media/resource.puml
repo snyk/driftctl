@@ -12,16 +12,5 @@ RemoteSDK --> Enumerator: Attrs
 end
 Enumerator --> Scanner: []Resource with limited attributes
 end
-alt if deep mode enabled
-hnote across: Details fetching phase
-loop for each enumerated resource
-Scanner -> DetailsFetcher: ReadDetails(res)
-DetailsFetcher -> TerraformProvider: ReadResource()
-TerraformProvider --> DetailsFetcher: CTYValue
-DetailsFetcher -> Deserializer: Deserialize()
-Deserializer -> DetailsFetcher: Resource
-DetailsFetcher -> Scanner: Resource with\nfull attributes
-end
-end
 Scanner --> driftctl: []Resource
 @enduml

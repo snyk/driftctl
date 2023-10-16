@@ -204,7 +204,6 @@ func initAwsNetworkACLRuleMetaData(resourceSchemaRepository dctlresource.SchemaR
 		res.Attrs.DeleteIfDefault("cidr_block")
 		res.Attrs.DeleteIfDefault("ipv6_cidr_block")
 	})
-	resourceSchemaRepository.SetFlags(AwsNetworkACLRuleResourceType, resource.FlagDeepMode)
 	resourceSchemaRepository.SetHumanReadableAttributesFunc(AwsNetworkACLRuleResourceType, func(res *resource.Resource) map[string]string {
 
 		ruleNumber := strconv.FormatInt((*res.Attrs)["rule_number"].(int64), 10)

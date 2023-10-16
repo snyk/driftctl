@@ -3,8 +3,9 @@ package aws
 import (
 	"bytes"
 	"fmt"
-	dctlresource "github.com/snyk/driftctl/pkg/resource"
 	"strings"
+
+	dctlresource "github.com/snyk/driftctl/pkg/resource"
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/snyk/driftctl/enumeration/resource"
@@ -84,7 +85,6 @@ func initAwsSecurityGroupRuleMetaData(resourceSchemaRepository dctlresource.Sche
 		}
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(AwsSecurityGroupRuleResourceType, resource.FlagDeepMode)
 }
 
 func join(elems []interface{}, sep string) string {

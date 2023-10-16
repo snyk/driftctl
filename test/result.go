@@ -40,49 +40,8 @@ func (r *ScanResult) AssertResourceDeleted(id, ty string) {
 	r.Failf("Resource not deleted", "%s(%s)", id, ty)
 }
 
-func (r *ScanResult) AssertResourceDriftCount(id, ty string, count int) {
-	for _, u := range r.Differences() {
-		if u.Res.ResourceType() == ty && u.Res.ResourceId() == id {
-			r.Equal(count, len(u.Changelog))
-		}
-	}
-	r.Failf("no differences found", "%s(%s)", id, ty)
-}
-
-func (r *ScanResult) AssertResourceHasDrift(id, ty string, change analyser.Change) {
-	found := false
-	for _, u := range r.Differences() {
-		if u.Res.ResourceType() == ty && u.Res.ResourceId() == id {
-			changelogStr, _ := json.MarshalIndent(u.Changelog, "", " ")
-			changeStr, _ := json.MarshalIndent(change, "", " ")
-			r.Contains(u.Changelog, change, fmt.Sprintf("Change not found\nCHANGE: %s\nCHANGELOG:\n%s", changeStr, changelogStr))
-			found = true
-		}
-	}
-	if !found {
-		r.Failf("no differences found", "%s (%s)", id, ty)
-	}
-}
-
-func (r *ScanResult) AssertResourceHasNoDrift(id, ty string) {
-	for _, u := range r.Differences() {
-		if u.Res.ResourceType() == ty && u.Res.ResourceId() == id {
-			changelogStr, _ := json.MarshalIndent(u.Changelog, "", " ")
-			r.Failf("resource has drifted", "%s(%s) :\n %v", id, ty, changelogStr)
-		}
-	}
-}
-
 func (r *ScanResult) AssertCoverage(expected int) {
 	r.Equal(expected, r.Coverage())
-}
-
-func (r *ScanResult) AssertDriftCountTotal(count int) {
-	driftCount := 0
-	for _, diff := range r.Differences() {
-		driftCount += len(diff.Changelog)
-	}
-	r.Equal(count, driftCount)
 }
 
 func (r *ScanResult) AssertDeletedCount(count int) {

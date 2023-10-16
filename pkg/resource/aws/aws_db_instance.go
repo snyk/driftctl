@@ -21,5 +21,4 @@ func initAwsDbInstanceMetaData(resourceSchemaRepository dctlresource.SchemaRepos
 		val.SafeDelete([]string{"apply_immediately"})
 		val.DeleteIfDefault("CharacterSetName")
 	})
-	resourceSchemaRepository.SetFlags(AwsDbInstanceResourceType, resource.FlagDeepMode)
 }

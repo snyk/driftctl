@@ -13,7 +13,7 @@ func TestAcc_Azure_PrivateDNSCNAMERecord(t *testing.T) {
 		Paths:            []string{"./testdata/acc/azurerm_private_dns_cname_record"},
 		Args: []string{
 			"scan",
-			"--to", "azure+tf", "--deep",
+			"--to", "azure+tf",
 		},
 		Checks: []acceptance.AccCheck{
 			{

@@ -28,5 +28,4 @@ func initAwsLambdaEventSourceMappingMetaData(resourceSchemaRepository dctlresour
 		}
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(AwsLambdaEventSourceMappingResourceType, resource.FlagDeepMode)
 }

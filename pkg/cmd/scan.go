@@ -115,10 +115,6 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 
 			opts.ConfigDir, _ = cmd.Flags().GetString("config-dir")
 
-			if onlyManaged, _ := cmd.Flags().GetBool("only-managed"); onlyManaged {
-				opts.Deep = true
-			}
-
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -205,12 +201,6 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 		false,
 		"Includes cloud provider service-linked roles (disabled by default)",
 	)
-	fl.BoolVar(&opts.Deep,
-		"deep",
-		false,
-		fmt.Sprintf("%s Enable deep mode\n", warn("EXPERIMENTAL:"))+
-			"You should check the documentation for more details: https://docs.driftctl.com/deep-mode\n",
-	)
 	fl.StringVar(&opts.DriftignorePath,
 		"driftignore",
 		".driftignore",
@@ -238,15 +228,11 @@ func NewScanCmd(opts *pkg.ScanOptions) *cobra.Command {
 		configDir,
 		"Directory path that driftctl uses for configuration.\n",
 	)
-	fl.BoolVar(&opts.OnlyManaged,
-		"only-managed",
-		false,
-		"Report only what's managed by your IaC\n",
-	)
-	fl.BoolVar(&opts.OnlyUnmanaged,
+	var deprecatedOnlyUnmanaged bool
+	fl.BoolVar(&deprecatedOnlyUnmanaged,
 		"only-unmanaged",
 		false,
-		"Report only what's not managed by your IaC\n",
+		fmt.Sprintf("%s Report only what's not managed by your IaC.\nThis option is a no-op as unmanaged is the only supported mode.\n", warn("DEPRECATED:")),
 	)
 
 	return cmd
@@ -320,7 +306,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 	driftIgnore := filter.NewDriftIgnore(opts.DriftignorePath, opts.Driftignores...)
 
 	// TODO use enum library interface here
-	scanner := remote.NewScanner(remoteLibrary, alerter, remote.ScannerOptions{Deep: opts.Deep}, driftIgnore)
+	scanner := remote.NewScanner(remoteLibrary, alerter, driftIgnore)
 
 	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, alerter, resFactory, driftIgnore)
 	if err != nil {
@@ -331,7 +317,7 @@ func scanRun(opts *pkg.ScanOptions) error {
 		scanner,
 		iacSupplier,
 		alerter,
-		analyser.NewAnalyzer(alerter, analyser.AnalyzerOptions{Deep: opts.Deep, OnlyManaged: opts.OnlyManaged, OnlyUnmanaged: opts.OnlyUnmanaged}, driftIgnore),
+		analyser.NewAnalyzer(alerter, driftIgnore),
 		resFactory,
 		opts,
 		scanProgress,

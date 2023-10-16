@@ -1,7 +1,6 @@
 package analyser
 
 import (
-	"github.com/r3labs/diff/v2"
 	"github.com/snyk/driftctl/enumeration/alerter"
 	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/pkg/filter"
@@ -45,24 +44,17 @@ func (c *ComputedDiffAlert) Resource() *resource.Resource {
 	return nil
 }
 
-type AnalyzerOptions struct {
-	Deep          bool `json:"deep"`
-	OnlyManaged   bool `json:"only_managed"`
-	OnlyUnmanaged bool `json:"only_unmanaged"`
-}
-
 type Analyzer struct {
 	alerter *alerter.Alerter
-	options AnalyzerOptions
 	filter  filter.Filter
 }
 
-func NewAnalyzer(alerter *alerter.Alerter, options AnalyzerOptions, filter filter.Filter) *Analyzer {
-	return &Analyzer{alerter, options, filter}
+func NewAnalyzer(alerter *alerter.Alerter, filter filter.Filter) *Analyzer {
+	return &Analyzer{alerter, filter}
 }
 
 func (a Analyzer) Analyze(remoteResources, resourcesFromState []*resource.Resource) (Analysis, error) {
-	analysis := Analysis{options: a.options}
+	analysis := Analysis{}
 
 	// Iterate on remote resources and filter ignored resources
 	filteredRemoteResource := make([]*resource.Resource, 0, len(remoteResources))
@@ -75,62 +67,20 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []*resource.Resour
 
 	haveComputedDiff := false
 	for _, stateRes := range resourcesFromState {
-		i, remoteRes, found := findCorrespondingRes(filteredRemoteResource, stateRes)
+		i, _, found := findCorrespondingRes(filteredRemoteResource, stateRes)
 
 		if a.filter.IsResourceIgnored(stateRes) || a.alerter.IsResourceIgnored(stateRes) {
 			continue
 		}
 
 		if !found {
-			if !analysis.Options().OnlyUnmanaged {
-				analysis.AddDeleted(stateRes)
-			}
+			analysis.AddDeleted(stateRes)
 			continue
 		}
 
 		// Remove managed resources, so it will remain only unmanaged ones
 		filteredRemoteResource = removeResourceByIndex(i, filteredRemoteResource)
 		analysis.AddManaged(stateRes)
-
-		// Stop there if we are not in deep mode, we do not want to compute diffs
-		if !a.options.Deep {
-			continue
-		}
-
-		// Stop if the resource is not compatible with deep mode
-		if stateRes.Schema() != nil && !stateRes.Schema().Flags.HasFlag(resource.FlagDeepMode) {
-			continue
-		}
-
-		var delta diff.Changelog
-		delta, _ = diff.Diff(stateRes.Attributes(), remoteRes.Attributes())
-
-		if len(delta) == 0 {
-			continue
-		}
-
-		changelog := make([]Change, 0, len(delta))
-		for _, change := range delta {
-			if a.filter.IsFieldIgnored(stateRes, change.Path) {
-				continue
-			}
-			c := Change{Change: change}
-			resSchema := stateRes.Schema()
-			if resSchema != nil {
-				c.Computed = resSchema.IsComputedField(c.Path)
-				c.JsonString = resSchema.IsJsonStringField(c.Path)
-			}
-			if c.Computed {
-				haveComputedDiff = true
-			}
-			changelog = append(changelog, c)
-		}
-		if len(changelog) > 0 {
-			analysis.AddDifference(Difference{
-				Res:       stateRes,
-				Changelog: changelog,
-			})
-		}
 	}
 
 	if a.hasUnmanagedSecurityGroupRules(filteredRemoteResource) {
@@ -142,9 +92,7 @@ func (a Analyzer) Analyze(remoteResources, resourcesFromState []*resource.Resour
 	}
 
 	// Add remaining unmanaged resources
-	if !analysis.Options().OnlyManaged {
-		analysis.AddUnmanaged(filteredRemoteResource...)
-	}
+	analysis.AddUnmanaged(filteredRemoteResource...)
 
 	// Sort resources by Terraform Id
 	// The purpose is to have a predictable output

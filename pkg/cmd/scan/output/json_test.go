@@ -27,15 +27,7 @@ func TestJSON_Write(t *testing.T) {
 			name:       "test json output",
 			goldenfile: "output.json",
 			args: args{
-				analysis: fakeAnalysis(analyser.AnalyzerOptions{}),
-			},
-			wantErr: false,
-		},
-		{
-			name:       "test json output with drift on computed fields",
-			goldenfile: "output_computed_fields.json",
-			args: args{
-				analysis: fakeAnalysisWithComputedFields(),
+				analysis: fakeAnalysis(),
 			},
 			wantErr: false,
 		},
@@ -102,7 +94,7 @@ func TestJSON_Write_stdout(t *testing.T) {
 			goldenfile: "output.json",
 			path:       "stdout",
 			args: args{
-				analysis: fakeAnalysis(analyser.AnalyzerOptions{}),
+				analysis: fakeAnalysis(),
 			},
 			wantErr: false,
 		},
@@ -112,7 +104,7 @@ func TestJSON_Write_stdout(t *testing.T) {
 			goldenfile: "output.json",
 			path:       "/dev/stdout",
 			args: args{
-				analysis: fakeAnalysis(analyser.AnalyzerOptions{}),
+				analysis: fakeAnalysis(),
 			},
 			wantErr: false,
 		},
@@ -159,7 +151,7 @@ func TestJSON_Write_stdout(t *testing.T) {
 
 func TestJSON_WriteMultiplesTimesInSameFile(t *testing.T) {
 	emptyAnalysis := &analyser.Analysis{}
-	longerAnalysis := fakeAnalysis(analyser.AnalyzerOptions{})
+	longerAnalysis := fakeAnalysis()
 	tempDir := t.TempDir()
 	tempFile, err := os.CreateTemp(tempDir, "result")
 	if err != nil {

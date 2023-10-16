@@ -28,5 +28,4 @@ func initAwsIAMAccessKeyMetaData(resourceSchemaRepository dctlresource.SchemaRep
 		}
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(AwsIamAccessKeyResourceType, resource.FlagDeepMode)
 }

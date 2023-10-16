@@ -20,7 +20,6 @@ import (
 	resourceazure "github.com/snyk/driftctl/enumeration/resource/azurerm"
 	"github.com/snyk/driftctl/mocks"
 
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
@@ -28,7 +27,6 @@ import (
 )
 
 func TestAzurermVirtualNetwork(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
@@ -87,8 +85,6 @@ func TestAzurermVirtualNetwork(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-
-			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -103,7 +99,7 @@ func TestAzurermVirtualNetwork(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -118,7 +114,6 @@ func TestAzurermVirtualNetwork(t *testing.T) {
 }
 
 func TestAzurermRouteTables(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
@@ -177,8 +172,6 @@ func TestAzurermRouteTables(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-
-			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -193,7 +186,7 @@ func TestAzurermRouteTables(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -208,7 +201,6 @@ func TestAzurermRouteTables(t *testing.T) {
 }
 
 func TestAzurermRoutes(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
@@ -323,8 +315,6 @@ func TestAzurermRoutes(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-
-			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -339,7 +329,7 @@ func TestAzurermRoutes(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -354,7 +344,6 @@ func TestAzurermRoutes(t *testing.T) {
 }
 
 func TestAzurermSubnets(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	networks := []*armnetwork.VirtualNetwork{
@@ -453,8 +442,6 @@ func TestAzurermSubnets(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-
-			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -469,7 +456,7 @@ func TestAzurermSubnets(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -484,7 +471,6 @@ func TestAzurermSubnets(t *testing.T) {
 }
 
 func TestAzurermFirewalls(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
@@ -543,8 +529,6 @@ func TestAzurermFirewalls(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-
-			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -559,7 +543,7 @@ func TestAzurermFirewalls(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -574,7 +558,6 @@ func TestAzurermFirewalls(t *testing.T) {
 }
 
 func TestAzurermPublicIP(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
@@ -633,8 +616,6 @@ func TestAzurermPublicIP(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-
-			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -649,7 +630,7 @@ func TestAzurermPublicIP(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -664,14 +645,14 @@ func TestAzurermPublicIP(t *testing.T) {
 }
 
 func TestAzurermSecurityGroups(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no security group",
@@ -679,12 +660,18 @@ func TestAzurermSecurityGroups(t *testing.T) {
 			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSecurityGroups").Return([]*armnetwork.NetworkSecurityGroup{}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 		{
 			test:    "error listing security groups",
 			dirName: "azurerm_network_security_group_empty",
 			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSecurityGroups").Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: error2.NewResourceListingError(dummyError, resourceazure.AzureNetworkSecurityGroupResourceType),
 		},
@@ -707,17 +694,23 @@ func TestAzurermSecurityGroups(t *testing.T) {
 					},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/example-resources/providers/Microsoft.Network/networkSecurityGroups/acceptanceTestSecurityGroup1", got[0].ResourceId())
+				assert.Equal(t, resourceazure.AzureNetworkSecurityGroupResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/example-resources/providers/Microsoft.Network/networkSecurityGroups/acceptanceTestSecurityGroup2", got[1].ResourceId())
+				assert.Equal(t, resourceazure.AzureNetworkSecurityGroupResourceType, got[1].ResourceType())
+			},
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
-
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -751,19 +744,19 @@ func TestAzurermSecurityGroups(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermNetworkSecurityGroupEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzureNetworkSecurityGroupResourceType, common.NewGenericDetailsFetcher(resourceazure.AzureNetworkSecurityGroupResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceazure.AzureNetworkSecurityGroupResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -771,7 +764,6 @@ func TestAzurermSecurityGroups(t *testing.T) {
 }
 
 func TestAzurermLoadBalancers(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
@@ -830,8 +822,6 @@ func TestAzurermLoadBalancers(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-
-			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -846,7 +836,7 @@ func TestAzurermLoadBalancers(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -861,14 +851,14 @@ func TestAzurermLoadBalancers(t *testing.T) {
 }
 
 func TestAzurermLoadBalancerRules(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockNetworkRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no load balancer rule",
@@ -885,12 +875,18 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 
 				repository.On("ListLoadBalancerRules", loadbalancer).Return([]*armnetwork.LoadBalancingRule{}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 		{
 			test:    "error listing load balancer rules",
 			dirName: "azurerm_lb_rule_empty",
 			mocks: func(repository *repository.MockNetworkRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllLoadBalancers").Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: error2.NewResourceListingErrorWithType(dummyError, resourceazure.AzureLoadBalancerRuleResourceType, resourceazure.AzureLoadBalancerResourceType),
 		},
@@ -922,17 +918,23 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 					},
 				}, nil).Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/loadBalancingRules/LBRule", got[0].ResourceId())
+				assert.Equal(t, resourceazure.AzureLoadBalancerRuleResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/raphael-dev/providers/Microsoft.Network/loadBalancers/TestLoadBalancer/loadBalancingRules/LBRule2", got[1].ResourceId())
+				assert.Equal(t, resourceazure.AzureLoadBalancerRuleResourceType, got[1].ResourceType())
+			},
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
-
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -966,19 +968,19 @@ func TestAzurermLoadBalancerRules(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermLoadBalancerRuleEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzureLoadBalancerRuleResourceType, common.NewGenericDetailsFetcher(resourceazure.AzureLoadBalancerRuleResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceazure.AzureLoadBalancerRuleResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})

@@ -23,5 +23,4 @@ func initSnsTopicPolicyMetaData(resourceSchemaRepository dctlresource.SchemaRepo
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetFlags(AwsSnsTopicPolicyResourceType, resource.FlagDeepMode)
 }

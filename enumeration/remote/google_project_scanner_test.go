@@ -95,7 +95,6 @@ func TestGoogleProjectIAMMember(t *testing.T) {
 
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -122,7 +121,7 @@ func TestGoogleProjectIAMMember(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {

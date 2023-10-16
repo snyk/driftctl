@@ -12,7 +12,7 @@ func TestAcc_Aws_NATGateway(t *testing.T) {
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_nat_gateway"},
 		// We filter on aws_eip_association too to test the middleware behavior
-		Args: []string{"scan", "--deep"},
+		Args: []string{"scan"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{

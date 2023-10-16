@@ -1,20 +1,13 @@
 package output
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"os"
-	"reflect"
 	"sort"
-	"strings"
 
-	"github.com/aws/aws-sdk-go/aws/awsutil"
+	"github.com/snyk/driftctl/enumeration/remote/alerts"
+
 	"github.com/fatih/color"
-	"github.com/mattn/go-isatty"
-	"github.com/r3labs/diff/v2"
-	"github.com/yudai/gojsondiff"
-	"github.com/yudai/gojsondiff/formatter"
 
 	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg/analyser"
@@ -95,70 +88,6 @@ func (c *Console) Write(analysis *analyser.Analysis) error {
 		}
 	}
 
-	if analysis.Summary().TotalDrifted > 0 {
-		var sources []string
-		groupedBySource := make(map[string][]analyser.Difference)
-		for _, difference := range analysis.Differences() {
-			key := ""
-			if difference.Res.Source != nil {
-				key = difference.Res.Source.Source()
-			}
-			if _, exist := groupedBySource[key]; !exist {
-				groupedBySource[key] = []analyser.Difference{difference}
-				continue
-			}
-			groupedBySource[key] = append(groupedBySource[key], difference)
-		}
-
-		for s := range groupedBySource {
-			sources = append(sources, s)
-		}
-		sort.Strings(sources)
-
-		fmt.Println("Found changed resources:")
-		for _, source := range sources {
-			indentBase := "  "
-			if source != "" {
-				fmt.Print(color.BlueString("%sFrom %s\n", indentBase, source))
-				indentBase += indentBase
-			}
-			for _, difference := range groupedBySource[source] {
-				humanStringSource := difference.Res.ResourceType()
-				if difference.Res.SourceString() != "" {
-					humanStringSource = difference.Res.SourceString()
-				}
-				humanString := fmt.Sprintf("%s- %s (%s):", indentBase, difference.Res.ResourceId(), humanStringSource)
-				whiteSpace := indentBase + "    "
-				if humanAttrs := formatResourceAttributes(difference.Res); humanAttrs != "" {
-					humanString += fmt.Sprintf("\n%s%s", whiteSpace, humanAttrs)
-					whiteSpace += "    "
-				}
-				fmt.Println(humanString)
-				for _, change := range difference.Changelog {
-					path := strings.Join(change.Path, ".")
-					pref := fmt.Sprintf("%s %s:", color.YellowString("~"), path)
-					if change.Type == diff.CREATE {
-						pref = fmt.Sprintf("%s %s:", color.GreenString("+"), path)
-					} else if change.Type == diff.DELETE {
-						pref = fmt.Sprintf("%s %s:", color.RedString("-"), path)
-					}
-					if change.Type == diff.UPDATE {
-						if change.JsonString {
-							prefix := "           "
-							fmt.Printf("%s%s\n%s%s\n", whiteSpace, pref, prefix, jsonDiff(change.From, change.To, isatty.IsTerminal(os.Stdout.Fd())))
-							continue
-						}
-					}
-					fmt.Printf("%s%s %s => %s", whiteSpace, pref, prettify(change.From), prettify(change.To))
-					if change.Computed {
-						fmt.Printf(" %s", color.YellowString("(computed)"))
-					}
-					fmt.Printf("\n")
-				}
-			}
-		}
-	}
-
 	c.writeSummary(analysis)
 
 	enumerationErrorMessage := ""
@@ -203,42 +132,20 @@ func (c Console) writeSummary(analysis *analyser.Analysis) {
 		}
 		fmt.Printf(" - %s resource(s) managed by Terraform\n", managed)
 
-		drifted := successWriter.Sprintf("0")
-		if analysis.Summary().TotalDrifted > 0 {
-			drifted = errorWriter.Sprintf("%d", analysis.Summary().TotalDrifted)
-		}
-		if analysis.Options().Deep {
-			fmt.Printf("     - %s resource(s) out of sync with Terraform state\n", boldWriter.Sprintf("%s/%d", drifted, analysis.Summary().TotalManaged))
-		}
-
 		unmanaged := successWriter.Sprintf("0")
 		if analysis.Summary().TotalUnmanaged > 0 {
 			unmanaged = warningWriter.Sprintf("%d", analysis.Summary().TotalUnmanaged)
 		}
-		if !analysis.Options().OnlyManaged {
-			fmt.Printf(" - %s resource(s) not managed by Terraform\n", unmanaged)
-		}
-
 		deleted := successWriter.Sprintf("0")
 		if analysis.Summary().TotalDeleted > 0 {
 			deleted = errorWriter.Sprintf("%d", analysis.Summary().TotalDeleted)
 		}
-		if !analysis.Options().OnlyUnmanaged {
-			fmt.Printf(" - %s resource(s) found in a Terraform state but missing on the cloud provider\n", deleted)
-		}
+		fmt.Printf(" - %s resource(s) not managed by Terraform\n", unmanaged)
+		fmt.Printf(" - %s resource(s) found in a Terraform state but missing on the cloud provider\n", deleted)
 	}
 	if analysis.IsSync() {
 		fmt.Println(color.GreenString("Congrats! Your infrastructure is fully in sync."))
 	}
-}
-
-func prettify(resource interface{}) string {
-	res := reflect.ValueOf(resource)
-	if resource == nil || res.Kind() == reflect.Ptr && res.IsNil() {
-		return "<nil>"
-	}
-
-	return awsutil.Prettify(resource)
 }
 
 func groupByType(resources []*resource.Resource) (map[string][]*resource.Resource, []string) {
@@ -258,26 +165,6 @@ func groupByType(resources []*resource.Resource) (map[string][]*resource.Resourc
 	sort.Strings(keys)
 
 	return result, keys
-}
-
-func jsonDiff(a, b interface{}, coloring bool) string {
-	aStr := fmt.Sprintf("%s", a)
-	bStr := fmt.Sprintf("%s", b)
-	d := gojsondiff.New()
-	var aJson map[string]interface{}
-	_ = json.Unmarshal([]byte(aStr), &aJson)
-	result, _ := d.Compare([]byte(aStr), []byte(bStr))
-	f := formatter.NewAsciiFormatter(aJson, formatter.AsciiFormatterConfig{
-		Coloring: coloring,
-	})
-	// Set foreground green color for added lines and red color for deleted lines
-	formatter.AsciiStyles = map[string]string{
-		"+": "32",
-		"-": "31",
-	}
-	diffStr, _ := f.Format(result)
-
-	return diffStr
 }
 
 func formatResourceAttributes(res *resource.Resource) string {

@@ -9,7 +9,7 @@ package aws_test
 // 	acceptance.Run(t, acceptance.AccTestCase{
 // 		TerraformVersion: "0.15.5",
 // 		Paths:            []string{"./testdata/acc/aws_default_network_acl"},
-// 		Args:             []string{"scan", "--deep"},
+// 		Args:             []string{"scan"},
 // 		Checks: []acceptance.AccCheck{
 // 			{
 // 				Env: map[string]string{

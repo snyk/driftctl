@@ -20,7 +20,6 @@ import (
 	resourceazure "github.com/snyk/driftctl/enumeration/resource/azurerm"
 	"github.com/snyk/driftctl/mocks"
 
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
@@ -28,7 +27,6 @@ import (
 )
 
 func TestAzurermCompute_Image(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
@@ -93,7 +91,6 @@ func TestAzurermCompute_Image(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -106,7 +103,7 @@ func TestAzurermCompute_Image(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -121,14 +118,14 @@ func TestAzurermCompute_Image(t *testing.T) {
 }
 
 func TestAzurermCompute_SSHPublicKey(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockComputeRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockComputeRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no public key",
@@ -136,12 +133,18 @@ func TestAzurermCompute_SSHPublicKey(t *testing.T) {
 			mocks: func(repository *repository.MockComputeRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSSHPublicKeys").Return([]*armcompute.SSHPublicKeyResource{}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 		{
 			test:    "error listing public keys",
 			dirName: "azurerm_ssh_public_key_empty",
 			mocks: func(repository *repository.MockComputeRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllSSHPublicKeys").Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzureSSHPublicKeyResourceType),
 		},
@@ -164,17 +167,24 @@ func TestAzurermCompute_SSHPublicKey(t *testing.T) {
 					},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/TESTRESGROUP/providers/Microsoft.Compute/sshPublicKeys/example-key", got[0].ResourceId())
+				assert.Equal(t, resourceazure.AzureSSHPublicKeyResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/TESTRESGROUP/providers/Microsoft.Compute/sshPublicKeys/example-key2", got[1].ResourceId())
+				assert.Equal(t, resourceazure.AzureSSHPublicKeyResourceType, got[1].ResourceType())
+			},
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -208,19 +218,19 @@ func TestAzurermCompute_SSHPublicKey(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermSSHPublicKeyEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzureSSHPublicKeyResourceType, common.NewGenericDetailsFetcher(resourceazure.AzureSSHPublicKeyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceazure.AzureSSHPublicKeyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})

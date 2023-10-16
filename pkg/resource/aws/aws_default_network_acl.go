@@ -15,6 +15,5 @@ func initAwsDefaultNetworkACLMetaData(resourceSchemaRepository dctlresource.Sche
 		res.Attrs.SafeDelete([]string{"subnet_ids"})
 
 	})
-	resourceSchemaRepository.SetFlags(AwsDefaultNetworkACLResourceType, resource.FlagDeepMode)
 
 }
