@@ -85,4 +85,9 @@ ignore:
     - '*':
         reason: This license is addressed by including acknowledgments in each release
         created: 2022-09-09T14:25:05.042Z
+  SNYK-GOLANG-GOLANGORGXNETHTTP2-5953327:
+    - '*':
+        reason: Not affected because CLI
+        expires: 2024-04-15T15:15:28.330Z
+        created: 2023-10-16T15:15:28.356Z
 patch: {}
