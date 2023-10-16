@@ -17,10 +17,10 @@ import (
 
 	testgoogle "github.com/snyk/driftctl/test/google"
 
+	assetpb "cloud.google.com/go/asset/apiv1/assetpb"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	assetpb "google.golang.org/genproto/googleapis/cloud/asset/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

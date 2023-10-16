@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	asset "cloud.google.com/go/asset/apiv1"
+	assetpb "cloud.google.com/go/asset/apiv1/assetpb"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/google/config"
 	"google.golang.org/api/iterator"
-	assetpb "google.golang.org/genproto/googleapis/cloud/asset/v1"
 )
 
 // https://cloud.google.com/asset-inventory/docs/supported-asset-types#supported_resource_types

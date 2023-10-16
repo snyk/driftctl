@@ -20,12 +20,12 @@ import (
 	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/mocks"
 
+	assetpb "cloud.google.com/go/asset/apiv1/assetpb"
 	"github.com/snyk/driftctl/test/goldenfile"
 	testgoogle "github.com/snyk/driftctl/test/google"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	assetpb "google.golang.org/genproto/googleapis/cloud/asset/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
