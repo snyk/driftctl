@@ -25,24 +25,26 @@ import (
 	"github.com/snyk/driftctl/enumeration/resource"
 	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestScanSNSTopic(t *testing.T) {
-
 	cases := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockSNSRepository, *mocks.AlerterInterface)
-		err     error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockSNSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		err            error
 	}{
 		{
 			test:    "no SNS Topic",
 			dirName: "aws_sns_topic_empty",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTopics").Return([]*sns.Topic{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			err: nil,
 		},
@@ -56,6 +58,18 @@ func TestScanSNSTopic(t *testing.T) {
 					{TopicArn: awssdk.String("arn:aws:sns:eu-west-3:526954929923:user-updates-topic3")},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, "arn:aws:sns:eu-west-3:526954929923:user-updates-topic", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsSnsTopicResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "arn:aws:sns:eu-west-3:526954929923:user-updates-topic2", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsSnsTopicResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "arn:aws:sns:eu-west-3:526954929923:user-updates-topic3", got[2].ResourceId())
+				assert.Equal(t, resourceaws.AwsSnsTopicResourceType, got[2].ResourceType())
+			},
 			err: nil,
 		},
 		{
@@ -67,12 +81,14 @@ func TestScanSNSTopic(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsSnsTopicResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSnsTopicResourceType, resourceaws.AwsSnsTopicResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			err: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -82,7 +98,6 @@ func TestScanSNSTopic(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -111,18 +126,18 @@ func TestScanSNSTopic(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewSNSTopicEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSnsTopicResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsSnsTopicResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -130,18 +145,21 @@ func TestScanSNSTopic(t *testing.T) {
 }
 
 func TestSNSTopicPolicyScan(t *testing.T) {
-
 	cases := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockSNSRepository, *mocks.AlerterInterface)
-		err     error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockSNSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		err            error
 	}{
 		{
 			test:    "no SNS Topic policy",
 			dirName: "aws_sns_topic_policy_empty",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllTopics").Return([]*sns.Topic{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			err: nil,
 		},
@@ -154,6 +172,15 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 					{TopicArn: awssdk.String("arn:aws:sns:us-east-1:526954929923:my-topic-with-policy2")},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "arn:aws:sns:us-east-1:526954929923:my-topic-with-policy", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsSnsTopicPolicyResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "arn:aws:sns:us-east-1:526954929923:my-topic-with-policy2", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsSnsTopicPolicyResourceType, got[1].ResourceType())
+			},
 			err: nil,
 		},
 		{
@@ -165,12 +192,14 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsSnsTopicPolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSnsTopicPolicyResourceType, resourceaws.AwsSnsTopicResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			err: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -180,7 +209,6 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -209,18 +237,18 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewSNSTopicPolicyEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicPolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSnsTopicPolicyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.err, err)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsSnsTopicPolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -228,18 +256,21 @@ func TestSNSTopicPolicyScan(t *testing.T) {
 }
 
 func TestSNSTopicSubscriptionScan(t *testing.T) {
-
 	cases := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockSNSRepository, *mocks.AlerterInterface)
-		err     error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockSNSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		err            error
 	}{
 		{
 			test:    "no SNS Topic Subscription",
 			dirName: "aws_sns_topic_subscription_empty",
 			mocks: func(client *repository.MockSNSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllSubscriptions").Return([]*sns.Subscription{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			err: nil,
 		},
@@ -251,6 +282,15 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 					{SubscriptionArn: awssdk.String("arn:aws:sns:us-east-1:526954929923:user-updates-topic2:c0f794c5-a009-4db4-9147-4c55959787fa")},
 					{SubscriptionArn: awssdk.String("arn:aws:sns:us-east-1:526954929923:user-updates-topic:b6e66147-2b31-4486-8d4b-2a2272264c8e")},
 				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "arn:aws:sns:us-east-1:526954929923:user-updates-topic2:c0f794c5-a009-4db4-9147-4c55959787fa", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsSnsTopicSubscriptionResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "arn:aws:sns:us-east-1:526954929923:user-updates-topic:b6e66147-2b31-4486-8d4b-2a2272264c8e", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsSnsTopicSubscriptionResourceType, got[1].ResourceType())
 			},
 			err: nil,
 		},
@@ -269,6 +309,15 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 
 				alerter.On("SendAlert", "aws_sns_topic_subscription.Incorrect", aws.NewWrongArnTopicAlert("Incorrect", awssdk.String("INCORRECT"))).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "arn:aws:sns:us-east-1:526954929923:user-updates-topic2:c0f794c5-a009-4db4-9147-4c55959787fa", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsSnsTopicSubscriptionResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "arn:aws:sns:us-east-1:526954929923:user-updates-topic:b6e66147-2b31-4486-8d4b-2a2272264c8e", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsSnsTopicSubscriptionResourceType, got[1].ResourceType())
+			},
 			err: nil,
 		},
 		{
@@ -280,12 +329,14 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsSnsTopicSubscriptionResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSnsTopicSubscriptionResourceType, resourceaws.AwsSnsTopicSubscriptionResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			err: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -295,7 +346,6 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -324,18 +374,18 @@ func TestSNSTopicSubscriptionScan(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewSNSTopicSubscriptionEnumerator(repo, factory, alerter))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSnsTopicSubscriptionResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSnsTopicSubscriptionResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.err)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsSnsTopicSubscriptionResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})

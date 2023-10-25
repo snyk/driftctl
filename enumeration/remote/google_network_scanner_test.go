@@ -18,10 +18,10 @@ import (
 
 	testgoogle "github.com/snyk/driftctl/test/google"
 
+	assetpb "cloud.google.com/go/asset/apiv1/assetpb"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	assetpb "google.golang.org/genproto/googleapis/cloud/asset/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -109,7 +109,6 @@ func TestGoogleDNSNanagedZone(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -136,7 +135,7 @@ func TestGoogleDNSNanagedZone(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -146,7 +145,7 @@ func TestGoogleDNSNanagedZone(t *testing.T) {
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 			if c.assertExpected != nil {
-				c.assertExpected(t, got)
+				c.assertExpected(tt, got)
 			}
 		})
 	}

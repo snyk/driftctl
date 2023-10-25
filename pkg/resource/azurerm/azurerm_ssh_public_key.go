@@ -20,5 +20,4 @@ func initAzureSSHPublicKeyMetaData(resourceSchemaRepository dctlresource.SchemaR
 
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(AzureSSHPublicKeyResourceType, resource.FlagDeepMode)
 }

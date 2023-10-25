@@ -12,5 +12,4 @@ func initGithubTeamMembershipMetaData(resourceSchemaRepository dctlresource.Sche
 		val := res.Attrs
 		val.SafeDelete([]string{"etag"})
 	})
-	resourceSchemaRepository.SetFlags(GithubTeamMembershipResourceType, resource.FlagDeepMode)
 }

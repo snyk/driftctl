@@ -281,3 +281,13 @@ ff72de8e77f908fba61df50bc0938744270d1b51:pkg/remote/aws/test/iam_role_multiple/r
 ff72de8e77f908fba61df50bc0938744270d1b51:pkg/remote/aws/test/iam_user_multiple/results.golden.json:aws-access-token:12
 ff72de8e77f908fba61df50bc0938744270d1b51:pkg/remote/aws/test/iam_user_multiple/results.golden.json:aws-access-token:24
 ff72de8e77f908fba61df50bc0938744270d1b51:pkg/remote/aws/test/iam_user_multiple/results.golden.json:aws-access-token:36
+20e6356a49e6dd18f00cd6c36b735ef1a850ac55:enumeration/remote/aws_iam_scanner_test.go:aws-access-token:823
+20e6356a49e6dd18f00cd6c36b735ef1a850ac55:enumeration/remote/aws_iam_scanner_test.go:aws-access-token:826
+651ab697db3ff60ba195c22dc0570d1204a97f7e:enumeration/remote/aws_iam_scanner_test.go:aws-access-token:823
+651ab697db3ff60ba195c22dc0570d1204a97f7e:enumeration/remote/aws_iam_scanner_test.go:aws-access-token:826
+6cf09f996d8637c30ad06884a450ff66920d9798:enumeration/remote/aws_iam_scanner_test.go:aws-access-token:823
+6cf09f996d8637c30ad06884a450ff66920d9798:enumeration/remote/aws_iam_scanner_test.go:aws-access-token:826
+6d204a7f446251a3c1519bfc4b80599529eec279:enumeration/remote/aws_iam_scanner_test.go:aws-access-token:823
+6d204a7f446251a3c1519bfc4b80599529eec279:enumeration/remote/aws_iam_scanner_test.go:aws-access-token:826
+40f68d61a91d8c10c09e43263cbd36b380cca90a:enumeration/remote/aws_iam_scanner_test.go:aws-access-token:823
+40f68d61a91d8c10c09e43263cbd36b380cca90a:enumeration/remote/aws_iam_scanner_test.go:aws-access-token:826

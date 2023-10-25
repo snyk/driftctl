@@ -11,5 +11,4 @@ func initGoogleComputeFirewallMetadata(resourceSchemaRepository dctlresource.Sch
 	resourceSchemaRepository.SetNormalizeFunc(GoogleComputeFirewallResourceType, func(res *resource.Resource) {
 		res.Attrs.SafeDelete([]string{"timeouts"})
 	})
-	resourceSchemaRepository.SetFlags(GoogleComputeFirewallResourceType, resource.FlagDeepMode)
 }

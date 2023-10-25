@@ -11,5 +11,4 @@ func initAwsLaunchTemplateMetaData(resourceSchemaRepository dctlresource.SchemaR
 	resourceSchemaRepository.SetNormalizeFunc(AwsLaunchTemplateResourceType, func(res *resource.Resource) {
 		res.Attributes().SafeDelete([]string{"arn"})
 	})
-	resourceSchemaRepository.SetFlags(AwsLaunchTemplateResourceType, resource.FlagDeepMode)
 }

@@ -13,5 +13,4 @@ func initGithubRepositoryMetaData(resourceSchemaRepository dctlresource.SchemaRe
 		val.SafeDelete([]string{"auto_init"})
 		val.SafeDelete([]string{"etag"})
 	})
-	resourceSchemaRepository.SetFlags(GithubRepositoryResourceType, resource.FlagDeepMode)
 }

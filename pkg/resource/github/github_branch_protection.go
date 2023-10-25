@@ -2,6 +2,7 @@ package github
 
 import (
 	"encoding/base64"
+
 	"github.com/snyk/driftctl/enumeration/resource"
 	dctlresource "github.com/snyk/driftctl/pkg/resource"
 )
@@ -38,5 +39,4 @@ func initGithubBranchProtectionMetaData(resourceSchemaRepository dctlresource.Sc
 		attrs["Id"] = res.ResourceId()
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(GithubBranchProtectionResourceType, resource.FlagDeepMode)
 }

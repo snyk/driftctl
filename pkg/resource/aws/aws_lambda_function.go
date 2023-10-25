@@ -21,5 +21,4 @@ func initAwsLambdaFunctionMetaData(resourceSchemaRepository dctlresource.SchemaR
 		val.DeleteIfDefault("signing_profile_version_arn")
 		val.SafeDelete([]string{"source_code_size"})
 	})
-	resourceSchemaRepository.SetFlags(AwsLambdaFunctionResourceType, resource.FlagDeepMode)
 }

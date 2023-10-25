@@ -13,5 +13,4 @@ func initAwsKeyPairMetaData(resourceSchemaRepository dctlresource.SchemaReposito
 		val.SafeDelete([]string{"key_name_prefix"})
 		val.SafeDelete([]string{"public_key"})
 	})
-	resourceSchemaRepository.SetFlags(AwsKeyPairResourceType, resource.FlagDeepMode)
 }

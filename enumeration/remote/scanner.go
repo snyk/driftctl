@@ -13,27 +13,19 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type ScannerOptions struct {
-	Deep bool
-}
-
 type Scanner struct {
-	enumeratorRunner     *parallel.ParallelRunner
-	detailsFetcherRunner *parallel.ParallelRunner
-	remoteLibrary        *common.RemoteLibrary
-	alerter              alerter.AlerterInterface
-	options              ScannerOptions
-	filter               enumeration.Filter
+	enumeratorRunner *parallel.ParallelRunner
+	remoteLibrary    *common.RemoteLibrary
+	alerter          alerter.AlerterInterface
+	filter           enumeration.Filter
 }
 
-func NewScanner(remoteLibrary *common.RemoteLibrary, alerter alerter.AlerterInterface, options ScannerOptions, filter enumeration.Filter) *Scanner {
+func NewScanner(remoteLibrary *common.RemoteLibrary, alerter alerter.AlerterInterface, filter enumeration.Filter) *Scanner {
 	return &Scanner{
-		enumeratorRunner:     parallel.NewParallelRunner(context.TODO(), 10),
-		detailsFetcherRunner: parallel.NewParallelRunner(context.TODO(), 10),
-		remoteLibrary:        remoteLibrary,
-		alerter:              alerter,
-		options:              options,
-		filter:               filter,
+		enumeratorRunner: parallel.NewParallelRunner(context.TODO(), 10),
+		remoteLibrary:    remoteLibrary,
+		alerter:          alerter,
+		filter:           filter,
 	}
 }
 
@@ -95,30 +87,7 @@ func (s *Scanner) scan() ([]*resource.Resource, error) {
 		return nil, err
 	}
 
-	if !s.options.Deep {
-		return enumerationResult, nil
-	}
-
-	for _, res := range enumerationResult {
-		res := res
-		s.detailsFetcherRunner.Run(func() (interface{}, error) {
-			fetcher := s.remoteLibrary.GetDetailsFetcher(resource.ResourceType(res.ResourceType()))
-			if fetcher == nil {
-				return []*resource.Resource{res}, nil
-			}
-
-			resourceWithDetails, err := fetcher.ReadDetails(res)
-			if err != nil {
-				if err := HandleResourceDetailsFetchingError(err, s.alerter); err != nil {
-					return nil, err
-				}
-				return []*resource.Resource{}, nil
-			}
-			return []*resource.Resource{resourceWithDetails}, nil
-		})
-	}
-
-	return s.retrieveRunnerResults(s.detailsFetcherRunner)
+	return enumerationResult, nil
 }
 
 func (s *Scanner) Resources() ([]*resource.Resource, error) {
@@ -132,5 +101,4 @@ func (s *Scanner) Resources() ([]*resource.Resource, error) {
 func (s *Scanner) Stop() {
 	logrus.Debug("Stopping scanner")
 	s.enumeratorRunner.Stop(errors.New("interrupted"))
-	s.detailsFetcherRunner.Stop(errors.New("interrupted"))
 }

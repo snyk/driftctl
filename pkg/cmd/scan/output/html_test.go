@@ -6,10 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/r3labs/diff/v2"
-	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/snyk/driftctl/test/goldenfile"
 )
@@ -123,66 +122,6 @@ func TestHTML_Write(t *testing.T) {
 						Type: "aws_unmanaged_resource",
 					},
 				)
-				a.AddDifference(analyser.Difference{
-					Res: &resource.Resource{
-						Id:   "diff-id-2",
-						Type: "aws_diff_resource",
-						Source: &resource.TerraformStateSource{
-							State:  "tfstate://state.tfstate",
-							Name:   "diff-id-2",
-							Module: "module",
-						},
-					}, Changelog: []analyser.Change{
-						{
-							Change: diff.Change{
-								Type: diff.DELETE,
-								Path: []string{"path", "to", "fields", "0"},
-								From: "value",
-								To:   nil,
-							},
-						},
-						{
-							Change: diff.Change{
-								Type: diff.UPDATE,
-								Path: []string{"path", "to", "fields", "1"},
-								From: 12,
-								To:   "12",
-							},
-						},
-						{
-							Change: diff.Change{
-								Type: diff.DELETE,
-								Path: []string{"group_ids"},
-								From: []string{"a071314398026"},
-								To:   nil,
-							},
-						},
-						{
-							JsonString: true,
-							Change: diff.Change{
-								Type: diff.UPDATE,
-								Path: []string{"policy"},
-								From: `{"Statement":[{"Action":["s3:GetObjectVersion"],"Effect":"Allow","Principal":"*","Resource":"arn:aws:s3:::tmxxrn.foobar.driftctl-test.com/*","Sid":"PublicRead"}],"Version":"2012-10-17"}`,
-								To:   `{"Statement":[{"Action":["*"],"Effect":"Deny","Principal":"*","Resource":"arn:aws:s3:::tmxxrn.foobar.driftctl-test.com/b/*","Sid":"PublicReadWrite"},{"Effect":"Deny","Sid":"PublicReadWrite"}],"Version":"2021-10-17","Test":[]}`,
-							},
-						},
-						{
-							Change: diff.Change{
-								Type: diff.CREATE,
-								Path: []string{"Tags", "0", "Name"},
-								From: nil,
-								To:   "test",
-							},
-						},
-						{
-							Change: diff.Change{
-								Type: diff.UPDATE,
-								Path: []string{"InstanceInitiatedShutdownBehavior"},
-								From: "",
-								To:   nil,
-							},
-						},
-					}})
 				a.ProviderName = "AWS"
 				a.ProviderVersion = "3.19.0"
 				return a
@@ -207,25 +146,6 @@ func TestHTML_Write(t *testing.T) {
 						},
 					},
 				)
-				a.AddDifference(analyser.Difference{
-					Res: &resource.Resource{
-						Id:   "resource-id-1",
-						Type: "aws_resource",
-						Source: &resource.TerraformStateSource{
-							State:  "tfstate://state.tfstate",
-							Module: "module",
-							Name:   "name",
-						},
-					}, Changelog: []analyser.Change{
-						{
-							Change: diff.Change{
-								Type: diff.DELETE,
-								Path: []string{"path", "to", "fields", "0"},
-								From: "value",
-								To:   nil,
-							},
-						},
-					}})
 				a.ProviderName = "AWS"
 				a.ProviderVersion = "3.19.0"
 				return a

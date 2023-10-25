@@ -18,5 +18,4 @@ func initGoogleComputeInstanceGroupMetadata(resourceSchemaRepository dctlresourc
 		}
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(GoogleComputeInstanceGroupResourceType, resource.FlagDeepMode)
 }

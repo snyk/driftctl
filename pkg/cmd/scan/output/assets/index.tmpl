@@ -77,12 +77,6 @@
                     Unmanaged Resources (<span data-count="resource-unmanaged">{{len .Unmanaged}}</span>)
                 </button>
                 {{end}}
-                {{if (gt (len .Differences) 0)}}
-                <button type="button" role="tab" aria-selected="false" aria-controls="changed-tab" id="changed"
-                        tabindex="-1">
-                    Changed Resources (<span data-count="resource-changed">{{len .Differences}}</span>)
-                </button>
-                {{end}}
                 {{if (gt (len .Deleted) 0)}}
                 <button type="button" role="tab" aria-selected="false" aria-controls="missing-tab" id="missing"
                         tabindex="-1">
@@ -115,38 +109,6 @@
                         {{end}}
                         </tbody>
                     </table>
-                    <div class="empty-panel is-hidden">
-                        <p>No results matched your filters</p>
-                    </div>
-                </div>
-                {{end}}
-                {{ if (gt (len .Differences) 0) }}
-                <div class="is-hidden" tabindex="0" role="tabpanel" id="changed-tab" aria-labelledby="changed">
-                    <div role="table">
-                        <div role="rowgroup">
-                            <div role="row" class="table-header">
-                                <span role="columnheader">Resource ID</span>
-                                <span role="columnheader">IaC source</span>
-                            </div>
-                        </div>
-                        <div role="rowgroup" class="table-body">
-                            {{range $diff := .Differences}}
-                            <div role="row" data-kind="resource-changed" class="resource-item">
-                                <div class="row">
-                                    <span role="cell">
-                                        <span data-type="resource-id">{{$diff.Res.ResourceId}}</span>
-                                        {{ if $diff.Res.Src }}(<span>{{$diff.Res.SourceString}}</span>){{ else }}<span>({{$diff.Res.ResourceType}})</span>{{ end }}
-                                        <span style="display:none;" data-type="resource-type">{{$diff.Res.ResourceType}}</span>
-                                    </span>
-                                    {{ if $diff.Res.Src }}<span role="cell" data-type="resource-source">{{$diff.Res.Src.Source}}</span>{{ end }}
-                                </div>
-                                <pre class="code-box">
-                                    <code class="code-box-line">{{ jsonDiff $diff.Changelog }}</code>
-                                </pre>
-                            </div>
-                            {{end}}
-                        </div>
-                    </div>
                     <div class="empty-panel is-hidden">
                         <p>No results matched your filters</p>
                     </div>
@@ -240,7 +202,6 @@
     function refreshCounters() {
         const map = {
             "[data-kind='resource-unmanaged']": "[data-count='resource-unmanaged']",
-            "[data-kind='resource-changed']": "[data-count='resource-changed']",
             "[data-kind='resource-deleted']": "[data-count='resource-deleted']",
             "[data-kind='resource-alerts']": "[data-count='resource-alerts']",
         };

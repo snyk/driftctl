@@ -19,24 +19,26 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestScanGithubTeam(t *testing.T) {
-
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*github.MockGithubRepository, *mocks.AlerterInterface)
-		err     error
+		test           string
+		dirName        string
+		mocks          func(*github.MockGithubRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		err            error
 	}{
 		{
 			test:    "no github teams",
 			dirName: "github_teams_empty",
 			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListTeams").Return([]github.Team{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			err: nil,
 		},
@@ -50,6 +52,18 @@ func TestScanGithubTeam(t *testing.T) {
 					{DatabaseId: 4556814}, // github_team.with_parent
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, "4556811", got[0].ResourceId())
+				assert.Equal(t, githubres.GithubTeamResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "4556812", got[1].ResourceId())
+				assert.Equal(t, githubres.GithubTeamResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "4556814", got[2].ResourceId())
+				assert.Equal(t, githubres.GithubTeamResourceType, got[2].ResourceType())
+			},
 			err: nil,
 		},
 		{
@@ -60,18 +74,18 @@ func TestScanGithubTeam(t *testing.T) {
 
 				alerter.On("SendAlert", githubres.GithubTeamResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Your token has not been granted the required scopes to execute this query."), githubres.GithubTeamResourceType, githubres.GithubTeamResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			err: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
-
-			scanOptions := ScannerOptions{Deep: true}
 
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
@@ -100,18 +114,18 @@ func TestScanGithubTeam(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(github.NewGithubTeamEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(githubres.GithubTeamResourceType, common.NewGenericDetailsFetcher(githubres.GithubTeamResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.err)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, githubres.GithubTeamResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			mockedRepo.AssertExpectations(tt)
 			alerter.AssertExpectations(tt)
 		})

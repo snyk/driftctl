@@ -12,5 +12,4 @@ func initAzurePrivateDNSZoneMetaData(resourceSchemaRepository dctlresource.Schem
 		res.Attributes().SafeDelete([]string{"number_of_record_sets"})
 		res.Attributes().SafeDelete([]string{"timeouts"})
 	})
-	resourceSchemaRepository.SetFlags(AzurePrivateDNSZoneResourceType, resource.FlagDeepMode)
 }

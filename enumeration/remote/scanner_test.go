@@ -26,7 +26,7 @@ func TestScannerShouldIgnoreType(t *testing.T) {
 	testFilter := &enumeration.MockFilter{}
 	testFilter.On("IsTypeIgnored", resource.ResourceType("FakeType")).Return(true)
 
-	s := NewScanner(remoteLibrary, alerter, ScannerOptions{}, testFilter)
+	s := NewScanner(remoteLibrary, alerter, testFilter)
 	_, err := s.Resources()
 	assert.Nil(t, err)
 	fakeEnumerator.AssertExpectations(t)

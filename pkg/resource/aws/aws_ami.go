@@ -12,5 +12,4 @@ func initAwsAmiMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryIn
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 	})
-	resourceSchemaRepository.SetFlags(AwsAmiResourceType, resource.FlagDeepMode)
 }

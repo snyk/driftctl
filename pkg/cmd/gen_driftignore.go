@@ -46,7 +46,6 @@ func NewGenDriftIgnoreCmd() *cobra.Command {
 
 	fl.BoolVar(&opts.ExcludeUnmanaged, "exclude-unmanaged", false, "Exclude resources not managed by IaC")
 	fl.BoolVar(&opts.ExcludeDeleted, "exclude-missing", false, "Exclude missing resources")
-	fl.BoolVar(&opts.ExcludeDrifted, "exclude-changed", false, "Exclude resources that changed on cloud provider")
 	fl.StringVarP(&opts.InputPath, "input", "i", "-", "Input where the JSON should be parsed from. Defaults to stdin.")
 	fl.StringVarP(&opts.OutputPath, "output", "o", ".driftignore", "Output file path to write the driftignore to.")
 

@@ -3,8 +3,6 @@ package remote
 import (
 	"testing"
 
-	resource2 "github.com/snyk/driftctl/pkg/resource"
-
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/cache"
@@ -18,33 +16,35 @@ import (
 	googleresource "github.com/snyk/driftctl/enumeration/resource/google"
 	"github.com/snyk/driftctl/mocks"
 
-	"github.com/snyk/driftctl/test"
+	assetpb "cloud.google.com/go/asset/apiv1/assetpb"
 	"github.com/snyk/driftctl/test/goldenfile"
 	testgoogle "github.com/snyk/driftctl/test/google"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	assetpb "google.golang.org/genproto/googleapis/cloud/asset/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func TestGoogleComputeFirewall(t *testing.T) {
-
 	cases := []struct {
 		test             string
 		dirName          string
 		response         []*assetpb.ResourceSearchResult
 		responseErr      error
 		setupAlerterMock func(alerter *mocks.AlerterInterface)
+		assertExpected   func(*testing.T, []*resource.Resource)
 		wantErr          error
 	}{
 		{
 			test:     "no compute firewall",
 			dirName:  "google_compute_firewall_empty",
 			response: []*assetpb.ResourceSearchResult{},
-			wantErr:  nil,
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+			wantErr: nil,
 		},
 		{
 			test:    "multiples compute firewall",
@@ -66,6 +66,18 @@ func TestGoogleComputeFirewall(t *testing.T) {
 					Name:        "//compute.googleapis.com/projects/cloudskiff-dev-elie/global/firewalls/test-firewall-2",
 				},
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, "projects/cloudskiff-dev-elie/global/firewalls/test-firewall-0", got[0].ResourceId())
+				assert.Equal(t, googleresource.GoogleComputeFirewallResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "projects/cloudskiff-dev-elie/global/firewalls/test-firewall-1", got[1].ResourceId())
+				assert.Equal(t, googleresource.GoogleComputeFirewallResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "projects/cloudskiff-dev-elie/global/firewalls/test-firewall-2", got[2].ResourceId())
+				assert.Equal(t, googleresource.GoogleComputeFirewallResourceType, got[2].ResourceType())
+			},
 			wantErr: nil,
 		},
 		{
@@ -86,19 +98,19 @@ func TestGoogleComputeFirewall(t *testing.T) {
 					),
 				).Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
-	resType := resource.ResourceType(googleresource.GoogleComputeFirewallResourceType)
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -132,12 +144,11 @@ func TestGoogleComputeFirewall(t *testing.T) {
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeFirewallEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -145,13 +156,12 @@ func TestGoogleComputeFirewall(t *testing.T) {
 			}
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
-			test.TestAgainstGoldenFile(got, resType.String(), c.dirName, provider, deserializer, shouldUpdate, tt)
+			c.assertExpected(tt, got)
 		})
 	}
 }
 
 func TestGoogleComputeRouter(t *testing.T) {
-
 	cases := []struct {
 		test             string
 		response         []*assetpb.ResourceSearchResult
@@ -229,7 +239,6 @@ func TestGoogleComputeRouter(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -256,7 +265,7 @@ func TestGoogleComputeRouter(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -266,14 +275,13 @@ func TestGoogleComputeRouter(t *testing.T) {
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 			if c.assertExpected != nil {
-				c.assertExpected(t, got)
+				c.assertExpected(tt, got)
 			}
 		})
 	}
 }
 
 func TestGoogleComputeInstance(t *testing.T) {
-
 	cases := []struct {
 		test             string
 		assertExpected   func(t *testing.T, got []*resource.Resource)
@@ -330,7 +338,6 @@ func TestGoogleComputeInstance(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -357,7 +364,7 @@ func TestGoogleComputeInstance(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -366,27 +373,30 @@ func TestGoogleComputeInstance(t *testing.T) {
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 			if c.assertExpected != nil {
-				c.assertExpected(t, got)
+				c.assertExpected(tt, got)
 			}
 		})
 	}
 }
 
 func TestGoogleComputeNetwork(t *testing.T) {
-
 	cases := []struct {
 		test             string
 		dirName          string
 		response         []*assetpb.ResourceSearchResult
 		responseErr      error
 		setupAlerterMock func(alerter *mocks.AlerterInterface)
+		assertExpected   func(*testing.T, []*resource.Resource)
 		wantErr          error
 	}{
 		{
 			test:     "no network",
 			dirName:  "google_compute_network_empty",
 			response: []*assetpb.ResourceSearchResult{},
-			wantErr:  nil,
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+			wantErr: nil,
 		},
 		{
 			test:    "multiple networks",
@@ -408,6 +418,18 @@ func TestGoogleComputeNetwork(t *testing.T) {
 					Name:        "//compute.googleapis.com/projects/driftctl-qa-1/global/networks/driftctl-unittest-3",
 				},
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, "projects/driftctl-qa-1/global/networks/driftctl-unittest-1", got[0].ResourceId())
+				assert.Equal(t, googleresource.GoogleComputeNetworkResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "projects/driftctl-qa-1/global/networks/driftctl-unittest-2", got[1].ResourceId())
+				assert.Equal(t, googleresource.GoogleComputeNetworkResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "projects/driftctl-qa-1/global/networks/driftctl-unittest-3", got[2].ResourceId())
+				assert.Equal(t, googleresource.GoogleComputeNetworkResourceType, got[2].ResourceType())
+			},
 			wantErr: nil,
 		},
 		{
@@ -428,19 +450,19 @@ func TestGoogleComputeNetwork(t *testing.T) {
 					),
 				).Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
-	resType := resource.ResourceType(googleresource.GoogleComputeNetworkResourceType)
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -474,12 +496,11 @@ func TestGoogleComputeNetwork(t *testing.T) {
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeNetworkEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -487,26 +508,30 @@ func TestGoogleComputeNetwork(t *testing.T) {
 			}
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
-			test.TestAgainstGoldenFile(got, resType.String(), c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 		})
 	}
 }
 
 func TestGoogleComputeInstanceGroup(t *testing.T) {
-
 	cases := []struct {
 		test             string
 		dirName          string
 		response         []*assetpb.ResourceSearchResult
 		responseErr      error
 		setupAlerterMock func(alerter *mocks.AlerterInterface)
+		assertExpected   func(*testing.T, []*resource.Resource)
 		wantErr          error
 	}{
 		{
 			test:     "no instance group",
 			dirName:  "google_compute_instance_group_empty",
 			response: []*assetpb.ResourceSearchResult{},
-			wantErr:  nil,
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+			wantErr: nil,
 		},
 		{
 			test:    "multiple instance groups",
@@ -526,6 +551,15 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 					Project:     "cloudskiff-dev-raphael",
 					Location:    "us-central1-a",
 				},
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "projects/cloudskiff-dev-raphael/zones/us-central1-a/instanceGroups/driftctl-test-1", got[0].ResourceId())
+				assert.Equal(t, googleresource.GoogleComputeInstanceGroupResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "projects/cloudskiff-dev-raphael/zones/us-central1-a/instanceGroups/driftctl-test-2", got[1].ResourceId())
+				assert.Equal(t, googleresource.GoogleComputeInstanceGroupResourceType, got[1].ResourceType())
 			},
 			wantErr: nil,
 		},
@@ -547,19 +581,19 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 					),
 				).Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
-	resType := resource2.ResourceType(googleresource.GoogleComputeInstanceGroupResourceType)
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -593,12 +627,11 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeInstanceGroupEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(googleresource.GoogleComputeInstanceGroupResourceType, common.NewGenericDetailsFetcher(googleresource.GoogleComputeInstanceGroupResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -607,13 +640,12 @@ func TestGoogleComputeInstanceGroup(t *testing.T) {
 
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
-			test.TestAgainstGoldenFile(got, resType.String(), c.dirName, provider, deserializer, shouldUpdate, tt)
+			c.assertExpected(tt, got)
 		})
 	}
 }
 
 func TestGoogleComputeAddress(t *testing.T) {
-
 	cases := []struct {
 		test             string
 		assertExpected   func(t *testing.T, got []*resource.Resource)
@@ -688,7 +720,6 @@ func TestGoogleComputeAddress(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -715,7 +746,7 @@ func TestGoogleComputeAddress(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -724,14 +755,13 @@ func TestGoogleComputeAddress(t *testing.T) {
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 			if c.assertExpected != nil {
-				c.assertExpected(t, got)
+				c.assertExpected(tt, got)
 			}
 		})
 	}
 }
 
 func TestGoogleComputeGlobalAddress(t *testing.T) {
-
 	cases := []struct {
 		test             string
 		assertExpected   func(t *testing.T, got []*resource.Resource)
@@ -811,7 +841,6 @@ func TestGoogleComputeGlobalAddress(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -838,7 +867,7 @@ func TestGoogleComputeGlobalAddress(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -847,27 +876,30 @@ func TestGoogleComputeGlobalAddress(t *testing.T) {
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 			if c.assertExpected != nil {
-				c.assertExpected(t, got)
+				c.assertExpected(tt, got)
 			}
 		})
 	}
 }
 
 func TestGoogleComputeSubnetwork(t *testing.T) {
-
 	cases := []struct {
 		test             string
 		dirName          string
 		response         []*assetpb.ResourceSearchResult
 		responseErr      error
 		setupAlerterMock func(alerter *mocks.AlerterInterface)
+		assertExpected   func(*testing.T, []*resource.Resource)
 		wantErr          error
 	}{
 		{
 			test:     "no subnetwork",
 			dirName:  "google_compute_subnetwork_empty",
 			response: []*assetpb.ResourceSearchResult{},
-			wantErr:  nil,
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+			wantErr: nil,
 		},
 		{
 			test:    "multiple subnetworks",
@@ -889,6 +921,18 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 					Name:        "//compute.googleapis.com/projects/cloudskiff-dev-raphael/regions/us-central1/subnetworks/driftctl-unittest-3",
 				},
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, "projects/cloudskiff-dev-raphael/regions/us-central1/subnetworks/driftctl-unittest-1", got[0].ResourceId())
+				assert.Equal(t, googleresource.GoogleComputeSubnetworkResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "projects/cloudskiff-dev-raphael/regions/us-central1/subnetworks/driftctl-unittest-2", got[1].ResourceId())
+				assert.Equal(t, googleresource.GoogleComputeSubnetworkResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "projects/cloudskiff-dev-raphael/regions/us-central1/subnetworks/driftctl-unittest-3", got[2].ResourceId())
+				assert.Equal(t, googleresource.GoogleComputeSubnetworkResourceType, got[2].ResourceType())
+			},
 			wantErr: nil,
 		},
 		{
@@ -909,19 +953,19 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 					),
 				).Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
-	resType := resource.ResourceType(googleresource.GoogleComputeSubnetworkResourceType)
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -955,12 +999,11 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleComputeSubnetworkEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -968,13 +1011,12 @@ func TestGoogleComputeSubnetwork(t *testing.T) {
 			}
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
-			test.TestAgainstGoldenFile(got, resType.String(), c.dirName, provider, deserializer, shouldUpdate, tt)
+			c.assertExpected(tt, got)
 		})
 	}
 }
 
 func TestGoogleComputeDisk(t *testing.T) {
-
 	cases := []struct {
 		test             string
 		assertExpected   func(t *testing.T, got []*resource.Resource)
@@ -1038,7 +1080,6 @@ func TestGoogleComputeDisk(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -1065,7 +1106,7 @@ func TestGoogleComputeDisk(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1074,14 +1115,13 @@ func TestGoogleComputeDisk(t *testing.T) {
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 			if c.assertExpected != nil {
-				c.assertExpected(t, got)
+				c.assertExpected(tt, got)
 			}
 		})
 	}
 }
 
 func TestGoogleComputeImage(t *testing.T) {
-
 	cases := []struct {
 		test             string
 		assertExpected   func(t *testing.T, got []*resource.Resource)
@@ -1145,7 +1185,6 @@ func TestGoogleComputeImage(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -1172,7 +1211,7 @@ func TestGoogleComputeImage(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1181,14 +1220,13 @@ func TestGoogleComputeImage(t *testing.T) {
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 			if c.assertExpected != nil {
-				c.assertExpected(t, got)
+				c.assertExpected(tt, got)
 			}
 		})
 	}
 }
 
 func TestGoogleComputeHealthCheck(t *testing.T) {
-
 	cases := []struct {
 		test             string
 		assertExpected   func(t *testing.T, got []*resource.Resource)
@@ -1252,7 +1290,6 @@ func TestGoogleComputeHealthCheck(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -1279,7 +1316,7 @@ func TestGoogleComputeHealthCheck(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1288,14 +1325,13 @@ func TestGoogleComputeHealthCheck(t *testing.T) {
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 			if c.assertExpected != nil {
-				c.assertExpected(t, got)
+				c.assertExpected(tt, got)
 			}
 		})
 	}
 }
 
 func TestGoogleComputeNodeGroup(t *testing.T) {
-
 	cases := []struct {
 		test             string
 		assertExpected   func(t *testing.T, got []*resource.Resource)
@@ -1359,7 +1395,6 @@ func TestGoogleComputeNodeGroup(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -1386,7 +1421,7 @@ func TestGoogleComputeNodeGroup(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1395,7 +1430,7 @@ func TestGoogleComputeNodeGroup(t *testing.T) {
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 			if c.assertExpected != nil {
-				c.assertExpected(t, got)
+				c.assertExpected(tt, got)
 			}
 		})
 	}
@@ -1465,7 +1500,6 @@ func TestGoogleComputeForwardingRule(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -1492,7 +1526,7 @@ func TestGoogleComputeForwardingRule(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1501,7 +1535,7 @@ func TestGoogleComputeForwardingRule(t *testing.T) {
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 			if c.assertExpected != nil {
-				c.assertExpected(t, got)
+				c.assertExpected(tt, got)
 			}
 		})
 	}
@@ -1571,7 +1605,6 @@ func TestGoogleComputeSslCertificate(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -1598,7 +1631,7 @@ func TestGoogleComputeSslCertificate(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1607,14 +1640,13 @@ func TestGoogleComputeSslCertificate(t *testing.T) {
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 			if c.assertExpected != nil {
-				c.assertExpected(t, got)
+				c.assertExpected(tt, got)
 			}
 		})
 	}
 }
 
 func TestGoogleComputeInstanceGroupManager(t *testing.T) {
-
 	cases := []struct {
 		test             string
 		assertExpected   func(t *testing.T, got []*resource.Resource)
@@ -1678,7 +1710,6 @@ func TestGoogleComputeInstanceGroupManager(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -1705,7 +1736,7 @@ func TestGoogleComputeInstanceGroupManager(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1714,7 +1745,7 @@ func TestGoogleComputeInstanceGroupManager(t *testing.T) {
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 			if c.assertExpected != nil {
-				c.assertExpected(t, got)
+				c.assertExpected(tt, got)
 			}
 		})
 	}
@@ -1784,7 +1815,6 @@ func TestGoogleComputeGlobalForwardingRule(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -1811,7 +1841,7 @@ func TestGoogleComputeGlobalForwardingRule(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -1820,7 +1850,7 @@ func TestGoogleComputeGlobalForwardingRule(t *testing.T) {
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
 			if c.assertExpected != nil {
-				c.assertExpected(t, got)
+				c.assertExpected(tt, got)
 			}
 		})
 	}

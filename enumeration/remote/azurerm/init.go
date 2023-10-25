@@ -9,7 +9,6 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/azurerm"
 	"github.com/snyk/driftctl/enumeration/terraform"
 )
 
@@ -46,7 +45,6 @@ func Init(version string, alerter alerter.AlerterInterface, providerLibrary *ter
 	computeRepo := repository.NewComputeRepository(cred, clientOptions, providerConfig, c)
 
 	providerLibrary.AddProvider(terraform.AZURE, provider)
-	deserializer := resource.NewDeserializer(factory)
 
 	remoteLibrary.AddEnumerator(NewAzurermStorageAccountEnumerator(storageAccountRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermStorageContainerEnumerator(storageAccountRepo, factory))
@@ -61,31 +59,20 @@ func Init(version string, alerter alerter.AlerterInterface, providerLibrary *ter
 	remoteLibrary.AddEnumerator(NewAzurermPublicIPEnumerator(networkRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermPostgresqlDatabaseEnumerator(postgresqlRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermNetworkSecurityGroupEnumerator(networkRepo, factory))
-	remoteLibrary.AddDetailsFetcher(azurerm.AzureNetworkSecurityGroupResourceType, common.NewGenericDetailsFetcher(azurerm.AzureNetworkSecurityGroupResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewAzurermLoadBalancerEnumerator(networkRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermLoadBalancerRuleEnumerator(networkRepo, factory))
-	remoteLibrary.AddDetailsFetcher(azurerm.AzureLoadBalancerRuleResourceType, common.NewGenericDetailsFetcher(azurerm.AzureLoadBalancerRuleResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSZoneEnumerator(privateDNSRepo, factory))
-	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSZoneResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSZoneResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSARecordEnumerator(privateDNSRepo, factory))
-	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSARecordResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSARecordResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSAAAARecordEnumerator(privateDNSRepo, factory))
-	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSAAAARecordResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSAAAARecordResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSMXRecordEnumerator(privateDNSRepo, factory))
-	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSMXRecordResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSMXRecordResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSCNameRecordEnumerator(privateDNSRepo, factory))
-	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSCNameRecordResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSCNameRecordResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSPTRRecordEnumerator(privateDNSRepo, factory))
-	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSPTRRecordResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSPTRRecordResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSSRVRecordEnumerator(privateDNSRepo, factory))
-	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSSRVRecordResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSSRVRecordResourceType, provider, deserializer))
 	remoteLibrary.AddEnumerator(NewAzurermPrivateDNSTXTRecordEnumerator(privateDNSRepo, factory))
-	remoteLibrary.AddDetailsFetcher(azurerm.AzurePrivateDNSTXTRecordResourceType, common.NewGenericDetailsFetcher(azurerm.AzurePrivateDNSTXTRecordResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewAzurermImageEnumerator(computeRepo, factory))
 	remoteLibrary.AddEnumerator(NewAzurermSSHPublicKeyEnumerator(computeRepo, factory))
-	remoteLibrary.AddDetailsFetcher(azurerm.AzureSSHPublicKeyResourceType, common.NewGenericDetailsFetcher(azurerm.AzureSSHPublicKeyResourceType, provider, deserializer))
 
 	return nil
 }

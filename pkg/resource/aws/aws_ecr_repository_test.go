@@ -7,9 +7,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/ecr"
 
-	"github.com/r3labs/diff/v2"
-	awsresources "github.com/snyk/driftctl/enumeration/resource/aws"
-	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/acceptance"
 	"github.com/snyk/driftctl/test/acceptance/awsutils"
@@ -20,7 +17,7 @@ func TestAcc_Aws_ECRRepository(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_ecr_repository"},
-		Args:             []string{"scan", "--deep"},
+		Args:             []string{"scan"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
@@ -54,25 +51,9 @@ func TestAcc_Aws_ECRRepository(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					result.AssertDriftCountTotal(1)
 					result.AssertDeletedCount(0)
 					result.AssertManagedCount(1)
 					result.AssertUnmanagedCount(0)
-
-					result.AssertResourceHasDrift(
-						mutatedRepositoryID,
-						awsresources.AwsEcrRepositoryResourceType,
-						analyser.Change{
-							Change: diff.Change{
-								Type: diff.UPDATE,
-								Path: []string{"image_tag_mutability"},
-								From: "MUTABLE",
-								To:   "IMMUTABLE",
-							},
-							Computed: false,
-						},
-					)
-
 				},
 			},
 		},

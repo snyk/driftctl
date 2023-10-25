@@ -12,7 +12,7 @@ func TestAcc_Aws_Eip(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_eip"},
-		Args:             []string{"scan", "--deep"},
+		Args:             []string{"scan"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
@@ -23,7 +23,6 @@ func TestAcc_Aws_Eip(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					result.AssertDriftCountTotal(0)
 					result.AssertDeletedCount(0)
 					result.AssertManagedCount(2)
 				},

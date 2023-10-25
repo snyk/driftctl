@@ -13,22 +13,12 @@ Then, you'll find below a more detailed flow of how we handle the enumeration an
 First step would be to add a file called `pkg/resource/<providername>/<resourcetype>.go`.
 This file will define a string constant that will be the resource type identifier in driftctl.
 
-Optionally, if your resource is to be supported by driftctl experimental deep mode, you can add a function that will be applied to this resource at creation.
-This allows to prevent useless diffs to be displayed.
-You can also add metadata to fields so that they are compared or displayed differently.
-
 For example this defines the `aws_iam_role` resource:
 
 ```go
 const AwsIamRoleResourceType = "aws_iam_role"
 
 func initAwsIAMRoleMetaData(resourceSchemaRepository resource.SchemaRepositoryInterface) {
-	// assume_role_policy drifts will be displayed as json
-	resourceSchemaRepository.UpdateSchema(AwsIamRoleResourceType, map[string]func(attributeSchema *resource.AttributeSchema){
-		"assume_role_policy": func(attributeSchema *resource.AttributeSchema) {
-			attributeSchema.JsonString = true
-		},
-	})
 	// force_detach_policies should not be compared so it will be removed before the comparison
 	resourceSchemaRepository.SetNormalizeFunc(AwsIamRoleResourceType, func(res *resource.Resource) {
 		val := res.Attrs
@@ -57,17 +47,12 @@ var supportedTypes = map[string]struct{}{
 All resources inside driftctl are `resource.Resource` structs.
 All the other attributes are represented inside a `map[string]interface`
 
-## Repository, Enumerator and DetailsFetcher
+## Repository, Enumerator
 
-Then you will have to implement two interfaces:
+Then you will have to implement one interface:
 
 - Repositories are the way we decided to hide direct calls to SDK and pagination logic. It's a common abstraction pattern for data retrieval.
 - `remote.common.Enumerator` is used to enumerate resources. It will call the cloud provider SDK to get the list of resources.
-  For some resource it could make other call to enrich the resource with additional attributes when driftctl is used in deep mode
-- `remote.common.DetailsFetcher` is used to retrieve resource's details. It makes a call to Terraform provider `ReadResource`.
-  This implementation is optional and is only needed if your resource type is to be supported by experimental deep mode.
-  Please also note that it exists a generic implementation called `remote.common.GenericDetailsFetcher` that can be used with most resource types.
-
 
 ### Repository
 
@@ -126,7 +111,6 @@ Most of the resource returned by enumerator have empty attributes: they only rep
 
 **There are exceptions to this**:
 - Sometimes, you will need more information about resources for them to be fetched in the `DetailsFetcher`. For those cases, you will add specific attributes to the map of data.
-- For complex cases (e.g. middlewares) where you would need driftctl to run as expected in deep and non-deep mode, you would need to enumerate resources as well as to fetch manually specific attributes, using the remote SDK, before adding them to the map of data.
 
 You can use an already implemented Enumerator as example.
 
@@ -192,26 +176,3 @@ Once the enumerator is written you have to add it to the remote initialization l
 ```go
     remoteLibrary.AddEnumerator(NewEC2InstanceEnumerator(s3Repository, factory))
 ```
-
-### DetailsFetcher
-
-DetailsFetchers are only used by driftctl experimental deep mode.
-
-This is the component that call Terraform provider to retrieve all attributes for each resource.
-We do not want to reimplement what has already been done in each Terraform provider. Thus, you should not call the remote SDK there.
-
-If `common.GenericDetailsFetcher` satisfies your needs you should always prefer using it instead of implementing a custom `DetailsFetcher` in a new struct.
-
-The `DetailsFetcher` should also be added to `pkg/remote/<providername>/init.go` even if you use the generic version:
-
-```go
-    remoteLibrary.AddDetailsFetcher(aws.AwsEbsVolumeResourceType, common.NewGenericDetailsFetcher(aws.AwsEbsVolumeResourceType, provider, deserializer))
-```
-
-***Don't forget to add unit tests after adding a new resource.***
-
-You can find example of **functional tests** in `pkg/remote/<type>_scanner_test.go`.
-
-You should also add **acceptance tests** if you think it makes sense. They are located next to the resource definition described in the first step.
-
-More information about adding tests can be found in [testing documentation](testing.md)

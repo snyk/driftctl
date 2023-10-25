@@ -12,5 +12,4 @@ func initGoogleProjectIAMMemberMetadata(resourceSchemaRepository dctlresource.Sc
 		res.Attributes().SafeDelete([]string{"force_destroy"})
 		res.Attributes().SafeDelete([]string{"etag"})
 	})
-	resourceSchemaRepository.SetFlags(GoogleProjectIamMemberResourceType, resource.FlagDeepMode)
 }

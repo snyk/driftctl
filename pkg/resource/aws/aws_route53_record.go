@@ -30,5 +30,4 @@ func initAwsRoute53RecordMetaData(resourceSchemaRepository dctlresource.SchemaRe
 		}
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(AwsRoute53RecordResourceType, resource.FlagDeepMode)
 }

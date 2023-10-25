@@ -11,5 +11,4 @@ func initAwsVpcMetaData(resourceSchemaRepository dctlresource.SchemaRepositoryIn
 	resourceSchemaRepository.SetNormalizeFunc(AwsVpcResourceType, func(res *resource.Resource) {
 		res.Attributes().SafeDelete([]string{"arn"})
 	})
-	resourceSchemaRepository.SetFlags(AwsVpcResourceType, resource.FlagDeepMode)
 }

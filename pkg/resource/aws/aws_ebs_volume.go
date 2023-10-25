@@ -15,5 +15,4 @@ func initAwsEbsVolumeMetaData(resourceSchemaRepository dctlresource.SchemaReposi
 		val.SafeDelete([]string{"snapshot_id"})
 		val.DeleteIfDefault("throughput")
 	})
-	resourceSchemaRepository.SetFlags(AwsEbsVolumeResourceType, resource.FlagDeepMode)
 }

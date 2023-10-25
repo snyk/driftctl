@@ -11,5 +11,4 @@ func initAwsInternetGatewayMetaData(resourceSchemaRepository dctlresource.Schema
 	resourceSchemaRepository.SetNormalizeFunc(AwsInternetGatewayResourceType, func(res *resource.Resource) {
 		res.Attributes().SafeDelete([]string{"arn"})
 	})
-	resourceSchemaRepository.SetFlags(AwsInternetGatewayResourceType, resource.FlagDeepMode)
 }

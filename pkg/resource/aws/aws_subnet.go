@@ -12,5 +12,4 @@ func initAwsSubnetMetaData(resourceSchemaRepository dctlresource.SchemaRepositor
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 	})
-	resourceSchemaRepository.SetFlags(AwsSubnetResourceType, resource.FlagDeepMode)
 }

@@ -19,5 +19,4 @@ func initAwsRDSClusterMetaData(resourceSchemaRepository dctlresource.SchemaRepos
 		val.SafeDelete([]string{"final_snapshot_identifier"})
 		val.SafeDelete([]string{"source_region"})
 	})
-	resourceSchemaRepository.SetFlags(AwsRDSClusterResourceType, resource.FlagDeepMode)
 }

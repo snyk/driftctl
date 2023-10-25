@@ -5,11 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/cloudfront"
 
-	awsresources "github.com/snyk/driftctl/enumeration/resource/aws"
-	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/snyk/driftctl/test"
-
-	"github.com/r3labs/diff/v2"
 
 	"github.com/aws/aws-sdk-go/aws"
 
@@ -24,7 +20,7 @@ func TestAcc_Aws_CloudfrontDistribution(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion:           "0.15.5",
 		Paths:                      []string{"./testdata/acc/aws_cloudfront_distribution"},
-		Args:                       []string{"scan", "--deep"},
+		Args:                       []string{"scan"},
 		ShouldRefreshBeforeDestroy: true,
 		Checks: []acceptance.AccCheck{
 			{
@@ -66,19 +62,6 @@ func TestAcc_Aws_CloudfrontDistribution(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					result.AssertDriftCountTotal(1)
-					result.AssertResourceHasDrift(
-						mutatedDistribution,
-						awsresources.AwsCloudfrontDistributionResourceType,
-						analyser.Change{
-							Change: diff.Change{
-								Type: diff.UPDATE,
-								Path: []string{"is_ipv6_enabled"},
-								From: false,
-								To:   true,
-							},
-						},
-					)
 				},
 			},
 		},

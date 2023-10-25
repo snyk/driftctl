@@ -1,22 +1,15 @@
 package output
 
 import (
-	"bytes"
 	"embed"
 	"encoding/base64"
-	"fmt"
-	"github.com/snyk/driftctl/enumeration/alerter"
 	"html/template"
 	"math"
 	"os"
-	"reflect"
-	"regexp"
-	"strconv"
-	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/r3labs/diff/v2"
+	"github.com/snyk/driftctl/enumeration/alerter"
+
 	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg/analyser"
 )
@@ -39,7 +32,6 @@ type HTMLTemplateParams struct {
 	Coverage        int
 	Summary         analyser.Summary
 	Unmanaged       []*resource.Resource
-	Differences     []analyser.Difference
 	Deleted         []*resource.Resource
 	Alerts          alerter.Alerts
 	Stylesheet      template.CSS
@@ -91,10 +83,6 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 			resources = append(resources, analysis.Unmanaged()...)
 			resources = append(resources, analysis.Deleted()...)
 
-			for _, d := range analysis.Differences() {
-				resources = append(resources, d.Res)
-			}
-
 			return distinctResourceTypes(resources)
 		},
 		"getIaCSources": func() []string {
@@ -111,42 +99,6 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 			rate := 100 * float64(count) / float64(analysis.Summary().TotalResources)
 			return math.Floor(rate*100) / 100
 		},
-		"jsonDiff": func(ch analyser.Changelog) template.HTML {
-			var buf bytes.Buffer
-
-			whiteSpace := "&emsp;"
-			for _, change := range ch {
-				for i, v := range change.Path {
-					if _, err := strconv.Atoi(v); err == nil {
-						change.Path[i] = fmt.Sprintf("[%s]", v)
-					}
-				}
-				path := strings.Join(change.Path, ".")
-
-				switch change.Type {
-				case diff.CREATE:
-					pref := fmt.Sprintf("%s %s:", "+", path)
-					_, _ = fmt.Fprintf(&buf, "%s%s <span class=\"code-box-line-create\">%s</span>", whiteSpace, pref, prettify(change.To))
-				case diff.DELETE:
-					pref := fmt.Sprintf("%s %s:", "-", path)
-					_, _ = fmt.Fprintf(&buf, "%s%s <span class=\"code-box-line-delete\">%s</span>", whiteSpace, pref, prettify(change.From))
-				case diff.UPDATE:
-					prefix := fmt.Sprintf("%s %s:", "~", path)
-					if change.JsonString {
-						_, _ = fmt.Fprintf(&buf, "%s%s<br>%s%s<br>", whiteSpace, prefix, whiteSpace, jsonDiffHTML(change.From, change.To))
-						continue
-					}
-					_, _ = fmt.Fprintf(&buf, "%s%s <span class=\"code-box-line-delete\">%s</span> => <span class=\"code-box-line-create\">%s</span>", whiteSpace, prefix, htmlPrettify(change.From), htmlPrettify(change.To))
-				}
-
-				if change.Computed {
-					_, _ = fmt.Fprintf(&buf, " %s", "(computed)")
-				}
-				_, _ = fmt.Fprintf(&buf, "<br>")
-			}
-
-			return template.HTML(buf.String())
-		},
 	}
 
 	tmpl, err := template.New("main").Funcs(funcMap).Parse(string(tmplFile))
@@ -160,7 +112,6 @@ func (c *HTML) Write(analysis *analyser.Analysis) error {
 		Coverage:        analysis.Coverage(),
 		Summary:         analysis.Summary(),
 		Unmanaged:       analysis.Unmanaged(),
-		Differences:     analysis.Differences(),
 		Deleted:         analysis.Deleted(),
 		Alerts:          analysis.Alerts(),
 		Stylesheet:      template.CSS(styleFile),
@@ -219,24 +170,4 @@ func distinctIaCSources(resources []*resource.Resource) []string {
 	}
 
 	return types
-}
-
-func htmlPrettify(resource interface{}) string {
-	res := reflect.ValueOf(resource)
-	if resource == nil || res.Kind() == reflect.Ptr && res.IsNil() {
-		return "null"
-	}
-	return awsutil.Prettify(resource)
-}
-
-func jsonDiffHTML(a, b interface{}) string {
-	diffStr := jsonDiff(a, b, false)
-
-	re := regexp.MustCompile(`(?m)^(?P<value>(\-)(.*))$`)
-	diffStr = re.ReplaceAllString(diffStr, `<span class="code-box-line-delete">$value</span>`)
-
-	re = regexp.MustCompile(`(?m)^(?P<value>(\+)(.*))$`)
-	diffStr = re.ReplaceAllString(diffStr, `<span class="code-box-line-create">$value</span>`)
-
-	return diffStr
 }

@@ -19,7 +19,6 @@ import (
 	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/mocks"
 
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
@@ -28,10 +27,11 @@ import (
 
 func TestAppAutoScalingTarget(t *testing.T) {
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockAppAutoScalingRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockAppAutoScalingRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "should return one target",
@@ -52,6 +52,12 @@ func TestAppAutoScalingTarget(t *testing.T) {
 
 				client.On("DescribeScalableTargets", mock.AnythingOfType("string")).Return([]*applicationautoscaling.ScalableTarget{}, nil).Times(len(applicationautoscaling.ServiceNamespace_Values()) - 1)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+
+				assert.Equal(t, got[0].ResourceId(), "table/GameScores")
+				assert.Equal(t, got[0].ResourceType(), resourceaws.AwsAppAutoscalingTargetResourceType)
+			},
 			wantErr: nil,
 		},
 		{
@@ -67,7 +73,6 @@ func TestAppAutoScalingTarget(t *testing.T) {
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -77,7 +82,6 @@ func TestAppAutoScalingTarget(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -106,12 +110,11 @@ func TestAppAutoScalingTarget(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewAppAutoscalingTargetEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsAppAutoscalingTargetResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsAppAutoscalingTargetResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			if err != nil {
 				assert.EqualError(tt, c.wantErr, err.Error())
@@ -122,7 +125,7 @@ func TestAppAutoScalingTarget(t *testing.T) {
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsAppAutoscalingTargetResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -131,10 +134,11 @@ func TestAppAutoScalingTarget(t *testing.T) {
 
 func TestAppAutoScalingPolicy(t *testing.T) {
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockAppAutoScalingRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockAppAutoScalingRepository, *mocks.AlerterInterface)
+		assertExpected func(t *testing.T, got []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "should return one policy",
@@ -153,6 +157,12 @@ func TestAppAutoScalingPolicy(t *testing.T) {
 
 				client.On("DescribeScalingPolicies", mock.AnythingOfType("string")).Return([]*applicationautoscaling.ScalingPolicy{}, nil).Times(len(applicationautoscaling.ServiceNamespace_Values()) - 1)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+
+				assert.Equal(t, got[0].ResourceId(), "DynamoDBReadCapacityUtilization:table/GameScores")
+				assert.Equal(t, got[0].ResourceType(), resourceaws.AwsAppAutoscalingPolicyResourceType)
+			},
 			wantErr: nil,
 		},
 		{
@@ -168,7 +178,6 @@ func TestAppAutoScalingPolicy(t *testing.T) {
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -178,7 +187,6 @@ func TestAppAutoScalingPolicy(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -207,12 +215,11 @@ func TestAppAutoScalingPolicy(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewAppAutoscalingPolicyEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsAppAutoscalingPolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsAppAutoscalingPolicyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			if err != nil {
 				assert.EqualError(tt, c.wantErr, err.Error())
@@ -223,7 +230,8 @@ func TestAppAutoScalingPolicy(t *testing.T) {
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsAppAutoscalingPolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -289,7 +297,6 @@ func TestAppAutoScalingScheduledAction(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
-			scanOptions := ScannerOptions{}
 			remoteLibrary := common.NewRemoteLibrary()
 
 			// Initialize mocks
@@ -304,7 +311,7 @@ func TestAppAutoScalingScheduledAction(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {

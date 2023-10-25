@@ -21,7 +21,6 @@ import (
 	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/mocks"
 
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
@@ -30,16 +29,20 @@ import (
 
 func TestKMSKey(t *testing.T) {
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockKMSRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockKMSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no keys",
 			dirName: "aws_kms_key_empty",
 			mocks: func(repository *repository.MockKMSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllKeys").Return([]*kms.KeyListEntry{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 		},
 		{
@@ -52,6 +55,18 @@ func TestKMSKey(t *testing.T) {
 					{KeyId: awssdk.String("89d2c023-ea53-40a5-b20a-d84905c622d7")},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, "8ee21d91-c000-428c-8032-235aac55da36", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsKmsKeyResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "5d765f32-bfdc-4610-b6ab-f82db5d0601b", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsKmsKeyResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "89d2c023-ea53-40a5-b20a-d84905c622d7", got[2].ResourceId())
+				assert.Equal(t, resourceaws.AwsKmsKeyResourceType, got[2].ResourceType())
+			},
 		},
 		{
 			test:    "cannot list keys",
@@ -62,12 +77,14 @@ func TestKMSKey(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsKmsKeyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsKmsKeyResourceType, resourceaws.AwsKmsKeyResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -77,7 +94,6 @@ func TestKMSKey(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -106,18 +122,18 @@ func TestKMSKey(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewKMSKeyEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsKmsKeyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsKmsKeyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsKmsKeyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -126,16 +142,20 @@ func TestKMSKey(t *testing.T) {
 
 func TestKMSAlias(t *testing.T) {
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockKMSRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockKMSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no aliases",
 			dirName: "aws_kms_alias_empty",
 			mocks: func(repository *repository.MockKMSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllAliases").Return([]*kms.AliasListEntry{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 		},
 		{
@@ -148,6 +168,18 @@ func TestKMSAlias(t *testing.T) {
 					{AliasName: awssdk.String("alias/baz20210225124429210500000001")},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, "alias/foo", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsKmsAliasResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "alias/bar", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsKmsAliasResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "alias/baz20210225124429210500000001", got[2].ResourceId())
+				assert.Equal(t, resourceaws.AwsKmsAliasResourceType, got[2].ResourceType())
+			},
 		},
 		{
 			test:    "cannot list aliases",
@@ -158,12 +190,14 @@ func TestKMSAlias(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsKmsAliasResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsKmsAliasResourceType, resourceaws.AwsKmsAliasResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -173,7 +207,6 @@ func TestKMSAlias(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -202,18 +235,18 @@ func TestKMSAlias(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewKMSAliasEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsKmsAliasResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsKmsAliasResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsKmsAliasResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})

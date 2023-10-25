@@ -15,5 +15,4 @@ func initAwsAppAutoscalingPolicyMetaData(resourceSchemaRepository dctlresource.S
 		}
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(AwsAppAutoscalingPolicyResourceType, resource.FlagDeepMode)
 }

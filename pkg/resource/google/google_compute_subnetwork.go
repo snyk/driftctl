@@ -20,5 +20,4 @@ func initGoogleComputeSubnetworkMetadata(resourceSchemaRepository dctlresource.S
 		}
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(GoogleComputeSubnetworkResourceType, resource.FlagDeepMode)
 }

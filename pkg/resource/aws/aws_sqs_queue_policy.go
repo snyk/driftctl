@@ -22,5 +22,4 @@ func initAwsSQSQueuePolicyMetaData(resourceSchemaRepository dctlresource.SchemaR
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetFlags(AwsSqsQueuePolicyResourceType, resource.FlagDeepMode)
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/github"
 	"github.com/snyk/driftctl/enumeration/terraform"
 )
 
@@ -29,23 +28,17 @@ func Init(version string, alerter alerter.AlerterInterface, providerLibrary *ter
 	repositoryCache := cache.New(100)
 
 	repository := NewGithubRepository(provider.GetConfig(), repositoryCache)
-	deserializer := resource.NewDeserializer(factory)
 	providerLibrary.AddProvider(terraform.GITHUB, provider)
 
 	remoteLibrary.AddEnumerator(NewGithubTeamEnumerator(repository, factory))
-	remoteLibrary.AddDetailsFetcher(github.GithubTeamResourceType, common.NewGenericDetailsFetcher(github.GithubTeamResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewGithubRepositoryEnumerator(repository, factory))
-	remoteLibrary.AddDetailsFetcher(github.GithubRepositoryResourceType, common.NewGenericDetailsFetcher(github.GithubRepositoryResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewGithubMembershipEnumerator(repository, factory))
-	remoteLibrary.AddDetailsFetcher(github.GithubMembershipResourceType, common.NewGenericDetailsFetcher(github.GithubMembershipResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewGithubTeamMembershipEnumerator(repository, factory))
-	remoteLibrary.AddDetailsFetcher(github.GithubTeamMembershipResourceType, common.NewGenericDetailsFetcher(github.GithubTeamMembershipResourceType, provider, deserializer))
 
 	remoteLibrary.AddEnumerator(NewGithubBranchProtectionEnumerator(repository, factory))
-	remoteLibrary.AddDetailsFetcher(github.GithubBranchProtectionResourceType, common.NewGenericDetailsFetcher(github.GithubBranchProtectionResourceType, provider, deserializer))
 
 	return nil
 }
