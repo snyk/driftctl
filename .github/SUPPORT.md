@@ -1,4 +1,2 @@
-# Support
-
-If you have questions about driftctl usage, please feel free to get in touch with us on [Discord](https://discord.gg/NMCBxtD7Nd).
+## This project is now in maintenance mode. We cannot promise to review contributions. Please feel free to fork the project to apply any changes you might want to make.
 

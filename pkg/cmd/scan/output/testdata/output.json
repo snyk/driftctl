@@ -1,12 +1,6 @@
 {
-	"options": {
-		"deep": true,
-		"only_managed": false,
-		"only_unmanaged": false
-	},
 	"summary": {
 		"total_resources": 6,
-		"total_changed": 2,
 		"total_unmanaged": 2,
 		"total_missing": 2,
 		"total_managed": 2,
@@ -45,68 +39,6 @@
 		{
 			"id": "deleted-id-2",
 			"type": "aws_deleted_resource"
-		}
-	],
-	"differences": [
-		{
-			"res": {
-				"id": "diff-id-2",
-				"type": "aws_diff_resource"
-			},
-			"changelog": [
-				{
-					"type": "update",
-					"path": [
-						"updated",
-						"field"
-					],
-					"from": "foobar",
-					"to": "barfoo",
-					"computed": false
-				}
-			]
-		},
-		{
-			"res": {
-				"id": "diff-id-1",
-				"type": "aws_diff_resource",
-				"source": {
-					"source": "tfstate://state.tfstate",
-					"namespace": "module",
-					"internal_name": "name"
-				}
-			},
-			"changelog": [
-				{
-					"type": "update",
-					"path": [
-						"updated",
-						"field"
-					],
-					"from": "foobar",
-					"to": "barfoo",
-					"computed": false
-				},
-				{
-					"type": "create",
-					"path": [
-						"new",
-						"field"
-					],
-					"from": null,
-					"to": "newValue",
-					"computed": false
-				},
-				{
-					"type": "delete",
-					"path": [
-						"a"
-					],
-					"from": "oldValue",
-					"to": null,
-					"computed": false
-				}
-			]
 		}
 	],
 	"coverage": 33,

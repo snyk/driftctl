@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/r3labs/diff/v2"
 	"github.com/snyk/driftctl/enumeration/alerter"
 	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/pkg"
@@ -79,7 +78,7 @@ func runTest(t *testing.T, cases TestCases) {
 			var resourceFactory resource.ResourceFactory = dctlresource.NewDriftctlResourceFactory(repo)
 
 			if c.options == nil {
-				c.options = &pkg.ScanOptions{Deep: true}
+				c.options = &pkg.ScanOptions{}
 			}
 
 			scanProgress := &output.MockProgress{}
@@ -93,8 +92,7 @@ func runTest(t *testing.T, cases TestCases) {
 			testFilter := &filter.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 			testFilter.On("IsResourceIgnored", mock.Anything).Return(false)
-			testFilter.On("IsFieldIgnored", mock.Anything, mock.Anything).Return(false)
-			analyzer := analyser.NewAnalyzer(testAlerter, analyser.AnalyzerOptions{Deep: c.options.Deep}, testFilter)
+			analyzer := analyser.NewAnalyzer(testAlerter, testFilter)
 
 			store := memstore.New()
 			driftctl := pkg.NewDriftCTL(remoteSupplier, stateSupplier, testAlerter, analyzer, resourceFactory, c.options, scanProgress, iacProgress, repo, store)
@@ -159,7 +157,7 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				assert.Equal(t, uint(2), store.Bucket(memstore.TelemetryBucket).Get("iac_source_count"))
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
-				return &pkg.ScanOptions{Deep: true}
+				return &pkg.ScanOptions{}
 			}(t),
 		},
 		{
@@ -192,173 +190,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
 				assert.Equal(t, 0, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
 				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
-			},
-		},
-		{
-			name: "we should have changes of field update",
-			stateResources: []*resource.Resource{
-				&resource.Resource{
-					Id:   "fake",
-					Type: "FakeResource",
-					Attrs: &resource.Attributes{
-						"foobar": "barfoo",
-					},
-				},
-			},
-			remoteResources: []*resource.Resource{
-				&resource.Resource{
-					Id:   "fake",
-					Type: "FakeResource",
-					Attrs: &resource.Attributes{
-						"foobar": "foobar",
-					},
-				},
-			},
-			assert: func(t *testing.T, result *test.ScanResult, err error) {
-				result.AssertManagedCount(1)
-				result.AssertResourceHasDrift("fake", "FakeResource", analyser.Change{
-					Change: diff.Change{
-						Type: diff.UPDATE,
-						Path: []string{"foobar"},
-						From: "barfoo",
-						To:   "foobar",
-					},
-					Computed: false,
-				})
-				result.Equal(uint(2), result.Summary().TotalIaCSourceCount)
-			},
-			assertStore: func(t *testing.T, store memstore.Store) {
-				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
-				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
-				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
-				assert.Equal(t, uint(2), store.Bucket(memstore.TelemetryBucket).Get("iac_source_count"))
-			},
-		},
-		{
-			name: "we should have changes on computed field",
-			stateResources: []*resource.Resource{
-				&resource.Resource{
-					Id:   "fake",
-					Type: aws.AwsAmiResourceType,
-					Attrs: &resource.Attributes{
-						"arn": "barfoo",
-					},
-				},
-			},
-			remoteResources: []*resource.Resource{
-				&resource.Resource{
-					Id:   "fake",
-					Type: aws.AwsAmiResourceType,
-					Attrs: &resource.Attributes{
-						"arn": "foobar",
-					},
-				},
-			},
-			assert: func(t *testing.T, result *test.ScanResult, err error) {
-				result.AssertManagedCount(1)
-				result.AssertResourceHasDrift("fake", aws.AwsAmiResourceType, analyser.Change{
-					Change: diff.Change{
-						Type: diff.UPDATE,
-						Path: []string{"arn"},
-						From: "barfoo",
-						To:   "foobar",
-					},
-					Computed: true,
-				})
-				result.Equal(uint(2), result.Summary().TotalIaCSourceCount)
-			},
-			assertStore: func(t *testing.T, store memstore.Store) {
-				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
-				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
-				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
-				assert.Equal(t, uint(2), store.Bucket(memstore.TelemetryBucket).Get("iac_source_count"))
-			},
-		},
-		{
-			name: "we should have changes on deleted field",
-			stateResources: []*resource.Resource{
-				&resource.Resource{
-					Id:   "fake",
-					Type: "FakeResource",
-					Attrs: &resource.Attributes{
-						"tags": map[string]string{
-							"tag1": "deleted",
-							"tag2": "not_deleted",
-						},
-					},
-				},
-			},
-			remoteResources: []*resource.Resource{
-				&resource.Resource{
-					Id:   "fake",
-					Type: "FakeResource",
-					Attrs: &resource.Attributes{
-						"tags": map[string]string{
-							"tag2": "not_deleted",
-						},
-					},
-				},
-			},
-			assert: func(t *testing.T, result *test.ScanResult, err error) {
-				result.AssertManagedCount(1)
-				result.AssertResourceHasDrift("fake", "FakeResource", analyser.Change{
-					Change: diff.Change{
-						Type: diff.DELETE,
-						Path: []string{"tags", "tag1"},
-						From: "deleted",
-						To:   nil,
-					},
-					Computed: false,
-				})
-				result.Equal(uint(2), result.Summary().TotalIaCSourceCount)
-			},
-			assertStore: func(t *testing.T, store memstore.Store) {
-				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
-				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
-				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
-				assert.Equal(t, uint(2), store.Bucket(memstore.TelemetryBucket).Get("iac_source_count"))
-			},
-		},
-		{
-			name: "we should have changes of added field",
-			stateResources: []*resource.Resource{
-				&resource.Resource{
-					Id:   "fake",
-					Type: "FakeResource",
-					Attrs: &resource.Attributes{
-						"tags": map[string]string{},
-					},
-				},
-			},
-			remoteResources: []*resource.Resource{
-				&resource.Resource{
-					Id:   "fake",
-					Type: "FakeResource",
-					Attrs: &resource.Attributes{
-						"tags": map[string]string{
-							"tag1": "added",
-						},
-					},
-				},
-			},
-			assert: func(t *testing.T, result *test.ScanResult, err error) {
-				result.AssertManagedCount(1)
-				result.AssertResourceHasDrift("fake", "FakeResource", analyser.Change{
-					Change: diff.Change{
-						Type: diff.CREATE,
-						Path: []string{"tags", "tag1"},
-						From: nil,
-						To:   "added",
-					},
-					Computed: false,
-				})
-				result.Equal(uint(2), result.Summary().TotalIaCSourceCount)
-			},
-			assertStore: func(t *testing.T, store memstore.Store) {
-				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_resources"))
-				assert.Equal(t, 1, store.Bucket(memstore.TelemetryBucket).Get("total_managed"))
-				assert.Equal(t, uint(0), store.Bucket(memstore.TelemetryBucket).Get("duration"))
-				assert.Equal(t, uint(2), store.Bucket(memstore.TelemetryBucket).Get("iac_source_count"))
 			},
 		},
 		{
@@ -426,7 +257,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				result.AssertManagedCount(2)
 				result.AssertUnmanagedCount(2)
 				result.AssertDeletedCount(0)
-				result.AssertDriftCountTotal(0)
 				result.Equal(uint(2), result.Summary().TotalIaCSourceCount)
 			},
 			assertStore: func(t *testing.T, store memstore.Store) {
@@ -438,7 +268,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{
 					StrictMode: false,
-					Deep:       true,
 				}
 			}(t),
 		},
@@ -507,7 +336,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				result.AssertManagedCount(2)
 				result.AssertUnmanagedCount(4)
 				result.AssertDeletedCount(0)
-				result.AssertDriftCountTotal(0)
 				result.Equal(uint(2), result.Summary().TotalIaCSourceCount)
 			},
 			assertStore: func(t *testing.T, store memstore.Store) {
@@ -519,7 +347,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 			options: func(t *testing.T) *pkg.ScanOptions {
 				return &pkg.ScanOptions{
 					StrictMode: true,
-					Deep:       true,
 				}
 			}(t),
 		},
@@ -589,7 +416,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				result.AssertManagedCount(0)
 				result.AssertUnmanagedCount(1)
 				result.AssertDeletedCount(0)
-				result.AssertDriftCountTotal(0)
 				result.Equal(uint(2), result.Summary().TotalIaCSourceCount)
 			},
 			assertStore: func(t *testing.T, store memstore.Store) {
@@ -608,7 +434,6 @@ func TestDriftctlRun_BasicBehavior(t *testing.T) {
 				return &pkg.ScanOptions{
 					Filter:     f,
 					StrictMode: true,
-					Deep:       true,
 				}
 			}(t),
 		},
@@ -645,7 +470,7 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f, Deep: true}
+				return &pkg.ScanOptions{Filter: f}
 			}(t),
 		},
 		{
@@ -674,7 +499,7 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f, Deep: true}
+				return &pkg.ScanOptions{Filter: f}
 			}(t),
 		},
 		{
@@ -705,7 +530,7 @@ func TestDriftctlRun_BasicFilter(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f, Deep: true}
+				return &pkg.ScanOptions{Filter: f}
 			}(t),
 		},
 	}
@@ -740,16 +565,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 			},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
-				result.AssertResourceHasDrift("foo", "aws_s3_bucket_policy", analyser.Change{
-					Change: diff.Change{
-						Type: diff.UPDATE,
-						Path: []string{"policy"},
-						From: "{\"Id\":\"foo\"}",
-						To:   "{\"Id\":\"bar\"}",
-					},
-					Computed:   false,
-					JsonString: true,
-				})
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				filterStr := "Type=='aws_s3_bucket_policy' && Attr.bucket=='foo'"
@@ -758,7 +573,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f, Deep: true}
+				return &pkg.ScanOptions{Filter: f}
 			}(t),
 		},
 		{
@@ -806,24 +621,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 			},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(2)
-				result.AssertResourceHasDrift("vol-02862d9b39045a3a4", "aws_ebs_volume", analyser.Change{
-					Change: diff.Change{
-						Type: diff.UPDATE,
-						Path: []string{"type"},
-						From: "gp2",
-						To:   "gp3",
-					},
-					Computed: true,
-				})
-				result.AssertResourceHasDrift("vol-018c5ae89895aca4c", "aws_ebs_volume", analyser.Change{
-					Change: diff.Change{
-						Type: diff.UPDATE,
-						Path: []string{"encrypted"},
-						From: true,
-						To:   false,
-					},
-					Computed: true,
-				})
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				filterStr := "Type=='aws_ebs_volume' && Attr.availability_zone=='us-east-1'"
@@ -832,7 +629,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f, Deep: true}
+				return &pkg.ScanOptions{Filter: f}
 			}(t),
 		},
 		{
@@ -893,7 +690,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f, Deep: true}
+				return &pkg.ScanOptions{Filter: f}
 			}(t),
 		},
 		{
@@ -922,16 +719,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 			},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
-				result.AssertResourceHasDrift("foo", "aws_sns_topic_policy", analyser.Change{
-					Change: diff.Change{
-						Type: diff.UPDATE,
-						Path: []string{"policy"},
-						From: "{\"policy\":\"bar\"}",
-						To:   "{\"policy\":\"baz\"}",
-					},
-					Computed:   false,
-					JsonString: true,
-				})
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				filterStr := "Type=='aws_sns_topic_policy' && Attr.arn=='arn'"
@@ -940,7 +727,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f, Deep: true}
+				return &pkg.ScanOptions{Filter: f}
 			}(t),
 		},
 		{
@@ -968,16 +755,6 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 			},
 			assert: func(t *testing.T, result *test.ScanResult, err error) {
 				result.AssertManagedCount(1)
-				result.AssertResourceHasDrift("foo", "aws_sqs_queue_policy", analyser.Change{
-					Change: diff.Change{
-						Type: diff.UPDATE,
-						Path: []string{"policy"},
-						From: "{\"policy\":\"bar\"}",
-						To:   "{\"policy\":\"baz\"}",
-					},
-					Computed:   false,
-					JsonString: true,
-				})
 			},
 			options: func(t *testing.T) *pkg.ScanOptions {
 				filterStr := "Type=='aws_sqs_queue_policy' && Attr.queue_url=='foo'"
@@ -986,7 +763,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f, Deep: true}
+				return &pkg.ScanOptions{Filter: f}
 			}(t),
 		},
 		{
@@ -1165,7 +942,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f, Deep: true}
+				return &pkg.ScanOptions{Filter: f}
 			}(t),
 		},
 		{
@@ -1245,7 +1022,7 @@ func TestDriftctlRun_Middlewares(t *testing.T) {
 					t.Fatalf("Unable to build filter expression: %s\n%s", filterStr, err)
 				}
 
-				return &pkg.ScanOptions{Filter: f, Deep: true}
+				return &pkg.ScanOptions{Filter: f}
 			}(t),
 		},
 		{
@@ -1526,9 +1303,7 @@ func TestDriftctlRun_TestResourcesNormalization(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			options := &pkg.ScanOptions{
-				Deep: true,
-			}
+			options := &pkg.ScanOptions{}
 
 			repo := testresource.InitFakeSchemaRepository(c.ProviderName, c.ProviderVersion)
 			resourceFactory := dctlresource.NewDriftctlResourceFactory(repo)
@@ -1549,8 +1324,7 @@ func TestDriftctlRun_TestResourcesNormalization(t *testing.T) {
 			testFilter.On("IsResourceIgnored", mock.MatchedBy(func(res *resource.Resource) bool {
 				return res.ResourceType() != c.Resource
 			})).Return(true)
-			testFilter.On("IsFieldIgnored", mock.Anything, mock.Anything).Return(false)
-			analyzer := analyser.NewAnalyzer(testAlerter, analyser.AnalyzerOptions{Deep: options.Deep}, testFilter)
+			analyzer := analyser.NewAnalyzer(testAlerter, testFilter)
 
 			stateSupplier := &dctlresource.MockIaCSupplier{}
 			stateSupplier.On("Resources").Return(expectedResources, nil)

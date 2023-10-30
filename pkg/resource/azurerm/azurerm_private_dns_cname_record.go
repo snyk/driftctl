@@ -22,5 +22,4 @@ func initAzurePrivateDNSCNameRecordMetaData(resourceSchemaRepository dctlresourc
 		}
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(AzurePrivateDNSCNameRecordResourceType, resource.FlagDeepMode)
 }

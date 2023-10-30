@@ -13,5 +13,4 @@ func initAwsIAMRolePolicyMetaData(resourceSchemaRepository dctlresource.SchemaRe
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetFlags(AwsIamRolePolicyResourceType, resource.FlagDeepMode)
 }

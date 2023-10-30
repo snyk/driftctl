@@ -21,7 +21,6 @@ import (
 	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/mocks"
 
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
@@ -30,16 +29,20 @@ import (
 
 func TestSQSQueue(t *testing.T) {
 	cases := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockSQSRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockSQSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no sqs queues",
 			dirName: "aws_sqs_queue_empty",
 			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -52,6 +55,15 @@ func TestSQSQueue(t *testing.T) {
 					awssdk.String("https://sqs.eu-west-3.amazonaws.com/047081014315/foo"),
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsSqsQueueResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "https://sqs.eu-west-3.amazonaws.com/047081014315/foo", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsSqsQueueResourceType, got[1].ResourceType())
+			},
 			wantErr: nil,
 		},
 		{
@@ -63,12 +75,14 @@ func TestSQSQueue(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsSqsQueueResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSqsQueueResourceType, resourceaws.AwsSqsQueueResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -78,7 +92,6 @@ func TestSQSQueue(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -106,18 +119,18 @@ func TestSQSQueue(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewSQSQueueEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSqsQueueResourceType, aws.NewSQSQueueDetailsFetcher(provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsSqsQueueResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			fakeRepo.AssertExpectations(tt)
 			alerter.AssertExpectations(tt)
 		})
@@ -126,10 +139,11 @@ func TestSQSQueue(t *testing.T) {
 
 func TestSQSQueuePolicy(t *testing.T) {
 	cases := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockSQSRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockSQSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			// sqs queue with no policy case is not possible
@@ -138,6 +152,9 @@ func TestSQSQueuePolicy(t *testing.T) {
 			dirName: "aws_sqs_queue_policy_empty",
 			mocks: func(client *repository.MockSQSRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListAllQueues").Return([]*string{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -160,6 +177,18 @@ func TestSQSQueuePolicy(t *testing.T) {
 					nil,
 				)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, "https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsSqsQueuePolicyResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "https://sqs.eu-west-3.amazonaws.com/047081014315/foo", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsSqsQueuePolicyResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "https://sqs.eu-west-3.amazonaws.com/047081014315/baz", got[2].ResourceId())
+				assert.Equal(t, resourceaws.AwsSqsQueuePolicyResourceType, got[2].ResourceType())
+			},
 			wantErr: nil,
 		},
 		{
@@ -177,6 +206,18 @@ func TestSQSQueuePolicy(t *testing.T) {
 					nil,
 				)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, "https://sqs.eu-west-3.amazonaws.com/047081014315/bar.fifo", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsSqsQueuePolicyResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "https://sqs.eu-west-3.amazonaws.com/047081014315/foo", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsSqsQueuePolicyResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "https://sqs.eu-west-3.amazonaws.com/047081014315/baz", got[2].ResourceId())
+				assert.Equal(t, resourceaws.AwsSqsQueuePolicyResourceType, got[2].ResourceType())
+			},
 			wantErr: nil,
 		},
 		{
@@ -188,12 +229,14 @@ func TestSQSQueuePolicy(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsSqsQueuePolicyResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsSqsQueuePolicyResourceType, resourceaws.AwsSqsQueueResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -203,7 +246,6 @@ func TestSQSQueuePolicy(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -231,18 +273,18 @@ func TestSQSQueuePolicy(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewSQSQueuePolicyEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsSqsQueuePolicyResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsSqsQueuePolicyResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsSqsQueuePolicyResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			fakeRepo.AssertExpectations(tt)
 			alerter.AssertExpectations(tt)
 		})

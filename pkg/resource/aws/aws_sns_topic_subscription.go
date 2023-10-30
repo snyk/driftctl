@@ -36,6 +36,4 @@ func initSnsTopicSubscriptionMetaData(resourceSchemaRepository dctlresource.Sche
 			attributeSchema.JsonString = true
 		},
 	})
-
-	resourceSchemaRepository.SetFlags(AwsSnsTopicSubscriptionResourceType, resource.FlagDeepMode)
 }

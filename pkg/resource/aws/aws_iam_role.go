@@ -17,5 +17,4 @@ func initAwsIAMRoleMetaData(resourceSchemaRepository dctlresource.SchemaReposito
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetFlags(AwsIamRoleResourceType, resource.FlagDeepMode)
 }

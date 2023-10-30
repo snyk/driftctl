@@ -11,41 +11,43 @@ import (
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 	"github.com/snyk/driftctl/enumeration/remote/google"
 	"github.com/snyk/driftctl/enumeration/remote/google/repository"
+	googleresource "github.com/snyk/driftctl/enumeration/resource/google"
 	"github.com/snyk/driftctl/enumeration/terraform"
 
 	asset "cloud.google.com/go/asset/apiv1"
 	"cloud.google.com/go/storage"
 	"github.com/pkg/errors"
 	"github.com/snyk/driftctl/enumeration/resource"
-	googleresource "github.com/snyk/driftctl/enumeration/resource/google"
 	"github.com/snyk/driftctl/mocks"
 
-	"github.com/snyk/driftctl/test"
+	assetpb "cloud.google.com/go/asset/apiv1/assetpb"
 	"github.com/snyk/driftctl/test/goldenfile"
 	testgoogle "github.com/snyk/driftctl/test/google"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	assetpb "google.golang.org/genproto/googleapis/cloud/asset/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 func TestGoogleStorageBucket(t *testing.T) {
-
 	cases := []struct {
 		test             string
 		dirName          string
 		response         []*assetpb.ResourceSearchResult
 		responseErr      error
 		setupAlerterMock func(alerter *mocks.AlerterInterface)
+		assertExpected   func(*testing.T, []*resource.Resource)
 		wantErr          error
 	}{
 		{
 			test:     "no storage buckets",
 			dirName:  "google_storage_bucket_empty",
 			response: []*assetpb.ResourceSearchResult{},
-			wantErr:  nil,
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
+			wantErr: nil,
 		},
 		{
 			test:    "multiples storage buckets",
@@ -63,6 +65,18 @@ func TestGoogleStorageBucket(t *testing.T) {
 					AssetType:   "storage.googleapis.com/Bucket",
 					DisplayName: "driftctl-unittest-3",
 				},
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, "driftctl-unittest-1", got[0].ResourceId())
+				assert.Equal(t, googleresource.GoogleStorageBucketResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "driftctl-unittest-2", got[1].ResourceId())
+				assert.Equal(t, googleresource.GoogleStorageBucketResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "driftctl-unittest-3", got[2].ResourceId())
+				assert.Equal(t, googleresource.GoogleStorageBucketResourceType, got[2].ResourceType())
 			},
 			wantErr: nil,
 		},
@@ -84,19 +98,19 @@ func TestGoogleStorageBucket(t *testing.T) {
 					),
 				).Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
-	resType := resource.ResourceType(googleresource.GoogleStorageBucketResourceType)
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -139,12 +153,11 @@ func TestGoogleStorageBucket(t *testing.T) {
 			repo := repository.NewAssetRepository(assetClient, realProvider.GetConfig(), cache.New(0))
 
 			remoteLibrary.AddEnumerator(google.NewGoogleStorageBucketEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resType, common.NewGenericDetailsFetcher(resType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
@@ -152,13 +165,12 @@ func TestGoogleStorageBucket(t *testing.T) {
 			}
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
-			test.TestAgainstGoldenFile(got, resType.String(), c.dirName, provider, deserializer, shouldUpdate, tt)
+			c.assertExpected(tt, got)
 		})
 	}
 }
 
 func TestGoogleStorageBucketIAMMember(t *testing.T) {
-
 	cases := []struct {
 		test                  string
 		dirName               string
@@ -166,6 +178,7 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 		storageRepositoryMock func(storageRepository *repository.MockStorageRepository)
 		responseErr           error
 		setupAlerterMock      func(alerter *mocks.AlerterInterface)
+		assertExpected        func(*testing.T, []*resource.Resource)
 		wantErr               error
 	}{
 		{
@@ -173,6 +186,9 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 			dirName: "google_storage_bucket_member_empty",
 			assetRepositoryMock: func(assetRepository *repository.MockAssetRepository) {
 				assetRepository.On("SearchAllBuckets").Return([]*assetpb.ResourceSearchResult{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -194,6 +210,9 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 			storageRepositoryMock: func(storageRepository *repository.MockStorageRepository) {
 				storageRepository.On("ListAllBindings", "dctlgstoragebucketiambinding-1").Return(map[string][]string{}, nil)
 				storageRepository.On("ListAllBindings", "dctlgstoragebucketiambinding-2").Return(map[string][]string{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: nil,
 		},
@@ -227,6 +246,9 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 					),
 				).Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 		{
@@ -255,13 +277,25 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 					"roles/storage.objectViewer": {"user:elie.charra@cloudskiff.com"},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 4)
+
+				var resourceIds []string
+				for _, res := range got {
+					assert.Equal(t, googleresource.GoogleStorageBucketIamMemberResourceType, res.ResourceType())
+					resourceIds = append(resourceIds, res.ResourceId())
+				}
+
+				assert.Contains(t, resourceIds, "b/dctlgstoragebucketiambinding-1/roles/storage.admin/user:elie.charra@cloudskiff.com")
+				assert.Contains(t, resourceIds, "b/dctlgstoragebucketiambinding-1/roles/storage.objectViewer/user:william.beuil@cloudskiff.com")
+				assert.Contains(t, resourceIds, "b/dctlgstoragebucketiambinding-2/roles/storage.admin/user:william.beuil@cloudskiff.com")
+				assert.Contains(t, resourceIds, "b/dctlgstoragebucketiambinding-2/roles/storage.admin/user:william.beuil@cloudskiff.com")
+			},
 			wantErr: nil,
 		},
 	}
 
-	resType := resource.ResourceType(googleresource.GoogleStorageBucketIamMemberResourceType)
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
@@ -269,7 +303,6 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -310,7 +343,7 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 			if err != nil {
@@ -318,7 +351,7 @@ func TestGoogleStorageBucketIAMMember(t *testing.T) {
 			}
 			alerter.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)
-			test.TestAgainstGoldenFileNoCty(got, resType.String(), c.dirName, provider, deserializer, shouldUpdate, tt)
+			c.assertExpected(tt, got)
 		})
 	}
 }

@@ -30,7 +30,7 @@ func TestConsole_Write(t *testing.T) {
 			name:       "test console output",
 			goldenfile: "output.txt",
 			args: args{analysis: func() *analyser.Analysis {
-				a := fakeAnalysis(analyser.AnalyzerOptions{})
+				a := fakeAnalysis()
 				a.AddDeleted(
 					&resource.Resource{
 						Id:   "test-id-1",
@@ -72,27 +72,9 @@ func TestConsole_Write(t *testing.T) {
 			wantErr:    false,
 		},
 		{
-			name:       "test console output with json fields",
-			goldenfile: "output_json_fields.txt",
-			args:       args{analysis: fakeAnalysisWithJsonFields()},
-			wantErr:    false,
-		},
-		{
-			name:       "test console output with resources which implement stringer",
-			goldenfile: "output_stringer_resources.txt",
-			args:       args{analysis: fakeAnalysisWithStringerResources()},
-			wantErr:    false,
-		},
-		{
 			name:       "test console output with resource without attributes",
 			goldenfile: "output_empty_attributes.txt",
 			args:       args{analysis: fakeAnalysisWithoutAttrs()},
-			wantErr:    false,
-		},
-		{
-			name:       "test console output with drift on computed fields",
-			goldenfile: "output_computed_fields.txt",
-			args:       args{analysis: fakeAnalysisWithComputedFields()},
 			wantErr:    false,
 		},
 		{
@@ -111,18 +93,6 @@ func TestConsole_Write(t *testing.T) {
 			name:       "test console output without deep mode",
 			goldenfile: "output_without_deep.txt",
 			args:       args{analysis: fakeAnalysisWithoutDeep()},
-			wantErr:    false,
-		},
-		{
-			name:       "test console output with --only-managed",
-			goldenfile: "output_with_only_managed.txt",
-			args:       args{analysis: fakeAnalysisWithOnlyManagedFlag()},
-			wantErr:    false,
-		},
-		{
-			name:       "test console output with --only-unmanaged",
-			goldenfile: "output_with_only_unmanaged.txt",
-			args:       args{analysis: fakeAnalysisWithOnlyUnmanagedFlag()},
 			wantErr:    false,
 		},
 	}

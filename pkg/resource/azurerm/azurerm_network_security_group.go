@@ -19,5 +19,4 @@ func initAzureNetworkSecurityGroupMetadata(resourceSchemaRepository dctlresource
 		}
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(AzureNetworkSecurityGroupResourceType, resource.FlagDeepMode)
 }

@@ -1,7 +1,6 @@
 {
   "summary": {
     "total_resources": 12,
-    "total_changed": 1,
     "total_unmanaged": 11,
     "total_missing": 0,
     "total_managed": 1
@@ -66,45 +65,6 @@
     {
       "id": "testrole1",
       "type": "aws_iam_role"
-    }
-  ],
-  "differences": [
-    {
-      "res": {
-        "id": "test-20210416154114486700000001",
-        "type": "aws_s3_bucket"
-      },
-      "changelog": [
-        {
-          "type": "update",
-          "path": [
-            "BucketPrefix"
-          ],
-          "from": "test-",
-          "to": null,
-          "computed": false
-        },
-        {
-          "type": "create",
-          "path": [
-            "Tags",
-            "tag2"
-          ],
-          "from": null,
-          "to": "value",
-          "computed": false
-        },
-        {
-          "type": "update",
-          "path": [
-            "Tags",
-            "test"
-          ],
-          "from": "test",
-          "to": "test1",
-          "computed": false
-        }
-      ]
     }
   ],
   "coverage": 8,

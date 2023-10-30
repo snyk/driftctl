@@ -21,7 +21,6 @@ import (
 	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/mocks"
 
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
@@ -30,16 +29,20 @@ import (
 
 func TestRDSDBInstance(t *testing.T) {
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockRDSRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockRDSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no db instances",
 			dirName: "aws_rds_db_instance_empty",
 			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBInstances").Return([]*rds.DBInstance{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 		},
 		{
@@ -49,6 +52,12 @@ func TestRDSDBInstance(t *testing.T) {
 				repository.On("ListAllDBInstances").Return([]*rds.DBInstance{
 					{DBInstanceIdentifier: awssdk.String("terraform-20201015115018309600000001")},
 				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+
+				assert.Equal(t, "terraform-20201015115018309600000001", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsDbInstanceResourceType, got[0].ResourceType())
 			},
 		},
 		{
@@ -60,6 +69,15 @@ func TestRDSDBInstance(t *testing.T) {
 					{DBInstanceIdentifier: awssdk.String("database-1")},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "terraform-20201015115018309600000001", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsDbInstanceResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "database-1", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsDbInstanceResourceType, got[1].ResourceType())
+			},
 		},
 		{
 			test:    "cannot list db instances",
@@ -70,12 +88,14 @@ func TestRDSDBInstance(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsDbInstanceResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsDbInstanceResourceType, resourceaws.AwsDbInstanceResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -85,7 +105,6 @@ func TestRDSDBInstance(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -114,18 +133,18 @@ func TestRDSDBInstance(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewRDSDBInstanceEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDbInstanceResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDbInstanceResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFileNoCty(got, resourceaws.AwsDbInstanceResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -134,16 +153,20 @@ func TestRDSDBInstance(t *testing.T) {
 
 func TestRDSDBSubnetGroup(t *testing.T) {
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockRDSRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockRDSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no db subnet groups",
 			dirName: "aws_rds_db_subnet_group_empty",
 			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBSubnetGroups").Return([]*rds.DBSubnetGroup{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 		},
 		{
@@ -155,6 +178,15 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 					{DBSubnetGroupName: awssdk.String("bar")},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "foo", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsDbSubnetGroupResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "bar", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsDbSubnetGroupResourceType, got[1].ResourceType())
+			},
 		},
 		{
 			test:    "cannot list db subnet groups",
@@ -165,12 +197,14 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsDbSubnetGroupResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsDbSubnetGroupResourceType, resourceaws.AwsDbSubnetGroupResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -180,7 +214,6 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -209,18 +242,18 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewRDSDBSubnetGroupEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsDbSubnetGroupResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsDbSubnetGroupResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsDbSubnetGroupResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -229,10 +262,11 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 
 func TestRDSCluster(t *testing.T) {
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockRDSRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockRDSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no cluster",
@@ -240,9 +274,12 @@ func TestRDSCluster(t *testing.T) {
 			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBClusters").Return([]*rds.DBCluster{}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 		{
-			test:    "should return one result",
+			test:    "should return results",
 			dirName: "aws_rds_clusters_results",
 			mocks: func(repository *repository.MockRDSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDBClusters").Return([]*rds.DBCluster{
@@ -255,6 +292,15 @@ func TestRDSCluster(t *testing.T) {
 					},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "aurora-cluster-demo", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsRDSClusterResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "aurora-cluster-demo-2", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsRDSClusterResourceType, got[1].ResourceType())
+			},
 		},
 		{
 			test:    "cannot list clusters",
@@ -265,12 +311,14 @@ func TestRDSCluster(t *testing.T) {
 
 				alerter.On("SendAlert", resourceaws.AwsRDSClusterResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsRDSClusterResourceType, resourceaws.AwsRDSClusterResourceType), alerts.EnumerationPhase)).Return().Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			wantErr: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -280,7 +328,6 @@ func TestRDSCluster(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -309,18 +356,18 @@ func TestRDSCluster(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewRDSClusterEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsRDSClusterResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsRDSClusterResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsRDSClusterResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})

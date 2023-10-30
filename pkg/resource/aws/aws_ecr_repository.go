@@ -12,5 +12,4 @@ func initAwsEcrRepositoryMetaData(resourceSchemaRepository dctlresource.SchemaRe
 		val := res.Attrs
 		val.SafeDelete([]string{"timeouts"})
 	})
-	resourceSchemaRepository.SetFlags(AwsEcrRepositoryResourceType, resource.FlagDeepMode)
 }

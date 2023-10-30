@@ -3,32 +3,16 @@ package analyser
 import (
 	"encoding/json"
 	"fmt"
-	"sort"
 	"strings"
 	"time"
 
 	"github.com/snyk/driftctl/enumeration/alerter"
 
-	"github.com/r3labs/diff/v2"
 	"github.com/snyk/driftctl/enumeration/resource"
 )
 
-type Change struct {
-	diff.Change
-	Computed   bool `json:"computed"`
-	JsonString bool `json:"-"`
-}
-
-type Changelog []Change
-
-type Difference struct {
-	Res       *resource.Resource
-	Changelog Changelog
-}
-
 type Summary struct {
 	TotalResources      int  `json:"total_resources"`
-	TotalDrifted        int  `json:"total_changed"`
 	TotalUnmanaged      int  `json:"total_unmanaged"`
 	TotalDeleted        int  `json:"total_missing"`
 	TotalManaged        int  `json:"total_managed"`
@@ -39,8 +23,6 @@ type Analysis struct {
 	unmanaged       []*resource.Resource
 	managed         []*resource.Resource
 	deleted         []*resource.Resource
-	differences     []Difference
-	options         AnalyzerOptions
 	summary         Summary
 	alerts          alerter.Alerts
 	Duration        time.Duration
@@ -49,18 +31,11 @@ type Analysis struct {
 	ProviderVersion string
 }
 
-type serializableDifference struct {
-	Res       resource.SerializableResource `json:"res"`
-	Changelog Changelog                     `json:"changelog"`
-}
-
 type serializableAnalysis struct {
-	Options         AnalyzerOptions                        `json:"options"`
 	Summary         Summary                                `json:"summary"`
 	Managed         []resource.SerializableResource        `json:"managed"`
 	Unmanaged       []resource.SerializableResource        `json:"unmanaged"`
 	Deleted         []resource.SerializableResource        `json:"missing"`
-	Differences     []serializableDifference               `json:"differences"`
 	Coverage        int                                    `json:"coverage"`
 	Alerts          map[string][]alerter.SerializableAlert `json:"alerts"`
 	ProviderName    string                                 `json:"provider_name"`
@@ -77,8 +52,8 @@ type GenDriftIgnoreOptions struct {
 	OutputPath       string
 }
 
-func NewAnalysis(options AnalyzerOptions) *Analysis {
-	return &Analysis{options: options}
+func NewAnalysis() *Analysis {
+	return &Analysis{}
 }
 
 func (a Analysis) MarshalJSON() ([]byte, error) {
@@ -91,12 +66,6 @@ func (a Analysis) MarshalJSON() ([]byte, error) {
 	}
 	for _, d := range a.deleted {
 		bla.Deleted = append(bla.Deleted, *resource.NewSerializableResource(d))
-	}
-	for _, di := range a.differences {
-		bla.Differences = append(bla.Differences, serializableDifference{
-			Res:       *resource.NewSerializableResource(di.Res),
-			Changelog: di.Changelog,
-		})
 	}
 	if len(a.alerts) > 0 {
 		bla.Alerts = make(map[string][]alerter.SerializableAlert)
@@ -111,7 +80,6 @@ func (a Analysis) MarshalJSON() ([]byte, error) {
 	bla.ProviderName = a.ProviderName
 	bla.ProviderVersion = a.ProviderVersion
 	bla.ScanDuration = uint(a.Duration.Seconds())
-	bla.Options = a.Options()
 	bla.Date = a.Date
 
 	return json.Marshal(bla)
@@ -152,15 +120,6 @@ func (a *Analysis) UnmarshalJSON(bytes []byte) error {
 		}
 		a.AddManaged(res)
 	}
-	for _, di := range bla.Differences {
-		a.AddDifference(Difference{
-			Res: &resource.Resource{
-				Id:   di.Res.Id,
-				Type: di.Res.Type,
-			},
-			Changelog: di.Changelog,
-		})
-	}
 	if len(bla.Alerts) > 0 {
 		a.alerts = make(alerter.Alerts)
 		for k, v := range bla.Alerts {
@@ -175,17 +134,12 @@ func (a *Analysis) UnmarshalJSON(bytes []byte) error {
 	a.ProviderVersion = bla.ProviderVersion
 	a.SetIaCSourceCount(bla.Summary.TotalIaCSourceCount)
 	a.Duration = time.Duration(bla.ScanDuration) * time.Second
-	a.options = bla.Options
 	a.Date = bla.Date
 	return nil
 }
 
 func (a *Analysis) IsSync() bool {
-	return a.summary.TotalDrifted == 0 && a.summary.TotalUnmanaged == 0 && a.summary.TotalDeleted == 0
-}
-
-func (a *Analysis) Options() AnalyzerOptions {
-	return a.options
+	return a.summary.TotalUnmanaged == 0 && a.summary.TotalDeleted == 0
 }
 
 func (a *Analysis) AddDeleted(resources ...*resource.Resource) {
@@ -206,17 +160,8 @@ func (a *Analysis) AddManaged(resources ...*resource.Resource) {
 	a.summary.TotalManaged += len(resources)
 }
 
-func (a *Analysis) AddDifference(diffs ...Difference) {
-	a.differences = append(a.differences, diffs...)
-	a.summary.TotalDrifted += len(diffs)
-}
-
 func (a *Analysis) SetAlerts(alerts alerter.Alerts) {
 	a.alerts = alerts
-}
-
-func (a *Analysis) SetOptions(options AnalyzerOptions) {
-	a.options = options
 }
 
 func (a *Analysis) SetIaCSourceCount(i uint) {
@@ -242,10 +187,6 @@ func (a *Analysis) Deleted() []*resource.Resource {
 	return a.deleted
 }
 
-func (a *Analysis) Differences() []Difference {
-	return a.differences
-}
-
 func (a *Analysis) Summary() Summary {
 	return a.summary
 }
@@ -257,7 +198,6 @@ func (a *Analysis) Alerts() alerter.Alerts {
 func (a *Analysis) SortResources() {
 	a.unmanaged = resource.Sort(a.unmanaged)
 	a.deleted = resource.Sort(a.deleted)
-	a.differences = SortDifferences(a.differences)
 }
 
 func (a *Analysis) DriftIgnoreList(opts GenDriftIgnoreOptions) (int, string) {
@@ -271,12 +211,6 @@ func (a *Analysis) DriftIgnoreList(opts GenDriftIgnoreOptions) (int, string) {
 		}
 		resourceCount += len(res)
 	}
-	addDifferences := func(diff ...Difference) {
-		for _, d := range diff {
-			addResources(d.Res)
-		}
-		resourceCount += len(diff)
-	}
 
 	if !opts.ExcludeUnmanaged && a.Summary().TotalUnmanaged > 0 {
 		list = append(list, "# Resources not covered by IaC")
@@ -286,34 +220,8 @@ func (a *Analysis) DriftIgnoreList(opts GenDriftIgnoreOptions) (int, string) {
 		list = append(list, "# Missing resources")
 		addResources(a.Deleted()...)
 	}
-	if !opts.ExcludeDrifted && a.Summary().TotalDrifted > 0 {
-		list = append(list, "# Changed resources")
-		addDifferences(a.Differences()...)
-	}
 
 	return resourceCount, strings.Join(list, "\n")
-}
-
-func SortDifferences(diffs []Difference) []Difference {
-	sort.SliceStable(diffs, func(i, j int) bool {
-		if diffs[i].Res.ResourceType() != diffs[j].Res.ResourceType() {
-			return diffs[i].Res.ResourceType() < diffs[j].Res.ResourceType()
-		}
-		return diffs[i].Res.ResourceId() < diffs[j].Res.ResourceId()
-	})
-
-	for _, d := range diffs {
-		SortChanges(d.Changelog)
-	}
-
-	return diffs
-}
-
-func SortChanges(changes []Change) []Change {
-	sort.SliceStable(changes, func(i, j int) bool {
-		return strings.Join(changes[i].Path, ".") < strings.Join(changes[j].Path, ".")
-	})
-	return changes
 }
 
 func escapeKey(line string) string {

@@ -58,31 +58,6 @@ func HandleResourceEnumerationError(err error, alerter alerter.AlerterInterface)
 	return err
 }
 
-func HandleResourceDetailsFetchingError(err error, alerter alerter.AlerterInterface) error {
-	listError, ok := err.(*remoteerror.ResourceScanningError)
-	if !ok {
-		return err
-	}
-
-	rootCause := listError.RootCause()
-
-	if shouldHandleGoogleForbiddenError(listError) {
-		alerts.SendDetailsFetchingAlert(common.RemoteGoogleTerraform, alerter, listError)
-		return nil
-	}
-
-	// This handles access denied errors like the following:
-	// iam_role_policy: error reading IAM Role Policy (<policy>): AccessDenied: User: <role_arn> ...
-	if strings.HasPrefix(rootCause.Error(), "AccessDeniedException") ||
-		strings.Contains(rootCause.Error(), "AccessDenied") ||
-		strings.Contains(rootCause.Error(), "AuthorizationError") {
-		alerts.SendDetailsFetchingAlert(common.RemoteAWSTerraform, alerter, listError)
-		return nil
-	}
-
-	return err
-}
-
 func handleAWSError(alerter alerter.AlerterInterface, listError *remoteerror.ResourceScanningError, reqerr awserr.RequestFailure) error {
 	if reqerr.StatusCode() == 403 || (reqerr.StatusCode() == 400 && strings.Contains(reqerr.Code(), "AccessDenied")) {
 		alerts.SendEnumerationAlert(common.RemoteAWSTerraform, alerter, listError)

@@ -13,7 +13,7 @@ func TestAcc_Google_ProjectIAMMember(t *testing.T) {
 		Paths:            []string{"./testdata/acc/google_project_iam_member"},
 		Args: []string{
 			"scan",
-			"--to", "gcp+tf", "--deep",
+			"--to", "gcp+tf",
 		},
 		Checks: []acceptance.AccCheck{
 			{

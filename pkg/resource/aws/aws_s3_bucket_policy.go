@@ -22,5 +22,4 @@ func initAwsS3BucketPolicyMetaData(resourceSchemaRepository dctlresource.SchemaR
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetFlags(AwsS3BucketPolicyResourceType, resource.FlagDeepMode)
 }

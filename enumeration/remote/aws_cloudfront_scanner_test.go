@@ -3,6 +3,7 @@ package remote
 import (
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/aws"
@@ -10,18 +11,16 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
+	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/enumeration/terraform"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudfront"
-	"github.com/pkg/errors"
 	"github.com/snyk/driftctl/enumeration/resource"
-	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/mocks"
 
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
@@ -30,16 +29,20 @@ import (
 
 func TestCloudfrontDistribution(t *testing.T) {
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockCloudfrontRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockCloudfrontRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no cloudfront distributions",
 			dirName: "aws_cloudfront_distribution_empty",
 			mocks: func(repository *repository.MockCloudfrontRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllDistributions").Return([]*cloudfront.DistributionSummary{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 		},
 		{
@@ -49,6 +52,12 @@ func TestCloudfrontDistribution(t *testing.T) {
 				repository.On("ListAllDistributions").Return([]*cloudfront.DistributionSummary{
 					{Id: awssdk.String("E1M9CNS0XSHI19")},
 				}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 1)
+
+				assert.Equal(t, "E1M9CNS0XSHI19", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsCloudfrontDistributionResourceType, got[0].ResourceType())
 			},
 		},
 		{
@@ -61,11 +70,13 @@ func TestCloudfrontDistribution(t *testing.T) {
 				alerter.On("SendAlert", resourceaws.AwsCloudfrontDistributionResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsCloudfrontDistributionResourceType, resourceaws.AwsCloudfrontDistributionResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -75,7 +86,6 @@ func TestCloudfrontDistribution(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -104,18 +114,18 @@ func TestCloudfrontDistribution(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewCloudfrontDistributionEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsCloudfrontDistributionResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsCloudfrontDistributionResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsCloudfrontDistributionResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})

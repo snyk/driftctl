@@ -12,18 +12,13 @@ import (
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
 
 	"github.com/pkg/errors"
-	"github.com/r3labs/diff/v2"
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/pkg/analyser"
 	"github.com/snyk/driftctl/pkg/output"
 )
 
-func fakeAnalysis(opts analyser.AnalyzerOptions) *analyser.Analysis {
-	if opts == (analyser.AnalyzerOptions{}) {
-		opts = analyser.AnalyzerOptions{Deep: true}
-	}
-	a := analyser.NewAnalysis(opts)
+func fakeAnalysis() *analyser.Analysis {
+	a := analyser.NewAnalysis()
 	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	a.SetIaCSourceCount(3)
 	a.Duration = 12 * time.Second
@@ -61,65 +56,13 @@ func fakeAnalysis(opts analyser.AnalyzerOptions) *analyser.Analysis {
 			Type: "aws_no_diff_resource",
 		},
 	)
-	// Cover the case when a diff occur on a resource without a source
-	a.AddDifference(analyser.Difference{
-		Res: &resource.Resource{
-			Id:   "diff-id-2",
-			Type: "aws_diff_resource",
-		},
-		Changelog: []analyser.Change{
-			{
-				Change: diff.Change{
-					Type: diff.UPDATE,
-					Path: []string{"updated", "field"},
-					From: "foobar",
-					To:   "barfoo",
-				},
-			},
-		},
-	})
-	a.AddDifference(analyser.Difference{Res: &resource.Resource{
-		Id:   "diff-id-1",
-		Type: "aws_diff_resource",
-		Source: &resource.TerraformStateSource{
-			State:  "tfstate://state.tfstate",
-			Module: "module",
-			Name:   "name",
-		},
-	},
-		Changelog: []analyser.Change{
-			{
-				Change: diff.Change{
-					Type: diff.UPDATE,
-					Path: []string{"updated", "field"},
-					From: "foobar",
-					To:   "barfoo",
-				},
-			},
-			{
-				Change: diff.Change{
-					Type: diff.CREATE,
-					Path: []string{"new", "field"},
-					From: nil,
-					To:   "newValue",
-				},
-			},
-			{
-				Change: diff.Change{
-					Type: diff.DELETE,
-					Path: []string{"a"},
-					From: "oldValue",
-					To:   nil,
-				},
-			},
-		}})
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
 	return a
 }
 
 func fakeAnalysisWithAlerts() *analyser.Analysis {
-	a := fakeAnalysis(analyser.AnalyzerOptions{})
+	a := fakeAnalysis()
 	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	a.SetAlerts(alerter.Alerts{
 		"": []alerter.Alert{
@@ -146,70 +89,8 @@ func fakeAnalysisNoDrift() *analyser.Analysis {
 	return &a
 }
 
-func fakeAnalysisWithJsonFields() *analyser.Analysis {
-	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
-	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
-	a.AddManaged(
-		&resource.Resource{
-			Id:   "diff-id-1",
-			Type: "aws_diff_resource",
-		},
-	)
-	a.AddManaged(
-		&resource.Resource{
-			Id:   "diff-id-2",
-			Type: "aws_diff_resource",
-		},
-	)
-	a.AddDifference(analyser.Difference{
-		Res: &resource.Resource{
-			Id:   "diff-id-1",
-			Type: "aws_diff_resource",
-			Source: &resource.TerraformStateSource{
-				State:  "tfstate://state.tfstate",
-				Module: "module",
-				Name:   "name",
-			},
-		},
-		Changelog: []analyser.Change{
-			{
-				JsonString: true,
-				Change: diff.Change{
-					Type: diff.UPDATE,
-					Path: []string{"Json"},
-					From: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Removed\":\"Added\",\"Changed\":[\"oldValue1\", \"oldValue2\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
-					To:   "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Changed\":\"newValue\",\"NewField\":[\"foobar\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
-				},
-			},
-		}})
-	a.AddDifference(analyser.Difference{
-		Res: &resource.Resource{
-			Id:   "diff-id-2",
-			Type: "aws_diff_resource",
-			Source: &resource.TerraformStateSource{
-				State:  "tfstate://state.tfstate",
-				Module: "module",
-				Name:   "name",
-			},
-		},
-		Changelog: []analyser.Change{
-			{
-				JsonString: true,
-				Change: diff.Change{
-					Type: diff.UPDATE,
-					Path: []string{"Json"},
-					From: "{\"foo\":\"bar\"}",
-					To:   "{\"bar\":\"foo\"}",
-				},
-			},
-		}})
-	a.ProviderName = "AWS"
-	a.ProviderVersion = "3.19.0"
-	return a
-}
-
 func fakeAnalysisWithoutAttrs() *analyser.Analysis {
-	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
+	a := analyser.NewAnalysis()
 	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
 	a.AddDeleted(
 		&resource.Resource{
@@ -237,159 +118,6 @@ func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 			Attrs: &resource.Attributes{},
 		},
 	)
-	a.ProviderName = "AWS"
-	a.ProviderVersion = "3.19.0"
-	return a
-}
-
-func fakeAnalysisWithStringerResources() *analyser.Analysis {
-	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
-	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
-	schema := &resource.Schema{HumanReadableAttributesFunc: func(res *resource.Resource) map[string]string {
-		return map[string]string{
-			"Name": (*res.Attrs)["name"].(string),
-		}
-	}}
-	a.AddDeleted(
-		&resource.Resource{
-			Id:   "dfjkgnbsgj",
-			Type: "FakeResourceStringer",
-			Sch:  schema,
-			Attrs: &resource.Attributes{
-				"name": "deleted resource",
-			},
-			Source: &resource.TerraformStateSource{
-				State:  "tfstate://state.tfstate",
-				Module: "module",
-				Name:   "name",
-			},
-		},
-	)
-	a.AddManaged(
-		&resource.Resource{
-			Id:   "usqyfsdbgjsdgjkdfg",
-			Type: "FakeResourceStringer",
-			Sch:  schema,
-			Attrs: &resource.Attributes{
-				"name": "managed resource",
-			},
-		},
-	)
-	a.AddUnmanaged(
-		&resource.Resource{
-			Id:   "duysgkfdjfdgfhd",
-			Type: "FakeResourceStringer",
-			Sch:  schema,
-			Attrs: &resource.Attributes{
-				"name": "unmanaged resource",
-			},
-		},
-	)
-	a.AddDifference(analyser.Difference{Res: &resource.Resource{
-		Id:   "gdsfhgkbn",
-		Type: "FakeResourceStringer",
-		Sch:  schema,
-		Attrs: &resource.Attributes{
-			"name": "resource with diff",
-		},
-		Source: &resource.TerraformStateSource{
-			State:  "tfstate://state.tfstate",
-			Module: "module",
-			Name:   "name",
-		},
-	}, Changelog: []analyser.Change{
-		{
-			Change: diff.Change{
-				Type: diff.UPDATE,
-				Path: []string{"Name"},
-				From: "",
-				To:   "resource with diff",
-			},
-		},
-	}})
-	a.ProviderName = "AWS"
-	a.ProviderVersion = "3.19.0"
-	return a
-}
-
-func fakeAnalysisWithComputedFields() *analyser.Analysis {
-	a := analyser.NewAnalysis(analyser.AnalyzerOptions{Deep: true})
-	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
-	a.AddManaged(
-		&resource.Resource{
-			Id:   "diff-id-1",
-			Type: "aws_diff_resource",
-		},
-	)
-	a.AddDifference(analyser.Difference{
-		Res: &resource.Resource{
-			Id:   "diff-id-1",
-			Type: "aws_diff_resource",
-			Source: &resource.TerraformStateSource{
-				State:  "tfstate://state.tfstate",
-				Module: "module",
-				Name:   "name",
-			},
-		}, Changelog: []analyser.Change{
-			{
-				Change: diff.Change{
-					Type: diff.UPDATE,
-					Path: []string{"updated", "field"},
-					From: "foobar",
-					To:   "barfoo",
-				},
-				Computed: true,
-			},
-			{
-				Change: diff.Change{
-					Type: diff.CREATE,
-					Path: []string{"new", "field"},
-					From: nil,
-					To:   "newValue",
-				},
-			},
-			{
-				Change: diff.Change{
-					Type: diff.DELETE,
-					Path: []string{"a"},
-					From: "oldValue",
-					To:   nil,
-				},
-				Computed: true,
-			},
-			{
-				Change: diff.Change{
-					Type: diff.UPDATE,
-					From: "foo",
-					To:   "oof",
-					Path: []string{
-						"struct",
-						"0",
-						"array",
-						"0",
-					},
-				},
-				Computed: true,
-			},
-			{
-				Change: diff.Change{
-					Type: diff.UPDATE,
-					From: "one",
-					To:   "two",
-					Path: []string{
-						"struct",
-						"0",
-						"string",
-					},
-				},
-				Computed: true,
-			},
-		}})
-	a.SetAlerts(alerter.Alerts{
-		"": []alerter.Alert{
-			analyser.NewComputedDiffAlert(),
-		},
-	})
 	a.ProviderName = "AWS"
 	a.ProviderVersion = "3.19.0"
 	return a
@@ -473,87 +201,6 @@ func fakeAnalysisWithoutDeep() *analyser.Analysis {
 			Type: "aws_unmanaged_resource",
 			Attrs: &resource.Attributes{
 				"name": "First unmanaged resource",
-			},
-		},
-	)
-	a.ProviderName = "AWS"
-	a.ProviderVersion = "3.19.0"
-	return &a
-}
-
-func fakeAnalysisWithOnlyManagedFlag() *analyser.Analysis {
-	a := analyser.Analysis{}
-	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
-	a.SetOptions(analyser.AnalyzerOptions{
-		OnlyManaged: true,
-		Deep:        true,
-	})
-	a.AddManaged(
-		&resource.Resource{
-			Id:   "foo",
-			Type: aws.AwsInstanceResourceType,
-			Attrs: &resource.Attributes{
-				"instance_type": "test2",
-			},
-		},
-	)
-	a.AddDifference(
-		analyser.Difference{
-			Res: &resource.Resource{
-				Id:   "foo",
-				Type: aws.AwsInstanceResourceType,
-				Attrs: &resource.Attributes{
-					"instance_type": "test2",
-				},
-			},
-			Changelog: []analyser.Change{
-				{
-					Change: diff.Change{
-						Type: "update",
-						From: "test2",
-						To:   "test1",
-						Path: []string{
-							"instance_type",
-						},
-					},
-				},
-			},
-		})
-	a.AddDeleted(
-		&resource.Resource{
-			Id:   "baz",
-			Type: aws.AwsInstanceResourceType,
-			Attrs: &resource.Attributes{
-				"instance_type": "test3",
-			},
-		},
-	)
-	a.ProviderName = "AWS"
-	a.ProviderVersion = "3.19.0"
-	return &a
-}
-
-func fakeAnalysisWithOnlyUnmanagedFlag() *analyser.Analysis {
-	a := analyser.Analysis{}
-	a.Date = time.Date(2022, 4, 8, 10, 35, 0, 0, time.UTC)
-	a.SetOptions(analyser.AnalyzerOptions{
-		OnlyUnmanaged: true,
-	})
-	a.AddManaged(
-		&resource.Resource{
-			Id:   "foo",
-			Type: aws.AwsInstanceResourceType,
-			Attrs: &resource.Attributes{
-				"instance_type": "test2",
-			},
-		},
-	)
-	a.AddUnmanaged(
-		&resource.Resource{
-			Id:   "bar",
-			Type: aws.AwsInstanceResourceType,
-			Attrs: &resource.Attributes{
-				"instance_type": "test2",
 			},
 		},
 	)

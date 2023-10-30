@@ -23,5 +23,4 @@ func initAwsKmsKeyMetaData(resourceSchemaRepository dctlresource.SchemaRepositor
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetFlags(AwsKmsKeyResourceType, resource.FlagDeepMode)
 }

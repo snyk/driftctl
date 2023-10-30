@@ -1,12 +1,6 @@
 {
-	"options": {
-		"deep": false,
-		"only_managed": false,
-		"only_unmanaged": false
-	},
 	"summary": {
 		"total_resources": 0,
-		"total_changed": 0,
 		"total_unmanaged": 0,
 		"total_missing": 0,
 		"total_managed": 0,
@@ -15,7 +9,6 @@
 	"managed": null,
 	"unmanaged": null,
 	"missing": null,
-	"differences": null,
 	"coverage": 0,
 	"alerts": null,
 	"provider_name": "",

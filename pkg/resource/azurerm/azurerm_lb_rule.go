@@ -18,5 +18,4 @@ func initAzureLoadBalancerRuleMetadata(resourceSchemaRepository dctlresource.Sch
 		}
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(AzureLoadBalancerRuleResourceType, resource.FlagDeepMode)
 }

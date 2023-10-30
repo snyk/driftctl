@@ -20,7 +20,6 @@ import (
 	resourceazure "github.com/snyk/driftctl/enumeration/resource/azurerm"
 	"github.com/snyk/driftctl/mocks"
 
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 
 	terraformtest "github.com/snyk/driftctl/test/terraform"
@@ -29,14 +28,14 @@ import (
 )
 
 func TestAzurermPrivateDNSZone(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no private zone",
@@ -44,12 +43,18 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 		{
 			test:    "error listing private zones",
 			dirName: "azurerm_private_dns_private_zone_empty",
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzurePrivateDNSZoneResourceType),
 		},
@@ -84,17 +89,27 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 					},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 3)
+
+				assert.Equal(t, "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com", got[0].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSZoneResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf2.com", got[1].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSZoneResourceType, got[1].ResourceType())
+
+				assert.Equal(t, "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/testmartin.com", got[2].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSZoneResourceType, got[2].ResourceType())
+			},
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -128,19 +143,19 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSZoneEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSZoneResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSZoneResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceazure.AzurePrivateDNSZoneResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -148,14 +163,14 @@ func TestAzurermPrivateDNSZone(t *testing.T) {
 }
 
 func TestAzurermPrivateDNSARecord(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no private a record",
@@ -163,12 +178,18 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 		{
 			test:    "error listing private zone",
 			dirName: "azurerm_private_dns_a_record_empty",
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePrivateDNSARecordResourceType, resourceazure.AzurePrivateDNSZoneResourceType),
 		},
@@ -187,6 +208,9 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 					},
 				}, nil)
 				repository.On("ListAllARecords", mock.Anything).Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzurePrivateDNSARecordResourceType),
 		},
@@ -235,17 +259,24 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 					},
 				}, nil).Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/A/test", got[0].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSARecordResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/A/othertest", got[1].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSARecordResourceType, got[1].ResourceType())
+			},
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -279,19 +310,19 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSARecordEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSARecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSARecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceazure.AzurePrivateDNSARecordResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -299,14 +330,14 @@ func TestAzurermPrivateDNSARecord(t *testing.T) {
 }
 
 func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no private aaaa record",
@@ -314,12 +345,18 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 		{
 			test:    "error listing private zone",
 			dirName: "azurerm_private_dns_aaaa_record_empty",
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePrivateDNSAAAARecordResourceType, resourceazure.AzurePrivateDNSZoneResourceType),
 		},
@@ -338,6 +375,9 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 					},
 				}, nil)
 				repository.On("ListAllAAAARecords", mock.Anything).Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzurePrivateDNSAAAARecordResourceType),
 		},
@@ -387,17 +427,24 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 					},
 				}, nil).Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/AAAA/test", got[0].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSAAAARecordResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/AAAA/othertest", got[1].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSAAAARecordResourceType, got[1].ResourceType())
+			},
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -431,19 +478,19 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSAAAARecordEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSAAAARecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSAAAARecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceazure.AzurePrivateDNSAAAARecordResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -451,14 +498,14 @@ func TestAzurermPrivateDNSAAAARecord(t *testing.T) {
 }
 
 func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no private cname record",
@@ -466,12 +513,18 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 		{
 			test:    "error listing private zone",
 			dirName: "azurerm_private_dns_cname_record_empty",
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePrivateDNSCNameRecordResourceType, resourceazure.AzurePrivateDNSZoneResourceType),
 		},
@@ -490,6 +543,9 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 					},
 				}, nil)
 				repository.On("ListAllCNAMERecords", mock.Anything).Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzurePrivateDNSCNameRecordResourceType),
 		},
@@ -527,17 +583,24 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 					},
 				}, nil).Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/CNAME/test", got[0].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSCNameRecordResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "/subscriptions/7bfb2c5c-7308-46ed-8ae4-fffa356eb406/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/CNAME/othertest", got[1].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSCNameRecordResourceType, got[1].ResourceType())
+			},
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -571,19 +634,19 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSCNameRecordEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSCNameRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSCNameRecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceazure.AzurePrivateDNSCNameRecordResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -591,14 +654,14 @@ func TestAzurermPrivateDNSCNAMERecord(t *testing.T) {
 }
 
 func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no private ptr record",
@@ -606,12 +669,18 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 		{
 			test:    "error listing private zone",
 			dirName: "azurerm_private_dns_ptr_record_empty",
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePrivateDNSPTRRecordResourceType, resourceazure.AzurePrivateDNSZoneResourceType),
 		},
@@ -630,6 +699,9 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 					},
 				}, nil)
 				repository.On("ListAllPTRRecords", mock.Anything).Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzurePrivateDNSPTRRecordResourceType),
 		},
@@ -678,17 +750,24 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 					},
 				}, nil).Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/PTR/othertestptr", got[0].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSPTRRecordResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/PTR/testptr", got[1].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSPTRRecordResourceType, got[1].ResourceType())
+			},
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -722,19 +801,19 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSPTRRecordEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSPTRRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSPTRRecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceazure.AzurePrivateDNSPTRRecordResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -742,14 +821,14 @@ func TestAzurermPrivateDNSPTRRecord(t *testing.T) {
 }
 
 func TestAzurermPrivateDNSMXRecord(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no private mx record",
@@ -757,12 +836,18 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 		{
 			test:    "error listing private zone",
 			dirName: "azurerm_private_dns_mx_record_empty",
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePrivateDNSMXRecordResourceType, resourceazure.AzurePrivateDNSZoneResourceType),
 		},
@@ -781,6 +866,9 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 					},
 				}, nil)
 				repository.On("ListAllMXRecords", mock.Anything).Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzurePrivateDNSMXRecordResourceType),
 		},
@@ -830,17 +918,24 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 					},
 				}, nil).Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/MX/othertestmx", got[0].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSMXRecordResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/MX/testmx", got[1].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSMXRecordResourceType, got[1].ResourceType())
+			},
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -874,19 +969,19 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSMXRecordEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSMXRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSMXRecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceazure.AzurePrivateDNSMXRecordResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -894,14 +989,14 @@ func TestAzurermPrivateDNSMXRecord(t *testing.T) {
 }
 
 func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no private srv record",
@@ -909,12 +1004,18 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 		{
 			test:    "error listing private zone",
 			dirName: "azurerm_private_dns_srv_record_empty",
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePrivateDNSSRVRecordResourceType, resourceazure.AzurePrivateDNSZoneResourceType),
 		},
@@ -933,6 +1034,9 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 					},
 				}, nil)
 				repository.On("ListAllSRVRecords", mock.Anything).Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzurePrivateDNSSRVRecordResourceType),
 		},
@@ -981,17 +1085,24 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 					},
 				}, nil).Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/SRV/othertestptr", got[0].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSSRVRecordResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/SRV/testptr", got[1].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSSRVRecordResourceType, got[1].ResourceType())
+			},
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -1025,19 +1136,19 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSSRVRecordEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSSRVRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSSRVRecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceazure.AzurePrivateDNSSRVRecordResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})
@@ -1045,14 +1156,14 @@ func TestAzurermPrivateDNSSRVRecord(t *testing.T) {
 }
 
 func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
-
 	dummyError := errors.New("this is an error")
 
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockPrivateDNSRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no private txt record",
@@ -1060,12 +1171,18 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return([]*armprivatedns.PrivateZone{}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 		{
 			test:    "error listing private zone",
 			dirName: "azurerm_private_dns_txt_record_empty",
 			mocks: func(repository *repository.MockPrivateDNSRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllPrivateZones").Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingErrorWithType(dummyError, resourceazure.AzurePrivateDNSTXTRecordResourceType, resourceazure.AzurePrivateDNSZoneResourceType),
 		},
@@ -1084,6 +1201,9 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 					},
 				}, nil)
 				repository.On("ListAllTXTRecords", mock.Anything).Return(nil, dummyError)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			wantErr: remoteerr.NewResourceListingError(dummyError, resourceazure.AzurePrivateDNSTXTRecordResourceType),
 		},
@@ -1132,17 +1252,24 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 					},
 				}, nil).Once()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/TXT/othertesttxt", got[0].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSTXTRecordResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "/subscriptions/8cb43347-a79f-4bb2-a8b4-c838b41fa5a5/resourceGroups/martin-dev/providers/Microsoft.Network/privateDnsZones/thisisatestusingtf.com/TXT/testtxt", got[1].ResourceId())
+				assert.Equal(t, resourceazure.AzurePrivateDNSTXTRecordResourceType, got[1].ResourceType())
+			},
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -1176,19 +1303,19 @@ func TestAzurermPrivateDNSTXTRecord(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(azurerm.NewAzurermPrivateDNSTXTRecordEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceazure.AzurePrivateDNSTXTRecordResourceType, common.NewGenericDetailsFetcher(resourceazure.AzurePrivateDNSTXTRecordResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, c.wantErr, err)
 
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceazure.AzurePrivateDNSTXTRecordResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 		})

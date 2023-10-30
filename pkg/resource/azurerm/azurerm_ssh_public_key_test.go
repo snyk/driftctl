@@ -8,7 +8,6 @@ package azurerm_test
 // 		Args: []string{
 // 			"scan",
 // 			"--to", "azure+tf",
-// 			"--deep",
 // 		},
 // 		Checks: []acceptance.AccCheck{
 // 			{

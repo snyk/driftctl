@@ -17,6 +17,7 @@ ij_editorconfig_space_before_comma = false
 ij_editorconfig_spaces_around_assignment_operators = true
 
 [{*.go,*.go2}]
+indent_style = tab
 ij_continuation_indent_size = 4
 ij_go_add_leading_space_to_comments = true
 ij_go_add_parentheses_for_single_import = false

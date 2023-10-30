@@ -1,9 +1,9 @@
 package remote
 
 import (
-	"errors"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/snyk/driftctl/enumeration"
 	"github.com/snyk/driftctl/enumeration/remote/alerts"
 	"github.com/snyk/driftctl/enumeration/remote/aws"
@@ -11,6 +11,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	remoteerr "github.com/snyk/driftctl/enumeration/remote/error"
+	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/enumeration/terraform"
 
 	awssdk "github.com/aws/aws-sdk-go/aws"
@@ -18,10 +19,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/snyk/driftctl/enumeration/resource"
-	resourceaws "github.com/snyk/driftctl/enumeration/resource/aws"
 	"github.com/snyk/driftctl/mocks"
 
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	terraform2 "github.com/snyk/driftctl/test/terraform"
 	"github.com/stretchr/testify/assert"
@@ -29,17 +28,22 @@ import (
 )
 
 func TestCloudformationStack(t *testing.T) {
+	awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 400, "")
 	tests := []struct {
-		test    string
-		dirName string
-		mocks   func(*repository.MockCloudformationRepository, *mocks.AlerterInterface)
-		wantErr error
+		test           string
+		dirName        string
+		mocks          func(*repository.MockCloudformationRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		wantErr        error
 	}{
 		{
 			test:    "no cloudformation stacks",
 			dirName: "aws_cloudformation_stack_empty",
 			mocks: func(repository *repository.MockCloudformationRepository, alerter *mocks.AlerterInterface) {
 				repository.On("ListAllStacks").Return([]*cloudformation.Stack{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 		},
 		{
@@ -51,22 +55,32 @@ func TestCloudformationStack(t *testing.T) {
 					{StackId: awssdk.String("arn:aws:cloudformation:us-east-1:047081014315:stack/foo-stack/c7aa0ab0-0f21-11ec-ba25-129d8c0b3757")},
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "arn:aws:cloudformation:us-east-1:047081014315:stack/bar-stack/c7a96e70-0f21-11ec-bd2a-0a2d95c2b2ab", got[0].ResourceId())
+				assert.Equal(t, resourceaws.AwsCloudformationStackResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "arn:aws:cloudformation:us-east-1:047081014315:stack/foo-stack/c7aa0ab0-0f21-11ec-ba25-129d8c0b3757", got[1].ResourceId())
+				assert.Equal(t, resourceaws.AwsCloudformationStackResourceType, got[1].ResourceType())
+			},
 		},
 		{
 			test:    "cannot list cloudformation stacks",
 			dirName: "aws_cloudformation_stack_list",
 			mocks: func(repository *repository.MockCloudformationRepository, alerter *mocks.AlerterInterface) {
-				awsError := awserr.NewRequestFailure(awserr.New("AccessDeniedException", "", errors.New("")), 400, "")
 				repository.On("ListAllStacks").Return(nil, awsError)
 
 				alerter.On("SendAlert", resourceaws.AwsCloudformationStackResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(awsError, resourceaws.AwsCloudformationStackResourceType, resourceaws.AwsCloudformationStackResourceType), alerts.EnumerationPhase)).Return()
 			},
 			wantErr: nil,
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range tests {
 		t.Run(c.test, func(tt *testing.T) {
@@ -76,7 +90,6 @@ func TestCloudformationStack(t *testing.T) {
 				SharedConfigState: session.SharedConfigEnable,
 			}))
 
-			scanOptions := ScannerOptions{Deep: true}
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
 
@@ -105,18 +118,18 @@ func TestCloudformationStack(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(aws.NewCloudformationStackEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(resourceaws.AwsCloudformationStackResourceType, common.NewGenericDetailsFetcher(resourceaws.AwsCloudformationStackResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.wantErr)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, resourceaws.AwsCloudformationStackResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			alerter.AssertExpectations(tt)
 			fakeRepo.AssertExpectations(tt)
 			testFilter.AssertExpectations(tt)

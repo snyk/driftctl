@@ -20,6 +20,5 @@ func initGoogleStorageBucketIamBMemberMetadata(resourceSchemaRepository dctlreso
 		}
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(GoogleStorageBucketIamMemberResourceType, resource.FlagDeepMode)
 
 }

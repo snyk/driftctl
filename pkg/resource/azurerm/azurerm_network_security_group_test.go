@@ -9,7 +9,6 @@ package azurerm_test
 // 			"scan",
 // 			"--to", "azure+tf",
 // 			"--filter", "contains(Id, 'acceptanceTestSecurityGroup-')",
-// 			"--deep",
 // 		},
 // 		Checks: []acceptance.AccCheck{
 // 			{

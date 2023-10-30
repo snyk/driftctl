@@ -19,24 +19,26 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/snyk/driftctl/enumeration/resource"
-	"github.com/snyk/driftctl/test"
 	"github.com/snyk/driftctl/test/goldenfile"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestScanGithubMembership(t *testing.T) {
-
 	cases := []struct {
-		test    string
-		dirName string
-		mocks   func(*github.MockGithubRepository, *mocks.AlerterInterface)
-		err     error
+		test           string
+		dirName        string
+		mocks          func(*github.MockGithubRepository, *mocks.AlerterInterface)
+		assertExpected func(*testing.T, []*resource.Resource)
+		err            error
 	}{
 		{
 			test:    "no members",
 			dirName: "github_membership_empty",
 			mocks: func(client *github.MockGithubRepository, alerter *mocks.AlerterInterface) {
 				client.On("ListMembership").Return([]string{}, nil)
+			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
 			},
 			err: nil,
 		},
@@ -49,6 +51,15 @@ func TestScanGithubMembership(t *testing.T) {
 					"driftctl-test:eliecharra",
 				}, nil)
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 2)
+
+				assert.Equal(t, "driftctl-test:driftctl-acceptance-tester", got[0].ResourceId())
+				assert.Equal(t, githubres.GithubMembershipResourceType, got[0].ResourceType())
+
+				assert.Equal(t, "driftctl-test:eliecharra", got[1].ResourceId())
+				assert.Equal(t, githubres.GithubMembershipResourceType, got[1].ResourceType())
+			},
 			err: nil,
 		},
 		{
@@ -59,18 +70,18 @@ func TestScanGithubMembership(t *testing.T) {
 
 				alerter.On("SendAlert", githubres.GithubMembershipResourceType, alerts.NewRemoteAccessDeniedAlert(common.RemoteGithubTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("Your token has not been granted the required scopes to execute this query."), githubres.GithubMembershipResourceType, githubres.GithubMembershipResourceType), alerts.EnumerationPhase)).Return()
 			},
+			assertExpected: func(t *testing.T, got []*resource.Resource) {
+				assert.Len(t, got, 0)
+			},
 			err: nil,
 		},
 	}
 
 	factory := terraform.NewTerraformResourceFactory()
-	deserializer := resource.NewDeserializer(factory)
 
 	for _, c := range cases {
 		t.Run(c.test, func(tt *testing.T) {
 			shouldUpdate := c.dirName == *goldenfile.Update
-
-			scanOptions := ScannerOptions{Deep: true}
 
 			providerLibrary := terraform.NewProviderLibrary()
 			remoteLibrary := common.NewRemoteLibrary()
@@ -99,18 +110,18 @@ func TestScanGithubMembership(t *testing.T) {
 			}
 
 			remoteLibrary.AddEnumerator(github.NewGithubMembershipEnumerator(repo, factory))
-			remoteLibrary.AddDetailsFetcher(githubres.GithubMembershipResourceType, common.NewGenericDetailsFetcher(githubres.GithubMembershipResourceType, provider, deserializer))
 
 			testFilter := &enumeration.MockFilter{}
 			testFilter.On("IsTypeIgnored", mock.Anything).Return(false)
 
-			s := NewScanner(remoteLibrary, alerter, scanOptions, testFilter)
+			s := NewScanner(remoteLibrary, alerter, testFilter)
 			got, err := s.Resources()
 			assert.Equal(tt, err, c.err)
 			if err != nil {
 				return
 			}
-			test.TestAgainstGoldenFile(got, githubres.GithubMembershipResourceType, c.dirName, provider, deserializer, shouldUpdate, tt)
+
+			c.assertExpected(tt, got)
 			mockedRepo.AssertExpectations(tt)
 			alerter.AssertExpectations(tt)
 		})

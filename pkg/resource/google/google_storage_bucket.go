@@ -11,5 +11,4 @@ func initGoogleStorageBucketMetadata(resourceSchemaRepository dctlresource.Schem
 	resourceSchemaRepository.SetNormalizeFunc(GoogleStorageBucketResourceType, func(res *resource.Resource) {
 		res.Attributes().SafeDelete([]string{"force_destroy"})
 	})
-	resourceSchemaRepository.SetFlags(GoogleStorageBucketResourceType, resource.FlagDeepMode)
 }

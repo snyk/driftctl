@@ -38,14 +38,8 @@ func TestGenDriftIgnoreCmd_Input(t *testing.T) {
 			err:    nil,
 		},
 		{
-			name:   "test driftignore content with valid input and filter missing & changed only",
-			args:   []string{"-i", "./testdata/input_stdin_valid.json", "--exclude-unmanaged"},
-			output: "./testdata/output_stdin_valid_filter.txt",
-			err:    nil,
-		},
-		{
 			name:   "test driftignore content with valid input and filter unmanaged only",
-			args:   []string{"-i", "./testdata/input_stdin_valid.json", "--exclude-missing", "--exclude-changed"},
+			args:   []string{"-i", "./testdata/input_stdin_valid.json", "--exclude-missing"},
 			output: "./testdata/output_stdin_valid_filter2.txt",
 			err:    nil,
 		},
@@ -103,8 +97,7 @@ func TestGenDriftIgnoreCmd_ValidFlags(t *testing.T) {
 		{args: []string{"gen-driftignore"}},
 		{args: []string{"gen-driftignore", "--exclude-unmanaged"}},
 		{args: []string{"gen-driftignore", "--exclude-missing"}},
-		{args: []string{"gen-driftignore", "--exclude-changed"}},
-		{args: []string{"gen-driftignore", "--exclude-changed=false", "--exclude-missing=false", "--exclude-unmanaged=true"}},
+		{args: []string{"gen-driftignore", "--exclude-missing=false", "--exclude-unmanaged=true"}},
 		{args: []string{"gen-driftignore", "--input", "-"}},
 		{args: []string{"gen-driftignore", "-i", "/dev/stdout"}},
 	}

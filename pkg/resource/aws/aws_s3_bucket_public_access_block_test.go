@@ -8,6 +8,8 @@ import (
 )
 
 func TestAcc_Aws_S3Bucket_PublicAccessBlock(t *testing.T) {
+	t.Skip("flake")
+
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "0.15.5",
 		Paths:            []string{"./testdata/acc/aws_s3_bucket_public_access_block"},

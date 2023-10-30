@@ -14,10 +14,6 @@ type AttributeSchema struct {
 
 type Flags uint32
 
-const (
-	FlagDeepMode Flags = 1 << iota
-)
-
 func (f Flags) HasFlag(flag Flags) bool {
 	return f&flag != 0
 }

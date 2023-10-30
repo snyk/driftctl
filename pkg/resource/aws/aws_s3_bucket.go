@@ -18,5 +18,4 @@ func initAwsS3BucketMetaData(resourceSchemaRepository dctlresource.SchemaReposit
 			attributeSchema.JsonString = true
 		},
 	})
-	resourceSchemaRepository.SetFlags(AwsS3BucketResourceType, resource.FlagDeepMode)
 }

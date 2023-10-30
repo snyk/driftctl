@@ -11,7 +11,7 @@ func TestAcc_Aws_S3Bucket_BucketInUsEast1(t *testing.T) {
 	acceptance.Run(t, acceptance.AccTestCase{
 		TerraformVersion: "1.4.6",
 		Paths:            []string{"./testdata/acc/aws_s3_bucket"},
-		Args:             []string{"scan", "--deep"},
+		Args:             []string{"scan"},
 		Checks: []acceptance.AccCheck{
 			{
 				Env: map[string]string{
@@ -22,7 +22,6 @@ func TestAcc_Aws_S3Bucket_BucketInUsEast1(t *testing.T) {
 						t.Fatal(err)
 					}
 					result.AssertManagedCount(1)
-					result.AssertDriftCountTotal(0)
 				},
 			},
 		},

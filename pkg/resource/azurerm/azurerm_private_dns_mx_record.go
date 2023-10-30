@@ -25,5 +25,4 @@ func initAzurePrivateDNSMXRecordMetaData(resourceSchemaRepository dctlresource.S
 		}
 		return attrs
 	})
-	resourceSchemaRepository.SetFlags(AzurePrivateDNSMXRecordResourceType, resource.FlagDeepMode)
 }
