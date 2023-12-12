@@ -226,30 +226,6 @@ jobs:
                 project: ${CIRCLE_PROJECT_REPONAME}
                 organization: cloud-cloud
 workflows:
-  nightly:
-    jobs:
-      - test_acc:
-          name: "Acceptance tests: << matrix.pattern >>"
-          matrix:
-            parameters:
-              pattern:
-                - TestAcc_Aws
-                - TestAcc_Google
-                - TestAcc_Azure_
-                - TestAcc_StateReader_
-
-                # Disable this rather than create a new test org
-                # - TestAcc_Github_
-          context:
-            - driftctl-acc
-            - snyk-bot-slack
-    triggers:
-      - schedule:
-          cron: "0 3 * * *"
-          filters:
-            branches:
-              only:
-                - main
   manual-acc-tests:
     when:
       equal: ['1', << pipeline.parameters.ACC_TESTS >>]
