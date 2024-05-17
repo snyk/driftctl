@@ -63,7 +63,7 @@ lint:
 .PHONY: install-tools
 install-tools:
 	$(GOINSTALL) gotest.tools/gotestsum@v1.10.0
-	$(GOINSTALL) github.com/vektra/mockery/v2@latest
+	$(GOINSTALL) github.com/vektra/mockery/v2@v2.30.7
 
 
 go.mod: FORCE
