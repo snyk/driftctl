@@ -4,8 +4,8 @@ metadata:
   name: driftctl
   annotations:
     github.com/project-slug: snyk/driftctl
-    github.com/team-slug: snyk/cloud-dev-ex
+    github.com/team-slug: snyk/iac
 spec:
   type: external-tooling
   lifecycle: "-"
-  owner: cloud-dev-ex
+  owner: iac
