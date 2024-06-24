@@ -24,7 +24,7 @@ require (
 	github.com/getsentry/sentry-go v0.10.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-git/go-git/v5 v5.4.2
-	github.com/hashicorp/go-getter v1.7.0
+	github.com/hashicorp/go-getter v1.7.4
 	github.com/hashicorp/go-hclog v0.9.2
 	github.com/hashicorp/go-plugin v1.3.0
 	github.com/hashicorp/go-tfe v0.20.0
