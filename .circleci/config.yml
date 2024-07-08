@@ -10,7 +10,7 @@ only_maintainers: &only_maintainers
       # Forked pull requests have CIRCLE_BRANCH set to pull/XXX
       ignore: /pull\/[0-9]+/
 orbs:
-  prodsec: snyk/prodsec-orb@1.0
+  prodsec: snyk/prodsec-orb@1
   go: circleci/go@1.7.0
   snyk: snyk/snyk@1.1.2
   gh: circleci/github-cli@1.1.0
@@ -204,27 +204,16 @@ jobs:
               ./lambda-env-updater_linux_amd64\
                 -name ${FUNCTION_NAME}\
                 -env "LATEST_VERSION=${CIRCLE_TAG}"
-  security-oss:
+  security-scans:
       docker:
           - image: cimg/go:1.18
+      resource_class: small
       steps:
           - checkout
-          - snyk/scan:
-                severity-threshold: high
-                monitor-on-build: false
-                project: ${CIRCLE_PROJECT_REPONAME}
-                organization: cloud-cloud
-  security-code:
-      docker:
-          - image: cimg/go:1.18.3
-      steps:
-          - checkout
-          - snyk/scan:
-                command: code test
-                severity-threshold: high
-                monitor-on-build: false
-                project: ${CIRCLE_PROJECT_REPONAME}
-                organization: cloud-cloud
+          - prodsec/security_scans:
+              mode: auto
+              iac-scan: disabled
+
 workflows:
   manual-acc-tests:
     when:
@@ -252,20 +241,15 @@ workflows:
           context:
             - snyk-bot-slack
           channel: group-infrastructure-as-code-alerts
+      - security-scans:
+          name: Security Scans
+          context:
+            - analysis-iac
       - lint:
           <<: *only_branches
       - test:
           <<: *only_branches
-      - security-code:
-          name: Snyk code
-          context:
-            - driftctl-snyk
-          <<: *only_maintainers
-      - security-oss:
-          name: Snyk test
-          context:
-            - driftctl-snyk
-          <<: *only_maintainers
+
 # Disabled since it makes every PR to stay in "pending" state
 # https://ideas.circleci.com/cloud-feature-requests/p/show-overall-all-checks-have-passed-status-in-github-even-on-builds-with-incompl
 #  pullrequest_acc:
