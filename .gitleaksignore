@@ -291,3 +291,9 @@ ff72de8e77f908fba61df50bc0938744270d1b51:pkg/remote/aws/test/iam_user_multiple/r
 6d204a7f446251a3c1519bfc4b80599529eec279:enumeration/remote/aws_iam_scanner_test.go:aws-access-token:826
 40f68d61a91d8c10c09e43263cbd36b380cca90a:enumeration/remote/aws_iam_scanner_test.go:aws-access-token:823
 40f68d61a91d8c10c09e43263cbd36b380cca90a:enumeration/remote/aws_iam_scanner_test.go:aws-access-token:826
+7c653d0500440a35eba12700ba4734f571a959e6:pkg/resource/aws/testdata/acc/aws_rds_cluster_instance/terraform.tf:hashicorp-tf-password:17
+b8ef7c8a4722b7a90d5b2eb1b8d143895689afd6:pkg/iac/terraform/state/test/rds_cluster/terraform.tf:hashicorp-tf-password:21
+b8ef7c8a4722b7a90d5b2eb1b8d143895689afd6:pkg/resource/aws/testdata/acc/aws_rds_cluster/terraform.tf:hashicorp-tf-password:17
+af08a560e11e1ac1b31e87b6b8c66f6a309d5476:pkg/resource/aws/testdata/acc/aws_db_instance/db_instance.tf:hashicorp-tf-password:8
+b7e38f9e26f3ab4c0f445ec2c7f407215a582248:pkg/iac/terraform/state/test/db_instance/terraform.tf:hashicorp-tf-password:19
+b7e38f9e26f3ab4c0f445ec2c7f407215a582248:pkg/resource/aws/testdata/acc/aws_db_instance/terraform.tf:hashicorp-tf-password:19
