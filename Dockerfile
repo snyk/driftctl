@@ -1,4 +1,4 @@
-FROM golang:1.18 AS builder
+FROM golang:1.21 AS builder
 
 ARG OS="linux"
 ARG ARCH="amd64"
