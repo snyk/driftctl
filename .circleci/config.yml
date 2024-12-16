@@ -82,7 +82,7 @@ jobs:
     steps:
       - checkout
       - go/install:
-          version: "1.18.3"
+          version: "1.21"
       - go/load-cache:
           key: test_acc
       - run: make install-tools
@@ -103,7 +103,7 @@ jobs:
           path: ./
   lint:
     docker:
-      - image: golang:1.18
+      - image: golang:1.21
     steps:
       - checkout
       - run:
@@ -129,7 +129,7 @@ jobs:
     resource_class: large
     executor:
         name: go/default
-        tag: '1.18.3'
+        tag: '1.21'
     steps:
       - checkout
       - go/load-cache:
@@ -145,7 +145,7 @@ jobs:
   release:
     resource_class: large
     docker:
-      - image: cimg/go:1.18
+      - image: cimg/go:1.21
     steps:
       - checkout
       - gh/setup:
@@ -206,7 +206,7 @@ jobs:
                 -env "LATEST_VERSION=${CIRCLE_TAG}"
   security-scans:
       docker:
-          - image: cimg/go:1.18
+          - image: cimg/go:1.21
       resource_class: small
       steps:
           - checkout
