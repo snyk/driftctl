@@ -2,6 +2,13 @@
 version: v1.25.0
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
+  SNYK-GOLANG-GITHUBCOMDGRIJALVAJWTGO-596515:
+    - github.com/Azure/go-autorest/autorest/azure@0.11.3 > github.com/Azure/go-autorest/autorest@0.11.3 > github.com/Azure/go-autorest/autorest/adal@0.9.0 > github.com/dgrijalva/jwt-go@3.2.0:
+        reason: >-
+          This vuln is ignored since it is related to JWT in azure SDK and we
+          are not concerned by this code
+        expires: 2030-12-22T16:25:33.572Z
+        created: 2030-11-22T16:25:33.580Z
   'snyk:lic:golang:github.com:hashicorp:go-checkpoint:MPL-2.0':
     - '*':
         reason: This license is addressed by including acknowledgments in each release
