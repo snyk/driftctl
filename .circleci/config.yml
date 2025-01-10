@@ -241,6 +241,7 @@ workflows:
           context:
             - snyk-bot-slack
           channel: group-infrastructure-as-code-alerts
+          trusted-branch: main
       - security-scans:
           name: Security Scans
           context:
