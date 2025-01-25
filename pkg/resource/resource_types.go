@@ -254,6 +254,8 @@ var supportedTypes = map[string]ResourceTypeMeta{
 	"azurerm_private_dns_txt_record":   {},
 	"azurerm_image":                    {},
 	"azurerm_ssh_public_key":           {},
+
+	"scaleway_function_namespace": {},
 }
 
 func IsResourceTypeSupported(ty string) bool {
