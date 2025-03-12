@@ -106,7 +106,7 @@ func (c *AccTestCase) createResultFile(t *testing.T) error {
 }
 
 func (c *AccTestCase) validate() error {
-	if c.Checks == nil || len(c.Checks) == 0 {
+	if len(c.Checks) == 0 {
 		return fmt.Errorf("checks attribute must be defined")
 	}
 

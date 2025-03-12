@@ -171,7 +171,7 @@ func (p *TerraformProvider) ReadResource(args tf.ReadResourceArgs) (*cty.Value, 
 	}
 	p.lock.Unlock()
 
-	if args.Attributes != nil && len(args.Attributes) > 0 {
+	if len(args.Attributes) > 0 {
 		// call to the provider sometimes add and delete field to their attribute this may broke caller so we deep copy attributes
 		state.Attributes = make(map[string]string, len(args.Attributes))
 		for k, v := range args.Attributes {

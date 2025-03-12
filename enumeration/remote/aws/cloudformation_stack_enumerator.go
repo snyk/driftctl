@@ -38,7 +38,7 @@ func (e *CloudformationStackEnumerator) Enumerate() ([]*resource.Resource, error
 
 	for _, stack := range stacks {
 		attrs := map[string]interface{}{}
-		if stack.Parameters != nil && len(stack.Parameters) > 0 {
+		if len(stack.Parameters) > 0 {
 			attrs["parameters.%"] = strconv.FormatInt(int64(len(stack.Parameters)), 10)
 			for k, v := range flattenParameters(stack.Parameters) {
 				attrs[fmt.Sprintf("parameters.%s", k)] = v
