@@ -57,7 +57,7 @@ clean:
 
 .PHONY: lint
 lint:
-	@which golangci-lint > /dev/null 2>&1 || (curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | bash -s -- -b $(GOBINPATH) v1.58.0)
+	@which golangci-lint > /dev/null 2>&1 || (curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | bash -s -- -b $(GOBINPATH) v1.64.7)
 	golangci-lint run -v --timeout=10m
 
 .PHONY: install-tools

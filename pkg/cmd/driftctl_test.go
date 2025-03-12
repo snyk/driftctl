@@ -119,7 +119,7 @@ func TestDriftctlCmd_Scan(t *testing.T) {
 	config.Init()
 	for index, c := range cases {
 		t.Run(fmt.Sprintf("%d", index), func(t *testing.T) {
-			if c.env != nil && len(c.env) > 0 {
+			if len(c.env) > 0 {
 				for key, val := range c.env {
 					_ = os.Setenv(key, val)
 					defer os.Unsetenv(key)

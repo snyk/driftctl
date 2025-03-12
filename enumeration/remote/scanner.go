@@ -52,14 +52,14 @@ loop:
 }
 
 func (s *Scanner) scan() ([]*resource.Resource, error) {
-	for _, enumerator := range s.remoteLibrary.Enumerators() {
-		if s.filter.IsTypeIgnored(enumerator.SupportedType()) {
+	for _, enum := range s.remoteLibrary.Enumerators() {
+		if s.filter.IsTypeIgnored(enum.SupportedType()) {
 			logrus.WithFields(logrus.Fields{
-				"type": enumerator.SupportedType(),
+				"type": enum.SupportedType(),
 			}).Debug("Ignored enumeration of resources since it is ignored in filter")
 			continue
 		}
-		enumerator := enumerator
+		enumerator := enum
 		s.enumeratorRunner.Run(func() (interface{}, error) {
 			resources, err := enumerator.Enumerate()
 			if err != nil {

@@ -363,12 +363,12 @@ func TestIamPolicyAttachmentTransformer_Execute(t *testing.T) {
 				resourceFactory: factory,
 			}
 			if err := m.Execute(tt.args.RemoteResources, tt.args.ResourcesFromState); err != nil {
-				t.Errorf(err.Error())
+				t.Error(err.Error())
 			}
 
 			changelog, err := diff.Diff(tt.expected, tt.args)
 			if err != nil {
-				t.Errorf(err.Error())
+				t.Error(err.Error())
 			}
 
 			if len(changelog) > 0 {

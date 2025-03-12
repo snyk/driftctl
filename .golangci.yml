@@ -1,10 +1,10 @@
 run:
-  go: '1.21'
+  go: '1.23'
 linters:
   enable:
-    - exportloopref
+    - copyloopvar
 issues:
   exclude-rules:
     - path: _test\.go
       linters:
-        - exportloopref
+        - copyloopvar
