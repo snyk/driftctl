@@ -305,8 +305,9 @@ func scanRun(opts *pkg.ScanOptions) error {
 	logrus.Debug("Checking for driftignore")
 	driftIgnore := filter.NewDriftIgnore(opts.DriftignorePath, opts.Driftignores...)
 
-	// TODO use enum library interface here
-	scanner := remote.NewScanner(remoteLibrary, alerter, driftIgnore)
+	// Create a composite filter that includes both driftIgnore and opts.Filter
+	compositeFilter := filter.NewCompositeFilter(driftIgnore, opts.Filter)
+	scanner := remote.NewScanner(remoteLibrary, alerter, compositeFilter)
 
 	iacSupplier, err := supplier.GetIACSupplier(opts.From, providerLibrary, opts.BackendOptions, iacProgress, alerter, resFactory, driftIgnore)
 	if err != nil {

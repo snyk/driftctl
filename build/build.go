@@ -6,7 +6,7 @@ var env = "dev"
 // That mean that following services will be disabled:
 // - telemetry
 // - version check
-var enableUsageReporting = "true"
+var enableUsageReporting = "false"
 
 type BuildInterface interface {
 	IsRelease() bool
