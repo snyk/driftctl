@@ -1,10 +1,12 @@
 package repository
 
 import (
-	"github.com/snyk/driftctl/enumeration/remote/cache"
 	"strings"
 	"testing"
 
+	"github.com/snyk/driftctl/enumeration/remote/cache"
+
+	"github.com/aws/aws-sdk-go/aws"
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	awstest "github.com/snyk/driftctl/test/aws"
 
@@ -25,7 +27,7 @@ func Test_sqsRepository_ListAllQueues(t *testing.T) {
 			name: "list with multiple pages",
 			mocks: func(client *awstest.MockFakeSQS) {
 				client.On("ListQueuesPages",
-					&sqs.ListQueuesInput{},
+					&sqs.ListQueuesInput{MaxResults: aws.Int64(100)},
 					mock.MatchedBy(func(callback func(res *sqs.ListQueuesOutput, lastPage bool) bool) bool {
 						callback(&sqs.ListQueuesOutput{
 							QueueUrls: []*string{

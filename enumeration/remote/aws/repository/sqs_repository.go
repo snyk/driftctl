@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+
 	"github.com/snyk/driftctl/enumeration/remote/cache"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -56,7 +57,7 @@ func (r *sqsRepository) ListAllQueues() ([]*string, error) {
 	}
 
 	var queues []*string
-	input := sqs.ListQueuesInput{}
+	input := sqs.ListQueuesInput{MaxResults: aws.Int64(100)}
 	err := r.client.ListQueuesPages(&input,
 		func(resp *sqs.ListQueuesOutput, lastPage bool) bool {
 			queues = append(queues, resp.QueueUrls...)

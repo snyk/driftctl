@@ -43,6 +43,5 @@ func (e *SQSQueueEnumerator) Enumerate() ([]*resource.Resource, error) {
 			),
 		)
 	}
-
 	return results, err
 }
