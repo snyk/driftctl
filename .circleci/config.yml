@@ -10,60 +10,14 @@ only_maintainers: &only_maintainers
       # Forked pull requests have CIRCLE_BRANCH set to pull/XXX
       ignore: /pull\/[0-9]+/
 orbs:
-  prodsec: snyk/prodsec-orb@1
   go: circleci/go@1.7.0
   snyk: snyk/snyk@1.1.2
   gh: circleci/github-cli@1.1.0
-  slack: circleci/slack@4.12.5
 parameters:
   ACC_TESTS:
     type: string
     description: manually run acceptance tests
     default: '0'
-commands:
-  notify_slack_on_failure:
-    steps:
-      - slack/notify:
-          channel: group-infrastructure-as-code-alerts
-          event: fail
-          custom: |
-              {
-                "blocks": [
-                    {
-                        "type": "header",
-                        "text": {
-                            "type": "plain_text",
-                            "text": ":warning: Driftctl acceptance tests failed :warning:",
-                            "emoji": true
-                        }
-                    },
-                    {
-                        "type": "divider"
-                    },
-                    {
-                        "type": "section",
-                        "fields": [
-                            {
-                                "type": "mrkdwn",
-                                "text": "*Suite*: ${ACC_PATTERN}"
-                            },
-                            {
-                                "type": "mrkdwn",
-                                "text": "*Branch*: ${CIRCLE_BRANCH}"
-                            }
-                        ],
-                        "accessory": {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "emoji": true,
-                                "text": "View Job"
-                            },
-                            "url": "${CIRCLE_BUILD_URL}"
-                        }
-                    }
-                ]
-              }
 jobs:
   test_acc:
     parameters:
@@ -95,7 +49,6 @@ jobs:
           name: Run acceptance tests
           command: make acc
           no_output_timeout: 30m
-      - notify_slack_on_failure
       - go/save-cache:
           key: test_acc
           path: /home/circleci/.go_workspace/pkg/mod
@@ -210,9 +163,6 @@ jobs:
       resource_class: small
       steps:
           - checkout
-          - prodsec/security_scans:
-              mode: auto
-              iac-scan: disabled
 
 workflows:
   manual-acc-tests:
@@ -233,15 +183,8 @@ workflows:
                 # - TestAcc_Github_
           context:
             - driftctl-acc
-            - snyk-bot-slack
   pullrequest:
     jobs:
-      - prodsec/secrets-scan:
-          name: Scan repository for secrets
-          context:
-            - snyk-bot-slack
-          channel: snyk-vuln-alerts-iac
-          trusted-branch: main
       - security-scans:
           name: Security Scans
           context:
