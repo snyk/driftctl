@@ -376,7 +376,7 @@ func TestAnalyze(t *testing.T) {
 				al.SetAlerts(c.alerts)
 			}
 
-			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+			repo := testresource.InitFakeSchemaRepository("aws", "5.94.1")
 			aws.InitResourcesMetadata(repo)
 
 			analyzer := NewAnalyzer(al, testFilter)

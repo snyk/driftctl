@@ -44,7 +44,7 @@ func runTest(t *testing.T, cases TestCases) {
 		if c.provider == nil {
 			c.provider = &TestProvider{
 				Name:    "aws",
-				Version: "3.19.0",
+				Version: "5.94.1",
 			}
 		}
 		repo := testresource.InitFakeSchemaRepository(c.provider.Name, c.provider.Version)
@@ -1209,7 +1209,7 @@ func TestDriftctlRun_TestResourcesNormalization(t *testing.T) {
 	}
 
 	defaultProviderVersions := map[string]string{
-		"aws":     "3.19.0",
+		"aws":     "5.94.1",
 		"github":  "4.4.0",
 		"google":  "3.78.0",
 		"azurerm": "2.71.0",

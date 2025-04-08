@@ -51,7 +51,7 @@ func (r *SchemaRepository) Init(providerName, providerVersion string, schema map
 	if providerVersion == "" {
 		switch providerName {
 		case "aws":
-			providerVersion = "3.19.0"
+			providerVersion = "5.94.1"
 		case "github":
 			providerVersion = "4.4.0"
 		case "google":

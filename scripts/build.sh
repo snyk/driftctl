@@ -7,7 +7,7 @@ set -eo pipefail
 
 if ! which goreleaser >/dev/null; then
     echo "+ Installing goreleaser..."
-    go install github.com/goreleaser/goreleaser@v1.1.0
+    go install github.com/goreleaser/goreleaser@v1.24.0
 fi
 
 export ENV="${ENV:-dev}"

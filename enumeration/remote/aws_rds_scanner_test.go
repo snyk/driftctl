@@ -114,7 +114,7 @@ func TestRDSDBInstance(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.RDSRepository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -223,7 +223,7 @@ func TestRDSDBSubnetGroup(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.RDSRepository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -337,7 +337,7 @@ func TestRDSCluster(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.RDSRepository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)

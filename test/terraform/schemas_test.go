@@ -24,7 +24,7 @@ func TestCreateNewSchema(t *testing.T) {
 	providerLibrary := terraform.NewProviderLibrary()
 
 	// Replace this with provider you want to create schema
-	realProvider, _ := InitTestAwsProvider(providerLibrary, "3.19.0")
+	realProvider, _ := InitTestAwsProvider(providerLibrary, "5.94.1")
 
 	err := realProvider.Init()
 	if err != nil {

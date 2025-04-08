@@ -57,7 +57,7 @@ func fakeAnalysis() *analyser.Analysis {
 		},
 	)
 	a.ProviderName = "AWS"
-	a.ProviderVersion = "3.19.0"
+	a.ProviderVersion = "5.94.1"
 	return a
 }
 
@@ -71,7 +71,7 @@ func fakeAnalysisWithAlerts() *analyser.Analysis {
 			alerts.NewRemoteAccessDeniedAlert(common.RemoteAWSTerraform, remoteerr.NewResourceListingErrorWithType(errors.New("dummy error"), "aws_sns", "aws_sns"), alerts.EnumerationPhase),
 		},
 	})
-	a.ProviderVersion = "3.19.0"
+	a.ProviderVersion = "5.94.1"
 	return a
 }
 
@@ -85,7 +85,7 @@ func fakeAnalysisNoDrift() *analyser.Analysis {
 		})
 	}
 	a.ProviderName = "AWS"
-	a.ProviderVersion = "3.19.0"
+	a.ProviderVersion = "5.94.1"
 	return &a
 }
 
@@ -119,7 +119,7 @@ func fakeAnalysisWithoutAttrs() *analyser.Analysis {
 		},
 	)
 	a.ProviderName = "AWS"
-	a.ProviderVersion = "3.19.0"
+	a.ProviderVersion = "5.94.1"
 	return a
 }
 
@@ -134,7 +134,7 @@ func fakeAnalysisWithAWSEnumerationError() *analyser.Analysis {
 		},
 	})
 	a.ProviderName = "AWS"
-	a.ProviderVersion = "3.19.0"
+	a.ProviderVersion = "5.94.1"
 	return &a
 }
 
@@ -148,7 +148,7 @@ func fakeAnalysisWithGithubEnumerationError() *analyser.Analysis {
 		},
 	})
 	a.ProviderName = "AWS"
-	a.ProviderVersion = "3.19.0"
+	a.ProviderVersion = "5.94.1"
 	return &a
 }
 
@@ -188,7 +188,7 @@ func fakeAnalysisForJSONPlan() *analyser.Analysis {
 		},
 	)
 	a.ProviderName = "AWS"
-	a.ProviderVersion = "3.19.0"
+	a.ProviderVersion = "5.94.1"
 	return &a
 }
 
@@ -205,7 +205,7 @@ func fakeAnalysisWithoutDeep() *analyser.Analysis {
 		},
 	)
 	a.ProviderName = "AWS"
-	a.ProviderVersion = "3.19.0"
+	a.ProviderVersion = "5.94.1"
 	return &a
 }
 

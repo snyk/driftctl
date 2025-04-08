@@ -27,7 +27,7 @@ func TestHTML_Write(t *testing.T) {
 				a := &analyser.Analysis{}
 				a.Date = time.Date(2021, 06, 10, 0, 0, 0, 0, &time.Location{})
 				a.ProviderName = "AWS"
-				a.ProviderVersion = "3.19.0"
+				a.ProviderVersion = "5.94.1"
 				return a
 			},
 			err: nil,
@@ -46,7 +46,7 @@ func TestHTML_Write(t *testing.T) {
 					},
 				)
 				a.ProviderName = "AWS"
-				a.ProviderVersion = "3.19.0"
+				a.ProviderVersion = "5.94.1"
 				return a
 			},
 			err: nil,
@@ -123,7 +123,7 @@ func TestHTML_Write(t *testing.T) {
 					},
 				)
 				a.ProviderName = "AWS"
-				a.ProviderVersion = "3.19.0"
+				a.ProviderVersion = "5.94.1"
 				return a
 			},
 			err: nil,
@@ -147,7 +147,7 @@ func TestHTML_Write(t *testing.T) {
 					},
 				)
 				a.ProviderName = "AWS"
-				a.ProviderVersion = "3.19.0"
+				a.ProviderVersion = "5.94.1"
 				return a
 			},
 			err: nil,

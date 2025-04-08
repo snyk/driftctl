@@ -48,9 +48,6 @@ func TestProviderConfig_GetBinaryName(t *testing.T) {
 
 func TestProviderConfig_GetDownloadUrl(t *testing.T) {
 	arch := runtime.GOARCH
-	if runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
-		arch = "amd64"
-	}
 	type fields struct {
 		Key     string
 		Version string

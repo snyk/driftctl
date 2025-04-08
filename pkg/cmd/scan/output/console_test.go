@@ -98,7 +98,7 @@ func TestConsole_Write(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+			repo := testresource.InitFakeSchemaRepository("aws", "5.94.1")
 			aws.InitResourcesMetadata(repo)
 
 			c := NewConsole()

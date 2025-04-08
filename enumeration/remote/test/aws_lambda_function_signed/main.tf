@@ -1,6 +1,6 @@
 provider "aws" {
   region = "eu-west-3"
-  version = "3.19.0"
+  version = "5.94.1"
 }
 
 resource "aws_signer_signing_profile" "example" {

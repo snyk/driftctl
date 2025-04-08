@@ -120,7 +120,7 @@ func TestAWS_Metadata_Flags(t *testing.T) {
 		aws.AwsEcrRepositoryPolicyResourceType:             {},
 	}
 
-	schemaRepository := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+	schemaRepository := testresource.InitFakeSchemaRepository("aws", "5.94.1")
 	aws.InitResourcesMetadata(schemaRepository)
 
 	for ty, flags := range testcases {

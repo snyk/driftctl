@@ -99,7 +99,7 @@ func TestEC2EbsVolume(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -208,7 +208,7 @@ func TestEC2EbsSnapshot(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -319,7 +319,7 @@ func TestEC2Eip(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -428,7 +428,7 @@ func TestEC2Ami(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -537,7 +537,7 @@ func TestEC2KeyPair(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -645,7 +645,7 @@ func TestEC2EipAssociation(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -773,7 +773,7 @@ func TestEC2Instance(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -882,7 +882,7 @@ func TestEC2InternetGateway(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -1011,7 +1011,7 @@ func TestVPC(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -1131,7 +1131,7 @@ func TestDefaultVPC(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -1315,7 +1315,7 @@ func TestEC2RouteTableAssociation(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -1450,7 +1450,7 @@ func TestEC2Subnet(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -1585,7 +1585,7 @@ func TestEC2DefaultSubnet(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -1707,7 +1707,7 @@ func TestEC2RouteTable(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -1823,7 +1823,7 @@ func TestEC2DefaultRouteTable(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -1939,7 +1939,7 @@ func TestVpcSecurityGroup(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -2055,7 +2055,7 @@ func TestVpcDefaultSecurityGroup(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -2160,7 +2160,7 @@ func TestEC2NatGateway(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -2290,7 +2290,7 @@ func TestEC2NetworkACL(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -2451,7 +2451,7 @@ func TestEC2NetworkACLRule(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, "3.19.0")
+			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, "5.94.1")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -2576,7 +2576,7 @@ func TestEC2DefaultNetworkACL(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -2757,7 +2757,7 @@ func TestEC2Route(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -2960,7 +2960,7 @@ func TestVpcSecurityGroupRule(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -3071,7 +3071,7 @@ func TestEC2LaunchTemplate(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -3165,7 +3165,7 @@ func TestEC2EbsEncryptionByDefault(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.EC2Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)

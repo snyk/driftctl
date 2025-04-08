@@ -57,7 +57,7 @@ func TestTerraformStateReader_Source(t *testing.T) {
 	progress.On("Inc").Return().Times(1)
 	progress.On("Stop").Return().Times(1)
 
-	version := "3.19.0"
+	version := "5.94.1"
 
 	provider := mocks.NewMockedGoldenTFProvider("source", terraform.AWS, version, nil, false)
 	library := terraform.NewProviderLibrary()
@@ -222,7 +222,7 @@ func TestTerraformStateReader_AWS_Resources(t *testing.T) {
 
 			var realProvider *aws.AWSTerraformProvider
 			if tt.providerVersion == "" {
-				tt.providerVersion = "3.19.0"
+				tt.providerVersion = "5.94.1"
 			}
 
 			if shouldUpdate {
@@ -630,7 +630,7 @@ func TestTerraformStateReader_WithIgnoredResource(t *testing.T) {
 	progress.On("Inc").Return().Times(1)
 	progress.On("Stop").Return().Times(1)
 
-	provider := mocks.NewMockedGoldenTFProvider("ignored_resources", terraform.AWS, "3.19.0", nil, false)
+	provider := mocks.NewMockedGoldenTFProvider("ignored_resources", terraform.AWS, "5.94.1", nil, false)
 	library := terraform.NewProviderLibrary()
 	library.AddProvider(terraform.AWS, provider)
 

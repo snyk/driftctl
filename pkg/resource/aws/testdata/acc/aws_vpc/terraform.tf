@@ -9,7 +9,7 @@ locals {
 
 terraform {
     required_providers {
-        aws = "3.19.0"
+        aws = "5.94.1"
     }
 }
 resource "aws_default_vpc" "default" {

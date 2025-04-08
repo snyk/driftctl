@@ -51,7 +51,7 @@ type AWSTerraformProvider struct {
 
 func NewAWSTerraformProvider(version string, progress enumeration.ProgressCounter, configDir string) (*AWSTerraformProvider, error) {
 	if version == "" {
-		version = "3.19.0"
+		version = "5.94.1"
 	}
 	p := &AWSTerraformProvider{
 		version: version,

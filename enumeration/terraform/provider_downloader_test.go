@@ -19,7 +19,7 @@ func TestProviderDownloader_Download(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 	downloader := NewProviderDownloader()
-	url := "https://example.com/terraform-provider-aws_3.19.0_linux_amd64.zip"
+	url := "https://example.com/terraform-provider-aws_5.94.1_linux_amd64.zip"
 
 	cases := []struct {
 		name       string

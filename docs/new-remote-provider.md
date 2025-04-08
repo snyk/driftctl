@@ -39,7 +39,7 @@ func Init(
 
 	// You need to define the default version of the Terraform provider when the user does not specify one
 	if version == "" {
-		version = "3.19.0"
+		version = "5.94.1"
 	}
 
 	// Creation of the Terraform provider

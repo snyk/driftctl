@@ -100,7 +100,7 @@ func TestDynamoDBTable(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.DynamoDBRepository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)

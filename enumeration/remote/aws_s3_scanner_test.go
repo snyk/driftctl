@@ -115,7 +115,7 @@ func TestS3Bucket(t *testing.T) {
 			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo, alerter)
 			var repo repository.S3Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -286,7 +286,7 @@ func TestS3BucketInventory(t *testing.T) {
 			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo, alerter)
 			var repo repository.S3Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -483,7 +483,7 @@ func TestS3BucketNotification(t *testing.T) {
 			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo, alerter)
 			var repo repository.S3Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -655,7 +655,7 @@ func TestS3BucketMetrics(t *testing.T) {
 			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo, alerter)
 			var repo repository.S3Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -821,7 +821,7 @@ func TestS3BucketPolicy(t *testing.T) {
 			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo, alerter)
 			var repo repository.S3Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -1095,7 +1095,7 @@ func TestS3BucketAnalytic(t *testing.T) {
 			fakeRepo := &repository.MockS3Repository{}
 			c.mocks(fakeRepo, alerter)
 			var repo repository.S3Repository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)

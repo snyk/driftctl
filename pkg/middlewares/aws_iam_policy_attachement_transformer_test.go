@@ -357,7 +357,7 @@ func TestIamPolicyAttachmentTransformer_Execute(t *testing.T) {
 				tt.mocks(factory)
 			}
 
-			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+			repo := testresource.InitFakeSchemaRepository("aws", "5.94.1")
 			aws.InitResourcesMetadata(repo)
 			m := IamPolicyAttachmentTransformer{
 				resourceFactory: factory,

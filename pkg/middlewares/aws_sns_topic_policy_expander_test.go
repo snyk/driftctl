@@ -229,7 +229,7 @@ func TestAwsSNSTopicPolicyExpander_Execute(t *testing.T) {
 				tt.mock(factory)
 			}
 
-			repo := testresource.InitFakeSchemaRepository("aws", "3.19.0")
+			repo := testresource.InitFakeSchemaRepository("aws", "5.94.1")
 			awsresource.InitResourcesMetadata(repo)
 
 			m := NewAwsSNSTopicPolicyExpander(factory, repo)

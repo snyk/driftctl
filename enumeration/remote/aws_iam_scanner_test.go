@@ -112,7 +112,7 @@ func TestIamUser(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.IAMRepository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -267,7 +267,7 @@ func TestIamUserPolicy(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.IAMRepository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -389,7 +389,7 @@ func TestIamPolicy(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.IAMRepository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -524,7 +524,7 @@ func TestIamRole(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.IAMRepository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -725,7 +725,7 @@ func TestIamRolePolicyAttachment(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.IAMRepository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -878,7 +878,7 @@ func TestIamAccessKey(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.IAMRepository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -1106,7 +1106,7 @@ func TestIamUserPolicyAttachment(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.IAMRepository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)
@@ -1252,7 +1252,7 @@ func TestIamRolePolicy(t *testing.T) {
 			c.mocks(fakeRepo, alerter)
 
 			var repo repository.IAMRepository = fakeRepo
-			providerVersion := "3.19.0"
+			providerVersion := "5.94.1"
 			realProvider, err := terraform2.InitTestAwsProvider(providerLibrary, providerVersion)
 			if err != nil {
 				t.Fatal(err)

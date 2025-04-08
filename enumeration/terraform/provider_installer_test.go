@@ -23,7 +23,7 @@ func TestProviderInstallerInstallDoesNotExist(t *testing.T) {
 
 	config := ProviderConfig{
 		Key:     "aws",
-		Version: "3.19.0",
+		Version: "5.94.1",
 	}
 
 	mockDownloader := mocks.ProviderDownloaderInterface{}
@@ -55,7 +55,7 @@ func TestProviderInstallerInstallAlreadyExist(t *testing.T) {
 
 	config := ProviderConfig{
 		Key:     "aws",
-		Version: "3.19.0",
+		Version: "5.94.1",
 	}
 
 	_, err = os.Create(path.Join(fakeTmpHome, expectedSubFolder, config.GetBinaryName()))
@@ -87,7 +87,7 @@ func TestProviderInstallerInstallAlreadyExistButIsDirectory(t *testing.T) {
 
 	config := ProviderConfig{
 		Key:     "aws",
-		Version: "3.19.0",
+		Version: "5.94.1",
 	}
 
 	invalidDirPath := path.Join(fakeTmpHome, expectedSubFolder, config.GetBinaryName())
@@ -132,7 +132,7 @@ func TestProviderInstallerInstallPostfixIsHandler(t *testing.T) {
 
 	config := ProviderConfig{
 		Key:     "aws",
-		Version: "3.19.0",
+		Version: "5.94.1",
 	}
 
 	_, err = os.Create(path.Join(fakeTmpHome, expectedSubFolder, config.GetBinaryName()+"_x5"))
@@ -187,7 +187,7 @@ func TestProviderInstallerWithConfigDirectory(t *testing.T) {
 
 	config := ProviderConfig{
 		Key:       "aws",
-		Version:   "3.19.0",
+		Version:   "5.94.1",
 		ConfigDir: fakeTmpHome,
 	}
 

@@ -91,7 +91,7 @@ func TestGetIACSupplier(t *testing.T) {
 			progress := &output.MockProgress{}
 			progress.On("Start").Return().Times(1)
 
-			repo := testresource.InitFakeSchemaRepository(terraform.AWS, "3.19.0")
+			repo := testresource.InitFakeSchemaRepository(terraform.AWS, "5.94.1")
 			factory := resource.NewDriftctlResourceFactory(repo)
 			alerter := alerter.NewAlerter()
 
