@@ -27,12 +27,17 @@ func (m Route53RecordIDReconcilier) Execute(_, resourcesFromState *[]*resource.R
 			continue
 		}
 
-		vars := []string{
-			(*stateResource.Attrs)["zone_id"].(string),
-			(*stateResource.Attrs)["fqdn"].(string),
-			(*stateResource.Attrs)["type"].(string),
-		}
-		newId := strings.Join(vars, "_")
+		// Extracting attributes.
+		zoneID := (*stateResource.Attrs)["zone_id"].(string)
+		fqdn := (*stateResource.Attrs)["fqdn"].(string)
+		recordType := (*stateResource.Attrs)["type"].(string)
+
+		// Replacing the wildcard placeholder '\\052' with '*' in fqdn.
+		normalizedFqdn := strings.ReplaceAll(fqdn, "\\052", "*")
+
+		// Constructing the new ID.
+		newId := strings.Join([]string{zoneID, normalizedFqdn, recordType}, "_")
+
 		if newId != stateResource.Id {
 			stateResource.Id = newId
 			_ = stateResource.Attrs.SafeSet([]string{"id"}, newId)
