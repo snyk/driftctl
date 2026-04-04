@@ -1,3 +1,0 @@
-package aws
-
-const AwsS3BucketAnalyticsConfigurationResourceType = "aws_s3_bucket_analytics_configuration"

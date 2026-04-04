@@ -1,3 +1,0 @@
-package aws
-
-const AwsS3AccountPublicAccessBlockResourceType = "aws_s3_account_public_access_block"
