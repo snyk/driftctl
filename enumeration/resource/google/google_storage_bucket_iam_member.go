@@ -1,3 +1,0 @@
-package google
-
-const GoogleStorageBucketIamMemberResourceType = "google_storage_bucket_iam_member"

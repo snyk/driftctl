@@ -1,3 +1,0 @@
-package aws
-
-const AwsApiGatewayV2IntegrationResponseResourceType = "aws_apigatewayv2_integration_response"

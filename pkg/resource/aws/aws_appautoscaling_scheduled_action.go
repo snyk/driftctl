@@ -1,3 +1,0 @@
-package aws
-
-const AwsAppAutoscalingScheduledActionResourceType = "aws_appautoscaling_scheduled_action"
