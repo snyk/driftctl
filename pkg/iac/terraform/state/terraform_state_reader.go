@@ -1,6 +1,7 @@
 package state
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -173,6 +174,20 @@ func (r *TerraformStateReader) retrieve() (map[string][]decodedRes, error) {
 }
 
 func (r *TerraformStateReader) convertInstance(instance *states.ResourceInstanceObjectSrc, ty cty.Type) (*states.ResourceInstanceObject, error) {
+	// Drop unsupported attributes explicitly natively to guarantee decoding integrity
+	var raw map[string]interface{}
+	if err := json.Unmarshal(instance.AttrsJSON, &raw); err == nil && ty.IsObjectType() {
+		attrTypes := ty.AttributeTypes()
+		for k := range raw {
+			if _, ok := attrTypes[k]; !ok {
+				delete(raw, k)
+			}
+		}
+		if newBytes, err := json.Marshal(raw); err == nil {
+			instance.AttrsJSON = newBytes
+		}
+	}
+
 	inputType, err := ctyjson.ImpliedType(instance.AttrsJSON)
 	if err != nil {
 		return nil, err

@@ -1,3 +1,0 @@
-package azurerm
-
-const AzurePrivateDNSCNameRecordResourceType = "azurerm_private_dns_cname_record"

@@ -1,8 +1,0 @@
-blank_issues_enabled: false
-contact_links:
-  - name: '📝 Documentation'
-    url: https://github.com/snyk/driftctl-docs/issues/new
-    about: Please open documentation issue on driftctl docs repository
-  - name: '👾 Support chat'
-    url: https://discord.gg/NMCBxtD7Nd
-    about: Find support with community chat on discord
