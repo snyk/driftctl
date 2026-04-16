@@ -31,21 +31,21 @@ func NewRemoteAccessDeniedAlert(provider string, scanErr *remoteerror.ResourceSc
 	switch scanningPhase {
 	case EnumerationPhase:
 		message = fmt.Sprintf(
-			"An error occured listing %s: listing %s is forbidden: %s",
+			"An error occurred listing %s: listing %s is forbidden: %s",
 			scanErr.Resource(),
 			scanErr.ListedTypeError(),
 			scanErr.RootCause().Error(),
 		)
 	case DetailsFetchingPhase:
 		message = fmt.Sprintf(
-			"An error occured listing %s: reading details of %s is forbidden: %s",
+			"An error occurred listing %s: reading details of %s is forbidden: %s",
 			scanErr.Resource(),
 			scanErr.ListedTypeError(),
 			scanErr.RootCause().Error(),
 		)
 	default:
 		message = fmt.Sprintf(
-			"An error occured listing %s: %s",
+			"An error occurred listing %s: %s",
 			scanErr.Resource(),
 			scanErr.RootCause().Error(),
 		)
