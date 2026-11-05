@@ -219,6 +219,20 @@ func (p *TerraformProvider) Cleanup() {
 		logrus.WithFields(logrus.Fields{
 			"alias": alias,
 		}).Debug("Closing gRPC client")
-		client.Close()
+		done := make(chan struct{})
+		go func(c *plugin.GRPCProvider) {
+			c.Close()
+			close(done)
+		}(client)
+		select {
+		case <-done:
+			logrus.WithFields(logrus.Fields{
+				"alias": alias,
+			}).Debug("gRPC client closed")
+		case <-time.After(5 * time.Second):
+			logrus.WithFields(logrus.Fields{
+				"alias": alias,
+			}).Warn("gRPC client close timed out, forcing exit")
+		}
 	}
 }
