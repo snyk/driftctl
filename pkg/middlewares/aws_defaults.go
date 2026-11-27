@@ -41,6 +41,35 @@ func (m AwsDefaults) awsIamRoleDefaults(remoteResources []*resource.Resource) []
 	return resourcesToIgnore
 }
 
+func (m AwsDefaults) awsIamPolicyAttachmentDefaults(remoteResources []*resource.Resource) []*resource.Resource {
+	resourcesToIgnore := make([]*resource.Resource, 0)
+
+	for _, remoteResource := range remoteResources {
+		// Ignore all resources other than iam policy attachment
+		if remoteResource.ResourceType() != aws.AwsIamPolicyAttachmentResourceType {
+			continue
+		}
+
+		// NewIamPolicyAttachmentExpander ensures that each attachment resource has only one user, group, or role
+		if (remoteResource.Attrs.GetSlice("users") != nil) || (remoteResource.Attrs.GetSlice("groups") != nil) {
+			continue
+		}
+
+		roleId := remoteResource.Attrs.GetSlice("roles")[0]
+		for _, res := range remoteResources {
+			if res.ResourceType() == aws.AwsIamRoleResourceType && res.Id == roleId {
+				rolePath := res.Attributes().GetString("path")
+				if match := strings.HasPrefix(*rolePath, defaultIamRolePathPrefix); match {
+					resourcesToIgnore = append(resourcesToIgnore, remoteResource)
+				}
+				break
+			}
+		}
+	}
+
+	return resourcesToIgnore
+}
+
 func (m AwsDefaults) awsIamRolePolicyDefaults(remoteResources []*resource.Resource) []*resource.Resource {
 	resourcesToIgnore := make([]*resource.Resource, 0)
 
@@ -78,6 +107,7 @@ func (m AwsDefaults) Execute(remoteResources, resourcesFromState *[]*resource.Re
 	resourcesToIgnore := make([]*resource.Resource, 0)
 
 	resourcesToIgnore = append(resourcesToIgnore, m.awsIamRoleDefaults(*remoteResources)...)
+	resourcesToIgnore = append(resourcesToIgnore, m.awsIamPolicyAttachmentDefaults(*remoteResources)...)
 	resourcesToIgnore = append(resourcesToIgnore, m.awsIamRolePolicyDefaults(*remoteResources)...)
 
 	for _, res := range *remoteResources {
