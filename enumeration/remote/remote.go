@@ -9,6 +9,7 @@ import (
 	"github.com/snyk/driftctl/enumeration/remote/common"
 	"github.com/snyk/driftctl/enumeration/remote/github"
 	"github.com/snyk/driftctl/enumeration/remote/google"
+	"github.com/snyk/driftctl/enumeration/remote/scaleway"
 	"github.com/snyk/driftctl/enumeration/resource"
 	"github.com/snyk/driftctl/enumeration/terraform"
 )
@@ -18,6 +19,7 @@ var supportedRemotes = []string{
 	common.RemoteGithubTerraform,
 	common.RemoteGoogleTerraform,
 	common.RemoteAzureTerraform,
+	common.RemoteScalewayTerraform,
 }
 
 func IsSupported(remote string) bool {
@@ -39,6 +41,8 @@ func Activate(remote, version string, alerter alerter.AlerterInterface, provider
 		return google.Init(version, alerter, providerLibrary, remoteLibrary, progress, factory, configDir)
 	case common.RemoteAzureTerraform:
 		return azurerm.Init(version, alerter, providerLibrary, remoteLibrary, progress, factory, configDir)
+	case common.RemoteScalewayTerraform:
+		return scaleway.Init(version, alerter, providerLibrary, remoteLibrary, progress, factory, configDir)
 
 	default:
 		return errors.Errorf("unsupported remote '%s'", remote)
