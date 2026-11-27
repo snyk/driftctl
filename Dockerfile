@@ -9,12 +9,11 @@ RUN go mod download
 COPY . .
 RUN SINGLE_TARGET=true make release
 
-FROM alpine:3.21.2
+FROM gcr.io/distroless/static AS runner
 
 ARG OS="linux"
 ARG ARCH="amd64"
 
 WORKDIR /app
 COPY --from=builder /go/src/app/bin/driftctl_${OS}_${ARCH}/driftctl /bin/driftctl
-RUN chmod +x /bin/driftctl
 ENTRYPOINT ["/bin/driftctl"]
